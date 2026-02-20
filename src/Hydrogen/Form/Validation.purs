@@ -78,6 +78,10 @@ data ValidationResult
 
 derive instance eqValidationResult :: Eq ValidationResult
 
+instance showValidationResult :: Show ValidationResult where
+  show Valid = "Valid"
+  show (Invalid errs) = "(Invalid " <> show errs <> ")"
+
 instance semigroupValidationResult :: Semigroup ValidationResult where
   append Valid Valid = Valid
   append Valid (Invalid errs) = Invalid errs
