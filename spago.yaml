@@ -21,6 +21,12 @@ package:
     - numbers
     - foldable-traversable
     - transformers
+    - refs
+    - tuples
+    - ordered-collections
+    - datetime
+    - now
+    - newtype
     # HTTP
     - affjax
     - affjax-web

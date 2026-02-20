@@ -25,6 +25,7 @@
 -- | - **Hydrogen.Data.Format** - Number/byte/duration formatting
 -- | - **Hydrogen.SSG** - Static site generation
 -- | - **Hydrogen.HTML.Renderer** - Render Halogen HTML to strings
+-- | - **Hydrogen.Query** - Data fetching with caching and deduplication
 -- |
 -- | ## Related Packages
 -- |

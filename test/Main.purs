@@ -2,6 +2,7 @@ module Test.Main where
 
 import Prelude
 
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String as String
 import Effect (Effect)
@@ -11,6 +12,7 @@ import Halogen.HTML.Properties as HP
 import Hydrogen.HTML.Renderer (render, renderWith, defaultOptions)
 import Hydrogen.HTML.Renderer as Renderer
 import Hydrogen.Data.Format as Format
+import Hydrogen.Query as Q
 import Hydrogen.Router (normalizeTrailingSlash)
 import Hydrogen.SSG as SSG
 import Hydrogen.UI.Core as UI
@@ -31,6 +33,7 @@ main = launchAff_ $ runSpec [consoleReporter] do
     uiErrorTests
     ssgTests
     rendererTests
+    queryTests
 
 -- =============================================================================
 --                                                              // format tests
@@ -414,3 +417,50 @@ rendererTests = describe "HTML.Renderer" do
         , HH.p [] [ HH.text "Content with ", HH.strong [] [ HH.text "bold" ], HH.text " text." ]
         ])
         `shouldEqual` "<article class=\"post\"><h1>Title</h1><p>Content with <strong>bold</strong> text.</p></article>"
+
+-- =============================================================================
+--                                                             // query tests
+-- =============================================================================
+
+queryTests :: Spec Unit
+queryTests = describe "Query" do
+  describe "QueryResult" do
+    it "QueryIdle equals itself" do
+      (Q.QueryIdle :: Q.QueryResult Int) `shouldEqual` Q.QueryIdle
+    
+    it "QueryLoading equals itself" do
+      (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Q.QueryLoading
+    
+    it "QuerySuccess wraps data" do
+      Q.QuerySuccess 42 `shouldEqual` Q.QuerySuccess 42
+    
+    it "QueryError wraps error message" do
+      Q.QueryError "failed" Nothing `shouldEqual` (Q.QueryError "failed" Nothing :: Q.QueryResult Int)
+    
+    it "QueryRefetching has stale data" do
+      Q.QueryRefetching 42 `shouldEqual` Q.QueryRefetching 42
+
+  describe "defaultQueryOptions" do
+    it "creates options with key and fetch" do
+      let opts = Q.defaultQueryOptions ["user", "123"] (pure $ Right 42)
+      opts.key `shouldEqual` ["user", "123"]
+      opts.retry `shouldEqual` 0
+    
+    it "has sensible defaults" do
+      let opts = Q.defaultQueryOptions ["test"] (pure $ Right "data")
+      opts.staleTime `shouldEqual` Nothing
+      opts.retry `shouldEqual` 0
+
+  describe "PagedResult" do
+    it "PagedIdle equals itself" do
+      (Q.PagedIdle :: Q.PagedResult Int) `shouldEqual` Q.PagedIdle
+    
+    it "PagedLoading equals itself" do
+      (Q.PagedLoading :: Q.PagedResult Int) `shouldEqual` Q.PagedLoading
+    
+    it "PagedError wraps error" do
+      Q.PagedError "failed" `shouldEqual` (Q.PagedError "failed" :: Q.PagedResult Int)
+    
+    it "PagedSuccess tracks pages and hasNextPage" do
+      let result = Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
+      result `shouldEqual` Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
