@@ -1,0 +1,15 @@
+# Spago
+.spago/
+output/
+spago.lock
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
