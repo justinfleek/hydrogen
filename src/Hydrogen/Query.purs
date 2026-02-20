@@ -208,19 +208,22 @@ instance applyQueryResult :: Apply QueryResult where
   apply _ QueryIdle = QueryIdle
 
 -- | Applicative instance
+-- |
+-- | Use with `ado` syntax for combining independent queries:
+-- |
+-- | ```purescript
+-- | ado
+-- |   user <- userResult
+-- |   posts <- postsResult
+-- |   settings <- settingsResult
+-- |   in { user, posts, settings }
+-- | ```
+-- |
+-- | Note: No Monad instance. QueryResult is for combining independent
+-- | results, not sequential dependent computations. For dependent fetches,
+-- | use Aff directly.
 instance applicativeQueryResult :: Applicative QueryResult where
   pure = QuerySuccess
-
--- | Bind instance - monadic chaining
-instance bindQueryResult :: Bind QueryResult where
-  bind QueryIdle _ = QueryIdle
-  bind QueryLoading _ = QueryLoading
-  bind (QueryError e _) _ = QueryError e Nothing  -- Can't preserve stale data (type changes)
-  bind (QueryRefetching a) f = f a  -- Use stale data for chaining
-  bind (QuerySuccess a) f = f a
-
--- | Monad instance
-instance monadQueryResult :: Monad QueryResult
 
 -- ============================================================
 -- INTERNAL

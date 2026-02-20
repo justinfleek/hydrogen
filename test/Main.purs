@@ -487,6 +487,52 @@ queryTests = describe "Query" do
     
     it "combines Success values" do
       (pure (+) <*> Q.QuerySuccess 1 <*> Q.QuerySuccess 2) `shouldEqual` Q.QuerySuccess 3
+    
+    it "combines with ado syntax" do
+      let combined = ado
+            a <- Q.QuerySuccess 1
+            b <- Q.QuerySuccess 2
+            c <- Q.QuerySuccess 3
+            in a + b + c
+      combined `shouldEqual` Q.QuerySuccess 6
+    
+    it "propagates Loading in ado" do
+      let combined = ado
+            a <- Q.QuerySuccess 1
+            b <- Q.QueryLoading
+            c <- Q.QuerySuccess 3
+            in a + b + c
+      combined `shouldEqual` (Q.QueryLoading :: Q.QueryResult Int)
+    
+    it "propagates Error in ado" do
+      let combined = ado
+            a <- Q.QuerySuccess 1
+            b <- Q.QueryError "oops" Nothing
+            c <- Q.QuerySuccess 3
+            in a + b + c
+      combined `shouldEqual` Q.QueryError "oops" Nothing
+    
+    it "preserves Refetching state in ado" do
+      let combined = ado
+            a <- Q.QuerySuccess 1
+            b <- Q.QueryRefetching 2
+            in a + b
+      combined `shouldEqual` Q.QueryRefetching 3
+    
+    -- Applicative laws
+    it "identity law: pure id <*> v = v" do
+      let v = Q.QuerySuccess 42
+      (pure identity <*> v) `shouldEqual` v
+    
+    it "homomorphism: pure f <*> pure x = pure (f x)" do
+      let f = (_ + 1)
+      let x = 42
+      (pure f <*> pure x) `shouldEqual` (pure (f x) :: Q.QueryResult Int)
+    
+    it "interchange: u <*> pure y = pure ($ y) <*> u" do
+      let u = Q.QuerySuccess (_ + 1)
+      let y = 42
+      (u <*> pure y) `shouldEqual` (pure (_ $ y) <*> u)
 
   describe "QueryResult helpers" do
     it "getData extracts from Success" do
