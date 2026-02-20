@@ -47,6 +47,7 @@ package:
 
 ```purescript
 import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData as RD
 import Hydrogen.Router (class IsRoute, navigate)
 import Hydrogen.UI.Core (cls, row, column)
 import Hydrogen.UI.Loading (loadingState)
@@ -54,23 +55,26 @@ import Hydrogen.UI.Error (errorState)
 
 -- Data fetching with caching
 client <- Q.newClient
-result <- Q.query client
+state <- Q.query client
   { key: ["user", userId]
   , fetch: Api.getUser userId
   }
 
--- Combine multiple queries with ado
-dashboard <- pure $ ado
-  user <- userResult
-  posts <- postsResult
-  stats <- statsResult
-  in { user, posts, stats }
+-- state contains RemoteData + metadata
+-- state :: { data :: RemoteData String User, isStale :: Boolean, isFetching :: Boolean }
 
--- Render based on state
-render = Q.fold
-  { idle: mempty
-  , loading: \_ -> loadingState "Loading..."
-  , error: \e _ -> errorState e
+-- Combine multiple queries with ado (RemoteData is a lawful Monad!)
+let dashboard = ado
+      user <- userState.data
+      posts <- postsState.data
+      stats <- statsState.data
+      in { user, posts, stats }
+
+-- Render based on RemoteData
+render = RD.fold
+  { notAsked: mempty
+  , loading: loadingState "Loading..."
+  , failure: \e -> errorState e
   , success: renderDashboard
   }
   dashboard
@@ -81,6 +85,7 @@ render = Q.fold
 | Module | Description |
 |--------|-------------|
 | `Hydrogen.Query` | Data fetching, caching, pagination, batching |
+| `Hydrogen.Data.RemoteData` | Lawful Monad for async state (NotAsked/Loading/Failure/Success) |
 | `Hydrogen.Router` | Type-safe routing, navigation, link interception |
 | `Hydrogen.API.Client` | HTTP client with auth and JSON |
 | `Hydrogen.SSG` | Static site generation, meta tags |
@@ -102,15 +107,24 @@ render = Q.fold
 
 ### Lawful Algebra
 
-`QueryResult` is Applicative (not Monad) because the 5-state design enables
-stale-while-revalidate but breaks monad laws. Use `ado` syntax:
+`RemoteData` is a **lawful Monad** — use `do` or `ado` syntax freely:
 
 ```purescript
+-- Applicative (parallel semantics)
 ado
-  user <- userResult
-  posts <- postsResult
+  user <- userState.data
+  posts <- postsState.data
   in { user, posts }
+
+-- Monad (sequential semantics)  
+do
+  user <- userState.data
+  posts <- postsState.data
+  pure { user, posts }
 ```
+
+Query state is split into `RemoteData` (the data) + metadata (`isStale`, `isFetching`).
+This enables stale-while-revalidate UX while keeping the algebra lawful.
 
 ### Type-Safe by Default
 

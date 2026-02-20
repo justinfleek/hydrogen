@@ -12,7 +12,8 @@
 -- | import Hydrogen.UI.Loading (loadingState, spinnerMd)
 -- | import Hydrogen.UI.Error (errorState, emptyState)
 -- | import Hydrogen.Data.Format (formatBytes, formatDuration)
--- | import Data.RemoteData (RemoteData(..))
+-- | import Hydrogen.Data.RemoteData (RemoteData(..))
+-- | import Hydrogen.Query as Q
 -- | ```
 -- |
 -- | ## Modules
@@ -23,14 +24,10 @@
 -- | - **Hydrogen.UI.Loading** - Loading states and skeletons
 -- | - **Hydrogen.UI.Error** - Error and empty states
 -- | - **Hydrogen.Data.Format** - Number/byte/duration formatting
+-- | - **Hydrogen.Data.RemoteData** - RemoteData type for async state (lawful Monad)
 -- | - **Hydrogen.SSG** - Static site generation
 -- | - **Hydrogen.HTML.Renderer** - Render Halogen HTML to strings
--- | - **Hydrogen.Query** - Data fetching with caching and deduplication
--- |
--- | ## Related Packages
--- |
--- | - **straylight-remote-data** - RemoteData type for async state
--- | - **radix-halogen** - Accessible UI components
+-- | - **Hydrogen.Query** - Data fetching with caching, deduplication, and QueryState
 module Hydrogen
   ( module Hydrogen.Router
   , module Hydrogen.API.Client
@@ -38,6 +35,7 @@ module Hydrogen
   , module Hydrogen.UI.Loading
   , module Hydrogen.UI.Error
   , module Hydrogen.Data.Format
+  , module Hydrogen.Data.RemoteData
   , module Hydrogen.SSG
   , module Hydrogen.HTML.Renderer
   ) where
@@ -48,5 +46,6 @@ import Hydrogen.UI.Core (classes, cls, svgCls, flex, row, column, box, container
 import Hydrogen.UI.Loading (spinner, spinnerSm, spinnerMd, spinnerLg, loadingState, loadingInline, loadingCard, loadingCardLarge, skeletonText, skeletonRow)
 import Hydrogen.UI.Error (errorState, errorCard, errorBadge, errorInline, emptyState)
 import Hydrogen.Data.Format (formatBytes, formatBytesCompact, parseBytes, kb, mb, gb, tb, formatNum, formatNumCompact, formatPercent, formatCount, formatDuration, formatDurationCompact, formatDurationMs, percentage, rate, ratio)
+import Hydrogen.Data.RemoteData (RemoteData(..), fromEither, fromMaybe, toEither, toMaybe, fold, withDefault, isNotAsked, isLoading, isFailure, isSuccess, mapError, map2, map3, map4, sequence, traverse)
 import Hydrogen.SSG (DocConfig, defaultDocConfig, PageMeta, renderPage, renderDocument, pageMetaFromRoute, renderRouteStatic, metaTags, ogTags, twitterTags)
 import Hydrogen.HTML.Renderer (render, renderWith, RenderOptions, defaultOptions)

@@ -8,30 +8,80 @@ Inspired by TanStack Query, designed for PureScript/Halogen applications.
 
 ```purescript
 import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData as RD
 
 -- Create a query client (once, at app startup)
 client <- Q.newClient
 
 -- Fetch data with automatic caching
-result <- Q.query client
+state <- Q.query client
   { key: ["user", userId]
   , fetch: Api.getUser config userId
   }
 
--- Render based on result
-case result of
-  Q.QueryIdle -> mempty
-  Q.QueryLoading -> loadingSpinner
-  Q.QueryRefetching user -> renderUser user <> loadingBadge
-  Q.QueryError err mStale -> errorCard err (map renderUser mStale)
-  Q.QuerySuccess user -> renderUser user
+-- The state contains RemoteData + metadata
+-- state :: { data :: RemoteData String User, isStale :: Boolean, isFetching :: Boolean }
+
+-- Render based on the RemoteData
+case state.data of
+  RD.NotAsked -> mempty
+  RD.Loading -> loadingSpinner
+  RD.Failure err -> errorCard err
+  RD.Success user -> renderUser user
+
+-- Or use fold
+Q.foldData state
+  { notAsked: mempty
+  , loading: loadingSpinner
+  , failure: errorCard
+  , success: renderUser
+  }
+
+-- Show stale data with refresh indicator
+when (state.isFetching && Q.hasData state) $
+  renderWithRefreshing (Q.getData state)
 ```
+
+## Design
+
+Query state is split into two concerns:
+
+1. **RemoteData e a** — The core data state (NotAsked, Loading, Failure, Success).
+   This is a **lawful Monad**, so you can use `do` notation and all standard combinators.
+
+2. **QueryState e a** — A record with metadata:
+   ```purescript
+   type QueryState e a =
+     { data :: RemoteData e a
+     , isStale :: Boolean      -- Data exists but may be outdated
+     , isFetching :: Boolean   -- Currently fetching (initial or refetch)
+     }
+   ```
+
+This design mirrors TanStack Query where `data` and `isFetching` are separate.
+You can show stale data while a background refetch is in progress.
+
+### Why This Design?
+
+Previous versions used a 5-state `QueryResult` type that tried to encode staleness
+in the sum type itself (`QueryRefetching a`, `QueryError e (Maybe a)`). This broke
+the Monad laws:
+
+```purescript
+-- Monad right-identity law: m >>= pure ≡ m
+QueryRefetching 42 >>= pure = QuerySuccess 42 ≠ QueryRefetching 42  -- BROKEN!
+```
+
+By using the lawful 4-state `RemoteData` + separate metadata, we get:
+- **Full Monad instance** — use `do` notation freely
+- **Better composability** — combine queries with standard operators
+- **Clear separation** — data state vs. fetch state
 
 ## Core Concepts
 
 ### Query Keys
 
-Every query has a key - an array of strings that uniquely identifies it:
+Every query has a key — an array of strings that uniquely identifies it:
 
 ```purescript
 ["user", "123"]           -- User with ID 123
@@ -45,28 +95,34 @@ Keys are used for:
 - **Deduplication**: Concurrent requests to same key share one fetch
 - **Invalidation**: Invalidate by prefix (`["user"]` invalidates all user queries)
 
-### QueryResult States
+### RemoteData States
 
 ```
-QueryIdle         -- No request made yet
+NotAsked      -- No request made yet
     │
     ▼
-QueryLoading      -- First fetch in progress
+Loading       -- Fetch in progress
     │
-    ├──▶ QuerySuccess a        -- Fetch succeeded
-    │         │
-    │         ▼
-    │    QueryRefetching a     -- Refetching with stale data shown
-    │         │
-    │         ├──▶ QuerySuccess a    -- New data arrived
-    │         │
-    │         └──▶ QueryError e (Just a)  -- Failed, but have stale
+    ├──▶ Success a    -- Fetch succeeded
     │
-    └──▶ QueryError e Nothing  -- First fetch failed
+    └──▶ Failure e    -- Fetch failed
 ```
 
-The key insight: **QueryRefetching** and **QueryError with stale data** let you show
-*something* to the user while fetching, rather than a loading spinner.
+### QueryState Metadata
+
+In addition to the `RemoteData` in `state.data`, QueryState tracks:
+
+- `isStale: Boolean` — Data exists but is past its stale time
+- `isFetching: Boolean` — A fetch is currently in progress
+
+This allows patterns like:
+
+```purescript
+-- Show stale data with a "refreshing" indicator
+if state.isFetching && Q.hasData state
+  then renderData (Q.getData state) <> refreshingBadge
+  else case state.data of ...
+```
 
 ## Basic Usage
 
@@ -91,7 +147,7 @@ main = do
 ### Simple Query
 
 ```purescript
-fetchUser :: Q.QueryClient -> String -> Aff (Q.QueryResult User)
+fetchUser :: Q.QueryClient -> String -> Aff (Q.QueryState String User)
 fetchUser client userId = Q.query client
   { key: ["user", userId]
   , fetch: Api.getUser config userId
@@ -105,7 +161,7 @@ fetchUser client userId = Q.query client
 
 ```purescript
 -- Only fetch if we have a userId
-result <- Q.queryWith client opts { enabled: userId /= "" }
+state <- Q.queryWith client opts { enabled: userId /= "" }
 ```
 
 ### Prefetching
@@ -163,46 +219,54 @@ case mUser of
 
 ## Combining Queries
 
-QueryResult is **Applicative** (but not Monad - see [Why No Monad?](#why-no-monad)).
+Because `RemoteData` is a **lawful Monad**, you can combine queries naturally:
 
-Use `ado` syntax to combine independent queries:
+### Using ado (Applicative — parallel semantics)
 
 ```purescript
-import Prelude
-
-renderDashboard :: Aff (Q.QueryResult DashboardData)
+renderDashboard :: Aff (RemoteData String DashboardData)
 renderDashboard = do
-  userResult <- Q.query client userOpts
-  postsResult <- Q.query client postsOpts
-  statsResult <- Q.query client statsOpts
+  userState <- Q.query client userOpts
+  postsState <- Q.query client postsOpts
+  statsState <- Q.query client statsOpts
   
-  -- Combine with ado
+  -- Extract RemoteData and combine with ado
   pure $ ado
-    user <- userResult
-    posts <- postsResult
-    stats <- statsResult
+    user <- userState.data
+    posts <- postsState.data
+    stats <- statsState.data
     in { user, posts, stats }
 ```
 
-Or with applicative operators:
+### Using do (Monad — sequential semantics)
 
 ```purescript
-mkDashboard <$> userResult <*> postsResult <*> statsResult
+-- Dependent fetches in RemoteData
+let result :: RemoteData String Dashboard
+    result = do
+      user <- userState.data
+      posts <- postsState.data
+      pure $ makeDashboard user posts
+```
+
+### Using applicative operators
+
+```purescript
+mkDashboard <$> userState.data <*> postsState.data <*> statsState.data
   where
   mkDashboard user posts stats = { user, posts, stats }
 ```
 
 ### State Propagation
 
-When combining results:
+When combining RemoteData values:
 
 | Combined states | Result |
 |-----------------|--------|
 | All `Success` | `Success` |
-| Any `Error` | `Error` (first one wins) |
-| Any `Loading` (no errors) | `Loading` |
-| Any `Idle` (no errors/loading) | `Idle` |
-| Mix of `Success`/`Refetching` | `Refetching` |
+| Any `Failure` | `Failure` (first one wins) |
+| Any `Loading` (no failures) | `Loading` |
+| Any `NotAsked` (no failures/loading) | `NotAsked` |
 
 ## Pagination
 
@@ -217,17 +281,14 @@ pagedOpts =
   }
 
 -- Initial fetch
-result <- Q.queryPaged client pagedOpts
+state <- Q.queryPaged client pagedOpts
 
 -- Load more
-result' <- Q.fetchNextPage client pagedOpts result
+state' <- Q.fetchNextPage client pagedOpts state
 
 -- Check if more available
-case result' of
-  Q.PagedSuccess { pages, hasNextPage } ->
-    if hasNextPage
-      then showLoadMoreButton
-      else mempty
+case state'.data of
+  RD.Success pages | state'.hasNextPage -> showLoadMoreButton
   _ -> mempty
 ```
 
@@ -252,95 +313,98 @@ results <- Q.loadMany userBatcher ["user-1", "user-2", "user-3"]
 
 ## Helper Functions
 
-### Extracting Data
+### Extracting Data from QueryState
 
 ```purescript
-Q.getData result       -- Maybe a (from Success, Refetching, or stale in Error)
-Q.getError result      -- Maybe String
-Q.withDefault [] result  -- Use default if no data
+Q.getData state        -- Maybe a (from Success only)
+Q.getError state       -- Maybe e (from Failure only)
+Q.hasData state        -- Boolean
+Q.withDefaultData [] state  -- Use default if no data
 ```
 
-### Predicates
+### Pattern Matching with foldData
 
 ```purescript
-Q.isLoading result   -- True for Loading or Refetching
-Q.isSuccess result   -- True for Success only
-Q.isError result     -- True for Error
-```
-
-### Pattern Matching with fold
-
-```purescript
-Q.fold
-  { idle: HH.text "Click to load"
-  , loading: \mStale -> case mStale of
-      Nothing -> loadingSpinner
-      Just data -> renderData data <> loadingBadge
-  , error: \msg mStale -> 
-      errorCard msg <> maybe mempty renderData mStale
-  , success: renderData
+Q.foldData
+  { notAsked: HH.text "Click to load"
+  , loading: loadingSpinner
+  , failure: \e -> errorCard e
+  , success: \a -> renderData a
   }
-  result
+  state
 ```
 
-## Why No Monad?
-
-QueryResult has 5 states, not 4. The extra states (`QueryRefetching a`, `QueryError e (Maybe a)`)
-carry "stale data" which enables stale-while-revalidate UX.
-
-But this breaks the Monad laws. Specifically, right-identity:
+### Handling Stale-While-Revalidate
 
 ```purescript
--- Monad law: m >>= pure ≡ m
--- But:
-QueryRefetching 42 >>= pure
-= pure 42
-= QuerySuccess 42
-≠ QueryRefetching 42  -- Law violated!
+renderQuery :: forall a. Q.QueryState String a -> (a -> HTML) -> HTML
+renderQuery state render =
+  if state.isFetching && Q.hasData state
+    -- Show stale data with loading indicator
+    then HH.div_
+      [ maybe mempty render (Q.getData state)
+      , refreshingBadge
+      ]
+    -- Normal render
+    else Q.foldData
+      { notAsked: mempty
+      , loading: loadingSpinner
+      , failure: errorCard
+      , success: render
+      }
+      state
 ```
 
-So we provide **Applicative only**. This is actually fine because:
+## RemoteData Directly
 
-1. **Applicative handles combining**: `ado` syntax works for N independent queries
-2. **Dependent fetches use Aff**: If query B needs result of query A, that's `Aff` Monad, not `QueryResult`
+The `Hydrogen.Data.RemoteData` module is re-exported from `Hydrogen.Query`.
+You can also import it directly:
 
 ```purescript
--- Dependent fetches happen in Aff, not QueryResult
-fetchUserAndPosts :: Aff (Q.QueryResult { user :: User, posts :: Array Post })
-fetchUserAndPosts = do
-  userResult <- Q.query client userOpts
-  case Q.getData userResult of
-    Nothing -> pure userResult $> { user: _, posts: [] }  -- Can't continue
-    Just user -> do
-      postsResult <- Q.query client (postsOpts user.id)
-      pure $ { user: _, posts: _ } <$> userResult <*> postsResult
+import Hydrogen.Data.RemoteData (RemoteData(..))
+import Hydrogen.Data.RemoteData as RD
+
+-- Construction
+RD.fromEither (Right 42)  -- Success 42
+RD.fromEither (Left "err")  -- Failure "err"
+
+-- Predicates
+RD.isSuccess (Success 42)  -- true
+RD.isLoading Loading       -- true
+
+-- Elimination
+RD.fold
+  { notAsked: "..."
+  , loading: "..."
+  , failure: \e -> "..."
+  , success: \a -> "..."
+  }
+  remoteData
+
+RD.withDefault 0 (Success 42)  -- 42
+RD.withDefault 0 Loading       -- 0
+
+-- Combining
+RD.map2 (+) (Success 1) (Success 2)  -- Success 3
+RD.map3 f ra rb rc
+RD.map4 f ra rb rc rd
+RD.sequence [Success 1, Success 2]   -- Success [1, 2]
 ```
 
-## Integration with RemoteData
+## Migration from QueryResult
 
-If you're using RemoteData elsewhere, convert at boundaries:
+If you were using the old 5-state `QueryResult`, here's how to migrate:
 
-```purescript
--- QueryResult → RemoteData-style record
-Q.toRemoteData result
--- { notAsked :: Boolean, loading :: Boolean, error :: Maybe String, data :: Maybe a }
+| Old (QueryResult) | New (QueryState + RemoteData) |
+|-------------------|-------------------------------|
+| `QueryIdle` | `state.data == NotAsked` |
+| `QueryLoading` | `state.data == Loading` |
+| `QuerySuccess a` | `state.data == Success a` |
+| `QueryError e Nothing` | `state.data == Failure e` |
+| `QueryRefetching a` | `state.data == Success a` + `state.isFetching == true` |
+| `QueryError e (Just a)` | `state.data == Success a` + `state.isStale == true` |
 
--- Either → QueryResult
-Q.fromRemoteData (Right user)  -- QuerySuccess user
-Q.fromRemoteData (Left err)    -- QueryError err Nothing
-```
-
-For full RemoteData compatibility, pattern match:
-
-```purescript
-queryResultToRemoteData :: forall a. Q.QueryResult a -> RemoteData String a
-queryResultToRemoteData = case _ of
-  Q.QueryIdle -> NotAsked
-  Q.QueryLoading -> Loading
-  Q.QueryRefetching _ -> Loading  -- Loses stale data
-  Q.QueryError e _ -> Failure e   -- Loses stale data
-  Q.QuerySuccess a -> Success a
-```
-
-Note: Converting loses stale-while-revalidate information. Consider whether you
-actually need the conversion, or if `Q.fold` is sufficient.
+Key changes:
+- Extract `.data` to get the `RemoteData` for Monad operations
+- Check `isFetching` and `isStale` separately for UI state
+- Use `foldData` instead of `fold` (same signature, works on QueryState)

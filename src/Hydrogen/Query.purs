@@ -2,41 +2,94 @@
 -- |
 -- | Inspired by TanStack Query, designed to work with zeitschrift-generated clients.
 -- |
+-- | ## Design
+-- |
+-- | Query state is split into two concerns:
+-- |
+-- | 1. **RemoteData e a** - The core data state (NotAsked, Loading, Failure, Success)
+-- |    This is a lawful Monad, so you can use `do` notation and all standard combinators.
+-- |
+-- | 2. **QueryState e a** - Record with metadata:
+-- |    ```purescript
+-- |    { data :: RemoteData e a
+-- |    , isStale :: Boolean      -- Data exists but may be outdated
+-- |    , isFetching :: Boolean   -- Currently fetching (initial or refetch)
+-- |    }
+-- |    ```
+-- |
+-- | This design mirrors TanStack Query where `data` and `isFetching` are separate.
+-- | You can show stale data while a background refetch is in progress.
+-- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Query as Q
+-- | import Hydrogen.Data.RemoteData as RD
 -- | 
 -- | -- Create a query client (typically in your main)
 -- | client <- Q.newClient Q.defaultClientOptions
 -- | 
 -- | -- Fetch data with caching
--- | result <- Q.query client
+-- | state <- Q.query client
 -- |   { key: ["user", userId]
 -- |   , fetch: Api.getUser config userId
 -- |   }
+-- | 
+-- | -- Use the RemoteData for rendering
+-- | case state.data of
+-- |   RD.NotAsked -> HH.text "Not loaded"
+-- |   RD.Loading -> spinner
+-- |   RD.Failure e -> errorCard e
+-- |   RD.Success user -> userCard user
+-- |
+-- | -- Or use fold
+-- | Q.foldData state
+-- |   { notAsked: HH.text "Click to load"
+-- |   , loading: spinner
+-- |   , failure: \e -> errorCard e
+-- |   , success: \user -> userCard user
+-- |   }
+-- |
+-- | -- Show stale data with loading indicator
+-- | if state.isFetching && Q.hasData state
+-- |   then showWithSpinner (Q.getData state)
+-- |   else normalRender state.data
 -- | 
 -- | -- Invalidate cache after mutation
 -- | Q.invalidate client ["user", userId]
 -- | ```
 -- |
--- | ## Design
+-- | ## Combining Queries with RemoteData
 -- |
--- | The cache stores `Json` values, so any type with `EncodeJson`/`DecodeJson`
--- | instances can be cached. This matches zeitschrift-generated types which
--- | always derive Argonaut instances.
+-- | Because RemoteData is a lawful Monad, you can combine queries naturally:
+-- |
+-- | ```purescript
+-- | -- Using ado syntax (Applicative - parallel semantics)
+-- | let combined = ado
+-- |       user <- userState.data
+-- |       posts <- postsState.data
+-- |       in { user, posts }
+-- |
+-- | -- Using do syntax (Monad - sequential semantics)
+-- | let dependent = do
+-- |       user <- userState.data
+-- |       posts <- postsState.data
+-- |       pure $ renderUserWithPosts user posts
+-- | ```
 module Hydrogen.Query
   ( -- * Client
     QueryClient
   , ClientOptions
   , defaultClientOptions
   , newClient
+  , newClientWith
   
     -- * Query types
   , QueryKey
   , QueryOptions
   , defaultQueryOptions
-  , QueryResult(..)
+  , QueryState
+  , initialQueryState
   
     -- * Query operations
   , query
@@ -54,7 +107,8 @@ module Hydrogen.Query
     -- * Pagination
   , PageParam
   , PagedQueryOptions
-  , PagedResult(..)
+  , PagedState
+  , initialPagedState
   , queryPaged
   , fetchNextPage
   
@@ -65,16 +119,15 @@ module Hydrogen.Query
   , load
   , loadMany
   
-    -- * RemoteData-style API
-  , toRemoteData
-  , fromRemoteData
+    -- * QueryState helpers
   , getData
   , getError
-  , isLoading
-  , isSuccess
-  , isError
-  , fold
-  , withDefault
+  , hasData
+  , foldData
+  , withDefaultData
+  
+    -- * Re-exports from RemoteData
+  , module Hydrogen.Data.RemoteData
   ) where
 
 import Prelude
@@ -84,7 +137,7 @@ import Data.Array as Array
 import Data.DateTime.Instant (Instant, unInstant)
 import Data.Either (Either(..), hush)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.Newtype (unwrap)
 import Data.String as String
 import Data.Time.Duration (Milliseconds(..))
@@ -95,10 +148,12 @@ import Effect.Class (liftEffect)
 import Effect.Now (now)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.Data.RemoteData (RemoteData(..))
+import Hydrogen.Data.RemoteData (RemoteData(..), fromEither, toMaybe, isSuccess, isLoading, isFailure, isNotAsked, mapError, map2, map3, map4) as Hydrogen.Data.RemoteData
 
--- ============================================================
--- CLIENT
--- ============================================================
+-- =============================================================================
+--                                                                     // client
+-- =============================================================================
 
 -- | Opaque query client that manages cache and in-flight requests.
 newtype QueryClient = QueryClient
@@ -126,7 +181,7 @@ defaultClientOptions =
   , cacheTime: Milliseconds 300000.0
   }
 
--- | Create a new query client.
+-- | Create a new query client with default options.
 newClient :: Effect QueryClient
 newClient = newClientWith defaultClientOptions
 
@@ -137,9 +192,9 @@ newClientWith options = do
   inFlight <- Ref.new Map.empty
   pure $ QueryClient { cache, inFlight, options }
 
--- ============================================================
--- QUERY TYPES
--- ============================================================
+-- =============================================================================
+--                                                                // query types
+-- =============================================================================
 
 -- | Query key - identifies a unique query.
 -- | Convention: ["resource", "id"] or ["resource", "list", "filter:value"]
@@ -169,65 +224,35 @@ defaultQueryOptions key fetch =
   , retryDelay: Milliseconds 1000.0
   }
 
--- | Query result with all metadata.
-data QueryResult a
-  = QueryIdle
-  | QueryLoading
-  | QueryRefetching a  -- Has stale data, fetching fresh
-  | QueryError String (Maybe a)  -- Error with optional stale data
-  | QuerySuccess a
-
-derive instance eqQueryResult :: Eq a => Eq (QueryResult a)
-
-instance showQueryResult :: Show a => Show (QueryResult a) where
-  show QueryIdle = "QueryIdle"
-  show QueryLoading = "QueryLoading"
-  show (QueryRefetching a) = "QueryRefetching(" <> show a <> ")"
-  show (QueryError e ma) = "QueryError(" <> e <> ", " <> show ma <> ")"
-  show (QuerySuccess a) = "QuerySuccess(" <> show a <> ")"
-
--- | Functor instance - map over success/refetching/stale data
-instance functorQueryResult :: Functor QueryResult where
-  map _ QueryIdle = QueryIdle
-  map _ QueryLoading = QueryLoading
-  map f (QueryRefetching a) = QueryRefetching (f a)
-  map f (QueryError e ma) = QueryError e (map f ma)
-  map f (QuerySuccess a) = QuerySuccess (f a)
-
--- | Apply instance - combine results (first error wins)
-instance applyQueryResult :: Apply QueryResult where
-  apply (QuerySuccess f) (QuerySuccess a) = QuerySuccess (f a)
-  apply (QuerySuccess f) (QueryRefetching a) = QueryRefetching (f a)
-  apply (QueryRefetching f) (QuerySuccess a) = QueryRefetching (f a)
-  apply (QueryRefetching f) (QueryRefetching a) = QueryRefetching (f a)
-  apply (QueryError e _) _ = QueryError e Nothing
-  apply _ (QueryError e _) = QueryError e Nothing
-  apply QueryLoading _ = QueryLoading
-  apply _ QueryLoading = QueryLoading
-  apply QueryIdle _ = QueryIdle
-  apply _ QueryIdle = QueryIdle
-
--- | Applicative instance
+-- | Query state with RemoteData plus metadata.
 -- |
--- | Use with `ado` syntax for combining independent queries:
+-- | The `data` field contains the core RemoteData (lawful Monad).
+-- | The metadata fields track additional state:
 -- |
--- | ```purescript
--- | ado
--- |   user <- userResult
--- |   posts <- postsResult
--- |   settings <- settingsResult
--- |   in { user, posts, settings }
--- | ```
+-- | - `isStale`: Data exists but may be outdated (triggers background refetch)
+-- | - `isFetching`: A fetch is currently in progress (initial or refetch)
 -- |
--- | Note: No Monad instance. QueryResult is for combining independent
--- | results, not sequential dependent computations. For dependent fetches,
--- | use Aff directly.
-instance applicativeQueryResult :: Applicative QueryResult where
-  pure = QuerySuccess
+-- | This separation allows you to:
+-- | 1. Use RemoteData's Monad instance for combining queries
+-- | 2. Show stale data while refetching in the background
+-- | 3. Distinguish between "loading for first time" vs "refreshing"
+type QueryState e a =
+  { data :: RemoteData e a
+  , isStale :: Boolean
+  , isFetching :: Boolean
+  }
 
--- ============================================================
--- INTERNAL
--- ============================================================
+-- | Initial query state (not asked, not fetching).
+initialQueryState :: forall e a. QueryState e a
+initialQueryState =
+  { data: NotAsked
+  , isStale: false
+  , isFetching: false
+  }
+
+-- =============================================================================
+--                                                                   // internal
+-- =============================================================================
 
 type CacheEntry =
   { json :: Json
@@ -238,15 +263,15 @@ type CacheEntry =
 keyToString :: QueryKey -> String
 keyToString = String.joinWith ":"
 
-isStale :: CacheEntry -> Instant -> Boolean
-isStale entry currentTime = 
+isEntryStale :: CacheEntry -> Instant -> Boolean
+isEntryStale entry currentTime = 
   toMs currentTime > toMs entry.staleAt
   where
   toMs instant = unwrap (unInstant instant)
 
--- ============================================================
--- QUERY OPERATIONS
--- ============================================================
+-- =============================================================================
+--                                                            // query operations
+-- =============================================================================
 
 -- | Execute a query with caching and deduplication.
 -- |
@@ -259,14 +284,14 @@ query
   => EncodeJson a
   => QueryClient 
   -> QueryOptions a 
-  -> Aff (QueryResult a)
+  -> Aff (QueryState String a)
 query client opts = queryWith client opts { enabled: true }
 
 -- | Execute a query with an enabled flag.
 -- |
 -- | Useful for conditional fetching:
 -- | ```purescript
--- | result <- Q.queryWith client opts { enabled: userId /= "" }
+-- | state <- Q.queryWith client opts { enabled: userId /= "" }
 -- | ```
 queryWith 
   :: forall a
@@ -275,8 +300,8 @@ queryWith
   => QueryClient 
   -> QueryOptions a
   -> { enabled :: Boolean }
-  -> Aff (QueryResult a)
-queryWith _ _ { enabled: false } = pure QueryIdle
+  -> Aff (QueryState String a)
+queryWith _ _ { enabled: false } = pure initialQueryState
 queryWith client@(QueryClient c) opts _ = do
   let cacheKey = keyToString opts.key
   
@@ -286,22 +311,22 @@ queryWith client@(QueryClient c) opts _ = do
   
   case cachedEntry of
     -- Fresh cache hit
-    Just entry | not (isStale entry currentTime) -> 
+    Just entry | not (isEntryStale entry currentTime) -> 
       case decodeJson entry.json of
-        Right a -> pure $ QuerySuccess a
-        Left _ -> fetchFresh client opts  -- Cache corrupted, refetch
+        Right a -> pure
+          { data: Success a
+          , isStale: false
+          , isFetching: false
+          }
+        Left _ -> fetchFresh client opts Nothing  -- Cache corrupted, refetch
     
     -- Stale cache - return stale data + refetch
     Just entry -> do
       let staleData = hush $ decodeJson entry.json
-      result <- fetchFresh client opts
-      case result of
-        QuerySuccess a -> pure $ QuerySuccess a
-        QueryError e _ -> pure $ QueryError e staleData
-        _ -> pure $ fromMaybe QueryLoading (QueryRefetching <$> staleData)
+      fetchFresh client opts staleData
     
     -- No cache
-    Nothing -> fetchFresh client opts
+    Nothing -> fetchFresh client opts Nothing
 
 -- | Fetch fresh data, handling deduplication and retries.
 fetchFresh 
@@ -309,9 +334,10 @@ fetchFresh
    . DecodeJson a 
   => EncodeJson a
   => QueryClient 
-  -> QueryOptions a 
-  -> Aff (QueryResult a)
-fetchFresh (QueryClient c) opts = do
+  -> QueryOptions a
+  -> Maybe a  -- Stale data to preserve
+  -> Aff (QueryState String a)
+fetchFresh (QueryClient c) opts staleData = do
   let cacheKey = keyToString opts.key
   
   -- Check for in-flight request
@@ -341,12 +367,35 @@ fetchFresh (QueryClient c) opts = do
       
       pure result
   
-  -- Decode and return
+  -- Build QueryState from result
   pure $ case jsonResult of
-    Left err -> QueryError err Nothing
-    Right json -> case decodeJson json of
-      Left err -> QueryError (show err) Nothing
-      Right a -> QuerySuccess a
+    Left err -> 
+      -- On error, preserve stale data if available
+      case staleData of
+        Just a ->
+          { data: Success a  -- Keep showing stale data
+          , isStale: true
+          , isFetching: false
+          -- Note: We could also expose the error separately
+          -- For now, stale data + isStale=true signals this state
+          }
+        Nothing ->
+          { data: Failure err
+          , isStale: false
+          , isFetching: false
+          }
+    Right json -> 
+      case decodeJson json of
+        Left err ->
+          { data: Failure (show err)
+          , isStale: false
+          , isFetching: false
+          }
+        Right a ->
+          { data: Success a
+          , isStale: false
+          , isFetching: false
+          }
 
 -- | Fetch with retry logic.
 fetchWithRetry 
@@ -413,9 +462,9 @@ setQueryData (QueryClient c) key value = do
         }
   Ref.modify_ (Map.insert (keyToString key) entry) c.cache
 
--- ============================================================
--- CACHE INVALIDATION
--- ============================================================
+-- =============================================================================
+--                                                          // cache invalidation
+-- =============================================================================
 
 -- | Invalidate all queries matching a key prefix.
 -- |
@@ -454,9 +503,9 @@ removeQuery :: QueryClient -> QueryKey -> Effect Unit
 removeQuery (QueryClient c) key = 
   Ref.modify_ (Map.delete (keyToString key)) c.cache
 
--- ============================================================
--- PAGINATION
--- ============================================================
+-- =============================================================================
+--                                                                 // pagination
+-- =============================================================================
 
 -- | Page parameter for cursor-based pagination.
 type PageParam = Maybe String
@@ -468,24 +517,24 @@ type PagedQueryOptions a =
   , getNextPageParam :: a -> PageParam
   }
 
--- | Result of a paginated query.
-data PagedResult a
-  = PagedIdle
-  | PagedLoading
-  | PagedError String
-  | PagedSuccess
-      { pages :: Array a
-      , hasNextPage :: Boolean
-      }
+-- | State for paginated queries.
+type PagedState e a =
+  { data :: RemoteData e (Array a)
+  , pages :: Array a
+  , hasNextPage :: Boolean
+  , isFetching :: Boolean
+  , isFetchingNextPage :: Boolean
+  }
 
-derive instance eqPagedResult :: Eq a => Eq (PagedResult a)
-
-instance showPagedResult :: Show a => Show (PagedResult a) where
-  show PagedIdle = "PagedIdle"
-  show PagedLoading = "PagedLoading"
-  show (PagedError e) = "PagedError(" <> e <> ")"
-  show (PagedSuccess { pages, hasNextPage }) = 
-    "PagedSuccess({ pages: " <> show pages <> ", hasNextPage: " <> show hasNextPage <> " })"
+-- | Initial paged state.
+initialPagedState :: forall e a. PagedState e a
+initialPagedState =
+  { data: NotAsked
+  , pages: []
+  , hasNextPage: false
+  , isFetching: false
+  , isFetchingNextPage: false
+  }
 
 -- | Execute a paginated query.
 queryPaged 
@@ -494,14 +543,23 @@ queryPaged
   => EncodeJson a
   => QueryClient 
   -> PagedQueryOptions a 
-  -> Aff (PagedResult a)
+  -> Aff (PagedState String a)
 queryPaged _client opts = do
   result <- opts.fetch Nothing
   pure $ case result of
-    Left err -> PagedError err
-    Right a -> PagedSuccess 
-      { pages: [a]
+    Left err ->
+      { data: Failure err
+      , pages: []
+      , hasNextPage: false
+      , isFetching: false
+      , isFetchingNextPage: false
+      }
+    Right a ->
+      { data: Success [a]
+      , pages: [a]
       , hasNextPage: opts.getNextPageParam a /= Nothing
+      , isFetching: false
+      , isFetchingNextPage: false
       }
 
 -- | Fetch the next page.
@@ -511,26 +569,30 @@ fetchNextPage
   => EncodeJson a
   => QueryClient 
   -> PagedQueryOptions a
-  -> PagedResult a  -- Current state
-  -> Aff (PagedResult a)
-fetchNextPage _client opts (PagedSuccess { pages }) = do
-  let lastPage = Array.last pages
+  -> PagedState String a
+  -> Aff (PagedState String a)
+fetchNextPage _client opts state = do
+  let lastPage = Array.last state.pages
   let nextCursor = lastPage >>= opts.getNextPageParam
   case nextCursor of
-    Nothing -> pure $ PagedSuccess { pages, hasNextPage: false }
+    Nothing -> pure state { hasNextPage = false }
     Just cursor -> do
       result <- opts.fetch (Just cursor)
       pure $ case result of
-        Left err -> PagedError err
-        Right newPage -> PagedSuccess
-          { pages: pages <> [newPage]
-          , hasNextPage: opts.getNextPageParam newPage /= Nothing
-          }
-fetchNextPage _ _ state = pure state
+        Left err ->
+          state { data = Failure err, isFetchingNextPage = false }
+        Right newPage ->
+          let newPages = state.pages <> [newPage]
+          in state
+            { data = Success newPages
+            , pages = newPages
+            , hasNextPage = opts.getNextPageParam newPage /= Nothing
+            , isFetchingNextPage = false
+            }
 
--- ============================================================
--- BATCHING (DataLoader pattern)
--- ============================================================
+-- =============================================================================
+--                                                    // batching (DataLoader)
+-- =============================================================================
 
 -- | Options for a batcher.
 type BatchOptions k v =
@@ -568,105 +630,61 @@ loadMany (Batcher b) keys = do
   results <- b.options.batchFn keys
   pure $ Map.fromFoldable results
 
--- ============================================================
--- HELPERS
--- ============================================================
+-- =============================================================================
+--                                                                    // helpers
+-- =============================================================================
 
 -- | Add milliseconds to an instant (simplified - loses precision).
 addMs :: Instant -> Milliseconds -> Instant
 addMs instant (Milliseconds _) = instant  -- TODO: proper impl needs purescript-datetime
 
--- ============================================================
--- REMOTEDATA-STYLE API
--- ============================================================
+-- =============================================================================
+--                                                          // QueryState helpers
+-- =============================================================================
 
--- | Convert QueryResult to a simpler 4-state representation.
--- |
--- | This loses the "refetching with stale data" distinction:
--- | - QueryRefetching becomes the stale data (Success)
--- | - QueryError with stale data becomes Error (loses the stale data)
--- |
--- | For full fidelity, pattern match on QueryResult directly.
-toRemoteData 
-  :: forall a
-   . QueryResult a 
-  -> { notAsked :: Boolean
-     , loading :: Boolean  
-     , error :: Maybe String
-     , data :: Maybe a
-     }
-toRemoteData = case _ of
-  QueryIdle -> { notAsked: true, loading: false, error: Nothing, data: Nothing }
-  QueryLoading -> { notAsked: false, loading: true, error: Nothing, data: Nothing }
-  QueryRefetching a -> { notAsked: false, loading: true, error: Nothing, data: Just a }
-  QueryError e ma -> { notAsked: false, loading: false, error: Just e, data: ma }
-  QuerySuccess a -> { notAsked: false, loading: false, error: Nothing, data: Just a }
+-- | Get the data from a QueryState if available.
+getData :: forall e a. QueryState e a -> Maybe a
+getData state = case state.data of
+  Success a -> Just a
+  _ -> Nothing
 
--- | Create a QueryResult from Either (for wrapping API responses).
-fromRemoteData :: forall a. Either String a -> QueryResult a
-fromRemoteData (Left e) = QueryError e Nothing
-fromRemoteData (Right a) = QuerySuccess a
+-- | Get the error from a QueryState if in failure state.
+getError :: forall e a. QueryState e a -> Maybe e
+getError state = case state.data of
+  Failure e -> Just e
+  _ -> Nothing
 
--- | Get the data if available (Success, Refetching, or stale in Error).
-getData :: forall a. QueryResult a -> Maybe a
-getData QueryIdle = Nothing
-getData QueryLoading = Nothing
-getData (QueryRefetching a) = Just a
-getData (QueryError _ ma) = ma
-getData (QuerySuccess a) = Just a
+-- | Check if QueryState has data (Success or stale data preserved).
+hasData :: forall e a. QueryState e a -> Boolean
+hasData state = isJust (getData state)
 
--- | Get the error if in error state.
-getError :: forall a. QueryResult a -> Maybe String
-getError (QueryError e _) = Just e
-getError _ = Nothing
-
--- | Check if currently loading (initial or refetching).
-isLoading :: forall a. QueryResult a -> Boolean
-isLoading QueryLoading = true
-isLoading (QueryRefetching _) = true
-isLoading _ = false
-
--- | Check if successfully loaded.
-isSuccess :: forall a. QueryResult a -> Boolean
-isSuccess (QuerySuccess _) = true
-isSuccess _ = false
-
--- | Check if in error state.
-isError :: forall a. QueryResult a -> Boolean
-isError (QueryError _ _) = true
-isError _ = false
-
--- | Fold over QueryResult (like RemoteData.fold).
+-- | Fold over the RemoteData in a QueryState.
 -- |
 -- | ```purescript
--- | fold
--- |   { idle: HH.text "Click to load"
--- |   , loading: \stale -> spinner stale
--- |   , error: \e stale -> errorCard e stale
--- |   , success: \a -> renderData a
+-- | Q.foldData state
+-- |   { notAsked: HH.text "Click to load"
+-- |   , loading: spinner
+-- |   , failure: \e -> errorCard e
+-- |   , success: \user -> userCard user
 -- |   }
--- |   result
 -- | ```
-fold
-  :: forall a r
-   . { idle :: r
-     , loading :: Maybe a -> r
-     , error :: String -> Maybe a -> r
+foldData
+  :: forall e a r
+   . { notAsked :: r
+     , loading :: r
+     , failure :: e -> r
      , success :: a -> r
      }
-  -> QueryResult a
+  -> QueryState e a
   -> r
-fold handlers = case _ of
-  QueryIdle -> handlers.idle
-  QueryLoading -> handlers.loading Nothing
-  QueryRefetching a -> handlers.loading (Just a)
-  QueryError e ma -> handlers.error e ma
-  QuerySuccess a -> handlers.success a
+foldData handlers state = case state.data of
+  NotAsked -> handlers.notAsked
+  Loading -> handlers.loading
+  Failure e -> handlers.failure e
+  Success a -> handlers.success a
 
 -- | Get success value or fall back to default.
-withDefault :: forall a. a -> QueryResult a -> a
-withDefault def = case _ of
-  QuerySuccess a -> a
-  QueryRefetching a -> a
-  QueryError _ (Just a) -> a
+withDefaultData :: forall e a. a -> QueryState e a -> a
+withDefaultData def state = case state.data of
+  Success a -> a
   _ -> def

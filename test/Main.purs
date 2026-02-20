@@ -2,6 +2,7 @@ module Test.Main where
 
 import Prelude
 
+import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String as String
@@ -12,6 +13,7 @@ import Halogen.HTML.Properties as HP
 import Hydrogen.HTML.Renderer (render, renderWith, defaultOptions)
 import Hydrogen.HTML.Renderer as Renderer
 import Hydrogen.Data.Format as Format
+import Hydrogen.Data.RemoteData as RD
 import Hydrogen.Query as Q
 import Hydrogen.Router (normalizeTrailingSlash)
 import Hydrogen.SSG as SSG
@@ -33,6 +35,7 @@ main = launchAff_ $ runSpec [consoleReporter] do
     uiErrorTests
     ssgTests
     rendererTests
+    remoteDataTests
     queryTests
 
 -- =============================================================================
@@ -419,27 +422,185 @@ rendererTests = describe "HTML.Renderer" do
         `shouldEqual` "<article class=\"post\"><h1>Title</h1><p>Content with <strong>bold</strong> text.</p></article>"
 
 -- =============================================================================
+--                                                          // RemoteData tests
+-- =============================================================================
+
+remoteDataTests :: Spec Unit
+remoteDataTests = describe "RemoteData" do
+  describe "construction" do
+    it "NotAsked equals itself" do
+      (RD.NotAsked :: RD.RemoteData String Int) `shouldEqual` RD.NotAsked
+    
+    it "Loading equals itself" do
+      (RD.Loading :: RD.RemoteData String Int) `shouldEqual` RD.Loading
+    
+    it "Success wraps data" do
+      RD.Success 42 `shouldEqual` (RD.Success 42 :: RD.RemoteData String Int)
+    
+    it "Failure wraps error" do
+      RD.Failure "oops" `shouldEqual` (RD.Failure "oops" :: RD.RemoteData String Int)
+    
+    it "fromEither converts Right to Success" do
+      RD.fromEither (Right 42) `shouldEqual` (RD.Success 42 :: RD.RemoteData String Int)
+    
+    it "fromEither converts Left to Failure" do
+      RD.fromEither (Left "err") `shouldEqual` (RD.Failure "err" :: RD.RemoteData String Int)
+
+  describe "Functor" do
+    it "maps over Success" do
+      map (_ + 1) (RD.Success 1 :: RD.RemoteData String Int) `shouldEqual` RD.Success 2
+    
+    it "preserves NotAsked" do
+      map (_ + 1) (RD.NotAsked :: RD.RemoteData String Int) `shouldEqual` RD.NotAsked
+    
+    it "preserves Loading" do
+      map (_ + 1) (RD.Loading :: RD.RemoteData String Int) `shouldEqual` RD.Loading
+    
+    it "preserves Failure" do
+      map (_ + 1) (RD.Failure "err" :: RD.RemoteData String Int) `shouldEqual` RD.Failure "err"
+
+  describe "Applicative" do
+    it "pure creates Success" do
+      (pure 42 :: RD.RemoteData String Int) `shouldEqual` RD.Success 42
+    
+    it "applies functions" do
+      (pure (_ + 1) <*> RD.Success 1) `shouldEqual` (RD.Success 2 :: RD.RemoteData String Int)
+    
+    it "combines Success values" do
+      (pure (+) <*> RD.Success 1 <*> RD.Success 2) `shouldEqual` (RD.Success 3 :: RD.RemoteData String Int)
+    
+    it "combines with ado syntax" do
+      let combined = ado
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            b <- RD.Success 2
+            c <- RD.Success 3
+            in a + b + c
+      combined `shouldEqual` RD.Success 6
+    
+    it "propagates Loading in ado" do
+      let combined = ado
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            b <- RD.Loading
+            c <- RD.Success 3
+            in a + b + c
+      combined `shouldEqual` RD.Loading
+    
+    it "propagates Failure in ado" do
+      let combined = ado
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            b <- RD.Failure "oops"
+            c <- RD.Success 3
+            in a + b + c
+      combined `shouldEqual` RD.Failure "oops"
+    
+    -- Applicative laws
+    it "identity law: pure id <*> v = v" do
+      let v = RD.Success 42 :: RD.RemoteData String Int
+      (pure identity <*> v) `shouldEqual` v
+    
+    it "homomorphism: pure f <*> pure x = pure (f x)" do
+      let f = (_ + 1)
+      let x = 42
+      (pure f <*> pure x) `shouldEqual` (pure (f x) :: RD.RemoteData String Int)
+    
+    it "interchange: u <*> pure y = pure ($ y) <*> u" do
+      let u = RD.Success (_ + 1) :: RD.RemoteData String (Int -> Int)
+      let y = 42
+      (u <*> pure y) `shouldEqual` (pure (_ $ y) <*> u)
+
+  describe "Monad" do
+    it "bind chains Success" do
+      let result = do
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            b <- RD.Success 2
+            pure (a + b)
+      result `shouldEqual` RD.Success 3
+    
+    it "bind short-circuits on Failure" do
+      let result = do
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            _ <- RD.Failure "oops"
+            pure a
+      result `shouldEqual` RD.Failure "oops"
+    
+    it "bind short-circuits on Loading" do
+      let result = do
+            a <- RD.Success 1 :: RD.RemoteData String Int
+            _ <- RD.Loading
+            pure a
+      result `shouldEqual` RD.Loading
+    
+    -- Monad laws
+    it "left identity: pure a >>= f = f a" do
+      let f x = RD.Success (x + 1) :: RD.RemoteData String Int
+      (pure 42 >>= f) `shouldEqual` f 42
+    
+    it "right identity: m >>= pure = m" do
+      let m = RD.Success 42 :: RD.RemoteData String Int
+      (m >>= pure) `shouldEqual` m
+    
+    it "right identity holds for all states" do
+      let notAsked = RD.NotAsked :: RD.RemoteData String Int
+      let loading = RD.Loading :: RD.RemoteData String Int
+      let failure = RD.Failure "err" :: RD.RemoteData String Int
+      let success = RD.Success 42 :: RD.RemoteData String Int
+      (notAsked >>= pure) `shouldEqual` notAsked
+      (loading >>= pure) `shouldEqual` loading
+      (failure >>= pure) `shouldEqual` failure
+      (success >>= pure) `shouldEqual` success
+    
+    it "associativity: (m >>= f) >>= g = m >>= (\\x -> f x >>= g)" do
+      let m = RD.Success 1 :: RD.RemoteData String Int
+      let f x = RD.Success (x + 1) :: RD.RemoteData String Int
+      let g x = RD.Success (x * 2) :: RD.RemoteData String Int
+      ((m >>= f) >>= g) `shouldEqual` (m >>= (\x -> f x >>= g))
+
+  describe "predicates" do
+    it "isNotAsked works" do
+      RD.isNotAsked (RD.NotAsked :: RD.RemoteData String Int) `shouldEqual` true
+      RD.isNotAsked (RD.Loading :: RD.RemoteData String Int) `shouldEqual` false
+    
+    it "isLoading works" do
+      RD.isLoading (RD.Loading :: RD.RemoteData String Int) `shouldEqual` true
+      RD.isLoading (RD.Success 1 :: RD.RemoteData String Int) `shouldEqual` false
+    
+    it "isFailure works" do
+      RD.isFailure (RD.Failure "err" :: RD.RemoteData String Int) `shouldEqual` true
+      RD.isFailure (RD.Success 1 :: RD.RemoteData String Int) `shouldEqual` false
+    
+    it "isSuccess works" do
+      RD.isSuccess (RD.Success 42 :: RD.RemoteData String Int) `shouldEqual` true
+      RD.isSuccess (RD.Failure "err" :: RD.RemoteData String Int) `shouldEqual` false
+
+  describe "fold" do
+    it "handles all cases" do
+      let handlers = 
+            { notAsked: "notAsked"
+            , loading: "loading"
+            , failure: \e -> "failure: " <> e
+            , success: \n -> "success: " <> show n
+            }
+      RD.fold handlers (RD.NotAsked :: RD.RemoteData String Int) `shouldEqual` "notAsked"
+      RD.fold handlers (RD.Loading :: RD.RemoteData String Int) `shouldEqual` "loading"
+      RD.fold handlers (RD.Failure "oops") `shouldEqual` "failure: oops"
+      RD.fold handlers (RD.Success 42) `shouldEqual` "success: 42"
+
+  describe "withDefault" do
+    it "uses Success value" do
+      RD.withDefault 0 (RD.Success 42 :: RD.RemoteData String Int) `shouldEqual` 42
+    
+    it "uses default for Loading" do
+      RD.withDefault 0 (RD.Loading :: RD.RemoteData String Int) `shouldEqual` 0
+    
+    it "uses default for Failure" do
+      RD.withDefault 0 (RD.Failure "err" :: RD.RemoteData String Int) `shouldEqual` 0
+
+-- =============================================================================
 --                                                             // query tests
 -- =============================================================================
 
 queryTests :: Spec Unit
 queryTests = describe "Query" do
-  describe "QueryResult" do
-    it "QueryIdle equals itself" do
-      (Q.QueryIdle :: Q.QueryResult Int) `shouldEqual` Q.QueryIdle
-    
-    it "QueryLoading equals itself" do
-      (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Q.QueryLoading
-    
-    it "QuerySuccess wraps data" do
-      Q.QuerySuccess 42 `shouldEqual` Q.QuerySuccess 42
-    
-    it "QueryError wraps error message" do
-      Q.QueryError "failed" Nothing `shouldEqual` (Q.QueryError "failed" Nothing :: Q.QueryResult Int)
-    
-    it "QueryRefetching has stale data" do
-      Q.QueryRefetching 42 `shouldEqual` Q.QueryRefetching 42
-
   describe "defaultQueryOptions" do
     it "creates options with key and fetch" do
       let opts = Q.defaultQueryOptions ["user", "123"] (pure $ Right 42)
@@ -451,125 +612,100 @@ queryTests = describe "Query" do
       opts.staleTime `shouldEqual` Nothing
       opts.retry `shouldEqual` 0
 
-  describe "PagedResult" do
-    it "PagedIdle equals itself" do
-      (Q.PagedIdle :: Q.PagedResult Int) `shouldEqual` Q.PagedIdle
-    
-    it "PagedLoading equals itself" do
-      (Q.PagedLoading :: Q.PagedResult Int) `shouldEqual` Q.PagedLoading
-    
-    it "PagedError wraps error" do
-      Q.PagedError "failed" `shouldEqual` (Q.PagedError "failed" :: Q.PagedResult Int)
-    
-    it "PagedSuccess tracks pages and hasNextPage" do
-      let result = Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
-      result `shouldEqual` Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
+  describe "QueryState" do
+    it "initialQueryState has NotAsked data" do
+      let state = Q.initialQueryState :: Q.QueryState String Int
+      state.data `shouldEqual` RD.NotAsked
+      state.isStale `shouldEqual` false
+      state.isFetching `shouldEqual` false
 
-  describe "QueryResult Functor" do
-    it "maps over Success" do
-      map (_ + 1) (Q.QuerySuccess 1) `shouldEqual` Q.QuerySuccess 2
-    
-    it "maps over Refetching" do
-      map (_ + 1) (Q.QueryRefetching 1) `shouldEqual` Q.QueryRefetching 2
-    
-    it "preserves Idle" do
-      map (_ + 1) (Q.QueryIdle :: Q.QueryResult Int) `shouldEqual` Q.QueryIdle
-    
-    it "preserves Loading" do
-      map (_ + 1) (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Q.QueryLoading
-
-  describe "QueryResult Applicative" do
-    it "pure creates Success" do
-      (pure 42 :: Q.QueryResult Int) `shouldEqual` Q.QuerySuccess 42
-    
-    it "applies functions" do
-      (pure (_ + 1) <*> Q.QuerySuccess 1) `shouldEqual` Q.QuerySuccess 2
-    
-    it "combines Success values" do
-      (pure (+) <*> Q.QuerySuccess 1 <*> Q.QuerySuccess 2) `shouldEqual` Q.QuerySuccess 3
-    
-    it "combines with ado syntax" do
-      let combined = ado
-            a <- Q.QuerySuccess 1
-            b <- Q.QuerySuccess 2
-            c <- Q.QuerySuccess 3
-            in a + b + c
-      combined `shouldEqual` Q.QuerySuccess 6
-    
-    it "propagates Loading in ado" do
-      let combined = ado
-            a <- Q.QuerySuccess 1
-            b <- Q.QueryLoading
-            c <- Q.QuerySuccess 3
-            in a + b + c
-      combined `shouldEqual` (Q.QueryLoading :: Q.QueryResult Int)
-    
-    it "propagates Error in ado" do
-      let combined = ado
-            a <- Q.QuerySuccess 1
-            b <- Q.QueryError "oops" Nothing
-            c <- Q.QuerySuccess 3
-            in a + b + c
-      combined `shouldEqual` Q.QueryError "oops" Nothing
-    
-    it "preserves Refetching state in ado" do
-      let combined = ado
-            a <- Q.QuerySuccess 1
-            b <- Q.QueryRefetching 2
-            in a + b
-      combined `shouldEqual` Q.QueryRefetching 3
-    
-    -- Applicative laws
-    it "identity law: pure id <*> v = v" do
-      let v = Q.QuerySuccess 42
-      (pure identity <*> v) `shouldEqual` v
-    
-    it "homomorphism: pure f <*> pure x = pure (f x)" do
-      let f = (_ + 1)
-      let x = 42
-      (pure f <*> pure x) `shouldEqual` (pure (f x) :: Q.QueryResult Int)
-    
-    it "interchange: u <*> pure y = pure ($ y) <*> u" do
-      let u = Q.QuerySuccess (_ + 1)
-      let y = 42
-      (u <*> pure y) `shouldEqual` (pure (_ $ y) <*> u)
-
-  describe "QueryResult helpers" do
+  describe "QueryState helpers" do
     it "getData extracts from Success" do
-      Q.getData (Q.QuerySuccess 42) `shouldEqual` Just 42
-    
-    it "getData extracts from Refetching" do
-      Q.getData (Q.QueryRefetching 42) `shouldEqual` Just 42
+      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.getData state `shouldEqual` Just 42
     
     it "getData returns Nothing for Loading" do
-      Q.getData (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Nothing
+      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.getData state `shouldEqual` Nothing
     
-    it "isLoading is true for Loading" do
-      Q.isLoading (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` true
+    it "getError extracts from Failure" do
+      let state = { data: RD.Failure "oops", isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.getError state `shouldEqual` Just "oops"
     
-    it "isLoading is true for Refetching" do
-      Q.isLoading (Q.QueryRefetching 42) `shouldEqual` true
+    it "getError returns Nothing for Success" do
+      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.getError state `shouldEqual` Nothing
     
-    it "isSuccess is true for Success" do
-      Q.isSuccess (Q.QuerySuccess 42) `shouldEqual` true
+    it "hasData is true for Success" do
+      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.hasData state `shouldEqual` true
     
-    it "withDefault uses Success value" do
-      Q.withDefault 0 (Q.QuerySuccess 42) `shouldEqual` 42
+    it "hasData is false for Loading" do
+      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.hasData state `shouldEqual` false
     
-    it "withDefault uses Refetching value" do
-      Q.withDefault 0 (Q.QueryRefetching 42) `shouldEqual` 42
+    it "withDefaultData uses Success value" do
+      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.withDefaultData 0 state `shouldEqual` 42
     
-    it "withDefault uses default for Loading" do
-      Q.withDefault 0 (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` 0
+    it "withDefaultData uses default for Loading" do
+      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.withDefaultData 0 state `shouldEqual` 0
     
-    it "fold handles all cases" do
+    it "foldData handles all cases" do
       let handlers = 
-            { idle: "idle"
-            , loading: \_ -> "loading"
-            , error: \e _ -> "error: " <> e
+            { notAsked: "notAsked"
+            , loading: "loading"
+            , failure: \e -> "failure: " <> e
             , success: \n -> "success: " <> show n
             }
-      Q.fold handlers Q.QueryIdle `shouldEqual` "idle"
-      Q.fold handlers Q.QueryLoading `shouldEqual` "loading"
-      Q.fold handlers (Q.QueryError "oops" Nothing) `shouldEqual` "error: oops"
-      Q.fold handlers (Q.QuerySuccess 42) `shouldEqual` "success: 42"
+      let notAsked = { data: RD.NotAsked, isStale: false, isFetching: false } :: Q.QueryState String Int
+      let loading = { data: RD.Loading, isStale: false, isFetching: true } :: Q.QueryState String Int
+      let failure = { data: RD.Failure "oops", isStale: false, isFetching: false } :: Q.QueryState String Int
+      let success = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
+      Q.foldData handlers notAsked `shouldEqual` "notAsked"
+      Q.foldData handlers loading `shouldEqual` "loading"
+      Q.foldData handlers failure `shouldEqual` "failure: oops"
+      Q.foldData handlers success `shouldEqual` "success: 42"
+
+  describe "Combining queries with RemoteData" do
+    it "combines queries with ado" do
+      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
+      let postsState = { data: RD.Success 3, isStale: false, isFetching: false } :: Q.QueryState String Int
+      let combined :: RD.RemoteData String { userName :: String, postCount :: Int }
+          combined = ado
+            user <- userState.data
+            posts <- postsState.data
+            in { userName: user, postCount: posts }
+      RD.isSuccess combined `shouldEqual` true
+    
+    it "propagates Loading when combining" do
+      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
+      let postsState = { data: RD.Loading, isStale: false, isFetching: true } :: Q.QueryState String Int
+      let combined :: RD.RemoteData String Int
+          combined = ado
+            _ <- userState.data
+            posts <- postsState.data
+            in posts
+      combined `shouldEqual` RD.Loading
+    
+    it "propagates Failure when combining" do
+      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
+      let postsState = { data: RD.Failure "Network error", isStale: false, isFetching: false } :: Q.QueryState String Int
+      let combined :: RD.RemoteData String Int
+          combined = ado
+            _ <- userState.data
+            posts <- postsState.data
+            in posts
+      combined `shouldEqual` RD.Failure "Network error"
+
+  describe "PagedState" do
+    it "initialPagedState has NotAsked data" do
+      let state = Q.initialPagedState :: Q.PagedState String Int
+      state.data `shouldEqual` RD.NotAsked
+      state.pages `shouldEqual` []
+      state.hasNextPage `shouldEqual` false
+
+-- Helper for length
+length :: forall a. Array a -> Int
+length = Array.length
