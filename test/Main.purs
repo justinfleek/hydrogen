@@ -464,3 +464,66 @@ queryTests = describe "Query" do
     it "PagedSuccess tracks pages and hasNextPage" do
       let result = Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
       result `shouldEqual` Q.PagedSuccess { pages: [1, 2, 3], hasNextPage: true }
+
+  describe "QueryResult Functor" do
+    it "maps over Success" do
+      map (_ + 1) (Q.QuerySuccess 1) `shouldEqual` Q.QuerySuccess 2
+    
+    it "maps over Refetching" do
+      map (_ + 1) (Q.QueryRefetching 1) `shouldEqual` Q.QueryRefetching 2
+    
+    it "preserves Idle" do
+      map (_ + 1) (Q.QueryIdle :: Q.QueryResult Int) `shouldEqual` Q.QueryIdle
+    
+    it "preserves Loading" do
+      map (_ + 1) (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Q.QueryLoading
+
+  describe "QueryResult Applicative" do
+    it "pure creates Success" do
+      (pure 42 :: Q.QueryResult Int) `shouldEqual` Q.QuerySuccess 42
+    
+    it "applies functions" do
+      (pure (_ + 1) <*> Q.QuerySuccess 1) `shouldEqual` Q.QuerySuccess 2
+    
+    it "combines Success values" do
+      (pure (+) <*> Q.QuerySuccess 1 <*> Q.QuerySuccess 2) `shouldEqual` Q.QuerySuccess 3
+
+  describe "QueryResult helpers" do
+    it "getData extracts from Success" do
+      Q.getData (Q.QuerySuccess 42) `shouldEqual` Just 42
+    
+    it "getData extracts from Refetching" do
+      Q.getData (Q.QueryRefetching 42) `shouldEqual` Just 42
+    
+    it "getData returns Nothing for Loading" do
+      Q.getData (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` Nothing
+    
+    it "isLoading is true for Loading" do
+      Q.isLoading (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` true
+    
+    it "isLoading is true for Refetching" do
+      Q.isLoading (Q.QueryRefetching 42) `shouldEqual` true
+    
+    it "isSuccess is true for Success" do
+      Q.isSuccess (Q.QuerySuccess 42) `shouldEqual` true
+    
+    it "withDefault uses Success value" do
+      Q.withDefault 0 (Q.QuerySuccess 42) `shouldEqual` 42
+    
+    it "withDefault uses Refetching value" do
+      Q.withDefault 0 (Q.QueryRefetching 42) `shouldEqual` 42
+    
+    it "withDefault uses default for Loading" do
+      Q.withDefault 0 (Q.QueryLoading :: Q.QueryResult Int) `shouldEqual` 0
+    
+    it "fold handles all cases" do
+      let handlers = 
+            { idle: "idle"
+            , loading: \_ -> "loading"
+            , error: \e _ -> "error: " <> e
+            , success: \n -> "success: " <> show n
+            }
+      Q.fold handlers Q.QueryIdle `shouldEqual` "idle"
+      Q.fold handlers Q.QueryLoading `shouldEqual` "loading"
+      Q.fold handlers (Q.QueryError "oops" Nothing) `shouldEqual` "error: oops"
+      Q.fold handlers (Q.QuerySuccess 42) `shouldEqual` "success: 42"

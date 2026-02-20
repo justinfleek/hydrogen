@@ -64,6 +64,17 @@ module Hydrogen.Query
   , newBatcher
   , load
   , loadMany
+  
+    -- * RemoteData-style API
+  , toRemoteData
+  , fromRemoteData
+  , getData
+  , getError
+  , isLoading
+  , isSuccess
+  , isError
+  , fold
+  , withDefault
   ) where
 
 import Prelude
@@ -174,6 +185,42 @@ instance showQueryResult :: Show a => Show (QueryResult a) where
   show (QueryRefetching a) = "QueryRefetching(" <> show a <> ")"
   show (QueryError e ma) = "QueryError(" <> e <> ", " <> show ma <> ")"
   show (QuerySuccess a) = "QuerySuccess(" <> show a <> ")"
+
+-- | Functor instance - map over success/refetching/stale data
+instance functorQueryResult :: Functor QueryResult where
+  map _ QueryIdle = QueryIdle
+  map _ QueryLoading = QueryLoading
+  map f (QueryRefetching a) = QueryRefetching (f a)
+  map f (QueryError e ma) = QueryError e (map f ma)
+  map f (QuerySuccess a) = QuerySuccess (f a)
+
+-- | Apply instance - combine results (first error wins)
+instance applyQueryResult :: Apply QueryResult where
+  apply (QuerySuccess f) (QuerySuccess a) = QuerySuccess (f a)
+  apply (QuerySuccess f) (QueryRefetching a) = QueryRefetching (f a)
+  apply (QueryRefetching f) (QuerySuccess a) = QueryRefetching (f a)
+  apply (QueryRefetching f) (QueryRefetching a) = QueryRefetching (f a)
+  apply (QueryError e _) _ = QueryError e Nothing
+  apply _ (QueryError e _) = QueryError e Nothing
+  apply QueryLoading _ = QueryLoading
+  apply _ QueryLoading = QueryLoading
+  apply QueryIdle _ = QueryIdle
+  apply _ QueryIdle = QueryIdle
+
+-- | Applicative instance
+instance applicativeQueryResult :: Applicative QueryResult where
+  pure = QuerySuccess
+
+-- | Bind instance - monadic chaining
+instance bindQueryResult :: Bind QueryResult where
+  bind QueryIdle _ = QueryIdle
+  bind QueryLoading _ = QueryLoading
+  bind (QueryError e _) _ = QueryError e Nothing  -- Can't preserve stale data (type changes)
+  bind (QueryRefetching a) f = f a  -- Use stale data for chaining
+  bind (QuerySuccess a) f = f a
+
+-- | Monad instance
+instance monadQueryResult :: Monad QueryResult
 
 -- ============================================================
 -- INTERNAL
@@ -525,3 +572,98 @@ loadMany (Batcher b) keys = do
 -- | Add milliseconds to an instant (simplified - loses precision).
 addMs :: Instant -> Milliseconds -> Instant
 addMs instant (Milliseconds _) = instant  -- TODO: proper impl needs purescript-datetime
+
+-- ============================================================
+-- REMOTEDATA-STYLE API
+-- ============================================================
+
+-- | Convert QueryResult to a simpler 4-state representation.
+-- |
+-- | This loses the "refetching with stale data" distinction:
+-- | - QueryRefetching becomes the stale data (Success)
+-- | - QueryError with stale data becomes Error (loses the stale data)
+-- |
+-- | For full fidelity, pattern match on QueryResult directly.
+toRemoteData 
+  :: forall a
+   . QueryResult a 
+  -> { notAsked :: Boolean
+     , loading :: Boolean  
+     , error :: Maybe String
+     , data :: Maybe a
+     }
+toRemoteData = case _ of
+  QueryIdle -> { notAsked: true, loading: false, error: Nothing, data: Nothing }
+  QueryLoading -> { notAsked: false, loading: true, error: Nothing, data: Nothing }
+  QueryRefetching a -> { notAsked: false, loading: true, error: Nothing, data: Just a }
+  QueryError e ma -> { notAsked: false, loading: false, error: Just e, data: ma }
+  QuerySuccess a -> { notAsked: false, loading: false, error: Nothing, data: Just a }
+
+-- | Create a QueryResult from Either (for wrapping API responses).
+fromRemoteData :: forall a. Either String a -> QueryResult a
+fromRemoteData (Left e) = QueryError e Nothing
+fromRemoteData (Right a) = QuerySuccess a
+
+-- | Get the data if available (Success, Refetching, or stale in Error).
+getData :: forall a. QueryResult a -> Maybe a
+getData QueryIdle = Nothing
+getData QueryLoading = Nothing
+getData (QueryRefetching a) = Just a
+getData (QueryError _ ma) = ma
+getData (QuerySuccess a) = Just a
+
+-- | Get the error if in error state.
+getError :: forall a. QueryResult a -> Maybe String
+getError (QueryError e _) = Just e
+getError _ = Nothing
+
+-- | Check if currently loading (initial or refetching).
+isLoading :: forall a. QueryResult a -> Boolean
+isLoading QueryLoading = true
+isLoading (QueryRefetching _) = true
+isLoading _ = false
+
+-- | Check if successfully loaded.
+isSuccess :: forall a. QueryResult a -> Boolean
+isSuccess (QuerySuccess _) = true
+isSuccess _ = false
+
+-- | Check if in error state.
+isError :: forall a. QueryResult a -> Boolean
+isError (QueryError _ _) = true
+isError _ = false
+
+-- | Fold over QueryResult (like RemoteData.fold).
+-- |
+-- | ```purescript
+-- | fold
+-- |   { idle: HH.text "Click to load"
+-- |   , loading: \stale -> spinner stale
+-- |   , error: \e stale -> errorCard e stale
+-- |   , success: \a -> renderData a
+-- |   }
+-- |   result
+-- | ```
+fold
+  :: forall a r
+   . { idle :: r
+     , loading :: Maybe a -> r
+     , error :: String -> Maybe a -> r
+     , success :: a -> r
+     }
+  -> QueryResult a
+  -> r
+fold handlers = case _ of
+  QueryIdle -> handlers.idle
+  QueryLoading -> handlers.loading Nothing
+  QueryRefetching a -> handlers.loading (Just a)
+  QueryError e ma -> handlers.error e ma
+  QuerySuccess a -> handlers.success a
+
+-- | Get success value or fall back to default.
+withDefault :: forall a. a -> QueryResult a -> a
+withDefault def = case _ of
+  QuerySuccess a -> a
+  QueryRefetching a -> a
+  QueryError _ (Just a) -> a
+  _ -> def
