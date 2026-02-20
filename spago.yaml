@@ -46,6 +46,10 @@ package:
     dependencies:
       - spec
       - spec-node
+      - spec-quickcheck
+      - quickcheck
+      - quickcheck-laws
+      - gen
 
 workspace:
   package_set:

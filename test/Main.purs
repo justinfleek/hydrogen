@@ -24,6 +24,7 @@ import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual, shouldSatisfy)
 import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
+import Test.Property as Property
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -37,6 +38,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     rendererTests
     remoteDataTests
     queryTests
+  describe "Property Tests" do
+    Property.propertyTests
 
 -- =============================================================================
 --                                                              // format tests
