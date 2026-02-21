@@ -1,0 +1,53 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                               // hydrogen // schema // color
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Color pillar - color science, theory, and application.
+-- |
+-- | ## Architecture
+-- |
+-- | - **Atoms**: Channel (0-255), Hue (0-360), Saturation (0-100), Lightness (0-100)
+-- | - **Molecules**: RGB, RGBA, HSL, HSLA — composed of atoms
+-- | - **Conversions**: Explicit functions between color spaces
+-- |
+-- | ## Modules
+-- |
+-- | - **RGB**: RGB and RGBA molecules
+-- | - **HSL**: HSL molecule
+-- | - **Channel/Hue/Saturation/Lightness**: Bounded atoms
+-- | - **Harmony**: Color wheel relationships
+-- | - **Contrast**: WCAG accessibility
+-- | - **Properties**: Colorfulness, brightness, luminance
+-- |
+-- | ## Usage
+-- |
+-- | ```purescript
+-- | import Hydrogen.Schema.Color.RGB as RGB
+-- | import Hydrogen.Schema.Color.HSL as HSL
+-- |
+-- | primary :: RGB.RGB
+-- | primary = RGB.rgb 59 130 246
+-- |
+-- | -- Check WCAG contrast
+-- | import Hydrogen.Schema.Color.Contrast as Contrast
+-- | isAccessible = Contrast.meetsWCAG Contrast.WCAGAA primary (RGB.rgb 255 255 255)
+-- | ```
+
+module Hydrogen.Schema.Color where
+
+-- | This module serves as documentation for the Color pillar.
+-- |
+-- | Import submodules directly with qualification:
+-- |
+-- | ```purescript
+-- | import Hydrogen.Schema.Color.RGB as RGB
+-- | import Hydrogen.Schema.Color.HSL as HSL
+-- | import Hydrogen.Schema.Color.Channel as Channel
+-- | import Hydrogen.Schema.Color.Hue as Hue
+-- | import Hydrogen.Schema.Color.Saturation as Saturation
+-- | import Hydrogen.Schema.Color.Lightness as Lightness
+-- | import Hydrogen.Schema.Color.Contrast as Contrast
+-- | import Hydrogen.Schema.Color.Harmony as Harmony
+-- | ```
+
+-- No imports needed - this is a documentation module
