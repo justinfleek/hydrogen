@@ -1373,7 +1373,7 @@ searchIcon :: forall w i. HH.HTML w i
 searchIcon =
   HH.span
     [ cls [ "inline-block w-4 h-4" ] ]
-    [ HH.text "S" ] -- Simplified - in production use Lucide icons
+    [ HH.text "S" ] -- Simplified - in production use Hydrogen icons
 
 -- | Sort ascending icon
 sortAscIcon :: forall w i. HH.HTML w i
