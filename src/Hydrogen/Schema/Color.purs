@@ -6,7 +6,7 @@
 -- |
 -- | ## Architecture
 -- |
--- | - **Atoms**: Channel (0-255), Hue (0-360), Saturation (0-100), Lightness (0-100)
+-- | - **Atoms**: Channel (0-255), Hue (0-360), Saturation (0-100), Lightness (0-100), Opacity (0.0-1.0)
 -- | - **Molecules**: RGB, RGBA, HSL — composed of atoms
 -- | - **Conversions**: Explicit functions between color spaces
 -- |
@@ -25,11 +25,15 @@
 -- |
 -- | ## Submodules
 -- |
--- | **Atoms** (import with qualification to avoid conflicts):
+-- | **Atoms** (import with qualification to avoid naming conflicts):
 -- | - `Hydrogen.Schema.Color.Channel` — 0-255 channel values
 -- | - `Hydrogen.Schema.Color.Hue` — 0-360 color wheel position
 -- | - `Hydrogen.Schema.Color.Saturation` — 0-100 color intensity
 -- | - `Hydrogen.Schema.Color.Lightness` — 0-100 light/dark level
+-- | - `Hydrogen.Schema.Color.Opacity` — 0.0-1.0 alpha transparency
+-- |
+-- | Note: Atoms should be imported with qualification (e.g., `import Hydrogen.Schema.Color.Opacity as Opacity`)
+-- | to avoid naming conflicts. Many atoms share operation names like `blend`, `scale`, `invert`.
 -- |
 -- | **Molecules**:
 -- | - `Hydrogen.Schema.Color.RGB` — RGB and RGBA colors
