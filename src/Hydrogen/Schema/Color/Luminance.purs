@@ -33,13 +33,15 @@
 module Hydrogen.Schema.Color.Luminance
   ( Luminance
   , luminance
+  , fromInt
   , unsafeLuminance
   , unwrap
+  , toInt
+  , toNumber
   , scale
   , increase
   , decrease
   , bounds
-  , toNumber
   , isOff
   , isSubtle
   , isBright
@@ -48,6 +50,7 @@ module Hydrogen.Schema.Color.Luminance
 
 import Prelude
 
+import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -83,6 +86,16 @@ instance showLuminance :: Show Luminance where
 -- | ```
 luminance :: Number -> Luminance
 luminance n = Luminance (Bounded.clampNumber 0.0 100000.0 n)
+
+-- | Create luminance from integer nit value
+-- |
+-- | Common in display specifications and UI:
+-- | ```purescript
+-- | fromInt 100   -- 100 nits (typical display)
+-- | fromInt 1000  -- 1000 nits (HDR)
+-- | ```
+fromInt :: Int -> Luminance
+fromInt n = luminance (Int.toNumber n)
 
 -- | Create a luminance value without clamping
 -- |
@@ -155,6 +168,16 @@ isHDR (Luminance l) = l > 1000.0
 -- | Extract the raw Number value (nits)
 unwrap :: Luminance -> Number
 unwrap (Luminance l) = l
+
+-- | Round to nearest integer nit
+-- |
+-- | Useful for display and serialization:
+-- | ```purescript
+-- | toInt (luminance 147.3)  -- 147
+-- | toInt (luminance 999.8)  -- 1000
+-- | ```
+toInt :: Luminance -> Int
+toInt (Luminance l) = Int.round l
 
 -- | Convert to Number (alias for unwrap)
 toNumber :: Luminance -> Number
