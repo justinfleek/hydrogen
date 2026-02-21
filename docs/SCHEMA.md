@@ -226,36 +226,128 @@ Measurement, spacing, and layout.
 
 ### Atoms
 
+#### Device Units (Context-Dependent)
+
+| Name        | Type   | Min  | Max   | Behavior | Notes                          |
+|-------------|--------|------|-------|----------|--------------------------------|
+| Pixel       | Number | 0    | none  | clamps   | Discrete count, needs PPI      |
+| DevicePixel | Number | 0    | none  | clamps   | Hardware pixel                 |
+| CSSPixel    | Number | 0    | none  | clamps   | Reference pixel (1/96 inch)    |
+| DP          | Number | 0    | none  | clamps   | Android density-independent    |
+| SP          | Number | 0    | none  | clamps   | Android scaled pixel (text)    |
+
+#### Physical Units (SI)
+
 | Name        | Type   | Min  | Max  | Behavior | Notes                          |
 |-------------|--------|------|------|----------|--------------------------------|
-| Pixel       | Number | 0    | none | clamps   | Discrete count, needs PPI      |
 | Meter       | Number | none | none | finite   | SI base unit, signed           |
 | Millimeter  | Number | none | none | finite   | 1/1000 meter                   |
 | Centimeter  | Number | none | none | finite   | 1/100 meter                    |
+| Kilometer   | Number | none | none | finite   | 1000 meters                    |
+| Micrometer  | Number | none | none | finite   | 1/1000000 meter                |
+| Nanometer   | Number | none | none | finite   | 1/1000000000 meter             |
+
+#### Physical Units (Imperial)
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
 | Inch        | Number | none | none | finite   | 25.4mm exactly                 |
+| Foot        | Number | none | none | finite   | 12 inches                      |
+| Yard        | Number | none | none | finite   | 3 feet                         |
+| Mile        | Number | none | none | finite   | 5280 feet                      |
+| Thou        | Number | none | none | finite   | 1/1000 inch (mil)              |
+
+#### Typographic Units
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
 | Point       | Number | none | none | finite   | 1/72 inch (PostScript)         |
 | Pica        | Number | none | none | finite   | 12 points                      |
+| Didot       | Number | none | none | finite   | European point (0.376mm)       |
+| Cicero      | Number | none | none | finite   | 12 Didot points                |
+
+#### Relative Units
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
 | Em          | Number | 0    | none | finite   | Relative to font size          |
 | Rem         | Number | 0    | none | finite   | Relative to root font size     |
+| Ex          | Number | 0    | none | finite   | x-height of font               |
+| Ch          | Number | 0    | none | finite   | Width of '0' character         |
+| Cap         | Number | 0    | none | finite   | Cap height of font             |
+| Ic          | Number | 0    | none | finite   | CJK water ideograph width      |
+| Lh          | Number | 0    | none | finite   | Line height of element         |
+| Rlh         | Number | 0    | none | finite   | Root line height               |
+
+#### Viewport Units
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| Vw          | Number | 0    | none | finite   | 1% of viewport width           |
+| Vh          | Number | 0    | none | finite   | 1% of viewport height          |
+| Vmin        | Number | 0    | none | finite   | Min of vw/vh                   |
+| Vmax        | Number | 0    | none | finite   | Max of vw/vh                   |
+| Dvw         | Number | 0    | none | finite   | Dynamic viewport width         |
+| Dvh         | Number | 0    | none | finite   | Dynamic viewport height        |
+| Svw         | Number | 0    | none | finite   | Small viewport width           |
+| Svh         | Number | 0    | none | finite   | Small viewport height          |
+| Lvw         | Number | 0    | none | finite   | Large viewport width           |
+| Lvh         | Number | 0    | none | finite   | Large viewport height          |
+
+#### Container Units
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| Cqw         | Number | 0    | none | finite   | 1% container query width       |
+| Cqh         | Number | 0    | none | finite   | 1% container query height      |
+| Cqi         | Number | 0    | none | finite   | 1% container inline size       |
+| Cqb         | Number | 0    | none | finite   | 1% container block size        |
+| Cqmin       | Number | 0    | none | finite   | Min of cqi/cqb                 |
+| Cqmax       | Number | 0    | none | finite   | Max of cqi/cqb                 |
+
+#### Flex/Grid Units
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| Fr          | Number | 0    | none | finite   | Flex fraction                  |
+
+#### Ratio/Percentage
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
 | Percent     | Number | 0    | 100  | clamps   | Percentage value               |
 | Ratio       | Number | 0.0  | 1.0  | clamps   | Normalized 0-1                 |
-| PPI         | Number | 1    | none | finite   | Pixels per inch (display)      |
+| Proportion  | Number | 0    | none | finite   | Unbounded ratio (e.g., 16:9)   |
+
+#### Display Properties
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| PPI         | Number | 1    | none | finite   | Pixels per inch                |
+| PPCM        | Number | 1    | none | finite   | Pixels per centimeter          |
 | DPR         | Number | 0.5  | none | finite   | Device pixel ratio             |
 
 ### Molecules
 
-| Name   | Composition                    |
-|--------|--------------------------------|
-| Size   | Width (Pixel) + Height (Pixel) |
-| Inset  | Top + Right + Bottom + Left    |
-| Rect   | Position + Size                |
+| Name        | Composition                         |
+|-------------|-------------------------------------|
+| Size2D      | Width + Height                      |
+| Point2D     | X + Y                               |
+| Inset       | Top + Right + Bottom + Left         |
+| InsetXY     | Horizontal + Vertical               |
+| Range       | Min + Max                           |
+| Rect        | Origin (Point2D) + Size2D           |
+| AspectRatio | Width : Height (as Proportion)      |
 
 ### Compounds
 
-| Name    | Description                              |
-|---------|------------------------------------------|
-| Spacing | Semantic spacing scale (xs/sm/md/lg/xl)  |
-| Context | Display context for conversions          |
+| Name        | Description                              |
+|-------------|------------------------------------------|
+| Spacing     | Semantic spacing scale (xs/sm/md/lg/xl)  |
+| Context     | Display context for conversions          |
+| Breakpoint  | Named viewport width threshold           |
+| Grid        | Columns + Rows + Gap                     |
+| SafeArea    | Device safe area insets                  |
 
 ## Pillar 3: Geometry
 
@@ -263,31 +355,117 @@ Shape, form, and spatial transformation.
 
 ### Atoms
 
-| Name      | Type   | Min   | Max   | Behavior | Notes                     |
-|-----------|--------|-------|-------|----------|---------------------------|
-| Degrees   | Number | none  | none  | finite   | Angle in degrees          |
-| Radians   | Number | none  | none  | finite   | Angle in radians          |
-| Turns     | Number | none  | none  | finite   | Full rotations (1 = 360)  |
-| Factor    | Number | 0.0   | none  | finite   | Scale multiplier          |
+#### Angles
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                     |
+|---------------|--------|-------|-------|----------|---------------------------|
+| Degrees       | Number | none  | none  | finite   | Angle in degrees          |
+| Radians       | Number | none  | none  | finite   | Angle in radians          |
+| Gradians      | Number | none  | none  | finite   | Angle in gradians (400)   |
+| Turns         | Number | none  | none  | finite   | Full rotations (1 = 360)  |
+| ArcMinute     | Number | none  | none  | finite   | 1/60 degree               |
+| ArcSecond     | Number | none  | none  | finite   | 1/60 arc minute           |
+
+#### Scale/Factor
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                     |
+|---------------|--------|-------|-------|----------|---------------------------|
+| Factor        | Number | 0.0   | none  | finite   | Scale multiplier          |
+| SignedFactor  | Number | none  | none  | finite   | Can be negative (flip)    |
+
+#### Bezier Control
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                     |
+|---------------|--------|-------|-------|----------|---------------------------|
+| T             | Number | 0.0   | 1.0   | clamps   | Curve parameter           |
+| Tension       | Number | 0.0   | 1.0   | clamps   | Spline tension            |
+| Bias          | Number | -1.0  | 1.0   | clamps   | Spline bias               |
+| Continuity    | Number | -1.0  | 1.0   | clamps   | Spline continuity         |
+
+#### Path Commands (SVG)
+
+| Name          | Type   | Notes                                    |
+|---------------|--------|------------------------------------------|
+| MoveTo        | enum   | M/m - move to point                      |
+| LineTo        | enum   | L/l - line to point                      |
+| HLineTo       | enum   | H/h - horizontal line                    |
+| VLineTo       | enum   | V/v - vertical line                      |
+| CurveTo       | enum   | C/c - cubic bezier                       |
+| SmoothCurve   | enum   | S/s - smooth cubic                       |
+| QuadTo        | enum   | Q/q - quadratic bezier                   |
+| SmoothQuad    | enum   | T/t - smooth quadratic                   |
+| ArcTo         | enum   | A/a - elliptical arc                     |
+| ClosePath     | enum   | Z/z - close path                         |
 
 ### Molecules
 
-| Name      | Composition                       |
-|-----------|-----------------------------------|
-| Point2D   | X (Pixel) + Y (Pixel)             |
-| Line      | Point2D + Point2D                 |
-| Circle    | Center (Point2D) + Radius         |
-| Ellipse   | Center + RadiusX + RadiusY        |
-| Rectangle | Origin + Size                     |
+#### Points
+
+| Name          | Composition                       |
+|---------------|-----------------------------------|
+| Point2D       | X + Y                             |
+| Point3D       | X + Y + Z                         |
+| PolarPoint    | Radius + Angle                    |
+| CylindricalPt | Radius + Angle + Z                |
+| SphericalPt   | Radius + Theta + Phi              |
+
+#### Lines and Segments
+
+| Name          | Composition                       |
+|---------------|-----------------------------------|
+| Line          | Point2D + Point2D                 |
+| Ray           | Origin + Direction                |
+| LineSegment   | Start + End                       |
+| Polyline      | Array of Point2D                  |
+
+#### Basic Shapes
+
+| Name          | Composition                       |
+|---------------|-----------------------------------|
+| Circle        | Center + Radius                   |
+| Ellipse       | Center + RadiusX + RadiusY        |
+| Rectangle     | Origin + Size                     |
+| RoundedRect   | Rectangle + CornerRadii           |
+| Triangle      | Point2D x 3                       |
+| Polygon       | Array of Point2D                  |
+| RegularPolygon| Center + Radius + Sides           |
+| Star          | Center + OuterR + InnerR + Points |
+| Arc           | Center + Radius + StartAngle + EndAngle |
+| Sector        | Arc (closed to center)            |
+| Ring          | Center + InnerR + OuterR          |
+
+#### Curves
+
+| Name          | Composition                       |
+|---------------|-----------------------------------|
+| QuadBezier    | Start + Control + End             |
+| CubicBezier   | Start + Control1 + Control2 + End |
+| CatmullRom    | Array of Point2D + Tension        |
+| BSpline       | Control points + Degree           |
+| NurbsCurve    | Control points + Weights + Knots  |
+
+#### Transforms
+
+| Name          | Composition                       |
+|---------------|-----------------------------------|
+| Matrix2x3     | 6 Numbers (2D affine)             |
+| Matrix3x3     | 9 Numbers (2D projective)         |
+| Translate2D   | X + Y offsets                     |
+| Rotate2D      | Angle + optional Origin           |
+| Scale2D       | X factor + Y factor + Origin      |
+| Skew2D        | X angle + Y angle                 |
 
 ### Compounds
 
-| Name      | Description                              |
-|-----------|------------------------------------------|
-| Radius    | Corner radius (uniform or per-corner)    |
-| Path      | SVG path data, bezier curves             |
-| Transform | Matrix transformation (2D)               |
-| Clip      | Clipping region                          |
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| CornerRadii   | Per-corner radius (TL, TR, BR, BL)       |
+| Squircle      | Superellipse corner smoothing            |
+| Path          | SVG path data (commands + coords)        |
+| ClipPath      | Clipping region (any shape)              |
+| Mask          | Alpha mask for compositing               |
+| Pattern       | Repeating shape/image fill               |
+| Gradient      | Linear/radial/conic with stops           |
 
 ## Pillar 4: Typography
 
@@ -295,28 +473,80 @@ Text rendering and typographic hierarchy.
 
 ### Atoms
 
+#### Weight and Width
+
 | Name          | Type   | Min  | Max   | Behavior | Notes                       |
-|---------------|--------|------|-------|----------|-----------------------------|
+|---------------|--------|------|-------|----------|-----------------------------| 
 | FontWeight    | Int    | 1    | 1000  | clamps   | CSS font-weight             |
+| FontWidth     | Int    | 50   | 200   | clamps   | CSS font-stretch (%)        |
+
+#### Size and Spacing
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                       |
+|---------------|--------|------|-------|----------|-----------------------------| 
 | FontSize      | Number | 0    | none  | finite   | Size in pixels or relative  |
 | LineHeight    | Number | 0    | none  | finite   | Leading (unitless or px)    |
 | LetterSpacing | Number | none | none  | finite   | Tracking (em or px)         |
 | WordSpacing   | Number | none | none  | finite   | Word gap adjustment         |
+| TextIndent    | Number | none | none  | finite   | First line indent           |
+| TabSize       | Int    | 0    | none  | finite   | Tab character width         |
+
+#### Optical Sizing
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                       |
+|---------------|--------|------|-------|----------|-----------------------------| 
+| OpticalSize   | Number | 0    | none  | finite   | Variable font optical size  |
+| Grade         | Number | -200 | 200   | clamps   | Variable font grade         |
+
+#### OpenType Metrics
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                       |
+|---------------|--------|------|-------|----------|-----------------------------| 
+| Ascender      | Number | none | none  | finite   | Height above baseline       |
+| Descender     | Number | none | none  | finite   | Depth below baseline        |
+| XHeight       | Number | 0    | none  | finite   | Lowercase x height          |
+| CapHeight     | Number | 0    | none  | finite   | Capital letter height       |
+| UnitsPerEm    | Int    | 1    | none  | finite   | Font design units           |
 
 ### Molecules
 
-| Name      | Composition                           |
-|-----------|---------------------------------------|
-| FontStack | Array of font family names            |
-| TypeScale | Base size + scale ratio               |
+| Name          | Composition                           |
+|---------------|---------------------------------------|
+| FontFamily    | Family name string                    |
+| FontStack     | Array of FontFamily (fallbacks)       |
+| FontVariation | Axis tag + value (wght, wdth, etc)    |
+| TypeScale     | Base size + scale ratio               |
+| FontMetrics   | Ascender + Descender + XHeight + Cap  |
 
 ### Compounds
 
-| Name      | Description                              |
-|-----------|------------------------------------------|
-| TypeStyle | Font + Size + Weight + LineHeight        |
-| Hierarchy | Display/Heading/Body/Caption roles       |
-| Features  | OpenType features (ligatures, etc)       |
+#### Style
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| TypeStyle     | Font + Size + Weight + LineHeight + Spacing |
+| TypeVariant   | Small-caps, all-caps, petite-caps        |
+| TextDecoration| Underline, overline, line-through, wavy  |
+| TextEmphasis  | Emphasis marks (CJK)                     |
+
+#### Hierarchy
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| TypeHierarchy | Display/H1-H6/Body/Caption/Overline/Code |
+| TypeRole      | Semantic role (primary, secondary, etc)  |
+| TypeContrast  | High/medium/low contrast variant         |
+
+#### Features
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Ligatures     | Common, discretionary, contextual, historical |
+| Numerals      | Lining, oldstyle, proportional, tabular  |
+| Fractions     | Diagonal, stacked                        |
+| Stylistic     | Stylistic sets (ss01-ss20), swash, etc   |
+| Kerning       | Kerning on/off, optical                  |
+| CJKFeatures   | Ruby, vertical, traditional/simplified   |
 
 ## Pillar 5: Material
 
