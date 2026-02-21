@@ -35,6 +35,7 @@ module Hydrogen.Schema.Color.HSL
   
   -- * Constructors
   , hsl
+  , hslFromRecord
   , fromRecord
   , fromComponents
   
@@ -42,15 +43,16 @@ module Hydrogen.Schema.Color.HSL
   , hue
   , saturation
   , lightness
+  , hslToRecord
   , toRecord
   
-  -- * Operations
-  , rotate
+  -- * Operations (HSL-space, NOT perceptually uniform)
+  , rotateHue
   , complement
-  , lighten
-  , darken
-  , saturate
-  , desaturate
+  , increaseLightness
+  , decreaseLightness
+  , increaseSaturation
+  , decreaseSaturation
   , grayscale
   
   -- * CSS Output
@@ -111,8 +113,13 @@ hsl h s l = HSL
   }
 
 -- | Create from a record of raw values.
+-- | **Explicitly named for backend persistence** - no conflicts with other color spaces.
+hslFromRecord :: { h :: Int, s :: Int, l :: Int } -> HSL
+hslFromRecord { h, s, l } = hsl h s l
+
+-- | Generic alias for hslFromRecord
 fromRecord :: { h :: Int, s :: Int, l :: Int } -> HSL
-fromRecord { h, s, l } = hsl h s l
+fromRecord = hslFromRecord
 
 -- | Create from already-validated atoms.
 -- |
@@ -139,25 +146,36 @@ lightness (HSL c) = c.lightness
 -- | Convert to a record of raw Int values.
 -- |
 -- | Useful for interop with other systems or JSON serialization.
-toRecord :: HSL -> { h :: Int, s :: Int, l :: Int }
-toRecord (HSL c) =
+-- | **Explicitly named for backend persistence** - no conflicts with other color spaces.
+hslToRecord :: HSL -> { h :: Int, s :: Int, l :: Int }
+hslToRecord (HSL c) =
   { h: Hue.unwrap c.hue
   , s: Sat.unwrap c.saturation
   , l: Light.unwrap c.lightness
   }
 
+-- | Generic alias for hslToRecord
+toRecord :: HSL -> { h :: Int, s :: Int, l :: Int }
+toRecord = hslToRecord
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // operations
 -- ═══════════════════════════════════════════════════════════════════════════════
 
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                 // operations // explicit names
+-- ═══════════════════════════════════════════════════════════════════════════════
+
 -- | Rotate hue by degrees (wraps around the color wheel).
 -- |
+-- | **Semantically explicit name:** `rotateHue` makes clear this operates on hue angle.
+-- |
 -- | ```purescript
--- | rotate 120 (hsl 0 100 50)   -- Red → Green
--- | rotate (-60) (hsl 60 100 50) -- Yellow → Red
+-- | rotateHue 120 (hsl 0 100 50)   -- Red → Green
+-- | rotateHue (-60) (hsl 60 100 50) -- Yellow → Red
 -- | ```
-rotate :: Int -> HSL -> HSL
-rotate degrees (HSL c) = HSL
+rotateHue :: Int -> HSL -> HSL
+rotateHue degrees (HSL c) = HSL
   { hue: Hue.rotate degrees c.hue
   , saturation: c.saturation
   , lightness: c.lightness
@@ -170,55 +188,69 @@ rotate degrees (HSL c) = HSL
 -- | complement (hsl 60 100 50)  -- Yellow → Blue (240°)
 -- | ```
 complement :: HSL -> HSL
-complement = rotate 180
+complement = rotateHue 180
 
--- | Increase lightness by percentage points.
+-- | Increase HSL lightness by percentage points.
+-- |
+-- | **WARNING:** HSL lightness is NOT perceptually uniform. For accurate "looks 10% lighter"
+-- | operations, convert to LAB via Conversion module and use `LAB.increaseLuminance`.
 -- |
 -- | ```purescript
--- | lighten 20 (hsl 0 100 50)  -- L: 50 → 70
+-- | increaseLightness 20 (hsl 0 100 50)  -- L: 50 → 70 (HSL space, not perceptual)
 -- | ```
-lighten :: Int -> HSL -> HSL
-lighten amount (HSL c) = HSL
+increaseLightness :: Int -> HSL -> HSL
+increaseLightness amount (HSL c) = HSL
   { hue: c.hue
   , saturation: c.saturation
   , lightness: Light.lighten amount c.lightness
   }
 
--- | Decrease lightness by percentage points.
+-- | Decrease HSL lightness by percentage points.
+-- |
+-- | **WARNING:** HSL lightness is NOT perceptually uniform. For accurate "looks 10% darker"
+-- | operations, convert to LAB via Conversion module and use `LAB.decreaseLuminance`.
 -- |
 -- | ```purescript
--- | darken 20 (hsl 0 100 50)  -- L: 50 → 30
+-- | decreaseLightness 20 (hsl 0 100 50)  -- L: 50 → 30 (HSL space, not perceptual)
 -- | ```
-darken :: Int -> HSL -> HSL
-darken amount (HSL c) = HSL
+decreaseLightness :: Int -> HSL -> HSL
+decreaseLightness amount (HSL c) = HSL
   { hue: c.hue
   , saturation: c.saturation
   , lightness: Light.darken amount c.lightness
   }
 
--- | Increase saturation by percentage points.
+-- | Increase HSL saturation by percentage points.
+-- |
+-- | **NOTE:** HSL saturation differs from LCH chroma. For perceptually uniform saturation
+-- | adjustments, use LCH.increaseChroma.
 -- |
 -- | ```purescript
--- | saturate 20 (hsl 0 50 50)  -- S: 50 → 70
+-- | increaseSaturation 20 (hsl 0 50 50)  -- S: 50 → 70
 -- | ```
-saturate :: Int -> HSL -> HSL
-saturate amount (HSL c) = HSL
+increaseSaturation :: Int -> HSL -> HSL
+increaseSaturation amount (HSL c) = HSL
   { hue: c.hue
   , saturation: Sat.increase amount c.saturation
   , lightness: c.lightness
   }
 
--- | Decrease saturation by percentage points.
+-- | Decrease HSL saturation by percentage points.
+-- |
+-- | **NOTE:** HSL saturation differs from LCH chroma. For perceptually uniform saturation
+-- | adjustments, use LCH.decreaseChroma.
 -- |
 -- | ```purescript
--- | desaturate 20 (hsl 0 100 50)  -- S: 100 → 80
+-- | decreaseSaturation 20 (hsl 0 100 50)  -- S: 100 → 80
 -- | ```
-desaturate :: Int -> HSL -> HSL
-desaturate amount (HSL c) = HSL
+decreaseSaturation :: Int -> HSL -> HSL
+decreaseSaturation amount (HSL c) = HSL
   { hue: c.hue
   , saturation: Sat.decrease amount c.saturation
   , lightness: c.lightness
   }
+
+
 
 -- | Convert to grayscale (saturation = 0).
 -- |
