@@ -33,14 +33,14 @@ module Hydrogen.Schema.Color.RGB
   
   -- * RGB Constructors
   , rgb
-  , fromRecord
-  , fromChannels
+  , rgbFromRecord
+  , rgbFromChannels
   
   -- * RGB Accessors
   , red
   , green
   , blue
-  , toRecord
+  , rgbToRecord
   
   -- * RGB Operations
   , invert
@@ -50,14 +50,21 @@ module Hydrogen.Schema.Color.RGB
   , screen
   
   -- * RGB Output
-  , toCss
-  , toHex
+  , rgbToCss
+  , rgbToHex
   
-  -- * RGBA
+  -- * RGBA Constructors
   , rgba
+  , rgbaFromRecord
+  
+  -- * RGBA Accessors
   , alpha
-  , toRecordA
-  , toCssA
+  , rgbaToRecord
+  
+  -- * RGBA Output
+  , rgbaToCss
+  
+  -- * Conversion
   , toRGBA
   , fromRGBA
   ) where
@@ -86,7 +93,7 @@ derive instance eqRGB :: Eq RGB
 derive instance ordRGB :: Ord RGB
 
 instance showRGB :: Show RGB where
-  show = toCss
+  show = rgbToCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -109,14 +116,14 @@ rgb r g b = RGB
   }
 
 -- | Create from a record of raw values.
-fromRecord :: { r :: Int, g :: Int, b :: Int } -> RGB
-fromRecord { r, g, b } = rgb r g b
+rgbFromRecord :: { r :: Int, g :: Int, b :: Int } -> RGB
+rgbFromRecord { r, g, b } = rgb r g b
 
 -- | Create from already-validated Channel atoms.
 -- |
 -- | Use when you already have valid Channel values.
-fromChannels :: Ch.Channel -> Ch.Channel -> Ch.Channel -> RGB
-fromChannels r g b = RGB { red: r, green: g, blue: b }
+rgbFromChannels :: Ch.Channel -> Ch.Channel -> Ch.Channel -> RGB
+rgbFromChannels r g b = RGB { red: r, green: g, blue: b }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors
@@ -137,8 +144,8 @@ blue (RGB c) = c.blue
 -- | Convert to a record of raw Int values.
 -- |
 -- | Useful for interop with other systems or JSON serialization.
-toRecord :: RGB -> { r :: Int, g :: Int, b :: Int }
-toRecord (RGB c) =
+rgbToRecord :: RGB -> { r :: Int, g :: Int, b :: Int }
+rgbToRecord (RGB c) =
   { r: Ch.unwrap c.red
   , g: Ch.unwrap c.green
   , b: Ch.unwrap c.blue
@@ -224,10 +231,10 @@ screen (RGB c1) (RGB c2) = RGB
 -- | Convert to CSS rgb() function string.
 -- |
 -- | ```purescript
--- | toCss (rgb 255 128 0)  -- "rgb(255, 128, 0)"
+-- | rgbToCss (rgb 255 128 0)  -- "rgb(255, 128, 0)"
 -- | ```
-toCss :: RGB -> String
-toCss (RGB c) =
+rgbToCss :: RGB -> String
+rgbToCss (RGB c) =
   "rgb(" <> show (Ch.unwrap c.red)
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue) <> ")"
@@ -235,10 +242,10 @@ toCss (RGB c) =
 -- | Convert to 6-character hex string (without #).
 -- |
 -- | ```purescript
--- | toHex (rgb 255 128 0)  -- "ff8000"
+-- | rgbToHex (rgb 255 128 0)  -- "ff8000"
 -- | ```
-toHex :: RGB -> String
-toHex (RGB c) =
+rgbToHex :: RGB -> String
+rgbToHex (RGB c) =
   intToHex (Ch.unwrap c.red) 
   <> intToHex (Ch.unwrap c.green) 
   <> intToHex (Ch.unwrap c.blue)
@@ -294,7 +301,7 @@ derive instance eqRGBA :: Eq RGBA
 derive instance ordRGBA :: Ord RGBA
 
 instance showRGBA :: Show RGBA where
-  show = toCssA
+  show = rgbaToCss
 
 -- | Create an RGBA color from raw values.
 rgba :: Int -> Int -> Int -> Int -> RGBA
@@ -310,8 +317,8 @@ alpha :: RGBA -> Ch.Channel
 alpha (RGBA c) = c.alpha
 
 -- | Convert RGBA to a record of raw Int values.
-toRecordA :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
-toRecordA (RGBA c) =
+rgbaToRecord :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
+rgbaToRecord (RGBA c) =
   { r: Ch.unwrap c.red
   , g: Ch.unwrap c.green
   , b: Ch.unwrap c.blue
@@ -319,8 +326,8 @@ toRecordA (RGBA c) =
   }
 
 -- | Convert to CSS rgba() function string.
-toCssA :: RGBA -> String
-toCssA (RGBA c) =
+rgbaToCss :: RGBA -> String
+rgbaToCss (RGBA c) =
   let a' = Int.toNumber (Ch.unwrap c.alpha) / 255.0
   in "rgba(" <> show (Ch.unwrap c.red)
   <> ", " <> show (Ch.unwrap c.green)

@@ -13,16 +13,16 @@
 -- |
 -- | ```purescript
 -- | import Hydrogen.Icon.Icon as Icon
--- | import Hydrogen.Icon.Lucide as Lucide
+-- | import Hydrogen.Icon.Icons as Icons
 -- |
 -- | -- Render an icon with default size
--- | Lucide.check []
+-- | Icons.check []
 -- |
 -- | -- With custom size
--- | Lucide.check [ Icon.size Icon.Lg ]
+-- | Icons.check [ Icon.size Icon.Lg ]
 -- |
 -- | -- With custom class
--- | Lucide.check [ Icon.className "text-primary" ]
+-- | Icons.check [ Icon.className "text-primary" ]
 -- | ```
 module Hydrogen.Icon.Icon
   ( -- * Icon Props

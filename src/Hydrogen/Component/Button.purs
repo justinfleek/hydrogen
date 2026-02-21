@@ -42,6 +42,7 @@ module Hydrogen.Component.Button
   , className
   , onClick
   , type_
+  , shadow
     -- * Variants
   , ButtonVariant(..)
   , variantClasses
@@ -50,6 +51,7 @@ module Hydrogen.Component.Button
   , sizeClasses
     -- * Types
   , ButtonType(..)
+  , buttonTypeStr
   ) where
 
 import Prelude
@@ -81,13 +83,13 @@ derive instance eqButtonVariant :: Eq ButtonVariant
 variantClasses :: ButtonVariant -> String
 variantClasses = case _ of
   Default ->
-    "bg-primary text-primary-foreground hover:bg-primary/90"
+    "bg-primary text-primary-foreground hover:bg-primary-foreground hover:text-primary border border-transparent hover:border-primary"
   Destructive ->
-    "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+    "bg-destructive text-destructive-foreground hover:bg-destructive-foreground hover:text-destructive border border-transparent hover:border-destructive"
   Outline ->
-    "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+    "border border-white/20 bg-transparent hover:bg-white/5 hover:border-white/40"
   Secondary ->
-    "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+    "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
   Ghost ->
     "hover:bg-accent hover:text-accent-foreground"
   Link ->
@@ -142,6 +144,7 @@ type ButtonProps i =
   , size :: ButtonSize
   , disabled :: Boolean
   , loading :: Boolean
+  , shadow :: Boolean
   , className :: String
   , onClick :: Maybe (MouseEvent -> i)
   , type_ :: ButtonType
@@ -157,6 +160,7 @@ defaultProps =
   , size: Md
   , disabled: false
   , loading: false
+  , shadow: false
   , className: ""
   , onClick: Nothing
   , type_: TypeButton
@@ -194,6 +198,10 @@ onClick handler props = props { onClick = Just handler }
 type_ :: forall i. ButtonType -> ButtonProp i
 type_ t props = props { type_ = t }
 
+-- | Enable drop shadow
+shadow :: forall i. Boolean -> ButtonProp i
+shadow s props = props { shadow = s }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // component
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -201,14 +209,20 @@ type_ t props = props { type_ = t }
 -- | Base button classes
 baseClasses :: String
 baseClasses =
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]"
+
+-- | Shadow classes for elevated buttons
+shadowClasses :: String
+shadowClasses =
+  "shadow-lg shadow-black/25 hover:shadow-xl hover:shadow-black/30"
 
 -- | Render a button
 button :: forall w i. Array (ButtonProp i) -> Array (HH.HTML w i) -> HH.HTML w i
 button propMods children =
   let
     props = foldl (\p f -> f p) defaultProps propMods
-    classes = baseClasses <> " " <> variantClasses props.variant <> " " <> sizeClasses props.size <> " " <> props.className
+    shadowClass = if props.shadow then shadowClasses else ""
+    classes = baseClasses <> " " <> variantClasses props.variant <> " " <> sizeClasses props.size <> " " <> shadowClass <> " " <> props.className
     loadingClass = if props.loading then "opacity-70 cursor-wait" else ""
   in
     HH.button

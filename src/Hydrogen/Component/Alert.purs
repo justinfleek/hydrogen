@@ -10,7 +10,7 @@
 -- |
 -- | ```purescript
 -- | import Hydrogen.Component.Alert as Alert
--- | import Hydrogen.Icon.Lucide as Icon
+-- | import Hydrogen.Icon.Icons as Icon
 -- |
 -- | -- Default alert
 -- | Alert.alert []
