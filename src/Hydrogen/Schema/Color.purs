@@ -36,14 +36,14 @@
 -- | to avoid naming conflicts. Many atoms share operation names like `blend`, `scale`, `invert`.
 -- |
 -- | **Molecules**:
--- | - `Hydrogen.Schema.Color.RGB` — RGB and RGBA colors (import qualified for RGBA)
--- | - `Hydrogen.Schema.Color.HSL` — HSL colors
--- | - `Hydrogen.Schema.Color.HSLA` — HSLA colors (import qualified)
+-- | - `Hydrogen.Schema.Color.RGB` — RGB colors (red, green, blue channels)
+-- | - `Hydrogen.Schema.Color.RGB` — RGBA colors (RGB with alpha, import qualified)
+-- | - `Hydrogen.Schema.Color.HSL` — HSL colors (hue, saturation, lightness)
+-- | - `Hydrogen.Schema.Color.HSLA` — HSLA colors (HSL with alpha, import qualified)
 -- |
--- | Note: RGBA and HSLA have naming conflicts with each other (both export `alpha`).
--- | Import with qualification when using both:
+-- | Note: Both RGB.purs and HSLA.purs export an `alpha` accessor. Import with qualification:
 -- | ```purescript
--- | import Hydrogen.Schema.Color.RGB as RGB
+-- | import Hydrogen.Schema.Color.RGB as RGB  -- for RGB.RGBA
 -- | import Hydrogen.Schema.Color.HSLA as HSLA
 -- | ```
 -- |
