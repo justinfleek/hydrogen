@@ -166,6 +166,7 @@ import Data.Argonaut (class EncodeJson, encodeJson, stringify)
 import Data.Array (filter, foldl, length, mapWithIndex, sortBy, take, drop, (:))
 import Data.Array as Array
 import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Number (fromString) as Number
 
 import Data.String (Pattern(..), contains, toLower)
 import Data.String as String
@@ -854,7 +855,7 @@ renderBody props cols rowData =
         then renderLoadingRows cols
         else if isEmpty
           then renderEmptyState props cols
-          else mapWithIndex (renderRow props cols) rowData
+          else Array.concat (mapWithIndex (renderRowWithExpansion props cols) rowData)
   in
     HH.tbody
       [ ARIA.role "rowgroup"
@@ -955,8 +956,41 @@ renderRow props cols rowIndex rowData =
         -- Data cells
         <> mapWithIndex (\colIndex col -> renderCell props col rowIndex colIndex rowData isSelected isExpanded) cols
       )
-    -- Expanded row content
-    -- TODO: Render expanded content row when isExpanded
+-- | Render a data row with optional expansion row
+renderRowWithExpansion :: forall w i. GridProps w i -> Array (ColumnDef w i) -> Int -> Object String -> Array (HH.HTML w i)
+renderRowWithExpansion props cols rowIndex rowData =
+  let
+    rowKeyValue = fromMaybe (show rowIndex) (Object.lookup props.rowKey rowData)
+    isSelected = Array.elem rowKeyValue props.selectedRowKeys
+    isExpanded = Array.elem rowKeyValue props.expandedRowKeys
+    rowContext =
+      { rowIndex
+      , rowData
+      , isSelected
+      , isExpanded
+      }
+    mainRow = renderRow props cols rowIndex rowData
+    totalColSpan = length cols 
+      + (if props.selectionMode == CheckboxSelect then 1 else 0) 
+      + (if props.expandable then 1 else 0)
+    expandedRow = 
+      if isExpanded
+        then case props.expandedContent of
+          Just renderer ->
+            [ HH.tr
+                [ cls [ "border-b border-border bg-muted/30" ]
+                , HP.attr (HH.AttrName "data-expanded-row") rowKeyValue
+                ]
+                [ HH.td
+                    [ HP.colSpan totalColSpan
+                    , cls [ "p-4" ]
+                    ]
+                    [ renderer rowContext ]
+                ]
+            ]
+          Nothing -> []
+        else []
+  in [ mainRow ] <> expandedRow
 
 -- | Toggle selection helper
 toggleSelection :: Array String -> String -> SelectionMode -> Array String
@@ -1247,12 +1281,31 @@ matchesColumnFilter colKey filterVal rowData =
       case filterVal of
         TextFilter searchText ->
           contains (Pattern (toLower searchText)) (toLower cellValue)
-        NumberFilter _ -> true -- TODO: implement number range filtering
+        NumberFilter { min: minVal, max: maxVal } ->
+          case Number.fromString cellValue of
+            Nothing -> false
+            Just num ->
+              let
+                aboveMin = case minVal of
+                  Nothing -> true
+                  Just m -> num >= m
+                aboveMax = case maxVal of
+                  Nothing -> true
+                  Just m -> num <= m
+              in aboveMin && aboveMax
         BooleanFilter expected ->
           (cellValue == "true" || cellValue == "1") == expected
         SelectFilter allowedValues ->
           Array.elem cellValue allowedValues
-        DateRangeFilter _ -> true -- TODO: implement date range filtering
+        DateRangeFilter { start: startDate, end: endDate } ->
+          let
+            afterStart = case startDate of
+              Nothing -> true
+              Just s -> cellValue >= s
+            beforeEnd = case endDate of
+              Nothing -> true
+              Just e -> cellValue <= e
+          in afterStart && beforeEnd
 
 -- | Apply sorting to rows
 applySorting :: Array SortConfig -> Array (Object String) -> Array (Object String)

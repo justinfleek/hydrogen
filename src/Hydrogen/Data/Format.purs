@@ -31,6 +31,7 @@ import Prelude
 import Data.Int (floor, toNumber)
 import Data.Maybe (Maybe(..))
 import Data.Number (isFinite)
+import Data.Number (fromString) as Number
 import Data.String (Pattern(..), split) as S
 
 -- ============================================================
@@ -109,7 +110,7 @@ parseBytes str =
     _ -> Nothing
   where
   parseNum :: String -> Maybe Number
-  parseNum _ = Nothing  -- TODO: implement proper parsing with Number.fromString
+  parseNum = Number.fromString
 
 -- ============================================================
 -- Number Formatting
