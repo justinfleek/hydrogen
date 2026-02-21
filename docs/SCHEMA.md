@@ -554,29 +554,99 @@ Surface appearance and texture.
 
 ### Atoms
 
-| Name      | Type   | Min  | Max  | Behavior | Notes                     |
-|-----------|--------|------|------|----------|---------------------------|
-| BlurRadius| Number | 0    | none | finite   | Gaussian blur amount      |
-| NoiseFreq | Number | 0    | none | finite   | Noise frequency           |
-| NoiseAmp  | Number | 0    | 1.0  | clamps   | Noise amplitude           |
+#### Blur and Effects
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| BlurRadius    | Number | 0    | none | finite   | Gaussian blur amount      |
+| BlurSigma     | Number | 0    | none | finite   | Blur sigma (std dev)      |
+| Saturation    | Number | 0    | 2.0  | clamps   | Filter saturation         |
+| Brightness    | Number | 0    | 2.0  | clamps   | Filter brightness         |
+| Contrast      | Number | 0    | 2.0  | clamps   | Filter contrast           |
+| Sepia         | Number | 0    | 1.0  | clamps   | Sepia filter amount       |
+| Grayscale     | Number | 0    | 1.0  | clamps   | Grayscale amount          |
+| Invert        | Number | 0    | 1.0  | clamps   | Invert amount             |
+| HueRotate     | Number | none | none | finite   | Hue rotation (degrees)    |
+
+#### Noise
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| NoiseFreq     | Number | 0    | none | finite   | Noise frequency           |
+| NoiseAmp      | Number | 0    | 1.0  | clamps   | Noise amplitude           |
+| NoiseOctaves  | Int    | 1    | 16   | clamps   | Fractal octaves           |
+| NoiseLacunarity| Number| 1    | none | finite   | Frequency multiplier      |
+| NoisePersist  | Number | 0    | 1.0  | clamps   | Amplitude decay           |
+| NoiseSeed     | Int    | none | none | finite   | Random seed               |
+
+#### Border
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| BorderWidth   | Number | 0    | none | finite   | Border thickness          |
+| DashLength    | Number | 0    | none | finite   | Dash segment length       |
+| DashGap       | Number | 0    | none | finite   | Gap between dashes        |
+| DashOffset    | Number | none | none | finite   | Dash pattern offset       |
 
 ### Molecules
 
-| Name          | Composition                       |
-|---------------|-----------------------------------|
-| LinearGrad    | Angle + ColorStops                |
-| RadialGrad    | Center + Radius + ColorStops      |
-| ConicGrad     | Center + Angle + ColorStops       |
-| ColorStop     | Color + Position (Ratio)          |
+#### Gradients
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| ColorStop     | Color + Position (Ratio)                 |
+| LinearGrad    | Angle + Array of ColorStop               |
+| RadialGrad    | Center + Radius + Array of ColorStop     |
+| ConicGrad     | Center + Angle + Array of ColorStop      |
+| MeshGrad      | Grid of Colors                           |
+
+#### Noise Types
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| PerlinNoise   | Freq + Amp + Octaves + Seed              |
+| SimplexNoise  | Freq + Amp + Octaves + Seed              |
+| WorleyNoise   | Freq + Type (F1/F2/F2-F1)                |
+| FBM           | NoiseType + Octaves + Lacunarity + Persist|
+
+#### Borders
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| BorderSide    | Width + Style + Color                    |
+| BorderAll     | Top + Right + Bottom + Left              |
+| BorderImage   | Source + Slice + Width + Outset + Repeat |
 
 ### Compounds
 
-| Name      | Description                              |
-|-----------|------------------------------------------|
-| Fill      | Solid, gradient, or pattern              |
-| Texture   | Noise, image, procedural                 |
-| Border    | Width + Style + Color                    |
-| Glass     | Glassmorphism effect parameters          |
+#### Fill Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| SolidFill     | Single color fill                        |
+| GradientFill  | Any gradient type                        |
+| PatternFill   | Repeating image/shape                    |
+| NoiseFill     | Procedural noise texture                 |
+
+#### Effects
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| BackdropBlur  | Background blur (glassmorphism)          |
+| Frosted       | Blur + tint + noise                      |
+| Neumorphism   | Soft UI with inset/outset shadows        |
+| Duotone       | Two-color image effect                   |
+| FilterChain   | Multiple CSS filters in sequence         |
+
+#### Surface
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Matte         | No reflectivity, solid appearance        |
+| Glossy        | High reflectivity, specular highlight    |
+| Metallic      | Metal-like reflection                    |
+| Satin         | Soft sheen, between matte and glossy     |
+| Textured      | Surface with tactile appearance          |
 
 ## Pillar 6: Elevation
 
@@ -584,29 +654,79 @@ Depth, shadow, and visual hierarchy.
 
 ### Atoms
 
-| Name        | Type   | Min  | Max  | Behavior | Notes                    |
-|-------------|--------|------|------|----------|--------------------------|
-| ZIndex      | Int    | none | none | finite   | Stacking order           |
-| BlurAmount  | Number | 0    | none | finite   | Shadow blur              |
-| SpreadAmount| Number | none | none | finite   | Shadow spread            |
-| OffsetX     | Number | none | none | finite   | Horizontal offset        |
-| OffsetY     | Number | none | none | finite   | Vertical offset          |
+#### Stacking
+
+| Name          | Type   | Min    | Max    | Behavior | Notes                    |
+|---------------|--------|--------|--------|----------|--------------------------|
+| ZIndex        | Int    | -32768 | 32767  | finite   | Stacking order           |
+| IsolationMode | Bool   | -      | -      | -        | Creates stacking context |
+
+#### Shadow Parameters
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| ShadowBlur    | Number | 0    | none | finite   | Shadow blur radius       |
+| ShadowSpread  | Number | none | none | finite   | Shadow spread (+ or -)   |
+| ShadowOffsetX | Number | none | none | finite   | Horizontal offset        |
+| ShadowOffsetY | Number | none | none | finite   | Vertical offset          |
+| ShadowInset   | Bool   | -    | -    | -        | Inner vs outer shadow    |
+
+#### Perspective
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                    |
+|---------------|--------|------|-------|----------|--------------------------|
+| Perspective   | Number | 0    | none  | finite   | Perspective distance     |
+| PerspOrigX    | Number | 0    | 100   | clamps   | Perspective origin X (%) |
+| PerspOrigY    | Number | 0    | 100   | clamps   | Perspective origin Y (%) |
+
+#### Depth of Field
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| FocalDistance | Number | 0    | none | finite   | Focus distance           |
+| Aperture      | Number | 0    | none | finite   | f-stop (affects DoF)     |
+| BokehRadius   | Number | 0    | none | finite   | Out-of-focus blur        |
 
 ### Molecules
 
-| Name     | Composition                              |
-|----------|------------------------------------------|
-| Offset   | OffsetX + OffsetY                        |
-| Shadow   | Offset + Blur + Spread + Color + Inset   |
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| ShadowOffset  | OffsetX + OffsetY                        |
+| BoxShadow     | Offset + Blur + Spread + Color + Inset   |
+| DropShadowCSS | Offset + Blur + Color (no spread/inset)  |
+| TextShadow    | Offset + Blur + Color                    |
+| PerspectiveOrigin | X + Y                               |
 
 ### Compounds
 
-| Name       | Description                              |
-|------------|------------------------------------------|
-| Elevation  | Semantic elevation levels (0-24)         |
-| DropShadow | External shadow                          |
-| InnerShadow| Inset shadow                             |
-| Layers     | Multiple shadow composition              |
+#### Semantic Elevation
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Elevation0    | Flat, no shadow (ground level)           |
+| Elevation1    | Subtle lift (cards, buttons)             |
+| Elevation2    | Raised (FAB, active cards)               |
+| Elevation3    | Floating (menus, tooltips)               |
+| Elevation4    | Modal (dialogs, drawers)                 |
+| Elevation5    | Overlay (maximum elevation)              |
+
+#### Shadow Styles
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ShadowSoft    | Large blur, low opacity, diffuse         |
+| ShadowHard    | Small blur, higher opacity, defined      |
+| ShadowLayered | Multiple shadows at different levels     |
+| ShadowColored | Tinted shadow matching element color     |
+| ShadowLong    | Extended shadow (simulates low light)    |
+
+#### Depth Effects
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Parallax      | Scroll-linked depth movement             |
+| DepthStack    | Z-ordered layer composition              |
+| FloatingUI    | Combined elevation + backdrop blur       |
 
 ## Pillar 7: Temporal
 
@@ -614,31 +734,134 @@ Time, motion, and animation.
 
 ### Atoms
 
-| Name         | Type   | Min  | Max  | Behavior | Notes                    |
-|--------------|--------|------|------|----------|--------------------------|
-| Milliseconds | Number | 0    | none | finite   | Duration in ms           |
-| Seconds      | Number | 0    | none | finite   | Duration in seconds      |
-| Frames       | Int    | 0    | none | finite   | Frame count              |
-| FPS          | Number | 0    | none | finite   | Frames per second        |
-| Progress     | Number | 0.0  | 1.0  | clamps   | Animation progress       |
+#### Time Units
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| Nanoseconds   | Number | 0    | none | finite   | Duration in ns           |
+| Microseconds  | Number | 0    | none | finite   | Duration in us           |
+| Milliseconds  | Number | 0    | none | finite   | Duration in ms           |
+| Seconds       | Number | 0    | none | finite   | Duration in seconds      |
+| Minutes       | Number | 0    | none | finite   | Duration in minutes      |
+| Hours         | Number | 0    | none | finite   | Duration in hours        |
+
+#### Frame-Based
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| Frames        | Int    | 0    | none | finite   | Frame count              |
+| FPS           | Number | 0.01 | none | finite   | Frames per second        |
+| Timecode      | String | -    | -    | -        | HH:MM:SS:FF format       |
+
+#### Progress
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| Progress      | Number | 0.0  | 1.0  | clamps   | Animation progress       |
+| Iteration     | Number | 0    | none | finite   | Loop iteration count     |
+| Direction     | enum   | -    | -    | -        | normal/reverse/alternate |
+| FillMode      | enum   | -    | -    | -        | none/forwards/backwards/both |
+| PlayState     | enum   | -    | -    | -        | running/paused           |
+
+#### Easing Parameters
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| CubicX1       | Number | 0    | 1    | clamps   | Bezier control point 1 X |
+| CubicY1       | Number | none | none | finite   | Bezier control point 1 Y |
+| CubicX2       | Number | 0    | 1    | clamps   | Bezier control point 2 X |
+| CubicY2       | Number | none | none | finite   | Bezier control point 2 Y |
+| Steps         | Int    | 1    | none | finite   | Step easing count        |
+| StepPosition  | enum   | -    | -    | -        | start/end/both/none      |
+
+#### Spring Physics
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| Mass          | Number | 0.01 | none | finite   | Object mass              |
+| Stiffness     | Number | 0    | none | finite   | Spring constant (k)      |
+| Damping       | Number | 0    | none | finite   | Friction/resistance      |
+| Velocity      | Number | none | none | finite   | Initial velocity         |
+| RestDelta     | Number | 0    | none | finite   | Rest threshold           |
+| RestSpeed     | Number | 0    | none | finite   | Speed threshold          |
 
 ### Molecules
 
-| Name       | Composition                          |
-|------------|--------------------------------------|
-| Duration   | Milliseconds or Seconds              |
-| Delay      | Milliseconds before start            |
-| Keyframe   | Progress + Properties                |
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Duration      | Value + Unit (ms, s, frames, etc)        |
+| Delay         | Duration (before start)                  |
+| CubicBezier   | X1 + Y1 + X2 + Y2                        |
+| StepEasing    | Steps + Position                         |
+| SpringConfig  | Mass + Stiffness + Damping + Velocity    |
+| Keyframe      | Progress (0-1) + PropertyValues          |
+| TimeRange     | Start + End (durations or timecodes)     |
 
 ### Compounds
 
-| Name         | Description                            |
-|--------------|----------------------------------------|
-| Easing       | Timing function (linear, ease, cubic)  |
-| Transition   | Property + Duration + Easing + Delay   |
-| Animation    | Keyframes + Duration + Iteration       |
-| Spring       | Mass + Stiffness + Damping             |
-| Orchestration| Stagger, sequence, parallel            |
+#### Easing Functions
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Linear        | No acceleration                          |
+| EaseIn        | Accelerate from zero velocity            |
+| EaseOut       | Decelerate to zero velocity              |
+| EaseInOut     | Accelerate then decelerate               |
+| EaseInQuad    | Quadratic ease in                        |
+| EaseOutQuad   | Quadratic ease out                       |
+| EaseInOutQuad | Quadratic ease in/out                    |
+| EaseInCubic   | Cubic ease in                            |
+| EaseOutCubic  | Cubic ease out                           |
+| EaseInOutCubic| Cubic ease in/out                        |
+| EaseInQuart   | Quartic ease in                          |
+| EaseOutQuart  | Quartic ease out                         |
+| EaseInOutQuart| Quartic ease in/out                      |
+| EaseInQuint   | Quintic ease in                          |
+| EaseOutQuint  | Quintic ease out                         |
+| EaseInOutQuint| Quintic ease in/out                      |
+| EaseInExpo    | Exponential ease in                      |
+| EaseOutExpo   | Exponential ease out                     |
+| EaseInOutExpo | Exponential ease in/out                  |
+| EaseInCirc    | Circular ease in                         |
+| EaseOutCirc   | Circular ease out                        |
+| EaseInOutCirc | Circular ease in/out                     |
+| EaseInBack    | Overshoot ease in                        |
+| EaseOutBack   | Overshoot ease out                       |
+| EaseInOutBack | Overshoot ease in/out                    |
+| EaseInElastic | Elastic ease in                          |
+| EaseOutElastic| Elastic ease out                         |
+| EaseInOutElastic| Elastic ease in/out                    |
+| EaseInBounce  | Bounce ease in                           |
+| EaseOutBounce | Bounce ease out                          |
+| EaseInOutBounce| Bounce ease in/out                      |
+
+#### Animation Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Transition    | Property + Duration + Easing + Delay     |
+| KeyframeAnim  | Keyframes[] + Duration + Timing          |
+| SpringAnim    | SpringConfig + TargetValue               |
+| PhysicsAnim   | Velocity + Friction + Bounds             |
+
+#### Orchestration
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Sequence      | Animations run one after another         |
+| Parallel      | Animations run simultaneously            |
+| Stagger       | Delayed start per element                |
+| Timeline      | Absolute time positioning                |
+| Chain         | Output of one feeds into next            |
+
+#### Integrations
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| LottieConfig  | Lottie animation configuration           |
+| RiveConfig    | Rive animation configuration             |
+| GSAPConfig    | GSAP timeline configuration              |
+| FramerConfig  | Framer Motion configuration              |
 
 ## Pillar 8: Reactive
 
@@ -646,23 +869,111 @@ State and feedback.
 
 ### Atoms
 
-| Name     | Type    | Notes                                   |
-|----------|---------|-----------------------------------------|
-| Boolean  | Boolean | True/false state                        |
+#### Flags
+
+| Name          | Type    | Notes                                   |
+|---------------|---------|-----------------------------------------|
+| Enabled       | Boolean | Component is enabled                    |
+| Visible       | Boolean | Component is visible                    |
+| Selected      | Boolean | Item is selected                        |
+| Checked       | Boolean | Checkbox/toggle is checked              |
+| Expanded      | Boolean | Accordion/tree is expanded              |
+| Open          | Boolean | Dropdown/modal is open                  |
+| Focused       | Boolean | Element has focus                       |
+| Hovered       | Boolean | Pointer is over element                 |
+| Pressed       | Boolean | Element is being pressed                |
+| Dragging      | Boolean | Element is being dragged                |
+| Loading       | Boolean | Data is loading                         |
+| Busy          | Boolean | Action in progress                      |
+| ReadOnly      | Boolean | Input is read-only                      |
+| Required      | Boolean | Field is required                       |
+| Invalid       | Boolean | Validation failed                       |
+| Indeterminate | Boolean | Partial selection (checkbox)            |
+
+#### Progress
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| LoadProgress  | Number | 0.0  | 1.0  | clamps   | Loading progress         |
+| UploadProgress| Number | 0.0  | 1.0  | clamps   | Upload progress          |
+| StepIndex     | Int    | 0    | none | finite   | Current step in wizard   |
+| PageIndex     | Int    | 0    | none | finite   | Current page             |
 
 ### Molecules
 
-(No molecules - states are semantic, not compositional)
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| FocusRing     | Color + Width + Offset + Style           |
+| SelectionState| Selected + Indeterminate                 |
+| LoadingState  | Loading + Progress + Error               |
 
 ### Compounds
 
-| Name        | Description                              |
-|-------------|------------------------------------------|
-| Interactive | Default/Hover/Focus/Active/Disabled      |
-| Semantic    | Loading/Success/Error/Warning/Info       |
-| Data        | Empty/Populated/Partial/Stale            |
-| Validation  | Valid/Invalid/Pristine/Dirty/Touched     |
-| Feedback    | Toast/Notification/Inline/Modal          |
+#### Interactive States
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Default       | Initial/resting state                    |
+| Hover         | Pointer over element                     |
+| Focus         | Keyboard focus                           |
+| FocusVisible  | Keyboard focus (visible ring)            |
+| Active        | Being clicked/pressed                    |
+| Pressed       | Held down                                |
+| Disabled      | Not interactive                          |
+| ReadOnly      | Visible but not editable                 |
+| Selected      | Item is selected                         |
+| Checked       | Toggle/checkbox is on                    |
+| Dragging      | Being dragged                            |
+| DropTarget    | Valid drop zone                          |
+
+#### Semantic States
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Idle          | No activity                              |
+| Loading       | Fetching data                            |
+| Success       | Operation completed                      |
+| Error         | Operation failed                         |
+| Warning       | Attention needed                         |
+| Info          | Informational                            |
+| Pending       | Awaiting action                          |
+| Processing    | Background work                          |
+
+#### Data States
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Empty         | No data                                  |
+| Populated     | Has data                                 |
+| Partial       | Incomplete data                          |
+| Stale         | Data may be outdated                     |
+| Refreshing    | Updating data                            |
+| Offline       | No connection                            |
+
+#### Validation States
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Valid         | Passes validation                        |
+| Invalid       | Fails validation                         |
+| Pristine      | Never modified                           |
+| Dirty         | Has been modified                        |
+| Touched       | Has been focused and blurred             |
+| Validating    | Validation in progress                   |
+
+#### Feedback Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Toast         | Temporary notification                   |
+| Snackbar      | Action notification                      |
+| Banner        | Persistent top/bottom message            |
+| Alert         | Inline alert box                         |
+| Tooltip       | Hover information                        |
+| Popover       | Click information                        |
+| Modal         | Blocking dialog                          |
+| Drawer        | Slide-in panel                           |
+| Sheet         | Bottom sheet (mobile)                    |
 
 ## Pillar 9: Gestural
 
@@ -670,28 +981,136 @@ User input and interaction patterns.
 
 ### Atoms
 
-| Name       | Type   | Min  | Max  | Behavior | Notes                    |
-|------------|--------|------|------|----------|--------------------------|
-| Pressure   | Number | 0.0  | 1.0  | clamps   | Touch/pen pressure       |
-| Velocity   | Number | none | none | finite   | Movement speed           |
-| Distance   | Number | 0    | none | finite   | Gesture travel distance  |
+#### Pointer Metrics
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| PointerX      | Number | none | none | finite   | Pointer X position       |
+| PointerY      | Number | none | none | finite   | Pointer Y position       |
+| Pressure      | Number | 0.0  | 1.0  | clamps   | Touch/pen pressure       |
+| TiltX         | Number | -90  | 90   | clamps   | Pen tilt X (degrees)     |
+| TiltY         | Number | -90  | 90   | clamps   | Pen tilt Y (degrees)     |
+| Twist         | Number | 0    | 359  | wraps    | Pen rotation (degrees)   |
+| Width         | Number | 0    | none | finite   | Touch contact width      |
+| Height        | Number | 0    | none | finite   | Touch contact height     |
+
+#### Motion
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| VelocityX     | Number | none | none | finite   | Horizontal velocity      |
+| VelocityY     | Number | none | none | finite   | Vertical velocity        |
+| Acceleration  | Number | none | none | finite   | Rate of velocity change  |
+| Distance      | Number | 0    | none | finite   | Gesture travel distance  |
+| Angle         | Number | 0    | 359  | wraps    | Direction angle          |
+
+#### Timing
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| ClickCount    | Int    | 1    | none | finite   | Consecutive clicks       |
+| HoldDuration  | Number | 0    | none | finite   | Long press duration (ms) |
+| TapInterval   | Number | 0    | none | finite   | Time between taps (ms)   |
+
+#### Scroll
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| ScrollX       | Number | none | none | finite   | Horizontal scroll offset |
+| ScrollY       | Number | none | none | finite   | Vertical scroll offset   |
+| ScrollDeltaX  | Number | none | none | finite   | Scroll delta X           |
+| ScrollDeltaY  | Number | none | none | finite   | Scroll delta Y           |
+| ScrollProgress| Number | 0.0  | 1.0  | clamps   | Scroll position (0-1)    |
+
+#### Multi-touch
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                    |
+|---------------|--------|------|------|----------|--------------------------|
+| TouchCount    | Int    | 0    | 10   | clamps   | Number of touch points   |
+| PinchScale    | Number | 0    | none | finite   | Pinch zoom factor        |
+| RotationAngle | Number | none | none | finite   | Two-finger rotation      |
 
 ### Molecules
 
-| Name      | Composition                          |
-|-----------|--------------------------------------|
-| SwipeDir  | Direction + Velocity + Distance      |
-| PinchData | Scale factor + Center point          |
-| RotateData| Angle + Center point                 |
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Point         | X + Y                                    |
+| PointerEvent  | Point + Pressure + Tilt + Twist          |
+| TouchPoint    | Point + Width + Height + Pressure        |
+| Velocity2D    | VelocityX + VelocityY                    |
+| GestureVector | Distance + Angle + Velocity              |
+| ScrollState   | X + Y + DeltaX + DeltaY + Progress       |
+| PinchState    | Scale + Center + Rotation                |
+| SwipeData     | Direction + Velocity + Distance          |
+| DragData      | Start + Current + Delta + Velocity       |
 
 ### Compounds
 
-| Name      | Description                              |
-|-----------|------------------------------------------|
-| Pointer   | Click/DoubleClick/RightClick/Hover/Drag  |
-| Touch     | Tap/DoubleTap/LongPress/Swipe/Pinch      |
-| Scroll    | ScrollSnap/Overscroll/Infinite           |
-| Keyboard  | Shortcuts/Focus/KeySequence              |
+#### Pointer Events
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Click         | Single pointer press+release             |
+| DoubleClick   | Two rapid clicks                         |
+| TripleClick   | Three rapid clicks (select paragraph)    |
+| RightClick    | Secondary button click                   |
+| MiddleClick   | Middle button click                      |
+| Hover         | Pointer over without press               |
+| HoverEnter    | Pointer enters element                   |
+| HoverLeave    | Pointer leaves element                   |
+
+#### Touch Gestures
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Tap           | Quick touch+release                      |
+| DoubleTap     | Two rapid taps                           |
+| LongPress     | Hold for threshold duration              |
+| Swipe         | Quick directional movement               |
+| Pan           | Continuous drag movement                 |
+| Pinch         | Two-finger scale                         |
+| Rotate        | Two-finger rotation                      |
+| TwoFingerTap  | Two fingers tap simultaneously           |
+| ThreeFingerSwipe| Three finger swipe (system gesture)    |
+| EdgeSwipe     | Swipe from screen edge                   |
+
+#### Drag and Drop
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| DragStart     | Drag operation begins                    |
+| Drag          | Dragging in progress                     |
+| DragEnter     | Dragged over drop target                 |
+| DragOver      | Continuing over drop target              |
+| DragLeave     | Left drop target                         |
+| Drop          | Released over drop target                |
+| DragEnd       | Drag operation complete                  |
+| DragCancel    | Drag cancelled (Escape, etc)             |
+
+#### Scroll Behaviors
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ScrollStart   | Scroll begins                            |
+| Scroll        | Scrolling in progress                    |
+| ScrollEnd     | Scroll complete                          |
+| ScrollSnap    | Snap to defined points                   |
+| Overscroll    | Scrolled past boundaries                 |
+| InfiniteScroll| Load more at threshold                   |
+| PullToRefresh | Pull down to refresh                     |
+
+#### Keyboard
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| KeyDown       | Key pressed                              |
+| KeyUp         | Key released                             |
+| KeyPress      | Character input                          |
+| Shortcut      | Modifier + key combination               |
+| FocusNext     | Tab navigation                           |
+| FocusPrev     | Shift+Tab navigation                     |
+| ArrowNav      | Arrow key navigation                     |
+| TypeAhead     | Search by typing                         |
 
 ## Pillar 10: Haptic
 
@@ -699,26 +1118,89 @@ Tactile and sensory feedback.
 
 ### Atoms
 
-| Name      | Type   | Min  | Max  | Behavior | Notes                     |
-|-----------|--------|------|------|----------|---------------------------|
-| Intensity | Number | 0.0  | 1.0  | clamps   | Vibration strength        |
-| Frequency | Number | 0    | none | finite   | Vibration frequency (Hz)  |
-| Duration  | Number | 0    | none | finite   | Haptic duration (ms)      |
+#### Vibration Parameters
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                     |
+|---------------|--------|------|-------|----------|---------------------------|
+| Intensity     | Number | 0.0  | 1.0   | clamps   | Vibration strength        |
+| Sharpness     | Number | 0.0  | 1.0   | clamps   | Haptic sharpness (iOS)    |
+| Frequency     | Number | 0    | 500   | clamps   | Vibration frequency (Hz)  |
+| Duration      | Number | 0    | 10000 | clamps   | Haptic duration (ms)      |
+| Attack        | Number | 0    | none  | finite   | Ramp up time (ms)         |
+| Decay         | Number | 0    | none  | finite   | Ramp down time (ms)       |
+
+#### Audio Parameters
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| Volume        | Number | 0.0  | 1.0  | clamps   | Sound volume              |
+| Pitch         | Number | 0.1  | 4.0  | clamps   | Pitch multiplier          |
+| Pan           | Number | -1.0 | 1.0  | clamps   | Stereo pan                |
 
 ### Molecules
 
-| Name       | Composition                          |
-|------------|--------------------------------------|
-| Vibration  | Intensity + Duration + Pattern       |
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| HapticEvent   | Intensity + Sharpness + Duration         |
+| VibrationStep | Intensity + Duration                     |
+| AudioCue      | SoundID + Volume + Pitch + Pan           |
+| HapticPattern | Array of HapticEvent + timing            |
 
 ### Compounds
 
-| Name       | Description                            |
-|------------|----------------------------------------|
-| Impact     | Light/Medium/Heavy                     |
-| Notification| Success/Warning/Error                 |
-| Selection  | Tick feedback                          |
-| Pattern    | Custom vibration sequence              |
+#### Impact Feedback
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ImpactLight   | Subtle tap                               |
+| ImpactMedium  | Standard tap                             |
+| ImpactHeavy   | Strong tap                               |
+| ImpactSoft    | Muted tap                                |
+| ImpactRigid   | Sharp tap                                |
+
+#### Notification Feedback
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| NotifySuccess | Positive acknowledgment                  |
+| NotifyWarning | Attention needed                         |
+| NotifyError   | Something went wrong                     |
+
+#### Selection Feedback
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| SelectionTick | Single selection change                  |
+| SelectionStart| Begin selection                          |
+| SelectionEnd  | End selection                            |
+
+#### Continuous Feedback
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Texture       | Continuous textured sensation            |
+| Slider        | Position-dependent feedback              |
+| Ramp          | Increasing/decreasing intensity          |
+
+#### System Patterns (iOS)
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Peek          | Preview content                          |
+| Pop           | Confirm selection                        |
+| AlignmentGuide| Snap to guide                            |
+| LevelChange   | Undo/redo level                          |
+
+#### Audio Feedback
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ClickSound    | UI click                                 |
+| KeySound      | Keyboard key press                       |
+| LockSound     | Lock screen                              |
+| PaymentSound  | Transaction complete                     |
+| CameraSound   | Shutter sound                            |
+| AmbientLoop   | Background audio                         |
 
 ## Pillar 11: Spatial
 
@@ -726,55 +1208,308 @@ Tactile and sensory feedback.
 
 ### Atoms
 
-| Name       | Type   | Min  | Max  | Behavior | Notes                     |
-|------------|--------|------|------|----------|---------------------------|
-| Coordinate | Number | none | none | finite   | Position on one axis      |
-| Scale      | Number | 0    | none | finite   | Scale factor              |
-| FOV        | Number | 1    | 179  | clamps   | Field of view (degrees)   |
+#### Position and Scale
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| Coordinate    | Number | none | none | finite   | Position on one axis      |
+| Scale         | Number | 0    | none | finite   | Uniform scale factor      |
+| ScaleX        | Number | none | none | finite   | X axis scale (can flip)   |
+| ScaleY        | Number | none | none | finite   | Y axis scale              |
+| ScaleZ        | Number | none | none | finite   | Z axis scale              |
+
+#### Camera Parameters
+
+| Name          | Type   | Min    | Max    | Behavior | Notes                     |
+|---------------|--------|--------|--------|----------|---------------------------|
+| FOV           | Number | 1      | 179    | clamps   | Field of view (degrees)   |
+| NearClip      | Number | 0.001  | none   | finite   | Near clipping plane       |
+| FarClip       | Number | 0.001  | none   | finite   | Far clipping plane        |
+| FocalLength   | Number | 1      | none   | finite   | Lens focal length (mm)    |
+| SensorWidth   | Number | 1      | none   | finite   | Sensor width (mm)         |
+| Aperture      | Number | 0.5    | 128    | clamps   | f-stop                    |
+| FocusDistance | Number | 0      | none   | finite   | Focus distance            |
+| Exposure      | Number | -10    | 10     | clamps   | Exposure compensation     |
+
+#### Light Parameters
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| LightIntensity| Number | 0    | none | finite   | Light brightness          |
+| LightRange    | Number | 0    | none | finite   | Attenuation range         |
+| SpotAngle     | Number | 0    | 180  | clamps   | Spotlight cone angle      |
+| SpotSoftness  | Number | 0    | 1    | clamps   | Spotlight edge softness   |
+| ShadowBias    | Number | 0    | none | finite   | Shadow map bias           |
+| ShadowStrength| Number | 0    | 1    | clamps   | Shadow opacity            |
+
+#### PBR Material Parameters
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| Roughness     | Number | 0    | 1    | clamps   | Surface roughness         |
+| Metallic      | Number | 0    | 1    | clamps   | Metallic factor           |
+| Reflectance   | Number | 0    | 1    | clamps   | Dielectric reflectance    |
+| ClearCoat     | Number | 0    | 1    | clamps   | Clear coat amount         |
+| ClearCoatRough| Number | 0    | 1    | clamps   | Clear coat roughness      |
+| Anisotropy    | Number | -1   | 1    | clamps   | Anisotropic reflection    |
+| Transmission  | Number | 0    | 1    | clamps   | Light transmission        |
+| IOR           | Number | 1    | 3    | clamps   | Index of refraction       |
+| Subsurface    | Number | 0    | 1    | clamps   | Subsurface scattering     |
+| Sheen         | Number | 0    | 1    | clamps   | Fabric sheen              |
+| Emissive      | Number | 0    | none | finite   | Emission intensity        |
 
 ### Molecules
 
-| Name       | Composition                          |
-|------------|--------------------------------------|
-| Vec2       | X (Coordinate) + Y (Coordinate)      |
-| Vec3       | X + Y + Z (Coordinates)              |
-| Vec4       | X + Y + Z + W                        |
-| Quaternion | X + Y + Z + W (rotation)             |
-| Matrix4    | 16 Numbers (4x4 transform)           |
+#### Vectors
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Vec2          | X + Y                                    |
+| Vec3          | X + Y + Z                                |
+| Vec4          | X + Y + Z + W                            |
+| Normal        | Vec3 (unit length)                       |
+| Tangent       | Vec3 (surface tangent)                   |
+| Bitangent     | Vec3 (surface bitangent)                 |
+
+#### Rotations
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| EulerAngles   | Pitch + Yaw + Roll (XYZ order matters)   |
+| Quaternion    | X + Y + Z + W                            |
+| AxisAngle     | Axis (Vec3) + Angle                      |
+
+#### Matrices
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Matrix2       | 4 Numbers (2x2)                          |
+| Matrix3       | 9 Numbers (3x3)                          |
+| Matrix4       | 16 Numbers (4x4)                         |
+| Transform     | Translation + Rotation + Scale           |
+
+#### Bounds
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| AABB          | Min (Vec3) + Max (Vec3)                  |
+| BoundingSphere| Center (Vec3) + Radius                   |
+| OBB           | Center + Extents + Rotation              |
+| Frustum       | 6 Planes                                 |
 
 ### Compounds
 
-| Name       | Description                            |
-|------------|----------------------------------------|
-| Transform3D| Position + Rotation + Scale            |
-| Camera     | Position + Target + Up + FOV           |
-| Light      | Type + Position + Color + Intensity    |
-| Material3D | Albedo + Normal + Roughness + Metallic |
-| Scene      | Camera + Lights + Objects              |
+#### Camera Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| PerspectiveCam| Standard perspective projection          |
+| OrthographicCam| No perspective distortion               |
+| PhysicalCam   | Real camera parameters (f-stop, etc)     |
+| CubemapCam    | 6-face environment capture               |
+| VRCamera      | Stereo camera for XR                     |
+
+#### Light Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| DirectionalLight| Sun-like parallel rays                 |
+| PointLight    | Omnidirectional light source             |
+| SpotLight     | Cone-shaped light                        |
+| AreaLight     | Soft rectangular/disc light              |
+| HemisphereLight| Sky/ground ambient                      |
+| ProbeLight    | Environment reflection probe             |
+| IESLight      | Photometric light profile                |
+
+#### Materials
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| StandardPBR   | Full PBR material                        |
+| UnlitMaterial | No lighting, just color/texture          |
+| TransparentMat| Glass, water, etc                        |
+| SubsurfaceMat | Skin, wax, marble                        |
+| ClothMaterial | Fabric with sheen                        |
+| HairMaterial  | Hair/fur shading                         |
+| ToonMaterial  | Cel-shaded look                          |
+
+#### Geometry
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Mesh          | Vertices + Indices + Normals + UVs       |
+| SkinnedMesh   | Mesh + Bones + Weights                   |
+| InstancedMesh | Single mesh, many transforms             |
+| PointCloud    | Points only                              |
+| Line3D        | 3D line/polyline                         |
+| Sprite3D      | Billboard in 3D space                    |
+
+#### XR (AR/VR)
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| XRSession     | AR/VR session configuration              |
+| XRAnchor      | World-locked position                    |
+| XRPlane       | Detected surface                         |
+| XRMesh        | Scanned environment mesh                 |
+| XRHand        | Hand tracking data                       |
+| XRController  | Controller tracking + buttons            |
+| XRHitTest     | Raycast against real world               |
+| XRLight       | Real-world light estimation              |
+
+#### Scene Graph
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Node          | Transform + Children                     |
+| Scene         | Root node + Environment                  |
+| Environment   | Skybox + Ambient + Fog                   |
+| Skybox        | Cubemap or procedural sky                |
+| Fog           | Distance-based atmosphere                |
+| PostProcess   | Screen-space effects                     |
 
 ## Pillar 12: Brand
 
-Identity and theming.
+Identity and theming. This pillar composes from all others - it's the final export.
 
 ### Atoms
 
-(No primitive atoms - Brand composes from all other pillars)
+Brand has no primitive atoms of its own. It composes from all other pillars.
+However, it does define semantic naming atoms:
+
+| Name          | Type   | Notes                                   |
+|---------------|--------|-----------------------------------------|
+| TokenName     | String | Semantic token identifier               |
+| TokenDesc     | String | Human-readable description              |
+| TokenCategory | String | Grouping category                       |
 
 ### Molecules
 
-| Name       | Composition                          |
-|------------|--------------------------------------|
-| ColorToken | Name + Color + Semantic role         |
-| SpaceToken | Name + Dimension value               |
-| TypeToken  | Name + TypeStyle                     |
+#### Design Tokens
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| ColorToken    | Name + Color + Description + Category    |
+| SpacingToken  | Name + Dimension + Description           |
+| SizeToken     | Name + Dimension + Description           |
+| RadiusToken   | Name + Radius + Description              |
+| ShadowToken   | Name + Shadow + Description              |
+| TypeToken     | Name + TypeStyle + Description           |
+| DurationToken | Name + Duration + Description            |
+| EasingToken   | Name + Easing + Description              |
+| ZIndexToken   | Name + ZIndex + Description              |
+
+#### Token References
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| TokenRef      | Token name reference (alias)             |
+| TokenGroup    | Name + Array of Tokens                   |
+| TokenSet      | Name + Map of TokenGroups                |
 
 ### Compounds
 
-| Name       | Description                            |
-|------------|----------------------------------------|
-| Theme      | Light/Dark/HighContrast modes          |
-| Palette    | Primary/Secondary/Accent/Neutral/Semantic colors |
-| Scale      | Spacing scale, type scale, radius scale|
-| Voice      | Tone, personality, microcopy style     |
-| Assets     | Logo, icons, illustration style        |
-| Brand      | Complete composition of all tokens     |
+#### Color System
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| PrimitiveColors| Raw color values (blue-500, gray-100)   |
+| SemanticColors | Contextual colors (primary, success)    |
+| ComponentColors| UI-specific (button-bg, card-border)    |
+| StateColors   | Interactive states per component         |
+| DarkPalette   | Dark mode color mappings                 |
+| LightPalette  | Light mode color mappings                |
+| ContrastPalette| High contrast mode                      |
+
+#### Spacing System
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| SpacingScale  | 0/xs/sm/md/lg/xl/2xl/... scale          |
+| LayoutSpacing | Page margins, gutters, sections          |
+| ComponentSpacing| Internal padding, gaps                 |
+| TouchTargets  | Minimum tap target sizes                 |
+
+#### Typography System
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| TypeScale     | Size scale with line heights             |
+| TypeFamilies  | Display/body/mono font stacks            |
+| TypeStyles    | Named styles (h1-h6, body, caption)      |
+| TypeRoles     | Semantic roles (primary, secondary)      |
+| Responsive    | Size adjustments per breakpoint          |
+
+#### Effects System
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ShadowScale   | Elevation shadow levels                  |
+| RadiusScale   | Corner radius scale                      |
+| BlurScale     | Blur intensity scale                     |
+| OpacityScale  | Transparency levels                      |
+
+#### Motion System
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| DurationScale | xs/sm/md/lg timing                       |
+| EasingSet     | Standard/emphasized/decelerate/accelerate|
+| Transitions   | Property-specific transitions            |
+| Animations    | Named keyframe animations                |
+
+#### Component Tokens
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ButtonTokens  | All button variants and states           |
+| InputTokens   | Form input styling                       |
+| CardTokens    | Card/surface styling                     |
+| NavTokens     | Navigation components                    |
+| ModalTokens   | Dialog/modal styling                     |
+| TableTokens   | Data table styling                       |
+
+#### Theme Configuration
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| ThemeLight    | Complete light mode token set            |
+| ThemeDark     | Complete dark mode token set             |
+| ThemeContrast | High contrast accessibility mode         |
+| ThemeCustom   | User-defined theme variant               |
+| ThemeAuto     | System preference respecting             |
+
+#### Brand Identity
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| LogoPrimary   | Primary logo + usage rules               |
+| LogoVariants  | Alternative logos (mono, icon, etc)      |
+| IconSet       | Icon library configuration               |
+| Illustration  | Illustration style guide                 |
+| Photography   | Photo treatment guidelines               |
+| Voice         | Tone, personality, writing style         |
+| Mascot        | Brand character (if applicable)          |
+
+#### Export Formats
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| PureScriptExport| Type-safe compiled modules             |
+| JSONExport    | Machine-readable token export            |
+| CSSExport     | CSS custom properties                    |
+| SCSSExport    | SCSS variables and mixins                |
+| FigmaExport   | Figma variables format                   |
+| StyleDictExport| Style Dictionary format                 |
+| TailwindExport| Tailwind config format                   |
+
+#### Complete Brand
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Brand         | Complete brand configuration:            |
+|               | - All token sets                         |
+|               | - All theme variants                     |
+|               | - All component tokens                   |
+|               | - Identity assets                        |
+|               | - Export configurations                  |
