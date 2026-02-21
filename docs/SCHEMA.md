@@ -67,6 +67,44 @@ Color science, theory, and application.
 | Y    | Number | 0   | 1.0  | clamps   | Y tristimulus (luminance)    |
 | Z    | Number | 0   | 1.09 | clamps   | Z tristimulus                |
 
+#### YUV/YCbCr Family (Video/Broadcast)
+
+| Name | Type   | Min  | Max  | Behavior | Notes                        |
+|------|--------|------|------|----------|------------------------------|
+| Luma | Number | 0    | 1.0  | clamps   | Y luminance component        |
+| Cb   | Number | -0.5 | 0.5  | clamps   | Blue-difference chroma       |
+| Cr   | Number | -0.5 | 0.5  | clamps   | Red-difference chroma        |
+| U    | Number | -0.5 | 0.5  | clamps   | U chroma (PAL/SECAM)         |
+| V    | Number | -0.5 | 0.5  | clamps   | V chroma (PAL/SECAM)         |
+| I    | Number | -0.5 | 0.5  | clamps   | I in-phase (NTSC)            |
+| Q    | Number | -0.5 | 0.5  | clamps   | Q quadrature (NTSC)          |
+
+#### HWB (CSS4)
+
+| Name      | Type | Min | Max | Behavior | Notes                        |
+|-----------|------|-----|-----|----------|------------------------------|
+| Whiteness | Int  | 0   | 100 | clamps   | White mixed in (%)           |
+| Blackness | Int  | 0   | 100 | clamps   | Black mixed in (%)           |
+
+(Uses Hue from HSL family)
+
+#### Color Temperature
+
+| Name   | Type | Min  | Max   | Behavior | Notes                        |
+|--------|------|------|-------|----------|------------------------------|
+| Kelvin | Int  | 1000 | 40000 | clamps   | Color temperature in K       |
+
+#### Camera Log Curves (Atoms for encoded values)
+
+| Name       | Type   | Min  | Max  | Behavior | Notes                        |
+|------------|--------|------|------|----------|------------------------------|
+| LogC       | Number | 0.0  | 1.0  | clamps   | ARRI LogC encoded            |
+| SLog3      | Number | 0.0  | 1.0  | clamps   | Sony S-Log3 encoded          |
+| VLog       | Number | 0.0  | 1.0  | clamps   | Panasonic V-Log encoded      |
+| RedLog3G10 | Number | 0.0  | 1.0  | clamps   | RED Log3G10 encoded          |
+| CanonLog3  | Number | 0.0  | 1.0  | clamps   | Canon Log3 encoded           |
+| BMDFilm    | Number | 0.0  | 1.0  | clamps   | Blackmagic Film encoded      |
+
 #### Common
 
 | Name    | Type   | Min | Max | Behavior | Notes                        |
@@ -113,11 +151,46 @@ Color science, theory, and application.
 
 #### Film/VFX
 
+| Name          | Composition                          | Notes                    |
+|---------------|--------------------------------------|--------------------------|
+| ACEScg        | LinearChannel x 3                    | ACES working space       |
+| ACEScc        | LinearChannel x 3                    | ACES log (grading)       |
+| ACEScct       | LinearChannel x 3                    | ACES log (toe)           |
+| ACES2065_1    | LinearChannel x 3                    | ACES archival            |
+| DCI_P3        | LinearChannel x 3                    | Cinema projection        |
+| REDWideGamut  | LinearChannel x 3                    | RED camera native        |
+| ArriWideGamut | LinearChannel x 3                    | ARRI camera native       |
+| SonyGamut     | LinearChannel x 3                    | Sony camera native       |
+| VGamut        | LinearChannel x 3                    | Panasonic camera native  |
+| CanonGamut    | LinearChannel x 3                    | Canon camera native      |
+| BMDWideGamut  | LinearChannel x 3                    | Blackmagic camera native |
+
+#### Camera Log Spaces
+
+| Name          | Composition                          | Notes                    |
+|---------------|--------------------------------------|--------------------------|
+| ArriLogC3     | LogC x 3                             | ARRI LogC3 AWG3          |
+| ArriLogC4     | LogC x 3                             | ARRI LogC4 AWG4          |
+| SLog3_SGamut3 | SLog3 x 3                            | Sony S-Log3 S-Gamut3     |
+| VLog_VGamut   | VLog x 3                             | Panasonic V-Log V-Gamut  |
+| RedLog3G10_RWG| RedLog3G10 x 3                       | RED Log3G10 RWG          |
+| CanonLog3_CG  | CanonLog3 x 3                        | Canon Log3 Cinema Gamut  |
+| BMDFilm_BWG   | BMDFilm x 3                          | BMD Film Wide Gamut      |
+
+#### Video/Broadcast
+
 | Name     | Composition                          | Notes                    |
 |----------|--------------------------------------|--------------------------|
-| ACEScg   | LinearChannel x 3                    | ACES working space       |
-| ACEScc   | LinearChannel x 3                    | ACES log (grading)       |
-| ACEScct  | LinearChannel x 3                    | ACES log (toe)           |
+| YCbCr    | Luma + Cb + Cr                       | Digital video            |
+| YUV      | Luma + U + V                         | PAL/SECAM analog         |
+| YIQ      | Luma + I + Q                         | NTSC analog              |
+| YPbPr    | Luma + Cb + Cr                       | Component analog         |
+
+#### CSS4
+
+| Name | Composition                          | Notes                    |
+|------|--------------------------------------|--------------------------|
+| HWB  | Hue + Whiteness + Blackness          | CSS Color Level 4        |
 
 #### With Alpha
 
@@ -139,7 +212,13 @@ Color science, theory, and application.
 | Mood        | Psychological associations               |
 | Gamut       | Color space boundaries and mapping       |
 | Profile     | ICC color profile reference              |
-| WhitePoint  | D50, D65, etc. illuminant reference      |
+| WhitePoint  | D50, D65, D55, D75, Illuminant A         |
+| LUT1D       | 1D lookup table (per-channel curves)     |
+| LUT3D       | 3D lookup table (color cube)             |
+| CDL         | ASC Color Decision List (SOP + Sat)      |
+| Curves      | RGB/Luminance curve adjustment           |
+| LiftGammaGain| Three-way color correction              |
+| Gradient    | Color stops for gradients                |
 
 ## Pillar 2: Dimension
 
