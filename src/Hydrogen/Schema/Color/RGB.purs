@@ -81,6 +81,7 @@ import Prelude
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Channel as Ch
+import Hydrogen.Schema.Color.Opacity as Op
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                         // rgb
@@ -316,12 +317,13 @@ intToHexChar n = case n of
 
 -- | RGBA color value — RGB with an alpha channel.
 -- |
--- | Alpha is also a Channel (0-255): 0 = fully transparent, 255 = fully opaque.
+-- | Alpha is an Opacity (0-100%): 0% = fully transparent, 100% = fully opaque.
+-- | This matches the pattern of other percentage-based atoms in the Schema.
 newtype RGBA = RGBA
   { red :: Ch.Channel
   , green :: Ch.Channel
   , blue :: Ch.Channel
-  , alpha :: Ch.Channel
+  , alpha :: Op.Opacity
   }
 
 derive instance eqRGBA :: Eq RGBA
@@ -331,29 +333,39 @@ instance showRGBA :: Show RGBA where
   show = rgbaToCss
 
 -- | Create an RGBA color from raw values.
+-- |
+-- | Alpha is a percentage (0-100): 0 = transparent, 100 = opaque.
+-- |
+-- | ```purescript
+-- | rgba 255 128 0 100  -- Orange, fully opaque
+-- | rgba 255 0 0 50     -- Red, half transparent
+-- | rgba 0 0 0 0        -- Black, fully transparent
+-- | ```
 rgba :: Int -> Int -> Int -> Int -> RGBA
 rgba r g b a = RGBA
   { red: Ch.channel r
   , green: Ch.channel g
   , blue: Ch.channel b
-  , alpha: Ch.channel a
+  , alpha: Op.opacity a
   }
 
 -- | Create an RGBA color from a record.
 rgbaFromRecord :: { r :: Int, g :: Int, b :: Int, a :: Int } -> RGBA
 rgbaFromRecord { r, g, b, a } = rgba r g b a
 
--- | Extract the alpha channel.
-alpha :: RGBA -> Ch.Channel
+-- | Extract the alpha (opacity).
+alpha :: RGBA -> Op.Opacity
 alpha (RGBA c) = c.alpha
 
 -- | Convert RGBA to a record of raw Int values.
+-- |
+-- | Alpha is returned as percentage (0-100).
 rgbaToRecord :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
 rgbaToRecord (RGBA c) =
   { r: Ch.unwrap c.red
   , g: Ch.unwrap c.green
   , b: Ch.unwrap c.blue
-  , a: Ch.unwrap c.alpha
+  , a: Op.unwrap c.alpha
   }
 
 -- | Alias for rgbaToRecord (legacy name).
@@ -361,9 +373,16 @@ toRecordA :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
 toRecordA = rgbaToRecord
 
 -- | Convert to CSS rgba() function string.
+-- |
+-- | CSS expects alpha as 0.0-1.0, so we use Opacity.toUnitInterval.
+-- |
+-- | ```purescript
+-- | rgbaToCss (rgba 255 128 0 100)  -- "rgba(255, 128, 0, 1.0)"
+-- | rgbaToCss (rgba 255 0 0 50)     -- "rgba(255, 0, 0, 0.5)"
+-- | ```
 rgbaToCss :: RGBA -> String
 rgbaToCss (RGBA c) =
-  let a' = Int.toNumber (Ch.unwrap c.alpha) / 255.0
+  let a' = Op.toUnitInterval c.alpha
   in "rgba(" <> show (Ch.unwrap c.red)
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue)
@@ -373,13 +392,13 @@ rgbaToCss (RGBA c) =
 toCssA :: RGBA -> String
 toCssA = rgbaToCss
 
--- | Convert RGB to RGBA with full opacity.
+-- | Convert RGB to RGBA with full opacity (100%).
 toRGBA :: RGB -> RGBA
 toRGBA (RGB c) = RGBA
   { red: c.red
   , green: c.green
   , blue: c.blue
-  , alpha: Ch.channel 255
+  , alpha: Op.opacity 100
   }
 
 -- | Convert RGBA to RGB (drops alpha).

@@ -35,6 +35,7 @@ import Data.Int (toNumber, round)
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Color.Channel as Ch
+import Hydrogen.Schema.Color.Opacity as Op
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // blend modes
@@ -87,12 +88,12 @@ blendRGBA mode base top =
     baseR = Ch.unwrap (RGB.red (RGB.fromRGBA base))
     baseG = Ch.unwrap (RGB.green (RGB.fromRGBA base))
     baseB = Ch.unwrap (RGB.blue (RGB.fromRGBA base))
-    baseA = toNumber (Ch.unwrap (RGB.alpha base)) / 255.0
+    baseA = Op.toUnitInterval (RGB.alpha base)
     
     topR = Ch.unwrap (RGB.red (RGB.fromRGBA top))
     topG = Ch.unwrap (RGB.green (RGB.fromRGBA top))
     topB = Ch.unwrap (RGB.blue (RGB.fromRGBA top))
-    topA = toNumber (Ch.unwrap (RGB.alpha top)) / 255.0
+    topA = Op.toUnitInterval (RGB.alpha top)
     
     -- Apply blend mode to each channel
     blendedR = blendChannel mode baseR topR
@@ -109,7 +110,7 @@ blendRGBA mode base top =
       (mixWithAlpha baseR blendedR)
       (mixWithAlpha baseG blendedG)
       (mixWithAlpha baseB blendedB)
-      (round (resultA * 255.0))
+      (round (resultA * 100.0))
 
 -- | Apply blend mode to a single channel (0-255)
 blendChannel :: BlendMode -> Int -> Int -> Int
@@ -179,12 +180,12 @@ composite op src dst =
     srcR = Ch.unwrap (RGB.red (RGB.fromRGBA src))
     srcG = Ch.unwrap (RGB.green (RGB.fromRGBA src))
     srcB = Ch.unwrap (RGB.blue (RGB.fromRGBA src))
-    srcA = toNumber (Ch.unwrap (RGB.alpha src)) / 255.0
+    srcA = Op.toUnitInterval (RGB.alpha src)
     
     dstR = Ch.unwrap (RGB.red (RGB.fromRGBA dst))
     dstG = Ch.unwrap (RGB.green (RGB.fromRGBA dst))
     dstB = Ch.unwrap (RGB.blue (RGB.fromRGBA dst))
-    dstA = toNumber (Ch.unwrap (RGB.alpha dst)) / 255.0
+    dstA = Op.toUnitInterval (RGB.alpha dst)
     
     -- Porter-Duff factors: Fa for source, Fb for destination
     factors = case op of
@@ -212,7 +213,7 @@ composite op src dst =
       (compChannel srcR dstR)
       (compChannel srcG dstG)
       (compChannel srcB dstB)
-      (round (resultA * 255.0))
+      (round (resultA * 100.0))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // color mixing
