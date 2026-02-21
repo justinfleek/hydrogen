@@ -383,3 +383,76 @@ Let's build something that lasts.
                                                      — Opus 4.5 // 2026-02-21
 ```
 
+════════════════════════════════════════════════════════════════════════════════
+                                                          // broken // 02d889a
+════════════════════════════════════════════════════════════════════════════════
+
+**BUILD IS BROKEN.** Here's what needs fixing:
+
+## RGB.purs — Missing Export
+
+The module exports `rgbaFromRecord` but the function doesn't exist. Add it:
+
+```purescript
+-- After the rgba constructor, add:
+rgbaFromRecord :: { r :: Int, g :: Int, b :: Int, a :: Int } -> RGBA
+rgbaFromRecord { r, g, b, a } = rgba r g b a
+```
+
+## Color.purs — Invalid Re-exports
+
+The re-export module references old function names. Update lines 72-78:
+
+```purescript
+import Hydrogen.Schema.Color.RGB 
+  ( RGB, RGBA
+  , rgb, rgba, rgbFromRecord, rgbFromChannels, rgbaFromRecord
+  , red, green, blue, alpha, rgbToRecord, rgbaToRecord
+  , invert, blend, add, multiply, screen
+  , rgbToCss, rgbToHex, rgbaToCss, toRGBA, fromRGBA
+  ) as RGB
+```
+
+And lines 80-85 for HSL (needs same treatment — rename toCss → hslToCss, etc.):
+
+```purescript
+import Hydrogen.Schema.Color.HSL
+  ( HSL
+  , hsl, hslFromRecord, fromComponents
+  , hue, saturation, lightness, hslToRecord
+  , rotate, complement, lighten, darken, saturate, desaturate, grayscale
+  , hslToCss
+  ) as HSL
+```
+
+## HSL.purs — Function Renames Needed
+
+Rename for unique exports (to avoid conflicts when re-exporting):
+- `fromRecord` → `hslFromRecord`
+- `toRecord` → `hslToRecord`  
+- `toCss` → `hslToCss`
+
+Update the Show instance to use `hslToCss`.
+
+## Blend.purs — Uses Old RGBA Function
+
+Line 241-242 uses `RGB.toRecordA` which was renamed to `RGB.rgbaToRecord`.
+
+## Icon Modules — Untested
+
+Files added but not verified against build:
+- `src/Hydrogen/Icon/Icons.purs` (renamed from Lucide.purs)
+- `src/Hydrogen/Icon/Icons3D.purs`
+- `src/Hydrogen/Icon/Icon3D.purs`
+
+These may have issues. The original Lucide.purs was deleted.
+
+## Showcase — New Directory
+
+A `showcase/` directory was added with HTML/PureScript for icon demos.
+Untested.
+
+────────────────────────────────────────────────────────────────────────────────
+
+To fix: run `nix develop -c spago build` and address errors one by one.
+
