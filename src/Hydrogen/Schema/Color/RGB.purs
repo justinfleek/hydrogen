@@ -34,13 +34,16 @@ module Hydrogen.Schema.Color.RGB
   -- * RGB Constructors
   , rgb
   , rgbFromRecord
+  , fromRecord
   , rgbFromChannels
+  , fromChannels
   
   -- * RGB Accessors
   , red
   , green
   , blue
   , rgbToRecord
+  , toRecord
   
   -- * RGB Operations
   , invert
@@ -51,7 +54,9 @@ module Hydrogen.Schema.Color.RGB
   
   -- * RGB Output
   , rgbToCss
+  , toCss
   , rgbToHex
+  , toHex
   
   -- * RGBA Constructors
   , rgba
@@ -60,9 +65,11 @@ module Hydrogen.Schema.Color.RGB
   -- * RGBA Accessors
   , alpha
   , rgbaToRecord
+  , toRecordA
   
   -- * RGBA Output
   , rgbaToCss
+  , toCssA
   
   -- * Conversion
   , toRGBA
@@ -119,11 +126,19 @@ rgb r g b = RGB
 rgbFromRecord :: { r :: Int, g :: Int, b :: Int } -> RGB
 rgbFromRecord { r, g, b } = rgb r g b
 
+-- | Alias for rgbFromRecord (legacy name).
+fromRecord :: { r :: Int, g :: Int, b :: Int } -> RGB
+fromRecord = rgbFromRecord
+
 -- | Create from already-validated Channel atoms.
 -- |
 -- | Use when you already have valid Channel values.
 rgbFromChannels :: Ch.Channel -> Ch.Channel -> Ch.Channel -> RGB
 rgbFromChannels r g b = RGB { red: r, green: g, blue: b }
+
+-- | Alias for rgbFromChannels (legacy name).
+fromChannels :: Ch.Channel -> Ch.Channel -> Ch.Channel -> RGB
+fromChannels = rgbFromChannels
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors
@@ -150,6 +165,10 @@ rgbToRecord (RGB c) =
   , g: Ch.unwrap c.green
   , b: Ch.unwrap c.blue
   }
+
+-- | Alias for rgbToRecord (legacy name).
+toRecord :: RGB -> { r :: Int, g :: Int, b :: Int }
+toRecord = rgbToRecord
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // operations
@@ -239,6 +258,10 @@ rgbToCss (RGB c) =
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue) <> ")"
 
+-- | Alias for rgbToCss (legacy name).
+toCss :: RGB -> String
+toCss = rgbToCss
+
 -- | Convert to 6-character hex string (without #).
 -- |
 -- | ```purescript
@@ -249,6 +272,10 @@ rgbToHex (RGB c) =
   intToHex (Ch.unwrap c.red) 
   <> intToHex (Ch.unwrap c.green) 
   <> intToHex (Ch.unwrap c.blue)
+
+-- | Alias for rgbToHex (legacy name).
+toHex :: RGB -> String
+toHex = rgbToHex
 
 -- ─────────────────────────────────────────────────────────────────────────────
 --                                                                  // internal
@@ -312,6 +339,10 @@ rgba r g b a = RGBA
   , alpha: Ch.channel a
   }
 
+-- | Create an RGBA color from a record.
+rgbaFromRecord :: { r :: Int, g :: Int, b :: Int, a :: Int } -> RGBA
+rgbaFromRecord { r, g, b, a } = rgba r g b a
+
 -- | Extract the alpha channel.
 alpha :: RGBA -> Ch.Channel
 alpha (RGBA c) = c.alpha
@@ -325,6 +356,10 @@ rgbaToRecord (RGBA c) =
   , a: Ch.unwrap c.alpha
   }
 
+-- | Alias for rgbaToRecord (legacy name).
+toRecordA :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
+toRecordA = rgbaToRecord
+
 -- | Convert to CSS rgba() function string.
 rgbaToCss :: RGBA -> String
 rgbaToCss (RGBA c) =
@@ -333,6 +368,10 @@ rgbaToCss (RGBA c) =
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue)
   <> ", " <> show a' <> ")"
+
+-- | Alias for rgbaToCss (legacy name).
+toCssA :: RGBA -> String
+toCssA = rgbaToCss
 
 -- | Convert RGB to RGBA with full opacity.
 toRGBA :: RGB -> RGBA
