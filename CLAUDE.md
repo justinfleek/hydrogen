@@ -17,6 +17,25 @@ framework itself. Built on lawful abstractions and designed for eventual
 integration with Lean4 proofs.
 
 ════════════════════════════════════════════════════════════════════════════════
+                                          // required // reading // for // context
+════════════════════════════════════════════════════════════════════════════════
+
+**READ THESE FIRST:**
+
+1. **The Continuity Project Vision** - See `docs/CONTINUITY_VISION.md`
+   - Why Correct AI matters
+   - The perverse incentives problem
+   - What we're building to solve it
+
+2. **Straylight Software Conventions** - https://github.com/straylight-software
+   - Typographical watermarks
+   - Epistemological framework
+   - "When It Changed" mythology
+
+These documents explain WHY the rules exist and what you're actually building.
+Without this context, the strictness seems arbitrary. With it, it's necessary.
+
+════════════════════════════════════════════════════════════════════════════════
                                                           // read // this // first
 ════════════════════════════════════════════════════════════════════════════════
 
