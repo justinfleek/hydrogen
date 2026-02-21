@@ -134,7 +134,7 @@ import Prelude
 
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
 import Data.Array as Array
-import Data.DateTime.Instant (Instant, unInstant)
+import Data.DateTime.Instant (Instant, unInstant, instant)
 import Data.Either (Either(..), hush)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe, isJust)
@@ -634,9 +634,13 @@ loadMany (Batcher b) keys = do
 --                                                                    // helpers
 -- =============================================================================
 
--- | Add milliseconds to an instant (simplified - loses precision).
+-- | Add milliseconds to an instant.
+-- | Falls back to original instant if result would be invalid.
 addMs :: Instant -> Milliseconds -> Instant
-addMs instant (Milliseconds _) = instant  -- TODO: proper impl needs purescript-datetime
+addMs inst (Milliseconds delta) =
+  let Milliseconds current = unInstant inst
+      newMs = Milliseconds (current + delta)
+  in fromMaybe inst (instant newMs)
 
 -- =============================================================================
 --                                                          // QueryState helpers
