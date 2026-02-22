@@ -1,832 +1,418 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                                    // hydrogen // colorpicker
+--                                                   // hydrogen // color picker
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Color picker component
+-- | ColorPicker component
 -- |
--- | A comprehensive color picker with spectrum selection, format options,
--- | swatches, and eyedropper support.
+-- | Interactive color selection with multiple color space modes:
+-- | - HSL sliders (Hue 0-359, Saturation 0-100, Lightness 0-100)
+-- | - RGB sliders (Red 0-255, Green 0-255, Blue 0-255)
+-- | - HWB sliders (Hue 0-359, Whiteness 0-100, Blackness 0-100)
+-- | - OKLAB sliders (L 0-1, a -0.4 to 0.4, b -0.4 to 0.4)
+-- | - OKLCH sliders (L 0-1, C 0-0.4, H 0-359)
+-- | - Checkboxes to enable/disable each color space
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Component.ColorPicker as ColorPicker
+-- | import Hydrogen.Schema.Color.RGB (rgb)
 -- |
--- | -- Basic color picker
 -- | ColorPicker.colorPicker
--- |   [ ColorPicker.value "#ff5500"
+-- |   [ ColorPicker.initialColor (rgb 100 150 200)
 -- |   , ColorPicker.onChange HandleColorChange
--- |   ]
--- |
--- | -- With alpha/opacity support
--- | ColorPicker.colorPicker
--- |   [ ColorPicker.value "rgba(255, 85, 0, 0.8)"
--- |   , ColorPicker.showAlpha true
--- |   , ColorPicker.onChange HandleColorChange
--- |   ]
--- |
--- | -- Inline mode with swatches
--- | ColorPicker.colorPicker
--- |   [ ColorPicker.mode ColorPicker.Inline
--- |   , ColorPicker.swatches ["#ff0000", "#00ff00", "#0000ff"]
--- |   , ColorPicker.showRecentColors true
--- |   ]
--- |
--- | -- Popover mode with format toggle
--- | ColorPicker.colorPicker
--- |   [ ColorPicker.mode ColorPicker.Popover
--- |   , ColorPicker.format ColorPicker.RGB
--- |   , ColorPicker.showFormatToggle true
+-- |   , ColorPicker.enabledModes [ColorPicker.ModeHSL, ColorPicker.ModeRGB]
 -- |   ]
 -- | ```
+
 module Hydrogen.Component.ColorPicker
-  ( -- * Color Picker Components
+  ( -- * Component
     colorPicker
-  , saturationPanel
-  , hueSlider
-  , alphaSlider
-  , colorInput
-  , colorSwatches
-  , recentColors
-  , eyedropperButton
-  , copyButton
-  , formatToggle
     -- * Props
   , ColorPickerProps
   , ColorPickerProp
   , defaultProps
     -- * Prop Builders
-  , value
-  , format
-  , mode
-  , showAlpha
-  , showHex
-  , showRgb
-  , showHsl
-  , swatches
-  , showRecentColors
-  , maxRecentColors
-  , showEyedropper
-  , showCopy
-  , showFormatToggle
-  , disabled
-  , className
+  , initialColor
   , onChange
-  , onFormatChange
+  , enabledModes
+  , onModeToggle
+  , className
     -- * Types
-  , ColorFormat(..)
-  , PickerMode(..)
-  , ColorValue
-  , HSVColor
-  , RGBColor
-  , HSLColor
-    -- * FFI
-  , ColorPickerElement
-    -- * Color Utilities
-  , hexToRgb
-  , rgbToHex
-  , rgbToHsl
-  , hslToRgb
-  , hsvToRgb
-  , rgbToHsv
-  , parseColor
-  , formatColor
+  , ColorMode(ModeHSL, ModeRGB, ModeHWB, ModeOKLAB, ModeOKLCH)
+  , modeName
   ) where
 
-import Prelude hiding (map)
+import Prelude
 
-import Data.Array (foldl, take)
+import Data.Array (elem, foldl)
 import Data.Int (round, toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Number (abs)
-import Data.String (toLower, trim)
-import Data.String as String
-import Effect (Effect)
-import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Number.Format (fixed, toStringWith)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Halogen.HTML.Properties.ARIA as ARIA
+import Hydrogen.Component.Checkbox as Checkbox
+import Hydrogen.Component.Slider as Slider
+import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToRecord, rgbToCss)
+import Hydrogen.Schema.Color.HSL (hsl, hslToRecord)
+import Hydrogen.Schema.Color.HWB (hwb, hwbToRecord)
+import Hydrogen.Schema.Color.OKLAB (oklab, oklabToRecord)
+import Hydrogen.Schema.Color.OKLCH (oklch, oklchToRecord)
+import Hydrogen.Schema.Color.Conversion (rgbToHsl, rgbToHwb, rgbToOklab, rgbToOklch, hslToRgb, hwbToRgb, oklabToRgb, oklchToRgb)
 import Hydrogen.UI.Core (cls)
-import Web.DOM.Element (Element)
-import Web.Event.Event (Event)
-import Web.UIEvent.MouseEvent (MouseEvent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
+--                                                                        // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Color format for display/input
-data ColorFormat
-  = Hex
-  | RGB
-  | HSL
+-- | Color picker input mode
+data ColorMode
+  = ModeHSL
+  | ModeRGB
+  | ModeHWB
+  | ModeOKLAB
+  | ModeOKLCH
 
-derive instance eqColorFormat :: Eq ColorFormat
+derive instance eqColorMode :: Eq ColorMode
 
--- | Picker display mode
-data PickerMode
-  = Inline
-  | Popover
-
-derive instance eqPickerMode :: Eq PickerMode
-
--- | Generic color value (string representation)
-type ColorValue = String
-
--- | RGB color components (0-255)
-type RGBColor =
-  { r :: Int
-  , g :: Int
-  , b :: Int
-  , a :: Number
-  }
-
--- | HSL color components
-type HSLColor =
-  { h :: Number  -- 0-360
-  , s :: Number  -- 0-100
-  , l :: Number  -- 0-100
-  , a :: Number  -- 0-1
-  }
-
--- | HSV color components (used internally)
-type HSVColor =
-  { h :: Number  -- 0-360
-  , s :: Number  -- 0-100
-  , v :: Number  -- 0-100
-  , a :: Number  -- 0-1
-  }
-
--- | Opaque picker element type
-foreign import data ColorPickerElement :: Type
+-- | Get display name for mode
+modeName :: ColorMode -> String
+modeName = case _ of
+  ModeHSL -> "HSL"
+  ModeRGB -> "RGB"
+  ModeHWB -> "HWB"
+  ModeOKLAB -> "OKLAB"
+  ModeOKLCH -> "OKLCH"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
+--                                                                        // props
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Initialize saturation panel pointer events
-foreign import initSaturationPanelImpl :: EffectFn3 Element ({ s :: Number, v :: Number } -> Effect Unit) { hue :: Number } ColorPickerElement
-
--- | Initialize hue slider pointer events
-foreign import initHueSliderImpl :: EffectFn2 Element (Number -> Effect Unit) ColorPickerElement
-
--- | Initialize alpha slider pointer events
-foreign import initAlphaSliderImpl :: EffectFn2 Element (Number -> Effect Unit) ColorPickerElement
-
--- | Cleanup color picker element
-foreign import destroyColorPickerImpl :: EffectFn1 ColorPickerElement Unit
-
--- | Open eyedropper (EyeDropper API)
-foreign import openEyedropperImpl :: EffectFn1 (String -> Effect Unit) Unit
-
--- | Copy text to clipboard
-foreign import copyToClipboardImpl :: EffectFn1 String Unit
-
--- | Check if eyedropper is supported
-foreign import isEyedropperSupportedImpl :: Effect Boolean
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
-
+-- | ColorPicker properties
 type ColorPickerProps i =
-  { value :: ColorValue
-  , format :: ColorFormat
-  , mode :: PickerMode
-  , showAlpha :: Boolean
-  , showHex :: Boolean
-  , showRgb :: Boolean
-  , showHsl :: Boolean
-  , swatches :: Array ColorValue
-  , showRecentColors :: Boolean
-  , maxRecentColors :: Int
-  , recentColorsList :: Array ColorValue
-  , showEyedropper :: Boolean
-  , showCopy :: Boolean
-  , showFormatToggle :: Boolean
-  , disabled :: Boolean
-  , isOpen :: Boolean
+  { color :: RGB
+  , enabledModes :: Array ColorMode
   , className :: String
-  , onChange :: Maybe (ColorValue -> i)
-  , onFormatChange :: Maybe (ColorFormat -> i)
-  , onOpenChange :: Maybe (Boolean -> i)
+  , onChange :: Maybe (RGB -> i)
+  , onModeToggle :: Maybe (ColorMode -> Boolean -> i)
   }
 
+-- | Property modifier
 type ColorPickerProp i = ColorPickerProps i -> ColorPickerProps i
 
+-- | Default color picker properties
 defaultProps :: forall i. ColorPickerProps i
 defaultProps =
-  { value: "#000000"
-  , format: Hex
-  , mode: Popover
-  , showAlpha: false
-  , showHex: true
-  , showRgb: true
-  , showHsl: false
-  , swatches: []
-  , showRecentColors: false
-  , maxRecentColors: 8
-  , recentColorsList: []
-  , showEyedropper: true
-  , showCopy: true
-  , showFormatToggle: true
-  , disabled: false
-  , isOpen: false
+  { color: rgb 128 128 128
+  , enabledModes: [ModeHSL, ModeRGB, ModeHWB, ModeOKLAB, ModeOKLCH]
   , className: ""
   , onChange: Nothing
-  , onFormatChange: Nothing
-  , onOpenChange: Nothing
+  , onModeToggle: Nothing
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // prop builders
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Set color value
-value :: forall i. ColorValue -> ColorPickerProp i
-value v props = props { value = v }
+-- | Set initial color
+initialColor :: forall i. RGB -> ColorPickerProp i
+initialColor c props = props { color = c }
 
--- | Set color format
-format :: forall i. ColorFormat -> ColorPickerProp i
-format f props = props { format = f }
+-- | Set change handler
+onChange :: forall i. (RGB -> i) -> ColorPickerProp i
+onChange handler props = props { onChange = Just handler }
 
--- | Set picker mode (inline/popover)
-mode :: forall i. PickerMode -> ColorPickerProp i
-mode m props = props { mode = m }
+-- | Set which color modes are enabled
+enabledModes :: forall i. Array ColorMode -> ColorPickerProp i
+enabledModes modes props = props { enabledModes = modes }
 
--- | Show alpha/opacity slider
-showAlpha :: forall i. Boolean -> ColorPickerProp i
-showAlpha s props = props { showAlpha = s }
-
--- | Show hex input
-showHex :: forall i. Boolean -> ColorPickerProp i
-showHex s props = props { showHex = s }
-
--- | Show RGB inputs
-showRgb :: forall i. Boolean -> ColorPickerProp i
-showRgb s props = props { showRgb = s }
-
--- | Show HSL inputs
-showHsl :: forall i. Boolean -> ColorPickerProp i
-showHsl s props = props { showHsl = s }
-
--- | Set preset color swatches
-swatches :: forall i. Array ColorValue -> ColorPickerProp i
-swatches s props = props { swatches = s }
-
--- | Show recent colors
-showRecentColors :: forall i. Boolean -> ColorPickerProp i
-showRecentColors s props = props { showRecentColors = s }
-
--- | Set max recent colors to display
-maxRecentColors :: forall i. Int -> ColorPickerProp i
-maxRecentColors n props = props { maxRecentColors = n }
-
--- | Show eyedropper button
-showEyedropper :: forall i. Boolean -> ColorPickerProp i
-showEyedropper s props = props { showEyedropper = s }
-
--- | Show copy button
-showCopy :: forall i. Boolean -> ColorPickerProp i
-showCopy s props = props { showCopy = s }
-
--- | Show format toggle
-showFormatToggle :: forall i. Boolean -> ColorPickerProp i
-showFormatToggle s props = props { showFormatToggle = s }
-
--- | Set disabled state
-disabled :: forall i. Boolean -> ColorPickerProp i
-disabled d props = props { disabled = d }
+-- | Set mode toggle handler
+onModeToggle :: forall i. (ColorMode -> Boolean -> i) -> ColorPickerProp i
+onModeToggle handler props = props { onModeToggle = Just handler }
 
 -- | Add custom class
 className :: forall i. String -> ColorPickerProp i
 className c props = props { className = props.className <> " " <> c }
 
--- | Set color change handler
-onChange :: forall i. (ColorValue -> i) -> ColorPickerProp i
-onChange handler props = props { onChange = Just handler }
-
--- | Set format change handler
-onFormatChange :: forall i. (ColorFormat -> i) -> ColorPickerProp i
-onFormatChange handler props = props { onFormatChange = Just handler }
-
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // color conversions
+--                                                                   // component
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Parse hex string to RGB
-hexToRgb :: String -> Maybe RGBColor
-hexToRgb hex =
-  let
-    cleaned = if String.take 1 hex == "#" then String.drop 1 hex else hex
-    len = String.length cleaned
-  in
-    if len == 6 || len == 8
-      then 
-        let
-          r = parseHexPair (String.take 2 cleaned)
-          g = parseHexPair (String.take 2 (String.drop 2 cleaned))
-          b = parseHexPair (String.take 2 (String.drop 4 cleaned))
-          a = if len == 8 
-                then toNumber (parseHexPair (String.drop 6 cleaned)) / 255.0
-                else 1.0
-        in Just { r, g, b, a }
-      else Nothing
-
--- | Convert RGB to hex string
-rgbToHex :: RGBColor -> String
-rgbToHex { r, g, b, a } =
-  let
-    rHex = toHexPair r
-    gHex = toHexPair g
-    bHex = toHexPair b
-    aHex = if a < 1.0 then toHexPair (round (a * 255.0)) else ""
-  in "#" <> rHex <> gHex <> bHex <> aHex
-
--- | Convert RGB to HSL
-rgbToHsl :: RGBColor -> HSLColor
-rgbToHsl { r, g, b, a } =
-  let
-    r' = toNumber r / 255.0
-    g' = toNumber g / 255.0
-    b' = toNumber b / 255.0
-    maxVal = max r' (max g' b')
-    minVal = min r' (min g' b')
-    l = (maxVal + minVal) / 2.0
-    d = maxVal - minVal
-    s = if d == 0.0 
-          then 0.0 
-          else d / (1.0 - abs (2.0 * l - 1.0))
-    h = if d == 0.0 
-          then 0.0
-          else if maxVal == r' 
-            then 60.0 * (mod' ((g' - b') / d) 6.0)
-            else if maxVal == g'
-              then 60.0 * ((b' - r') / d + 2.0)
-              else 60.0 * ((r' - g') / d + 4.0)
-    h' = if h < 0.0 then h + 360.0 else h
-  in { h: h', s: s * 100.0, l: l * 100.0, a }
-
--- | Convert HSL to RGB
-hslToRgb :: HSLColor -> RGBColor
-hslToRgb { h, s, l, a } =
-  let
-    s' = s / 100.0
-    l' = l / 100.0
-    c = (1.0 - abs (2.0 * l' - 1.0)) * s'
-    x = c * (1.0 - abs (mod' (h / 60.0) 2.0 - 1.0))
-    m = l' - c / 2.0
-    { r', g', b' } = 
-      if h < 60.0 then { r': c, g': x, b': 0.0 }
-      else if h < 120.0 then { r': x, g': c, b': 0.0 }
-      else if h < 180.0 then { r': 0.0, g': c, b': x }
-      else if h < 240.0 then { r': 0.0, g': x, b': c }
-      else if h < 300.0 then { r': x, g': 0.0, b': c }
-      else { r': c, g': 0.0, b': x }
-  in { r: round ((r' + m) * 255.0)
-     , g: round ((g' + m) * 255.0)
-     , b: round ((b' + m) * 255.0)
-     , a }
-
--- | Convert HSV to RGB
-hsvToRgb :: HSVColor -> RGBColor
-hsvToRgb { h, s, v, a } =
-  let
-    s' = s / 100.0
-    v' = v / 100.0
-    c = v' * s'
-    x = c * (1.0 - abs (mod' (h / 60.0) 2.0 - 1.0))
-    m = v' - c
-    { r', g', b' } = 
-      if h < 60.0 then { r': c, g': x, b': 0.0 }
-      else if h < 120.0 then { r': x, g': c, b': 0.0 }
-      else if h < 180.0 then { r': 0.0, g': c, b': x }
-      else if h < 240.0 then { r': 0.0, g': x, b': c }
-      else if h < 300.0 then { r': x, g': 0.0, b': c }
-      else { r': c, g': 0.0, b': x }
-  in { r: round ((r' + m) * 255.0)
-     , g: round ((g' + m) * 255.0)
-     , b: round ((b' + m) * 255.0)
-     , a }
-
--- | Convert RGB to HSV
-rgbToHsv :: RGBColor -> HSVColor
-rgbToHsv { r, g, b, a } =
-  let
-    r' = toNumber r / 255.0
-    g' = toNumber g / 255.0
-    b' = toNumber b / 255.0
-    maxVal = max r' (max g' b')
-    minVal = min r' (min g' b')
-    d = maxVal - minVal
-    v = maxVal * 100.0
-    s = if maxVal == 0.0 then 0.0 else (d / maxVal) * 100.0
-    h = if d == 0.0 
-          then 0.0
-          else if maxVal == r' 
-            then 60.0 * (mod' ((g' - b') / d) 6.0)
-            else if maxVal == g'
-              then 60.0 * ((b' - r') / d + 2.0)
-              else 60.0 * ((r' - g') / d + 4.0)
-    h' = if h < 0.0 then h + 360.0 else h
-  in { h: h', s, v, a }
-
--- | Parse any color string to RGB
-parseColor :: ColorValue -> Maybe RGBColor
-parseColor colorStr =
-  let str = toLower (trim colorStr)
-  in if String.take 1 str == "#"
-       then hexToRgb str
-       else if String.take 4 str == "rgb("
-         then parseRgbString str
-         else if String.take 5 str == "rgba("
-           then parseRgbaString str
-           else if String.take 4 str == "hsl("
-             then parseHslString str
-             else if String.take 5 str == "hsla("
-               then parseHslaString str
-               else Nothing
-
--- | Format RGB to specified format
-formatColor :: ColorFormat -> RGBColor -> ColorValue
-formatColor fmt rgb = case fmt of
-  Hex -> rgbToHex rgb
-  RGB -> 
-    if rgb.a < 1.0
-      then "rgba(" <> show rgb.r <> ", " <> show rgb.g <> ", " <> show rgb.b <> ", " <> show rgb.a <> ")"
-      else "rgb(" <> show rgb.r <> ", " <> show rgb.g <> ", " <> show rgb.b <> ")"
-  HSL ->
-    let hsl = rgbToHsl rgb
-    in if hsl.a < 1.0
-         then "hsla(" <> show (round hsl.h) <> ", " <> show (round hsl.s) <> "%, " <> show (round hsl.l) <> "%, " <> show hsl.a <> ")"
-         else "hsl(" <> show (round hsl.h) <> ", " <> show (round hsl.s) <> "%, " <> show (round hsl.l) <> "%)"
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // components
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Main color picker component
+-- | Render a color picker
 colorPicker :: forall w i. Array (ColorPickerProp i) -> HH.HTML w i
 colorPicker propMods =
   let
     props = foldl (\p f -> f p) defaultProps propMods
-    rgb = fromMaybe { r: 0, g: 0, b: 0, a: 1.0 } (parseColor props.value)
-    hsv = rgbToHsv rgb
-    
-    pickerContent = 
-      HH.div
-        [ cls [ "p-3 space-y-3" ] ]
-        [ -- Saturation/brightness panel
-          saturationPanel props hsv
-          -- Hue slider
-        , hueSlider props hsv.h
-          -- Alpha slider (optional)
-        , if props.showAlpha
-            then alphaSlider props rgb.a rgb
-            else HH.text ""
-          -- Color inputs based on format
-        , colorInputs props rgb
-          -- Tools row (eyedropper, copy, format toggle)
-        , toolsRow props
-          -- Swatches
-        , if not (null props.swatches)
-            then colorSwatches props.swatches props.onChange
-            else HH.text ""
-          -- Recent colors
-        , if props.showRecentColors && not (null props.recentColorsList)
-            then recentColors (take props.maxRecentColors props.recentColorsList) props.onChange
-            else HH.text ""
-        ]
   in
-    case props.mode of
-      Inline ->
+    HH.div
+      [ cls [ "color-picker space-y-4 p-4 border border-white/20 rounded-lg", props.className ] ]
+      [ -- Color preview
         HH.div
-          [ cls [ "w-64 rounded-lg border bg-popover text-popover-foreground shadow-md", props.className ]
+          [ cls [ "color-preview w-full h-16 rounded border border-white/20" ]
+          , HP.style ("background-color: " <> rgbToCss props.color)
           ]
-          [ pickerContent ]
-      Popover ->
-        HH.div
-          [ cls [ "relative inline-block", props.className ] ]
-          [ -- Color preview/trigger button
-            HH.button
-              [ cls [ "w-10 h-10 rounded-md border border-input shadow-sm focus:outline-none focus:ring-2 focus:ring-ring" ]
-              , HP.attr (HH.AttrName "style") ("background-color: " <> props.value)
-              , HP.disabled props.disabled
-              , ARIA.label "Select color"
+          []
+        
+        -- Mode toggles
+        , renderModeToggles props.enabledModes props.onModeToggle
+        
+        -- HSL mode
+        , if elem ModeHSL props.enabledModes
+            then renderHSLSliders props.color props.onChange
+            else HH.text ""
+        
+        -- RGB mode
+        , if elem ModeRGB props.enabledModes
+            then renderRGBSliders props.color props.onChange
+            else HH.text ""
+        
+        -- HWB mode
+        , if elem ModeHWB props.enabledModes
+            then renderHWBSliders props.color props.onChange
+            else HH.text ""
+        
+        -- OKLAB mode
+        , if elem ModeOKLAB props.enabledModes
+            then renderOKLABSliders props.color props.onChange
+            else HH.text ""
+        
+        -- OKLCH mode
+        , if elem ModeOKLCH props.enabledModes
+            then renderOKLCHSliders props.color props.onChange
+            else HH.text ""
+      ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // mode // toggles
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render mode toggle checkboxes
+renderModeToggles :: forall w i. Array ColorMode -> Maybe (ColorMode -> Boolean -> i) -> HH.HTML w i
+renderModeToggles enabledModes onToggle =
+  HH.div [ cls [ "flex flex-wrap gap-3 pb-2 border-b border-white/10" ] ]
+    [ renderModeCheckbox ModeHSL enabledModes onToggle
+    , renderModeCheckbox ModeRGB enabledModes onToggle
+    , renderModeCheckbox ModeHWB enabledModes onToggle
+    , renderModeCheckbox ModeOKLAB enabledModes onToggle
+    , renderModeCheckbox ModeOKLCH enabledModes onToggle
+    ]
+
+-- | Render a single mode checkbox
+renderModeCheckbox :: forall w i. ColorMode -> Array ColorMode -> Maybe (ColorMode -> Boolean -> i) -> HH.HTML w i
+renderModeCheckbox mode enabledModes onToggle =
+  let
+    isChecked = elem mode enabledModes
+  in
+    HH.label [ cls [ "flex items-center gap-2 cursor-pointer" ] ]
+      [ case onToggle of
+          Nothing ->
+            Checkbox.checkbox
+              [ Checkbox.checked isChecked
+              , Checkbox.disabled true
               ]
-              []
-            -- Dropdown panel
-          , if props.isOpen
-              then 
-                HH.div
-                  [ cls [ "absolute z-50 mt-2 w-64 rounded-lg border bg-popover text-popover-foreground shadow-md" ] ]
-                  [ pickerContent ]
-              else HH.text ""
-          ]
+          Just handler ->
+            Checkbox.checkbox
+              [ Checkbox.checked isChecked
+              , Checkbox.onChange (\_ -> handler mode (not isChecked))
+              ]
+      , HH.span [ cls [ "text-sm font-medium" ] ] [ HH.text (modeName mode) ]
+      ]
 
--- | Saturation/brightness panel
-saturationPanel :: forall w i. ColorPickerProps i -> HSVColor -> HH.HTML w i
-saturationPanel props hsv =
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // hsl // sliders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render HSL sliders
+renderHSLSliders :: forall w i. RGB -> Maybe (RGB -> i) -> HH.HTML w i
+renderHSLSliders rgb onChange =
   let
-    hueColor = rgbToHex (hsvToRgb { h: hsv.h, s: 100.0, v: 100.0, a: 1.0 })
-    cursorX = hsv.s
-    cursorY = 100.0 - hsv.v
+    hslColor = rgbToHsl rgb
+    hslRec = hslToRecord hslColor
   in
-    HH.div
-      [ cls [ "relative w-full h-40 rounded-md cursor-crosshair overflow-hidden" ]
-      , HP.attr (HH.AttrName "style") ("background: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, " <> hueColor <> ")")
-      , HP.attr (HH.AttrName "data-saturation-panel") "true"
-      ]
-      [ -- Cursor indicator
-        HH.div
-          [ cls [ "absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white shadow-md pointer-events-none" ]
-          , HP.attr (HH.AttrName "style") ("left: " <> show cursorX <> "%; top: " <> show cursorY <> "%; background-color: " <> props.value)
-          ]
-          []
+    HH.div [ cls [ "space-y-2 pt-2" ] ]
+      [ HH.h3 [ cls [ "text-sm font-bold text-white/60" ] ] [ HH.text "HSL" ]
+      , case onChange of
+          Nothing ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderReadonly "Hue" 0 359 hslRec.h
+              , renderSliderReadonly "Saturation" 0 100 hslRec.s
+              , renderSliderReadonly "Lightness" 0 100 hslRec.l
+              ]
+          Just handler ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSlider "Hue" 0 359 hslRec.h (\v -> handler (hslToRgb (hsl v hslRec.s hslRec.l)))
+              , renderSlider "Saturation" 0 100 hslRec.s (\v -> handler (hslToRgb (hsl hslRec.h v hslRec.l)))
+              , renderSlider "Lightness" 0 100 hslRec.l (\v -> handler (hslToRgb (hsl hslRec.h hslRec.s v)))
+              ]
       ]
 
--- | Hue slider
-hueSlider :: forall w i. ColorPickerProps i -> Number -> HH.HTML w i
-hueSlider _ hue =
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // rgb // sliders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render RGB sliders
+renderRGBSliders :: forall w i. RGB -> Maybe (RGB -> i) -> HH.HTML w i
+renderRGBSliders rgbColor onChange =
   let
-    huePercent = (hue / 360.0) * 100.0
+    rgbRec = rgbToRecord rgbColor
   in
-    HH.div
-      [ cls [ "relative w-full h-3 rounded-full cursor-pointer" ]
-      , HP.attr (HH.AttrName "style") "background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)"
-      , HP.attr (HH.AttrName "data-hue-slider") "true"
-      ]
-      [ HH.div
-          [ cls [ "absolute w-4 h-4 -mt-0.5 -ml-2 rounded-full border-2 border-white shadow-md pointer-events-none" ]
-          , HP.attr (HH.AttrName "style") ("left: " <> show huePercent <> "%; background-color: hsl(" <> show hue <> ", 100%, 50%)")
-          ]
-          []
+    HH.div [ cls [ "space-y-2 pt-2" ] ]
+      [ HH.h3 [ cls [ "text-sm font-bold text-white/60" ] ] [ HH.text "RGB" ]
+      , case onChange of
+          Nothing ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderReadonly "Red" 0 255 rgbRec.r
+              , renderSliderReadonly "Green" 0 255 rgbRec.g
+              , renderSliderReadonly "Blue" 0 255 rgbRec.b
+              ]
+          Just handler ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSlider "Red" 0 255 rgbRec.r (\v -> handler (rgb v rgbRec.g rgbRec.b))
+              , renderSlider "Green" 0 255 rgbRec.g (\v -> handler (rgb rgbRec.r v rgbRec.b))
+              , renderSlider "Blue" 0 255 rgbRec.b (\v -> handler (rgb rgbRec.r rgbRec.g v))
+              ]
       ]
 
--- | Alpha/opacity slider
-alphaSlider :: forall w i. ColorPickerProps i -> Number -> RGBColor -> HH.HTML w i
-alphaSlider _ alpha rgb =
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // hwb // sliders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render HWB sliders
+renderHWBSliders :: forall w i. RGB -> Maybe (RGB -> i) -> HH.HTML w i
+renderHWBSliders rgb onChange =
   let
-    alphaPercent = alpha * 100.0
-    solidColor = "rgb(" <> show rgb.r <> "," <> show rgb.g <> "," <> show rgb.b <> ")"
-    transparentColor = "rgba(" <> show rgb.r <> "," <> show rgb.g <> "," <> show rgb.b <> ",0)"
+    hwbColor = rgbToHwb rgb
+    hwbRec = hwbToRecord hwbColor
   in
-    HH.div
-      [ cls [ "relative w-full h-3 rounded-full cursor-pointer" ]
-      , HP.attr (HH.AttrName "style") ("background: linear-gradient(to right, " <> transparentColor <> ", " <> solidColor <> "), url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill-opacity='.05'%3E%3Crect x='4' width='4' height='4'/%3E%3Crect y='4' width='4' height='4'/%3E%3C/svg%3E\")")
-      , HP.attr (HH.AttrName "data-alpha-slider") "true"
-      ]
-      [ HH.div
-          [ cls [ "absolute w-4 h-4 -mt-0.5 -ml-2 rounded-full border-2 border-white shadow-md pointer-events-none" ]
-          , HP.attr (HH.AttrName "style") ("left: " <> show alphaPercent <> "%;")
-          ]
-          []
+    HH.div [ cls [ "space-y-2 pt-2" ] ]
+      [ HH.h3 [ cls [ "text-sm font-bold text-white/60" ] ] [ HH.text "HWB" ]
+      , case onChange of
+          Nothing ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderReadonly "Hue" 0 359 hwbRec.h
+              , renderSliderReadonly "Whiteness" 0 100 hwbRec.w
+              , renderSliderReadonly "Blackness" 0 100 hwbRec.b
+              ]
+          Just handler ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSlider "Hue" 0 359 hwbRec.h (\v -> handler (hwbToRgb (hwb v hwbRec.w hwbRec.b)))
+              , renderSlider "Whiteness" 0 100 hwbRec.w (\v -> handler (hwbToRgb (hwb hwbRec.h v hwbRec.b)))
+              , renderSlider "Blackness" 0 100 hwbRec.b (\v -> handler (hwbToRgb (hwb hwbRec.h hwbRec.w v)))
+              ]
       ]
 
--- | Color input field
-colorInput :: forall w i. String -> String -> String -> Maybe (Event -> i) -> HH.HTML w i
-colorInput labelText inputValue inputType onInputHandler =
-  HH.div
-    [ cls [ "flex flex-col gap-1" ] ]
-    [ HH.label
-        [ cls [ "text-xs text-muted-foreground" ] ]
-        [ HH.text labelText ]
-    , HH.input
-        ( [ cls [ "w-full h-8 px-2 text-xs rounded border border-input bg-background text-center focus:outline-none focus:ring-1 focus:ring-ring" ]
-          , HP.value inputValue
-          , HP.type_ HP.InputText
-          , HP.attr (HH.AttrName "data-input-type") inputType
-          ] <> case onInputHandler of
-            Just handler -> [ HE.onInput handler ]
-            Nothing -> []
-        )
-    ]
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // oklab // sliders
+-- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Color inputs based on format
-colorInputs :: forall w i. ColorPickerProps i -> RGBColor -> HH.HTML w i
-colorInputs props rgb =
+-- | Render OKLAB sliders
+renderOKLABSliders :: forall w i. RGB -> Maybe (RGB -> i) -> HH.HTML w i
+renderOKLABSliders rgb onChange =
   let
-    hsl = rgbToHsl rgb
-    hexValue = rgbToHex rgb
+    oklabColor = rgbToOklab rgb
+    oklabRec = oklabToRecord oklabColor
   in
-    HH.div
-      [ cls [ "grid grid-cols-4 gap-2" ] ]
-      ( case props.format of
-          Hex ->
-            [ HH.div 
-                [ cls [ "col-span-4" ] ]
-                [ colorInput "HEX" hexValue "hex" Nothing ]
-            ]
-          RGB ->
-            [ colorInput "R" (show rgb.r) "r" Nothing
-            , colorInput "G" (show rgb.g) "g" Nothing
-            , colorInput "B" (show rgb.b) "b" Nothing
-            , if props.showAlpha
-                then colorInput "A" (show (round (rgb.a * 100.0)) <> "%") "a" Nothing
-                else HH.text ""
-            ]
-          HSL ->
-            [ colorInput "H" (show (round hsl.h) <> "°") "h" Nothing
-            , colorInput "S" (show (round hsl.s) <> "%") "s" Nothing
-            , colorInput "L" (show (round hsl.l) <> "%") "l" Nothing
-            , if props.showAlpha
-                then colorInput "A" (show (round (hsl.a * 100.0)) <> "%") "a" Nothing
-                else HH.text ""
-            ]
-      )
+    HH.div [ cls [ "space-y-2 pt-2" ] ]
+      [ HH.h3 [ cls [ "text-sm font-bold text-white/60" ] ] [ HH.text "OKLAB" ]
+      , case onChange of
+          Nothing ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderReadonlyFloat "L" 0.0 1.0 oklabRec.l
+              , renderSliderReadonlyFloat "a" (-0.4) 0.4 oklabRec.a
+              , renderSliderReadonlyFloat "b" (-0.4) 0.4 oklabRec.b
+              ]
+          Just handler ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderFloat "L" 0.0 1.0 0.01 oklabRec.l (\v -> handler (oklabToRgb (oklab v oklabRec.a oklabRec.b)))
+              , renderSliderFloat "a" (-0.4) 0.4 0.01 oklabRec.a (\v -> handler (oklabToRgb (oklab oklabRec.l v oklabRec.b)))
+              , renderSliderFloat "b" (-0.4) 0.4 0.01 oklabRec.b (\v -> handler (oklabToRgb (oklab oklabRec.l oklabRec.a v)))
+              ]
+      ]
 
--- | Tools row (eyedropper, copy, format toggle)
-toolsRow :: forall w i. ColorPickerProps i -> HH.HTML w i
-toolsRow props =
-  HH.div
-    [ cls [ "flex items-center justify-between gap-2" ] ]
-    [ HH.div
-        [ cls [ "flex gap-1" ] ]
-        [ if props.showEyedropper then eyedropperButton else HH.text ""
-        , if props.showCopy then copyButton props.value else HH.text ""
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // oklch // sliders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render OKLCH sliders
+renderOKLCHSliders :: forall w i. RGB -> Maybe (RGB -> i) -> HH.HTML w i
+renderOKLCHSliders rgb onChange =
+  let
+    oklchColor = rgbToOklch rgb
+    oklchRec = oklchToRecord oklchColor
+  in
+    HH.div [ cls [ "space-y-2 pt-2" ] ]
+      [ HH.h3 [ cls [ "text-sm font-bold text-white/60" ] ] [ HH.text "OKLCH" ]
+      , case onChange of
+          Nothing ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderReadonlyFloat "L" 0.0 1.0 oklchRec.l
+              , renderSliderReadonlyFloat "C" 0.0 0.4 oklchRec.c
+              , renderSliderReadonly "H" 0 359 oklchRec.h
+              ]
+          Just handler ->
+            HH.div [ cls [ "space-y-2" ] ]
+              [ renderSliderFloat "L" 0.0 1.0 0.01 oklchRec.l (\v -> handler (oklchToRgb (oklch v oklchRec.c oklchRec.h)))
+              , renderSliderFloat "C" 0.0 0.4 0.01 oklchRec.c (\v -> handler (oklchToRgb (oklch oklchRec.l v oklchRec.h)))
+              , renderSlider "H" 0 359 oklchRec.h (\v -> handler (oklchToRgb (oklch oklchRec.l oklchRec.c v)))
+              ]
+      ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render a labeled slider (Int)
+renderSlider :: forall w i. String -> Int -> Int -> Int -> (Int -> i) -> HH.HTML w i
+renderSlider label minVal maxVal value handler =
+  HH.div [ cls [ "space-y-1" ] ]
+    [ HH.label [ cls [ "text-sm font-medium" ] ] [ HH.text (label <> ": " <> show value) ]
+    , Slider.slider
+        [ Slider.value (toNumber value)
+        , Slider.min (toNumber minVal)
+        , Slider.max (toNumber maxVal)
+        , Slider.onChange (\v -> handler (round v))
         ]
-    , if props.showFormatToggle 
-        then formatToggle props.format
-        else HH.text ""
     ]
 
--- | Color swatches
-colorSwatches :: forall w i. Array ColorValue -> Maybe (ColorValue -> i) -> HH.HTML w i
-colorSwatches swatchList onColorSelect =
-  HH.div
-    [ cls [ "space-y-1" ] ]
-    [ HH.div
-        [ cls [ "text-xs text-muted-foreground" ] ]
-        [ HH.text "Swatches" ]
-    , HH.div
-        [ cls [ "flex flex-wrap gap-1" ] ]
-        ( map (renderSwatch onColorSelect) swatchList )
-    ]
-
--- | Recent colors
-recentColors :: forall w i. Array ColorValue -> Maybe (ColorValue -> i) -> HH.HTML w i
-recentColors colorList onColorSelect =
-  HH.div
-    [ cls [ "space-y-1" ] ]
-    [ HH.div
-        [ cls [ "text-xs text-muted-foreground" ] ]
-        [ HH.text "Recent" ]
-    , HH.div
-        [ cls [ "flex flex-wrap gap-1" ] ]
-        ( map (renderSwatch onColorSelect) colorList )
-    ]
-
--- | Render a single swatch
-renderSwatch :: forall w i. Maybe (ColorValue -> i) -> ColorValue -> HH.HTML w i
-renderSwatch onSelect color =
-  HH.button
-    ( [ cls [ "w-6 h-6 rounded border border-input shadow-sm hover:ring-2 hover:ring-ring focus:outline-none focus:ring-2 focus:ring-ring" ]
-      , HP.attr (HH.AttrName "style") ("background-color: " <> color)
-      , ARIA.label ("Select color " <> color)
-      ] <> case onSelect of
-        Just handler -> [ HE.onClick (\_ -> handler color) ]
-        Nothing -> []
-    )
-    []
-
--- | Eyedropper button
-eyedropperButton :: forall w i. HH.HTML w i
-eyedropperButton =
-  HH.button
-    [ cls [ "p-2 rounded hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring" ]
-    , ARIA.label "Pick color from screen"
-    ]
-    [ eyedropperIcon ]
-
--- | Copy button
-copyButton :: forall w i. ColorValue -> HH.HTML w i
-copyButton _ =
-  HH.button
-    [ cls [ "p-2 rounded hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring" ]
-    , ARIA.label "Copy color value"
-    ]
-    [ copyIcon ]
-
--- | Format toggle
-formatToggle :: forall w i. ColorFormat -> HH.HTML w i
-formatToggle currentFormat =
-  let
-    formatLabel = case currentFormat of
-      Hex -> "HEX"
-      RGB -> "RGB"
-      HSL -> "HSL"
-  in
-    HH.button
-      [ cls [ "px-2 py-1 text-xs rounded border border-input hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring" ] ]
-      [ HH.text formatLabel ]
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Eyedropper icon
-eyedropperIcon :: forall w i. HH.HTML w i
-eyedropperIcon =
-  HH.element (HH.ElemName "svg")
-    [ HP.attr (HH.AttrName "xmlns") "http://www.w3.org/2000/svg"
-    , HP.attr (HH.AttrName "width") "16"
-    , HP.attr (HH.AttrName "height") "16"
-    , HP.attr (HH.AttrName "viewBox") "0 0 24 24"
-    , HP.attr (HH.AttrName "fill") "none"
-    , HP.attr (HH.AttrName "stroke") "currentColor"
-    , HP.attr (HH.AttrName "stroke-width") "2"
-    , HP.attr (HH.AttrName "stroke-linecap") "round"
-    , HP.attr (HH.AttrName "stroke-linejoin") "round"
-    ]
-    [ HH.element (HH.ElemName "path")
-        [ HP.attr (HH.AttrName "d") "m2 22 1-1h3l9-9" ]
-        []
-    , HH.element (HH.ElemName "path")
-        [ HP.attr (HH.AttrName "d") "M3 21v-3l9-9" ]
-        []
-    , HH.element (HH.ElemName "path")
-        [ HP.attr (HH.AttrName "d") "m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z" ]
-        []
-    ]
-
--- | Copy icon
-copyIcon :: forall w i. HH.HTML w i
-copyIcon =
-  HH.element (HH.ElemName "svg")
-    [ HP.attr (HH.AttrName "xmlns") "http://www.w3.org/2000/svg"
-    , HP.attr (HH.AttrName "width") "16"
-    , HP.attr (HH.AttrName "height") "16"
-    , HP.attr (HH.AttrName "viewBox") "0 0 24 24"
-    , HP.attr (HH.AttrName "fill") "none"
-    , HP.attr (HH.AttrName "stroke") "currentColor"
-    , HP.attr (HH.AttrName "stroke-width") "2"
-    , HP.attr (HH.AttrName "stroke-linecap") "round"
-    , HP.attr (HH.AttrName "stroke-linejoin") "round"
-    ]
-    [ HH.element (HH.ElemName "rect")
-        [ HP.attr (HH.AttrName "width") "14"
-        , HP.attr (HH.AttrName "height") "14"
-        , HP.attr (HH.AttrName "x") "8"
-        , HP.attr (HH.AttrName "y") "8"
-        , HP.attr (HH.AttrName "rx") "2"
-        , HP.attr (HH.AttrName "ry") "2"
+-- | Render a readonly labeled slider (Int)
+renderSliderReadonly :: forall w i. String -> Int -> Int -> Int -> HH.HTML w i
+renderSliderReadonly label minVal maxVal value =
+  HH.div [ cls [ "space-y-1" ] ]
+    [ HH.label [ cls [ "text-sm font-medium" ] ] [ HH.text (label <> ": " <> show value) ]
+    , Slider.slider
+        [ Slider.value (toNumber value)
+        , Slider.min (toNumber minVal)
+        , Slider.max (toNumber maxVal)
+        , Slider.disabled true
         ]
-        []
-    , HH.element (HH.ElemName "path")
-        [ HP.attr (HH.AttrName "d") "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" ]
-        []
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- | Render a labeled slider (Number)
+renderSliderFloat :: forall w i. String -> Number -> Number -> Number -> Number -> (Number -> i) -> HH.HTML w i
+renderSliderFloat label minVal maxVal step value handler =
+  HH.div [ cls [ "space-y-1" ] ]
+    [ HH.label [ cls [ "text-sm font-medium" ] ] 
+        [ HH.text (label <> ": " <> toStringWith (fixed 3) value) ]
+    , Slider.slider
+        [ Slider.value value
+        , Slider.min minVal
+        , Slider.max maxVal
+        , Slider.step step
+        , Slider.onChange handler
+        ]
+    ]
 
--- | Modulo for floats
-mod' :: Number -> Number -> Number
-mod' a b = a - b * toNumber (floor (a / b))
-  where
-    floor :: Number -> Int
-    floor n = round (n - 0.5)
-
--- | Null check for arrays
-null :: forall a. Array a -> Boolean
-null arr = case arr of
-  [] -> true
-  _ -> false
-
--- | Parse a hex pair to Int (simplified)
-parseHexPair :: String -> Int
-parseHexPair _ = 0  -- Placeholder - actual implementation in JS
-
--- | Convert Int to two-digit hex string
-toHexPair :: Int -> String
-toHexPair n =
-  let
-    hexChars = "0123456789abcdef"
-    hi = n / 16
-    lo = n `mod` 16
-  in String.take 1 (String.drop hi hexChars) <> String.take 1 (String.drop lo hexChars)
-
--- | Parse rgb() string
-parseRgbString :: String -> Maybe RGBColor
-parseRgbString _ = Nothing  -- Placeholder - handled in JS for robustness
-
--- | Parse rgba() string
-parseRgbaString :: String -> Maybe RGBColor
-parseRgbaString _ = Nothing  -- Placeholder
-
--- | Parse hsl() string
-parseHslString :: String -> Maybe RGBColor
-parseHslString _ = Nothing  -- Placeholder
-
--- | Parse hsla() string
-parseHslaString :: String -> Maybe RGBColor
-parseHslaString _ = Nothing  -- Placeholder
-
--- | Map function for arrays
-map :: forall a b. (a -> b) -> Array a -> Array b
-map _ [] = []
-map f xs = mapImpl f xs
-
-foreign import mapImpl :: forall a b. (a -> b) -> Array a -> Array b
+-- | Render a readonly labeled slider (Number)
+renderSliderReadonlyFloat :: forall w i. String -> Number -> Number -> Number -> HH.HTML w i
+renderSliderReadonlyFloat label minVal maxVal value =
+  HH.div [ cls [ "space-y-1" ] ]
+    [ HH.label [ cls [ "text-sm font-medium" ] ] 
+        [ HH.text (label <> ": " <> toStringWith (fixed 3) value) ]
+    , Slider.slider
+        [ Slider.value value
+        , Slider.min minVal
+        , Slider.max maxVal
+        , Slider.disabled true
+        ]
+    ]

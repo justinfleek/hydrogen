@@ -25,6 +25,8 @@ import Test.Spec.Assertions (shouldEqual, shouldSatisfy)
 import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
 import Test.Property as Property
+import Test.ColorConversion as ColorConversion
+import Test.ColorEdgeCases as ColorEdgeCases
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -40,6 +42,9 @@ main = launchAff_ $ runSpec [consoleReporter] do
     queryTests
   describe "Property Tests" do
     Property.propertyTests
+  describe "Color System Tests" do
+    ColorConversion.colorConversionTests
+    ColorEdgeCases.colorEdgeCaseTests
 
 -- =============================================================================
 --                                                              // format tests

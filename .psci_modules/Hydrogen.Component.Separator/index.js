@@ -1,0 +1,129 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//                                                      // hydrogen // separator
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// | Separator component
+// |
+// | Visual dividers for content separation.
+// |
+// | ## Usage
+// |
+// | ```purescript
+// | import Hydrogen.Component.Separator as Separator
+// |
+// | -- Horizontal separator (default)
+// | Separator.separator []
+// |
+// | -- Vertical separator
+// | Separator.separator [ Separator.orientation Separator.Vertical ]
+// |
+// | -- With label
+// | Separator.separatorWithLabel [] [ HH.text "OR" ]
+// | ```
+import * as Data_Array from "../Data.Array/index.js";
+import * as Halogen_HTML_Elements from "../Halogen.HTML.Elements/index.js";
+import * as Halogen_HTML_Properties_ARIA from "../Halogen.HTML.Properties.ARIA/index.js";
+import * as Hydrogen_UI_Core from "../Hydrogen.UI.Core/index.js";
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                // orientation
+// ═══════════════════════════════════════════════════════════════════════════════
+var Horizontal = /* #__PURE__ */ (function () {
+    function Horizontal() {
+
+    };
+    Horizontal.value = new Horizontal();
+    return Horizontal;
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                // orientation
+// ═══════════════════════════════════════════════════════════════════════════════
+var Vertical = /* #__PURE__ */ (function () {
+    function Vertical() {
+
+    };
+    Vertical.value = new Vertical();
+    return Vertical;
+})();
+var orientationClasses = function (v) {
+    if (v instanceof Horizontal) {
+        return "h-[1px] w-full";
+    };
+    if (v instanceof Vertical) {
+        return "h-full w-[1px]";
+    };
+    throw new Error("Failed pattern match at Hydrogen.Component.Separator (line 54, column 22 - line 56, column 31): " + [ v.constructor.name ]);
+};
+
+// | Set orientation
+var orientation = function (o) {
+    return function (props) {
+        return {
+            className: props.className,
+            orientation: o
+        };
+    };
+};
+var eqOrientation = {
+    eq: function (x) {
+        return function (y) {
+            if (x instanceof Horizontal && y instanceof Horizontal) {
+                return true;
+            };
+            if (x instanceof Vertical && y instanceof Vertical) {
+                return true;
+            };
+            return false;
+        };
+    }
+};
+var defaultProps = /* #__PURE__ */ (function () {
+    return {
+        orientation: Horizontal.value,
+        className: ""
+    };
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                  // components
+// ═══════════════════════════════════════════════════════════════════════════════
+// | Separator line
+var separator = function (propMods) {
+    var props = Data_Array.foldl(function (p) {
+        return function (f) {
+            return f(p);
+        };
+    })(defaultProps)(propMods);
+    return Halogen_HTML_Elements.div([ Hydrogen_UI_Core.cls([ "shrink-0 bg-border", orientationClasses(props.orientation), props.className ]), Halogen_HTML_Properties_ARIA.role("separator") ])([  ]);
+};
+
+// | Separator with centered label
+var separatorWithLabel = function (propMods) {
+    return function (children) {
+        var props = Data_Array.foldl(function (p) {
+            return function (f) {
+                return f(p);
+            };
+        })(defaultProps)(propMods);
+        return Halogen_HTML_Elements.div([ Hydrogen_UI_Core.cls([ "flex items-center", props.className ]) ])([ Halogen_HTML_Elements.div([ Hydrogen_UI_Core.cls([ "flex-1 h-[1px] bg-border" ]) ])([  ]), Halogen_HTML_Elements.span([ Hydrogen_UI_Core.cls([ "px-3 text-sm text-muted-foreground" ]) ])(children), Halogen_HTML_Elements.div([ Hydrogen_UI_Core.cls([ "flex-1 h-[1px] bg-border" ]) ])([  ]) ]);
+    };
+};
+
+// | Add custom class
+var className = function (c) {
+    return function (props) {
+        return {
+            orientation: props.orientation,
+            className: props.className + (" " + c)
+        };
+    };
+};
+export {
+    separator,
+    separatorWithLabel,
+    orientation,
+    className,
+    Horizontal,
+    Vertical,
+    eqOrientation
+};

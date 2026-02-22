@@ -57,6 +57,26 @@ module Hydrogen.Schema.Color.Conversion
   -- * Kelvin → RGB
   , kelvinToRgb
   
+  -- * RGB ↔ OKLAB (modern perceptual)
+  , rgbToOklab
+  , oklabToRgb
+  
+  -- * OKLAB ↔ OKLCH (rectangular ↔ cylindrical)
+  , oklabToOklch
+  , oklchToOklab
+  
+  -- * RGB ↔ OKLCH (convenience)
+  , rgbToOklch
+  , oklchToRgb
+  
+  -- * RGB ↔ HWB (CSS4)
+  , rgbToHwb
+  , hwbToRgb
+  
+  -- * RGB ↔ YUV (video)
+  , rgbToYuv
+  , yuvToRgb
+  
   -- * Record Serialization (for backend persistence)
   , rgbToRecord
   , rgbFromRecord
@@ -75,9 +95,10 @@ module Hydrogen.Schema.Color.Conversion
 import Prelude
 
 import Data.Int as Int
-import Data.Number (abs, pow)
+import Data.Number (abs, pow, sqrt)
 import Data.String (take, drop)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
+import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.CMYK as CMYK
@@ -93,6 +114,10 @@ import Hydrogen.Schema.Color.Kelvin as K
 import Hydrogen.Schema.Color.XYZ as XYZ
 import Hydrogen.Schema.Color.LAB as LAB
 import Hydrogen.Schema.Color.LCH as LCH
+import Hydrogen.Schema.Color.OKLAB as OKLAB
+import Hydrogen.Schema.Color.OKLCH as OKLCH
+import Hydrogen.Schema.Color.HWB as HWB
+import Hydrogen.Schema.Color.YUV as YUV
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // hsl ↔ rgb
@@ -650,3 +675,205 @@ xyzToRecord = XYZ.xyzToRecord
 -- | Record → XYZ (from JSON deserialization / backend)
 xyzFromRecord :: { x :: Number, y :: Number, z :: Number } -> XYZ.XYZ
 xyzFromRecord = XYZ.xyzFromRecord
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // rgb ↔ oklab
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | RGB → OKLAB (modern perceptual uniform space)
+-- | Uses linear RGB → LMS → OKLAB transformation
+rgbToOklab :: RGB.RGB -> OKLAB.OKLAB
+rgbToOklab rgb =
+  let
+    -- Convert to linear RGB (remove sRGB gamma)
+    r = toLinear (Ch.toNumber (RGB.red rgb) / 255.0)
+    g = toLinear (Ch.toNumber (RGB.green rgb) / 255.0)
+    b = toLinear (Ch.toNumber (RGB.blue rgb) / 255.0)
+    
+    -- Linear RGB → LMS (cone response)
+    l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b
+    m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b
+    s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b
+    
+    -- LMS → OKLAB (cube root for perceptual uniformity)
+    l' = cbrt l
+    m' = cbrt m
+    s' = cbrt s
+    
+    okL = 0.2104542553 * l' + 0.7936177850 * m' - 0.0040720468 * s'
+    okA = 1.9779984951 * l' - 2.4285922050 * m' + 0.4505937099 * s'
+    okB = 0.0259040371 * l' + 0.7827717662 * m' - 0.8086757660 * s'
+  in
+    OKLAB.oklab okL okA okB
+  where
+  -- sRGB to linear RGB
+  toLinear c
+    | c <= 0.04045 = c / 12.92
+    | otherwise = pow ((c + 0.055) / 1.055) 2.4
+  
+  -- Cube root (∛x)
+  cbrt x = pow x (1.0 / 3.0)
+
+-- | OKLAB → RGB
+oklabToRgb :: OKLAB.OKLAB -> RGB.RGB
+oklabToRgb oklab =
+  let
+    okL = OKLAB.unwrapOkL (OKLAB.okL oklab)
+    okA = OKLAB.unwrapOkA (OKLAB.okA oklab)
+    okB = OKLAB.unwrapOkB (OKLAB.okB oklab)
+    
+    -- OKLAB → LMS (inverse)
+    l' = okL + 0.3963377774 * okA + 0.2158037573 * okB
+    m' = okL - 0.1055613458 * okA - 0.0638541728 * okB
+    s' = okL - 0.0894841775 * okA - 1.2914855480 * okB
+    
+    -- LMS → Linear RGB (cube and inverse matrix)
+    l = l' * l' * l'
+    m = m' * m' * m'
+    s = s' * s' * s'
+    
+    r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
+    g = (-1.2684380046) * l + 2.6097574011 * m - 0.3413193965 * s
+    b = (-0.0041960863) * l - 0.7034186147 * m + 1.7076147010 * s
+    
+    -- Linear RGB → sRGB (apply gamma)
+    rGamma = toGamma r
+    gGamma = toGamma g
+    bGamma = toGamma b
+  in
+    RGB.rgb (Int.round (rGamma * 255.0)) (Int.round (gGamma * 255.0)) (Int.round (bGamma * 255.0))
+  where
+  -- Linear to sRGB gamma
+  toGamma c
+    | c <= 0.0031308 = 12.92 * c
+    | otherwise = 1.055 * pow c (1.0 / 2.4) - 0.055
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // oklab ↔ oklch
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | OKLAB → OKLCH (rectangular → cylindrical)
+oklabToOklch :: OKLAB.OKLAB -> OKLCH.OKLCH
+oklabToOklch oklab =
+  let
+    okL = OKLAB.unwrapOkL (OKLAB.okL oklab)
+    okA = OKLAB.unwrapOkA (OKLAB.okA oklab)
+    okB = OKLAB.unwrapOkB (OKLAB.okB oklab)
+    
+    -- Chroma (distance from neutral)
+    c = sqrt (okA * okA + okB * okB)
+    
+    -- Hue (angle in degrees)
+    h = atan2 okB okA * 180.0 / pi
+    hNormalized = if h < 0.0 then h + 360.0 else h
+  in
+    OKLCH.oklch okL c (Int.round hNormalized)
+  where
+  atan2 y x = Math.atan2 y x
+  sqrt x = Math.sqrt x
+  pi = Math.pi
+
+-- | OKLCH → OKLAB (cylindrical → rectangular)
+oklchToOklab :: OKLCH.OKLCH -> OKLAB.OKLAB
+oklchToOklab oklch =
+  let
+    okL = OKLAB.unwrapOkL (OKLCH.oklchL oklch)
+    c = OKLCH.unwrapChroma (OKLCH.chroma oklch)
+    h = Int.toNumber (Hue.unwrap (OKLCH.hue oklch))
+    
+    -- Convert hue to radians
+    hRad = h * pi / 180.0
+    
+    -- Chroma and hue → a,b
+    okA = c * cos hRad
+    okB = c * sin hRad
+  in
+    OKLAB.oklab okL okA okB
+  where
+  cos x = Math.cos x
+  sin x = Math.sin x
+  pi = Math.pi
+
+-- | RGB → OKLCH (convenience)
+rgbToOklch :: RGB.RGB -> OKLCH.OKLCH
+rgbToOklch = oklabToOklch <<< rgbToOklab
+
+-- | OKLCH → RGB (convenience)
+oklchToRgb :: OKLCH.OKLCH -> RGB.RGB
+oklchToRgb = oklabToRgb <<< oklchToOklab
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                               // rgb ↔ hwb
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | RGB → HWB (via HSL)
+rgbToHwb :: RGB.RGB -> HWB.HWB
+rgbToHwb rgb =
+  let
+    hsl = rgbToHsl rgb
+    h = Hue.unwrap (HSL.hue hsl)
+    s = Sat.unwrap (HSL.saturation hsl)
+    l = Light.unwrap (HSL.lightness hsl)
+    
+    -- Calculate whiteness and blackness from HSL
+    sNum = Int.toNumber s
+    lNum = Int.toNumber l
+    w = (100.0 - sNum) * lNum / 100.0
+    b = 100.0 - lNum - (sNum * lNum / 100.0)
+  in
+    HWB.hwb h (Int.round w) (Int.round b)
+
+-- | HWB → RGB (via HSL)
+hwbToRgb :: HWB.HWB -> RGB.RGB
+hwbToRgb hwb =
+  let
+    h = Hue.unwrap (HWB.hue hwb)
+    w = Int.toNumber (HWB.unwrapWhiteness (HWB.getWhiteness hwb))
+    b = Int.toNumber (HWB.unwrapBlackness (HWB.getBlackness hwb))
+    
+    -- Normalize if w + b > 100
+    total = w + b
+    w' = if total > 100.0 then (w * 100.0) / total else w
+    b' = if total > 100.0 then (b * 100.0) / total else b
+    
+    -- Convert to HSL
+    l = (100.0 - b') - (100.0 - b' - w') / 2.0
+    s = if l == 0.0 || l == 100.0 then 0.0 else ((100.0 - b' - l) * 100.0) / min l (100.0 - l)
+  in
+    hslToRgb (HSL.hsl h (Int.round s) (Int.round l))
+  where
+  min a b = if a < b then a else b
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                               // rgb ↔ yuv
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | RGB → YUV (video color space)
+rgbToYuv :: RGB.RGB -> YUV.YUV
+rgbToYuv rgb =
+  let
+    r = Ch.toNumber (RGB.red rgb) / 255.0
+    g = Ch.toNumber (RGB.green rgb) / 255.0
+    b = Ch.toNumber (RGB.blue rgb) / 255.0
+    
+    -- ITU-R BT.601 coefficients (standard definition)
+    y = 0.299 * r + 0.587 * g + 0.114 * b
+    u = 0.492 * (b - y)
+    v = 0.877 * (r - y)
+  in
+    YUV.yuv y u v
+
+-- | YUV → RGB
+yuvToRgb :: YUV.YUV -> RGB.RGB
+yuvToRgb yuv =
+  let
+    y = YUV.unwrapLuma (YUV.getLuma yuv)
+    u = YUV.unwrapU (YUV.getU yuv)
+    v = YUV.unwrapV (YUV.getV yuv)
+    
+    -- ITU-R BT.601 inverse
+    r = y + 1.140 * v
+    g = y - 0.395 * u - 0.581 * v
+    b = y + 2.032 * u
+  in
+    RGB.rgb (Int.round (r * 255.0)) (Int.round (g * 255.0)) (Int.round (b * 255.0))

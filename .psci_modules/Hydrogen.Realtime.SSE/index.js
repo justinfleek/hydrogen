@@ -1,0 +1,226 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//                                                            // hydrogen // sse
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// | Server-Sent Events (SSE) client
+// |
+// | For unidirectional server-to-client streaming.
+// |
+// | ## Usage
+// |
+// | ```purescript
+// | import Hydrogen.Realtime.SSE as SSE
+// |
+// | -- Connect to SSE endpoint
+// | sse <- SSE.connect "/api/events"
+// |   { onMessage: \msg -> handleMessage msg
+// |   , onError: \err -> Console.log err
+// |   }
+// |
+// | -- Listen for specific event types
+// | SSE.on sse "user-update" \data -> updateUser data
+// | SSE.on sse "notification" \data -> showNotification data
+// |
+// | -- Close connection
+// | SSE.close sse
+// | ```
+import * as $foreign from "./foreign.js";
+import * as Control_Applicative from "../Control.Applicative/index.js";
+import * as Data_Eq from "../Data.Eq/index.js";
+import * as Data_Maybe from "../Data.Maybe/index.js";
+import * as Data_Unit from "../Data.Unit/index.js";
+import * as Effect from "../Effect/index.js";
+import * as Effect_Ref from "../Effect.Ref/index.js";
+var pure = /* #__PURE__ */ Control_Applicative.pure(Effect.applicativeEffect);
+
+// | SSE connection state
+var SSEConnecting = /* #__PURE__ */ (function () {
+    function SSEConnecting() {
+
+    };
+    SSEConnecting.value = new SSEConnecting();
+    return SSEConnecting;
+})();
+
+// | SSE connection state
+var SSEOpen = /* #__PURE__ */ (function () {
+    function SSEOpen() {
+
+    };
+    SSEOpen.value = new SSEOpen();
+    return SSEOpen;
+})();
+
+// | SSE connection state
+var SSEClosed = /* #__PURE__ */ (function () {
+    function SSEClosed() {
+
+    };
+    SSEClosed.value = new SSEClosed();
+    return SSEClosed;
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                       // types
+// ═══════════════════════════════════════════════════════════════════════════════
+// | EventSource wrapper
+var EventSource = function (x) {
+    return x;
+};
+var showSSEState = {
+    show: function (v) {
+        if (v instanceof SSEConnecting) {
+            return "Connecting";
+        };
+        if (v instanceof SSEOpen) {
+            return "Open";
+        };
+        if (v instanceof SSEClosed) {
+            return "Closed";
+        };
+        throw new Error("Failed pattern match at Hydrogen.Realtime.SSE (line 78, column 1 - line 81, column 28): " + [ v.constructor.name ]);
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                      // events
+// ═══════════════════════════════════════════════════════════════════════════════
+// | Listen for a specific event type
+var on = function (v) {
+    return function (eventType) {
+        return function (handler) {
+            return function __do() {
+                var maybeSource = Effect_Ref.read(v.source)();
+                if (maybeSource instanceof Data_Maybe.Nothing) {
+                    return Data_Unit.unit;
+                };
+                if (maybeSource instanceof Data_Maybe.Just) {
+                    return $foreign.sseAddEventListener(maybeSource.value0)(eventType)(handler)();
+                };
+                throw new Error("Failed pattern match at Hydrogen.Realtime.SSE (line 156, column 3 - line 158, column 54): " + [ maybeSource.constructor.name ]);
+            };
+        };
+    };
+};
+
+// | Listen for the default message event
+var onMessage = function (es) {
+    return on(es)("message");
+};
+
+// | Remove event listener
+var off = function (v) {
+    return function (eventType) {
+        return function __do() {
+            var maybeSource = Effect_Ref.read(v.source)();
+            if (maybeSource instanceof Data_Maybe.Nothing) {
+                return Data_Unit.unit;
+            };
+            if (maybeSource instanceof Data_Maybe.Just) {
+                return $foreign.sseRemoveEventListener(maybeSource.value0)(eventType)();
+            };
+            throw new Error("Failed pattern match at Hydrogen.Realtime.SSE (line 168, column 3 - line 170, column 49): " + [ maybeSource.constructor.name ]);
+        };
+    };
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                       // state
+// ═══════════════════════════════════════════════════════════════════════════════
+// | Get current connection state
+var getState = function (v) {
+    return Effect_Ref.read(v.state);
+};
+var eqSSEState = {
+    eq: function (x) {
+        return function (y) {
+            if (x instanceof SSEConnecting && y instanceof SSEConnecting) {
+                return true;
+            };
+            if (x instanceof SSEOpen && y instanceof SSEOpen) {
+                return true;
+            };
+            if (x instanceof SSEClosed && y instanceof SSEClosed) {
+                return true;
+            };
+            return false;
+        };
+    }
+};
+var eq = /* #__PURE__ */ Data_Eq.eq(eqSSEState);
+
+// | Check if connected
+var isConnected = function (es) {
+    return function __do() {
+        var s = getState(es)();
+        return eq(s)(SSEOpen.value);
+    };
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                  // connection
+// ═══════════════════════════════════════════════════════════════════════════════
+// | Default SSE configuration
+var defaultConfig = {
+    onMessage: function (v) {
+        return pure(Data_Unit.unit);
+    },
+    onError: function (v) {
+        return pure(Data_Unit.unit);
+    },
+    onOpen: /* #__PURE__ */ pure(Data_Unit.unit),
+    withCredentials: false
+};
+
+// | Connect to an SSE endpoint
+var connect = function (url) {
+    return function (config) {
+        return function __do() {
+            var sourceRef = Effect_Ref["new"](Data_Maybe.Nothing.value)();
+            var stateRef = Effect_Ref["new"](SSEConnecting.value)();
+            var source = $foreign.newEventSource(url)(config.withCredentials)();
+            Effect_Ref.write(new Data_Maybe.Just(source))(sourceRef)();
+            $foreign.sseOnOpen(source)(function __do() {
+                Effect_Ref.write(SSEOpen.value)(stateRef)();
+                return config.onOpen();
+            })();
+            $foreign.sseOnMessage(source)(config.onMessage)();
+            $foreign.sseOnError(source)(function (err) {
+                return config.onError(err);
+            })();
+            return {
+                source: sourceRef,
+                url: url,
+                state: stateRef
+            };
+        };
+    };
+};
+
+// | Close the SSE connection
+var close = function (v) {
+    return function __do() {
+        Effect_Ref.write(SSEClosed.value)(v.state)();
+        var maybeSource = Effect_Ref.read(v.source)();
+        if (maybeSource instanceof Data_Maybe.Nothing) {
+            return Data_Unit.unit;
+        };
+        if (maybeSource instanceof Data_Maybe.Just) {
+            return $foreign.sseClose(maybeSource.value0)();
+        };
+        throw new Error("Failed pattern match at Hydrogen.Realtime.SSE (line 144, column 3 - line 146, column 25): " + [ maybeSource.constructor.name ]);
+    };
+};
+export {
+    SSEConnecting,
+    SSEOpen,
+    SSEClosed,
+    connect,
+    close,
+    on,
+    onMessage,
+    off,
+    getState,
+    isConnected,
+    eqSSEState,
+    showSSEState
+};

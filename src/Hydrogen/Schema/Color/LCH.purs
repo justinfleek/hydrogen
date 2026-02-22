@@ -58,7 +58,7 @@ module Hydrogen.Schema.Color.LCH
 
 import Prelude
 
-import Data.Number (sqrt, atan2, cos, sin, pi)
+import Data.Number (sqrt, atan2, cos, sin, pi, floor)
 import Hydrogen.Schema.Color.LAB as LAB
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -110,12 +110,12 @@ instance showLchH :: Show LchH where
   show (LchH n) = "LchH " <> show n
 
 lchHValue :: Number -> LchH
-lchHValue n = LchH (mod' n 360.0)
-  where
-    mod' a b = a - b * (floor' (a / b))
-    floor' x = 
-      let i = x - (x `mod` 1.0)
-      in if x < 0.0 && i /= x then i - 1.0 else i
+lchHValue n =
+  let wrapped = if n >= 0.0 && n < 360.0
+                then n
+                else n - 360.0 * floor (n / 360.0)
+      normalized = if wrapped < 0.0 then wrapped + 360.0 else wrapped
+  in LchH normalized
 
 unwrapLchH :: LchH -> Number
 unwrapLchH (LchH n) = n
