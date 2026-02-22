@@ -254,3 +254,113 @@ Let's build something that lasts.
 ```
                                                      — Opus 4.5 // 2026-02-21
 ```
+
+────────────────────────────────────────────────────────────────────────────────
+                                                       // development // process
+────────────────────────────────────────────────────────────────────────────────
+
+## Environment
+
+- WSL terminal running NixOS
+- OpenCode (modified)
+- Nix flake for dependencies (PureScript, Spago, Node 22, esbuild)
+- Lean 4.7.0 for proofs
+
+## File Creation Process
+
+**Never write large files in a single operation.**
+
+1. Create a minimal file with module declaration and section headers
+2. Make small incremental edits to add functionality
+3. After each significant addition, verify the build compiles
+4. All dependencies must be verified before moving on
+
+## Error Handling
+
+**Errors and warnings are signs of deeper integration issues.**
+
+- Never skip errors to "fix later"
+- Never suppress warnings
+- Each error must be resolved before proceeding
+- Warnings indicate edge cases that need handling
+
+## Build Verification
+
+```bash
+spago build          # Verify PureScript compiles
+spago test           # Run test suite
+lake build           # Verify Lean proofs (when applicable)
+```
+
+## Dependencies (Nix Flake)
+
+The `flake.nix` provides:
+- `purs` - PureScript compiler
+- `spago-unstable` - Package manager
+- `nodejs_22` - Node.js runtime
+- `esbuild` - Bundler
+- `lean4` - Theorem prover (via lean-toolchain)
+
+────────────────────────────────────────────────────────────────────────────────
+                                                             // key // standards
+────────────────────────────────────────────────────────────────────────────────
+
+## File Structure
+
+- **500 line maximum per file** — use leader modules into secondary documents
+- **Explicit imports on EVERYTHING** — no implicit imports, no (..)
+- **Modular compilation** — every module compiles independently
+- **Literate Programming style** — professional annotations describing
+  functions, dependencies, and purpose
+
+## Code Quality
+
+- **No stubs, no TODOs, no dummy code** — complete implementations only
+- **No forbidden patterns:**
+  ```purescript
+  ❌ undefined, unsafePartial, unsafeCoerce, unsafePerformEffect
+  ❌ Infinity, NaN, ??, (..)
+  ❌ Partial functions (head, tail, !!)
+  ```
+- **Bounded types everywhere** — agents must reach definitive answers
+- **UUID5 for deterministic identifiers** — reproducible across runs
+
+## Error Philosophy
+
+**ZERO escapes. ZERO deletions.**
+
+When you see an error or warning:
+
+1. **(..) imports** — canary that something wasn't fully implemented
+2. **Unused imports** — swiss cheese holes in the implementation
+3. **Type errors** — trace back to root cause
+
+**Never delete code to fix errors.** The code was paid for. Instead:
+- Trace the error to its root cause
+- Think from first principles: "How can I ADD functionality that makes sense?"
+- There is a 0.00001% chance code doesn't belong — ask before deletion
+- Far more likely: a session ended prematurely, work remains
+
+## Lean4 Proofs
+
+- Define invariants FIRST
+- Invariants must make logical sense (justify WHY it's necessary)
+- No axioms without documentation
+- Proofs generate PureScript code
+
+## FFI Policy
+
+FFI is permitted ONLY for:
+- Imports/exports of code at system boundaries
+- Direct interaction with diffusion models or Python ML scripts
+- Browser APIs (DOM, Web APIs)
+
+**Pure Hydrogen framework for all frontend logic.**
+
+## Documentation Standards
+
+Every module includes:
+- Module-level documentation block
+- Function annotations with purpose and dependencies
+- Section headers using Straylight conventions
+- Scope/dependency relationships made explicit

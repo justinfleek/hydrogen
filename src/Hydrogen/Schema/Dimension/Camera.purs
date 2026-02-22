@@ -120,8 +120,8 @@ module Hydrogen.Schema.Dimension.Camera
 import Prelude
 
 import Hydrogen.Math.Core as Math
-import Hydrogen.Schema.Dimension.Physical (Meter(..), Millimeter(..), meter, millimeter, unwrapMeter, unwrapMillimeter)
-import Hydrogen.Schema.Dimension.Angular (Degrees(..), Radians(..), degrees, radians, unwrapDegrees, toRadians, fromRadians)
+import Hydrogen.Schema.Dimension.Physical (Meter(..), Millimeter(..))
+import Hydrogen.Schema.Dimension.Angular (Degrees(..))
 import Hydrogen.Schema.Dimension.Vector (Vec3(..))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
