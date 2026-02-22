@@ -63,7 +63,7 @@ module Hydrogen.Schema.Typography.TypeScale
 import Prelude
 
 import Data.Int (toNumber) as Int
-import Math (pow)
+import Hydrogen.Math.Core (pow)
 import Hydrogen.Schema.Typography.FontSize (FontSize)
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
