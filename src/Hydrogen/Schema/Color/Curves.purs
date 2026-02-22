@@ -13,8 +13,11 @@ module Hydrogen.Schema.Color.Curves
 
 import Prelude
 
-import Hydrogen.Schema.Color.Channel (Channel, channel, channelValue)
-import Hydrogen.Schema.Color.RGB (RGB)
+import Data.Array (sortBy, uncons)
+import Data.Int (round, toNumber)
+import Data.Maybe (Maybe(..))
+import Hydrogen.Schema.Color.Channel (Channel, channel, unwrap)
+import Hydrogen.Schema.Color.RGB (RGB, red, green, blue, rgbFromChannels)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- TYPES
@@ -62,7 +65,7 @@ curve :: Array CurvePoint -> Curve
 curve points = Curve (sortBy comparePoints points)
   where
   comparePoints (CurvePoint p1) (CurvePoint p2) = 
-    compare (channelValue p1.input) (channelValue p2.input)
+    compare (unwrap p1.input) (unwrap p2.input)
 
 -- Create a complete curves configuration
 curves :: Curve -> Curve -> Curve -> Curve -> Curves
@@ -79,9 +82,9 @@ linearCurve = curve
 contrastCurve :: Number -> Curve
 contrastCurve amount = curve
   [ curvePoint (channel 0) (channel 0)
-  , curvePoint (channel 64) (channel (max 0 (min 255 (64 - amount * 10.0))))
+  , curvePoint (channel 64) (channel (round (max 0.0 (min 255.0 (64.0 - amount * 10.0)))))
   , curvePoint (channel 128) (channel 128)
-  , curvePoint (channel 192) (channel (max 0 (min 255 (192 + amount * 10.0))))
+  , curvePoint (channel 192) (channel (round (max 0.0 (min 255.0 (192.0 + amount * 10.0)))))
   , curvePoint (channel 255) (channel 255)
   ]
 
@@ -89,24 +92,20 @@ contrastCurve amount = curve
 -- CURVE INTERPOLATION
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-import Data.Array (sortBy, uncons)
-import Data.Maybe (Maybe(..))
-import Data.Int (toNumber, round)
-
 -- Apply curve to a single channel value
 -- Uses linear interpolation between control points
 applyToChannel :: Curve -> Channel -> Channel
 applyToChannel (Curve points) input =
-  let inputVal = toNumber (channelValue input)
+  let inputVal = toNumber (unwrap input)
   in case findSegment inputVal points of
     Nothing -> input  -- No points, return unchanged
     Just { before, after } ->
       let CurvePoint p1 = before
           CurvePoint p2 = after
-          x1 = toNumber (channelValue p1.input)
-          y1 = toNumber (channelValue p1.output)
-          x2 = toNumber (channelValue p2.input)
-          y2 = toNumber (channelValue p2.output)
+          x1 = toNumber (unwrap p1.input)
+          y1 = toNumber (unwrap p1.output)
+          x2 = toNumber (unwrap p2.input)
+          y2 = toNumber (unwrap p2.output)
           -- Linear interpolation
           t = if x2 == x1 then 0.0 else (inputVal - x1) / (x2 - x1)
           output = y1 + t * (y2 - y1)
@@ -118,7 +117,7 @@ findSegment inputVal points =
   case uncons points of
     Nothing -> Nothing
     Just { head: first, tail: rest } ->
-      if inputVal <= toNumber (channelValue (let CurvePoint p = first in p.input))
+      if inputVal <= toNumber (unwrap (let CurvePoint p = first in p.input))
         then case uncons rest of
           Nothing -> Nothing
           Just { head: second } -> Just { before: first, after: second }
@@ -131,7 +130,7 @@ findNext inputVal prev points =
     Nothing -> Nothing
     Just { head: curr, tail: rest } ->
       let CurvePoint p = curr
-          currInput = toNumber (channelValue p.input)
+          currInput = toNumber (unwrap p.input)
       in if inputVal <= currInput
            then Just { before: prev, after: curr }
            else findNext inputVal curr rest
@@ -145,13 +144,13 @@ findNext inputVal prev points =
 applyToRgb :: Curves -> RGB -> RGB
 applyToRgb (Curves c) rgb =
   let -- Apply master curve to all channels
-      rMaster = applyToChannel c.master rgb.r
-      gMaster = applyToChannel c.master rgb.g
-      bMaster = applyToChannel c.master rgb.b
+      rMaster = applyToChannel c.master (red rgb)
+      gMaster = applyToChannel c.master (green rgb)
+      bMaster = applyToChannel c.master (blue rgb)
       
       -- Apply individual channel curves
       rFinal = applyToChannel c.red rMaster
       gFinal = applyToChannel c.green gMaster
       bFinal = applyToChannel c.blue bMaster
-  in { r: rFinal, g: gFinal, b: bFinal }
+  in rgbFromChannels rFinal gFinal bFinal
 
