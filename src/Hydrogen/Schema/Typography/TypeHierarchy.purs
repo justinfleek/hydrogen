@@ -43,13 +43,11 @@ module Hydrogen.Schema.Typography.TypeHierarchy
 
 import Prelude
 
-import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight (FontWeight)
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.LetterSpacing (LetterSpacing)
 import Hydrogen.Schema.Typography.LetterSpacing as LetterSpacing
 import Hydrogen.Schema.Typography.LineHeight (LineHeight)
-import Hydrogen.Schema.Typography.LineHeight as LineHeight
 import Hydrogen.Schema.Typography.TextTransform (TextTransform(..))
 import Hydrogen.Schema.Typography.TypeScale (TypeScale)
 import Hydrogen.Schema.Typography.TypeScale as TypeScale

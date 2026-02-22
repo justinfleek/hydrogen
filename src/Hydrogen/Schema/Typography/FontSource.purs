@@ -22,6 +22,8 @@ module Hydrogen.Schema.Typography.FontSource
   , SystemFont(..)
   , CustomFont
   , ImportMethod(..)
+  , FontFaceConfig
+  , FontFormat(..)
   , customFont
   , customFontFamily
   , customFontImport
@@ -245,7 +247,7 @@ toCssImport (Custom (CustomFont { family, import' })) = case import' of
   FontFace config ->
     "@font-face {\n" <>
     "  font-family: " <> FontFamily.toCss family <> ";\n" <>
-    "  src: url('" <> config.src <> "') format('" <> config.format # show <> "');\n" <>
+    "  src: url('" <> config.src <> "') format('" <> show config.format <> "');\n" <>
     "  font-weight: " <> config.weight <> ";\n" <>
     "  font-style: " <> config.style <> ";\n" <>
     "  font-display: " <> config.display <> ";\n" <>
