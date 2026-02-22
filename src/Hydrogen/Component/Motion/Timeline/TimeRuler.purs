@@ -71,6 +71,16 @@ import Web.UIEvent.MouseEvent (MouseEvent)
 import Web.UIEvent.MouseEvent (toEvent) as MouseEvent
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                         // ffi
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Extract clientX from a mouse event
+foreign import getClientX :: Event -> Number
+
+-- | Get the bounding client rect left position of the target element
+foreign import getTargetLeft :: Event -> Number
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -388,16 +398,24 @@ handleAction = case _ of
 
 -- | Convert client X position to frame number
 -- |
--- | This requires FFI to access clientX from the event and element bounds.
--- | The parent component handles actual position calculation during drag.
+-- | Uses FFI to access clientX from the event and element bounds,
+-- | then calculates the frame based on scroll offset and zoom level.
 clientXToFrame :: State -> Event -> Maybe Frames
-clientXToFrame _state _event = 
-  -- Actual implementation requires FFI to:
-  -- 1. Get clientX from event
-  -- 2. Get element bounding rect
-  -- 3. Calculate relative position
-  -- For now, scrubbing is handled by parent component via output messages
-  Nothing
+clientXToFrame state event = 
+  let
+    clientX = getClientX event
+    elementLeft = getTargetLeft event
+    relativeX = clientX - elementLeft + state.scrollOffset
+    ppf = Zoom.pixelsPerFrame state.zoomLevel basePixelsPerFrame
+    frameNum = relativeX / ppf
+    maxFrame = Temporal.unwrapFrames state.duration
+  in
+    -- Clamp to valid range
+    if frameNum < 0.0
+      then Just (Frames 0.0)
+      else if frameNum > maxFrame
+        then Just (Frames maxFrame)
+        else Just (Frames frameNum)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // handle query

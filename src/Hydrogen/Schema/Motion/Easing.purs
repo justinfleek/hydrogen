@@ -101,6 +101,10 @@ module Hydrogen.Schema.Motion.Easing
   
   -- * Accessors
   , toControlPoints
+  , p1x
+  , p1y
+  , p2x
+  , p2y
   , toCSSString
   , name
   ) where
@@ -406,6 +410,22 @@ toControlPoints :: Easing -> { x1 :: Number, y1 :: Number, x2 :: Number, y2 :: N
 toControlPoints Linear = { x1: 0.0, y1: 0.0, x2: 1.0, y2: 1.0 }
 toControlPoints (Bezier (CubicBezier p) _) = p
 toControlPoints (Steps _ _) = { x1: 0.0, y1: 0.0, x2: 1.0, y2: 1.0 }
+
+-- | Extract first control point x coordinate
+p1x :: Easing -> Number
+p1x easing = (toControlPoints easing).x1
+
+-- | Extract first control point y coordinate
+p1y :: Easing -> Number
+p1y easing = (toControlPoints easing).y1
+
+-- | Extract second control point x coordinate
+p2x :: Easing -> Number
+p2x easing = (toControlPoints easing).x2
+
+-- | Extract second control point y coordinate
+p2y :: Easing -> Number
+p2y easing = (toControlPoints easing).y2
 
 -- | Get CSS animation-timing-function value
 toCSSString :: Easing -> String
