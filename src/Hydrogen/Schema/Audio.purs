@@ -1,0 +1,60 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                             // hydrogen // schema // audio
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Audio pillar (Pillar 10b) - synthesis, processing, and analysis.
+-- |
+-- | Leader module that re-exports all audio sub-modules.
+-- |
+-- | ## Sub-modules
+-- | - **Level**: Amplitude atoms (Decibel, LinearGain, dBFS)
+-- | - **Frequency**: Pitch atoms (Hertz, MidiNote, Cent, Semitone, Octave)
+-- | - **Time**: Temporal atoms (BeatTime, BarTime, SampleCount)
+-- | - **Spatial**: Stereo/3D positioning (Pan, Balance, Azimuth, Elevation)
+-- | - **Synthesis**: Filter/oscillator params (Cutoff, Resonance, Drive)
+-- | - **Envelope**: ADSR atoms (Attack, Decay, Sustain, Release)
+-- | - **Modulation**: LFO params (ModDepth, ModRate, LFOPhase)
+-- | - **Analysis**: Metering atoms (RMS, Peak, FFT)
+-- |
+-- | ## Design Philosophy
+-- | Audio primitives model synthesis concepts, not Web Audio API methods.
+-- | Conversion to Web Audio, MIDI, or other backends happens at boundaries.
+-- |
+-- | ## Ableton-style Workflow
+-- | These primitives support:
+-- | - Clip-based arrangement with BeatTime/BarTime
+-- | - Synthesis with Oscillator, Filter, Envelope
+-- | - Effects chains with Mix, Feedback, DecayTime
+-- | - Real-time analysis with RMS, Peak, FFT
+-- |
+-- | ## Usage
+-- | ```purescript
+-- | import Hydrogen.Schema.Audio.Level as Level
+-- | import Hydrogen.Schema.Audio.Frequency as Freq
+-- | import Hydrogen.Schema.Audio.Envelope as Env
+-- |
+-- | -- Define an envelope
+-- | ampEnv = Env.adsr
+-- |   (Env.attackTime 0.01)
+-- |   (Env.decayTime 0.2)
+-- |   (Env.sustainLevel 0.7)
+-- |   (Env.releaseTime 0.5)
+-- |
+-- | -- Define a note
+-- | note = Freq.midiNote 60  -- Middle C
+-- | freq = Freq.midiToHertz note  -- 261.63 Hz
+-- | ```
+
+module Hydrogen.Schema.Audio where
+
+-- Note: This module exists for documentation. Submodules have distinct
+-- names but related concepts. Use qualified imports:
+--
+--   import Hydrogen.Schema.Audio.Level as Level
+--   import Hydrogen.Schema.Audio.Frequency as Freq
+--   import Hydrogen.Schema.Audio.Time as AudioTime
+--   import Hydrogen.Schema.Audio.Spatial as Spatial
+--   import Hydrogen.Schema.Audio.Synthesis as Synth
+--   import Hydrogen.Schema.Audio.Envelope as Env
+--   import Hydrogen.Schema.Audio.Modulation as Mod
+--   import Hydrogen.Schema.Audio.Analysis as Analysis

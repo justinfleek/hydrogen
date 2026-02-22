@@ -236,7 +236,51 @@ Measurement, spacing, and layout.
 | DP          | Number | 0    | none  | clamps   | Android density-independent    |
 | SP          | Number | 0    | none  | clamps   | Android scaled pixel (text)    |
 
-#### Physical Units (SI)
+#### SI Unit Prefixes (Metric)
+
+Complete SI prefix system. Base unit determines the quantity type.
+
+| Prefix   | Symbol | Factor      | Implemented | Notes                           |
+|----------|--------|-------------|------------|--------------------------------|
+| quetta   | Q      | 10^30      | TODO       | Largest SI prefix (2022)       |
+| ronna    | R      | 10^27      | TODO       | Second largest (2022)          |
+| yotta    | Y      | 10^24      | TODO       | Largest (pre-2022)            |
+| zetta    | Z      | 10^21      | TODO       |                                |
+| exa      | E      | 10^18      | TODO       |                                |
+| peta     | P      | 10^15      | TODO       |                                |
+| tera     | T      | 10^12      | TODO       |                                |
+| giga     | G      | 10^9       | TODO       |                                |
+| mega     | M      | 10^6       | TODO       |                                |
+| kilo     | k      | 10^3       | TODO       |                                |
+| hecto    | h      | 10^2       | TODO       | Rarely used                    |
+| deca     | da     | 10^1       | TODO       | Rarely used                    |
+| (base)   | -      | 1          | ✓ Meter   | SI base unit                  |
+| deci     | d      | 10^-1      | TODO       |                                |
+| centi    | c      | 10^-2      | ✓ cm      |                                |
+| milli    | m      | 10^-3      | ✓ mm      |                                |
+| micro    | µ      | 10^-6      | ✓ µm      |                                |
+| nano     | n      | 10^-9      | ✓ nm      |                                |
+| pico     | p      | 10^-12     | TODO       | Atomic scale                   |
+| femto    | f      | 10^-15     | TODO       | Nuclear scale                  |
+| atto     | a      | 10^-18     | TODO       | Subatomic                     |
+| zepto    | z      | 10^-21     | TODO       |                                |
+| yocto    | y      | 10^-24     | TODO       | Smallest SI prefix             |
+
+#### Physical Units (SI Base)
+
+All units convert through Meter as the canonical representation.
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| Meter       | Number | none | none | finite   | SI base unit, signed           |
+| Kilogram    | Number | none | none | finite   | SI mass unit                  |
+| Second      | Number | none | none | finite   | SI time unit                  |
+| Ampere      | Number | none | none | finite   | SI electric current            |
+| Kelvin      | Number | none | none | finite   | SI temperature                 |
+| Mole        | Number | none | none | finite   | SI amount of substance         |
+| Candela     | Number | none | none | finite   | SI luminous intensity          |
+
+#### Physical Units (SI Derived - Length)
 
 | Name        | Type   | Min  | Max  | Behavior | Notes                          |
 |-------------|--------|------|------|----------|--------------------------------|
@@ -246,6 +290,10 @@ Measurement, spacing, and layout.
 | Kilometer   | Number | none | none | finite   | 1000 meters                    |
 | Micrometer  | Number | none | none | finite   | 1/1000000 meter                |
 | Nanometer   | Number | none | none | finite   | 1/1000000000 meter             |
+| Picometer   | Number | none | none | finite   | 10^-12 m (atomic scale)       |
+| Femtometer  | Number | none | none | finite   | 10^-15 m (nuclear scale)      |
+| Angstrom    | Number | none | none | finite   | 10^-10 m (wavelengths)        |
+| Fermi       | Number | none | none | finite   | 10^-15 m (nuclear physics)    |
 
 #### Physical Units (Imperial)
 
@@ -255,7 +303,36 @@ Measurement, spacing, and layout.
 | Foot        | Number | none | none | finite   | 12 inches                      |
 | Yard        | Number | none | none | finite   | 3 feet                         |
 | Mile        | Number | none | none | finite   | 5280 feet                      |
-| Thou        | Number | none | none | finite   | 1/1000 inch (mil)              |
+| Thou       | Number | none | none | finite   | 1/1000 inch (mil)              |
+| Fathom      | Number | none | none | finite   | 6 feet (nautical depth)       |
+| Chain       | Number | none | none | finite   | 66 feet (surveying)            |
+| League      | Number | none | none | finite   | 3 miles                       |
+
+#### Atomic and Quantum Scale
+
+For display at sub-microscopic scales.
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| Angstrom    | Number | none | none | finite   | 10^-10 m (atomic radii)       |
+| BohrRadius  | Number | none | none | finite   | 5.29×10^-11 m (hydrogen)     |
+| Fermi       | Number | none | none | finite   | 10^-15 m (nucleus)            |
+| PlanckLength| Number | none | none | finite   | 1.62×10^-35 m (minimum)      |
+| Nanometer   | Number | none | none | finite   | 10^-9 m (wavelengths)        |
+| Picometer   | Number | none | none | finite   | 10^-12 m (X-rays)             |
+
+#### Astronomical Scale
+
+For display at cosmic scales.
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                          |
+|-------------|--------|------|------|----------|--------------------------------|
+| LightYear   | Number | none | none | finite   | 9.46×10^15 m                  |
+| Parsec      | Number | none | none | finite   | 3.26 light years              |
+| AU          | Number | none | none | finite   | Astronomical Unit (sun-earth)  |
+| SolarRadius | Number | none | none | finite   | 6.96×10^8 m                   |
+| EarthRadius | Number | none | none | finite   | 6.37×10^6 m                   |
+| MoonDistance| Number | none | none | finite   | 3.84×10^8 m                   |
 
 #### Typographic Units
 
@@ -1112,6 +1189,154 @@ User input and interaction patterns.
 | ArrowNav      | Arrow key navigation                     |
 | TypeAhead     | Search by typing                         |
 
+#### Focus Management
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| FocusTrap       | Constrain focus within container         |
+| FocusScope      | Named focus region for restoration       |
+| FocusRestore    | Return focus to previous element         |
+| RovingTabindex  | Arrow-key navigation within group        |
+| FocusRing       | Visual focus indicator state             |
+| FocusVisible    | Keyboard-only focus visibility           |
+| FocusWithin     | Parent has focused descendant            |
+| AutoFocus       | Initial focus on mount                   |
+
+#### Selection
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| SingleSelect    | One item selected at a time              |
+| MultiSelect     | Multiple items via Ctrl/Cmd+click        |
+| RangeSelect     | Shift+click range selection              |
+| SelectAll       | Ctrl/Cmd+A selection                     |
+| SelectRect      | Marquee/lasso selection rectangle        |
+| SelectToggle    | Toggle item selection state              |
+| SelectionAnchor | Range selection starting point           |
+| SelectionFocus  | Range selection ending point             |
+
+#### Hover Patterns
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| HoverEnter      | Pointer enters element bounds            |
+| HoverLeave      | Pointer exits element bounds             |
+| HoverIntent     | Delayed hover (prevents flicker)         |
+| HoverPreview    | Preview content on hover                 |
+| HoverActivate   | Activate on hover (no click needed)      |
+| HoverZone       | Extended hover hit area                  |
+| HoverGroup      | Coordinated hover across elements        |
+| HoverCancel     | Hover cancelled (moved away too fast)    |
+
+#### Context Menu
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| ContextTrigger  | Right-click or long-press trigger        |
+| ContextPosition | Menu position (pointer or element)       |
+| ContextDismiss  | Close on outside click/escape            |
+| ContextNested   | Submenu navigation                       |
+| ContextKeyboard | Keyboard navigation within menu          |
+
+#### Gesture Arbitration
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| GesturePriority | Which gesture wins on conflict           |
+| GestureExclusive| Only one gesture can be active           |
+| GestureSimultaneous| Multiple gestures recognized together |
+| GestureRequireFailure| Wait for other to fail first        |
+| GestureDelegate | Parent decides child gesture handling    |
+| GestureCancel   | Cancel gesture in progress               |
+
+#### Key Sequences (Vim/Emacs)
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| KeySequence     | Multi-key command (gg, dd, ciw)          |
+| KeyChord        | Simultaneous keys (Ctrl+Shift+P)         |
+| LeaderKey       | Prefix key for command namespace         |
+| PartialMatch    | Sequence in progress (waiting for more)  |
+| SequenceTimeout | Reset sequence after delay               |
+| SequenceDisplay | Show pending keys to user                |
+| CountPrefix     | Numeric prefix (3dd = delete 3 lines)    |
+| MotionCommand   | Movement command (w, b, e, 0, $)         |
+| OperatorPending | Waiting for motion (d, c, y + motion)    |
+
+### Triggers (Interactive Relationships)
+
+Triggers define relationships between input events and arbitrary effects.
+They enable easter eggs, progressive disclosure, and delight.
+
+#### Atoms
+
+| Name            | Type   | Min  | Max   | Behavior | Notes                     |
+|-----------------|--------|------|-------|----------|---------------------------|
+| TriggerDelay    | Number | 0    | 30000 | clamps   | Delay before trigger (ms) |
+| TriggerCount    | Int    | 1    | 100   | clamps   | Required occurrences      |
+| TriggerCooldown | Number | 0    | none  | finite   | Time before re-trigger    |
+| TriggerWindow   | Number | 0    | 10000 | clamps   | Time window for sequence  |
+| ProximityRadius | Number | 0    | 500   | clamps   | Distance threshold (px)   |
+
+#### Molecules
+
+| Name            | Composition                              |
+|-----------------|------------------------------------------|
+| HoverTrigger    | Element + Delay + Target + Effect        |
+| ProximityTrigger| Element + Radius + Target + Effect       |
+| SequenceTrigger | KeySequence + Window + Effect            |
+| GestureTrigger  | GesturePattern + Target + Effect         |
+| TimeTrigger     | HoldDuration + Element + Effect          |
+| ComboTrigger    | Condition[] + Effect                     |
+
+#### Compounds
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| HoverReveal     | Hover over A reveals B                   |
+| HoverMorph      | Hover over A morphs A into alternate     |
+| HoverChain      | Hover A → reveal B → hover B → reveal C  |
+| ProximityGlow   | Cursor approaching causes glow           |
+| ProximityExpand | Cursor approaching expands element       |
+| ProximityAttract| Element subtly moves toward cursor       |
+| KonamiCode      | Classic ↑↑↓↓←→←→BA sequence              |
+| SecretTap       | Multi-tap hidden area                    |
+| CornerGesture   | Swipe from corner triggers action        |
+| HoldToReveal    | Long-press reveals hidden content        |
+| ShakeToUndo     | Device shake triggers undo               |
+| TiltToScroll    | Device tilt affects scroll               |
+| EasterEgg       | Arbitrary hidden trigger + reward        |
+
+#### Trigger Conditions
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| HoverFor        | Hover for duration                       |
+| HoverWhile      | Maintain hover + modifier key            |
+| ClickCount      | Specific click count (5 rapid clicks)    |
+| KeyPattern      | Specific key sequence                    |
+| GesturePattern  | Specific gesture sequence                |
+| TimeOfDay       | Trigger only at certain times            |
+| VisitCount      | Trigger after N visits                   |
+| IdleDuration    | Trigger after user idle period           |
+| ScrollDepth     | Trigger at scroll percentage             |
+| ElementVisible  | Trigger when element enters viewport     |
+
+#### Trigger Effects
+
+| Name            | Description                              |
+|-----------------|------------------------------------------|
+| Reveal          | Show hidden element                      |
+| Morph           | Transform element appearance             |
+| Navigate        | Go to URL or route                       |
+| Animate         | Play animation                           |
+| Sound           | Play audio                               |
+| Haptic          | Trigger haptic feedback                  |
+| Confetti        | Visual celebration                       |
+| Toast           | Show notification                        |
+| Unlock          | Enable hidden feature                    |
+| Achievement     | Award badge/achievement                  |
+
 ## Pillar 10: Haptic
 
 Tactile and sensory feedback.
@@ -1201,6 +1426,229 @@ Tactile and sensory feedback.
 | PaymentSound  | Transaction complete                     |
 | CameraSound   | Shutter sound                            |
 | AmbientLoop   | Background audio                         |
+
+## Pillar 10b: Audio
+
+Audio synthesis, processing, and analysis for interactive applications.
+
+### Atoms
+
+#### Level and Amplitude
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| Decibel      | Number | -120  | 0     | clamps   | dB (relative, logarithmic)    |
+| DecibelFS    | Number | -60   | 0     | clamps   | dBFS (digital full scale)     |
+| LinearGain   | Number | 0.0   | 1.0   | clamps   | Linear amplitude (0-1)         |
+| LinearGainNeg| Number | -1.0  | 1.0   | clamps   | Linear with negative phase     |
+| Percent      | Number | 0     | 100   | clamps   | Percentage                    |
+| Normalized   | Number | 0.0   | 1.0   | clamps   | Normalized value              |
+
+#### Frequency
+
+| Name          | Type   | Min     | Max     | Behavior | Notes                          |
+|---------------|--------|---------|---------|----------|--------------------------------|
+| Hertz        | Number | 0       | none    | finite   | Frequency in Hz                |
+| Kilohertz    | Number | 0       | none    | finite   | Frequency in kHz               |
+| MidiNote     | Int    | 0       | 127     | clamps   | MIDI note number (60 = C4)    |
+| MidiPitch    | Number | 0       | 127.99  | clamps   | MIDI with pitch bend           |
+| Cent         | Number | -100    | 100     | clamps   | Pitch offset in cents         |
+| Semitone     | Number | -12     | 12      | clamps   | Pitch offset in semitones     |
+| Octave       | Number | -10     | 10      | clamps   | Pitch offset in octaves       |
+| SampleRate   | Int    | 8000    | 192000  | clamps   | Audio sample rate (Hz)         |
+| BitDepth     | Int    | 8       | 32      | clamps   | Bits per sample                |
+
+#### Time and Duration
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| BeatTime      | Number | 0     | none  | finite   | Time in beats                 |
+| BarTime       | Number | 0     | none  | finite   | Time in bars                  |
+| SampleCount   | Int    | 0     | none  | finite   | Sample count                  |
+| LatencyMs     | Number | 0     | 1000  | clamps   | Latency in milliseconds        |
+
+#### Stereo and Spatial
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| Pan           | Number | -1.0  | 1.0   | clamps   | Stereo pan (-1 L, 0 C, 1 R)  |
+| Balance       | Number | -100  | 100   | clamps   | Balance in percent             |
+| Width         | Number | 0.0   | 2.0   | clamps   | Stereo width factor            |
+| Azimuth       | Number | -180  | 180   | wraps    | Azimuth angle (degrees)        |
+| Elevation     | Number | -90   | 90    | clamps   | Elevation angle (degrees)      |
+| Distance      | Number | 0     | none  | finite   | Distance in meters             |
+
+#### Synthesis Parameters
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| CutoffFreq    | Number | 20    | 20000 | clamps   | Filter cutoff (Hz)             |
+| Resonance     | Number | 0.0   | 1.0   | clamps   | Filter resonance/Q             |
+| ResonanceDb   | Number | 0     | 30    | clamps   | Resonance in dB                |
+| Drive        | Number | 0     | 10    | clamps   | Saturation/drive amount        |
+| Mix           | Number | 0.0   | 1.0   | clamps   | Wet/dry mix (0% = dry)        |
+| Feedback      | Number | 0.0   | 1.0   | clamps   | Feedback amount                |
+| DecayTime     | Number | 0     | 60    | clamps   | Decay time in seconds         |
+
+#### Envelope (ADSR)
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| AttackTime    | Number | 0     | 10    | clamps   | Attack time (seconds)          |
+| DecayTime     | Number | 0     | 10    | clamps   | Decay time (seconds)           |
+| SustainLevel  | Number | 0.0   | 1.0   | clamps   | Sustain level (0-1)            |
+| ReleaseTime   | Number | 0     | 30    | clamps   | Release time (seconds)         |
+| HoldTime      | Number | 0     | 10    | clamps   | Hold time (seconds)            |
+
+#### Modulation
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| ModDepth      | Number | 0.0   | 1.0   | clamps   | Modulation depth               |
+| ModRate       | Number | 0     | 50    | clamps   | Modulation rate (Hz)           |
+| LFOPhase      | Number | 0     | 360   | wraps    | LFO phase offset (degrees)    |
+| SyncRatio     | String | none  | none  | enum     | Sync ratio (1:4, 1:2, 1:1, etc) |
+
+#### Audio Analysis
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                          |
+|---------------|--------|-------|-------|----------|--------------------------------|
+| RMSLevel      | Number | 0.0   | 1.0   | clamps   | RMS amplitude                  |
+| PeakLevel     | Number | 0.0   | 1.0   | clamps   | Peak amplitude                 |
+| CrestFactor   | Number | 0     | 40    | finite   | Peak/RMS ratio (dB)           |
+| FFTBin        | Number | 0     | 1.0   | clamps   | Normalized FFT bin             |
+| SpectralCentroid| Number| 0     | 22050 | finite   | Spectral centroid (Hz)          |
+| ZeroCrossing  | Int    | 0     | none  | finite   | Zero crossing count            |
+
+### Molecules
+
+#### Audio Signal
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| AudioBuffer       | SampleRate + BitDepth + Channels + Samples              |
+| AudioRegion       | StartTime + Duration + Buffer + Gain + FadeIn + FadeOut |
+| AudioClip         | Filename + Region + Offset + Loop + Reverse             |
+| AudioBus          | Name + Input + Output + Gain + Pan + EffectsChain      |
+
+#### Synthesis
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| Oscillator        | Type + Frequency + Phase + Gain + Sync                  |
+| Filter            | Type + Cutoff + Resonance + Envelope + KeyTrack          |
+| Envelope          | Attack + Decay + Sustain + Release (+ Hold)             |
+| LFO               | Rate + Shape + Phase + Depth + Sync                     |
+| Mixer             | Channels + Gains + Pans + MasterGain                   |
+| Sampler           | Samples + RootNote + LoopPoints + OneShot               |
+
+#### Effects
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| Reverb            | RoomSize + Damping + WetDry + PreDelay + Diffusion     |
+| Delay             | Time + Feedback + WetDry + Sync + Filter                |
+| Compressor        | Threshold + Ratio + Attack + Release + Knee + Makeup   |
+| EQ                | Bands + Frequencies + Gains + QFactors                 |
+| Distortion        | Type + Drive + Tone + WetDry                          |
+| Chorus            | Rate + Depth + Phase + WetDry + VoiceCount             |
+| Phaser            | Rate + Depth + Stages + Resonance + WetDry             |
+| Flanger           | Rate + Depth + Feedback + Phase + WetDry              |
+| Gate              | Threshold + Attack + Hold + Release + Range            |
+| Limiter           | Threshold + Release + Ceiling + Lookahead             |
+
+#### Analysis
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| Waveform          | Samples + SampleRate + Channels                         |
+| Spectrum          | FFTBins + Magnitudes + Phases + WindowType             |
+| Spectrogram       | TimeSlices + Frequencies + Magnitudes                  |
+| Metering          | RMS + Peak + CrestFactor + ClipCount                   |
+| PitchDetection    | Note + Cent + Confidence + Frequency                   |
+| BPMDetection      | BPM + Confidence + BeatPositions                       |
+
+### Compounds
+
+#### Oscillator Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Sine          | Pure sine wave                          |
+| Cosine        | Pure cosine wave                        |
+| Square        | 50% duty cycle square wave             |
+| Pulse         | Variable duty cycle square              |
+| Sawtooth      | Rising sawtooth wave                   |
+| ReverseSaw    | Falling sawtooth wave                  |
+| Triangle      | Triangle wave                           |
+| NoiseWhite    | White noise                            |
+| NoisePink     | Pink noise (-3dB/oct)                  |
+| NoiseBrown    | Brown noise (-6dB/oct)                 |
+| NoiseBlue     | Blue noise (+3dB/oct)                  |
+| NoiseViolet   | Violet noise (+6dB/oct)                |
+| Sample        | Audio file playback                     |
+
+#### Filter Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| LowPass       | Frequencies above cutoff attenuated     |
+| HighPass      | Frequencies below cutoff attenuated     |
+| BandPass      | Frequencies outside band attenuated    |
+| BandStop      | Frequencies within band attenuated      |
+| Notch         | Narrow bandstop                         |
+| AllPass       | Phase shift, magnitude unchanged        |
+| Peak          | Parametric boost/cut                    |
+| LowShelf      | Bass boost/cut                          |
+| HighShelf     | Treble boost/cut                       |
+| Resonant      | Resonant lowpass (synth filter)        |
+
+#### Reverb Algorithms
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Hall          | Large concert hall                       |
+| Room          | Medium room                             |
+| Chamber       | Small chamber                           |
+| Plate        | Plate reverb                            |
+| Spring        | Spring reverb                           |
+| Convolution   | IR-based reverb                         |
+| Algorithmic   | Algorithmic (Schroeder, etc)            |
+
+#### Time Signatures
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Time4_4       | 4/4 common time                         |
+| Time3_4       | 3/4 waltz                               |
+| Time6_8       | 6/8 compound duple                      |
+| Time2_4       | 2/4 march                               |
+| Time5_4       | 5/4 odd meter                           |
+| Time7_8       | 7/8 odd meter                           |
+| TimeFree      | Free time (rubato)                      |
+
+#### Audio File Formats
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| WAV           | Uncompressed PCM                         |
+| AIFF          | Uncompressed PCM (Apple)                |
+| FLAC          | Lossless compressed                      |
+| MP3           | Lossy compressed                         |
+| AAC           | Lossy compressed (Apple)                |
+| OGG           | Lossy compressed (Vorbis)               |
+| Opus          | Lossy compressed (low latency)           |
+
+#### Metering Standards
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| VU            | Standard VU meter (-20 to +3 dBu)       |
+| Peak          | Peak meter (dBFS)                       |
+| RMS           | RMS meter (dBFS)                        |
+| Loudness      | LUFS (perceptual loudness)              |
+| Spectrogram   | FFT display                             |
+| PhaseScope    | Phase correlation meter                 |
 
 ## Pillar 11: Spatial
 

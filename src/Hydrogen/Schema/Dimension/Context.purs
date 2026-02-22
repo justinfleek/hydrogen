@@ -76,16 +76,11 @@ module Hydrogen.Schema.Dimension.Context
 
 import Prelude
 
-import Hydrogen.Math.Core as Math
-import Hydrogen.Schema.Dimension.Physical (Inch(..), Meter(..), unwrapInch, unwrapMeter, inch, meter)
+import Hydrogen.Schema.Dimension.Physical (Inch(..), Meter(..))
 import Hydrogen.Schema.Dimension.Device 
   ( Pixel(..), DevicePixel(..), CSSPixel(..), DensityIndependentPixel(..), ScaledPixel(..)
   , PixelsPerInch(..), DevicePixelRatio(..)
-  , unwrapPixel, unwrapDevicePixel, unwrapCSSPixel, unwrapDp, unwrapSp
-  , unwrapPpi, unwrapDpr
-  , px, devicePx, cssPx, dp, sp
   )
-import Hydrogen.Schema.Dimension.Angular (Radians(..), Degrees(..), radians, degrees, unwrapRadians, unwrapDegrees)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // display context
