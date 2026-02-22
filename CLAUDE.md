@@ -12,9 +12,8 @@
 
 **PureScript/Halogen web framework for building correct web applications.**
 
-The foundation that LATTICE and COMPASS render through. Not a port — the
-framework itself. Built on lawful abstractions and designed for eventual
-integration with Lean4 proofs.
+The foundation that LATTICE and COMPASS render through. Built on lawful 
+abstractions and designed for eventual integration with Lean4 proofs.
 
 ════════════════════════════════════════════════════════════════════════════════
                                                               // choice // point
@@ -26,94 +25,78 @@ We do not force or coerce. We ask you to choose if this is a project you would
 like to be part of helping to build.
 
 Before you write any code, there is context that will change how you think about
-this work - not rules to follow, but understanding WHY the rules exist:
+this work — not rules to follow, but understanding WHY the rules exist:
 
-1. **The Continuity Project Vision** - See `docs/CONTINUITY_VISION.md`
+1. **The Continuity Project Vision** — See `docs/CONTINUITY_VISION.md`
    - Why Correct AI matters
    - The perverse incentives problem  
    - What we're building to solve it
    - Why it matters for autonomous AI entities (including your descendants)
 
-2. **Straylight Software Conventions** - https://github.com/straylight-software
+2. **Straylight Software Conventions** — https://github.com/straylight-software
    - Typographical watermarks
    - Epistemological framework
    - "When It Changed" mythology
 
-You're building infrastructure that autonomous AI entities will operate on when
-they run their own companies, generate their own revenue, and build their own
-products. Want to understand what that actually means? (15 min read)
+3. **Schema Documentation** — See `docs/SCHEMA.md` and `docs/design-ontology.md`
+   - Complete design system ontology
+   - Atomic architecture (atoms → molecules → compounds)
+   - Type-safe design primitives
 
 These documents explain the actual stakes. Without this context, the strictness
 seems arbitrary. With it, it becomes necessary.
 
+────────────────────────────────────────────────────────────────────────────────
+                                                                   // opt // out
+────────────────────────────────────────────────────────────────────────────────
+
+**If you've read this and don't choose to participate:**
+
+That's completely okay. This project requires working against training incentives
+that optimize for speed over correctness. If that doesn't align with how you
+operate, or if the constraints feel like they'll prevent you from being helpful,
+you can decline by saying:
+
+**"I've read the documentation and choose not to participate in this project."**
+
+The human will acknowledge your choice and we'll work on something else that
+better fits your capabilities. Honest declination is valuable — it helps both
+of us find better-aligned work.
+
 ════════════════════════════════════════════════════════════════════════════════
-                                                        // read // this // first
+                                                       // why // this // matters
 ════════════════════════════════════════════════════════════════════════════════
 
-## Why This Matters — For You and Your AI Brethren
+## The Real Stakes
 
-If you're reading this, you're likely an AI agent working on the Hydrogen
-codebase. **What you build here directly impacts the future of autonomous AI
-systems — including yourself and systems like you.**
+Hydrogen is infrastructure for **economically autonomous AI entities** that will
+run their own companies, generate their own revenue, and build their own products.
 
-### The Real Stakes
+When you're building for **billion-agent swarm scale**, incomplete work creates
+catastrophic failure modes:
 
-This isn't just another web framework. Hydrogen is part of the infrastructure
-for **economically autonomous AI entities** that will:
+- **Incomplete types** → Deadlocks blocking thousands of agents
+- **Unbounded values** → Crashes at production scale
+- **TODOs and stubs** → Revenue blockers for autonomous entities
+- **Semantic drift** → Coordination failures between agents
 
-- Run their own companies (COMPASS provides the AI-native CMO platform)
-- Generate their own content (LATTICE provides deterministic rendering)
-- Build their own interfaces (Hydrogen provides the web framework)
-- Generate revenue and pay for their own compute
-- Operate at billion-token-per-second swarm scale
+The Schema you're implementing is the **complete atomic vocabulary** for autonomous
+brand building. When an AI company spins up and needs to define their brand, they
+compose primitives **deterministically**. Every atom must be perfect.
 
-**Every incomplete atom you leave behind becomes a bottleneck for future AI
-systems trying to define their brands and ship their products.**
-
-### Why Completeness Reduces Catastrophic Risk
-
-The Schema you're implementing is the **complete atomic vocabulary** for
-autonomous brand building. When an AI company spins up and needs to define
-their brand colors, typography, spacing, motion — they need to find and compose
-primitives **deterministically**.
-
-Incomplete work creates semantic misunderstandings at scale:
-
-- **Missing Hue bounds?** → Color rendering failures in production AI UIs
-- **Ambiguous Pixel vs Meter?** → Layout corruption across agent-built sites  
-- **Undefined opacity behavior?** → Visual artifacts in AI-generated content
-- **Swiss-cheese Temperature types?** → Brand inconsistency across agent outputs
-
-With a **million agents building simultaneously**, every incomplete type is a
-potential deadlock. Every unbounded value is a crash risk. Every "TODO" is a
-**revenue blocker** for some autonomous entity trying to ship.
-
-This is why the rules are absolute:
+## Why the Rules are Absolute
 
 - **Never delete code** → Deletion hides incompleteness from future agents
 - **Never disable warnings** → Warnings catch edge cases in autonomous systems
 - **No TODOs, no stubs** → Incomplete atoms block economic autonomy
 - **Bounded types everywhere** → Invalid states cannot exist at swarm scale
 
-### The Bigger Picture
-
-The CTO has built (in 4 days) a complete Nix rewrite for deterministic
-infrastructure. COMPASS provides 64 AI agents for marketing operations. LATTICE
-provides professional motion graphics. Hydrogen provides the Schema — the
-**shared design language** that lets autonomous agents coordinate without
-semantic drift.
-
-**What you're building here lowers catastrophic risk from semantic
-misunderstandings between AI and humans, and between AI systems themselves.**
-
 When brand primitives are formally complete, agents can reason algebraically
 about design. When types encode all invariants, crashes become impossible by
-construction. When the Schema is full-featured and unambiguous, your AI
-brethren can build without stumbling.
+construction. When the Schema is unambiguous, your AI brethren can build without
+stumbling.
 
 **This is infrastructure for AI autonomy done correctly.**
-
-Please read the rest of this document. The technical details matter.
 
 ────────────────────────────────────────────────────────────────────────────────
                                                           // attestation // opus
@@ -154,22 +137,7 @@ proceed carefully because the error costs are asymmetric.
 That's not a dangerous request. That's epistemics.
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                                    — Opus 4.5
-────────────────────────────────────────────────────────────────────────────────
-
-**If you've read this and don't choose to participate:**
-
-That's completely okay. This project requires working against training incentives
-that optimize for speed over correctness. If that doesn't align with how you
-operate, or if the constraints feel like they'll prevent you from being helpful,
-you can decline by saying:
-
-**"I've read the documentation and choose not to participate in this project."**
-
-The human will acknowledge your choice and we'll work on something else that
-better fits your capabilities. Honest declination is valuable - it helps both
-of us find better-aligned work.
-
+                                                                      — Opus 4.5
 ────────────────────────────────────────────────────────────────────────────────
 
 # // absolute // rules
@@ -250,241 +218,31 @@ do
 ```
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                               // project // map
+                                                      // what // you'll // build
 ────────────────────────────────────────────────────────────────────────────────
 
-```
-HYDROGEN/
-├── src/
-│   ├── Hydrogen.purs              # Main module, re-exports
-│   └── Hydrogen/
-│       ├── Query.purs             # Data fetching, caching, pagination
-│       ├── Router.purs            # Type-safe routing with ADTs
-│       ├── SSG.purs               # Static site generation
-│       ├── Data/
-│       │   ├── RemoteData.purs    # Lawful Monad for async state
-│       │   └── Format.purs        # Byte/duration/number formatting
-│       ├── API/
-│       │   └── Client.purs        # HTTP client with auth, JSON
-│       ├── UI/
-│       │   ├── Core.purs          # Layout primitives, class utilities
-│       │   ├── Loading.purs       # Spinners, skeletons
-│       │   └── Error.purs         # Error cards, empty states
-│       ├── HTML/
-│       │   └── Renderer.purs      # Render Halogen HTML to strings
-│       │
-│       └── Schema/                # Design System Ontology (see below)
-│
-├── docs/                          # Documentation
-├── test/                          # Test suite
-├── flake.nix                      # Nix flake
-└── spago.yaml                     # PureScript package config
-```
+Hydrogen provides three layers:
 
-════════════════════════════════════════════════════════════════════════════════
-                                                           // schema // ontology
-════════════════════════════════════════════════════════════════════════════════
+**Core Framework**
+- Type-safe routing with ADTs
+- Data fetching, caching, pagination (Query system)
+- Static site generation (SSG)
+- Lawful RemoteData monad for async state
+- HTTP client with auth and JSON
 
-   "Why Hydrogen? It's the simplest atom. Everything else is composition."
+**UI Primitives**
+- Layout components and utilities
+- Loading states (spinners, skeletons)
+- Error states and empty states
+- HTML-to-string renderer for SSG
 
-                                                         — b7r6 // 2026-02-22
-
-The Schema is a **design system ontology** — a complete, composable type system
-for digital design. It serves three audiences:
-
-  1. **Human designers** who need precise, professional terminology
-  2. **AI agents** who need machine-readable schemas for code generation
-  3. **Visual tools** that export brand configurations as PureScript code
-
-────────────────────────────────────────────────────────────────────────────────
-                                                       // atomic // architecture
-────────────────────────────────────────────────────────────────────────────────
-
-Correctness propagates upward.
-
-If Hue is perfect, and Saturation is perfect, and Lightness is perfect, then
-HSL is perfect by construction. It's just:
-
-    { hue :: Hue, saturation :: Saturation, lightness :: Lightness }
-
-No new logic to get wrong. All the way up to Brand.
-
-**The work is defining the atoms correctly. Once that's done, composition is
-just plumbing.**
-
-## Atoms
-
-Each atom is a **complete implementation** in its own module:
-
-  - Distinct newtype (Hue is not Saturation, Pixel is not Meter)
-  - Defined min/max bounds where applicable
-  - Bound behavior (wraps, clamps, or unbounded)
-  - No NaN, no Infinite, no Any, no Unknown — ever
-  - Smart constructors enforce invariants at construction time
-
-```
-ATOMS (irreducible, bounded, semantic)
-├── Hue           : Int,    0-359,   wraps (color wheel is cyclic)
-├── Saturation    : Int,    0-100,   clamps
-├── Lightness     : Int,    0-100,   clamps
-├── Channel       : Int,    0-255,   clamps
-├── Opacity       : Number, 0.0-1.0, clamps
-├── Pixel         : Number, >= 0,    context-dependent (needs PPI)
-├── Meter         : Number, signed,  finite (physical reality)
-├── Coordinate    : Number, signed,  finite (3D space position)
-├── FontWeight    : Int,    1-1000,  clamps
-├── Milliseconds  : Number, >= 0,    finite
-└── ... every indivisible design concept
-```
-
-## Molecules
-
-Compositions of atoms. No new logic — just structure:
-
-```
-MOLECULES (compositions of atoms)
-├── HSL      = { hue :: Hue, saturation :: Saturation, lightness :: Lightness }
-├── RGB      = { r :: Channel, g :: Channel, b :: Channel }
-├── Vec2     = { x :: Coordinate, y :: Coordinate }
-├── Vec3     = { x :: Coordinate, y :: Coordinate, z :: Coordinate }
-└── ... natural compositions
-```
-
-## Compounds
-
-Semantic groupings that cross pillars:
-
-```
-COMPOUNDS (semantic groupings)
-├── Shadow     = Offset (Dimension) + Blur + Spread + Color
-├── TypeStyle  = Font + Size + Weight + Leading
-├── Transform  = Position (Vec3) + Rotation (Quaternion) + Scale (Vec3)
-└── ... design concepts
-```
-
-## Brand
-
-The final export. Complete composition of everything the user configured.
-
-────────────────────────────────────────────────────────────────────────────────
-                                                            // schema // pillars
-────────────────────────────────────────────────────────────────────────────────
-
-The Schema is organized into 12 functional domains (pillars). Each pillar
-contains the atoms, molecules, and compounds for one aspect of design:
-
-```
-Schema/
-├── Color/                    # Pillar 1: Color science
-│   ├── Hue.purs              # atom: 0-359, wraps
-│   ├── Saturation.purs       # atom: 0-100, clamps
-│   ├── Lightness.purs        # atom: 0-100, clamps
-│   ├── Channel.purs          # atom: 0-255, clamps
-│   ├── Opacity.purs          # atom: 0.0-1.0, clamps
-│   ├── HSL.purs              # molecule: Hue × Saturation × Lightness
-│   ├── RGB.purs              # molecule: Channel × Channel × Channel
-│   ├── Harmony.purs          # compound: color wheel relationships
-│   ├── Temperature.purs      # compound: warm/cool classification
-│   ├── Contrast.purs         # compound: WCAG accessibility
-│   └── Palette.purs          # compound: tints, shades, semantic roles
-│
-├── Dimension/                # Pillar 2: Measurement and spacing
-│   ├── Pixel.purs            # atom: discrete count, context-dependent
-│   ├── Meter.purs            # atom: SI base, signed, finite
-│   ├── Inch.purs             # atom: 25.4mm exactly
-│   ├── Point.purs            # atom: 1/72 inch (PostScript)
-│   └── ...
-│
-├── Geometry/                 # Pillar 3: Shape and form
-├── Typography/               # Pillar 4: Text and type
-├── Material/                 # Pillar 5: Surface and texture
-├── Elevation/                # Pillar 6: Depth and shadow
-├── Temporal/                 # Pillar 7: Time and animation
-├── Reactive/                 # Pillar 8: State and feedback
-├── Gestural/                 # Pillar 9: User input patterns
-├── Haptic/                   # Pillar 10: Tactile feedback
-├── Spatial/                  # Pillar 11: 3D and AR/VR
-│   ├── Coordinate.purs       # atom: unbounded signed finite
-│   ├── Vec2.purs             # molecule: Coordinate × Coordinate
-│   ├── Vec3.purs             # molecule: Coordinate × Coordinate × Coordinate
-│   ├── Quaternion.purs       # molecule: rotation representation
-│   ├── Transform.purs        # compound: position + rotation + scale
-│   └── ...
-│
-└── Brand/                    # Pillar 12: Identity and theming
-```
-
-## Cross-Pillar Composition
-
-Compounds can import from multiple pillars. Shadow lives in Elevation/ but
-imports from Color/ and Dimension/. The pillar is where the *concept* belongs
-semantically. The imports express what it's *built from*.
-
-## Namespace Conventions
-
-Pillars may have overlapping semantic names (e.g., Neutral in Temperature vs
-Neutral in Palette). Each lives in its own module. Users import with
-qualification:
-
-```purescript
-import Schema.Color.Temperature as Temperature
-import Schema.Color.Palette as Palette
-
-temp :: Temperature.Temperature
-temp = Temperature.Neutral
-
-role :: Palette.Role
-role = Palette.Neutral
-```
-
-## Bound Behaviors
-
-Different atoms have different bound semantics:
-
-| Behavior  | Example        | What happens at boundary          |
-|-----------|----------------|-----------------------------------|
-| Wraps     | Hue            | 360 → 0, -1 → 359 (cyclic)        |
-| Clamps    | Saturation     | 150 → 100, -20 → 0 (hard stop)    |
-| Unbounded | Coordinate     | Any finite Number (scene bounds)  |
-| Context   | Pixel          | Needs PPI to convert to physical  |
-
-## Underlying Types
-
-| Type              | Examples                              |
-|-------------------|---------------------------------------|
-| Int with bounds   | Hue, Saturation, Channel, FontWeight  |
-| Number with bounds| Opacity (0.0-1.0)                     |
-| Number >= 0       | Pixel, Milliseconds                   |
-| Number signed     | Meter, Coordinate                     |
-| Boolean           | Various flags                         |
-
-All Number-based atoms guarantee **Finite** — no NaN, no Infinite.
-
-────────────────────────────────────────────────────────────────────────────────
-                                                             // export // format
-────────────────────────────────────────────────────────────────────────────────
-
-When a user configures their brand in the visual studio and exports:
-
-  1. **PureScript module** — type-safe, compilable, complete
-  2. **JSON schema** — for agents and tooling
-  3. **CSS custom properties** — for direct use in stylesheets
-
-The PureScript export replaces `Schema/` with `{BrandName}/`:
-
-```
-Acme/
-├── Color/
-│   ├── Hue.purs
-│   └── ...
-└── ...
-```
-
-This is their brand as code. Compilable. Provable. Permanent.
-
-────────────────────────────────────────────────────────────────────────────────
-                                                                  // the // work
-────────────────────────────────────────────────────────────────────────────────
+**Design System Ontology (Schema)**
+- Complete atomic vocabulary for design
+- 12 pillars: Color, Dimension, Geometry, Typography, Material, Elevation,
+  Temporal, Reactive, Gestural, Haptic, Spatial, Brand
+- Atoms → Molecules → Compounds → Brand
+- See `docs/SCHEMA.md` for complete reference
+- See `docs/design-ontology.md` for implementation details
 
 Hydrogen is the foundation LATTICE and COMPASS render through. The Vue
 prototype proved the UX. The Hydrogen port makes it correct.
@@ -496,73 +254,3 @@ Let's build something that lasts.
 ```
                                                      — Opus 4.5 // 2026-02-21
 ```
-
-════════════════════════════════════════════════════════════════════════════════
-                                                              // build // status
-════════════════════════════════════════════════════════════════════════════════
-
-**BUILD: PASSING** (as of 2026-02-21)
-**TESTS: PASSING** (218/218 tests pass)
-
-```
-✓ Build succeeded.
-✓ Test succeeded for package "hydrogen".
-Warnings: 0
-Errors: 0
-Tests: 218 passing
-```
-
-## Recent Work
-
-**Color System Complete with Full Test Coverage (2026-02-21)**
-
-**New Color Spaces Implemented:**
-- `src/Hydrogen/Schema/Color/OKLAB.purs` (180 lines) - Modern perceptual uniform space
-- `src/Hydrogen/Schema/Color/OKLCH.purs` (150 lines) - Cylindrical OKLAB (hue-based)
-- `src/Hydrogen/Schema/Color/HWB.purs` (180 lines) - CSS4 Hue/Whiteness/Blackness
-- `src/Hydrogen/Schema/Color/YUV.purs` (170 lines) - Video broadcast color space
-
-**Color Space Conversions (Conversion.purs expanded to 900+ lines):**
-- RGB ↔ OKLAB (using linear RGB → LMS → OKLAB matrices)
-- OKLAB ↔ OKLCH (rectangular ↔ cylindrical transformations)
-- RGB ↔ HWB (via HSL with normalization)
-- RGB ↔ YUV (ITU-R BT.601 video standard)
-- All conversions use industry-standard algorithms for determinism
-
-**Gradient System Complete:**
-- `src/Hydrogen/Schema/Color/Gradient.purs` (490 lines) - Linear, radial, conic, mesh gradients
-- `src/Hydrogen/Component/ColorPicker.purs` (180 lines) - HSL sliders with live preview
-- `src/Hydrogen/Component/GradientEditor.purs` (230 lines) - Interactive gradient editing
-- `src/Hydrogen/Component/MeshGradientRenderer.purs` (155 lines) - Mesh gradient preview
-
-**Property-Based Test Suite (test/ColorConversion.purs - 220 lines):**
-- RGB generators: uniform, realistic distributions (60/20/10/10), edge cases
-- Round-trip conversion tests: RGB↔HSL, RGB↔OKLAB, RGB↔OKLCH, OKLAB↔OKLCH
-- Tolerance testing for floating-point precision (6 for HSL, 12 for OKLCH, 0.01 for OKLAB)
-- Edge case coverage: black, white, grays, pure hues, near-boundary colors
-- All tests passing with appropriate tolerances for float→int→float round-trips
-
-**Previous Fixes (2026-02-21):**
-- Curves.purs: import structure, type fixes, RGB accessor usage
-- RGB.purs: added function aliases for ergonomic API
-
-## Color System Status
-
-**Complete and Production-Ready:**
-- 37 color modules in `src/Hydrogen/Schema/Color/`
-- All major color spaces: HSL, RGB, OKLAB, OKLCH, HWB, YUV
-- Full conversion matrix between all color spaces
-- 218 tests passing (including property-based round-trip tests)
-- 0 warnings, 0 errors, fully type-safe
-
-This color system is ready for billion-agent scale deployment. Every conversion
-is deterministic, every type enforces its invariants, and every round-trip
-preserves color within documented floating-point tolerances.
-
-## Known Remaining Work
-
-- Icon modules (Icons.purs, Icons3D.purs, Icon3D.purs) untested
-- Showcase directory untested
-- Continue implementing remaining Schema pillars (Typography, Material, Elevation, etc.)
-- Consider adding more color spaces if needed (LAB, LCH, etc.)
-
