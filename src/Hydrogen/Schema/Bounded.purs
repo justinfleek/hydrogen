@@ -33,6 +33,10 @@ module Hydrogen.Schema.Bounded
   , clampNumberMin
   , clampNumberMax
   
+  -- * Finite Number Handling
+  , ensureFinite
+  , isFiniteNumber
+  
   -- * Validation
   , inBoundsInt
   , inBoundsNumber
@@ -129,6 +133,29 @@ inBoundsInt minVal maxVal n = n >= minVal && n <= maxVal
 -- | Check if a number is within bounds
 inBoundsNumber :: Number -> Number -> Number -> Boolean
 inBoundsNumber minVal maxVal n = n >= minVal && n <= maxVal
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                         // finite number handling
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if a number is finite (not Infinity, -Infinity, or NaN)
+-- |
+-- | Uses the pattern that NaN /= NaN and comparison with Infinity.
+isFiniteNumber :: Number -> Boolean
+isFiniteNumber n = not (n /= n) && n /= (1.0 / 0.0) && n /= (-1.0 / 0.0)
+
+-- | Ensure a number is finite, returning fallback if not
+-- |
+-- | Protects against Infinity and NaN propagating through calculations:
+-- | ```purescript
+-- | ensureFinite (1.0 / 0.0) 0.0  -- 0.0 (Infinity replaced with fallback)
+-- | ensureFinite (0.0 / 0.0) 0.0  -- 0.0 (NaN replaced with fallback)
+-- | ensureFinite 42.0 0.0         -- 42.0 (finite, unchanged)
+-- | ```
+ensureFinite :: Number -> Number -> Number
+ensureFinite n fallback
+  | isFiniteNumber n = n
+  | otherwise = fallback
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // common bounds

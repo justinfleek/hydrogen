@@ -155,6 +155,9 @@ newtype LinearGradient = LinearGradient
 
 derive instance eqLinearGradient :: Eq LinearGradient
 
+instance showLinearGradient :: Show LinearGradient where
+  show g = linearToCss g
+
 -- | Create a linear gradient with default angle (180 degrees = top to bottom)
 linearGradient :: Array ColorStop -> LinearGradient
 linearGradient stops = LinearGradient
@@ -191,6 +194,9 @@ newtype RadialGradient = RadialGradient
 
 derive instance eqRadialGradient :: Eq RadialGradient
 
+instance showRadialGradient :: Show RadialGradient where
+  show g = radialToCss g
+
 -- | Create a radial gradient centered at (0.5, 0.5)
 radialGradient :: Array ColorStop -> RadialGradient
 radialGradient stops = RadialGradient
@@ -214,6 +220,9 @@ newtype ConicGradient = ConicGradient
   }
 
 derive instance eqConicGradient :: Eq ConicGradient
+
+instance showConicGradient :: Show ConicGradient where
+  show g = conicToCss g
 
 -- | Create a conic gradient centered at (0.5, 0.5) starting from top
 conicGradient :: Array ColorStop -> ConicGradient
@@ -246,6 +255,9 @@ newtype MeshGradient = MeshGradient
 
 derive instance eqMeshGradient :: Eq MeshGradient
 
+instance showMeshGradient :: Show MeshGradient where
+  show (MeshGradient m) = "mesh(" <> rgbToCss m.topLeft <> ", " <> rgbToCss m.topRight <> ", " <> rgbToCss m.bottomLeft <> ", " <> rgbToCss m.bottomRight <> ")"
+
 -- | Create a mesh gradient with equal blend (0.5) for all corners
 meshGradient :: RGB -> RGB -> RGB -> RGB -> MeshGradient
 meshGradient tl tr bl br = MeshGradient
@@ -271,6 +283,9 @@ data Gradient
   | Mesh MeshGradient
 
 derive instance eqGradient :: Eq Gradient
+
+instance showGradient :: Show Gradient where
+  show = toCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // css output

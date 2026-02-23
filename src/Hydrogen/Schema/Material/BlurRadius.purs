@@ -89,4 +89,4 @@ toNumber (BlurRadius r) = r
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 "none" "blurRadius" "Gaussian blur radius in pixels"
+bounds = Bounded.numberBounds 0.0 1000.0 "blurRadius" "Gaussian blur radius in pixels"

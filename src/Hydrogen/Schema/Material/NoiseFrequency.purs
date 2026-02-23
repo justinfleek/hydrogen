@@ -86,4 +86,4 @@ toNumber (NoiseFrequency f) = f
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 "none" "noiseFrequency" "Spatial frequency for procedural noise"
+bounds = Bounded.numberBounds 0.0 100.0 "noiseFrequency" "Spatial frequency for procedural noise"
