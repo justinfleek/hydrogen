@@ -47,26 +47,31 @@ module Hydrogen.Schema.Dimension.Physical
   ) where
 
 import Prelude
+  ( identity
+  , (*)
+  , (/)
+  , (<<<)
+  )
 
 import Hydrogen.Schema.Dimension.Physical.SI
-  ( Meter(..)
-  , Millimeter(..)
-  , Centimeter(..)
-  , Kilometer(..)
-  , Decimeter(..)
-  , Decameter(..)
-  , Hectometer(..)
-  , Megameter(..)
-  , Gigameter(..)
-  , Terameter(..)
-  , Petameter(..)
-  , Exameter(..)
-  , Zettameter(..)
-  , Yottameter(..)
-  , Ronnameter(..)
-  , Quettameter(..)
-  , Micrometer(..)
-  , Nanometer(..)
+  ( Meter(Meter)
+  , Millimeter(Millimeter)
+  , Centimeter(Centimeter)
+  , Kilometer(Kilometer)
+  , Decimeter(Decimeter)
+  , Decameter(Decameter)
+  , Hectometer(Hectometer)
+  , Megameter(Megameter)
+  , Gigameter(Gigameter)
+  , Terameter(Terameter)
+  , Petameter(Petameter)
+  , Exameter(Exameter)
+  , Zettameter(Zettameter)
+  , Yottameter(Yottameter)
+  , Ronnameter(Ronnameter)
+  , Quettameter(Quettameter)
+  , Micrometer(Micrometer)
+  , Nanometer(Nanometer)
   , meter
   , meters
   , millimeter
@@ -128,16 +133,16 @@ import Hydrogen.Schema.Dimension.Physical.SI
   ) as SI
 
 import Hydrogen.Schema.Dimension.Physical.Imperial
-  ( Thou(..)
-  , Inch(..)
-  , Foot(..)
-  , Yard(..)
-  , Mile(..)
-  , Fathom(..)
-  , Chain(..)
-  , Furlong(..)
-  , League(..)
-  , NauticalMile(..)
+  ( Thou(Thou)
+  , Inch(Inch)
+  , Foot(Foot)
+  , Yard(Yard)
+  , Mile(Mile)
+  , Fathom(Fathom)
+  , Chain(Chain)
+  , Furlong(Furlong)
+  , League(League)
+  , NauticalMile(NauticalMile)
   , thou
   , thou_
   , inch
@@ -180,12 +185,12 @@ import Hydrogen.Schema.Dimension.Physical.Imperial
   ) as Imperial
 
 import Hydrogen.Schema.Dimension.Physical.Typographic
-  ( Point(..)
-  , Pica(..)
-  , Didot(..)
-  , Cicero(..)
-  , Twip(..)
-  , Agate(..)
+  ( Point(Point)
+  , Pica(Pica)
+  , Didot(Didot)
+  , Cicero(Cicero)
+  , Twip(Twip)
+  , Agate(Agate)
   , point
   , points
   , pica
@@ -213,12 +218,12 @@ import Hydrogen.Schema.Dimension.Physical.Typographic
   ) as Typographic
 
 import Hydrogen.Schema.Dimension.Physical.Atomic
-  ( Picometer(..)
-  , Femtometer(..)
-  , Angstrom(..)
-  , BohrRadius(..)
-  , Fermi(..)
-  , PlanckLength(..)
+  ( Picometer(Picometer)
+  , Femtometer(Femtometer)
+  , Angstrom(Angstrom)
+  , BohrRadius(BohrRadius)
+  , Fermi(Fermi)
+  , PlanckLength(PlanckLength)
   , picometer
   , picometers
   , femtometer
@@ -238,13 +243,13 @@ import Hydrogen.Schema.Dimension.Physical.Atomic
   ) as Atomic
 
 import Hydrogen.Schema.Dimension.Physical.Astronomical
-  ( LightYear(..)
-  , Parsec(..)
-  , AstronomicalUnit(..)
-  , Kiloparsec(..)
-  , Megaparsec(..)
-  , LightSecond(..)
-  , LightMinute(..)
+  ( LightYear(LightYear)
+  , Parsec(Parsec)
+  , AstronomicalUnit(AstronomicalUnit)
+  , Kiloparsec(Kiloparsec)
+  , Megaparsec(Megaparsec)
+  , LightSecond(LightSecond)
+  , LightMinute(LightMinute)
   , lightYear
   , lightYears
   , parsec

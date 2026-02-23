@@ -38,6 +38,15 @@ module Hydrogen.Schema.Typography.FontFamily
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , otherwise
+  , show
+  , (==)
+  , (||)
+  , (<>)
+  )
 
 import Data.String (contains, Pattern(..))
 

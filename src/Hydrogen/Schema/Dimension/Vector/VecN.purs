@@ -13,7 +13,7 @@
 -- | Dimension is tracked at runtime.
 
 module Hydrogen.Schema.Dimension.Vector.VecN
-  ( VecN(..)
+  ( VecN(VecN)
   , vecN
   , vecNZero
   , vecNFromArray
@@ -34,9 +34,22 @@ module Hydrogen.Schema.Dimension.Vector.VecN
   ) where
 
 import Prelude
+  ( class Eq
+  , class Functor
+  , class Show
+  , map
+  , negate
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (==)
+  , (<>)
+  )
 
 import Data.Array as Array
-import Data.Maybe (Maybe, fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Foldable (sum)
 import Hydrogen.Math.Core as Math
 

@@ -12,6 +12,20 @@ module Hydrogen.Schema.Color.Curves
   ) where
 
 import Prelude
+  ( class Eq
+  , class Monoid
+  , class Ord
+  , class Semigroup
+  , compare
+  , max
+  , min
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (==)
+  , (<=)
+  )
 
 import Data.Array (sortBy, uncons)
 import Data.Int (round, toNumber)

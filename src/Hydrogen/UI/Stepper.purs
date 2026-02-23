@@ -8,8 +8,8 @@
 module Hydrogen.UI.Stepper
   ( stepper
   , stepperItem
-  , StepStatus(..)
-  , Orientation(..)
+  , StepStatus(Complete, Current, Upcoming)
+  , Orientation(Horizontal, Vertical)
   , orientation
   , className
   ) where

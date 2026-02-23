@@ -42,13 +42,19 @@ module Hydrogen.Schema.Typography.TypeHierarchy
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , negate
+  , (<>)
+  )
 
 import Hydrogen.Schema.Typography.FontWeight (FontWeight)
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.LetterSpacing (LetterSpacing)
 import Hydrogen.Schema.Typography.LetterSpacing as LetterSpacing
 import Hydrogen.Schema.Typography.LineHeight (LineHeight)
-import Hydrogen.Schema.Typography.TextTransform (TextTransform(..))
+import Hydrogen.Schema.Typography.TextTransform (TextTransform(None, Uppercase))
 import Hydrogen.Schema.Typography.TypeScale (TypeScale)
 import Hydrogen.Schema.Typography.TypeScale as TypeScale
 import Hydrogen.Schema.Typography.TypeStyle (TypeStyle, FontStack)

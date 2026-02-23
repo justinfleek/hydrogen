@@ -9,7 +9,7 @@ module Hydrogen.UI.Alert
   ( alert
   , alertTitle
   , alertDescription
-  , AlertVariant(..)
+  , AlertVariant(Default, Info, Success, Warning, Destructive)
   , variant
   , className
   ) where

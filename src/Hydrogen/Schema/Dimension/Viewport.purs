@@ -25,67 +25,73 @@
 
 module Hydrogen.Schema.Dimension.Viewport
   ( -- * Viewport Width
-    Vw(..)
+    Vw(Vw)
   , vw
   , vws
   , unwrapVw
   
   -- * Viewport Height
-  , Vh(..)
+  , Vh(Vh)
   , vh
   , vhs
   , unwrapVh
   
   -- * Viewport Minimum
-  , Vmin(..)
+  , Vmin(Vmin)
   , vmin
   , vmins
   , unwrapVmin
   
   -- * Viewport Maximum
-  , Vmax(..)
+  , Vmax(Vmax)
   , vmax
   , vmaxs
   , unwrapVmax
   
   -- * Dynamic Viewport Width
-  , Dvw(..)
+  , Dvw(Dvw)
   , dvw
   , dvws
   , unwrapDvw
   
   -- * Dynamic Viewport Height
-  , Dvh(..)
+  , Dvh(Dvh)
   , dvh
   , dvhs
   , unwrapDvh
   
   -- * Small Viewport Width
-  , Svw(..)
+  , Svw(Svw)
   , svw
   , svws
   , unwrapSvw
   
   -- * Small Viewport Height
-  , Svh(..)
+  , Svh(Svh)
   , svh
   , svhs
   , unwrapSvh
   
   -- * Large Viewport Width
-  , Lvw(..)
+  , Lvw(Lvw)
   , lvw
   , lvws
   , unwrapLvw
   
   -- * Large Viewport Height
-  , Lvh(..)
+  , Lvh(Lvh)
   , lvh
   , lvhs
   , unwrapLvh
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // vw // viewport

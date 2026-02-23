@@ -31,6 +31,15 @@ module Hydrogen.Schema.Color.Palette
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , map
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<>)
+  )
 
 import Data.Array ((:), range)
 import Data.Int (round, toNumber)

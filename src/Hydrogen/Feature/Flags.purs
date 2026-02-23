@@ -85,8 +85,9 @@ module Hydrogen.Feature.Flags
   , FlagState
   ) where
 
-import Prelude
+import Prelude hiding (when)
 
+import Control.Monad (when)
 import Data.Array as Array
 import Data.Map (Map)
 import Data.Map as Map
@@ -590,8 +591,6 @@ getFlagState provider f = do
 foreign import hashString :: String -> Int
 foreign import toNumber :: Int -> Number
 
-when :: Boolean -> Effect Unit -> Effect Unit
-when true action = action
-when false _ = pure unit
+-- Note: Using Control.Monad.when
 
 infixr 0 Tuple as /\

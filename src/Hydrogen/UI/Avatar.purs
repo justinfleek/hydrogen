@@ -9,7 +9,7 @@ module Hydrogen.UI.Avatar
   ( avatar
   , avatarImage
   , avatarFallback
-  , AvatarSize(..)
+  , AvatarSize(Sm, Md, Lg, Xl)
   , size
   , className
   ) where

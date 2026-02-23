@@ -20,7 +20,7 @@
 
 module Hydrogen.Schema.Dimension.Percentage
   ( -- * Percentage (0-100)
-    Percent(..)
+    Percent(Percent)
   , percent
   , percents
   , unwrapPercent
@@ -28,7 +28,7 @@ module Hydrogen.Schema.Dimension.Percentage
   , percentOf
   
   -- * Ratio (0.0-1.0)
-  , Ratio(..)
+  , Ratio(Ratio)
   , ratio
   , ratios
   , unwrapRatio
@@ -39,7 +39,7 @@ module Hydrogen.Schema.Dimension.Percentage
   
   -- * Proportion (unbounded)
     -- For aspect ratios like 16:9, 4:3
-  , Proportion(..)
+  , Proportion(Proportion)
   , proportion
   , proportions
   , unwrapProportion
@@ -52,6 +52,15 @@ module Hydrogen.Schema.Dimension.Percentage
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (*)
+  , (/)
+  , (<>)
+  , (<<<)
+  )
 
 import Hydrogen.Math.Core as Math
 

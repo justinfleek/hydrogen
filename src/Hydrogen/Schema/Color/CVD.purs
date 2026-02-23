@@ -47,6 +47,23 @@ module Hydrogen.Schema.Color.CVD
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , Unit
+  , map
+  , max
+  , min
+  , show
+  , unit
+  , (+)
+  , (*)
+  , (/)
+  , (>)
+  , (>=)
+  , (==)
+  , (<>)
+  )
 
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Either (Either)

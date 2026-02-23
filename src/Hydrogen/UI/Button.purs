@@ -55,13 +55,13 @@ module Hydrogen.UI.Button
   , type_
   
   -- * Variants
-  , ButtonVariant(..)
+  , ButtonVariant(Primary, Secondary, Destructive, Outline, Ghost, Link)
   
   -- * Sizes
-  , ButtonSize(..)
+  , ButtonSize(Sm, Md, Lg, Icon)
   
   -- * Types
-  , ButtonType(..)
+  , ButtonType(TypeButton, TypeSubmit, TypeReset)
   ) where
 
 import Prelude

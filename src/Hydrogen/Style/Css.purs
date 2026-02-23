@@ -80,7 +80,7 @@ module Hydrogen.Style.Css
   , arbitraryProperty
   ) where
 
-import Prelude
+import Prelude hiding (when)
 
 import Data.Array as Array
 import Data.Maybe (Maybe(..))

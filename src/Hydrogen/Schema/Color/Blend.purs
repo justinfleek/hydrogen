@@ -30,6 +30,20 @@ module Hydrogen.Schema.Color.Blend
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , otherwise
+  , ($)
+  , (==)
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  )
 
 import Data.Int (toNumber, round)
 import Hydrogen.Math.Core as Math

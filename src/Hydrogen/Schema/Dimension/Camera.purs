@@ -30,21 +30,31 @@
 
 module Hydrogen.Schema.Dimension.Camera
   ( -- * Camera Pose
-    CameraPose(..)
+    CameraPose
   , cameraPose
   , defaultCameraPose
   
   -- * Camera Movement Types
-  , CameraMove(..)
-  , Dolly(..)
-  , Truck(..)
-  , Pedestal(..)
-  , Pan(..)
-  , Tilt(..)
-  , Roll(..)
-  , Zoom(..)
-  , Orbit(..)
-  , Arc(..)
+  , CameraMove
+      ( MoveDolly
+      , MoveTruck
+      , MovePedestal
+      , MovePan
+      , MoveTilt
+      , MoveRoll
+      , MoveZoom
+      , MoveOrbit
+      , MoveArc
+      )
+  , Dolly(Dolly)
+  , Truck(Truck)
+  , Pedestal(Pedestal)
+  , Pan(Pan)
+  , Tilt(Tilt)
+  , Roll(Roll)
+  , Zoom(Zoom)
+  , Orbit
+  , Arc
   
   -- * Movement Constructors
   , dollyIn
@@ -65,11 +75,11 @@ module Hydrogen.Schema.Dimension.Camera
   , arcMove
   
   -- * Lens Properties
-  , FocalLength(..)
-  , Aperture(..)
-  , FocusDistance(..)
-  , SensorSize(..)
-  , FieldOfView(..)
+  , FocalLength(FocalLength)
+  , Aperture(Aperture)
+  , FocusDistance(FocusDistance)
+  , SensorSize(SensorSize)
+  , FieldOfView(FieldOfView)
   
   -- * Lens Constructors
   , focalLength
@@ -111,18 +121,31 @@ module Hydrogen.Schema.Dimension.Camera
   , equivalentFocalLength
   
   -- * Depth of Field
-  , DepthOfField(..)
+  , DepthOfField
   , calculateDof
   , hyperfocalDistance
   , circleOfConfusion
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , identity
+  , negate
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (>=)
+  , (<>)
+  )
 
 import Hydrogen.Math.Core as Math
-import Hydrogen.Schema.Dimension.Physical (Meter(..), Millimeter(..))
-import Hydrogen.Schema.Dimension.Angular (Degrees(..))
-import Hydrogen.Schema.Dimension.Vector (Vec3(..))
+import Hydrogen.Schema.Dimension.Physical (Meter(Meter), Millimeter(Millimeter))
+import Hydrogen.Schema.Dimension.Angular (Degrees(Degrees))
+import Hydrogen.Schema.Dimension.Vector (Vec3(Vec3))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // camera pose

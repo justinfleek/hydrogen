@@ -73,7 +73,7 @@ module Hydrogen.UI.Collapsible
   , contentClassName
   
   -- * Types
-  , IconPosition(..)
+  , IconPosition(IconLeft, IconRight)
   ) where
 
 import Prelude

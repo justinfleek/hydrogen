@@ -48,7 +48,7 @@ module Hydrogen.UI.Card
   , hoverable
   
   -- * Variants
-  , CardPadding(..)
+  , CardPadding(PaddingNone, PaddingSm, PaddingMd, PaddingLg)
   ) where
 
 import Prelude

@@ -675,9 +675,7 @@ padZero width n =
 replicate :: forall a. Int -> a -> Array a
 replicate n x = if n <= 0 then [] else map (const x) (range 1 n)
 
--- | Clamp a value between min and max
-clamp :: Int -> Int -> Int -> Int
-clamp minV maxV v = max minV (min maxV v)
+-- Note: Using Prelude.clamp for bounds checking
 
 -- | Parse integer
 parseInt :: String -> Maybe Int

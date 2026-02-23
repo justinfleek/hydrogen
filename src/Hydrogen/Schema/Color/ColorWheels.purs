@@ -44,6 +44,15 @@ module Hydrogen.Schema.Color.ColorWheels
   ) where
 
 import Prelude
+  ( negate
+  , otherwise
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  )
 
 import Data.Int as Int
 import Data.Number (cos, sin, pi)

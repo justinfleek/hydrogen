@@ -18,6 +18,14 @@ module Hydrogen.Schema.Color.Temperature
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , otherwise
+  , (<)
+  , (>=)
+  , (&&)
+  )
 
 import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.Hue as Hue

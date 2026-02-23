@@ -26,6 +26,12 @@ module Hydrogen.Schema.Material.DashLength
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 

@@ -71,8 +71,9 @@ module Hydrogen.Event.Bus
   , emitTyped
   ) where
 
-import Prelude
+import Prelude hiding (when)
 
+import Control.Monad (when, unless)
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
@@ -384,13 +385,9 @@ emitTyped bus (TypedChannel name) event =
 -- Utilities
 -- ═══════════════════════════════════════════════════════════════════════════
 
-when :: Boolean -> Effect Unit -> Effect Unit
-when true action = action
-when false _ = pure unit
+-- Note: Using Control.Monad.when and Control.Monad.unless from standard library
 
-unless :: Boolean -> Effect Unit -> Effect Unit
-unless cond = when (not cond)
-
+-- | Map function for arrays (FFI for performance in Effect contexts)
 map :: forall a b. (a -> b) -> Array a -> Array b
 map = mapImpl
 

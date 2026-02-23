@@ -693,6 +693,4 @@ formatNumber n =
     else if absN >= 1000.0 then show (n / 1000.0) <> "K"
     else show n
 
--- | Minimum of two integers
-min :: Int -> Int -> Int
-min a b = if a < b then a else b
+-- Note: Using Prelude.min for integer minimum

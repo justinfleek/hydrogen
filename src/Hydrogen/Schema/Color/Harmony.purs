@@ -17,6 +17,15 @@ module Hydrogen.Schema.Color.Harmony
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , otherwise
+  , mod
+  , (+)
+  , (-)
+  , (<)
+  , (>)
+  )
 
 import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.Hue as Hue

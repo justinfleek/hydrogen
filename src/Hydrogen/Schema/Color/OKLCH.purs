@@ -46,6 +46,14 @@ module Hydrogen.Schema.Color.OKLCH
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (+)
+  , (-)
+  , (<>)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Hue (Hue)

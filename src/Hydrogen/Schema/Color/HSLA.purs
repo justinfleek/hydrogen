@@ -53,6 +53,12 @@ module Hydrogen.Schema.Color.HSLA
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat

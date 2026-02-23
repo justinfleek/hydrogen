@@ -7,7 +7,7 @@
 -- | Small status indicators using the pure Element abstraction.
 module Hydrogen.UI.Badge
   ( badge
-  , BadgeVariant(..)
+  , BadgeVariant(Default, Secondary, Destructive, Outline, Success, Warning)
   , variant
   , className
   ) where

@@ -43,6 +43,7 @@ module Hydrogen.Schema.Attestation.UUID5
   , nsEvent
   , nsAttestation
   , nsContact
+  , nsButton
   ) where
 
 import Prelude
@@ -124,6 +125,17 @@ nsContact :: UUID5
 nsContact = UUID5
   [ 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x5f
   , 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e
+  ]
+
+-- | Namespace for Hydrogen Button UUIDs
+-- |
+-- | Buttons with identical semantic configuration get identical UUIDs.
+-- | Enables deterministic button identity across billion-agent scale.
+-- | Derived from: uuid5(nil, "hydrogen.button")
+nsButton :: UUID5
+nsButton = UUID5
+  [ 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
   ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════

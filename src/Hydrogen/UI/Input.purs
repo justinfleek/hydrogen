@@ -63,7 +63,7 @@ module Hydrogen.UI.Input
   , cols
   
   -- * Input Types
-  , InputType(..)
+  , InputType(Text, Password, Email, Number, Tel, Url, Search, Date, Time, DateTimeLocal, Month, Week, Color, File, Hidden)
   ) where
 
 import Prelude

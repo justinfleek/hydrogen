@@ -60,6 +60,17 @@ module Hydrogen.Schema.Color.Space
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , negate
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<=)
+  , (>=)
+  , (&&)
+  )
 
 import Hydrogen.Math.Core as Math
 

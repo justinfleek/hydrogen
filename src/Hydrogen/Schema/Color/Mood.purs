@@ -17,6 +17,16 @@ module Hydrogen.Schema.Color.Mood
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (==)
+  , (||)
+  , (&&)
+  )
 
 import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.Hue as Hue

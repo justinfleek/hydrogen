@@ -294,8 +294,7 @@ randomStagger (Milliseconds minDelay) (Milliseconds maxDelay) = \index _ ->
 toNumber :: Int -> Number
 toNumber n = if n <= 0 then 0.0 else toNumber (n - 1) + 1.0
 
-max :: Int -> Int -> Int
-max a b = if a > b then a else b
+-- Note: Using Prelude.max
 
 -- Foreign imports for math (not in PureScript Prelude)
 foreign import sin :: Number -> Number

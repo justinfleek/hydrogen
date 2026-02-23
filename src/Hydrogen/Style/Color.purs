@@ -324,12 +324,4 @@ contrastColor c
   | c.l > 55.0 = hsl 0.0 0.0 0.0   -- Dark text on light bg
   | otherwise = hsl 0.0 0.0 100.0   -- Light text on dark bg
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
-
-clamp :: Number -> Number -> Number -> Number
-clamp minVal maxVal val
-  | val < minVal = minVal
-  | val > maxVal = maxVal
-  | otherwise = val
+-- Note: Using Prelude.clamp for Number bounds checking
