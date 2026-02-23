@@ -11,6 +11,8 @@
 -- | 3. Timer App — Commands (delay, interval), self-scheduling
 -- | 4. Spring Demo — Physics-based animation with requestAnimationFrame
 -- | 5. Fetch App — HTTP commands with fetch API
+-- | 6. Color Demo — RGB color interpolation with easing
+-- | 7. Sequence Demo — Chained animations with delays
 -- |
 -- | ## Building
 -- |
@@ -44,7 +46,7 @@ import Hydrogen.Runtime.Example as Ex
 
 -- | Main entry point for browser demo.
 -- |
--- | Mounts all four example applications to their respective containers.
+-- | Mounts all example applications to their respective containers.
 -- | Each container should exist in the HTML:
 -- |
 -- | - #counter-app
@@ -52,6 +54,8 @@ import Hydrogen.Runtime.Example as Ex
 -- | - #timer-app
 -- | - #spring-app
 -- | - #fetch-app
+-- | - #color-app
+-- | - #sequence-app
 main :: Effect Unit
 main = do
   Console.log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -82,6 +86,16 @@ main = do
   Console.log "Mounting Fetch App..."
   fetchResult <- App.mountCmd "#fetch-app" Ex.fetchApp
   logMountResult "Fetch" fetchResult
+  
+  -- Mount Color Demo App (with color animation)
+  Console.log "Mounting Color Demo App..."
+  colorResult <- App.mountCmd "#color-app" Ex.colorDemoApp
+  logMountResult "Color" colorResult
+  
+  -- Mount Sequence Demo App (with chained animations)
+  Console.log "Mounting Sequence Demo App..."
+  sequenceResult <- App.mountCmd "#sequence-app" Ex.sequenceDemoApp
+  logMountResult "Sequence" sequenceResult
   
   Console.log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   Console.log "All apps mounted. Check the browser for the demo."

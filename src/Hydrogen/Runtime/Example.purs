@@ -71,6 +71,16 @@ module Hydrogen.Runtime.Example
   , FetchResult(..)
   , FetchMsg(..)
   , fetchApp
+  
+  -- * Color Animation Application
+  , ColorDemoState
+  , ColorDemoMsg(..)
+  , colorDemoApp
+  
+  -- * Sequence Animation Application
+  , SequenceDemoState
+  , SequenceDemoMsg(..)
+  , sequenceDemoApp
   ) where
 
 import Prelude
@@ -86,15 +96,17 @@ import Prelude
   , (-)
   , (*)
   , (/)
+  , (#)
   )
 
 import Data.Array (filter, length, snoc)
-import Data.Maybe (Maybe(Nothing))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (Tuple)
 import Foreign (Foreign)
-import Hydrogen.Motion.Spring (springWobbly)
+import Hydrogen.Motion.Spring (SpringConfig, springConfig, springWobbly)
 import Hydrogen.Render.Element as E
 import Hydrogen.Runtime.Animate as Anim
+import Hydrogen.Schema.Motion.Easing as Easing
 import Hydrogen.Runtime.App (App, AppCmd)
 import Hydrogen.Runtime.Cmd 
   ( HttpError(..)
@@ -104,7 +116,6 @@ import Hydrogen.Runtime.Cmd
   , HttpSuccess
   , Transition
   , animationFrame
-  , delay
   , http
   , noCmd
   , transition
@@ -359,28 +370,38 @@ itemsRemaining items =
 --                                                        // timer // example // cmd
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Timer state
+-- | Stopwatch state with millisecond precision and lap times
 type TimerState =
-  { seconds :: Int
+  { elapsed :: Number        -- Total elapsed milliseconds
   , running :: Boolean
+  , laps :: Array Number     -- Lap times in milliseconds
+  , lastLapTime :: Number    -- Time of last lap for delta display
+  , startTime :: Number      -- When current run started
   }
 
 -- | Timer messages
 data TimerMsg
-  = StartTimer
+  = StartTimer Number        -- Start with timestamp
   | StopTimer
   | ResetTimer
-  | Tick
+  | RecordLap
+  | TimerTick Number         -- Animation frame tick
 
 -- | Timer application with commands
 -- |
 -- | Demonstrates:
--- | - Command-based effects (delays)
--- | - Self-scheduling tick loop
--- | - State-dependent command generation
+-- | - High-precision timing with requestAnimationFrame
+-- | - Lap recording
+-- | - Start/Stop/Reset controls
 timerApp :: AppCmd TimerState TimerMsg
 timerApp =
-  { init: noCmd { seconds: 0, running: false }
+  { init: noCmd 
+      { elapsed: 0.0
+      , running: false
+      , laps: []
+      , lastLapTime: 0.0
+      , startTime: 0.0
+      }
   , update: timerUpdate
   , view: timerView
   }
@@ -388,86 +409,180 @@ timerApp =
 -- | Timer update with commands
 timerUpdate :: TimerMsg -> TimerState -> Transition TimerState TimerMsg
 timerUpdate msg state = case msg of
-  StartTimer -> 
+  StartTimer timestamp -> 
     case state.running of
-      true -> noCmd state  -- Already running
+      true -> noCmd state
       false -> 
         transition 
-          state { running = true }
-          (delay 1000.0 Tick)  -- Schedule first tick
+          state 
+            { running = true
+            , startTime = timestamp - state.elapsed  -- Account for previous elapsed time
+            }
+          (animationFrame TimerTick)
   
   StopTimer ->
     noCmd state { running = false }
   
   ResetTimer ->
-    noCmd state { seconds = 0, running = false }
+    noCmd state 
+      { elapsed = 0.0
+      , running = false
+      , laps = []
+      , lastLapTime = 0.0
+      , startTime = 0.0
+      }
   
-  Tick ->
+  RecordLap ->
     case state.running of
-      false -> noCmd state  -- Stopped, don't continue
+      false -> noCmd state
+      true ->
+        let lapTime = state.elapsed - state.lastLapTime
+        in noCmd state 
+            { laps = snoc state.laps lapTime
+            , lastLapTime = state.elapsed
+            }
+  
+  TimerTick timestamp ->
+    case state.running of
+      false -> noCmd state
       true -> 
-        transition
-          state { seconds = state.seconds + 1 }
-          (delay 1000.0 Tick)  -- Schedule next tick
+        let newElapsed = timestamp - state.startTime
+        in transition
+            state { elapsed = newElapsed }
+            (animationFrame TimerTick)
 
 -- | Timer view
 timerView :: TimerState -> E.Element TimerMsg
 timerView state =
   E.div_
-    [ E.class_ "timer-app p-8 text-center" ]
+    [ E.class_ "timer-app p-6 text-center" ]
     [ E.h1_
-        [ E.class_ "text-3xl font-bold mb-6" ]
-        [ E.text "Hydrogen Timer" ]
+        [ E.class_ "text-2xl font-bold mb-4" ]
+        [ E.text "Stopwatch" ]
+    
+    -- Main time display
     , E.div_
-        [ E.class_ "text-6xl font-mono mb-8" ]
-        [ E.text (formatTime state.seconds) ]
+        [ E.class_ "text-5xl font-mono mb-2 tabular-nums" ]
+        [ E.text (formatTimeMs state.elapsed) ]
+    
+    -- Milliseconds display (smaller, below main)
     , E.div_
-        [ E.class_ "flex justify-center gap-4" ]
-        [ timerButton 
-            (case state.running of
-              true -> StopTimer
-              false -> StartTimer)
-            (case state.running of
-              true -> "Stop"
-              false -> "Start")
-            (case state.running of
-              true -> "bg-red-500 hover:bg-red-600"
-              false -> "bg-green-500 hover:bg-green-600")
-        , timerButton ResetTimer "Reset" "bg-gray-500 hover:bg-gray-600"
+        [ E.class_ "text-xl font-mono text-gray-400 mb-6" ]
+        [ E.text (formatMillis state.elapsed) ]
+    
+    -- Control buttons
+    , E.div_
+        [ E.class_ "flex justify-center gap-3 mb-4" ]
+        [ case state.running of
+            true -> 
+              E.button_
+                [ E.onClick StopTimer
+                , E.class_ "px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium"
+                ]
+                [ E.text "Stop" ]
+            false ->
+              E.button_
+                [ E.onClick (StartTimer 0.0)  -- Will be replaced with actual timestamp via animationFrame
+                , E.class_ "px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium"
+                ]
+                [ E.text (case state.elapsed > 0.0 of
+                    true -> "Resume"
+                    false -> "Start") ]
+        , case state.running of
+            true ->
+              E.button_
+                [ E.onClick RecordLap
+                , E.class_ "px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium"
+                ]
+                [ E.text "Lap" ]
+            false ->
+              E.button_
+                [ E.onClick ResetTimer
+                , E.class_ "px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium"
+                ]
+                [ E.text "Reset" ]
         ]
+    
+    -- Lap times
+    , case length state.laps of
+        0 -> E.div_ [] []
+        _ -> 
+          E.div_
+            [ E.class_ "mt-4 max-h-32 overflow-y-auto" ]
+            [ E.div_
+                [ E.class_ "text-xs text-gray-500 uppercase tracking-wide mb-2" ]
+                [ E.text "Lap Times" ]
+            , E.div_
+                [ E.class_ "space-y-1 text-sm font-mono" ]
+                (mapWithIndex renderLap state.laps)
+            ]
     ]
 
--- | Timer button helper
-timerButton :: TimerMsg -> String -> String -> E.Element TimerMsg
-timerButton msg label colorClass =
-  E.button_
-    [ E.onClick msg
-    , E.class_ ("px-6 py-3 text-white rounded-lg font-medium " <> colorClass)
+-- | Render a single lap
+renderLap :: Int -> Number -> E.Element TimerMsg
+renderLap idx lapTime =
+  E.div_
+    [ E.class_ "flex justify-between px-4 py-1 bg-gray-100 rounded" ]
+    [ E.span_ [ E.class_ "text-gray-600" ] [ E.text ("Lap " <> show (idx + 1)) ]
+    , E.span_ [] [ E.text (formatTimeMs lapTime) ]
     ]
-    [ E.text label ]
 
--- | Format seconds as MM:SS
-formatTime :: Int -> String
-formatTime totalSeconds =
+-- | Map with index helper using accumulator for correct order
+mapWithIndex :: forall a b. (Int -> a -> b) -> Array a -> Array b
+mapWithIndex f arr = mapWithIndexAcc 0 f arr []
+
+mapWithIndexAcc :: forall a b. Int -> (Int -> a -> b) -> Array a -> Array b -> Array b
+mapWithIndexAcc idx f arr acc = 
+  case arrayIndex idx arr of
+    Nothing -> acc
+    Just item -> mapWithIndexAcc (idx + 1) f arr (snoc acc (f idx item))
+
+-- | FFI for array indexing used in mapWithIndex (takes constructors)
+foreign import arrayIndexImpl 
+  :: forall a. (a -> Maybe a) -> Maybe a -> Int -> Array a -> Maybe a
+
+-- | Safe array indexing
+arrayIndex :: forall a. Int -> Array a -> Maybe a
+arrayIndex = arrayIndexImpl Just Nothing
+
+-- | Format milliseconds as MM:SS
+formatTimeMs :: Number -> String
+formatTimeMs ms =
   let 
-    minutes = totalSeconds / 60
-    seconds = totalSeconds - (minutes * 60)
+    totalSeconds = ms / 1000.0
+    minutes = floorToInt (totalSeconds / 60.0)
+    seconds = floorToInt totalSeconds - (minutes * 60)
   in padZero minutes <> ":" <> padZero seconds
 
--- | Pad a number with leading zero
+-- | Format just the milliseconds portion
+formatMillis :: Number -> String
+formatMillis ms =
+  let millis = floorToInt ms - (floorToInt (ms / 1000.0) * 1000)
+  in "." <> padZeroThree millis
+
+-- | Pad a number with leading zero (2 digits)
 padZero :: Int -> String
 padZero n = case n < 10 of
   true -> "0" <> show n
   false -> show n
 
+-- | Pad a number with leading zeros (3 digits)
+padZeroThree :: Int -> String
+padZeroThree n 
+  | n < 10 = "00" <> show n
+  | n < 100 = "0" <> show n
+  | otherwise = show n
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                    // spring // demo // example
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Spring animation demo state
+-- | Spring animation demo state with adjustable physics parameters
 type SpringDemoState =
   { position :: Anim.SpringState
   , targetX :: Number
+  , stiffness :: Number   -- 10-500, controls speed
+  , damping :: Number     -- 1-50, controls bounciness
   }
 
 -- | Spring animation messages
@@ -475,38 +590,57 @@ data SpringDemoMsg
   = MoveLeft
   | MoveRight
   | MoveCenter
-  | AnimTick Number  -- timestamp
+  | SetStiffness String   -- From range input
+  | SetDamping String     -- From range input
+  | AnimTick Number       -- timestamp
 
 -- | Spring animation demo application
 -- |
 -- | Demonstrates:
 -- | - Physics-based spring animations
 -- | - Self-scheduling animation loop via Cmd
--- | - Smooth position interpolation
+-- | - Adjustable spring parameters via sliders
 springDemoApp :: AppCmd SpringDemoState SpringDemoMsg
 springDemoApp =
   { init: noCmd
       { position: Anim.springState springWobbly 200.0
       , targetX: 200.0
+      , stiffness: 180.0   -- Default wobbly stiffness
+      , damping: 12.0      -- Default wobbly damping
       }
   , update: springDemoUpdate
   , view: springDemoView
   }
 
+-- | Build SpringConfig from current slider values
+buildSpringConfig :: Number -> Number -> SpringConfig
+buildSpringConfig stiffness damping = springConfig stiffness damping
+
 -- | Update with spring physics
 springDemoUpdate :: SpringDemoMsg -> SpringDemoState -> Transition SpringDemoState SpringDemoMsg
 springDemoUpdate msg state = case msg of
   MoveLeft ->
-    let newPos = Anim.springTo state.position 50.0 0.0
+    let cfg = buildSpringConfig state.stiffness state.damping
+        newPos = Anim.springTo (state.position { config = cfg }) 50.0
     in transition state { position = newPos, targetX = 50.0 } (animationFrame AnimTick)
   
   MoveRight ->
-    let newPos = Anim.springTo state.position 350.0 0.0
+    let cfg = buildSpringConfig state.stiffness state.damping
+        newPos = Anim.springTo (state.position { config = cfg }) 350.0
     in transition state { position = newPos, targetX = 350.0 } (animationFrame AnimTick)
   
   MoveCenter ->
-    let newPos = Anim.springTo state.position 200.0 0.0
+    let cfg = buildSpringConfig state.stiffness state.damping
+        newPos = Anim.springTo (state.position { config = cfg }) 200.0
     in transition state { position = newPos, targetX = 200.0 } (animationFrame AnimTick)
+  
+  SetStiffness str ->
+    let val = parseNumberSafe str 180.0
+    in noCmd state { stiffness = val }
+  
+  SetDamping str ->
+    let val = parseNumberSafe str 12.0
+    in noCmd state { damping = val }
   
   AnimTick timestamp ->
     let newPos = Anim.tickSpring timestamp state.position
@@ -514,33 +648,89 @@ springDemoUpdate msg state = case msg of
       true -> noCmd state { position = newPos }
       false -> transition state { position = newPos } (animationFrame AnimTick)
 
+-- | Parse a number from string with default fallback
+parseNumberSafe :: String -> Number -> Number
+parseNumberSafe str def = parseNumberImpl str def
+
+foreign import parseNumberImpl :: String -> Number -> Number
+
 -- | Spring demo view
 springDemoView :: SpringDemoState -> E.Element SpringDemoMsg
 springDemoView state =
   let currentX = Anim.springValue state.position
   in E.div_
-    [ E.class_ "spring-demo p-8" ]
+    [ E.class_ "spring-demo p-4" ]
     [ E.h1_
-        [ E.class_ "text-3xl font-bold mb-6" ]
-        [ E.text "Spring Animation Demo" ]
+        [ E.class_ "text-xl font-bold mb-3" ]
+        [ E.text "Spring Physics" ]
+    
+    -- Animation track
     , E.div_
-        [ E.class_ "relative h-32 bg-gray-100 rounded-lg mb-6" ]
+        [ E.class_ "relative h-20 bg-gray-100 rounded-lg mb-4" ]
         [ E.div_
-            [ E.class_ "absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-blue-500 rounded-full"
+            [ E.class_ "absolute top-1/2 w-12 h-12 bg-blue-500 rounded-full shadow-lg"
             , E.style "transform" ("translateX(" <> show currentX <> "px) translateY(-50%)")
-            , E.style "transition" "none"  -- We're handling animation ourselves
+            , E.style "transition" "none"
             ]
             []
         ]
+    
+    -- Control buttons
     , E.div_
-        [ E.class_ "flex justify-center gap-4" ]
-        [ springButton MoveLeft "← Left" "bg-purple-500 hover:bg-purple-600"
-        , springButton MoveCenter "Center" "bg-gray-500 hover:bg-gray-600"
-        , springButton MoveRight "Right →" "bg-purple-500 hover:bg-purple-600"
+        [ E.class_ "flex justify-center gap-2 mb-4" ]
+        [ springButton MoveLeft "←" "bg-purple-500 hover:bg-purple-600"
+        , springButton MoveCenter "●" "bg-gray-500 hover:bg-gray-600"
+        , springButton MoveRight "→" "bg-purple-500 hover:bg-purple-600"
         ]
+    
+    -- Sliders for spring parameters
+    , E.div_
+        [ E.class_ "space-y-3" ]
+        [ -- Stiffness slider
+          E.div_
+            [ E.class_ "flex items-center gap-3" ]
+            [ E.label_
+                [ E.class_ "text-xs text-gray-500 w-16" ]
+                [ E.text "Stiffness" ]
+            , E.input_
+                [ E.type_ "range"
+                , E.min_ "10"
+                , E.max_ "500"
+                , E.step_ "10"
+                , E.value (show (floorToInt state.stiffness))
+                , E.onInput SetStiffness
+                , E.class_ "flex-1 h-2 accent-purple-500"
+                ]
+            , E.span_
+                [ E.class_ "text-xs font-mono w-10 text-right" ]
+                [ E.text (show (floorToInt state.stiffness)) ]
+            ]
+        
+        -- Damping slider
+        , E.div_
+            [ E.class_ "flex items-center gap-3" ]
+            [ E.label_
+                [ E.class_ "text-xs text-gray-500 w-16" ]
+                [ E.text "Damping" ]
+            , E.input_
+                [ E.type_ "range"
+                , E.min_ "1"
+                , E.max_ "50"
+                , E.step_ "1"
+                , E.value (show (floorToInt state.damping))
+                , E.onInput SetDamping
+                , E.class_ "flex-1 h-2 accent-purple-500"
+                ]
+            , E.span_
+                [ E.class_ "text-xs font-mono w-10 text-right" ]
+                [ E.text (show (floorToInt state.damping)) ]
+            ]
+        ]
+    
+    -- Position readout
     , E.p_
-        [ E.class_ "text-center text-sm text-gray-500 mt-4" ]
-        [ E.text ("Position: " <> show currentX <> "px (target: " <> show state.targetX <> "px)") ]
+        [ E.class_ "text-center text-xs text-gray-500 mt-3" ]
+        [ E.text ("Position: " <> show (floorToInt currentX) <> "px") ]
     ]
 
 -- | Spring demo button
@@ -548,7 +738,7 @@ springButton :: SpringDemoMsg -> String -> String -> E.Element SpringDemoMsg
 springButton msg label colorClass =
   E.button_
     [ E.onClick msg
-    , E.class_ ("px-6 py-3 text-white rounded-lg font-medium " <> colorClass)
+    , E.class_ ("px-4 py-2 text-white rounded-lg font-medium " <> colorClass)
     ]
     [ E.text label ]
 
@@ -814,3 +1004,291 @@ clearButton =
     , E.class_ "text-sm text-gray-500 hover:text-gray-700"
     ]
     [ E.text "Clear" ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                     // color // demo // example
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Color animation demo state
+-- |
+-- | Demonstrates smooth color transitions with easing.
+type ColorDemoState =
+  { color :: Anim.ColorState
+  , colorName :: String
+  , duration :: Number    -- Transition duration in ms
+  }
+
+-- | Color animation messages
+data ColorDemoMsg
+  = SetRed
+  | SetGreen
+  | SetBlue
+  | SetPurple
+  | SetOrange
+  | SetColorDuration String
+  | ColorTick Number
+
+-- | Color animation demo application
+-- |
+-- | Demonstrates:
+-- | - RGB color interpolation
+-- | - Easing applied to color channels
+-- | - Adjustable transition duration
+colorDemoApp :: AppCmd ColorDemoState ColorDemoMsg
+colorDemoApp =
+  { init: noCmd
+      { color: Anim.colorState { r: 59.0, g: 130.0, b: 246.0 }  -- blue-500
+      , colorName: "Blue"
+      , duration: 500.0
+      }
+  , update: colorDemoUpdate
+  , view: colorDemoView
+  }
+
+-- | Update with color animation
+colorDemoUpdate :: ColorDemoMsg -> ColorDemoState -> Transition ColorDemoState ColorDemoMsg
+colorDemoUpdate msg state = case msg of
+  SetRed ->
+    let newColor = Anim.colorTo state.color { r: 239.0, g: 68.0, b: 68.0 } state.duration Easing.easeOutCubic
+    in transition state { color = newColor, colorName = "Red" } (animationFrame ColorTick)
+  
+  SetGreen ->
+    let newColor = Anim.colorTo state.color { r: 34.0, g: 197.0, b: 94.0 } state.duration Easing.easeOutCubic
+    in transition state { color = newColor, colorName = "Green" } (animationFrame ColorTick)
+  
+  SetBlue ->
+    let newColor = Anim.colorTo state.color { r: 59.0, g: 130.0, b: 246.0 } state.duration Easing.easeOutCubic
+    in transition state { color = newColor, colorName = "Blue" } (animationFrame ColorTick)
+  
+  SetPurple ->
+    let newColor = Anim.colorTo state.color { r: 168.0, g: 85.0, b: 247.0 } state.duration Easing.easeOutCubic
+    in transition state { color = newColor, colorName = "Purple" } (animationFrame ColorTick)
+  
+  SetOrange ->
+    let newColor = Anim.colorTo state.color { r: 249.0, g: 115.0, b: 22.0 } state.duration Easing.easeOutCubic
+    in transition state { color = newColor, colorName = "Orange" } (animationFrame ColorTick)
+  
+  SetColorDuration str ->
+    let val = parseNumberSafe str 500.0
+    in noCmd state { duration = val }
+  
+  ColorTick timestamp ->
+    let newColor = Anim.tickColor timestamp state.color
+    in case Anim.colorComplete newColor of
+      true -> noCmd state { color = newColor }
+      false -> transition state { color = newColor } (animationFrame ColorTick)
+
+-- | Color demo view
+colorDemoView :: ColorDemoState -> E.Element ColorDemoMsg
+colorDemoView state =
+  let 
+    currentColor = Anim.colorValue state.color
+    cssColor = Anim.rgbToCss currentColor
+  in E.div_
+    [ E.class_ "color-demo p-4" ]
+    [ E.h1_
+        [ E.class_ "text-xl font-bold mb-3" ]
+        [ E.text "Color Transitions" ]
+    
+    -- Color preview box
+    , E.div_
+        [ E.class_ "w-full h-32 rounded-lg shadow-lg mb-4 flex items-center justify-center"
+        , E.style "background-color" cssColor
+        ]
+        [ E.span_
+            [ E.class_ "text-white text-xl font-bold drop-shadow-lg" ]
+            [ E.text state.colorName ]
+        ]
+    
+    -- Color buttons
+    , E.div_
+        [ E.class_ "flex justify-center gap-2 mb-4" ]
+        [ colorButton SetRed "bg-red-500"
+        , colorButton SetGreen "bg-green-500"
+        , colorButton SetBlue "bg-blue-500"
+        , colorButton SetPurple "bg-purple-500"
+        , colorButton SetOrange "bg-orange-500"
+        ]
+    
+    -- Duration slider
+    , E.div_
+        [ E.class_ "flex items-center gap-3 mb-3" ]
+        [ E.label_
+            [ E.class_ "text-xs text-gray-500 w-16" ]
+            [ E.text "Duration" ]
+        , E.input_
+            [ E.type_ "range"
+            , E.min_ "100"
+            , E.max_ "2000"
+            , E.step_ "100"
+            , E.value (show (floorToInt state.duration))
+            , E.onInput SetColorDuration
+            , E.class_ "flex-1 h-2 accent-purple-500"
+            ]
+        , E.span_
+            [ E.class_ "text-xs font-mono w-14 text-right" ]
+            [ E.text (show (floorToInt state.duration) <> "ms") ]
+        ]
+    
+    -- Current RGB values
+    , E.div_
+        [ E.class_ "text-xs text-gray-600 font-mono text-center" ]
+        [ E.text ("RGB(" <> show (intPart currentColor.r) <> ", " 
+                        <> show (intPart currentColor.g) <> ", " 
+                        <> show (intPart currentColor.b) <> ")") ]
+    ]
+
+-- | Color picker button (shows the color itself)
+colorButton :: ColorDemoMsg -> String -> E.Element ColorDemoMsg
+colorButton msg colorClass =
+  E.button_
+    [ E.onClick msg
+    , E.class_ ("w-12 h-12 rounded-full " <> colorClass <> " hover:scale-110 transition-transform shadow-md")
+    ]
+    []
+
+-- | Convert Number to Int for display (truncate decimals)
+intPart :: Number -> Int
+intPart n = 
+  let scaled = n * 1.0
+  in case scaled < 0.0 of
+    true -> 0 - (intPartPositive (0.0 - scaled))
+    false -> intPartPositive scaled
+
+-- | Helper for positive numbers
+intPartPositive :: Number -> Int
+intPartPositive n = 
+  -- Simple truncation: subtract decimal part
+  let asInt = n / 1.0
+  in case asInt > 2147483647.0 of
+    true -> 2147483647
+    false -> floorToInt n
+
+-- | Floor a number to int (FFI would be cleaner but keeping pure)
+foreign import floorToInt :: Number -> Int
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                  // sequence // demo // example
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Sequence animation demo state
+-- |
+-- | Demonstrates chained animations with delays.
+type SequenceDemoState =
+  { seq :: Anim.Sequence
+  , running :: Boolean
+  }
+
+-- | Sequence animation messages
+data SequenceDemoMsg
+  = StartSequence
+  | ResetSequence
+  | SeqTick Number
+
+-- | Sequence animation demo application
+-- |
+-- | Demonstrates:
+-- | - Sequential animations (one after another)
+-- | - Delay steps between animations
+-- | - Building complex motion from simple primitives
+sequenceDemoApp :: AppCmd SequenceDemoState SequenceDemoMsg
+sequenceDemoApp =
+  { init: noCmd
+      { seq: buildDemoSequence 0.0
+      , running: false
+      }
+  , update: sequenceDemoUpdate
+  , view: sequenceDemoView
+  }
+
+-- | Build the demo sequence: move right, pause, move left, pause, center
+buildDemoSequence :: Number -> Anim.Sequence
+buildDemoSequence initial =
+  Anim.sequence initial
+    # Anim.andThen 300.0 400.0 Easing.easeOutBack    -- Move right with overshoot
+    # Anim.withDelay 200.0                             -- Pause
+    # Anim.andThen 100.0 400.0 Easing.easeOutBack    -- Move left with overshoot
+    # Anim.withDelay 200.0                             -- Pause
+    # Anim.andThen 200.0 600.0 Easing.easeInOutQuad  -- Return to center smoothly
+
+-- | Update with sequence animation
+sequenceDemoUpdate :: SequenceDemoMsg -> SequenceDemoState -> Transition SequenceDemoState SequenceDemoMsg
+sequenceDemoUpdate msg state = case msg of
+  StartSequence ->
+    case state.running of
+      true -> noCmd state
+      false ->
+        -- Build a fresh sequence from current position, will start on first tick
+        let currentVal = Anim.sequenceValue state.seq
+            newSeq = buildDemoSequence currentVal
+        in transition state { seq = newSeq, running = true } (animationFrame SeqTick)
+  
+  ResetSequence ->
+    noCmd state { seq = buildDemoSequence 200.0, running = false }
+  
+  SeqTick timestamp ->
+    let newSeq = Anim.tickSequence timestamp state.seq
+    in case Anim.sequenceComplete newSeq of
+      true -> noCmd state { seq = newSeq, running = false }
+      false -> transition state { seq = newSeq } (animationFrame SeqTick)
+
+-- | Sequence demo view
+sequenceDemoView :: SequenceDemoState -> E.Element SequenceDemoMsg
+sequenceDemoView state =
+  let currentX = Anim.sequenceValue state.seq
+  in E.div_
+    [ E.class_ "sequence-demo p-8" ]
+    [ E.h1_
+        [ E.class_ "text-3xl font-bold mb-6" ]
+        [ E.text "Sequence Animation Demo" ]
+    , E.p_
+        [ E.class_ "text-sm text-gray-500 mb-4" ]
+        [ E.text "Chained animations: right → pause → left → pause → center" ]
+    
+    -- Animation track
+    , E.div_
+        [ E.class_ "relative h-24 bg-gray-100 rounded-lg mb-6 overflow-hidden" ]
+        [ -- Track markers
+          E.div_ [ E.class_ "absolute inset-0 flex justify-between px-8 items-center text-xs text-gray-400" ]
+            [ E.span_ [] [ E.text "100px" ]
+            , E.span_ [] [ E.text "200px" ]
+            , E.span_ [] [ E.text "300px" ]
+            ]
+        -- The animated ball
+        , E.div_
+            [ E.class_ "absolute top-1/2 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-lg"
+            , E.style "transform" ("translateX(" <> show currentX <> "px) translateY(-50%)")
+            , E.style "transition" "none"
+            ]
+            []
+        ]
+    
+    -- Controls
+    , E.div_
+        [ E.class_ "flex gap-4 mb-4" ]
+        [ seqButton StartSequence 
+            (case state.running of
+              true -> "Running..."
+              false -> "Start Sequence")
+            (case state.running of
+              true -> "bg-gray-400 cursor-not-allowed"
+              false -> "bg-purple-500 hover:bg-purple-600")
+            state.running
+        , seqButton ResetSequence "Reset" "bg-gray-500 hover:bg-gray-600" false
+        ]
+    
+    -- Position readout
+    , E.div_
+        [ E.class_ "text-sm text-gray-600 font-mono" ]
+        [ E.text ("Position: " <> show (intPart currentX) <> "px") ]
+    ]
+
+-- | Sequence demo button
+seqButton :: SequenceDemoMsg -> String -> String -> Boolean -> E.Element SequenceDemoMsg
+seqButton msg label colorClass disabled =
+  E.button_
+    [ E.onClick msg
+    , E.class_ ("px-6 py-3 text-white rounded-lg font-medium " <> colorClass)
+    , E.disabled disabled
+    ]
+    [ E.text label ]

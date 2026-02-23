@@ -133,6 +133,9 @@ module Hydrogen.Render.Element
   , value
   , type_
   , name
+  , min_
+  , max_
+  , step_
   , disabled
   , checked
   , selected
@@ -663,6 +666,18 @@ type_ = Attr "type"
 -- | Set name attribute
 name :: forall msg. String -> Attribute msg
 name = Attr "name"
+
+-- | Set min attribute (for range/number inputs)
+min_ :: forall msg. String -> Attribute msg
+min_ = Attr "min"
+
+-- | Set max attribute (for range/number inputs)
+max_ :: forall msg. String -> Attribute msg
+max_ = Attr "max"
+
+-- | Set step attribute (for range/number inputs)
+step_ :: forall msg. String -> Attribute msg
+step_ = Attr "step"
 
 -- | Set disabled property
 disabled :: forall msg. Boolean -> Attribute msg

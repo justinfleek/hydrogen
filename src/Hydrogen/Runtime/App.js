@@ -11,12 +11,12 @@ export const setTextContent = (text) => (node) => () => {
 };
 
 // Convert Node to Element (returns Just element or Nothing)
-// Uses Data.Maybe encoding: { value0: element } for Just, Nothing singleton
-export const nodeToElement = (node) => {
+// Takes Just and Nothing constructors from PureScript for proper Maybe encoding
+export const nodeToElementImpl = (just) => (nothing) => (node) => {
   if (node.nodeType === Node.ELEMENT_NODE) {
-    return { value0: node };  // Just
+    return just(node);
   }
-  return null;  // Nothing - PureScript will interpret this
+  return nothing;
 };
 
 // Clear all attributes from an element
@@ -94,13 +94,13 @@ export const historyForward = () => {
   window.history.forward();
 };
 
-// Get value from localStorage (returns Maybe encoding)
-export const getLocalStorage = (key) => () => {
+// Get value from localStorage (takes Just and Nothing constructors)
+export const getLocalStorageImpl = (just) => (nothing) => (key) => () => {
   const value = window.localStorage.getItem(key);
   if (value === null) {
-    return null;  // Nothing
+    return nothing;
   }
-  return { value0: value };  // Just
+  return just(value);
 };
 
 // Set value in localStorage

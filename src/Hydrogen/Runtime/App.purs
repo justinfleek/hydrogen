@@ -657,8 +657,16 @@ reconcileChildren doc dispatch oldChildren newChildren parentNode = do
 -- | Set text content of a node
 foreign import setTextContent :: String -> Node -> Effect Unit
 
+-- | Convert Node to Element (implementation takes constructors)
+foreign import nodeToElementImpl 
+  :: (DOMElement.Element -> Maybe DOMElement.Element) 
+  -> Maybe DOMElement.Element 
+  -> Node 
+  -> Maybe DOMElement.Element
+
 -- | Convert Node to Element (returns Nothing if not an element node)
-foreign import nodeToElement :: Node -> Maybe DOMElement.Element
+nodeToElement :: Node -> Maybe DOMElement.Element
+nodeToElement = nodeToElementImpl Just Nothing
 
 -- | Clear all attributes from an element
 foreign import clearAttributes :: DOMElement.Element -> Effect Unit
@@ -704,8 +712,16 @@ foreign import historyBack :: Effect Unit
 -- | Go forward in history
 foreign import historyForward :: Effect Unit
 
+-- | Get value from localStorage (implementation takes constructors)
+foreign import getLocalStorageImpl 
+  :: (String -> Maybe String) 
+  -> Maybe String 
+  -> String 
+  -> Effect (Maybe String)
+
 -- | Get value from localStorage
-foreign import getLocalStorage :: String -> Effect (Maybe String)
+getLocalStorage :: String -> Effect (Maybe String)
+getLocalStorage = getLocalStorageImpl Just Nothing
 
 -- | Set value in localStorage
 foreign import setLocalStorage :: String -> String -> Effect Unit
