@@ -1961,3 +1961,133 @@ However, it does define semantic naming atoms:
 |               | - All component tokens                   |
 |               | - Identity assets                        |
 |               | - Export configurations                  |
+
+## Pillar 13: Attestation
+
+Cryptographic integrity and identity verification.
+
+### Atoms
+
+#### Hash Functions
+
+| Name          | Type   | Notes                                   |
+|---------------|--------|-----------------------------------------|
+| SHA256        | Hash   | 256-bit SHA-2 hash                      |
+| SHA512        | Hash   | 512-bit SHA-2 hash                      |
+| Keccak256     | Hash   | 256-bit Keccak (Ethereum)              |
+
+#### Identifiers
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                     |
+|---------------|--------|-------|-------|----------|---------------------------|
+| UUID5         | String | -     | -     | -        | SHA-1 based namespace UUID|
+| Timestamp     | Number | 0     | none  | finite   | Unix epoch milliseconds   |
+
+### Molecules
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| HashOutput    | Algorithm + Digest + Length              |
+| SignedData    | Payload + Signature + PublicKey          |
+| MerkleTree    | Leaves + Root + Proof                    |
+
+### Compounds
+
+#### Verification
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Signature     | Ed25519/ECDSA signature                  |
+| MAC           | Message authentication code              |
+| MerkleProof   | Path + Siblings + Root                   |
+| TimestampProof| Timestamp + Hash + Authority             |
+
+#### Identity
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| DID           | Decentralized identifier                 |
+| VC            | Verifiable credential                    |
+| VP            | Verifiable presentation                  |
+
+## Pillar 14: Scheduling
+
+Time-based events and calendar systems.
+
+### Atoms
+
+#### Time Units
+
+| Name          | Type   | Min   | Max   | Behavior | Notes                     |
+|---------------|--------|-------|-------|----------|---------------------------|
+| Hour          | Int    | 0     | 23    | clamps   | Hour of day               |
+| Minute        | Int    | 0     | 59    | clamps   | Minute of hour            |
+| Second        | Int    | 0     | 59    | clamps   | Second of minute          |
+| Millisecond   | Int    | 0     | 999   | clamps   | Millisecond               |
+| DayOfWeek     | Int    | 0     | 6     | wraps    | 0=Sunday, 6=Saturday      |
+| Timezone      | String | -     | -     | -        | IANA timezone identifier  |
+
+### Molecules
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| TimeOfDay     | Hour + Minute + Second + Millisecond     |
+| CalendarDate  | Year + Month + Day                       |
+| DateTime      | CalendarDate + TimeOfDay + Timezone      |
+
+### Compounds
+
+#### Events
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Event         | Title + Start + End + Location + Desc   |
+| RecurringEvent| Event + RecurrenceRule                   |
+| AllDayEvent   | Event without time                       |
+| TimedEvent    | Event with specific time range           |
+
+#### Recurrence
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Daily         | Every N days                            |
+| Weekly        | Every N weeks on specific days           |
+| Monthly       | Every N months on day/ordinal            |
+| Yearly        | Every N years                            |
+| Custom        | Complex recurrence rule (RFC 5545)       |
+
+#### Invitations
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Invite        | Event + Recipient + Response            |
+| RSVP          | Status + ResponseTime + Message          |
+| Attendee      | Name + Email + Role + Status             |
+
+#### Contacts
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| Contact       | Name + Email + Phone + Organization     |
+| Calendar      | Owner + Events + Sharing + Permissions  |
+
+## Complete Atom Catalog
+
+Total: **203 atoms** across **14 pillars**
+
+| Pillar      | Atoms | Description                              |
+|-------------|-------|------------------------------------------|
+| Color       | 40    | Color science, theory, application       |
+| Dimension   | 54    | Measurement, spacing, layout             |
+| Geometry    | 4     | Shape, form, spatial transformation     |
+| Typography  | 19    | Text rendering, typographic hierarchy    |
+| Material    | 38    | Surface appearance, texture              |
+| Elevation   | 2     | Depth, shadow, visual hierarchy         |
+| Temporal    | 7     | Time units and calendar                 |
+| Motion      | 6     | Animation, transitions, easing           |
+| Reactive    | 14    | State, feedback, interaction            |
+| Gestural    | 7     | Input patterns, pointers, gestures      |
+| Haptic      | 4     | Tactile and sensory feedback            |
+| Spatial     | 17    | 3D, XR, PBR materials                   |
+| Attestation | 5     | Cryptographic integrity                 |
+| Scheduling  | 7     | Calendar, events, invitations           |

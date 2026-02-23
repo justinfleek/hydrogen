@@ -645,12 +645,188 @@ Alpha is handled via:
 
 ## Level 2: Design Tokens
 
-*To be continued: spacing, typography, lengths, durations, easing...*
+Design tokens compose numeric primitives into meaningful semantic units.
+
+```
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                                         // design // tokens
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Spacing Tokens
+
+```
+  Spacing
+    :: newtype over Number (pixels)
+    :: constrained to [0.0, infinity)
+    :: semantic names: xs/sm/md/lg/xl/2xl/3xl/4xl
+    
+    scale:
+      - xs: 4px
+      - sm: 8px
+      - md: 16px
+      - lg: 24px
+      - xl: 32px
+      - 2xl: 48px
+      - 3xl: 64px
+      - 4xl: 96px
+```
+
+### Typography Tokens
+
+```
+  TypeSize
+    :: newtype over Number (pixels)
+    :: constrained to [0.0, infinity)
+    :: semantic names: xs/sm/base/lg/xl/2xl/3xl/4xl
+    
+  TypeWeight
+    :: newtype over Int
+    :: constrained to [100, 900] (step 100)
+    :: names: thin/light/regular/medium/semibold/bold/extrabold/black
+```
+
+### Duration Tokens
+
+```
+  Duration
+    :: newtype over Number (milliseconds)
+    :: constrained to [0.0, infinity)
+    :: semantic names: instant/fast/normal/slow/delayed
+    
+    scale:
+      - instant: 0ms
+      - fast: 100ms
+      - normal: 200ms
+      - slow: 300ms
+      - delayed: 500ms
+```
+
+### Easing Tokens
+
+```
+  Easing
+    :: data type with multiple representations
+    :: linear, cubic-bezier, steps, spring
+    
+    standard eases:
+      - ease-in
+      - ease-out
+      - ease-in-out
+      - ease-out-back (overshoot)
+```
 
 ## Level 3: Components
 
-*To be continued: built from tokens, not primitives...*
+Components are pure functions returning Element, built from tokens.
+
+```
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                                            // components
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Component Architecture
+
+```
+  -- A component is a pure function from config to Element
+  componentName :: Config -> Array (Element msg) -> Element msg
+  
+  -- Config is a record of token references + behavior
+  type Config =
+    { variant :: Variant
+    , size :: Size
+    , state :: State
+    , -- references to design tokens
+      padding :: Spacing
+    , color :: Color
+    , font :: TypeStyle
+    }
+```
+
+### Primitive UI Components
+
+| Component      | Description                              |
+|----------------|------------------------------------------|
+| Button         | Clickable action trigger                 |
+| Input          | Text/numeric entry                       |
+| Select         | Dropdown selection                       |
+| Checkbox       | Boolean toggle                           |
+| Radio          | Single selection from options            |
+| Switch         | On/off toggle                            |
+| Slider         | Range value selector                     |
+| Card           | Container with elevation                 |
+| Modal          | Overlay dialog                          |
+| Toast          | Transient notification                  |
+| Avatar         | User/image display                       |
+| Badge          | Status indicator                         |
+| Alert          | Inline message                           |
+| Progress       | Loading/completion indicator             |
+| Skeleton       | Loading placeholder                     |
 
 ## Level 4: Theme / Brand
 
-*To be continued: brand palette, theme mapping, brand identity...*
+Theme composes tokens into complete design systems.
+
+```
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                                                // theme
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Theme Structure
+
+```
+  Theme
+    :: { colors :: ColorSystem
+       , typography :: TypeSystem
+       , spacing :: SpacingSystem
+       , motion :: MotionSystem
+       , elevation :: ElevationSystem
+       }
+    
+  ColorSystem
+    :: { primitive :: Map TokenName Color
+       , semantic :: Map TokenName Color
+       , state :: Map StateName Color
+       }
+```
+
+### Brand Extensions
+
+Brands extend themes with identity-specific tokens:
+
+```
+  Brand
+    :: extends Theme
+    :: { logo :: LogoAssets
+       , iconography :: IconSet
+       , illustration :: IllustrationStyle
+       , voice :: CopyStyle
+       }
+```
+
+## Schema Pillar Summary
+
+Hydrogen provides **14 pillars** with **203 atoms**:
+
+| Pillar      | Files | Purpose                                    |
+|-------------|-------|---------------------------------------------|
+| Color       | 40    | Color spaces, contrast, harmony            |
+| Dimension   | 54    | Units, vectors, spacing                    |
+| Geometry    | 4     | Shapes, transforms, positioning             |
+| Typography  | 19    | Fonts, metrics, hierarchy                  |
+| Material    | 38    | Filters, noise, borders                    |
+| Elevation   | 2     | Shadows, z-index                           |
+| Temporal    | 7     | Time, calendar                             |
+| Motion      | 6     | Animation, transitions                      |
+| Reactive    | 14    | State, validation, feedback                |
+| Gestural   | 7     | Input, pointers, touch                     |
+| Spatial     | 17    | 3D, PBR, XR                                |
+| Attestation | 5     | Hashing, signing, identity                 |
+| Scheduling  | 7     | Events, calendar, invitations              |
+
+The Schema is the **complete atomic vocabulary** for autonomous brand building.
+When design primitives are formally complete, agents can reason algebraically
+about design. When types encode all invariants, crashes become impossible by
+construction.
