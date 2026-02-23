@@ -45,6 +45,19 @@ module Hydrogen.Schema.Color.WhiteBalance
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , negate
+  , otherwise
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (<>)
+  )
 
 import Data.Int as Int
 import Hydrogen.Schema.Color.RGB as RGB

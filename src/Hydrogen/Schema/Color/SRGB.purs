@@ -79,6 +79,12 @@ module Hydrogen.Schema.Color.SRGB
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 import Data.Int (round, toNumber, hexadecimal, toStringAs) as Int
 import Hydrogen.Schema.Color.Channel as Ch

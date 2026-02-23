@@ -23,6 +23,13 @@ module Hydrogen.Schema.Material.FilterHighlights
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , negate
+  , show
+  , (<>)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 

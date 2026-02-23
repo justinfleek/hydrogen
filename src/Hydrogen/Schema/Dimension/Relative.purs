@@ -23,55 +23,61 @@
 
 module Hydrogen.Schema.Dimension.Relative
   ( -- * Em Units (relative to font-size)
-    Em(..)
+    Em(Em)
   , em
   , ems
   , unwrapEm
   
   -- * Rem Units (relative to root font-size)
-  , Rem(..)
+  , Rem(Rem)
   , rem
   , rems
   , unwrapRem
   
   -- * Ex Units (relative to x-height)
-  , Ex(..)
+  , Ex(Ex)
   , ex
   , exs
   , unwrapEx
   
   -- * Ch Units (relative to zero character width)
-  , Ch(..)
+  , Ch(Ch)
   , ch
   , chs
   , unwrapCh
   
   -- * Cap Height Units
-  , Cap(..)
+  , Cap(Cap)
   , cap
   , caps
   , unwrapCap
   
   -- * CJK Ideograph Width
-  , Ic(..)
+  , Ic(Ic)
   , ic
   , ics
   , unwrapIc
   
   -- * Line Height Units
-  , Lh(..)
+  , Lh(Lh)
   , lh
   , lhs
   , unwrapLh
   
   -- * Root Line Height Units
-  , Rlh(..)
+  , Rlh(Rlh)
   , rlh
   , rlhs
   , unwrapRlh
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // em // units

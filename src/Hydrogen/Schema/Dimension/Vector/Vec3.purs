@@ -5,7 +5,7 @@
 -- | 3D vector type parameterized by component type.
 
 module Hydrogen.Schema.Dimension.Vector.Vec3
-  ( Vec3(..)
+  ( Vec3(Vec3)
   , vec3
   , vec3Zero
   , vec3One
@@ -33,6 +33,23 @@ module Hydrogen.Schema.Dimension.Vector.Vec3
   ) where
 
 import Prelude
+  ( class Eq
+  , class Functor
+  , class Ring
+  , class Semiring
+  , class Show
+  , map
+  , negate
+  , one
+  , show
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (==)
+  , (<>)
+  )
 
 import Hydrogen.Math.Core as Math
 

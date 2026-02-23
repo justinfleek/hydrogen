@@ -7,7 +7,7 @@
 -- | Visual dividers for content sections.
 module Hydrogen.UI.Separator
   ( separator
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   , orientation
   , className
   ) where

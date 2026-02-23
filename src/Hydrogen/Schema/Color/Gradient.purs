@@ -68,6 +68,23 @@ module Hydrogen.Schema.Color.Gradient
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , compare
+  , map
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (==)
+  , (>=)
+  , (<=)
+  , (&&)
+  , (<>)
+  , ($)
+  )
 
 import Data.Array (drop, foldl, index, sortBy, take, uncons)
 import Data.Int (round)

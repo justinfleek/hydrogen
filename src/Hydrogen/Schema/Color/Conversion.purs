@@ -93,6 +93,25 @@ module Hydrogen.Schema.Color.Conversion
   ) where
 
 import Prelude
+  ( max
+  , min
+  , mod
+  , negate
+  , otherwise
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (==)
+  , (&&)
+  , (<>)
+  , (>>>)
+  , (<<<)
+  )
 
 import Data.Int as Int
 import Data.Number (abs, pow, sqrt)

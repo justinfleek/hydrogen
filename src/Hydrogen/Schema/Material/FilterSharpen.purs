@@ -24,6 +24,12 @@ module Hydrogen.Schema.Material.FilterSharpen
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 

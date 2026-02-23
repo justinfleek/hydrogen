@@ -82,12 +82,15 @@ module Hydrogen.Analytics.Tracker
   , getQueue
   ) where
 
-import Prelude
+import Prelude hiding (when)
 
+import Control.Monad (when)
 import Data.Array as Array
+import Data.Foldable (for_)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
@@ -584,23 +587,7 @@ getQueue tracker = Ref.read tracker.queue
 
 foreign import now :: Effect Number
 
-traverse :: forall a b. (a -> Effect b) -> Array a -> Effect (Array b)
-traverse = traverseImpl
-
-foreign import traverseImpl :: forall a b. (a -> Effect b) -> Array a -> Effect (Array b)
-
-for_ :: forall a. Array a -> (a -> Effect Unit) -> Effect Unit
-for_ arr f = void $ traverse f arr
-
-when :: Boolean -> Effect Unit -> Effect Unit
-when true action = action
-when false _ = pure unit
-
-fromMaybe :: forall a. a -> Maybe a -> a
-fromMaybe default = case _ of
-  Just a -> a
-  Nothing -> default
-
+-- | Insert a value into an Object only if the Maybe contains a value
 maybeInsert :: String -> Maybe String -> Object String -> Object String
 maybeInsert key = case _ of
   Just val -> Object.insert key val

@@ -46,6 +46,22 @@ module Hydrogen.Schema.Color.Kelvin
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , negate
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (&&)
+  , (<>)
+  )
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded

@@ -16,28 +16,28 @@
 
 module Hydrogen.Schema.Dimension.Physical.SI
   ( -- * Base Unit
-    Meter(..)
+    Meter(Meter)
   
   -- * Larger Than Meter
-  , Decameter(..)
-  , Hectometer(..)
-  , Kilometer(..)
-  , Megameter(..)
-  , Gigameter(..)
-  , Terameter(..)
-  , Petameter(..)
-  , Exameter(..)
-  , Zettameter(..)
-  , Yottameter(..)
-  , Ronnameter(..)
-  , Quettameter(..)
+  , Decameter(Decameter)
+  , Hectometer(Hectometer)
+  , Kilometer(Kilometer)
+  , Megameter(Megameter)
+  , Gigameter(Gigameter)
+  , Terameter(Terameter)
+  , Petameter(Petameter)
+  , Exameter(Exameter)
+  , Zettameter(Zettameter)
+  , Yottameter(Yottameter)
+  , Ronnameter(Ronnameter)
+  , Quettameter(Quettameter)
   
   -- * Smaller Than Meter
-  , Decimeter(..)
-  , Centimeter(..)
-  , Millimeter(..)
-  , Micrometer(..)
-  , Nanometer(..)
+  , Decimeter(Decimeter)
+  , Centimeter(Centimeter)
+  , Millimeter(Millimeter)
+  , Micrometer(Micrometer)
+  , Nanometer(Nanometer)
   
   -- * Constructors (Base)
   , meter
@@ -128,6 +128,23 @@ module Hydrogen.Schema.Dimension.Physical.SI
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Ring
+  , class Semiring
+  , class Show
+  , add
+  , mul
+  , negate
+  , one
+  , show
+  , sub
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // meter (base)

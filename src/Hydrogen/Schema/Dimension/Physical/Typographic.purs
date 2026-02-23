@@ -19,12 +19,12 @@
 
 module Hydrogen.Schema.Dimension.Physical.Typographic
   ( -- * Types
-    Point(..)
-  , Pica(..)
-  , Didot(..)
-  , Cicero(..)
-  , Twip(..)
-  , Agate(..)
+    Point(Point)
+  , Pica(Pica)
+  , Didot(Didot)
+  , Cicero(Cicero)
+  , Twip(Twip)
+  , Agate(Agate)
   
   -- * Constructors
   , point
@@ -66,6 +66,14 @@ module Hydrogen.Schema.Dimension.Physical.Typographic
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (*)
+  , (/)
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // constants

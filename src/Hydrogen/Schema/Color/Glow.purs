@@ -66,6 +66,20 @@ module Hydrogen.Schema.Color.Glow
   ) where
 
 import Prelude
+  ( show
+  , min
+  , negate
+  , not
+  , otherwise
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (/=)
+  , (&&)
+  , (<>)
+  )
 
 import Data.Int as Int
 import Hydrogen.Schema.Color.Channel as Ch

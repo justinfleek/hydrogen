@@ -56,7 +56,7 @@ module Hydrogen.Form.Validation
   , unless
   ) where
 
-import Prelude
+import Prelude hiding (min, max, when)
 
 import Data.Array as Array
 import Data.Either (Either(..))

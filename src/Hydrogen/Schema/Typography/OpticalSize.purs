@@ -47,6 +47,18 @@ module Hydrogen.Schema.Typography.OpticalSize
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , otherwise
+  , show
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (==)
+  , (<>)
+  )
 
 import Data.Int (round, toNumber) as Int
 

@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Dimension.Flex
   ( -- * Flex Fraction
-    Fr(..)
+    Fr(Fr)
   , fr
   , frs
   , unwrapFr
@@ -36,8 +36,16 @@ module Hydrogen.Schema.Dimension.Flex
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , map
+  , show
+  , (<>)
+  , (<<<)
+  )
 
-import Data.Array ((..))
+import Data.Array (range, (..))
 import Data.Int (toNumber)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

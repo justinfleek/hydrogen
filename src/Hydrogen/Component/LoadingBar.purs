@@ -205,12 +205,7 @@ percentageClasses =
 --                                                                  // components
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a value between min and max
-clamp :: Number -> Number -> Number -> Number
-clamp minVal maxVal val
-  | val < minVal = minVal
-  | val > maxVal = maxVal
-  | otherwise = val
+-- Note: Using Prelude.clamp for bounds checking
 
 -- | Full loading bar component
 loadingBar :: forall w i. Array LoadingBarProp -> HH.HTML w i

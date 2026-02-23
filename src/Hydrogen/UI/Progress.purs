@@ -7,7 +7,7 @@
 -- | Progress bars and indicators.
 module Hydrogen.UI.Progress
   ( progress
-  , ProgressVariant(..)
+  , ProgressVariant(Default, Success, Warning, Danger)
   , variant
   , className
   ) where

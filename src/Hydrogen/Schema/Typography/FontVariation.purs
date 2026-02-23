@@ -65,6 +65,16 @@ module Hydrogen.Schema.Typography.FontVariation
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , map
+  , not
+  , show
+  , (==)
+  , (/=)
+  , (<>)
+  )
 
 import Data.Array (filter, snoc, find, uncons) as Array
 import Data.Foldable (foldl)

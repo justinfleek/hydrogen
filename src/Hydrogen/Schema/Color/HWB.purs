@@ -54,6 +54,13 @@ module Hydrogen.Schema.Color.HWB
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (+)
+  , (<>)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Hue (Hue)

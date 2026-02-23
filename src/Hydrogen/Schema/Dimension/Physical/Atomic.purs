@@ -16,12 +16,12 @@
 
 module Hydrogen.Schema.Dimension.Physical.Atomic
   ( -- * Types
-    Picometer(..)
-  , Femtometer(..)
-  , Angstrom(..)
-  , BohrRadius(..)
-  , Fermi(..)
-  , PlanckLength(..)
+    Picometer(Picometer)
+  , Femtometer(Femtometer)
+  , Angstrom(Angstrom)
+  , BohrRadius(BohrRadius)
+  , Fermi(Fermi)
+  , PlanckLength(PlanckLength)
   
   -- * Constructors
   , picometer
@@ -53,6 +53,13 @@ module Hydrogen.Schema.Dimension.Physical.Atomic
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (*)
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // picometer

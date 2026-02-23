@@ -28,10 +28,10 @@ module Hydrogen.Schema.Dimension.Vector
 
 import Prelude (class Semiring, zero, one, (==), (/))
 
-import Hydrogen.Schema.Dimension.Vector.Vec2 (Vec2(..), vec2, vec2Zero, vec2One, vec2UnitX, vec2UnitY, addVec2, subtractVec2, scaleVec2, negateVec2, dotVec2, lengthSquaredVec2, lengthVec2, normalizeVec2, distanceVec2, lerpVec2, perpendicularVec2, angleVec2, getX2, getY2, setX2, setY2)
-import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3(..), vec3, vec3Zero, vec3One, vec3UnitX, vec3UnitY, vec3UnitZ, addVec3, subtractVec3, scaleVec3, negateVec3, dotVec3, crossVec3, lengthSquaredVec3, lengthVec3, normalizeVec3, distanceVec3, lerpVec3, reflectVec3, getX3, getY3, getZ3, setX3, setY3, setZ3)
-import Hydrogen.Schema.Dimension.Vector.Vec4 (Vec4(..), vec4, vec4Zero, vec4One, addVec4, subtractVec4, scaleVec4, negateVec4, dotVec4, lengthSquaredVec4, lengthVec4, normalizeVec4, lerpVec4, getX4, getY4, getZ4, getW4, setX4, setY4, setZ4, setW4)
-import Hydrogen.Schema.Dimension.Vector.VecN (VecN(..), vecN, vecNZero, vecNFromArray, vecNToArray, dimVecN, addVecN, subtractVecN, scaleVecN, negateVecN, dotVecN, lengthSquaredVecN, lengthVecN, normalizeVecN, distanceVecN, lerpVecN, getComponentN, setComponentN)
+import Hydrogen.Schema.Dimension.Vector.Vec2 (Vec2(Vec2), vec2, vec2Zero, vec2One, vec2UnitX, vec2UnitY, addVec2, subtractVec2, scaleVec2, negateVec2, dotVec2, lengthSquaredVec2, lengthVec2, normalizeVec2, distanceVec2, lerpVec2, perpendicularVec2, angleVec2, getX2, getY2, setX2, setY2)
+import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3(Vec3), vec3, vec3Zero, vec3One, vec3UnitX, vec3UnitY, vec3UnitZ, addVec3, subtractVec3, scaleVec3, negateVec3, dotVec3, crossVec3, lengthSquaredVec3, lengthVec3, normalizeVec3, distanceVec3, lerpVec3, reflectVec3, getX3, getY3, getZ3, setX3, setY3, setZ3)
+import Hydrogen.Schema.Dimension.Vector.Vec4 (Vec4(Vec4), vec4, vec4Zero, vec4One, addVec4, subtractVec4, scaleVec4, negateVec4, dotVec4, lengthSquaredVec4, lengthVec4, normalizeVec4, lerpVec4, getX4, getY4, getZ4, getW4, setX4, setY4, setZ4, setW4)
+import Hydrogen.Schema.Dimension.Vector.VecN (VecN(VecN), vecN, vecNZero, vecNFromArray, vecNToArray, dimVecN, addVecN, subtractVecN, scaleVecN, negateVecN, dotVecN, lengthSquaredVecN, lengthVecN, normalizeVecN, distanceVecN, lerpVecN, getComponentN, setComponentN)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // conversions

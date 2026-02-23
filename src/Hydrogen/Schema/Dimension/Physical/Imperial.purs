@@ -16,16 +16,16 @@
 
 module Hydrogen.Schema.Dimension.Physical.Imperial
   ( -- * Types
-    Thou(..)
-  , Inch(..)
-  , Foot(..)
-  , Yard(..)
-  , Mile(..)
-  , Fathom(..)
-  , Chain(..)
-  , Furlong(..)
-  , League(..)
-  , NauticalMile(..)
+    Thou(Thou)
+  , Inch(Inch)
+  , Foot(Foot)
+  , Yard(Yard)
+  , Mile(Mile)
+  , Fathom(Fathom)
+  , Chain(Chain)
+  , Furlong(Furlong)
+  , League(League)
+  , NauticalMile(NauticalMile)
   
   -- * Constructors
   , thou
@@ -86,6 +86,14 @@ module Hydrogen.Schema.Dimension.Physical.Imperial
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (*)
+  , (/)
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // constants

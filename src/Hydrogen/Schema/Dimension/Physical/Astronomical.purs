@@ -15,13 +15,13 @@
 
 module Hydrogen.Schema.Dimension.Physical.Astronomical
   ( -- * Types
-    LightYear(..)
-  , Parsec(..)
-  , AstronomicalUnit(..)
-  , Kiloparsec(..)
-  , Megaparsec(..)
-  , LightSecond(..)
-  , LightMinute(..)
+    LightYear(LightYear)
+  , Parsec(Parsec)
+  , AstronomicalUnit(AstronomicalUnit)
+  , Kiloparsec(Kiloparsec)
+  , Megaparsec(Megaparsec)
+  , LightSecond(LightSecond)
+  , LightMinute(LightMinute)
   
   -- * Constructors
   , lightYear
@@ -65,6 +65,13 @@ module Hydrogen.Schema.Dimension.Physical.Astronomical
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (*)
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // constants

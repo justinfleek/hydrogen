@@ -30,6 +30,16 @@ module Hydrogen.Schema.Color.Contrast
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , (+)
+  , (*)
+  , (/)
+  , (>)
+  , (>=)
+  , (<=)
+  )
 
 import Data.Int (toNumber)
 import Hydrogen.Math.Core as Math

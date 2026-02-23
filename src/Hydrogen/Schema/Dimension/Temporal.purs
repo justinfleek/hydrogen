@@ -24,16 +24,16 @@
 
 module Hydrogen.Schema.Dimension.Temporal
   ( -- * Core Types
-    Seconds(..)
-  , Milliseconds(..)
-  , Microseconds(..)
-  , Nanoseconds(..)
-  , Minutes(..)
-  , Hours(..)
+    Seconds(Seconds)
+  , Milliseconds(Milliseconds)
+  , Microseconds(Microseconds)
+  , Nanoseconds(Nanoseconds)
+  , Minutes(Minutes)
+  , Hours(Hours)
   
   -- * Frame-Based Types
-  , Frames(..)
-  , FrameRate(..)
+  , Frames(Frames)
+  , FrameRate(FrameRate)
   
   -- * Type Class
   , class TemporalUnit
@@ -97,6 +97,26 @@ module Hydrogen.Schema.Dimension.Temporal
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Ring
+  , class Semiring
+  , class Show
+  , add
+  , identity
+  , mul
+  , negate
+  , one
+  , show
+  , sub
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<>)
+  , (<<<)
+  )
 
 import Hydrogen.Math.Core as Math
 

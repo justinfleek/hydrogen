@@ -37,6 +37,15 @@ module Hydrogen.Schema.Typography.LetterSpacing
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , negate
+  , show
+  , (*)
+  , (/)
+  , (<>)
+  )
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded

@@ -48,6 +48,12 @@ module Hydrogen.Schema.Typography.TypeStyle
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , map
+  , show
+  , (<>)
+  )
 
 import Data.Array (intercalate)
 import Data.Array.NonEmpty (NonEmptyArray)

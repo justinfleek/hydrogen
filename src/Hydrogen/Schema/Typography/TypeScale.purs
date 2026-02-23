@@ -61,6 +61,12 @@ module Hydrogen.Schema.Typography.TypeScale
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , show
+  , (*)
+  , (<>)
+  )
 
 import Data.Int (toNumber) as Int
 import Hydrogen.Math.Core (pow)

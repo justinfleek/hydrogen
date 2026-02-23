@@ -63,7 +63,7 @@ module Hydrogen.Schema.Dimension.Context
   , pixelsToSp
   
   -- * Viewing Distance
-  , ViewingDistance(..)
+  , ViewingDistance(ViewingDistance)
   , typicalPhone
   , typicalTablet
   , typicalDesktop
@@ -75,11 +75,25 @@ module Hydrogen.Schema.Dimension.Context
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , identity
+  , show
+  , (*)
+  , (/)
+  , (<>)
+  )
 
-import Hydrogen.Schema.Dimension.Physical (Inch(..), Meter(..))
+import Hydrogen.Schema.Dimension.Physical (Inch(Inch), Meter(Meter))
 import Hydrogen.Schema.Dimension.Device 
-  ( Pixel(..), DevicePixel(..), CSSPixel(..), DensityIndependentPixel(..), ScaledPixel(..)
-  , PixelsPerInch(..), DevicePixelRatio(..)
+  ( Pixel(Pixel)
+  , DevicePixel(DevicePixel)
+  , CSSPixel(CSSPixel)
+  , DensityIndependentPixel(DensityIndependentPixel)
+  , ScaledPixel(ScaledPixel)
+  , PixelsPerInch(PixelsPerInch)
+  , DevicePixelRatio(DevicePixelRatio)
   )
 
 -- ═══════════════════════════════════════════════════════════════════════════════

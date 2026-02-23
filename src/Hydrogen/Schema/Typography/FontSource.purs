@@ -51,6 +51,13 @@ module Hydrogen.Schema.Typography.FontSource
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<<<)
+  , (<>)
+  )
 
 import Hydrogen.Schema.Typography.FontFamily (FontFamily)
 import Hydrogen.Schema.Typography.FontFamily as FontFamily

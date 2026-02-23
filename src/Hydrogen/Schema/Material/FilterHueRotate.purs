@@ -25,6 +25,12 @@ module Hydrogen.Schema.Material.FilterHueRotate
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 import Data.Number (isFinite)
 import Hydrogen.Schema.Bounded as Bounded

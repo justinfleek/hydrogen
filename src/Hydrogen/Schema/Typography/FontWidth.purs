@@ -54,6 +54,19 @@ module Hydrogen.Schema.Typography.FontWidth
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , identity
+  , otherwise
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (<)
+  , (>)
+  , (<>)
+  )
 
 import Data.Int (round, toNumber) as Int
 

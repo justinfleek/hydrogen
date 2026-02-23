@@ -18,43 +18,49 @@
 
 module Hydrogen.Schema.Dimension.Container
   ( -- * Container Query Width
-    Cqw(..)
+    Cqw(Cqw)
   , cqw
   , cqws
   , unwrapCqw
   
   -- * Container Query Height
-  , Cqh(..)
+  , Cqh(Cqh)
   , cqh
   , cqhs
   , unwrapCqh
   
   -- * Container Query Inline Size
-  , Cqi(..)
+  , Cqi(Cqi)
   , cqi
   , cqis
   , unwrapCqi
   
   -- * Container Query Block Size
-  , Cqb(..)
+  , Cqb(Cqb)
   , cqb
   , cqbs
   , unwrapCqb
   
   -- * Container Query Minimum
-  , Cqmin(..)
+  , Cqmin(Cqmin)
   , cqmin
   , cqmins
   , unwrapCqmin
   
   -- * Container Query Maximum
-  , Cqmax(..)
+  , Cqmax(Cqmax)
   , cqmax
   , cqmaxs
   , unwrapCqmax
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // cqw // container

@@ -6,7 +6,7 @@
 -- | Used for homogeneous coordinates and quaternions.
 
 module Hydrogen.Schema.Dimension.Vector.Vec4
-  ( Vec4(..)
+  ( Vec4(Vec4)
   , vec4
   , vec4Zero
   , vec4One
@@ -30,6 +30,23 @@ module Hydrogen.Schema.Dimension.Vector.Vec4
   ) where
 
 import Prelude
+  ( class Eq
+  , class Functor
+  , class Ring
+  , class Semiring
+  , class Show
+  , map
+  , negate
+  , one
+  , show
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (==)
+  , (<>)
+  )
 
 import Hydrogen.Math.Core as Math
 

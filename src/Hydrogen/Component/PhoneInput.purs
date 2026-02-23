@@ -75,7 +75,7 @@ module Hydrogen.Component.PhoneInput
   , PhoneInputElement
   ) where
 
-import Prelude
+import Prelude hiding (map)
 
 import Data.Array (foldl, filter, find, sortBy, (!!))
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -540,7 +540,7 @@ elem x xs = case find (_ == x) xs of
   Just _ -> true
   Nothing -> false
 
--- | Map function for arrays
+-- | Map function for arrays (FFI for performance in DOM operations)
 map :: forall a b. (a -> b) -> Array a -> Array b
 map f xs = mapImpl f xs
 

@@ -8,7 +8,7 @@
 module Hydrogen.UI.StatCard
   ( statCard
   , statCardWithTrend
-  , TrendDirection(..)
+  , TrendDirection(Up, Down, Neutral)
   , className
   ) where
 

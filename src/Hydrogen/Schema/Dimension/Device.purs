@@ -25,15 +25,15 @@
 
 module Hydrogen.Schema.Dimension.Device
   ( -- * Core Types
-    Pixel(..)
-  , DevicePixel(..)
-  , CSSPixel(..)
-  , DensityIndependentPixel(..)
-  , ScaledPixel(..)
+    Pixel(Pixel)
+  , DevicePixel(DevicePixel)
+  , CSSPixel(CSSPixel)
+  , DensityIndependentPixel(DensityIndependentPixel)
+  , ScaledPixel(ScaledPixel)
   
   -- * Display Properties
-  , PixelsPerInch(..)
-  , DevicePixelRatio(..)
+  , PixelsPerInch(PixelsPerInch)
+  , DevicePixelRatio(DevicePixelRatio)
   
   -- * Constructors
   , px
@@ -70,6 +70,23 @@ module Hydrogen.Schema.Dimension.Device
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Ring
+  , class Semiring
+  , class Show
+  , add
+  , mul
+  , negate
+  , one
+  , show
+  , sub
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (<>)
+  )
 
 import Hydrogen.Math.Core as Math
 

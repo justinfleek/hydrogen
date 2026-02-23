@@ -50,6 +50,19 @@ module Hydrogen.Schema.Typography.Grade
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , identity
+  , negate
+  , otherwise
+  , show
+  , (+)
+  , (*)
+  , (<)
+  , (>)
+  , (<>)
+  )
 
 import Data.Int (round, toNumber) as Int
 

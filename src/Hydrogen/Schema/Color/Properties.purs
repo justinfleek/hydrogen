@@ -24,6 +24,12 @@ module Hydrogen.Schema.Color.Properties
   ) where
 
 import Prelude
+  ( (+)
+  , (-)
+  , (*)
+  , (/)
+  , (>)
+  )
 
 import Data.Int (toNumber)
 import Hydrogen.Math.Core as Math

@@ -33,7 +33,7 @@
 -- |
 -- | This means you can use `<>` to "upgrade" state as responses arrive.
 module Hydrogen.Data.RemoteData
-  ( RemoteData(..)
+  ( RemoteData(NotAsked, Loading, Failure, Success)
   -- Construction
   , fromEither
   , fromMaybe

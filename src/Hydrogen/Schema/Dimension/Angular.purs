@@ -22,10 +22,10 @@
 
 module Hydrogen.Schema.Dimension.Angular
   ( -- * Core Types
-    Radians(..)
-  , Degrees(..)
-  , Turns(..)
-  , Gradians(..)
+    Radians(Radians)
+  , Degrees(Degrees)
+  , Turns(Turns)
+  , Gradians(Gradians)
   
   -- * Type Class
   , class AngularUnit
@@ -71,6 +71,27 @@ module Hydrogen.Schema.Dimension.Angular
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Ring
+  , class Semiring
+  , class Show
+  , add
+  , identity
+  , mul
+  , negate
+  , one
+  , show
+  , sub
+  , zero
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (<>)
+  , (<<<)
+  )
 
 import Hydrogen.Math.Core as Math
 
