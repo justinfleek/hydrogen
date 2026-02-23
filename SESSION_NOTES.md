@@ -34,7 +34,7 @@ nix develop --command spago build
 
 ## Component Porting Status
 
-### Ported to Element (38 components)
+### Ported to Element (40 components)
 
 | Component | Element Lines | Status |
 |-----------|---------------|--------|
@@ -53,6 +53,7 @@ nix develop --command spago build
 | Collapsible | 314 | Complete |
 | ColorPicker | 968 | Complete |
 | DataGrid | 939 + subs | Complete |
+| DatePicker | 1,081 (split) | Complete |
 | Input | 713 | Complete |
 | LoadingBar | 317 | Complete |
 | NumberInput | 522 | Complete |
@@ -74,18 +75,17 @@ nix develop --command spago build
 | TagInput | 734 | Complete |
 | Textarea | 836 | Complete |
 | Timeline | 361 | Complete |
+| TimePicker | 1,231 (split) | Complete |
 | Toast | 684 | Complete |
 | Toggle | 446 | Complete |
 
-### Not Yet Ported (33 components, ~12,130 lines)
+### Not Yet Ported (31 components, ~10,777 lines)
 
 #### High Priority — Date/Time (use new Scheduling schema)
 
 | Component | Halogen Lines | Notes |
 |-----------|---------------|-------|
-| DatePicker | 667 | Uses Calendar internally |
 | DateRangePicker | 675 | Uses Calendar internally |
-| TimePicker | 686 | Uses Hour/Minute/TimeOfDay atoms |
 
 #### Medium Priority — Complex Interactive
 
@@ -305,7 +305,7 @@ This is a large undertaking (7,741 lines). Consider:
 
 ## Session Summary (2026-02-23)
 
-### Created
+### Created (Scheduling Schema)
 
 - `Millisecond.purs` — Bounded millisecond atom
 - `TimeOfDay.purs` — Time molecule
@@ -318,11 +318,26 @@ This is a large undertaking (7,741 lines). Consider:
 - `EventQuery.purs` — Query functions
 - `EventMod.purs` — Modifiers and display
 
+### Created (DatePicker Element Port)
+
+- `Element/Component/DatePicker.purs` — Main component (464 lines)
+- `Element/Component/DatePicker/Types.purs` — DateFormat, ValidationError (80 lines)
+- `Element/Component/DatePicker/Format.purs` — Pure PureScript formatting (228 lines)
+- `Element/Component/DatePicker/Render.purs` — Render helpers (297 lines)
+
+### Created (TimePicker Element Port)
+
+- `Element/Component/TimePicker.purs` — Main component (496 lines)
+- `Element/Component/TimePicker/Types.purs` — HourFormat, Period, ValidationError (121 lines)
+- `Element/Component/TimePicker/Format.purs` — Pure PureScript formatting/parsing (268 lines)
+- `Element/Component/TimePicker/Render.purs` — Render helpers (346 lines)
+
 ### Fixed
 
 - `Hour.purs` — Added missing Show class import
 - `Minute.purs` — Added missing Show class import
 - `Second.purs` — Added missing Show class import
+- `DatePicker.purs` — Fixed unused imports ((<>), formatDate)
 - Removed monolithic `Time.purs` (replaced by individual modules)
 
 ### Verified
@@ -330,3 +345,4 @@ This is a large undertaking (7,741 lines). Consider:
 - Full build: 0 warnings, 0 errors
 - All new modules under 500 line limit
 - All imports explicit (no `(..)`)
+- No JavaScript FFI in any component (caught and fixed FFI attempt in TimePicker/Format.purs)

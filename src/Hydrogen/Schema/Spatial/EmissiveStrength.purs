@@ -85,5 +85,8 @@ toNumber :: EmissiveStrength -> Number
 toNumber (EmissiveStrength e) = e
 
 -- | Bounds documentation for this type
+-- |
+-- | Note: No practical upper bound, but we specify 1000.0 as a reasonable maximum
+-- | for documentation and UI purposes. HDR values commonly go up to 100 or so.
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 "none" "emissiveStrength" "Self-illumination intensity"
+bounds = Bounded.numberBounds 0.0 1000.0 "emissiveStrength" "Self-illumination intensity"

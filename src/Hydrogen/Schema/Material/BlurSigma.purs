@@ -88,5 +88,8 @@ toNumber :: BlurSigma -> Number
 toNumber (BlurSigma s) = s
 
 -- | Bounds documentation for this type
+-- |
+-- | Note: No practical upper bound, but we specify 1000.0 as a reasonable maximum
+-- | for documentation and UI purposes. The constructor enforces only minimum 0.0.
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 "none" "blurSigma" "Gaussian blur standard deviation"
+bounds = Bounded.numberBounds 0.0 1000.0 "blurSigma" "Gaussian blur standard deviation"

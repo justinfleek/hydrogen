@@ -27,7 +27,7 @@ module Hydrogen.Schema.Material.NoiseOctaves
 
 import Prelude
 
-import Data.Int (toNumber)
+import Data.Int (toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -88,7 +88,7 @@ toInt (NoiseOctaves o) = o
 
 -- | Convert to Number for calculations
 toNumber :: NoiseOctaves -> Number
-toNumber (NoiseOctaves o) = Data.Int.toNumber o
+toNumber (NoiseOctaves o) = Int.toNumber o
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds

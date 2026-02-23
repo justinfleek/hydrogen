@@ -80,5 +80,8 @@ toNumber :: NoiseLacunarity -> Number
 toNumber (NoiseLacunarity l) = l
 
 -- | Bounds documentation for this type
+-- |
+-- | Note: No practical upper bound, but we specify 10.0 as a reasonable maximum
+-- | for documentation and UI purposes. Values beyond this rarely make visual sense.
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 1.0 "none" "noiseLacunarity" "FBM frequency multiplier per octave"
+bounds = Bounded.numberBounds 1.0 10.0 "noiseLacunarity" "FBM frequency multiplier per octave"
