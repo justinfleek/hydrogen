@@ -170,41 +170,6 @@
     return EQ2;
   })();
 
-  // output/Data.Ring/foreign.js
-  var intSub = function(x) {
-    return function(y) {
-      return x - y | 0;
-    };
-  };
-
-  // output/Data.Semiring/foreign.js
-  var intAdd = function(x) {
-    return function(y) {
-      return x + y | 0;
-    };
-  };
-  var intMul = function(x) {
-    return function(y) {
-      return x * y | 0;
-    };
-  };
-
-  // output/Data.Semiring/index.js
-  var semiringInt = {
-    add: intAdd,
-    zero: 0,
-    mul: intMul,
-    one: 1
-  };
-
-  // output/Data.Ring/index.js
-  var ringInt = {
-    sub: intSub,
-    Semiring0: function() {
-      return semiringInt;
-    }
-  };
-
   // output/Data.Ord/index.js
   var ordInt = /* @__PURE__ */ (function() {
     return {
@@ -304,11 +269,11 @@
   var setTextContent = (text6) => (node) => () => {
     node.textContent = text6;
   };
-  var nodeToElement = (node) => {
+  var nodeToElementImpl = (just) => (nothing) => (node) => {
     if (node.nodeType === Node.ELEMENT_NODE) {
-      return { value0: node };
+      return just(node);
     }
-    return null;
+    return nothing;
   };
   var clearAttributes = (element2) => () => {
     while (element2.attributes.length > 0) {
@@ -355,12 +320,12 @@
   var historyForward = () => {
     window.history.forward();
   };
-  var getLocalStorage = (key) => () => {
+  var getLocalStorageImpl = (just) => (nothing) => (key) => () => {
     const value13 = window.localStorage.getItem(key);
     if (value13 === null) {
-      return null;
+      return nothing;
     }
-    return { value0: value13 };
+    return just(value13);
   };
   var setLocalStorage = (key) => (value13) => () => {
     window.localStorage.setItem(key, value13);
@@ -688,44 +653,6 @@
         });
       };
     };
-  };
-
-  // output/Data.EuclideanRing/foreign.js
-  var intDegree = function(x) {
-    return Math.min(Math.abs(x), 2147483647);
-  };
-  var intDiv = function(x) {
-    return function(y) {
-      if (y === 0) return 0;
-      return y > 0 ? Math.floor(x / y) : -Math.floor(x / -y);
-    };
-  };
-  var intMod = function(x) {
-    return function(y) {
-      if (y === 0) return 0;
-      var yy = Math.abs(y);
-      return (x % yy + yy) % yy;
-    };
-  };
-
-  // output/Data.CommutativeRing/index.js
-  var commutativeRingInt = {
-    Ring0: function() {
-      return ringInt;
-    }
-  };
-
-  // output/Data.EuclideanRing/index.js
-  var euclideanRingInt = {
-    degree: intDegree,
-    div: intDiv,
-    mod: intMod,
-    CommutativeRing0: function() {
-      return commutativeRingInt;
-    }
-  };
-  var div = function(dict) {
-    return dict.div;
   };
 
   // output/Data.Monoid/index.js
@@ -1487,6 +1414,9 @@
   var style = /* @__PURE__ */ (function() {
     return Style.create;
   })();
+  var step_ = /* @__PURE__ */ (function() {
+    return Attr.create("step");
+  })();
   var placeholder = /* @__PURE__ */ (function() {
     return Attr.create("placeholder");
   })();
@@ -1496,6 +1426,12 @@
   var onClick = function($180) {
     return Handler.create(OnClick.create($180));
   };
+  var min_ = /* @__PURE__ */ (function() {
+    return Attr.create("min");
+  })();
+  var max_ = /* @__PURE__ */ (function() {
+    return Attr.create("max");
+  })();
   var element = function(tag) {
     return function(attributes) {
       return function(children2) {
@@ -1513,6 +1449,7 @@
   var input_ = function(attrs) {
     return element("input")(attrs)([]);
   };
+  var label_ = /* @__PURE__ */ element("label");
   var li_ = /* @__PURE__ */ element("li");
   var p_ = /* @__PURE__ */ element("p");
   var pre_ = /* @__PURE__ */ element("pre");
@@ -1916,9 +1853,6 @@
   };
   var http = /* @__PURE__ */ (function() {
     return Http.create;
-  })();
-  var delay = /* @__PURE__ */ (function() {
-    return Delay.create;
   })();
   var animationFrame = /* @__PURE__ */ (function() {
     return AnimationFrame.create;
@@ -2687,6 +2621,12 @@
       };
     };
   };
+  var nodeToElement = /* @__PURE__ */ (function() {
+    return nodeToElementImpl(Just.create)(Nothing.value);
+  })();
+  var getLocalStorage = /* @__PURE__ */ (function() {
+    return getLocalStorageImpl(Just.create)(Nothing.value);
+  })();
   var interpretCmd = function(dispatch) {
     return function(v) {
       if (v instanceof None) {
@@ -3207,6 +3147,20 @@
     }
     return String(value13);
   };
+  var floorToInt = (n) => Math.floor(n) | 0;
+  var arrayIndexImpl = (just) => (nothing) => (idx) => (arr) => {
+    if (idx >= 0 && idx < arr.length) {
+      return just(arr[idx]);
+    }
+    return nothing;
+  };
+  var parseNumberImpl = (str) => (defaultVal) => {
+    const parsed = parseFloat(str);
+    if (isNaN(parsed)) {
+      return defaultVal;
+    }
+    return parsed;
+  };
 
   // output/Data.Number/foreign.js
   var abs = Math.abs;
@@ -3279,10 +3233,326 @@
     };
   };
 
+  // output/Hydrogen.Runtime.Animate/foreign.js
+  var arrayLength = (arr) => arr.length;
+  var arrayIndexImpl2 = (just) => (nothing) => (idx) => (arr) => {
+    if (idx >= 0 && idx < arr.length) {
+      return just(arr[idx]);
+    }
+    return nothing;
+  };
+
+  // output/Hydrogen.Schema.Motion.Easing/foreign.js
+  var intToNumber = function(n) {
+    return n;
+  };
+
   // output/Hydrogen.Math.Core/foreign.js
   var tau = Math.PI * 2;
+  var floor2 = (x) => Math.floor(x);
+  var abs2 = (x) => Math.abs(x);
+
+  // output/Hydrogen.Schema.Motion.Easing/index.js
+  var Linear = /* @__PURE__ */ (function() {
+    function Linear2() {
+    }
+    ;
+    Linear2.value = new Linear2();
+    return Linear2;
+  })();
+  var Bezier = /* @__PURE__ */ (function() {
+    function Bezier2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    Bezier2.create = function(value0) {
+      return function(value1) {
+        return new Bezier2(value0, value1);
+      };
+    };
+    return Bezier2;
+  })();
+  var Steps = /* @__PURE__ */ (function() {
+    function Steps2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    Steps2.create = function(value0) {
+      return function(value1) {
+        return new Steps2(value0, value1);
+      };
+    };
+    return Steps2;
+  })();
+  var linear = /* @__PURE__ */ (function() {
+    return Linear.value;
+  })();
+  var findTForX = function(x1) {
+    return function(x2) {
+      return function(x) {
+        var cx = 3 * x1;
+        var bx = 3 * x2 - 6 * x1;
+        var ax = 1 - 3 * x2 + 3 * x1;
+        var sampleDerivative = function(t) {
+          return (3 * ax * t + 2 * bx) * t + cx;
+        };
+        var sampleX = function(t) {
+          return ((ax * t + bx) * t + cx) * t;
+        };
+        var iterate2 = function($copy_v) {
+          return function($copy_v1) {
+            var $tco_var_v = $copy_v;
+            var $tco_done = false;
+            var $tco_result;
+            function $tco_loop(v, v1) {
+              if (v1 === 0) {
+                $tco_done = true;
+                return v;
+              }
+              ;
+              var derivative = sampleDerivative(v);
+              var currentX = sampleX(v);
+              var $69 = abs2(currentX - x) < 1e-4 || derivative === 0;
+              if ($69) {
+                $tco_done = true;
+                return v;
+              }
+              ;
+              $tco_var_v = v - (currentX - x) / derivative;
+              $copy_v1 = v1 - 1 | 0;
+              return;
+            }
+            ;
+            while (!$tco_done) {
+              $tco_result = $tco_loop($tco_var_v, $copy_v1);
+            }
+            ;
+            return $tco_result;
+          };
+        };
+        return iterate2(0.5)(8);
+      };
+    };
+  };
+  var evaluateSteps = function(n) {
+    return function(jumpStart) {
+      return function(t) {
+        if (t <= 0) {
+          if (jumpStart) {
+            return 1 / intToNumber(n);
+          }
+          ;
+          return 0;
+        }
+        ;
+        if (t >= 1) {
+          return 1;
+        }
+        ;
+        if (otherwise) {
+          var step2 = floor2(t * intToNumber(n));
+          var adjustedStep = (function() {
+            if (jumpStart) {
+              return step2 + 1;
+            }
+            ;
+            return step2;
+          })();
+          return adjustedStep / intToNumber(n);
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Schema.Motion.Easing (line 393, column 1 - line 393, column 52): " + [n.constructor.name, jumpStart.constructor.name, t.constructor.name]);
+      };
+    };
+  };
+  var evaluateBezier = function(v) {
+    return function(t) {
+      if (t <= 0) {
+        return 0;
+      }
+      ;
+      if (t >= 1) {
+        return 1;
+      }
+      ;
+      if (otherwise) {
+        var tx = findTForX(v.x1)(v.x2)(t);
+        var cy = 3 * v.y1;
+        var by = 3 * v.y2 - 6 * v.y1;
+        var ay = 1 - 3 * v.y2 + 3 * v.y1;
+        return ((ay * tx + by) * tx + cy) * tx;
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Schema.Motion.Easing (line 353, column 1 - line 353, column 50): " + [v.constructor.name, t.constructor.name]);
+    };
+  };
+  var evaluate = function(v) {
+    return function(v1) {
+      if (v instanceof Linear) {
+        return v1;
+      }
+      ;
+      if (v instanceof Bezier) {
+        return evaluateBezier(v.value0)(v1);
+      }
+      ;
+      if (v instanceof Steps) {
+        return evaluateSteps(v.value0)(v.value1)(v1);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Schema.Motion.Easing (line 344, column 1 - line 344, column 39): " + [v.constructor.name, v1.constructor.name]);
+    };
+  };
+  var easeOutCubic = /* @__PURE__ */ (function() {
+    return new Bezier({
+      x1: 0.33,
+      y1: 1,
+      x2: 0.68,
+      y2: 1
+    }, "ease-out-cubic");
+  })();
+  var easeOutBack = /* @__PURE__ */ (function() {
+    return new Bezier({
+      x1: 0.34,
+      y1: 1.56,
+      x2: 0.64,
+      y2: 1
+    }, "ease-out-back");
+  })();
+  var easeInOutQuad = /* @__PURE__ */ (function() {
+    return new Bezier({
+      x1: 0.45,
+      y1: 0,
+      x2: 0.55,
+      y2: 1
+    }, "ease-in-out-quad");
+  })();
 
   // output/Hydrogen.Runtime.Animate/index.js
+  var show3 = /* @__PURE__ */ show(showNumber);
+  var TweenStep = /* @__PURE__ */ (function() {
+    function TweenStep2(value0, value1, value22) {
+      this.value0 = value0;
+      this.value1 = value1;
+      this.value2 = value22;
+    }
+    ;
+    TweenStep2.create = function(value0) {
+      return function(value1) {
+        return function(value22) {
+          return new TweenStep2(value0, value1, value22);
+        };
+      };
+    };
+    return TweenStep2;
+  })();
+  var DelayStep = /* @__PURE__ */ (function() {
+    function DelayStep2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    DelayStep2.create = function(value0) {
+      return new DelayStep2(value0);
+    };
+    return DelayStep2;
+  })();
+  var withDelay = function(duration2) {
+    return function(seq) {
+      return {
+        currentStep: seq.currentStep,
+        tween: seq.tween,
+        stepStartTime: seq.stepStartTime,
+        delayRemaining: seq.delayRemaining,
+        complete: seq.complete,
+        started: seq.started,
+        steps: snoc(seq.steps)(new DelayStep(duration2))
+      };
+    };
+  };
+  var tweenTo = function(state2) {
+    return function(target5) {
+      return function(duration2) {
+        return function(easing) {
+          return {
+            easing,
+            from: state2.currentValue,
+            to: target5,
+            duration: duration2,
+            startTime: -1,
+            currentValue: state2.currentValue,
+            complete: false
+          };
+        };
+      };
+    };
+  };
+  var tweenState = function(initialValue) {
+    return {
+      easing: linear,
+      from: initialValue,
+      to: initialValue,
+      duration: 0,
+      startTime: 0,
+      currentValue: initialValue,
+      complete: true
+    };
+  };
+  var tickTween = function(timestamp) {
+    return function(state2) {
+      if (state2.complete) {
+        return state2;
+      }
+      ;
+      if (!state2.complete) {
+        var actualStartTime = (function() {
+          var v2 = state2.startTime < 0;
+          if (v2) {
+            return timestamp;
+          }
+          ;
+          if (!v2) {
+            return state2.startTime;
+          }
+          ;
+          throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 272, column 27 - line 274, column 35): " + [v2.constructor.name]);
+        })();
+        var elapsed = timestamp - actualStartTime;
+        var progress = elapsed / state2.duration;
+        var v = progress >= 1;
+        if (v) {
+          return {
+            easing: state2.easing,
+            from: state2.from,
+            to: state2.to,
+            duration: state2.duration,
+            startTime: actualStartTime,
+            currentValue: state2.to,
+            complete: true
+          };
+        }
+        ;
+        if (!v) {
+          var easedProgress = evaluate(state2.easing)(progress);
+          var newValue = state2.from + (state2.to - state2.from) * easedProgress;
+          return {
+            easing: state2.easing,
+            from: state2.from,
+            to: state2.to,
+            duration: state2.duration,
+            complete: state2.complete,
+            startTime: actualStartTime,
+            currentValue: newValue
+          };
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 279, column 9 - line 293, column 18): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 267, column 3 - line 293, column 18): " + [state2.complete.constructor.name]);
+    };
+  };
   var tickSpring = function(timestamp) {
     return function(state2) {
       if (state2.complete) {
@@ -3290,20 +3560,92 @@
       }
       ;
       if (!state2.complete) {
-        var elapsed = (timestamp - state2.startTime) / 1e3;
-        var newValue = springValue(state2.config)(state2.from)(state2.to)(elapsed);
+        var actualStartTime = (function() {
+          var v = state2.startTime < 0;
+          if (v) {
+            return timestamp;
+          }
+          ;
+          if (!v) {
+            return state2.startTime;
+          }
+          ;
+          throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 203, column 27 - line 205, column 35): " + [v.constructor.name]);
+        })();
+        var elapsed = (timestamp - actualStartTime) / 1e3;
         var atRest = isAtRest(state2.config)(state2.from)(state2.to)(elapsed);
+        var newValue = springValue(state2.config)(state2.from)(state2.to)(elapsed);
         return {
           config: state2.config,
           from: state2.from,
           to: state2.to,
-          startTime: state2.startTime,
+          startTime: actualStartTime,
           currentValue: newValue,
           complete: atRest
         };
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 143, column 3 - line 160, column 12): " + [state2.complete.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 198, column 3 - line 220, column 12): " + [state2.complete.constructor.name]);
+    };
+  };
+  var tickColor = function(timestamp) {
+    return function(state2) {
+      if (state2.complete) {
+        return state2;
+      }
+      ;
+      if (!state2.complete) {
+        var actualStartTime = (function() {
+          var v2 = state2.startTime < 0;
+          if (v2) {
+            return timestamp;
+          }
+          ;
+          if (!v2) {
+            return state2.startTime;
+          }
+          ;
+          throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 497, column 27 - line 499, column 35): " + [v2.constructor.name]);
+        })();
+        var elapsed = timestamp - actualStartTime;
+        var progress = elapsed / state2.duration;
+        var v = progress >= 1;
+        if (v) {
+          return {
+            easing: state2.easing,
+            from: state2.from,
+            to: state2.to,
+            duration: state2.duration,
+            startTime: actualStartTime,
+            currentValue: state2.to,
+            complete: true
+          };
+        }
+        ;
+        if (!v) {
+          var t = evaluate(state2.easing)(progress);
+          var newR = state2.from.r + (state2.to.r - state2.from.r) * t;
+          var newG = state2.from.g + (state2.to.g - state2.from.g) * t;
+          var newB = state2.from.b + (state2.to.b - state2.from.b) * t;
+          return {
+            easing: state2.easing,
+            from: state2.from,
+            to: state2.to,
+            duration: state2.duration,
+            complete: state2.complete,
+            startTime: actualStartTime,
+            currentValue: {
+              r: newR,
+              g: newG,
+              b: newB
+            }
+          };
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 504, column 9 - line 520, column 18): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 492, column 3 - line 520, column 18): " + [state2.complete.constructor.name]);
     };
   };
   var springValue2 = function(s) {
@@ -3311,15 +3653,13 @@
   };
   var springTo = function(state2) {
     return function(target5) {
-      return function(timestamp) {
-        return {
-          config: state2.config,
-          from: state2.currentValue,
-          to: target5,
-          startTime: timestamp,
-          currentValue: state2.currentValue,
-          complete: false
-        };
+      return {
+        config: state2.config,
+        from: state2.currentValue,
+        to: target5,
+        startTime: -1,
+        currentValue: state2.currentValue,
+        complete: false
       };
     };
   };
@@ -3338,12 +3678,237 @@
   var springComplete = function(s) {
     return s.complete;
   };
+  var sequenceValue = function(seq) {
+    return seq.tween.currentValue;
+  };
+  var sequenceComplete = function(seq) {
+    return seq.complete;
+  };
+  var sequence2 = function(initial) {
+    return {
+      steps: [],
+      currentStep: 0,
+      tween: tweenState(initial),
+      stepStartTime: -1,
+      delayRemaining: 0,
+      complete: true,
+      started: false
+    };
+  };
+  var rgbToCss = function(c) {
+    return "rgb(" + (show3(c.r) + (", " + (show3(c.g) + (", " + (show3(c.b) + ")")))));
+  };
+  var colorValue = function(s) {
+    return s.currentValue;
+  };
+  var colorTo = function(state2) {
+    return function(target5) {
+      return function(duration2) {
+        return function(easing) {
+          return {
+            easing,
+            from: state2.currentValue,
+            to: target5,
+            duration: duration2,
+            startTime: -1,
+            currentValue: state2.currentValue,
+            complete: false
+          };
+        };
+      };
+    };
+  };
+  var colorState = function(initial) {
+    return {
+      easing: linear,
+      from: initial,
+      to: initial,
+      duration: 0,
+      startTime: 0,
+      currentValue: initial,
+      complete: true
+    };
+  };
+  var colorComplete = function(s) {
+    return s.complete;
+  };
+  var arrayIndex = /* @__PURE__ */ (function() {
+    return arrayIndexImpl2(Just.create)(Nothing.value);
+  })();
+  var andThen = function(target5) {
+    return function(duration2) {
+      return function(easing) {
+        return function(seq) {
+          return {
+            currentStep: seq.currentStep,
+            tween: seq.tween,
+            stepStartTime: seq.stepStartTime,
+            delayRemaining: seq.delayRemaining,
+            complete: seq.complete,
+            started: seq.started,
+            steps: snoc(seq.steps)(new TweenStep(target5, duration2, easing))
+          };
+        };
+      };
+    };
+  };
+  var advanceSequence = function($copy_timestamp) {
+    return function($copy_seq) {
+      var $tco_var_timestamp = $copy_timestamp;
+      var $tco_done = false;
+      var $tco_result;
+      function $tco_loop(timestamp, seq) {
+        var v = arrayIndex(seq.currentStep)(seq.steps);
+        if (v instanceof Nothing) {
+          $tco_done = true;
+          return {
+            steps: seq.steps,
+            currentStep: seq.currentStep,
+            tween: seq.tween,
+            stepStartTime: seq.stepStartTime,
+            delayRemaining: seq.delayRemaining,
+            started: seq.started,
+            complete: true
+          };
+        }
+        ;
+        if (v instanceof Just) {
+          if (v.value0 instanceof DelayStep) {
+            var elapsed = timestamp - seq.stepStartTime;
+            var v1 = elapsed >= v.value0.value0;
+            if (v1) {
+              $tco_var_timestamp = timestamp;
+              $copy_seq = {
+                steps: seq.steps,
+                tween: seq.tween,
+                delayRemaining: seq.delayRemaining,
+                complete: seq.complete,
+                started: seq.started,
+                currentStep: seq.currentStep + 1 | 0,
+                stepStartTime: timestamp
+              };
+              return;
+            }
+            ;
+            if (!v1) {
+              $tco_done = true;
+              return {
+                steps: seq.steps,
+                currentStep: seq.currentStep,
+                tween: seq.tween,
+                stepStartTime: seq.stepStartTime,
+                complete: seq.complete,
+                started: seq.started,
+                delayRemaining: v.value0.value0 - elapsed
+              };
+            }
+            ;
+            throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 756, column 12 - line 761, column 63): " + [v1.constructor.name]);
+          }
+          ;
+          if (v.value0 instanceof TweenStep) {
+            if (seq.tween.complete) {
+              var newTween = tweenTo(seq.tween)(v.value0.value0)(v.value0.value1)(v.value0.value2);
+              $tco_var_timestamp = timestamp;
+              $copy_seq = {
+                steps: seq.steps,
+                currentStep: seq.currentStep,
+                stepStartTime: seq.stepStartTime,
+                delayRemaining: seq.delayRemaining,
+                complete: seq.complete,
+                started: seq.started,
+                tween: newTween
+              };
+              return;
+            }
+            ;
+            if (!seq.tween.complete) {
+              var tickedTween = tickTween(timestamp)(seq.tween);
+              if (tickedTween.complete) {
+                $tco_var_timestamp = timestamp;
+                $copy_seq = {
+                  steps: seq.steps,
+                  delayRemaining: seq.delayRemaining,
+                  complete: seq.complete,
+                  started: seq.started,
+                  tween: tickedTween,
+                  currentStep: seq.currentStep + 1 | 0,
+                  stepStartTime: timestamp
+                };
+                return;
+              }
+              ;
+              if (!tickedTween.complete) {
+                $tco_done = true;
+                return {
+                  steps: seq.steps,
+                  currentStep: seq.currentStep,
+                  stepStartTime: seq.stepStartTime,
+                  delayRemaining: seq.delayRemaining,
+                  complete: seq.complete,
+                  started: seq.started,
+                  tween: tickedTween
+                };
+              }
+              ;
+              throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 773, column 16 - line 779, column 51): " + [tickedTween.complete.constructor.name]);
+            }
+            ;
+            throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 765, column 9 - line 779, column 51): " + [seq.tween.complete.constructor.name]);
+          }
+          ;
+          throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 753, column 18 - line 779, column 51): " + [v.value0.constructor.name]);
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 751, column 3 - line 779, column 51): " + [v.constructor.name]);
+      }
+      ;
+      while (!$tco_done) {
+        $tco_result = $tco_loop($tco_var_timestamp, $copy_seq);
+      }
+      ;
+      return $tco_result;
+    };
+  };
+  var tickSequence = function(timestamp) {
+    return function(seq) {
+      if (!seq.started) {
+        var v = arrayLength(seq.steps);
+        if (v === 0) {
+          return seq;
+        }
+        ;
+        return advanceSequence(timestamp)({
+          steps: seq.steps,
+          currentStep: seq.currentStep,
+          tween: seq.tween,
+          delayRemaining: seq.delayRemaining,
+          started: true,
+          complete: false,
+          stepStartTime: timestamp
+        });
+      }
+      ;
+      if (seq.started) {
+        if (seq.complete) {
+          return seq;
+        }
+        ;
+        if (!seq.complete) {
+          return advanceSequence(timestamp)(seq);
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 744, column 7 - line 746, column 47): " + [seq.complete.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Animate (line 733, column 3 - line 746, column 47): " + [seq.started.constructor.name]);
+    };
+  };
 
   // output/Hydrogen.Runtime.Example/index.js
   var map6 = /* @__PURE__ */ map(functorArray);
-  var show3 = /* @__PURE__ */ show(showNumber);
+  var show4 = /* @__PURE__ */ show(showNumber);
   var show1 = /* @__PURE__ */ show(showInt);
-  var div2 = /* @__PURE__ */ div(euclideanRingInt);
   var AddTodo = /* @__PURE__ */ (function() {
     function AddTodo2() {
     }
@@ -3389,10 +3954,13 @@
     return ClearCompleted2;
   })();
   var StartTimer = /* @__PURE__ */ (function() {
-    function StartTimer2() {
+    function StartTimer2(value0) {
+      this.value0 = value0;
     }
     ;
-    StartTimer2.value = new StartTimer2();
+    StartTimer2.create = function(value0) {
+      return new StartTimer2(value0);
+    };
     return StartTimer2;
   })();
   var StopTimer = /* @__PURE__ */ (function() {
@@ -3409,12 +3977,22 @@
     ResetTimer2.value = new ResetTimer2();
     return ResetTimer2;
   })();
-  var Tick = /* @__PURE__ */ (function() {
-    function Tick2() {
+  var RecordLap = /* @__PURE__ */ (function() {
+    function RecordLap2() {
     }
     ;
-    Tick2.value = new Tick2();
-    return Tick2;
+    RecordLap2.value = new RecordLap2();
+    return RecordLap2;
+  })();
+  var TimerTick = /* @__PURE__ */ (function() {
+    function TimerTick2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    TimerTick2.create = function(value0) {
+      return new TimerTick2(value0);
+    };
+    return TimerTick2;
   })();
   var MoveLeft = /* @__PURE__ */ (function() {
     function MoveLeft2() {
@@ -3437,6 +4015,26 @@
     MoveCenter2.value = new MoveCenter2();
     return MoveCenter2;
   })();
+  var SetStiffness = /* @__PURE__ */ (function() {
+    function SetStiffness2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    SetStiffness2.create = function(value0) {
+      return new SetStiffness2(value0);
+    };
+    return SetStiffness2;
+  })();
+  var SetDamping = /* @__PURE__ */ (function() {
+    function SetDamping2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    SetDamping2.create = function(value0) {
+      return new SetDamping2(value0);
+    };
+    return SetDamping2;
+  })();
   var AnimTick = /* @__PURE__ */ (function() {
     function AnimTick2(value0) {
       this.value0 = value0;
@@ -3446,6 +4044,30 @@
       return new AnimTick2(value0);
     };
     return AnimTick2;
+  })();
+  var StartSequence = /* @__PURE__ */ (function() {
+    function StartSequence2() {
+    }
+    ;
+    StartSequence2.value = new StartSequence2();
+    return StartSequence2;
+  })();
+  var ResetSequence = /* @__PURE__ */ (function() {
+    function ResetSequence2() {
+    }
+    ;
+    ResetSequence2.value = new ResetSequence2();
+    return ResetSequence2;
+  })();
+  var SeqTick = /* @__PURE__ */ (function() {
+    function SeqTick2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    SeqTick2.create = function(value0) {
+      return new SeqTick2(value0);
+    };
+    return SeqTick2;
   })();
   var NotStarted = /* @__PURE__ */ (function() {
     function NotStarted2() {
@@ -3529,6 +4151,61 @@
     };
     return Add2;
   })();
+  var SetRed = /* @__PURE__ */ (function() {
+    function SetRed2() {
+    }
+    ;
+    SetRed2.value = new SetRed2();
+    return SetRed2;
+  })();
+  var SetGreen = /* @__PURE__ */ (function() {
+    function SetGreen2() {
+    }
+    ;
+    SetGreen2.value = new SetGreen2();
+    return SetGreen2;
+  })();
+  var SetBlue = /* @__PURE__ */ (function() {
+    function SetBlue2() {
+    }
+    ;
+    SetBlue2.value = new SetBlue2();
+    return SetBlue2;
+  })();
+  var SetPurple = /* @__PURE__ */ (function() {
+    function SetPurple2() {
+    }
+    ;
+    SetPurple2.value = new SetPurple2();
+    return SetPurple2;
+  })();
+  var SetOrange = /* @__PURE__ */ (function() {
+    function SetOrange2() {
+    }
+    ;
+    SetOrange2.value = new SetOrange2();
+    return SetOrange2;
+  })();
+  var SetColorDuration = /* @__PURE__ */ (function() {
+    function SetColorDuration2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    SetColorDuration2.create = function(value0) {
+      return new SetColorDuration2(value0);
+    };
+    return SetColorDuration2;
+  })();
+  var ColorTick = /* @__PURE__ */ (function() {
+    function ColorTick2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    ColorTick2.create = function(value0) {
+      return new ColorTick2(value0);
+    };
+    return ColorTick2;
+  })();
   var toggleItem = function(id2) {
     return function(items) {
       return map6(function(item) {
@@ -3545,7 +4222,7 @@
           return item;
         }
         ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 266, column 5 - line 268, column 20): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 277, column 5 - line 279, column 20): " + [v.constructor.name]);
       })(items);
     };
   };
@@ -3569,7 +4246,7 @@
           };
         }
         ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 238, column 5 - line 248, column 10): " + [v.constructor.name]);
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 249, column 5 - line 259, column 10): " + [v.constructor.name]);
       }
       ;
       if (msg instanceof RemoveTodo) {
@@ -3608,7 +4285,7 @@
         };
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 236, column 24 - line 260, column 76): " + [msg.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 247, column 24 - line 271, column 76): " + [msg.constructor.name]);
     };
   };
   var todoInput = function(currentText) {
@@ -3623,51 +4300,76 @@
         ;
         if (!state2.running) {
           return transition({
-            seconds: state2.seconds,
-            running: true
-          })(delay(1e3)(Tick.value));
+            elapsed: state2.elapsed,
+            laps: state2.laps,
+            lastLapTime: state2.lastLapTime,
+            running: true,
+            startTime: msg.value0 - state2.elapsed
+          })(animationFrame(TimerTick.create));
         }
         ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 392, column 5 - line 397, column 30): " + [state2.running.constructor.name]);
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 413, column 5 - line 421, column 37): " + [state2.running.constructor.name]);
       }
       ;
       if (msg instanceof StopTimer) {
         return noCmd({
-          seconds: state2.seconds,
+          elapsed: state2.elapsed,
+          laps: state2.laps,
+          lastLapTime: state2.lastLapTime,
+          startTime: state2.startTime,
           running: false
         });
       }
       ;
       if (msg instanceof ResetTimer) {
         return noCmd({
-          seconds: 0,
-          running: false
+          elapsed: 0,
+          running: false,
+          laps: [],
+          lastLapTime: 0,
+          startTime: 0
         });
       }
       ;
-      if (msg instanceof Tick) {
+      if (msg instanceof RecordLap) {
         if (!state2.running) {
           return noCmd(state2);
         }
         ;
         if (state2.running) {
-          return transition({
+          var lapTime = state2.elapsed - state2.lastLapTime;
+          return noCmd({
+            elapsed: state2.elapsed,
             running: state2.running,
-            seconds: state2.seconds + 1 | 0
-          })(delay(1e3)(Tick.value));
+            startTime: state2.startTime,
+            laps: snoc(state2.laps)(lapTime),
+            lastLapTime: state2.elapsed
+          });
         }
         ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 406, column 5 - line 411, column 30): " + [state2.running.constructor.name]);
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 436, column 5 - line 443, column 14): " + [state2.running.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 390, column 25 - line 411, column 30): " + [msg.constructor.name]);
-    };
-  };
-  var timerButton = function(msg) {
-    return function(label4) {
-      return function(colorClass) {
-        return button_([onClick(msg), class_("px-6 py-3 text-white rounded-lg font-medium " + colorClass)])([text(label4)]);
-      };
+      if (msg instanceof TimerTick) {
+        if (!state2.running) {
+          return noCmd(state2);
+        }
+        ;
+        if (state2.running) {
+          var newElapsed = msg.value0 - state2.startTime;
+          return transition({
+            laps: state2.laps,
+            lastLapTime: state2.lastLapTime,
+            running: state2.running,
+            startTime: state2.startTime,
+            elapsed: newElapsed
+          })(animationFrame(TimerTick.create));
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 446, column 5 - line 452, column 39): " + [state2.running.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 411, column 25 - line 452, column 39): " + [msg.constructor.name]);
     };
   };
   var textClass = function(completed) {
@@ -3679,7 +4381,7 @@
       return "flex-1";
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 333, column 23 - line 335, column 20): " + [completed.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 344, column 23 - line 346, column 20): " + [completed.constructor.name]);
   };
   var todoItemView = function(item) {
     return li_([class_("flex items-center gap-3 p-2 bg-gray-50 rounded")])([input_([type_("checkbox"), checked(item.completed), onClick(new ToggleTodo(item.id)), class_("w-5 h-5")]), span_([class_(textClass(item.completed))])([text(item.text)]), button_([onClick(new RemoveTodo(item.id)), class_("ml-auto text-red-500 hover:text-red-700")])([text("\xD7")])]);
@@ -3687,76 +4389,48 @@
   var todoList = function(items) {
     return ul_([class_("space-y-2 mb-4")])(map6(todoItemView)(items));
   };
-  var springDemoUpdate = function(msg) {
-    return function(state2) {
-      if (msg instanceof MoveLeft) {
-        var newPos = springTo(state2.position)(50)(0);
-        return transition({
-          position: newPos,
-          targetX: 50
-        })(animationFrame(AnimTick.create));
-      }
-      ;
-      if (msg instanceof MoveRight) {
-        var newPos = springTo(state2.position)(350)(0);
-        return transition({
-          position: newPos,
-          targetX: 350
-        })(animationFrame(AnimTick.create));
-      }
-      ;
-      if (msg instanceof MoveCenter) {
-        var newPos = springTo(state2.position)(200)(0);
-        return transition({
-          position: newPos,
-          targetX: 200
-        })(animationFrame(AnimTick.create));
-      }
-      ;
-      if (msg instanceof AnimTick) {
-        var newPos = tickSpring(msg.value0)(state2.position);
-        var v = springComplete(newPos);
-        if (v) {
-          return noCmd({
-            targetX: state2.targetX,
-            position: newPos
-          });
-        }
-        ;
-        if (!v) {
-          return transition({
-            targetX: state2.targetX,
-            position: newPos
-          })(animationFrame(AnimTick.create));
-        }
-        ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 513, column 8 - line 515, column 80): " + [v.constructor.name]);
-      }
-      ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 498, column 30 - line 515, column 80): " + [msg.constructor.name]);
-    };
-  };
   var springButton = function(msg) {
     return function(label4) {
       return function(colorClass) {
-        return button_([onClick(msg), class_("px-6 py-3 text-white rounded-lg font-medium " + colorClass)])([text(label4)]);
+        return button_([onClick(msg), class_("px-4 py-2 text-white rounded-lg font-medium " + colorClass)])([text(label4)]);
       };
     };
   };
   var springDemoView = function(state2) {
     var currentX = springValue2(state2.position);
-    return div_([class_("spring-demo p-8")])([h1_([class_("text-3xl font-bold mb-6")])([text("Spring Animation Demo")]), div_([class_("relative h-32 bg-gray-100 rounded-lg mb-6")])([div_([class_("absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-blue-500 rounded-full"), style("transform")("translateX(" + (show3(currentX) + "px) translateY(-50%)")), style("transition")("none")])([])]), div_([class_("flex justify-center gap-4")])([springButton(MoveLeft.value)("\u2190 Left")("bg-purple-500 hover:bg-purple-600"), springButton(MoveCenter.value)("Center")("bg-gray-500 hover:bg-gray-600"), springButton(MoveRight.value)("Right \u2192")("bg-purple-500 hover:bg-purple-600")]), p_([class_("text-center text-sm text-gray-500 mt-4")])([text("Position: " + (show3(currentX) + ("px (target: " + (show3(state2.targetX) + "px)"))))])]);
+    return div_([class_("spring-demo p-4")])([h1_([class_("text-xl font-bold mb-3")])([text("Spring Physics")]), div_([class_("relative h-20 bg-gray-100 rounded-lg mb-4")])([div_([class_("absolute top-1/2 w-12 h-12 bg-blue-500 rounded-full shadow-lg"), style("transform")("translateX(" + (show4(currentX) + "px) translateY(-50%)")), style("transition")("none")])([])]), div_([class_("flex justify-center gap-2 mb-4")])([springButton(MoveLeft.value)("\u2190")("bg-purple-500 hover:bg-purple-600"), springButton(MoveCenter.value)("\u25CF")("bg-gray-500 hover:bg-gray-600"), springButton(MoveRight.value)("\u2192")("bg-purple-500 hover:bg-purple-600")]), div_([class_("space-y-3")])([div_([class_("flex items-center gap-3")])([label_([class_("text-xs text-gray-500 w-16")])([text("Stiffness")]), input_([type_("range"), min_("10"), max_("500"), step_("10"), value(show1(floorToInt(state2.stiffness))), onInput(SetStiffness.create), class_("flex-1 h-2 accent-purple-500")]), span_([class_("text-xs font-mono w-10 text-right")])([text(show1(floorToInt(state2.stiffness)))])]), div_([class_("flex items-center gap-3")])([label_([class_("text-xs text-gray-500 w-16")])([text("Damping")]), input_([type_("range"), min_("1"), max_("50"), step_("1"), value(show1(floorToInt(state2.damping))), onInput(SetDamping.create), class_("flex-1 h-2 accent-purple-500")]), span_([class_("text-xs font-mono w-10 text-right")])([text(show1(floorToInt(state2.damping)))])])]), p_([class_("text-center text-xs text-gray-500 mt-3")])([text("Position: " + (show1(floorToInt(currentX)) + "px"))])]);
   };
-  var springDemoApp = {
-    init: /* @__PURE__ */ noCmd({
-      position: /* @__PURE__ */ springState(springWobbly)(200),
-      targetX: 200
-    }),
-    update: springDemoUpdate,
-    view: springDemoView
+  var seqButton = function(msg) {
+    return function(label4) {
+      return function(colorClass) {
+        return function(disabled11) {
+          return button_([onClick(msg), class_("px-6 py-3 text-white rounded-lg font-medium " + colorClass), disabled(disabled11)])([text(label4)]);
+        };
+      };
+    };
   };
   var renderSuggestion = function(suggestion) {
     return li_([class_("pl-2")])([text(suggestion)]);
+  };
+  var parseNumberSafe = function(str) {
+    return function(def) {
+      return parseNumberImpl(str)(def);
+    };
+  };
+  var padZeroThree = function(n) {
+    if (n < 10) {
+      return "00" + show1(n);
+    }
+    ;
+    if (n < 100) {
+      return "0" + show1(n);
+    }
+    ;
+    if (otherwise) {
+      return show1(n);
+    }
+    ;
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 570, column 1 - line 570, column 30): " + [n.constructor.name]);
   };
   var padZero = function(n) {
     var v = n < 10;
@@ -3768,7 +4442,7 @@
       return show1(n);
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 459, column 13 - line 461, column 18): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 565, column 13 - line 567, column 18): " + [v.constructor.name]);
   };
   var itemsRemaining = function(items) {
     var active = filter(function(item) {
@@ -3791,6 +4465,56 @@
     update: todoUpdate,
     view: todoView
   };
+  var intPartPositive = function(n) {
+    var asInt = n / 1;
+    var v = asInt > 2147483647;
+    if (v) {
+      return 2147483647;
+    }
+    ;
+    if (!v) {
+      return floorToInt(n);
+    }
+    ;
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1163, column 6 - line 1165, column 26): " + [v.constructor.name]);
+  };
+  var intPart = function(n) {
+    var scaled = n * 1;
+    var v = scaled < 0;
+    if (v) {
+      return 0 - intPartPositive(0 - scaled) | 0;
+    }
+    ;
+    if (!v) {
+      return intPartPositive(scaled);
+    }
+    ;
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1154, column 6 - line 1156, column 36): " + [v.constructor.name]);
+  };
+  var sequenceDemoView = function(state2) {
+    var currentX = sequenceValue(state2.seq);
+    return div_([class_("sequence-demo p-8")])([h1_([class_("text-3xl font-bold mb-6")])([text("Sequence Animation Demo")]), p_([class_("text-sm text-gray-500 mb-4")])([text("Chained animations: right \u2192 pause \u2192 left \u2192 pause \u2192 center")]), div_([class_("relative h-24 bg-gray-100 rounded-lg mb-6 overflow-hidden")])([div_([class_("absolute inset-0 flex justify-between px-8 items-center text-xs text-gray-400")])([span_([])([text("100px")]), span_([])([text("200px")]), span_([])([text("300px")])]), div_([class_("absolute top-1/2 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-lg"), style("transform")("translateX(" + (show4(currentX) + "px) translateY(-50%)")), style("transition")("none")])([])]), div_([class_("flex gap-4 mb-4")])([seqButton(StartSequence.value)((function() {
+      if (state2.running) {
+        return "Running...";
+      }
+      ;
+      if (!state2.running) {
+        return "Start Sequence";
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1270, column 14 - line 1272, column 40): " + [state2.running.constructor.name]);
+    })())((function() {
+      if (state2.running) {
+        return "bg-gray-400 cursor-not-allowed";
+      }
+      ;
+      if (!state2.running) {
+        return "bg-purple-500 hover:bg-purple-600";
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1273, column 14 - line 1275, column 59): " + [state2.running.constructor.name]);
+    })())(state2.running), seqButton(ResetSequence.value)("Reset")("bg-gray-500 hover:bg-gray-600")(false)]), div_([class_("text-sm text-gray-600 font-mono")])([text("Position: " + (show1(intPart(currentX)) + "px"))])]);
+  };
   var httpResultToFetchResult = function(httpResult) {
     if (httpResult instanceof HttpOk) {
       return new FetchSuccess(httpResult.value0);
@@ -3800,53 +4524,22 @@
       return new FetchError(httpResult.value0);
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 632, column 38 - line 634, column 32): " + [httpResult.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 822, column 38 - line 824, column 32): " + [httpResult.constructor.name]);
   };
-  var formatTime = function(totalSeconds) {
-    var minutes = div2(totalSeconds)(60);
-    var seconds = totalSeconds - (minutes * 60 | 0) | 0;
+  var formatTimeMs = function(ms) {
+    var totalSeconds = ms / 1e3;
+    var minutes = floorToInt(totalSeconds / 60);
+    var seconds = floorToInt(totalSeconds) - (minutes * 60 | 0) | 0;
     return padZero(minutes) + (":" + padZero(seconds));
   };
-  var timerView = function(state2) {
-    return div_([class_("timer-app p-8 text-center")])([h1_([class_("text-3xl font-bold mb-6")])([text("Hydrogen Timer")]), div_([class_("text-6xl font-mono mb-8")])([text(formatTime(state2.seconds))]), div_([class_("flex justify-center gap-4")])([timerButton((function() {
-      if (state2.running) {
-        return StopTimer.value;
-      }
-      ;
-      if (!state2.running) {
-        return StartTimer.value;
-      }
-      ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 427, column 14 - line 429, column 34): " + [state2.running.constructor.name]);
-    })())((function() {
-      if (state2.running) {
-        return "Stop";
-      }
-      ;
-      if (!state2.running) {
-        return "Start";
-      }
-      ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 430, column 14 - line 432, column 31): " + [state2.running.constructor.name]);
-    })())((function() {
-      if (state2.running) {
-        return "bg-red-500 hover:bg-red-600";
-      }
-      ;
-      if (!state2.running) {
-        return "bg-green-500 hover:bg-green-600";
-      }
-      ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 433, column 14 - line 435, column 57): " + [state2.running.constructor.name]);
-    })()), timerButton(ResetTimer.value)("Reset")("bg-gray-500 hover:bg-gray-600")])]);
+  var renderLap = function(idx) {
+    return function(lapTime) {
+      return div_([class_("flex justify-between px-4 py-1 bg-gray-100 rounded")])([span_([class_("text-gray-600")])([text("Lap " + show1(idx + 1 | 0))]), span_([])([text(formatTimeMs(lapTime))])]);
+    };
   };
-  var timerApp = {
-    init: /* @__PURE__ */ noCmd({
-      seconds: 0,
-      running: false
-    }),
-    update: timerUpdate,
-    view: timerView
+  var formatMillis = function(ms) {
+    var millis = floorToInt(ms) - (floorToInt(ms / 1e3) * 1e3 | 0) | 0;
+    return "." + padZeroThree(millis);
   };
   var fetchUpdate = function(msg) {
     return function(state2) {
@@ -3870,7 +4563,7 @@
           }));
         }
         ;
-        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 607, column 5 - line 619, column 15): " + [state2.loading.constructor.name]);
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 797, column 5 - line 809, column 15): " + [state2.loading.constructor.name]);
       }
       ;
       if (msg instanceof FetchComplete) {
@@ -3889,7 +4582,7 @@
         });
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 605, column 25 - line 628, column 40): " + [msg.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 795, column 25 - line 818, column 40): " + [msg.constructor.name]);
     };
   };
   var errorTypeName = function(err) {
@@ -3921,7 +4614,7 @@
       return "Unknown Error";
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 789, column 21 - line 796, column 36): " + [err.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 979, column 21 - line 986, column 36): " + [err.constructor.name]);
   };
   var errorContext = function(err) {
     if (err instanceof TimeoutError) {
@@ -3952,7 +4645,7 @@
       return err.value0;
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 800, column 20 - line 807, column 26): " + [err.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 990, column 20 - line 997, column 26): " + [err.constructor.name]);
   };
   var counterUpdate = function(msg) {
     return function(state2) {
@@ -3980,7 +4673,7 @@
         };
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 143, column 27 - line 147, column 45): " + [msg.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 154, column 27 - line 158, column 45): " + [msg.constructor.name]);
     };
   };
   var counterButton = function(msg) {
@@ -4003,7 +4696,7 @@
       return "black";
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 185, column 1 - line 185, column 28): " + [n.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 196, column 1 - line 196, column 28): " + [n.constructor.name]);
   };
   var counterView = function(state2) {
     return div_([class_("counter-app p-8")])([h1_([class_("text-3xl font-bold mb-6")])([text("Hydrogen Counter")]), div_([class_("flex items-center gap-4 mb-4")])([counterButton(Decrement.value)("-")("bg-red-500 hover:bg-red-600"), span_([class_("text-4xl font-mono min-w-24 text-center"), style("color")(countColor(state2.count))])([text(show1(state2.count))]), counterButton(Increment.value)("+")("bg-green-500 hover:bg-green-600")]), div_([class_("flex gap-2")])([counterButton(Reset.value)("Reset")("bg-gray-500 hover:bg-gray-600"), counterButton(new Add(10))("+10")("bg-blue-500 hover:bg-blue-600"), counterButton(new Add(-10 | 0))("-10")("bg-purple-500 hover:bg-purple-600")])]);
@@ -4014,6 +4707,130 @@
     },
     update: counterUpdate,
     view: counterView
+  };
+  var colorDemoUpdate = function(msg) {
+    return function(state2) {
+      if (msg instanceof SetRed) {
+        var newColor = colorTo(state2.color)({
+          r: 239,
+          g: 68,
+          b: 68
+        })(state2.duration)(easeOutCubic);
+        return transition({
+          duration: state2.duration,
+          color: newColor,
+          colorName: "Red"
+        })(animationFrame(ColorTick.create));
+      }
+      ;
+      if (msg instanceof SetGreen) {
+        var newColor = colorTo(state2.color)({
+          r: 34,
+          g: 197,
+          b: 94
+        })(state2.duration)(easeOutCubic);
+        return transition({
+          duration: state2.duration,
+          color: newColor,
+          colorName: "Green"
+        })(animationFrame(ColorTick.create));
+      }
+      ;
+      if (msg instanceof SetBlue) {
+        var newColor = colorTo(state2.color)({
+          r: 59,
+          g: 130,
+          b: 246
+        })(state2.duration)(easeOutCubic);
+        return transition({
+          duration: state2.duration,
+          color: newColor,
+          colorName: "Blue"
+        })(animationFrame(ColorTick.create));
+      }
+      ;
+      if (msg instanceof SetPurple) {
+        var newColor = colorTo(state2.color)({
+          r: 168,
+          g: 85,
+          b: 247
+        })(state2.duration)(easeOutCubic);
+        return transition({
+          duration: state2.duration,
+          color: newColor,
+          colorName: "Purple"
+        })(animationFrame(ColorTick.create));
+      }
+      ;
+      if (msg instanceof SetOrange) {
+        var newColor = colorTo(state2.color)({
+          r: 249,
+          g: 115,
+          b: 22
+        })(state2.duration)(easeOutCubic);
+        return transition({
+          duration: state2.duration,
+          color: newColor,
+          colorName: "Orange"
+        })(animationFrame(ColorTick.create));
+      }
+      ;
+      if (msg instanceof SetColorDuration) {
+        var val = parseNumberSafe(msg.value0)(500);
+        return noCmd({
+          color: state2.color,
+          colorName: state2.colorName,
+          duration: val
+        });
+      }
+      ;
+      if (msg instanceof ColorTick) {
+        var newColor = tickColor(msg.value0)(state2.color);
+        var v = colorComplete(newColor);
+        if (v) {
+          return noCmd({
+            colorName: state2.colorName,
+            duration: state2.duration,
+            color: newColor
+          });
+        }
+        ;
+        if (!v) {
+          return transition({
+            colorName: state2.colorName,
+            duration: state2.duration,
+            color: newColor
+          })(animationFrame(ColorTick.create));
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1077, column 8 - line 1079, column 80): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1050, column 29 - line 1079, column 80): " + [msg.constructor.name]);
+    };
+  };
+  var colorButton = function(msg) {
+    return function(colorClass) {
+      return button_([onClick(msg), class_("w-12 h-12 rounded-full " + (colorClass + " hover:scale-110 transition-transform shadow-md"))])([]);
+    };
+  };
+  var colorDemoView = function(state2) {
+    var currentColor = colorValue(state2.color);
+    var cssColor = rgbToCss(currentColor);
+    return div_([class_("color-demo p-4")])([h1_([class_("text-xl font-bold mb-3")])([text("Color Transitions")]), div_([class_("w-full h-32 rounded-lg shadow-lg mb-4 flex items-center justify-center"), style("background-color")(cssColor)])([span_([class_("text-white text-xl font-bold drop-shadow-lg")])([text(state2.colorName)])]), div_([class_("flex justify-center gap-2 mb-4")])([colorButton(SetRed.value)("bg-red-500"), colorButton(SetGreen.value)("bg-green-500"), colorButton(SetBlue.value)("bg-blue-500"), colorButton(SetPurple.value)("bg-purple-500"), colorButton(SetOrange.value)("bg-orange-500")]), div_([class_("flex items-center gap-3 mb-3")])([label_([class_("text-xs text-gray-500 w-16")])([text("Duration")]), input_([type_("range"), min_("100"), max_("2000"), step_("100"), value(show1(floorToInt(state2.duration))), onInput(SetColorDuration.create), class_("flex-1 h-2 accent-purple-500")]), span_([class_("text-xs font-mono w-14 text-right")])([text(show1(floorToInt(state2.duration)) + "ms")])]), div_([class_("text-xs text-gray-600 font-mono text-center")])([text("RGB(" + (show1(intPart(currentColor.r)) + (", " + (show1(intPart(currentColor.g)) + (", " + (show1(intPart(currentColor.b)) + ")"))))))])]);
+  };
+  var colorDemoApp = {
+    init: /* @__PURE__ */ noCmd({
+      color: /* @__PURE__ */ colorState({
+        r: 59,
+        g: 130,
+        b: 246
+      }),
+      colorName: "Blue",
+      duration: 500
+    }),
+    update: colorDemoUpdate,
+    view: colorDemoView
   };
   var clearButton = /* @__PURE__ */ (function() {
     return button_([onClick(ClearResult.value), class_("text-sm text-gray-500 hover:text-gray-700")])([text("Clear")]);
@@ -4033,7 +4850,7 @@
         return "text-green-700 font-medium";
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 703, column 19 - line 705, column 44): " + [isHttpError.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 893, column 19 - line 895, column 44): " + [isHttpError.constructor.name]);
     })();
     var bgClass = (function() {
       if (isHttpError) {
@@ -4044,7 +4861,7 @@
         return "p-4 bg-green-100 rounded-lg";
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 700, column 15 - line 702, column 45): " + [isHttpError.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 890, column 15 - line 892, column 45): " + [isHttpError.constructor.name]);
     })();
     return div_([class_(bgClass)])([div_([class_("flex items-center justify-between mb-2")])([span_([class_(statusClass)])([text("HTTP " + (show1(success.status) + (" " + success.statusText)))]), clearButton]), pre_([class_("text-sm bg-white p-3 rounded overflow-x-auto max-h-48")])([text(foreignToString(success.body))])]);
   };
@@ -4061,7 +4878,7 @@
       return renderError(result.value0);
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 683, column 26 - line 693, column 20): " + [result.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 873, column 26 - line 883, column 20): " + [result.constructor.name]);
   };
   var buttonLabel = function(loading) {
     if (loading) {
@@ -4072,7 +4889,7 @@
       return "Fetch Post";
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 677, column 23 - line 679, column 24): " + [loading.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 867, column 23 - line 869, column 24): " + [loading.constructor.name]);
   };
   var buttonClass = function(loading) {
     if (loading) {
@@ -4083,7 +4900,7 @@
       return "px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600";
     }
     ;
-    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 671, column 23 - line 673, column 87): " + [loading.constructor.name]);
+    throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 861, column 23 - line 863, column 87): " + [loading.constructor.name]);
   };
   var fetchButton = function(loading) {
     return button_([onClick(FetchData.value), class_(buttonClass(loading)), disabled(loading)])([text(buttonLabel(loading))]);
@@ -4102,6 +4919,280 @@
       view: fetchView
     };
   })();
+  var buildSpringConfig = function(stiffness) {
+    return function(damping) {
+      return springConfig(stiffness)(damping);
+    };
+  };
+  var springDemoUpdate = function(msg) {
+    return function(state2) {
+      if (msg instanceof MoveLeft) {
+        var cfg = buildSpringConfig(state2.stiffness)(state2.damping);
+        var newPos = springTo({
+          from: state2.position.from,
+          to: state2.position.to,
+          startTime: state2.position.startTime,
+          currentValue: state2.position.currentValue,
+          complete: state2.position.complete,
+          config: cfg
+        })(50);
+        return transition({
+          damping: state2.damping,
+          stiffness: state2.stiffness,
+          position: newPos,
+          targetX: 50
+        })(animationFrame(AnimTick.create));
+      }
+      ;
+      if (msg instanceof MoveRight) {
+        var cfg = buildSpringConfig(state2.stiffness)(state2.damping);
+        var newPos = springTo({
+          from: state2.position.from,
+          to: state2.position.to,
+          startTime: state2.position.startTime,
+          currentValue: state2.position.currentValue,
+          complete: state2.position.complete,
+          config: cfg
+        })(350);
+        return transition({
+          damping: state2.damping,
+          stiffness: state2.stiffness,
+          position: newPos,
+          targetX: 350
+        })(animationFrame(AnimTick.create));
+      }
+      ;
+      if (msg instanceof MoveCenter) {
+        var cfg = buildSpringConfig(state2.stiffness)(state2.damping);
+        var newPos = springTo({
+          from: state2.position.from,
+          to: state2.position.to,
+          startTime: state2.position.startTime,
+          currentValue: state2.position.currentValue,
+          complete: state2.position.complete,
+          config: cfg
+        })(200);
+        return transition({
+          damping: state2.damping,
+          stiffness: state2.stiffness,
+          position: newPos,
+          targetX: 200
+        })(animationFrame(AnimTick.create));
+      }
+      ;
+      if (msg instanceof SetStiffness) {
+        var val = parseNumberSafe(msg.value0)(180);
+        return noCmd({
+          damping: state2.damping,
+          position: state2.position,
+          targetX: state2.targetX,
+          stiffness: val
+        });
+      }
+      ;
+      if (msg instanceof SetDamping) {
+        var val = parseNumberSafe(msg.value0)(12);
+        return noCmd({
+          position: state2.position,
+          stiffness: state2.stiffness,
+          targetX: state2.targetX,
+          damping: val
+        });
+      }
+      ;
+      if (msg instanceof AnimTick) {
+        var newPos = tickSpring(msg.value0)(state2.position);
+        var v = springComplete(newPos);
+        if (v) {
+          return noCmd({
+            damping: state2.damping,
+            stiffness: state2.stiffness,
+            targetX: state2.targetX,
+            position: newPos
+          });
+        }
+        ;
+        if (!v) {
+          return transition({
+            damping: state2.damping,
+            stiffness: state2.stiffness,
+            targetX: state2.targetX,
+            position: newPos
+          })(animationFrame(AnimTick.create));
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 647, column 8 - line 649, column 80): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 621, column 30 - line 649, column 80): " + [msg.constructor.name]);
+    };
+  };
+  var springDemoApp = {
+    init: /* @__PURE__ */ noCmd({
+      position: /* @__PURE__ */ springState(springWobbly)(200),
+      targetX: 200,
+      stiffness: 180,
+      damping: 12
+    }),
+    update: springDemoUpdate,
+    view: springDemoView
+  };
+  var buildDemoSequence = function(initial) {
+    return andThen(200)(600)(easeInOutQuad)(withDelay(200)(andThen(100)(400)(easeOutBack)(withDelay(200)(andThen(300)(400)(easeOutBack)(sequence2(initial))))));
+  };
+  var sequenceDemoUpdate = function(msg) {
+    return function(state2) {
+      if (msg instanceof StartSequence) {
+        if (state2.running) {
+          return noCmd(state2);
+        }
+        ;
+        if (!state2.running) {
+          var currentVal = sequenceValue(state2.seq);
+          var newSeq = buildDemoSequence(currentVal);
+          return transition({
+            seq: newSeq,
+            running: true
+          })(animationFrame(SeqTick.create));
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1218, column 5 - line 1224, column 86): " + [state2.running.constructor.name]);
+      }
+      ;
+      if (msg instanceof ResetSequence) {
+        return noCmd({
+          seq: buildDemoSequence(200),
+          running: false
+        });
+      }
+      ;
+      if (msg instanceof SeqTick) {
+        var newSeq = tickSequence(msg.value0)(state2.seq);
+        var v = sequenceComplete(newSeq);
+        if (v) {
+          return noCmd({
+            seq: newSeq,
+            running: false
+          });
+        }
+        ;
+        if (!v) {
+          return transition({
+            running: state2.running,
+            seq: newSeq
+          })(animationFrame(SeqTick.create));
+        }
+        ;
+        throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1231, column 8 - line 1233, column 74): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 1216, column 32 - line 1233, column 74): " + [msg.constructor.name]);
+    };
+  };
+  var sequenceDemoApp = {
+    init: /* @__PURE__ */ noCmd({
+      seq: /* @__PURE__ */ buildDemoSequence(0),
+      running: false
+    }),
+    update: sequenceDemoUpdate,
+    view: sequenceDemoView
+  };
+  var arrayIndex2 = /* @__PURE__ */ (function() {
+    return arrayIndexImpl(Just.create)(Nothing.value);
+  })();
+  var mapWithIndexAcc = function($copy_idx) {
+    return function($copy_f) {
+      return function($copy_arr) {
+        return function($copy_acc) {
+          var $tco_var_idx = $copy_idx;
+          var $tco_var_f = $copy_f;
+          var $tco_var_arr = $copy_arr;
+          var $tco_done = false;
+          var $tco_result;
+          function $tco_loop(idx, f, arr, acc) {
+            var v = arrayIndex2(idx)(arr);
+            if (v instanceof Nothing) {
+              $tco_done = true;
+              return acc;
+            }
+            ;
+            if (v instanceof Just) {
+              $tco_var_idx = idx + 1 | 0;
+              $tco_var_f = f;
+              $tco_var_arr = arr;
+              $copy_acc = snoc(acc)(f(idx)(v.value0));
+              return;
+            }
+            ;
+            throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 536, column 3 - line 538, column 73): " + [v.constructor.name]);
+          }
+          ;
+          while (!$tco_done) {
+            $tco_result = $tco_loop($tco_var_idx, $tco_var_f, $tco_var_arr, $copy_acc);
+          }
+          ;
+          return $tco_result;
+        };
+      };
+    };
+  };
+  var mapWithIndex2 = function(f) {
+    return function(arr) {
+      return mapWithIndexAcc(0)(f)(arr)([]);
+    };
+  };
+  var timerView = function(state2) {
+    return div_([class_("timer-app p-6 text-center")])([h1_([class_("text-2xl font-bold mb-4")])([text("Stopwatch")]), div_([class_("text-5xl font-mono mb-2 tabular-nums")])([text(formatTimeMs(state2.elapsed))]), div_([class_("text-xl font-mono text-gray-400 mb-6")])([text(formatMillis(state2.elapsed))]), div_([class_("flex justify-center gap-3 mb-4")])([(function() {
+      if (state2.running) {
+        return button_([onClick(StopTimer.value), class_("px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium")])([text("Stop")]);
+      }
+      ;
+      if (!state2.running) {
+        return button_([onClick(new StartTimer(0)), class_("px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium")])([text((function() {
+          var v = state2.elapsed > 0;
+          if (v) {
+            return "Resume";
+          }
+          ;
+          if (!v) {
+            return "Start";
+          }
+          ;
+          throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 488, column 27 - line 490, column 37): " + [v.constructor.name]);
+        })())]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 476, column 11 - line 490, column 40): " + [state2.running.constructor.name]);
+    })(), (function() {
+      if (state2.running) {
+        return button_([onClick(RecordLap.value), class_("px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium")])([text("Lap")]);
+      }
+      ;
+      if (!state2.running) {
+        return button_([onClick(ResetTimer.value), class_("px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium")])([text("Reset")]);
+      }
+      ;
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Example (line 491, column 11 - line 503, column 35): " + [state2.running.constructor.name]);
+    })()]), (function() {
+      var v = length(state2.laps);
+      if (v === 0) {
+        return div_([])([]);
+      }
+      ;
+      return div_([class_("mt-4 max-h-32 overflow-y-auto")])([div_([class_("text-xs text-gray-500 uppercase tracking-wide mb-2")])([text("Lap Times")]), div_([class_("space-y-1 text-sm font-mono")])(mapWithIndex2(renderLap)(state2.laps))]);
+    })()]);
+  };
+  var timerApp = {
+    init: /* @__PURE__ */ noCmd({
+      elapsed: 0,
+      running: false,
+      laps: [],
+      lastLapTime: 0,
+      startTime: 0
+    }),
+    update: timerUpdate,
+    view: timerView
+  };
 
   // output/Hydrogen.Runtime.Demo/index.js
   var logMountResult = function(name14) {
@@ -4114,7 +5205,7 @@
         return log("  \u2717 " + (name14 + " App failed to mount (container not found)"));
       }
       ;
-      throw new Error("Failed pattern match at Hydrogen.Runtime.Demo (line 92, column 30 - line 94, column 90): " + [result.constructor.name]);
+      throw new Error("Failed pattern match at Hydrogen.Runtime.Demo (line 106, column 30 - line 108, column 90): " + [result.constructor.name]);
     };
   };
   var main = function __do() {
@@ -4136,6 +5227,12 @@
     log("Mounting Fetch App...")();
     var fetchResult = mountCmd("#fetch-app")(fetchApp)();
     logMountResult("Fetch")(fetchResult)();
+    log("Mounting Color Demo App...")();
+    var colorResult = mountCmd("#color-app")(colorDemoApp)();
+    logMountResult("Color")(colorResult)();
+    log("Mounting Sequence Demo App...")();
+    var sequenceResult = mountCmd("#sequence-app")(sequenceDemoApp)();
+    logMountResult("Sequence")(sequenceResult)();
     log("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501")();
     log("All apps mounted. Check the browser for the demo.")();
     return log("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501")();
