@@ -60,10 +60,31 @@ module Hydrogen.Component.Motion.Curve.CurveEditor
   ) where
 
 import Prelude
+  ( class Eq
+  , Unit
+  , bind
+  , discard
+  , map
+  , negate
+  , pure
+  , show
+  , unit
+  , when
+  , (-)
+  , (*)
+  , (+)
+  , (/)
+  , (/=)
+  , (<>)
+  , (<<<)
+  , (==)
+  )
 
 import Data.Array (range)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just))
+import Data.Ord (clamp)
+import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -74,6 +95,7 @@ import Hydrogen.Schema.Motion.Easing (Easing)
 import Hydrogen.Schema.Motion.Easing as Easing
 import Hydrogen.UI.Core (cls)
 import Type.Proxy (Proxy(Proxy))
+import Web.DOM.Element (Element)
 import Web.UIEvent.MouseEvent (MouseEvent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -91,6 +113,20 @@ foreign import getTargetLeft :: MouseEvent -> Number
 
 -- | Get element bounding rect top
 foreign import getTargetTop :: MouseEvent -> Number
+
+-- | Get the target SVG element from mouse event
+foreign import getTargetElement :: MouseEvent -> Element
+
+-- | Start document-level drag tracking
+-- | Captures mouse events at document level for smooth dragging outside element
+foreign import startDocumentDrag :: 
+  Element ->                              -- Element to track bounds from
+  (Number -> Number -> Effect Unit) ->    -- onMove (relX, relY relative to element)
+  Effect Unit ->                          -- onEnd
+  Effect Unit
+
+-- | Stop any active document drag
+foreign import stopDocumentDrag :: Effect Unit
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -147,9 +183,12 @@ type State =
 -- | Internal actions
 data Action
   = Initialize
+  | Finalize
   | Receive Input
   | HandleP1MouseDown MouseEvent
   | HandleP2MouseDown MouseEvent
+  | HandleDocumentDragMove Number Number  -- relX, relY relative to SVG
+  | HandleDocumentDragEnd
   | HandleMouseMove MouseEvent
   | HandleMouseUp MouseEvent
   | HandleMouseLeave MouseEvent
@@ -176,6 +215,7 @@ component = H.mkComponent
       , handleQuery = handleQuery
       , receive = Just <<< Receive
       , initialize = Just Initialize
+      , finalize = Just Finalize
       }
   }
 
@@ -560,6 +600,10 @@ handleAction = case _ of
   Initialize -> do
     pure unit
   
+  Finalize -> do
+    -- Clean up any active document drag tracking on component destruction
+    H.liftEffect stopDocumentDrag
+  
   Receive input -> do
     state <- H.get
     -- Only update if not dragging
@@ -640,6 +684,43 @@ handleAction = case _ of
   HandleCanvasClick _ -> do
     -- Could be used for adding keyframes in the future
     pure unit
+  
+  HandleDocumentDragMove relX relY -> do
+    -- Document-level drag move event (coordinates relative to SVG element)
+    state <- H.get
+    when (state.dragTarget /= NoDrag) do
+      let
+        -- Convert relative pixel coordinates to normalized coordinates
+        p = state.padding
+        innerW = state.width - 2.0 * p
+        innerH = state.height - 2.0 * p
+        
+        -- Clamp X to 0-1, allow Y to go slightly outside for overshoot curves
+        normX = clamp 0.0 1.0 ((relX - p) / innerW)
+        normY = clamp (-0.5) 1.5 (1.0 - (relY - p) / innerH)
+      
+      case state.dragTarget of
+        DragP1 -> do
+          H.modify_ _ { p1x = normX, p1y = normY }
+          let newEasing = Easing.cubicBezier normX normY state.p2x state.p2y
+          H.raise (EasingChanging newEasing)
+        
+        DragP2 -> do
+          H.modify_ _ { p2x = normX, p2y = normY }
+          let newEasing = Easing.cubicBezier state.p1x state.p1y normX normY
+          H.raise (EasingChanging newEasing)
+        
+        NoDrag -> pure unit
+  
+  HandleDocumentDragEnd -> do
+    -- Document-level drag end event (mouse released anywhere)
+    state <- H.get
+    when (state.dragTarget /= NoDrag) do
+      let newEasing = Easing.cubicBezier state.p1x state.p1y state.p2x state.p2y
+      H.modify_ _ { dragTarget = NoDrag, easing = newEasing }
+      H.liftEffect stopDocumentDrag
+      H.raise EditEnd
+      H.raise (EasingChanged newEasing)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // handle query
@@ -666,13 +747,4 @@ handleQuery = case _ of
     H.modify_ _ { width = w, height = h }
     pure (Just reply)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a value to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x
-  | x < lo = lo
-  | x > hi = hi
-  | otherwise = x
