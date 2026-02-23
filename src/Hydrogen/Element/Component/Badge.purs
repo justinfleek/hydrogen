@@ -240,15 +240,15 @@ buildBadgeAttrs props =
     
     -- Background color (transparent if not set and border is set = outline style)
     bgStyle = case props.backgroundColor of
-      Just c -> [ E.style "background-color" (Color.toCss c) ]
+      Just c -> [ E.style "background-color" (Color.toLegacyCss c) ]
       Nothing -> case props.borderColor of
         Just _ -> [ E.style "background-color" "transparent" ]
-        Nothing -> [ E.style "background-color" (Color.toCss defaultBgColor) ]
+        Nothing -> [ E.style "background-color" (Color.toLegacyCss defaultBgColor) ]
     
     -- Text color
     textStyle = case props.textColor of
-      Just c -> [ E.style "color" (Color.toCss c) ]
-      Nothing -> [ E.style "color" (Color.toCss defaultTextColor) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
+      Nothing -> [ E.style "color" (Color.toLegacyCss defaultTextColor) ]
     
     -- Border styles
     borderStyle = case props.borderColor of
@@ -257,13 +257,13 @@ buildBadgeAttrs props =
         let bw = maybe "1px" show props.borderWidth
         in [ E.style "border-style" "solid"
            , E.style "border-width" bw
-           , E.style "border-color" (Color.toCss bc)
+           , E.style "border-color" (Color.toLegacyCss bc)
            ]
     
     -- Border radius (default: fully rounded)
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "9999px" ]  -- Pill shape
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Padding
     paddingStyle =
@@ -276,11 +276,11 @@ buildBadgeAttrs props =
     -- Typography
     fontSizeStyle = case props.fontSize of
       Nothing -> [ E.style "font-size" "12px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.fontWeight of
       Nothing -> [ E.style "font-weight" "600" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     -- Line height
     lineHeightStyle = [ E.style "line-height" "1" ]

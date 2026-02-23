@@ -104,6 +104,6 @@ import Hydrogen.UI.FocusTrap (FocusScope, createFocusScope, destroyFocusScope, t
 import Hydrogen.UI.AriaHider (AriaHiderState, hideOthers, restoreOthers)
 import Hydrogen.UI.Id (IdGenerator, createIdGenerator, nextId, useId)
 import Hydrogen.Data.Format (formatBytes, formatBytesCompact, parseBytes, kb, mb, gb, tb, formatNum, formatNumCompact, formatPercent, formatCount, formatDuration, formatDurationCompact, formatDurationMs, percentage, rate, ratio)
-import Hydrogen.Data.RemoteData (RemoteData(..), fromEither, fromMaybe, toEither, toMaybe, fold, withDefault, isNotAsked, isLoading, isFailure, isSuccess, mapError, map2, map3, map4, sequence, traverse)
+import Hydrogen.Data.RemoteData (RemoteData(NotAsked, Loading, Failure, Success), fromEither, fromMaybe, toEither, toMaybe, fold, withDefault, isNotAsked, isLoading, isFailure, isSuccess, mapError, map2, map3, map4, sequence, traverse)
 import Hydrogen.SSG (DocConfig, defaultDocConfig, PageMeta, renderPage, renderDocument, pageMetaFromRoute, renderRouteStatic, metaTags, ogTags, twitterTags)
 import Hydrogen.HTML.Renderer (render, renderWith, RenderOptions, defaultOptions)

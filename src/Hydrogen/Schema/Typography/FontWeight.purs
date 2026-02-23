@@ -24,7 +24,7 @@ module Hydrogen.Schema.Typography.FontWeight
   , unsafeFontWeight
   , unwrap
   , toNumber
-  , toCss
+  , toLegacyCss
   , bounds
   -- Named weights
   , thin
@@ -161,9 +161,12 @@ unwrap (FontWeight w) = w
 toNumber :: FontWeight -> Number
 toNumber (FontWeight w) = Int.toNumber w
 
--- | Convert to CSS font-weight value
-toCss :: FontWeight -> String
-toCss (FontWeight w) = show w
+-- | Convert to CSS font-weight value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: FontWeight -> String
+toLegacyCss (FontWeight w) = show w
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds

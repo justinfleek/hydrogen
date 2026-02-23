@@ -59,9 +59,9 @@ module Hydrogen.Schema.Typography.FontVariation
   , getAxis
   , merge
   
-  -- * CSS Output
-  , toCSSValue
-  , toStyleAttribute
+  -- * Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCssValue
+  , toLegacyStyleAttribute
   ) where
 
 import Prelude
@@ -98,7 +98,7 @@ newtype FontVariation = FontVariation (Array { axis :: VariationAxis, value :: A
 derive instance eqFontVariation :: Eq FontVariation
 
 instance showFontVariation :: Show FontVariation where
-  show fv = "FontVariation " <> toCSSValue fv
+  show fv = "FontVariation " <> toLegacyCssValue fv
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // axis constructors
@@ -213,10 +213,13 @@ merge (FontVariation a) (FontVariation b) =
 --                                                              // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS font-variation-settings value
-toCSSValue :: FontVariation -> String
-toCSSValue (FontVariation []) = "normal"
-toCSSValue (FontVariation arr) =
+-- | Convert to CSS font-variation-settings value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCssValue :: FontVariation -> String
+toLegacyCssValue (FontVariation []) = "normal"
+toLegacyCssValue (FontVariation arr) =
   joinWith ", " (map formatSetting arr)
   where
   formatSetting :: { axis :: VariationAxis, value :: AxisValue } -> String
@@ -230,6 +233,9 @@ toCSSValue (FontVariation arr) =
     Just { head: first, tail: rest } -> 
       foldl (\acc x -> acc <> sep <> x) first rest
 
--- | Convert to CSS style attribute string
-toStyleAttribute :: FontVariation -> String
-toStyleAttribute fv = "font-variation-settings: " <> toCSSValue fv <> ";"
+-- | Convert to CSS style attribute string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyStyleAttribute :: FontVariation -> String
+toLegacyStyleAttribute fv = "font-variation-settings: " <> toLegacyCssValue fv <> ";"

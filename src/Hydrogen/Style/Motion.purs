@@ -207,7 +207,7 @@ easingCss = case _ of
 -- | Bridge from Schema easing to Style easing
 -- |
 -- | Maps complex Schema easing curves to the closest Tailwind preset.
--- | For exact curves, use inline styles with `Schema.Easing.toCSSString`.
+-- | For exact curves, use inline styles with `Schema.Easing.toLegacyCssString`.
 fromSchemaEasing :: Schema.Easing -> Easing
 fromSchemaEasing schemaEasing =
   -- Map to closest standard easing based on the Schema easing name

@@ -42,9 +42,9 @@ module Hydrogen.Schema.Typography.TypeStyle
   , withLetterSpacing
   , withTransform
   , scale
-  -- CSS
-  , toCss
-  , toInlineStyle
+  -- Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCss
+  , toLegacyInlineStyle
   ) where
 
 import Prelude
@@ -98,10 +98,10 @@ stackFamilies (FontStack fs) = fs
 primaryFont :: FontStack -> FontFamily
 primaryFont (FontStack fs) = NEA.head fs
 
--- | Convert font stack to CSS font-family value
-fontStackToCss :: FontStack -> String
-fontStackToCss (FontStack fs) = 
-  intercalate ", " (map FontFamily.toCss (NEA.toArray fs))
+-- | Convert font stack to CSS font-family value for legacy system interop.
+fontStackToLegacyCss :: FontStack -> String
+fontStackToLegacyCss (FontStack fs) = 
+  intercalate ", " (map FontFamily.toLegacyCss (NEA.toArray fs))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // type style
@@ -239,25 +239,31 @@ scale :: Number -> TypeStyle -> TypeStyle
 scale factor (TypeStyle ts) = TypeStyle ts { size = FontSize.scale factor ts.size }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS declarations (for stylesheet)
-toCss :: TypeStyle -> String
-toCss (TypeStyle ts) = 
-  "font-family: " <> fontStackToCss ts.families <> ";\n" <>
-  "font-weight: " <> FontWeight.toCss ts.weight <> ";\n" <>
-  "font-size: " <> FontSize.toCss ts.size <> ";\n" <>
-  "line-height: " <> LineHeight.toCss ts.lineHeight <> ";\n" <>
-  "letter-spacing: " <> LetterSpacing.toCss ts.letterSpacing <> ";\n" <>
-  "text-transform: " <> TextTransform.toCss ts.transform <> ";"
+-- | Convert to CSS declarations for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: TypeStyle -> String
+toLegacyCss (TypeStyle ts) = 
+  "font-family: " <> fontStackToLegacyCss ts.families <> ";\n" <>
+  "font-weight: " <> FontWeight.toLegacyCss ts.weight <> ";\n" <>
+  "font-size: " <> FontSize.toLegacyCss ts.size <> ";\n" <>
+  "line-height: " <> LineHeight.toLegacyCss ts.lineHeight <> ";\n" <>
+  "letter-spacing: " <> LetterSpacing.toLegacyCss ts.letterSpacing <> ";\n" <>
+  "text-transform: " <> TextTransform.toLegacyCss ts.transform <> ";"
 
--- | Convert to inline style attribute value
-toInlineStyle :: TypeStyle -> String
-toInlineStyle (TypeStyle ts) = 
-  "font-family: " <> fontStackToCss ts.families <> "; " <>
-  "font-weight: " <> FontWeight.toCss ts.weight <> "; " <>
-  "font-size: " <> FontSize.toCss ts.size <> "; " <>
-  "line-height: " <> LineHeight.toCss ts.lineHeight <> "; " <>
-  "letter-spacing: " <> LetterSpacing.toCss ts.letterSpacing <> "; " <>
-  "text-transform: " <> TextTransform.toCss ts.transform <> ";"
+-- | Convert to inline style attribute value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyInlineStyle :: TypeStyle -> String
+toLegacyInlineStyle (TypeStyle ts) = 
+  "font-family: " <> fontStackToLegacyCss ts.families <> "; " <>
+  "font-weight: " <> FontWeight.toLegacyCss ts.weight <> "; " <>
+  "font-size: " <> FontSize.toLegacyCss ts.size <> "; " <>
+  "line-height: " <> LineHeight.toLegacyCss ts.lineHeight <> "; " <>
+  "letter-spacing: " <> LetterSpacing.toLegacyCss ts.letterSpacing <> "; " <>
+  "text-transform: " <> TextTransform.toLegacyCss ts.transform <> ";"

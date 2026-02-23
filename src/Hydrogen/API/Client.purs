@@ -40,18 +40,30 @@ module Hydrogen.API.Client
   ) where
 
 import Prelude
+  ( Unit
+  , bind
+  , discard
+  , pure
+  , show
+  , unit
+  , when
+  , ($)
+  , (<>)
+  , (<<<)
+  , (<$>)
+  )
 
 import Affjax.Web as AX
 import Affjax.RequestBody as RequestBody
 import Affjax.ResponseFormat as ResponseFormat
-import Affjax.RequestHeader (RequestHeader(..))
+import Affjax.RequestHeader (RequestHeader(ContentType, RequestHeader))
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson, printJsonDecodeError)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
-import Data.Either (Either(..))
-import Data.HTTP.Method (Method(..))
-import Data.Maybe (Maybe(..))
-import Data.MediaType (MediaType(..))
+import Data.Either (Either(Left, Right))
+import Data.HTTP.Method (Method(GET, POST, PUT, PATCH, DELETE))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.MediaType (MediaType(MediaType))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Console as Console

@@ -42,7 +42,7 @@
 -- | defaultZ = ZIndex.auto
 -- |
 -- | -- Convert to CSS
--- | css = ZIndex.toCss dropdownZ  -- "100"
+-- | css = ZIndex.toLegacyCss dropdownZ  -- "100"
 -- | ```
 
 module Hydrogen.Schema.Elevation.ZIndex
@@ -61,7 +61,7 @@ module Hydrogen.Schema.Elevation.ZIndex
   , decrement
   
   -- * Conversion
-  , toCss
+  , toLegacyCss
   , toInt
   
   -- * Predicates
@@ -105,7 +105,7 @@ instance ordZIndex :: Ord ZIndex where
   compare (ZIndexValue a) (ZIndexValue b) = compare a b
 
 instance showZIndex :: Show ZIndex where
-  show = toCss
+  show = toLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -160,10 +160,13 @@ decrement delta = increment (negate delta)
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS string
-toCss :: ZIndex -> String
-toCss ZIndexAuto = "auto"
-toCss (ZIndexValue n) = show n
+-- | Convert to CSS string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: ZIndex -> String
+toLegacyCss ZIndexAuto = "auto"
+toLegacyCss (ZIndexValue n) = show n
 
 -- | Extract integer value (Nothing for auto)
 toInt :: ZIndex -> Int

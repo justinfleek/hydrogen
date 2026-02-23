@@ -16,7 +16,7 @@ module Hydrogen.Schema.Temporal.Hour
   , to12Hour
   , isAM
   , isPM
-  , toCss
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -96,9 +96,12 @@ isPM (Hour h) = h >= 12
 --                                                                 // formatting
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Format for CSS (not typically used, but included for consistency)
-toCss :: Hour -> String
-toCss (Hour h) = show h
+-- | Format for CSS for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: Hour -> String
+toLegacyCss (Hour h) = show h
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // helpers

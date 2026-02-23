@@ -24,15 +24,25 @@ module Hydrogen.HTML.Renderer
   ) where
 
 import Prelude
+  ( Void
+  , otherwise
+  , map
+  , ($)
+  , (#)
+  , (<>)
+  , (>>>)
+  , (&&)
+  , (==)
+  )
 
 import Data.Array as Array
 import Data.Foldable (foldMap)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Data.Tuple (snd)
-import Halogen.HTML.Core (HTML(..))
-import Halogen.VDom.DOM.Prop (Prop(..), PropValue)
-import Halogen.VDom.Types (ElemName(..), Namespace(..), VDom(..), runGraft)
+import Halogen.HTML.Core (HTML(HTML))
+import Halogen.VDom.DOM.Prop (Prop(Attribute, Property, Handler, Ref), PropValue)
+import Halogen.VDom.Types (ElemName(ElemName), Namespace(Namespace), VDom(Text, Elem, Keyed, Widget, Grafted), runGraft)
 
 -- | Options for customizing HTML rendering
 type RenderOptions =

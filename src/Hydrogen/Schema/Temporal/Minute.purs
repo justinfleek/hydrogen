@@ -12,7 +12,7 @@ module Hydrogen.Schema.Temporal.Minute
   , unsafeMinute
   , unwrap
   , toInt
-  , toCss
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -74,9 +74,12 @@ toInt = unwrap
 --                                                                 // formatting
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Format for CSS (not typically used, but included for consistency)
-toCss :: Minute -> String
-toCss (Minute m) = show m
+-- | Format for CSS for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: Minute -> String
+toLegacyCss (Minute m) = show m
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // helpers

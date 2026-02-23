@@ -26,6 +26,14 @@ module Hydrogen.Schema.Color.Hue
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , mod
+  , (+)
+  , (<>)
+  )
 
 import Data.Int (toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded

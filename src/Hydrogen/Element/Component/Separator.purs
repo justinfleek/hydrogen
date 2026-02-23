@@ -231,7 +231,7 @@ buildSeparatorAttrs props =
     coreStyles =
       [ E.role "separator"
       , E.style "flex-shrink" "0"
-      , E.style "background-color" (Color.toCss sepColor)
+      , E.style "background-color" (Color.toLegacyCss sepColor)
       ]
   in
     coreStyles <> orientationStyles <> props.extraAttributes
@@ -261,14 +261,14 @@ separatorWithLabel propMods children =
     -- Font size
     fontSizeStyle = case props.labelFontSize of
       Nothing -> [ E.style "font-size" "12px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     -- Line element
     lineElement =
       E.div_
         [ E.style "flex" "1"
         , E.style "height" "1px"
-        , E.style "background-color" (Color.toCss sepColor)
+        , E.style "background-color" (Color.toLegacyCss sepColor)
         ]
         []
     
@@ -277,7 +277,7 @@ separatorWithLabel propMods children =
       E.span_
         ( [ E.style "padding-left" gapValue
           , E.style "padding-right" gapValue
-          , E.style "color" (Color.toCss lblColor)
+          , E.style "color" (Color.toLegacyCss lblColor)
           , E.style "white-space" "nowrap"
           ]
           <> fontSizeStyle

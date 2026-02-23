@@ -246,7 +246,7 @@ toCssImport (Custom (CustomFont { family, import' })) = case import' of
     "@import url('" <> url <> "');"
   FontFace config ->
     "@font-face {\n" <>
-    "  font-family: " <> FontFamily.toCss family <> ";\n" <>
+    "  font-family: " <> FontFamily.toLegacyCss family <> ";\n" <>
     "  src: url('" <> config.src <> "') format('" <> show config.format <> "');\n" <>
     "  font-weight: " <> config.weight <> ";\n" <>
     "  font-style: " <> config.style <> ";\n" <>

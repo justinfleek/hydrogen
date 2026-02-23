@@ -27,12 +27,30 @@ module Hydrogen.Data.Format
   ) where
 
 import Prelude
+  ( class Show
+  , mod
+  , not
+  , otherwise
+  , show
+  , negate
+  , ($)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (<=)
+  , (==)
+  , (>=)
+  , (<>)
+  , (<$>)
+  , (||)
+  )
 
 import Data.Int (floor, toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Number (isFinite)
 import Data.Number (fromString) as Number
-import Data.String (Pattern(..), split) as S
+import Data.String (Pattern(Pattern), split) as S
 
 -- ============================================================
 -- Byte Constants

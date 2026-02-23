@@ -269,26 +269,26 @@ buildAlertAttrs props =
       [ E.role "alert"
       , E.style "position" "relative"
       , E.style "width" "100%"
-      , E.style "background-color" (Color.toCss bgColor)
+      , E.style "background-color" (Color.toLegacyCss bgColor)
       ]
     
     -- Text color
     textColorStyle = case props.textColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     -- Border styles
     borderStyle =
       let bw = maybe "1px" show props.borderWidth
       in [ E.style "border-style" "solid"
          , E.style "border-width" bw
-         , E.style "border-color" (Color.toCss brdColor)
+         , E.style "border-color" (Color.toLegacyCss brdColor)
          ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "8px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Padding
     paddingStyle = case props.padding of
@@ -309,15 +309,15 @@ alertTitle propMods children =
     
     fontSizeStyle = case props.titleFontSize of
       Nothing -> [ E.style "font-size" "16px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.titleFontWeight of
       Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.titleColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.h5_
       ( [ E.style "margin" "0"
@@ -339,11 +339,11 @@ alertDescription propMods children =
     
     fontSizeStyle = case props.descriptionFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     colorStyle = case props.descriptionColor of
       Nothing -> [ E.style "opacity" "0.9" ]
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.div_
       ( [ E.style "margin" "0"
@@ -368,7 +368,7 @@ alertIcon propMods children =
     
     colorStyle = case props.iconColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.span_
       ( [ E.style "flex-shrink" "0"

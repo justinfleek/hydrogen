@@ -250,10 +250,10 @@ dataGrid propMods =
         , E.style "width" "100%"
         , E.style "overflow" "hidden"
         ]
-        <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+        <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
         <> maybe [] (\w -> [E.style "border-width" (show w)]) props.borderWidth
         <> maybe [] (\_ -> [E.style "border-style" "solid"]) props.borderWidth
-        <> maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.containerBorderRadius
+        <> maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.containerBorderRadius
       )
       [ -- Global search (if any filterable columns)
         renderGlobalSearch props visibleColumns
@@ -270,7 +270,7 @@ dataGrid propMods =
                 , E.style "border-collapse" "collapse"
                 , E.style "caption-side" "bottom"
                 ]
-                <> maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
+                <> maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
               )
               [ renderHeader props visibleColumns
               , renderBody props visibleColumns processedRows
@@ -297,7 +297,7 @@ renderGlobalSearch props cols =
         ( [ E.style "padding" "1rem"
           , E.style "border-bottom" "1px solid"
           ]
-          <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+          <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
         )
         [ E.input_
             [ E.type_ "text"
@@ -326,7 +326,7 @@ renderHeader props cols =
       , E.style "top" "0"
       , E.style "z-index" "10"
       ]
-      <> maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.headerBgColor
+      <> maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.headerBgColor
     )
     [ E.tr_
         [ E.role "row" ]
@@ -353,7 +353,7 @@ renderSelectionHeaderCell props =
       , E.style "text-align" "center"
       , E.style "border-bottom" "1px solid"
       ]
-      <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+      <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     )
     [ E.input_
         [ E.type_ "checkbox"
@@ -403,10 +403,10 @@ renderHeaderCell props colIndex col =
         ]
         <> widthStyle
         <> fixedStyle
-        <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.headerTextColor
-        <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
-        <> maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.headerBgColor
-        <> maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.headerFontSize
+        <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.headerTextColor
+        <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
+        <> maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.headerBgColor
+        <> maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.headerFontSize
         <> (if col.sortable then [E.style "cursor" "pointer"] else [])
       )
       [ headerContent ]
@@ -441,7 +441,7 @@ renderLoadingRow :: forall msg. GridProps msg -> Array (ColumnDef msg) -> E.Elem
 renderLoadingRow props cols =
   E.tr_
     ( [ E.style "border-bottom" "1px solid" ]
-      <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+      <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     )
     (map (renderLoadingCell props) cols)
 
@@ -496,7 +496,7 @@ defaultEmptyState props =
       , E.style "gap" "0.5rem"
       , E.style "padding" "2rem"
       ]
-      <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.cellTextColor
+      <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.cellTextColor
     )
     [ E.p_
         [ E.style "font-size" "1.125rem"
@@ -525,9 +525,9 @@ renderRow props cols rowIndex rowData =
         , E.style "border-bottom" "1px solid"
         , E.style "transition" "background-color 0.15s"
         ]
-        <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
-        <> maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.rowBgColor
-        <> (if isSelected then maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.rowSelectedBgColor else [])
+        <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
+        <> maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.rowBgColor
+        <> (if isSelected then maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.rowSelectedBgColor else [])
         <> maybe [] (\h -> [E.style "height" (show h)]) props.rowHeight
       )
       ( -- Selection checkbox
@@ -551,7 +551,7 @@ renderSelectionCell props _rowKey isSelected =
       , E.style "padding" "0.75rem 1rem"
       , E.style "text-align" "center"
       ]
-      <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+      <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     )
     [ E.input_
         [ E.type_ "checkbox"
@@ -570,7 +570,7 @@ renderExpansionCell props _rowKey isExpanded =
       , E.style "width" "3rem"
       , E.style "padding" "0.75rem 1rem"
       ]
-      <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+      <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     )
     [ E.button_
         [ E.type_ "button"
@@ -616,7 +616,7 @@ renderDataCell props col rowIndex colIndex rowData isSelected isExpanded =
         <> fixedStyle
         <> maybe [] (\p -> [E.style "padding-left" (show p), E.style "padding-right" (show p)]) props.cellPaddingX
         <> maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.cellPaddingY
-        <> maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.rowBgColor
+        <> maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.rowBgColor
       )
       [ Cell.renderCell props col rowIndex colIndex cellContext ]
 
@@ -662,7 +662,7 @@ defaultLoadingState props =
           , E.style "border-top-color" "transparent"
           , E.style "animation" "spin 1s linear infinite"
           ]
-          <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.loadingSpinnerColor
+          <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.loadingSpinnerColor
         )
         []
     , E.span_
@@ -705,7 +705,7 @@ renderPaginationControls props currentPg totalPages total _ps =
       , E.style "padding" "0.75rem 1rem"
       , E.style "border-top" "1px solid"
       ]
-      <> maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+      <> maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     )
     [ -- Row count info
       E.div_

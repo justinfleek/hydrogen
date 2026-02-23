@@ -280,7 +280,7 @@ buildContainerAttrs props =
     -- Core styles
     coreStyles =
       [ E.style "height" heightValue
-      , E.style "background-color" (Color.toCss trackCol)
+      , E.style "background-color" (Color.toLegacyCss trackCol)
       , E.style "overflow" "hidden"
       ]
   in
@@ -311,7 +311,7 @@ buildBarAttrs props =
     -- Core styles
     coreStyles =
       [ E.style "height" "100%"
-      , E.style "background-color" (Color.toCss barCol)
+      , E.style "background-color" (Color.toLegacyCss barCol)
       ]
   in
     coreStyles <> widthAndAnimation

@@ -1335,18 +1335,18 @@ resolveConfig props =
   , disabledCol: maybe (Color.rgb 100 100 100) (\c -> c) props.disabledColor
   , rangeCol: maybe (Color.rgb 59 130 246) (\c -> c) props.rangeColor
   , headerTextCol: maybe (Color.rgb 180 180 180) (\c -> c) props.headerTextColor
-  , panelRadius: maybe "8px" Geometry.cornersToCss props.borderRadius
-  , cellRadius: maybe "4px" Geometry.cornersToCss props.cellBorderRadius
+  , panelRadius: maybe "8px" Geometry.cornersToLegacyCss props.borderRadius
+  , cellRadius: maybe "4px" Geometry.cornersToLegacyCss props.cellBorderRadius
   , paddingVal: maybe "12px" show props.padding
   , gapVal: maybe "4px" show props.gap
   , cellSizeVal: maybe "36px" show props.cellSize
   , borderWidthVal: maybe "1px" show props.borderWidth
-  , dayFontSizeVal: maybe "14px" FontSize.toCss props.dayFontSize
-  , dayFontWeightVal: maybe "400" FontWeight.toCss props.dayFontWeight
-  , headerFontSizeVal: maybe "14px" FontSize.toCss props.headerFontSize
-  , headerFontWeightVal: maybe "600" FontWeight.toCss props.headerFontWeight
-  , weekdayFontSizeVal: maybe "12px" FontSize.toCss props.weekdayFontSize
-  , weekdayFontWeightVal: maybe "400" FontWeight.toCss props.weekdayFontWeight
+  , dayFontSizeVal: maybe "14px" FontSize.toLegacyCss props.dayFontSize
+  , dayFontWeightVal: maybe "400" FontWeight.toLegacyCss props.dayFontWeight
+  , headerFontSizeVal: maybe "14px" FontSize.toLegacyCss props.headerFontSize
+  , headerFontWeightVal: maybe "600" FontWeight.toLegacyCss props.headerFontWeight
+  , weekdayFontSizeVal: maybe "12px" FontSize.toLegacyCss props.weekdayFontSize
+  , weekdayFontWeightVal: maybe "400" FontWeight.toLegacyCss props.weekdayFontWeight
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -1378,10 +1378,10 @@ buildPanelAttrs config =
   , E.style "flex-direction" "column"
   , E.style "gap" config.gapVal
   , E.style "padding" config.paddingVal
-  , E.style "background-color" (Color.toCss config.bgColor)
+  , E.style "background-color" (Color.toLegacyCss config.bgColor)
   , E.style "border-style" "solid"
   , E.style "border-width" config.borderWidthVal
-  , E.style "border-color" (Color.toCss config.borderCol)
+  , E.style "border-color" (Color.toLegacyCss config.borderCol)
   , E.style "border-radius" config.panelRadius
   , E.role "grid"
   , E.ariaLabel "Calendar"
@@ -1403,7 +1403,7 @@ renderHeader props config =
     [ E.span_
         [ E.style "font-size" config.headerFontSizeVal
         , E.style "font-weight" config.headerFontWeightVal
-        , E.style "color" (Color.toCss config.textCol)
+        , E.style "color" (Color.toLegacyCss config.textCol)
         ]
         [ E.text (monthName props.locale props.viewMonth <> " " <> show props.viewYear) ]
     ]
@@ -1442,7 +1442,7 @@ renderWeekNumHeader config =
     , E.style "justify-content" "center"
     , E.style "font-size" config.weekdayFontSizeVal
     , E.style "font-weight" config.weekdayFontWeightVal
-    , E.style "color" (Color.toCss config.headerTextCol)
+    , E.style "color" (Color.toLegacyCss config.headerTextCol)
     ]
     [ E.text "#" ]
 
@@ -1457,7 +1457,7 @@ renderDayHeader props config dow =
     , E.style "justify-content" "center"
     , E.style "font-size" config.weekdayFontSizeVal
     , E.style "font-weight" config.weekdayFontWeightVal
-    , E.style "color" (Color.toCss config.headerTextCol)
+    , E.style "color" (Color.toLegacyCss config.headerTextCol)
     , E.role "columnheader"
     ]
     [ E.text (dayNameShort props.locale dow) ]
@@ -1583,7 +1583,7 @@ renderWeekNumber config num =
     , E.style "align-items" "center"
     , E.style "justify-content" "center"
     , E.style "font-size" config.weekdayFontSizeVal
-    , E.style "color" (Color.toCss config.headerTextCol)
+    , E.style "color" (Color.toLegacyCss config.headerTextCol)
     ]
     [ E.text (show num) ]
 
@@ -1614,14 +1614,14 @@ renderDateDay props config date =
     
     -- Determine colors based on state
     bgColor = 
-      if isSelected then Color.toCss config.selectedCol
-      else if isInRange then Color.toCss config.rangeCol <> "40"  -- With alpha
+      if isSelected then Color.toLegacyCss config.selectedCol
+      else if isInRange then Color.toLegacyCss config.rangeCol <> "40"  -- With alpha
       else "transparent"
     
     txtColor =
-      if isDisabled then Color.toCss config.disabledCol
-      else if isSelected then Color.toCss config.selectedTextCol
-      else Color.toCss config.textCol
+      if isDisabled then Color.toLegacyCss config.disabledCol
+      else if isSelected then Color.toLegacyCss config.selectedTextCol
+      else Color.toLegacyCss config.textCol
     
     cursor = if isDisabled then "not-allowed" else "pointer"
     opacity = if isDisabled then "0.5" else "1"

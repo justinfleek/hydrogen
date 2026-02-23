@@ -672,9 +672,9 @@ buildInputStyles props =
       ]
     
     -- Color styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.backgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.textColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.backgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.textColor
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     
     -- Border styles
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.borderWidth
@@ -687,7 +687,7 @@ buildInputStyles props =
             Nothing -> []
     
     -- Border radius
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.borderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.borderRadius
     
     -- Dimension styles
     heightStyle = maybe [] (\h -> [E.style "height" (show h)]) props.height
@@ -701,7 +701,7 @@ buildInputStyles props =
         else []
     
     -- Typography styles
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
     
     -- Transition styles
     transitionStyle = maybe [] 
@@ -741,7 +741,7 @@ buildToggleButton props =
     clickHandler = maybe [] (\handler -> [ E.onClick handler ]) props.onToggle
     
     -- Icon color (only emit if atom provided)
-    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.toggleButtonColor
+    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.toggleButtonColor
     
     -- Icon size
     iconSizeVal = maybe "16px" show props.iconSize
@@ -789,16 +789,16 @@ buildStrengthIndicator props strength =
     strengthColor = getStrengthColor props strength
     
     -- Bar background color
-    barBgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.strengthBarBgColor
+    barBgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.strengthBarBgColor
     
     -- Strength bar fill color
-    fillStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) strengthColor
+    fillStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) strengthColor
     
     -- Label color
-    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.strengthLabelColor
+    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.strengthLabelColor
     
     -- Label font size
-    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.strengthLabelFontSize
+    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.strengthLabelFontSize
     
     -- Transition
     transitionVal = maybe "width 300ms ease-out" (\d -> "width " <> show d <> " ease-out") props.transitionDuration

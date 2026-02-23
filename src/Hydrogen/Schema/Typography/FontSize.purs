@@ -21,7 +21,7 @@ module Hydrogen.Schema.Typography.FontSize
   , unsafeFontSize
   , unwrap
   , scale
-  , toCss
+  , toLegacyCss
   , bounds
   -- Common sizes
   , browserDefault
@@ -108,9 +108,12 @@ scale factor (FontSize s) = fontSize (s * factor)
 unwrap :: FontSize -> Number
 unwrap (FontSize s) = s
 
--- | Convert to CSS font-size value
-toCss :: FontSize -> String
-toCss (FontSize s) = show s <> "px"
+-- | Convert to CSS font-size value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: FontSize -> String
+toLegacyCss (FontSize s) = show s <> "px"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds

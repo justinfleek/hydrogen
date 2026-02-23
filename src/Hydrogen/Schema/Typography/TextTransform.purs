@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Typography.TextTransform
   ( TextTransform(..)
-  , toCss
+  , toLegacyCss
   , requiresTracking
   ) where
 
@@ -48,12 +48,15 @@ instance showTextTransform :: Show TextTransform where
 --                                                                   // accessors
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS text-transform value
-toCss :: TextTransform -> String
-toCss None = "none"
-toCss Uppercase = "uppercase"
-toCss Lowercase = "lowercase"
-toCss Capitalize = "capitalize"
+-- | Convert to CSS text-transform value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: TextTransform -> String
+toLegacyCss None = "none"
+toLegacyCss Uppercase = "uppercase"
+toLegacyCss Lowercase = "lowercase"
+toLegacyCss Capitalize = "capitalize"
 
 -- | Does this transform require additional letter-spacing?
 -- |

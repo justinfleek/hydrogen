@@ -49,8 +49,8 @@ module Hydrogen.Schema.Color.HWB
   , increaseWhiteness
   , increaseBlackness
   
-  -- * CSS Output
-  , toCss
+  -- * Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -110,7 +110,7 @@ derive instance eqHWB :: Eq HWB
 derive instance ordHWB :: Ord HWB
 
 instance showHWB :: Show HWB where
-  show = toCss
+  show = toLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -173,12 +173,15 @@ increaseBlackness :: Int -> HWB -> HWB
 increaseBlackness amount (HWB c) = HWB c { b = blackness (unwrapBlackness c.b + amount) }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS hwb() function
-toCss :: HWB -> String
-toCss (HWB c) = 
+-- | Convert to CSS hwb() function for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: HWB -> String
+toLegacyCss (HWB c) = 
   "hwb(" <> show (Hue.unwrap c.h) <> "deg " 
          <> show (unwrapWhiteness c.w) <> "% " 
          <> show (unwrapBlackness c.b) <> "%)"

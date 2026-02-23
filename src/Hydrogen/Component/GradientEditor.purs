@@ -53,9 +53,9 @@ import Halogen.HTML.Properties as HP
 import Hydrogen.Component.Button as Button
 import Hydrogen.Component.ColorPicker as ColorPicker
 import Hydrogen.Component.Slider as Slider
-import Hydrogen.Schema.Color.Gradient (Gradient(Linear), LinearGradient, ColorStop(ColorStop), linearGradient, colorStop, getStops, addStop, removeStopAt, updateStop, toCss, unwrapRatio, ratio)
+import Hydrogen.Schema.Color.Gradient (Gradient(Linear), LinearGradient, ColorStop(ColorStop), linearGradient, colorStop, getStops, addStop, removeStopAt, updateStop, toLegacyCss, unwrapRatio, ratio)
 import Hydrogen.Schema.Color.HSL (hsl)
-import Hydrogen.Schema.Color.RGB (rgb, rgbToCss)
+import Hydrogen.Schema.Color.RGB (rgb, rgbToLegacyCss)
 import Hydrogen.Schema.Color.Conversion (rgbToHsl, hslToRgb)
 import Hydrogen.UI.Core (cls)
 
@@ -123,7 +123,7 @@ gradientEditor propMods =
         if props.showPreview
           then HH.div
             [ cls [ "gradient-preview w-full h-24 rounded border border-white/20" ]
-            , HP.style ("background: " <> toCss props.gradient)
+            , HP.style ("background: " <> toLegacyCss props.gradient)
             ]
             []
           else HH.text ""
@@ -157,7 +157,7 @@ renderGradientBar grad _ =
       [ -- Background gradient
         HH.div
           [ cls [ "absolute inset-0" ]
-          , HP.style ("background: " <> toCss grad)
+          , HP.style ("background: " <> toLegacyCss grad)
           ]
           []
         
@@ -174,7 +174,7 @@ renderStopMarker idx (ColorStop cs) =
   in
     HH.div
       [ cls [ "absolute top-0 bottom-0 w-1 cursor-pointer hover:w-2 transition-all" ]
-      , HP.style ("left: " <> show position <> "%; background-color: " <> rgbToCss cs.color <> "; border: 2px solid white;")
+      , HP.style ("left: " <> show position <> "%; background-color: " <> rgbToLegacyCss cs.color <> "; border: 2px solid white;")
       , HP.title ("Stop " <> show idx <> " at " <> show position <> "%")
       ]
       []
@@ -205,7 +205,7 @@ renderStopEditor idx (ColorStop cs) grad onChange =
         -- Color preview
         , HH.div
             [ cls [ "w-full h-8 rounded border border-white/20" ]
-            , HP.style ("background-color: " <> rgbToCss cs.color)
+            , HP.style ("background-color: " <> rgbToLegacyCss cs.color)
             ]
             []
         

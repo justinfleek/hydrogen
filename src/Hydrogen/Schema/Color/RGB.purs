@@ -52,9 +52,9 @@ module Hydrogen.Schema.Color.RGB
   , multiply
   , screen
   
-  -- * RGB Output
-  , rgbToCss
-  , toCss
+  -- * RGB Legacy CSS Output (for interop with legacy systems)
+  , rgbToLegacyCss
+  , toLegacyCss
   , rgbToHex
   , toHex
   
@@ -67,16 +67,16 @@ module Hydrogen.Schema.Color.RGB
   , rgbaToRecord
   , toRecordA
   
-  -- * RGBA Output
-  , rgbaToCss
-  , toCssA
+  -- * RGBA Legacy CSS Output (for interop with legacy systems)
+  , rgbaToLegacyCss
+  , toLegacyCssA
   
   -- * Conversion
   , toRGBA
   , fromRGBA
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, mod, show, (*), (-), (/), (<>))
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
@@ -101,7 +101,7 @@ derive instance eqRGB :: Eq RGB
 derive instance ordRGB :: Ord RGB
 
 instance showRGB :: Show RGB where
-  show = rgbToCss
+  show = rgbToLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -245,23 +245,26 @@ screen (RGB c1) (RGB c2) = RGB
     in Ch.channel (Int.round result)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS rgb() function string.
+-- | Convert to CSS rgb() function string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | ```purescript
--- | rgbToCss (rgb 255 128 0)  -- "rgb(255, 128, 0)"
+-- | rgbToLegacyCss (rgb 255 128 0)  -- "rgb(255, 128, 0)"
 -- | ```
-rgbToCss :: RGB -> String
-rgbToCss (RGB c) =
+rgbToLegacyCss :: RGB -> String
+rgbToLegacyCss (RGB c) =
   "rgb(" <> show (Ch.unwrap c.red)
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue) <> ")"
 
--- | Alias for rgbToCss (legacy name).
-toCss :: RGB -> String
-toCss = rgbToCss
+-- | Alias for rgbToLegacyCss.
+toLegacyCss :: RGB -> String
+toLegacyCss = rgbToLegacyCss
 
 -- | Convert to 6-character hex string (without #).
 -- |
@@ -330,7 +333,7 @@ derive instance eqRGBA :: Eq RGBA
 derive instance ordRGBA :: Ord RGBA
 
 instance showRGBA :: Show RGBA where
-  show = rgbaToCss
+  show = rgbaToLegacyCss
 
 -- | Create an RGBA color from raw values.
 -- |
@@ -372,25 +375,28 @@ rgbaToRecord (RGBA c) =
 toRecordA :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
 toRecordA = rgbaToRecord
 
--- | Convert to CSS rgba() function string.
+-- | Convert to CSS rgba() function string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | CSS expects alpha as 0.0-1.0, so we use Opacity.toUnitInterval.
 -- |
 -- | ```purescript
--- | rgbaToCss (rgba 255 128 0 100)  -- "rgba(255, 128, 0, 1.0)"
--- | rgbaToCss (rgba 255 0 0 50)     -- "rgba(255, 0, 0, 0.5)"
+-- | rgbaToLegacyCss (rgba 255 128 0 100)  -- "rgba(255, 128, 0, 1.0)"
+-- | rgbaToLegacyCss (rgba 255 0 0 50)     -- "rgba(255, 0, 0, 0.5)"
 -- | ```
-rgbaToCss :: RGBA -> String
-rgbaToCss (RGBA c) =
+rgbaToLegacyCss :: RGBA -> String
+rgbaToLegacyCss (RGBA c) =
   let a' = Op.toUnitInterval c.alpha
   in "rgba(" <> show (Ch.unwrap c.red)
   <> ", " <> show (Ch.unwrap c.green)
   <> ", " <> show (Ch.unwrap c.blue)
   <> ", " <> show a' <> ")"
 
--- | Alias for rgbaToCss (legacy name).
-toCssA :: RGBA -> String
-toCssA = rgbaToCss
+-- | Alias for rgbaToLegacyCss.
+toLegacyCssA :: RGBA -> String
+toLegacyCssA = rgbaToLegacyCss
 
 -- | Convert RGB to RGBA with full opacity (100%).
 toRGBA :: RGB -> RGBA

@@ -52,7 +52,7 @@ module Hydrogen.Schema.Color.CMYK
   , cmykToRgb
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, show, (<>), (/), (*), (-), (>=))
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Color.Cyan as C

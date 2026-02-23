@@ -46,7 +46,7 @@ module Hydrogen.Schema.Typography.FontWidth
   -- * Accessors
   , unwrap
   , toPercentage
-  , toCSSValue
+  , toLegacyCssValue
   
   -- * Operations
   , clamp
@@ -136,9 +136,12 @@ unwrap (FontWidth n) = n
 toPercentage :: FontWidth -> Number
 toPercentage (FontWidth n) = Int.toNumber n
 
--- | Convert to CSS value string
-toCSSValue :: FontWidth -> String
-toCSSValue (FontWidth n) = show n <> "%"
+-- | Convert to CSS value string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCssValue :: FontWidth -> String
+toLegacyCssValue (FontWidth n) = show n <> "%"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // operations

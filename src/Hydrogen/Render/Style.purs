@@ -15,10 +15,10 @@
 -- |
 -- | myStyle :: S.Style
 -- | myStyle = S.styles
--- |   [ S.backgroundColor (RGB.toCss (RGB.rgb 30 30 30))
+-- |   [ S.backgroundColor (RGB.toLegacyCss (RGB.rgb 30 30 30))
 -- |   , S.padding (S.px 16.0)
 -- |   , S.borderRadius (S.px 8.0)
--- |   , S.color (RGB.toCss (RGB.rgb 255 255 255))
+-- |   , S.color (RGB.toLegacyCss (RGB.rgb 255 255 255))
 -- |   ]
 -- | ```
 -- |

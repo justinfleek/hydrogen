@@ -350,13 +350,13 @@ buildToggleAttrs props =
         let bw = maybe "1px" show props.borderWidth
         in [ E.style "border-style" "solid"
            , E.style "border-width" bw
-           , E.style "border-color" (Color.toCss bc)
+           , E.style "border-color" (Color.toLegacyCss bc)
            ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "6px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Height
     heightStyle = case props.height of
@@ -374,11 +374,11 @@ buildToggleAttrs props =
     -- Typography
     fontSizeStyle = case props.fontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.fontWeight of
       Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     -- Transition
     transitionValue = maybe "150ms" show props.transitionDuration
@@ -392,8 +392,8 @@ buildToggleAttrs props =
       , E.style "align-items" "center"
       , E.style "justify-content" "center"
       , E.style "white-space" "nowrap"
-      , E.style "background-color" (Color.toCss currentBgColor)
-      , E.style "color" (Color.toCss currentTextColor)
+      , E.style "background-color" (Color.toLegacyCss currentBgColor)
+      , E.style "color" (Color.toLegacyCss currentTextColor)
       , E.style "cursor" (if props.disabled then "not-allowed" else "pointer")
       , E.style "transition" ("all " <> transitionValue <> " ease-out")
       , E.style "outline" "none"

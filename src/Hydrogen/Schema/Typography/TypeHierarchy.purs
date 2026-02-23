@@ -37,8 +37,8 @@ module Hydrogen.Schema.Typography.TypeHierarchy
   -- Generation
   , generate
   , GenerateConfig
-  -- CSS
-  , toCss
+  -- Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -303,20 +303,23 @@ generate cfg = TypeHierarchy
     Uppercase
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Generate CSS custom properties for the hierarchy
-toCss :: TypeHierarchy -> String
-toCss th = 
-  ".hero {\n" <> TypeStyle.toCss (hero th) <> "\n}\n\n" <>
-  "h1, .h1 {\n" <> TypeStyle.toCss (h1 th) <> "\n}\n\n" <>
-  "h2, .h2 {\n" <> TypeStyle.toCss (h2 th) <> "\n}\n\n" <>
-  "h3, .h3 {\n" <> TypeStyle.toCss (h3 th) <> "\n}\n\n" <>
-  "h4, .h4 {\n" <> TypeStyle.toCss (h4 th) <> "\n}\n\n" <>
-  "h5, .h5 {\n" <> TypeStyle.toCss (h5 th) <> "\n}\n\n" <>
-  "h6, .h6 {\n" <> TypeStyle.toCss (h6 th) <> "\n}\n\n" <>
-  "body, .body {\n" <> TypeStyle.toCss (body th) <> "\n}\n\n" <>
-  ".small {\n" <> TypeStyle.toCss (small th) <> "\n}\n\n" <>
-  ".caption {\n" <> TypeStyle.toCss (caption th) <> "\n}\n\n" <>
-  ".overline {\n" <> TypeStyle.toCss (overline th) <> "\n}"
+-- | Generate CSS stylesheet for the hierarchy for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: TypeHierarchy -> String
+toLegacyCss th = 
+  ".hero {\n" <> TypeStyle.toLegacyCss (hero th) <> "\n}\n\n" <>
+  "h1, .h1 {\n" <> TypeStyle.toLegacyCss (h1 th) <> "\n}\n\n" <>
+  "h2, .h2 {\n" <> TypeStyle.toLegacyCss (h2 th) <> "\n}\n\n" <>
+  "h3, .h3 {\n" <> TypeStyle.toLegacyCss (h3 th) <> "\n}\n\n" <>
+  "h4, .h4 {\n" <> TypeStyle.toLegacyCss (h4 th) <> "\n}\n\n" <>
+  "h5, .h5 {\n" <> TypeStyle.toLegacyCss (h5 th) <> "\n}\n\n" <>
+  "h6, .h6 {\n" <> TypeStyle.toLegacyCss (h6 th) <> "\n}\n\n" <>
+  "body, .body {\n" <> TypeStyle.toLegacyCss (body th) <> "\n}\n\n" <>
+  ".small {\n" <> TypeStyle.toLegacyCss (small th) <> "\n}\n\n" <>
+  ".caption {\n" <> TypeStyle.toLegacyCss (caption th) <> "\n}\n\n" <>
+  ".overline {\n" <> TypeStyle.toLegacyCss (overline th) <> "\n}"

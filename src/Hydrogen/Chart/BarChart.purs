@@ -64,7 +64,7 @@ module Hydrogen.Chart.BarChart
   , StackedDataPoint
   , GroupedDataPoint
     -- * Orientation
-  , Orientation(..)
+  , Orientation(Vertical, Horizontal)
     -- * Prop Builders
   , orientation
   , showGrid
@@ -81,7 +81,7 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (foldl, maximum, sum)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe, fromMaybe)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.UI.Core (cls, svgNS, svgCls)

@@ -613,9 +613,9 @@ buildInputStyles props =
       ]
     
     -- Color styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.inputBackgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.inputTextColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.inputBorderColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.inputBackgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.inputTextColor
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.inputBorderColor
     
     -- Border styles
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.inputBorderWidth
@@ -628,7 +628,7 @@ buildInputStyles props =
             Nothing -> []
     
     -- Border radius
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.inputBorderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.inputBorderRadius
     
     -- Dimension styles
     heightStyle = maybe [] (\h -> [E.style "height" (show h)]) props.inputHeight
@@ -636,7 +636,7 @@ buildInputStyles props =
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.inputPaddingY
     
     -- Typography styles
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.inputFontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.inputFontSize
     
     -- Disabled styles
     disabledStyles =
@@ -666,10 +666,10 @@ buildDropdown :: forall msg. AutoCompleteProps msg -> Array Suggestion -> E.Elem
 buildDropdown props filteredSuggestions =
   let
     -- Dropdown styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.dropdownBackgroundColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.dropdownBorderColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.dropdownBackgroundColor
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.dropdownBorderColor
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.dropdownBorderWidth
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.dropdownBorderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.dropdownBorderRadius
     maxHeightStyle = maybe [] (\h -> [E.style "max-height" (show h)]) props.dropdownMaxHeight
     
     borderStyleAttr = 
@@ -720,18 +720,18 @@ buildSuggestionItem props idx sug =
     -- Item styles
     paddingXStyle = maybe [] (\p -> [E.style "padding-left" (show p), E.style "padding-right" (show p)]) props.itemPaddingX
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.itemPaddingY
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.itemFontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.itemFontSize
     
     -- Text and background colors (highlight vs normal)
     bgStyle = 
       if isHighlighted
-        then maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.itemHighlightBgColor
+        then maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.itemHighlightBgColor
         else []
     
     txtStyle = 
       if isHighlighted
-        then maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.itemHighlightTextColor
-        else maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.itemTextColor
+        then maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.itemHighlightTextColor
+        else maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.itemTextColor
     
     -- Base styles
     baseStyles =
@@ -766,10 +766,10 @@ buildSuggestionItem props idx sug =
 buildLoadingIndicator :: forall msg. AutoCompleteProps msg -> E.Element msg
 buildLoadingIndicator props =
   let
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.loadingTextColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.loadingTextColor
     paddingXStyle = maybe [] (\p -> [E.style "padding-left" (show p), E.style "padding-right" (show p)]) props.itemPaddingX
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.itemPaddingY
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.itemFontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.itemFontSize
   in
     E.li_
       ([ E.style "display" "flex"
@@ -784,10 +784,10 @@ buildLoadingIndicator props =
 buildNoResults :: forall msg. AutoCompleteProps msg -> E.Element msg
 buildNoResults props =
   let
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.noResultsTextColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.noResultsTextColor
     paddingXStyle = maybe [] (\p -> [E.style "padding-left" (show p), E.style "padding-right" (show p)]) props.itemPaddingX
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.itemPaddingY
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.itemFontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.itemFontSize
   in
     E.li_
       ([ E.style "text-align" "center" ] <> paddingXStyle <> paddingYStyle <> fontSizeStyle <> txtStyle)

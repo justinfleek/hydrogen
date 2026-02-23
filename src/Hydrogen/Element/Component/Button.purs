@@ -502,8 +502,8 @@ buildButtonStyles isDisabled props =
     
     -- Color styles
     colorStyles =
-      [ E.style "background-color" (Color.toCss bgColor)
-      , E.style "color" (Color.toCss txtColor)
+      [ E.style "background-color" (Color.toLegacyCss bgColor)
+      , E.style "color" (Color.toLegacyCss txtColor)
       ]
     
     -- Border styles
@@ -513,13 +513,13 @@ buildButtonStyles isDisabled props =
         let bw = maybe "1px" show props.borderWidth
         in [ E.style "border-style" "solid"
            , E.style "border-width" bw
-           , E.style "border-color" (Color.toCss bc)
+           , E.style "border-color" (Color.toLegacyCss bc)
            ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "6px" ]  -- Default rounded
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Dimension styles
     heightStyle = case props.height of
@@ -544,11 +544,11 @@ buildButtonStyles isDisabled props =
     -- Typography styles
     fontSizeStyle = case props.fontSize of
       Nothing -> [ E.style "font-size" "14px" ]  -- Default
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.fontWeight of
       Nothing -> [ E.style "font-weight" "500" ]  -- Medium
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     -- Shadow styles
     shadowStyle = case props.shadow of
@@ -556,13 +556,13 @@ buildButtonStyles isDisabled props =
       Just s -> 
         if Shadow.isNoShadow s
           then []
-          else [ E.style "box-shadow" (Shadow.layeredToCss s) ]
+          else [ E.style "box-shadow" (Shadow.layeredToLegacyCss s) ]
     
     -- Transition styles
     transitionStyle =
       let
         dur = maybe "150ms" show props.transitionDuration
-        ease = maybe "ease-out" Easing.toCSSString props.transitionEasing
+        ease = maybe "ease-out" Easing.toLegacyCssString props.transitionEasing
         transitionValue = "background-color " <> dur <> " " <> ease 
                        <> ", color " <> dur <> " " <> ease
                        <> ", border-color " <> dur <> " " <> ease

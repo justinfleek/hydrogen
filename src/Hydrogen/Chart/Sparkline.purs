@@ -44,7 +44,7 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (foldl, maximum, minimum)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

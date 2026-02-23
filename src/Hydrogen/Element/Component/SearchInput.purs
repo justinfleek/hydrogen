@@ -459,7 +459,7 @@ buildLeftIcon :: forall msg. SearchInputProps msg -> String -> E.Element msg
 buildLeftIcon props iconSizeVal =
   let
     -- Icon color (only emit if atom provided)
-    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.iconColor
+    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.iconColor
     
     -- Container styles
     containerStyles =
@@ -539,9 +539,9 @@ buildInputStyles props =
       ]
     
     -- Color styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.backgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.textColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.backgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.textColor
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     
     -- Border styles
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.borderWidth
@@ -554,7 +554,7 @@ buildInputStyles props =
             Nothing -> []
     
     -- Border radius
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.borderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.borderRadius
     
     -- Dimension styles
     heightStyle = maybe [] (\h -> [E.style "height" (show h)]) props.height
@@ -570,7 +570,7 @@ buildInputStyles props =
     paddingRightStyle = [E.style "padding-right" rightPadding]
     
     -- Typography styles
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
     
     -- Transition styles
     transitionStyle = maybe [] 
@@ -648,7 +648,7 @@ buildClearButton props iconSizeVal =
     clickHandler = maybe [] (\handler -> [ E.onClick handler ]) props.onClear
     
     -- Icon color (only emit if atom provided)
-    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.clearButtonColor
+    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.clearButtonColor
     
     -- Button styles
     buttonStyles =
@@ -681,7 +681,7 @@ buildSubmitButton props iconSizeVal =
     clickHandler = maybe [] (\handler -> [ E.onClick (handler props.value) ]) props.onSubmit
     
     -- Icon color (only emit if atom provided)
-    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.submitButtonColor
+    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.submitButtonColor
     
     -- Button styles
     buttonStyles =

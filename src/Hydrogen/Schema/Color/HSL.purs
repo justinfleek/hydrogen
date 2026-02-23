@@ -55,15 +55,15 @@ module Hydrogen.Schema.Color.HSL
   , decreaseSaturation
   , grayscale
   
-  -- * CSS Output
-  , toCss
+  -- * Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCss
   
   -- * Interop
   , fromLegacy
   , toLegacy
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, show, (<>))
 
 import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat
@@ -87,7 +87,7 @@ derive instance eqHSL :: Eq HSL
 derive instance ordHSL :: Ord HSL
 
 instance showHSL :: Show HSL where
-  show = toCss
+  show = toLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -263,16 +263,19 @@ grayscale (HSL c) = HSL
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS hsl() function string.
+-- | Convert to CSS hsl() function string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | ```purescript
--- | toCss (hsl 210 80 50)  -- "hsl(210, 80%, 50%)"
+-- | toLegacyCss (hsl 210 80 50)  -- "hsl(210, 80%, 50%)"
 -- | ```
-toCss :: HSL -> String
-toCss (HSL c) =
+toLegacyCss :: HSL -> String
+toLegacyCss (HSL c) =
   "hsl(" <> show (Hue.unwrap c.hue) 
   <> ", " <> show (Sat.unwrap c.saturation) <> "%"
   <> ", " <> show (Light.unwrap c.lightness) <> "%)"

@@ -294,7 +294,7 @@ buildSwitchAttrs props =
       , E.style "height" heightValue
       , E.style "border-radius" "9999px"
       , E.style "border" "2px solid transparent"
-      , E.style "background-color" (Color.toCss trackCol)
+      , E.style "background-color" (Color.toLegacyCss trackCol)
       , E.style "transition" ("background-color " <> transitionValue <> " ease-out")
       , E.style "outline" "none"
       ]
@@ -335,7 +335,7 @@ buildThumb props =
       , E.style "width" thumbSizeValue
       , E.style "height" thumbSizeValue
       , E.style "border-radius" "50%"
-      , E.style "background-color" (Color.toCss thumbCol)
+      , E.style "background-color" (Color.toLegacyCss thumbCol)
       , E.style "box-shadow" "0 1px 3px rgba(0, 0, 0, 0.2)"
       , E.style "transform" ("translateX(" <> translateValue <> ")")
       , E.style "transition" ("transform " <> transitionValue <> " ease-out")
@@ -355,15 +355,15 @@ switchWithLabel labelText propMods =
     -- Label styles
     fontSizeStyle = case props.labelFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.labelFontWeight of
       Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.labelColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     cursorStyle = if props.disabled
       then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]

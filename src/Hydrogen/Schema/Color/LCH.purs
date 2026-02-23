@@ -57,6 +57,21 @@ module Hydrogen.Schema.Color.LCH
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , otherwise
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (>=)
+  , (&&)
+  , (<>)
+  )
 
 import Data.Number (sqrt, atan2, cos, sin, pi, floor)
 import Hydrogen.Schema.Color.LAB as LAB

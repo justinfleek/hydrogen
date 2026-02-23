@@ -54,7 +54,7 @@
 -- |   }
 -- |
 -- | -- Convert to CSS
--- | css = Shadow.toCss cardShadow
+-- | css = Shadow.toLegacyCss cardShadow
 -- | -- "0px 4px 6px -1px rgba(0, 0, 0, 0.1)"
 -- |
 -- | -- Layered shadows for depth
@@ -100,10 +100,10 @@ module Hydrogen.Schema.Elevation.Shadow
   , scaleBlur
   , scaleShadow
   
-  -- * Conversion
-  , toCss
-  , dropShadowToCss
-  , layeredToCss
+  -- * Legacy CSS Conversion (for interop with legacy systems)
+  , toLegacyCss
+  , dropShadowToLegacyCss
+  , layeredToLegacyCss
   
   -- * Predicates
   , isNoShadow
@@ -176,7 +176,7 @@ newtype LayeredShadow = LayeredShadow (Array BoxShadow)
 derive instance eqLayeredShadow :: Eq LayeredShadow
 
 instance showLayeredShadow :: Show LayeredShadow where
-  show = layeredToCss
+  show = layeredToLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -326,38 +326,47 @@ scaleShadow factor s = s
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert box shadow to CSS string
+-- | Convert box shadow to CSS string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Format: "[inset] <offset-x> <offset-y> <blur> <spread> <color>"
-toCss :: BoxShadow -> String
-toCss s =
+toLegacyCss :: BoxShadow -> String
+toLegacyCss s =
   let
     insetStr = if s.inset then "inset " else ""
     offsetXStr = showPx s.offsetX
     offsetYStr = showPx s.offsetY
     blurStr = showPx s.blur
     spreadStr = showPx s.spread
-    colorStr = RGB.toCssA s.color
+    colorStr = RGB.toLegacyCssA s.color
   in
     insetStr <> offsetXStr <> " " <> offsetYStr <> " " <> blurStr <> " " <> spreadStr <> " " <> colorStr
 
--- | Convert drop shadow to CSS filter string
+-- | Convert drop shadow to CSS filter string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Format: "drop-shadow(<offset-x> <offset-y> <blur> <color>)"
-dropShadowToCss :: DropShadow -> String
-dropShadowToCss s =
+dropShadowToLegacyCss :: DropShadow -> String
+dropShadowToLegacyCss s =
   "drop-shadow(" <> showPx s.offsetX <> " " <> showPx s.offsetY <> " " 
-    <> showPx s.blur <> " " <> RGB.toCssA s.color <> ")"
+    <> showPx s.blur <> " " <> RGB.toLegacyCssA s.color <> ")"
 
--- | Convert layered shadow to CSS string
+-- | Convert layered shadow to CSS string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Multiple shadows are comma-separated.
 -- | Returns "none" if no layers.
-layeredToCss :: LayeredShadow -> String
-layeredToCss (LayeredShadow ls) =
+layeredToLegacyCss :: LayeredShadow -> String
+layeredToLegacyCss (LayeredShadow ls) =
   if null ls
     then "none"
-    else joinWith ", " (map toCss ls)
+    else joinWith ", " (map toLegacyCss ls)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // predicates

@@ -52,7 +52,7 @@ import Data.Array (foldl)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.Schema.Color.Gradient (MeshGradient, meshGradient, sampleMeshAt)
-import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToCss)
+import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToLegacyCss)
 import Hydrogen.UI.Core (cls)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -149,7 +149,7 @@ meshGradientPreview propMods =
 renderSwatch :: forall w i. RGB -> HH.HTML w i
 renderSwatch color =
   HH.div
-    [ HP.style ("background-color: " <> rgbToCss color)
+    [ HP.style ("background-color: " <> rgbToLegacyCss color)
     , cls [ "w-full h-full" ]
     ]
     []

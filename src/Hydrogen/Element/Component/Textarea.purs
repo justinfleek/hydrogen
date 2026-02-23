@@ -577,15 +577,15 @@ buildTextareaStyles props =
       ]
     
     -- Color styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.backgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.textColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.backgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.textColor
     
     -- Border color (error state overrides normal)
     borderColorAtom = 
       if props.error
         then props.errorBorderColor
         else props.borderColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) borderColorAtom
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) borderColorAtom
     
     -- Border width and style
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.borderWidth
@@ -601,7 +601,7 @@ buildTextareaStyles props =
                 Nothing -> []
     
     -- Border radius
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.borderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.borderRadius
     
     -- Dimension styles
     heightStyle = maybe [] (\h -> [E.style "min-height" (show h)]) props.minHeight
@@ -610,8 +610,8 @@ buildTextareaStyles props =
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.paddingY
     
     -- Typography styles
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
-    lineHeightStyle = maybe [] (\h -> [E.style "line-height" (LineHeight.toCss h)]) props.lineHeight
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
+    lineHeightStyle = maybe [] (\h -> [E.style "line-height" (LineHeight.toLegacyCss h)]) props.lineHeight
     
     -- Transition styles
     transitionStyle = maybe [] 
@@ -666,12 +666,12 @@ textareaWithLabel labelText propMods =
     propsWithId = propMods <> [ textareaId fieldId ]
     
     -- Label styles (only emit if atoms provided)
-    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.labelFontSize
-    labelFontWeightStyle = maybe [] (\w -> [E.style "font-weight" (FontWeight.toCss w)]) props.labelFontWeight
-    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.labelColor
+    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.labelFontSize
+    labelFontWeightStyle = maybe [] (\w -> [E.style "font-weight" (FontWeight.toLegacyCss w)]) props.labelFontWeight
+    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.labelColor
     
     -- Required asterisk (only emit color if atom provided)
-    requiredColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.requiredColor
+    requiredColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.requiredColor
     requiredSpan = 
       if props.required
         then E.span_ ([ E.style "margin-left" "4px" ] <> requiredColorStyle) [ E.text "*" ]
@@ -718,8 +718,8 @@ textareaWithCounter propMods =
       if isOverLimit
         then props.errorTextColor
         else props.counterColor
-    counterColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) counterColorAtom
-    counterFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.counterFontSize
+    counterColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) counterColorAtom
+    counterFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.counterFontSize
   in
     E.div_
       [ E.style "display" "flex"
@@ -761,12 +761,12 @@ textareaField labelText propMods =
       Nothing -> false
     
     -- Label styles (only emit if atoms provided)
-    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.labelFontSize
-    labelFontWeightStyle = maybe [] (\w -> [E.style "font-weight" (FontWeight.toCss w)]) props.labelFontWeight
-    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.labelColor
+    labelFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.labelFontSize
+    labelFontWeightStyle = maybe [] (\w -> [E.style "font-weight" (FontWeight.toLegacyCss w)]) props.labelFontWeight
+    labelColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.labelColor
     
     -- Required asterisk (only emit color if atom provided)
-    requiredColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.requiredColor
+    requiredColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.requiredColor
     requiredSpan = 
       if props.required
         then E.span_ ([ E.style "margin-left" "4px" ] <> requiredColorStyle) [ E.text "*" ]
@@ -777,8 +777,8 @@ textareaField labelText propMods =
       if isOverLimit
         then props.errorTextColor
         else props.counterColor
-    counterColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) counterColorAtom
-    counterFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.counterFontSize
+    counterColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) counterColorAtom
+    counterFontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.counterFontSize
     
     -- Show counter only if maxLength is set
     showCounter = case props.maxLength of
@@ -827,7 +827,7 @@ textareaField labelText propMods =
 renderErrorMessage :: forall msg. TextareaProps msg -> E.Element msg
 renderErrorMessage props =
   let
-    errorColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.errorTextColor
+    errorColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.errorTextColor
   in
     if props.errorMsg /= ""
       then E.p_

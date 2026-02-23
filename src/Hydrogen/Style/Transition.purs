@@ -90,7 +90,7 @@ import Prelude
 
 import Data.Array (filter, intercalate)
 import Hydrogen.Schema.Motion.Easing (Easing)
-import Hydrogen.Schema.Motion.Easing (toCSSString) as SchemaEasing
+import Hydrogen.Schema.Motion.Easing (toLegacyCssString) as SchemaEasing
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // transition config
@@ -164,7 +164,7 @@ transitionStyle cfg =
   "transition: " <> 
   propertyToCss cfg.property <> " " <>
   show cfg.duration <> "ms " <>
-  SchemaEasing.toCSSString cfg.easing <>
+  SchemaEasing.toLegacyCssString cfg.easing <>
   (if cfg.delay > 0 then " " <> show cfg.delay <> "ms" else "")
 
 -- | Build CSS for multiple transitions
@@ -177,7 +177,7 @@ transitionsStyle configs =
     singleTransition cfg =
       propertyToCss cfg.property <> " " <>
       show cfg.duration <> "ms " <>
-      SchemaEasing.toCSSString cfg.easing <>
+      SchemaEasing.toLegacyCssString cfg.easing <>
       (if cfg.delay > 0 then " " <> show cfg.delay <> "ms" else "")
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -281,7 +281,7 @@ animationStyle cfg =
   "animation: " <>
   cfg.name <> " " <>
   show cfg.duration <> "ms " <>
-  SchemaEasing.toCSSString cfg.easing <> " " <>
+  SchemaEasing.toLegacyCssString cfg.easing <> " " <>
   show cfg.delay <> "ms " <>
   iterationToCss cfg.iteration <> " " <>
   directionToCss cfg.direction <> " " <>

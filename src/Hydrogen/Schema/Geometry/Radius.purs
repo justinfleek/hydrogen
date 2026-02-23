@@ -51,9 +51,9 @@ module Hydrogen.Schema.Geometry.Radius
   , double
   , half
   
-  -- * Conversion
-  , toCss
-  , cornersToCss
+  -- * Legacy CSS Conversion (for interop with legacy systems)
+  , toLegacyCss
+  , cornersToLegacyCss
   ) where
 
 import Prelude
@@ -75,7 +75,7 @@ data Radius
 derive instance eqRadius :: Eq Radius
 
 instance showRadius :: Show Radius where
-  show = toCss
+  show = toLegacyCss
 
 -- | Per-corner radius control
 type Corners =
@@ -207,21 +207,27 @@ half = scale 0.5
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert radius to CSS string
-toCss :: Radius -> String
-toCss = case _ of
+-- | Convert radius to CSS string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: Radius -> String
+toLegacyCss = case _ of
   RadiusPx n -> showNum n <> "px"
   RadiusPercent n -> showNum n <> "%"
   RadiusRem n -> showNum n <> "rem"
   RadiusFull -> "9999px"
   RadiusNone -> "0"
 
--- | Convert corners to CSS border-radius string
-cornersToCss :: Corners -> String
-cornersToCss { topLeft, topRight, bottomRight, bottomLeft } =
-  if allSame then toCss topLeft
-  else if topSame && bottomSame then toCss topLeft <> " " <> toCss bottomRight
-  else toCss topLeft <> " " <> toCss topRight <> " " <> toCss bottomRight <> " " <> toCss bottomLeft
+-- | Convert corners to CSS border-radius string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+cornersToLegacyCss :: Corners -> String
+cornersToLegacyCss { topLeft, topRight, bottomRight, bottomLeft } =
+  if allSame then toLegacyCss topLeft
+  else if topSame && bottomSame then toLegacyCss topLeft <> " " <> toLegacyCss bottomRight
+  else toLegacyCss topLeft <> " " <> toLegacyCss topRight <> " " <> toLegacyCss bottomRight <> " " <> toLegacyCss bottomLeft
   where
     allSame = topLeft == topRight && topRight == bottomRight && bottomRight == bottomLeft
     topSame = topLeft == topRight
