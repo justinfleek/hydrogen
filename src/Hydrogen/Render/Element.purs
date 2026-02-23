@@ -77,6 +77,8 @@ module Hydrogen.Render.Element
   , th_
   , thead_
   , tbody_
+  , tfoot_
+  , caption_
   , section_
   , article_
   , header_
@@ -114,6 +116,7 @@ module Hydrogen.Render.Element
   , stop_
   , text_
   , tspan_
+  , polyline_
   
   -- * Attributes
   , attr
@@ -148,6 +151,9 @@ module Hydrogen.Render.Element
   , ariaHidden
   , ariaDescribedBy
   , ariaLabelledBy
+  , ariaLive
+  , ariaAtomic
+  , ariaRole
   , dataAttr
   
   -- * Event Handlers
@@ -475,6 +481,12 @@ thead_ = element "thead"
 tbody_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 tbody_ = element "tbody"
 
+tfoot_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
+tfoot_ = element "tfoot"
+
+caption_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
+caption_ = element "caption"
+
 section_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 section_ = element "section"
 
@@ -591,6 +603,9 @@ text_ = svgElement "text"
 
 tspan_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 tspan_ = svgElement "tspan"
+
+polyline_ :: forall msg. Array (Attribute msg) -> Element msg
+polyline_ attrs = svgElement "polyline" attrs []
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // attributes
@@ -726,6 +741,18 @@ ariaDescribedBy = Attr "aria-describedby"
 -- | Set aria-labelledby
 ariaLabelledBy :: forall msg. String -> Attribute msg
 ariaLabelledBy = Attr "aria-labelledby"
+
+-- | Set aria-live for live regions
+ariaLive :: forall msg. String -> Attribute msg
+ariaLive = Attr "aria-live"
+
+-- | Set aria-atomic for live regions
+ariaAtomic :: forall msg. String -> Attribute msg
+ariaAtomic = Attr "aria-atomic"
+
+-- | Set aria role
+ariaRole :: forall msg. String -> Attribute msg
+ariaRole = Attr "role"
 
 -- | Set a data-* attribute
 dataAttr :: forall msg. String -> String -> Attribute msg
