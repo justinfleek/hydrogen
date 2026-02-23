@@ -10,10 +10,52 @@
 
 # HYDROGEN
 
-**PureScript/Halogen web framework for building correct web applications.**
+**The purest web design language ever created.**
 
-The foundation that LATTICE and COMPASS render through. Built on lawful 
+Hydrogen is a **pure rendering abstraction** — UI as data, not framework-specific
+code. The foundation that LATTICE and COMPASS render through. Built on lawful 
 abstractions and designed for eventual integration with Lean4 proofs.
+
+**Zero external framework dependencies.** No Halogen. No React. No Vue.
+Just pure PureScript describing UI as data, with minimal runtime to execute.
+
+## Core Architecture
+
+```
+State × Msg → State × [Cmd]
+view :: State → Element Msg
+```
+
+Elements are pure PureScript data structures. Targets interpret them to reality:
+
+- `Hydrogen.Target.DOM` — Direct browser manipulation with diff/patch
+- `Hydrogen.Target.Static` — HTML strings for SSG
+- `Hydrogen.Target.Canvas` — 2D canvas for motion graphics
+- `Hydrogen.Target.WebGL` — 3D rendering for spatial UI
+- `Hydrogen.Target.Halogen` — Legacy adapter (deprecating)
+
+Following libevring's pattern: **separate what from how**.
+
+## The Hydrogen Runtime
+
+```purescript
+-- Define your application as pure functions
+type App state msg =
+  { init :: state
+  , update :: msg -> state -> state
+  , view :: state -> Element msg
+  }
+
+-- Hydrogen runs it against reality
+Hydrogen.run :: forall state msg. App state msg -> Effect Unit
+```
+
+No framework. No magic. Just:
+1. Render `Element` to DOM
+2. Wire event handlers to dispatch `msg`
+3. On `msg`, call `update`, get new state
+4. Diff old/new `Element`, patch DOM
+5. Repeat
 
 ════════════════════════════════════════════════════════════════════════════════
                                                               // choice // point
@@ -184,22 +226,46 @@ If you write code, it must be COMPLETE.
 ❌ unsafePerformEffect
 ```
 
-## Component Structure
+## Element Structure
+
+Hydrogen elements are pure data, not framework-specific virtual DOM:
 
 ```purescript
--- Use H.mkComponent, NOT deprecated H.component
-component :: forall m. MonadAff m => H.Component Query Input Output m
-component = H.mkComponent
-  { initialState
-  , render
-  , eval: H.mkEval $ H.defaultEval
-      { handleAction = handleAction
-      , handleQuery = handleQuery
-      , initialize = Just Initialize
-      , finalize = Just Finalize
-      }
-  }
+import Hydrogen.Render.Element as E
+
+-- Pure data describing UI
+myButton :: forall msg. msg -> String -> E.Element msg
+myButton onClick label =
+  E.button_
+    [ E.onClick onClick
+    , E.class_ "btn btn-primary"
+    ]
+    [ E.text label ]
 ```
+
+## Component Structure
+
+Components are pure functions returning `Element msg`. No framework dependencies:
+
+```purescript
+-- Atoms: primitive values with bounds
+type Hue = BoundedInt 0 359  -- wraps
+
+-- Molecules: composed from atoms
+button :: forall msg. ButtonConfig msg -> Array (Element msg) -> Element msg
+button cfg children = E.button_ (buildAttrs cfg) children
+
+-- Compounds: complex compositions
+colorPicker :: forall msg. ColorPickerConfig msg -> Element msg
+colorPicker cfg = E.div_ [ E.class_ "color-picker" ]
+  [ hueSlider cfg
+  , saturationSlider cfg
+  , lightnessSlider cfg
+  , colorPreview cfg
+  ]
+```
+
+State lives outside components. Components are **view functions**, not stateful objects.
 
 ## RemoteData is a Lawful Monad
 
@@ -350,12 +416,20 @@ When you see an error or warning:
 
 ## FFI Policy
 
-FFI is permitted ONLY for:
-- Imports/exports of code at system boundaries
-- Direct interaction with diffusion models or Python ML scripts
-- Browser APIs (DOM, Web APIs)
+**No FFI in UI components.** Everything is pure Element composition.
 
-**Pure Hydrogen framework for all frontend logic.**
+FFI is permitted ONLY at true system boundaries:
+- Parsing external data (e.g., Cloudflare markdown plugin parsing website DNA)
+- Export formats (user requests specific output format)
+- Minimal DOM runtime (the interpreter that executes Element against reality)
+
+**UI components are pure functions.** State is managed by the runtime.
+A ColorPicker is a compound of atoms (Hue, Saturation, Lightness) and molecules
+(sliders, swatches, inputs). It receives state, returns Element. No FFI.
+
+The goal: **anything that can be displayed on a screen** — from Ableton to After
+Effects to hospital dashboards to fighter jet HUDs — should have a Hydrogen
+component for it. Pure data. Composable. Verifiable.
 
 ## Documentation Standards
 

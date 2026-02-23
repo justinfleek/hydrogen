@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydrogen // Runtime Demo</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-subtle: #111111;
+      --bg-muted: #1a1a1a;
+      --fg: #fafafa;
+      --fg-muted: #888888;
+      --fg-subtle: #666666;
+      --border: #222222;
+      --accent: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .demo-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .demo-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .demo-header p {
+      color: var(--fg-muted);
+      font-size: 0.875rem;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .demo-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .demo-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-muted);
+    }
+
+    .demo-card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 0.25rem;
+    }
+
+    .demo-card-description {
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+    }
+
+    .demo-card-content {
+      padding: 1.5rem;
+      min-height: 250px;
+    }
+
+    /* App-specific container styles */
+    .counter-app {
+      text-align: center;
+    }
+
+    .todo-app {
+      max-width: 100%;
+    }
+
+    /* Button styles for the demo apps */
+    .demo-card button {
+      transition: all 0.15s ease;
+    }
+
+    .demo-card button:active {
+      transform: scale(0.98);
+    }
+
+    /* Input styles */
+    .demo-card input[type="text"] {
+      background: var(--bg);
+      border-color: var(--border);
+      color: var(--fg);
+    }
+
+    .demo-card input[type="text"]::placeholder {
+      color: var(--fg-subtle);
+    }
+
+    .demo-card input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Checkbox styles */
+    .demo-card input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      border-radius: 9999px;
+      background: rgba(139, 92, 246, 0.15);
+      color: #a78bfa;
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Spring demo box */
+    .spring-box {
+      transition: none; /* Spring handles animation */
+    }
+
+    /* Console output */
+    .demo-footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .demo-footer h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-subtle);
+      margin-bottom: 0.75rem;
+    }
+
+    .demo-footer pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      max-height: 150px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body class="dark">
+  <!-- Header -->
+  <header class="demo-header">
+    <h1>Hydrogen // Runtime Demo</h1>
+    <p>Pure PureScript applications running without framework dependencies.</p>
+    <div style="margin-top: 0.75rem;">
+      <span class="status-badge">Runtime Active</span>
+    </div>
+  </header>
+
+  <!-- Demo Grid -->
+  <main class="demo-grid">
+    <!-- Counter App -->
+    <article class="demo-card">
+      <header class="demo-card-header">
+        <h2 class="demo-card-title">Counter</h2>
+        <p class="demo-card-description">Simple state management with event handling. No commands.</p>
+      </header>
+      <div class="demo-card-content" id="counter-app">
+        <p style="color: var(--fg-subtle); font-size: 0.875rem;">Loading...</p>
+      </div>
+    </article>
+
+    <!-- Todo App -->
+    <article class="demo-card">
+      <header class="demo-card-header">
+        <h2 class="demo-card-title">Todo List</h2>
+        <p class="demo-card-description">List rendering, input handling, array operations. No commands.</p>
+      </header>
+      <div class="demo-card-content" id="todo-app">
+        <p style="color: var(--fg-subtle); font-size: 0.875rem;">Loading...</p>
+      </div>
+    </article>
+
+    <!-- Timer App -->
+    <article class="demo-card">
+      <header class="demo-card-header">
+        <h2 class="demo-card-title">Timer</h2>
+        <p class="demo-card-description">Self-scheduling with delay and interval commands.</p>
+      </header>
+      <div class="demo-card-content" id="timer-app">
+        <p style="color: var(--fg-subtle); font-size: 0.875rem;">Loading...</p>
+      </div>
+    </article>
+
+    <!-- Spring Demo App -->
+    <article class="demo-card">
+      <header class="demo-card-header">
+        <h2 class="demo-card-title">Spring Animation</h2>
+        <p class="demo-card-description">Physics-based spring animation with requestAnimationFrame.</p>
+      </header>
+      <div class="demo-card-content" id="spring-app">
+        <p style="color: var(--fg-subtle); font-size: 0.875rem;">Loading...</p>
+      </div>
+    </article>
+
+    <!-- Fetch Demo App -->
+    <article class="demo-card">
+      <header class="demo-card-header">
+        <h2 class="demo-card-title">HTTP Fetch</h2>
+        <p class="demo-card-description">HTTP commands using the fetch API with loading and error states.</p>
+      </header>
+      <div class="demo-card-content" id="fetch-app">
+        <p style="color: var(--fg-subtle); font-size: 0.875rem;">Loading...</p>
+      </div>
+    </article>
+  </main>
+
+  <!-- Footer with instructions -->
+  <footer class="demo-footer">
+    <h3>Build Instructions</h3>
+    <pre>nix develop --command spago bundle --module Hydrogen.Runtime.Demo --outfile showcase/runtime-demo.js</pre>
+  </footer>
+
+  <!-- Load the bundled PureScript (IIFE, auto-executes main) -->
+  <script src="./runtime-demo.js"></script>
+</body>
+</html>

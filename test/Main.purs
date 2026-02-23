@@ -27,6 +27,7 @@ import Test.Spec.Runner (runSpec)
 import Test.Property as Property
 import Test.ColorConversion as ColorConversion
 import Test.ColorEdgeCases as ColorEdgeCases
+import Test.Element as Element
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -40,6 +41,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     rendererTests
     remoteDataTests
     queryTests
+  describe "Render Abstraction" do
+    Element.elementTests
   describe "Property Tests" do
     Property.propertyTests
   describe "Color System Tests" do

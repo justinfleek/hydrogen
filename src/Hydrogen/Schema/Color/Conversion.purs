@@ -806,43 +806,82 @@ oklchToRgb = oklabToRgb <<< oklchToOklab
 --                                                               // rgb ↔ hwb
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | RGB → HWB (via HSL)
+-- | RGB → HWB (direct conversion)
+-- |
+-- | **Algorithm:**
+-- | - Hue: same as HSL hue (derived from RGB)
+-- | - Whiteness: min(R, G, B) / 255 as percentage
+-- | - Blackness: 1 - max(R, G, B) / 255 as percentage
+-- |
+-- | This is a direct calculation, not via HSL intermediate.
 rgbToHwb :: RGB.RGB -> HWB.HWB
 rgbToHwb rgb =
   let
+    r = Ch.unwrap (RGB.red rgb)
+    g = Ch.unwrap (RGB.green rgb)
+    b = Ch.unwrap (RGB.blue rgb)
+    
+    -- Get hue from HSL (hue calculation is independent)
     hsl = rgbToHsl rgb
     h = Hue.unwrap (HSL.hue hsl)
-    s = Sat.unwrap (HSL.saturation hsl)
-    l = Light.unwrap (HSL.lightness hsl)
     
-    -- Calculate whiteness and blackness from HSL
-    sNum = Int.toNumber s
-    lNum = Int.toNumber l
-    w = (100.0 - sNum) * lNum / 100.0
-    b = 100.0 - lNum - (sNum * lNum / 100.0)
+    -- Direct whiteness/blackness calculation
+    minVal = min3 r g b
+    maxVal = max3 r g b
+    
+    -- Whiteness = min / 255 * 100
+    wNum = Int.toNumber minVal / 255.0 * 100.0
+    -- Blackness = (1 - max / 255) * 100
+    bNum = (1.0 - Int.toNumber maxVal / 255.0) * 100.0
   in
-    HWB.hwb h (Int.round w) (Int.round b)
+    HWB.hwb h (Int.round wNum) (Int.round bNum)
+  where
+  min3 a b c = if a <= b && a <= c then a else if b <= c then b else c
+  max3 a b c = if a >= b && a >= c then a else if b >= c then b else c
 
--- | HWB → RGB (via HSL)
+-- | HWB → RGB (direct conversion)
+-- |
+-- | **Algorithm:**
+-- | 1. If W + B >= 100: achromatic gray = W / (W + B)
+-- | 2. Otherwise: calculate pure hue RGB, then:
+-- |    RGB' = RGB * (1 - W/100 - B/100) + W/100
+-- |
+-- | This avoids HSL intermediate for better precision.
 hwbToRgb :: HWB.HWB -> RGB.RGB
 hwbToRgb hwb =
   let
     h = Hue.unwrap (HWB.hue hwb)
-    w = Int.toNumber (HWB.unwrapWhiteness (HWB.getWhiteness hwb))
-    b = Int.toNumber (HWB.unwrapBlackness (HWB.getBlackness hwb))
+    wInt = HWB.unwrapWhiteness (HWB.getWhiteness hwb)
+    bInt = HWB.unwrapBlackness (HWB.getBlackness hwb)
+    w = Int.toNumber wInt / 100.0
+    b = Int.toNumber bInt / 100.0
     
-    -- Normalize if w + b > 100
+    -- Normalize if w + b > 1
     total = w + b
-    w' = if total > 100.0 then (w * 100.0) / total else w
-    b' = if total > 100.0 then (b * 100.0) / total else b
-    
-    -- Convert to HSL
-    l = (100.0 - b') - (100.0 - b' - w') / 2.0
-    s = if l == 0.0 || l == 100.0 then 0.0 else ((100.0 - b' - l) * 100.0) / min l (100.0 - l)
+    w' = if total > 1.0 then w / total else w
+    b' = if total > 1.0 then b / total else b
   in
-    hslToRgb (HSL.hsl h (Int.round s) (Int.round l))
-  where
-  min a b = if a < b then a else b
+    if w' + b' >= 1.0
+      then
+        -- Achromatic case: gray
+        let gray = Int.round (w' / (w' + b') * 255.0)
+        in RGB.rgb gray gray gray
+      else
+        -- Chromatic case: get pure hue, then apply whiteness/blackness
+        let
+          -- Get pure hue RGB (saturation=100, lightness=50)
+          pureHueRgb = hslToRgb (HSL.hsl h 100 50)
+          pr = Int.toNumber (Ch.unwrap (RGB.red pureHueRgb)) / 255.0
+          pg = Int.toNumber (Ch.unwrap (RGB.green pureHueRgb)) / 255.0
+          pb = Int.toNumber (Ch.unwrap (RGB.blue pureHueRgb)) / 255.0
+          
+          -- Apply formula: RGB' = RGB * (1 - W - B) + W
+          factor = 1.0 - w' - b'
+          r = Int.round ((pr * factor + w') * 255.0)
+          g = Int.round ((pg * factor + w') * 255.0)
+          bb = Int.round ((pb * factor + w') * 255.0)
+        in
+          RGB.rgb r g bb
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // rgb ↔ yuv
