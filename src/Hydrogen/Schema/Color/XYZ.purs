@@ -61,7 +61,7 @@ module Hydrogen.Schema.Color.XYZ
   , d65White
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, show, (<>), (<), (>), otherwise)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // atoms

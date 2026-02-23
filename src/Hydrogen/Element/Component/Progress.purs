@@ -223,7 +223,7 @@ buildTrackAttrs props =
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "9999px" ]  -- Fully rounded
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Core styles
     coreStyles =
@@ -235,7 +235,7 @@ buildTrackAttrs props =
       , E.style "width" "100%"
       , E.style "height" heightValue
       , E.style "overflow" "hidden"
-      , E.style "background-color" (Color.toCss trackCol)
+      , E.style "background-color" (Color.toLegacyCss trackCol)
       ]
   in
     coreStyles <> radiusStyle <> props.extraAttributes
@@ -257,7 +257,7 @@ buildIndicatorAttrs percentage props =
     coreStyles =
       [ E.style "height" "100%"
       , E.style "width" (show percentage <> "%")
-      , E.style "background-color" (Color.toCss indicatorCol)
+      , E.style "background-color" (Color.toLegacyCss indicatorCol)
       , E.style "border-radius" "inherit"
       ]
   in
@@ -288,7 +288,7 @@ progressIndeterminate propMods =
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "9999px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Track styles
     trackStyles =
@@ -297,14 +297,14 @@ progressIndeterminate propMods =
       , E.style "width" "100%"
       , E.style "height" heightValue
       , E.style "overflow" "hidden"
-      , E.style "background-color" (Color.toCss trackCol)
+      , E.style "background-color" (Color.toLegacyCss trackCol)
       ]
     
     -- Indicator styles (animated)
     indicatorStyles =
       [ E.style "height" "100%"
       , E.style "width" "33%"
-      , E.style "background-color" (Color.toCss indicatorCol)
+      , E.style "background-color" (Color.toLegacyCss indicatorCol)
       , E.style "border-radius" "inherit"
       , E.style "animation" "progress-indeterminate 1.5s ease-in-out infinite"
       ]

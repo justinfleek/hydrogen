@@ -105,7 +105,7 @@ module Hydrogen.Schema.Motion.Easing
   , p1y
   , p2x
   , p2y
-  , toCSSString
+  , toLegacyCssString
   , name
   ) where
 
@@ -427,13 +427,16 @@ p2x easing = (toControlPoints easing).x2
 p2y :: Easing -> Number
 p2y easing = (toControlPoints easing).y2
 
--- | Get CSS animation-timing-function value
-toCSSString :: Easing -> String
-toCSSString Linear = "linear"
-toCSSString (Bezier (CubicBezier p) _) =
+-- | Get CSS animation-timing-function value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCssString :: Easing -> String
+toLegacyCssString Linear = "linear"
+toLegacyCssString (Bezier (CubicBezier p) _) =
   "cubic-bezier(" <> show p.x1 <> ", " <> show p.y1 <> 
   ", " <> show p.x2 <> ", " <> show p.y2 <> ")"
-toCSSString (Steps n jumpStart) =
+toLegacyCssString (Steps n jumpStart) =
   "steps(" <> show n <> ", " <> 
   (if jumpStart then "jump-start" else "jump-end") <> ")"
 

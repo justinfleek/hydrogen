@@ -41,8 +41,12 @@ module Hydrogen.SSG
   ) where
 
 import Prelude
+  ( map
+  , ($)
+  , (<>)
+  )
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.HTML.Renderer as Renderer

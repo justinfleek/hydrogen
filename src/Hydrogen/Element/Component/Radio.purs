@@ -402,7 +402,7 @@ buildRadioAttrs props =
       , E.style "width" sizeValue
       , E.style "height" sizeValue
       , E.style "border-radius" "50%"
-      , E.style "border" ("2px solid " <> Color.toCss currentBorderColor)
+      , E.style "border" ("2px solid " <> Color.toLegacyCss currentBorderColor)
       , E.style "background-color" "transparent"
       , E.style "cursor" (if props.disabled then "not-allowed" else "pointer")
       , E.style "transition" ("all " <> transitionValue <> " ease-out")
@@ -433,7 +433,7 @@ innerDot props =
       , E.style "width" "10px"
       , E.style "height" "10px"
       , E.style "border-radius" "50%"
-      , E.style "background-color" (Color.toCss selColor)
+      , E.style "background-color" (Color.toLegacyCss selColor)
       ]
       []
 
@@ -450,15 +450,15 @@ radioWithLabel labelText propMods =
     -- Label styles
     fontSizeStyle = case props.labelFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.labelFontWeight of
       Nothing -> [ E.style "font-weight" "400" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.labelColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     cursorStyle = if props.disabled
       then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]
@@ -518,15 +518,15 @@ radioItem itemValue propMods children =
     -- Label styles
     fontSizeStyle = case props.labelFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.labelFontWeight of
       Nothing -> [ E.style "font-weight" "400" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.labelColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     cursorStyle = if props.disabled
       then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]

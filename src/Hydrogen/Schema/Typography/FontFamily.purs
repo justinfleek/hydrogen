@@ -20,7 +20,7 @@ module Hydrogen.Schema.Typography.FontFamily
   ( FontFamily
   , fontFamily
   , unwrap
-  , toCss
+  , toLegacyCss
   -- Generic families (CSS keywords)
   , serif
   , sansSerif
@@ -138,12 +138,15 @@ fangsong = FontFamily "fangsong"
 unwrap :: FontFamily -> String
 unwrap (FontFamily f) = f
 
--- | Convert to CSS font-family value
+-- | Convert to CSS font-family value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Adds quotes if the family name contains spaces or special characters.
 -- | Generic family names (serif, sans-serif, etc.) are not quoted.
-toCss :: FontFamily -> String
-toCss (FontFamily f)
+toLegacyCss :: FontFamily -> String
+toLegacyCss (FontFamily f)
   | isGenericFamily f = f
   | needsQuotes f = "\"" <> f <> "\""
   | otherwise = f

@@ -39,7 +39,7 @@ module Hydrogen.Schema.Typography.Grade
   
   -- * Accessors
   , unwrap
-  , toCSSValue
+  , toLegacyCssValue
   , toVariationValue
   
   -- * Operations
@@ -120,9 +120,12 @@ lightMode = Grade 0
 unwrap :: Grade -> Int
 unwrap (Grade n) = n
 
--- | Convert to CSS value (for font-variation-settings)
-toCSSValue :: Grade -> String
-toCSSValue (Grade n) = show n
+-- | Convert to CSS value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCssValue :: Grade -> String
+toLegacyCssValue (Grade n) = show n
 
 -- | Convert to variation axis value string
 toVariationValue :: Grade -> String

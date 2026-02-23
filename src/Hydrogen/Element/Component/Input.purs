@@ -513,8 +513,8 @@ buildInputStyles props =
       [ E.style "display" "block"
       , E.style "width" "100%"
       , E.style "box-sizing" "border-box"
-      , E.style "background-color" (Color.toCss bgColor)
-      , E.style "color" (Color.toCss txtColor)
+      , E.style "background-color" (Color.toLegacyCss bgColor)
+      , E.style "color" (Color.toLegacyCss txtColor)
       ]
     
     -- Border styles
@@ -522,13 +522,13 @@ buildInputStyles props =
       let bw = maybe "1px" show props.borderWidth
       in [ E.style "border-style" "solid"
          , E.style "border-width" bw
-         , E.style "border-color" (Color.toCss brdColor)
+         , E.style "border-color" (Color.toLegacyCss brdColor)
          ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "6px" ]  -- Default rounded
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Dimension styles
     heightStyle = case props.height of
@@ -545,7 +545,7 @@ buildInputStyles props =
     -- Typography styles
     fontSizeStyle = case props.fontSize of
       Nothing -> [ E.style "font-size" "14px" ]  -- Default
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     -- Transition styles
     transitionStyle =
@@ -655,9 +655,9 @@ inputWithLabel labelText propMods =
     propsWithId = propMods <> [ inputId fieldId ]
     
     -- Label styles
-    labelFontSizeVal = maybe "14px" FontSize.toCss props.labelFontSize
-    labelFontWeightVal = maybe "500" FontWeight.toCss props.labelFontWeight
-    labelColorVal = maybe "inherit" Color.toCss props.labelColor
+    labelFontSizeVal = maybe "14px" FontSize.toLegacyCss props.labelFontSize
+    labelFontWeightVal = maybe "500" FontWeight.toLegacyCss props.labelFontWeight
+    labelColorVal = maybe "inherit" Color.toLegacyCss props.labelColor
   in
     E.div_
       [ E.style "display" "flex"
@@ -685,9 +685,9 @@ textareaWithLabel labelText propMods =
     propsWithId = propMods <> [ inputId fieldId ]
     
     -- Label styles
-    labelFontSizeVal = maybe "14px" FontSize.toCss props.labelFontSize
-    labelFontWeightVal = maybe "500" FontWeight.toCss props.labelFontWeight
-    labelColorVal = maybe "inherit" Color.toCss props.labelColor
+    labelFontSizeVal = maybe "14px" FontSize.toLegacyCss props.labelFontSize
+    labelFontWeightVal = maybe "500" FontWeight.toLegacyCss props.labelFontWeight
+    labelColorVal = maybe "inherit" Color.toLegacyCss props.labelColor
   in
     E.div_
       [ E.style "display" "flex"

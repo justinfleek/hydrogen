@@ -51,7 +51,7 @@ module Hydrogen.Schema.Color.LAB
   , deltaE
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, show, otherwise, negate, (<>), (<), (>), (+), (-), (*))
 
 import Data.Number (sqrt)
 

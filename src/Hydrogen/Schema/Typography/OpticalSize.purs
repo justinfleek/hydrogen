@@ -38,7 +38,7 @@ module Hydrogen.Schema.Typography.OpticalSize
   
   -- * Accessors
   , unwrap
-  , toCSSValue
+  , toLegacyCssValue
   , toVariationValue
   
   -- * Operations
@@ -121,10 +121,13 @@ unwrap (OpticalSize n) = n
 toPoints :: OpticalSize -> Number
 toPoints (OpticalSize n) = Int.toNumber n / 10.0
 
--- | Convert to CSS value string
-toCSSValue :: OpticalSize -> String
-toCSSValue (OpticalSize 0) = "auto"
-toCSSValue os = show (toPoints os)
+-- | Convert to CSS value string for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCssValue :: OpticalSize -> String
+toLegacyCssValue (OpticalSize 0) = "auto"
+toLegacyCssValue os = show (toPoints os)
 
 -- | Convert to variation axis value (for font-variation-settings)
 toVariationValue :: OpticalSize -> String

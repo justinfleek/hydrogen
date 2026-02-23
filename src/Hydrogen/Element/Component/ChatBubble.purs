@@ -467,7 +467,7 @@ renderSenderName isSent props =
       Nothing -> E.empty
       Just name ->
         let
-          colorStyle = maybe "inherit" Color.toCss props.senderTextColor
+          colorStyle = maybe "inherit" Color.toLegacyCss props.senderTextColor
         in
           E.span_
             [ E.style "font-size" "12px"
@@ -538,9 +538,9 @@ buildBubbleStyles isSent props =
     
     -- Core styles
     coreStyles =
-      [ E.style "background-color" (Color.toCss bgColor)
-      , E.style "color" (Color.toCss txtColor)
-      , E.style "border-radius" (Geometry.cornersToCss radiusValue)
+      [ E.style "background-color" (Color.toLegacyCss bgColor)
+      , E.style "color" (Color.toLegacyCss txtColor)
+      , E.style "border-radius" (Geometry.cornersToLegacyCss radiusValue)
       , E.style "padding" paddingValue
       , E.style "max-width" maxWidthValue
       , E.style "word-wrap" "break-word"
@@ -553,7 +553,7 @@ buildBubbleStyles isSent props =
       Just s -> 
         if Shadow.isNoShadow s
           then []
-          else [ E.style "box-shadow" (Shadow.layeredToCss s) ]
+          else [ E.style "box-shadow" (Shadow.layeredToLegacyCss s) ]
     
     -- Glow (if provided, and not "off")
     glowStyle = case props.glow of
@@ -586,7 +586,7 @@ renderMetadata isSent props =
     Nothing -> E.empty
     Just ts ->
       let
-        colorStyle = maybe "inherit" Color.toCss props.timestampTextColor
+        colorStyle = maybe "inherit" Color.toLegacyCss props.timestampTextColor
         defaultOpacity = "0.7"
       in
         E.div_

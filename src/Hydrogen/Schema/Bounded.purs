@@ -50,6 +50,18 @@ module Hydrogen.Schema.Bounded
   ) where
 
 import Prelude
+  ( class Ord
+  , otherwise
+  , not
+  , negate
+  , (&&)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (/=)
+  , (/)
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // bounds documentation

@@ -363,16 +363,16 @@ resolveConfig props =
   , labelCol: maybe (Color.rgb 200 200 200) (\c -> c) props.labelColor
   , primaryCol: maybe (Color.rgb 59 130 246) (\c -> c) props.primaryColor
   , trackColor: maybe (Color.rgb 80 80 80) (\c -> c) props.sliderTrackColor
-  , panelRadius: maybe "8px" Geometry.cornersToCss props.panelBorderRadius
-  , previewRadius: maybe "4px" Geometry.cornersToCss props.previewBorderRadius
+  , panelRadius: maybe "8px" Geometry.cornersToLegacyCss props.panelBorderRadius
+  , previewRadius: maybe "4px" Geometry.cornersToLegacyCss props.previewBorderRadius
   , paddingVal: maybe "16px" show props.padding
   , gapVal: maybe "16px" show props.gap
   , borderWidthVal: maybe "1px" show props.borderWidth
   , previewHeightVal: maybe "64px" show props.previewHeight
-  , labelFontSizeVal: maybe "14px" FontSize.toCss props.labelFontSize
-  , labelFontWeightVal: maybe "500" FontWeight.toCss props.labelFontWeight
-  , headerFontSizeVal: maybe "14px" FontSize.toCss props.headerFontSize
-  , headerFontWeightVal: maybe "700" FontWeight.toCss props.headerFontWeight
+  , labelFontSizeVal: maybe "14px" FontSize.toLegacyCss props.labelFontSize
+  , labelFontWeightVal: maybe "500" FontWeight.toLegacyCss props.labelFontWeight
+  , headerFontSizeVal: maybe "14px" FontSize.toLegacyCss props.headerFontSize
+  , headerFontWeightVal: maybe "700" FontWeight.toLegacyCss props.headerFontWeight
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -402,10 +402,10 @@ buildPanelAttrs config =
   , E.style "flex-direction" "column"
   , E.style "gap" config.gapVal
   , E.style "padding" config.paddingVal
-  , E.style "background-color" (Color.toCss config.bgColor)
+  , E.style "background-color" (Color.toLegacyCss config.bgColor)
   , E.style "border-style" "solid"
   , E.style "border-width" config.borderWidthVal
-  , E.style "border-color" (Color.toCss config.borderCol)
+  , E.style "border-color" (Color.toLegacyCss config.borderCol)
   , E.style "border-radius" config.panelRadius
   ]
 
@@ -419,10 +419,10 @@ renderColorPreview props config =
   E.div_
     [ E.style "width" "100%"
     , E.style "height" config.previewHeightVal
-    , E.style "background-color" (Color.toCss props.color)
+    , E.style "background-color" (Color.toLegacyCss props.color)
     , E.style "border-style" "solid"
     , E.style "border-width" config.borderWidthVal
-    , E.style "border-color" (Color.toCss config.borderCol)
+    , E.style "border-color" (Color.toLegacyCss config.borderCol)
     , E.style "border-radius" config.previewRadius
     ]
     []
@@ -439,7 +439,7 @@ renderModeToggles props config =
     , E.style "flex-wrap" "wrap"
     , E.style "gap" "12px"
     , E.style "padding-bottom" "8px"
-    , E.style "border-bottom" ("1px solid " <> Color.toCss config.borderCol)
+    , E.style "border-bottom" ("1px solid " <> Color.toLegacyCss config.borderCol)
     ]
     [ renderModeCheckbox ModeHSL props config
     , renderModeCheckbox ModeRGB props config
@@ -474,7 +474,7 @@ renderModeCheckbox mode props config =
       , E.span_
           [ E.style "font-size" config.labelFontSizeVal
           , E.style "font-weight" config.labelFontWeightVal
-          , E.style "color" (Color.toCss config.labelCol)
+          , E.style "color" (Color.toLegacyCss config.labelCol)
           ]
           [ E.text (modeName mode) ]
       ]
@@ -492,8 +492,8 @@ renderCheckboxVisual isChecked config =
       , E.style "border-radius" "4px"
       , E.style "border-style" "solid"
       , E.style "border-width" "2px"
-      , E.style "border-color" (Color.toCss borderCol)
-      , E.style "background-color" (Color.toCss bgColor)
+      , E.style "border-color" (Color.toLegacyCss borderCol)
+      , E.style "background-color" (Color.toLegacyCss bgColor)
       , E.style "display" "flex"
       , E.style "align-items" "center"
       , E.style "justify-content" "center"
@@ -792,7 +792,7 @@ renderSectionHeader label config =
     [ E.style "margin" "0"
     , E.style "font-size" config.headerFontSizeVal
     , E.style "font-weight" config.headerFontWeightVal
-    , E.style "color" (Color.toCss config.labelCol)
+    , E.style "color" (Color.toLegacyCss config.labelCol)
     , E.style "opacity" "0.6"
     ]
     [ E.text label ]
@@ -804,8 +804,8 @@ renderSlider label minVal maxVal currentVal handler config =
     -- Calculate fill percentage for track visualization
     percent = toPercent minVal maxVal currentVal
     trackGradient = "linear-gradient(to right, " 
-      <> Color.toCss config.primaryCol <> " " <> percent <> ", "
-      <> Color.toCss config.trackColor <> " " <> percent <> ")"
+      <> Color.toLegacyCss config.primaryCol <> " " <> percent <> ", "
+      <> Color.toLegacyCss config.trackColor <> " " <> percent <> ")"
   in
     E.div_
       [ E.style "display" "flex"
@@ -815,7 +815,7 @@ renderSlider label minVal maxVal currentVal handler config =
       [ E.label_
           [ E.style "font-size" config.labelFontSizeVal
           , E.style "font-weight" config.labelFontWeightVal
-          , E.style "color" (Color.toCss config.labelCol)
+          , E.style "color" (Color.toLegacyCss config.labelCol)
           ]
           [ E.text (label <> ": " <> show currentVal) ]
       , E.input_
@@ -828,7 +828,7 @@ renderSlider label minVal maxVal currentVal handler config =
           , E.style "height" "8px"
           , E.style "border-radius" "4px"
           , E.style "background" trackGradient
-          , E.style "accent-color" (Color.toCss config.primaryCol)
+          , E.style "accent-color" (Color.toLegacyCss config.primaryCol)
           , E.style "cursor" "pointer"
           ]
       ]
@@ -839,8 +839,8 @@ renderSliderReadonly label minVal maxVal currentVal config =
   let
     percent = toPercent minVal maxVal currentVal
     trackGradient = "linear-gradient(to right, " 
-      <> Color.toCss config.primaryCol <> " " <> percent <> ", "
-      <> Color.toCss config.trackColor <> " " <> percent <> ")"
+      <> Color.toLegacyCss config.primaryCol <> " " <> percent <> ", "
+      <> Color.toLegacyCss config.trackColor <> " " <> percent <> ")"
   in
     E.div_
       [ E.style "display" "flex"
@@ -850,7 +850,7 @@ renderSliderReadonly label minVal maxVal currentVal config =
       [ E.label_
           [ E.style "font-size" config.labelFontSizeVal
           , E.style "font-weight" config.labelFontWeightVal
-          , E.style "color" (Color.toCss config.labelCol)
+          , E.style "color" (Color.toLegacyCss config.labelCol)
           ]
           [ E.text (label <> ": " <> show currentVal) ]
       , E.input_
@@ -863,7 +863,7 @@ renderSliderReadonly label minVal maxVal currentVal config =
           , E.style "height" "8px"
           , E.style "border-radius" "4px"
           , E.style "background" trackGradient
-          , E.style "accent-color" (Color.toCss config.primaryCol)
+          , E.style "accent-color" (Color.toLegacyCss config.primaryCol)
           , E.style "opacity" "0.5"
           , E.style "cursor" "not-allowed"
           ]
@@ -876,8 +876,8 @@ renderSliderFloat label minVal maxVal stepVal currentVal handler config =
     displayVal = toStringWith (fixed 3) currentVal
     percent = toPercentFloat minVal maxVal currentVal
     trackGradient = "linear-gradient(to right, " 
-      <> Color.toCss config.primaryCol <> " " <> percent <> ", "
-      <> Color.toCss config.trackColor <> " " <> percent <> ")"
+      <> Color.toLegacyCss config.primaryCol <> " " <> percent <> ", "
+      <> Color.toLegacyCss config.trackColor <> " " <> percent <> ")"
   in
     E.div_
       [ E.style "display" "flex"
@@ -887,7 +887,7 @@ renderSliderFloat label minVal maxVal stepVal currentVal handler config =
       [ E.label_
           [ E.style "font-size" config.labelFontSizeVal
           , E.style "font-weight" config.labelFontWeightVal
-          , E.style "color" (Color.toCss config.labelCol)
+          , E.style "color" (Color.toLegacyCss config.labelCol)
           ]
           [ E.text (label <> ": " <> displayVal) ]
       , E.input_
@@ -901,7 +901,7 @@ renderSliderFloat label minVal maxVal stepVal currentVal handler config =
           , E.style "height" "8px"
           , E.style "border-radius" "4px"
           , E.style "background" trackGradient
-          , E.style "accent-color" (Color.toCss config.primaryCol)
+          , E.style "accent-color" (Color.toLegacyCss config.primaryCol)
           , E.style "cursor" "pointer"
           ]
       ]
@@ -913,8 +913,8 @@ renderSliderFloatReadonly label minVal maxVal currentVal config =
     displayVal = toStringWith (fixed 3) currentVal
     percent = toPercentFloat minVal maxVal currentVal
     trackGradient = "linear-gradient(to right, " 
-      <> Color.toCss config.primaryCol <> " " <> percent <> ", "
-      <> Color.toCss config.trackColor <> " " <> percent <> ")"
+      <> Color.toLegacyCss config.primaryCol <> " " <> percent <> ", "
+      <> Color.toLegacyCss config.trackColor <> " " <> percent <> ")"
   in
     E.div_
       [ E.style "display" "flex"
@@ -924,7 +924,7 @@ renderSliderFloatReadonly label minVal maxVal currentVal config =
       [ E.label_
           [ E.style "font-size" config.labelFontSizeVal
           , E.style "font-weight" config.labelFontWeightVal
-          , E.style "color" (Color.toCss config.labelCol)
+          , E.style "color" (Color.toLegacyCss config.labelCol)
           ]
           [ E.text (label <> ": " <> displayVal) ]
       , E.input_
@@ -937,7 +937,7 @@ renderSliderFloatReadonly label minVal maxVal currentVal config =
           , E.style "height" "8px"
           , E.style "border-radius" "4px"
           , E.style "background" trackGradient
-          , E.style "accent-color" (Color.toCss config.primaryCol)
+          , E.style "accent-color" (Color.toLegacyCss config.primaryCol)
           , E.style "opacity" "0.5"
           , E.style "cursor" "not-allowed"
           ]

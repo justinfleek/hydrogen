@@ -316,7 +316,7 @@ buildSkeletonAttrs props =
     -- Border radius (default: small rounded)
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "4px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Animation
     animationValue = case props.animation of
@@ -337,7 +337,7 @@ buildSkeletonAttrs props =
       [ E.style "display" "block"
       , E.style "width" widthValue
       , E.style "height" heightValue
-      , E.style "background-color" (Color.toCss baseColor)
+      , E.style "background-color" (Color.toLegacyCss baseColor)
       ]
   in
     coreStyles <> radiusStyle <> animationStyle <> props.extraAttributes

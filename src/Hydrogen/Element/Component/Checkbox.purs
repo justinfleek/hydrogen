@@ -301,7 +301,7 @@ buildCheckboxAttrs props =
     -- Border radius (default: 4px)
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "4px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Transition
     transitionValue = maybe "150ms" show props.transitionDuration
@@ -321,8 +321,8 @@ buildCheckboxAttrs props =
       , E.style "height" sizeValue
       , E.style "border-style" "solid"
       , E.style "border-width" brdWidth
-      , E.style "border-color" (if props.checked then Color.toCss bgColor else Color.toCss brdColor)
-      , E.style "background-color" (Color.toCss bgColor)
+      , E.style "border-color" (if props.checked then Color.toLegacyCss bgColor else Color.toLegacyCss brdColor)
+      , E.style "background-color" (Color.toLegacyCss bgColor)
       , E.style "cursor" (if props.disabled then "not-allowed" else "pointer")
       , E.style "transition" ("all " <> transitionValue <> " ease-out")
       , E.style "outline" "none"
@@ -358,7 +358,7 @@ checkmark props =
       , E.attr "height" "12"
       , E.attr "viewBox" "0 0 24 24"
       , E.attr "fill" "none"
-      , E.attr "stroke" (Color.toCss chkColor)
+      , E.attr "stroke" (Color.toLegacyCss chkColor)
       , E.attr "stroke-width" "3"
       , E.attr "stroke-linecap" "round"
       , E.attr "stroke-linejoin" "round"
@@ -383,15 +383,15 @@ checkboxWithLabel labelText propMods =
     -- Label styles
     fontSizeStyle = case props.labelFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.labelFontWeight of
       Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.labelColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     cursorStyle = if props.disabled
       then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]

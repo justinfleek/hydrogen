@@ -499,10 +499,10 @@ tagBadge :: forall msg. TagInputProps msg -> Tag -> Maybe msg -> E.Element msg
 tagBadge props t onRemoveMsg =
   let
     -- Tag styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.tagBackgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.tagTextColor
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.tagBorderRadius
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.tagFontSize
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.tagBackgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.tagTextColor
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.tagBorderRadius
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.tagFontSize
     paddingXStyle = maybe [] (\p -> [E.style "padding-left" (show p), E.style "padding-right" (show p)]) props.tagPaddingX
     paddingYStyle = maybe [] (\p -> [E.style "padding-top" (show p), E.style "padding-bottom" (show p)]) props.tagPaddingY
     
@@ -556,9 +556,9 @@ buildContainerStyles props =
       ]
     
     -- Color styles (only emit if atom provided)
-    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.backgroundColor
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.textColor
-    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toCss c)]) props.borderColor
+    bgStyle = maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.backgroundColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.textColor
+    borderColorStyle = maybe [] (\c -> [E.style "border-color" (Color.toLegacyCss c)]) props.borderColor
     
     -- Border styles
     borderWidthStyle = maybe [] (\w -> [E.style "border-width" (show w)]) props.borderWidth
@@ -571,7 +571,7 @@ buildContainerStyles props =
             Nothing -> []
     
     -- Border radius
-    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.borderRadius
+    radiusStyle = maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.borderRadius
     
     -- Dimension styles
     heightStyle = maybe [] (\h -> [E.style "min-height" (show h)]) props.minHeight
@@ -580,7 +580,7 @@ buildContainerStyles props =
     gapStyle = maybe [] (\g -> [E.style "gap" (show g)]) props.gap
     
     -- Typography styles
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
     
     -- Disabled styles
     disabledStyles =
@@ -654,10 +654,10 @@ buildInput props isDisabled placeholderText =
       ]
     
     -- Font size (inherit from container or use atom)
-    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toCss s)]) props.fontSize
+    fontSizeStyle = maybe [] (\s -> [E.style "font-size" (FontSize.toLegacyCss s)]) props.fontSize
     
     -- Text color (inherit from container)
-    txtStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.textColor
+    txtStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.textColor
   in
     E.input_
       ( coreAttrs
@@ -677,7 +677,7 @@ buildRemoveButton :: forall msg. TagInputProps msg -> msg -> E.Element msg
 buildRemoveButton props handler =
   let
     -- Icon color (only emit if atom provided)
-    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.tagRemoveColor
+    iconColorStyle = maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.tagRemoveColor
     
     buttonStyles =
       [ E.style "display" "inline-flex"

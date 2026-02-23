@@ -95,7 +95,7 @@ module Hydrogen.Runtime.Animate
   , tickColor
   , colorValue
   , colorComplete
-  , rgbToCss
+  , rgbToLegacyCss
   
   -- * Multi-Property Animation
   , AnimatorState
@@ -528,8 +528,8 @@ colorComplete :: ColorState -> Boolean
 colorComplete s = s.complete
 
 -- | Convert RGB to CSS string.
-rgbToCss :: RGB -> String
-rgbToCss c = "rgb(" <> show c.r <> ", " <> show c.g <> ", " <> show c.b <> ")"
+rgbToLegacyCss :: RGB -> String
+rgbToLegacyCss c = "rgb(" <> show c.r <> ", " <> show c.g <> ", " <> show c.b <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                    // multi // property // animator

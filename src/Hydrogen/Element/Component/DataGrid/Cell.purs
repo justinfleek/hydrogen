@@ -110,7 +110,7 @@ renderCellByType props cellType' ctx =
 renderTextCell :: forall msg. GridProps msg -> CellContext -> E.Element msg
 renderTextCell props ctx =
   E.span_
-    (maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.cellTextColor)
+    (maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.cellTextColor)
     [ E.text ctx.value ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -128,7 +128,7 @@ renderNumberCell props ctx =
       , E.style "text-align" "right"
       , E.style "display" "block"
       ]
-      <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.cellTextColor
+      <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.cellTextColor
     )
     [ E.text ctx.value ]
 
@@ -144,7 +144,7 @@ renderDateCell :: forall msg. GridProps msg -> CellContext -> E.Element msg
 renderDateCell props ctx =
   E.span_
     ( [ E.style "opacity" "0.8" ]
-      <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.cellTextColor
+      <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.cellTextColor
     )
     [ E.text ctx.value ]
 
@@ -185,7 +185,7 @@ renderLinkCell props ctx =
       , E.style "text-decoration" "underline"
       , E.style "text-underline-offset" "4px"
       ]
-      <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.linkColor
+      <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.linkColor
     )
     [ E.text ctx.value ]
 
@@ -206,9 +206,9 @@ renderBadgeCell props ctx =
       , E.style "font-size" "0.75rem"
       , E.style "font-weight" "600"
       ]
-      <> maybe [] (\c -> [E.style "background-color" (Color.toCss c)]) props.badgeBgColor
-      <> maybe [] (\c -> [E.style "color" (Color.toCss c)]) props.badgeTextColor
-      <> maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToCss r)]) props.badgeBorderRadius
+      <> maybe [] (\c -> [E.style "background-color" (Color.toLegacyCss c)]) props.badgeBgColor
+      <> maybe [] (\c -> [E.style "color" (Color.toLegacyCss c)]) props.badgeTextColor
+      <> maybe [] (\r -> [E.style "border-radius" (Geometry.cornersToLegacyCss r)]) props.badgeBorderRadius
     )
     [ E.text ctx.value ]
 

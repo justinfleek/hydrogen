@@ -26,7 +26,7 @@ module Hydrogen.Schema.Typography.LetterSpacing
   , fromEm
   , unwrap
   , toEm
-  , toCss
+  , toLegacyCss
   , bounds
   -- Common values
   , none
@@ -131,11 +131,14 @@ unwrap (LetterSpacing s) = s
 toEm :: LetterSpacing -> Number
 toEm (LetterSpacing s) = Int.toNumber s / 1000.0
 
--- | Convert to CSS letter-spacing value
+-- | Convert to CSS letter-spacing value for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Outputs in em units for proper scaling with font size.
-toCss :: LetterSpacing -> String
-toCss ls = show (toEm ls) <> "em"
+toLegacyCss :: LetterSpacing -> String
+toLegacyCss ls = show (toEm ls) <> "em"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds

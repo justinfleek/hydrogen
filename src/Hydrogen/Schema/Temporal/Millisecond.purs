@@ -13,7 +13,7 @@ module Hydrogen.Schema.Temporal.Millisecond
   , unsafeMillisecond
   , unwrap
   , toInt
-  , toCss
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -75,11 +75,14 @@ toInt = unwrap
 --                                                                 // formatting
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Format for CSS (transition durations, animation delays)
+-- | Format for CSS for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
 -- |
 -- | Returns value in milliseconds: "250ms"
-toCss :: Millisecond -> String
-toCss (Millisecond ms) = show ms <> "ms"
+toLegacyCss :: Millisecond -> String
+toLegacyCss (Millisecond ms) = show ms <> "ms"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // helpers

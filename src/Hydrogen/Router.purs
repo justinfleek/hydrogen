@@ -58,6 +58,10 @@ module Hydrogen.Router
   ) where
 
 import Prelude
+  ( class Eq
+  , Unit
+  , (==)
+  )
 
 import Data.Maybe (Maybe)
 import Data.String.CodeUnits as SCU

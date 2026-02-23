@@ -60,11 +60,11 @@ module Hydrogen.Schema.Color.Gradient
   , sampleConicAt
   , sampleMeshAt
   
-  -- * CSS Output
-  , toCss
-  , linearToCss
-  , radialToCss
-  , conicToCss
+  -- * Legacy CSS Output (for interop with legacy systems)
+  , toLegacyCss
+  , linearToLegacyCss
+  , radialToLegacyCss
+  , conicToLegacyCss
   ) where
 
 import Prelude
@@ -76,7 +76,7 @@ import Data.Number (max, min) as Number
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Channel (channel)
 import Hydrogen.Schema.Color.Channel (toNumber) as Channel
-import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbFromChannels, rgbToCss, red, green, blue)
+import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbFromChannels, rgbToLegacyCss, red, green, blue)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                        // ratio
@@ -128,7 +128,7 @@ derive instance eqColorStop :: Eq ColorStop
 derive instance ordColorStop :: Ord ColorStop
 
 instance showColorStop :: Show ColorStop where
-  show (ColorStop cs) = rgbToCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
+  show (ColorStop cs) = rgbToLegacyCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
 
 -- | Create a color stop at a specific position
 colorStop :: RGB -> Number -> ColorStop
@@ -156,7 +156,7 @@ newtype LinearGradient = LinearGradient
 derive instance eqLinearGradient :: Eq LinearGradient
 
 instance showLinearGradient :: Show LinearGradient where
-  show g = linearToCss g
+  show g = linearToLegacyCss g
 
 -- | Create a linear gradient with default angle (180 degrees = top to bottom)
 linearGradient :: Array ColorStop -> LinearGradient
@@ -195,7 +195,7 @@ newtype RadialGradient = RadialGradient
 derive instance eqRadialGradient :: Eq RadialGradient
 
 instance showRadialGradient :: Show RadialGradient where
-  show g = radialToCss g
+  show g = radialToLegacyCss g
 
 -- | Create a radial gradient centered at (0.5, 0.5)
 radialGradient :: Array ColorStop -> RadialGradient
@@ -222,7 +222,7 @@ newtype ConicGradient = ConicGradient
 derive instance eqConicGradient :: Eq ConicGradient
 
 instance showConicGradient :: Show ConicGradient where
-  show g = conicToCss g
+  show g = conicToLegacyCss g
 
 -- | Create a conic gradient centered at (0.5, 0.5) starting from top
 conicGradient :: Array ColorStop -> ConicGradient
@@ -256,7 +256,7 @@ newtype MeshGradient = MeshGradient
 derive instance eqMeshGradient :: Eq MeshGradient
 
 instance showMeshGradient :: Show MeshGradient where
-  show (MeshGradient m) = "mesh(" <> rgbToCss m.topLeft <> ", " <> rgbToCss m.topRight <> ", " <> rgbToCss m.bottomLeft <> ", " <> rgbToCss m.bottomRight <> ")"
+  show (MeshGradient m) = "mesh(" <> rgbToLegacyCss m.topLeft <> ", " <> rgbToLegacyCss m.topRight <> ", " <> rgbToLegacyCss m.bottomLeft <> ", " <> rgbToLegacyCss m.bottomRight <> ")"
 
 -- | Create a mesh gradient with equal blend (0.5) for all corners
 meshGradient :: RGB -> RGB -> RGB -> RGB -> MeshGradient
@@ -285,48 +285,51 @@ data Gradient
 derive instance eqGradient :: Eq Gradient
 
 instance showGradient :: Show Gradient where
-  show = toCss
+  show = toLegacyCss
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // css output
+--                                                       // legacy css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert gradient to CSS
-toCss :: Gradient -> String
-toCss (Linear g) = linearToCss g
-toCss (Radial g) = radialToCss g
-toCss (Conic g) = conicToCss g
-toCss (Mesh _) = "/* Mesh gradients require Canvas API or SVG - no CSS equivalent */"
+-- | Convert gradient to CSS for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: Gradient -> String
+toLegacyCss (Linear g) = linearToLegacyCss g
+toLegacyCss (Radial g) = radialToLegacyCss g
+toLegacyCss (Conic g) = conicToLegacyCss g
+toLegacyCss (Mesh _) = "/* Mesh gradients require Canvas API or SVG - no CSS equivalent */"
 
--- | Convert linear gradient to CSS
-linearToCss :: LinearGradient -> String
-linearToCss (LinearGradient g) =
-  "linear-gradient(" <> show g.angle <> "deg, " <> stopsToCSS g.stops <> ")"
+-- | Convert linear gradient to CSS for legacy system interop.
+linearToLegacyCss :: LinearGradient -> String
+linearToLegacyCss (LinearGradient g) =
+  "linear-gradient(" <> show g.angle <> "deg, " <> stopsToLegacyCss g.stops <> ")"
 
--- | Convert radial gradient to CSS  
-radialToCss :: RadialGradient -> String
-radialToCss (RadialGradient g) =
+-- | Convert radial gradient to CSS for legacy system interop.
+radialToLegacyCss :: RadialGradient -> String
+radialToLegacyCss (RadialGradient g) =
   "radial-gradient(circle at " 
     <> show (ratioToPercent g.centerX) <> "% " 
     <> show (ratioToPercent g.centerY) <> "%, " 
-    <> stopsToCSS g.stops <> ")"
+    <> stopsToLegacyCss g.stops <> ")"
 
--- | Convert conic gradient to CSS
-conicToCss :: ConicGradient -> String
-conicToCss (ConicGradient g) =
+-- | Convert conic gradient to CSS for legacy system interop.
+conicToLegacyCss :: ConicGradient -> String
+conicToLegacyCss (ConicGradient g) =
   "conic-gradient(from " <> show g.startAngle <> "deg at "
     <> show (ratioToPercent g.centerX) <> "% "
     <> show (ratioToPercent g.centerY) <> "%, "
-    <> stopsToCSS g.stops <> ")"
+    <> stopsToLegacyCss g.stops <> ")"
 
--- | Convert array of color stops to CSS format
-stopsToCSS :: Array ColorStop -> String
-stopsToCSS stops = 
-  let stopStrings = map stopToCSS stops
+-- | Convert array of color stops to CSS format for legacy system interop.
+stopsToLegacyCss :: Array ColorStop -> String
+stopsToLegacyCss stops = 
+  let stopStrings = map stopToLegacyCss stops
   in joinWith ", " stopStrings
   where
-  stopToCSS (ColorStop cs) = 
-    rgbToCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
+  stopToLegacyCss (ColorStop cs) = 
+    rgbToLegacyCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
   
   joinWith :: String -> Array String -> String
   joinWith sep arr = case uncons arr of

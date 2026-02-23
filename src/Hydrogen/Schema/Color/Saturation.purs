@@ -27,7 +27,7 @@ module Hydrogen.Schema.Color.Saturation
   , toUnitInterval
   ) where
 
-import Prelude
+import Prelude (class Eq, class Ord, class Show, show, (<>), (+), (-), (*), (/), (<), (>))
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded

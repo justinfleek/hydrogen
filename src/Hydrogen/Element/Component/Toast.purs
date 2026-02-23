@@ -427,27 +427,27 @@ buildToastAttrs props =
       [ E.role "alert"
       , E.style "display" "flex"
       , E.style "flex-direction" "column"
-      , E.style "background-color" (Color.toCss bgColor)
+      , E.style "background-color" (Color.toLegacyCss bgColor)
       , E.style "pointer-events" "auto"
       ]
     
     -- Text color
     textColorStyle = case props.textColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     -- Border
     borderStyle =
       let bw = maybe "1px" show props.borderWidth
       in [ E.style "border-style" "solid"
          , E.style "border-width" bw
-         , E.style "border-color" (Color.toCss brdColor)
+         , E.style "border-color" (Color.toLegacyCss brdColor)
          ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "8px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Shadow
     shadowStyle = case props.shadow of
@@ -455,7 +455,7 @@ buildToastAttrs props =
       Just s ->
         if Shadow.isNoShadow s
           then []
-          else [ E.style "box-shadow" (Shadow.layeredToCss s) ]
+          else [ E.style "box-shadow" (Shadow.layeredToLegacyCss s) ]
     
     -- Padding
     paddingStyle = case props.padding of
@@ -531,15 +531,15 @@ toastTitle props titleText =
   let
     fontSizeStyle = case props.titleFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.titleFontWeight of
       Nothing -> [ E.style "font-weight" "600" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.titleColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.div_
       ( [ E.style "line-height" "1.4" ]
@@ -555,11 +555,11 @@ toastDescription props descText =
   let
     fontSizeStyle = case props.descriptionFontSize of
       Nothing -> [ E.style "font-size" "13px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     colorStyle = case props.descriptionColor of
       Nothing -> [ E.style "opacity" "0.8" ]
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.div_
       ( [ E.style "line-height" "1.5"

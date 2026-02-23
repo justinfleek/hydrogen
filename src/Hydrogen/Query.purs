@@ -135,12 +135,12 @@ import Prelude
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
 import Data.Array as Array
 import Data.DateTime.Instant (Instant, unInstant, instant)
-import Data.Either (Either(..), hush)
+import Data.Either (Either(Left, Right), hush)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe, isJust)
 import Data.Newtype (unwrap)
 import Data.String as String
-import Data.Time.Duration (Milliseconds(..))
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Data.Tuple (Tuple)
 import Effect (Effect)
 import Effect.Aff (Aff, Fiber, delay, forkAff, joinFiber)
@@ -148,8 +148,8 @@ import Effect.Class (liftEffect)
 import Effect.Now (now)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Hydrogen.Data.RemoteData (RemoteData(..))
-import Hydrogen.Data.RemoteData (RemoteData(..), fromEither, toMaybe, isSuccess, isLoading, isFailure, isNotAsked, mapError, map2, map3, map4) as Hydrogen.Data.RemoteData
+import Hydrogen.Data.RemoteData (RemoteData(NotAsked, Loading, Failure, Success))
+import Hydrogen.Data.RemoteData (RemoteData(NotAsked, Loading, Failure, Success), fromEither, toMaybe, isSuccess, isLoading, isFailure, isNotAsked, mapError, map2, map3, map4) as Hydrogen.Data.RemoteData
 
 -- =============================================================================
 --                                                                     // client

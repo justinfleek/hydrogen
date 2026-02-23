@@ -260,7 +260,7 @@ buildAvatarAttrs props =
         let bw = maybe "2px" show props.borderWidth
         in [ E.style "border-style" "solid"
            , E.style "border-width" bw
-           , E.style "border-color" (Color.toCss bc)
+           , E.style "border-color" (Color.toLegacyCss bc)
            ]
   in
     coreStyles <> borderStyle <> props.extraAttributes
@@ -305,11 +305,11 @@ avatarFallback propMods children =
     -- Font styles
     fontSizeStyle = case props.fontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.fontWeight of
       Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
   in
     E.span_
       ( [ E.style "display" "flex"
@@ -318,8 +318,8 @@ avatarFallback propMods children =
         , E.style "align-items" "center"
         , E.style "justify-content" "center"
         , E.style "border-radius" "50%"
-        , E.style "background-color" (Color.toCss bgColor)
-        , E.style "color" (Color.toCss txtColor)
+        , E.style "background-color" (Color.toLegacyCss bgColor)
+        , E.style "color" (Color.toLegacyCss txtColor)
         , E.style "text-transform" "uppercase"
         ]
         <> fontSizeStyle

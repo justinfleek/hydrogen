@@ -373,7 +373,7 @@ buildCardStyles isInteractive props =
     
     -- Core styles
     coreStyles =
-      [ E.style "background-color" (Color.toCss bgColor)
+      [ E.style "background-color" (Color.toLegacyCss bgColor)
       , E.style "position" "relative"
       , E.style "overflow" "hidden"
       ]
@@ -381,7 +381,7 @@ buildCardStyles isInteractive props =
     -- Text color
     textColorStyle = case props.textColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
     
     -- Border styles
     borderStyle = case props.borderColor of
@@ -390,13 +390,13 @@ buildCardStyles isInteractive props =
         let bw = maybe "1px" show props.borderWidth
         in [ E.style "border-style" "solid"
            , E.style "border-width" bw
-           , E.style "border-color" (Color.toCss bc)
+           , E.style "border-color" (Color.toLegacyCss bc)
            ]
     
     -- Border radius
     radiusStyle = case props.borderRadius of
       Nothing -> [ E.style "border-radius" "8px" ]  -- Default rounded
-      Just r -> [ E.style "border-radius" (Geometry.cornersToCss r) ]
+      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
     
     -- Shadow styles
     shadowStyle = case props.shadow of
@@ -404,7 +404,7 @@ buildCardStyles isInteractive props =
       Just s -> 
         if Shadow.isNoShadow s
           then []
-          else [ E.style "box-shadow" (Shadow.layeredToCss s) ]
+          else [ E.style "box-shadow" (Shadow.layeredToLegacyCss s) ]
     
     -- Interactive styles
     interactiveStyles =
@@ -450,15 +450,15 @@ cardTitle propMods children =
     
     fontSizeStyle = case props.titleFontSize of
       Nothing -> [ E.style "font-size" "24px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     fontWeightStyle = case props.titleFontWeight of
       Nothing -> [ E.style "font-weight" "600" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toCss w) ]
+      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
     colorStyle = case props.titleColor of
       Nothing -> []
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.h3_
       ( [ E.style "margin" "0"
@@ -481,11 +481,11 @@ cardDescription propMods children =
     
     fontSizeStyle = case props.descriptionFontSize of
       Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toCss s) ]
+      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
     
     colorStyle = case props.descriptionColor of
       Nothing -> [ E.style "color" "rgba(0, 0, 0, 0.6)" ]  -- Muted default
-      Just c -> [ E.style "color" (Color.toCss c) ]
+      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
   in
     E.p_
       ( [ E.style "margin" "0"

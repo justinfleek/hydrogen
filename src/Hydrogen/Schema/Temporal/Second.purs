@@ -15,7 +15,7 @@ module Hydrogen.Schema.Temporal.Second
   , unsafeSecond
   , unwrap
   , toInt
-  , toCss
+  , toLegacyCss
   ) where
 
 import Prelude
@@ -78,9 +78,12 @@ toInt = unwrap
 --                                                                 // formatting
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Format for CSS (not typically used, but included for consistency)
-toCss :: Second -> String
-toCss (Second s) = show s
+-- | Format for CSS for legacy system interop.
+-- |
+-- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
+-- | for exporting to legacy systems that require CSS format.
+toLegacyCss :: Second -> String
+toLegacyCss (Second s) = show s
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // helpers

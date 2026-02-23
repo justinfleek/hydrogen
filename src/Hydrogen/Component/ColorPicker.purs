@@ -54,7 +54,7 @@ import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Hydrogen.Component.Checkbox as Checkbox
 import Hydrogen.Component.Slider as Slider
-import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToRecord, rgbToCss)
+import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToRecord, rgbToLegacyCss)
 import Hydrogen.Schema.Color.HSL (hsl, hslToRecord)
 import Hydrogen.Schema.Color.HWB (hwb, hwbToRecord)
 import Hydrogen.Schema.Color.OKLAB (oklab, oklabToRecord)
@@ -150,7 +150,7 @@ colorPicker propMods =
       [ -- Color preview
         HH.div
           [ cls [ "color-preview w-full h-16 rounded border border-white/20" ]
-          , HP.style ("background-color: " <> rgbToCss props.color)
+          , HP.style ("background-color: " <> rgbToLegacyCss props.color)
           ]
           []
         

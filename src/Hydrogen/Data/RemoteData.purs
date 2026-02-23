@@ -58,13 +58,30 @@ module Hydrogen.Data.RemoteData
   ) where
 
 import Prelude
+  ( class Applicative
+  , class Apply
+  , class Bind
+  , class Eq
+  , class Functor
+  , class Monad
+  , class Monoid
+  , class Ord
+  , class Semigroup
+  , class Show
+  , mempty
+  , pure
+  , show
+  , (<>)
+  , (<$>)
+  , (<*>)
+  )
 
 import Control.Alt (class Alt)
 import Control.Plus (class Plus)
 import Data.Bifunctor (class Bifunctor)
-import Data.Either (Either(..))
+import Data.Either (Either(Left, Right))
 import Data.Foldable (class Foldable)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Maybe (maybe) as Maybe
 import Data.Traversable (class Traversable)
 import Data.Traversable (sequence, traverse) as T
