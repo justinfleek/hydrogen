@@ -15,3 +15,9 @@ node_modules/
 .DS_Store
 .lake/
 lake-manifest.json
+
+# Large brand assets (PDFs belong in COMPASS, not Hydrogen)
+*.pdf
+
+# PSCI modules cache
+.psci_modules/
