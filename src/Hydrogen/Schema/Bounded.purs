@@ -30,6 +30,8 @@ module Hydrogen.Schema.Bounded
   -- * Clamping Functions
   , clampInt
   , clampNumber
+  , clampNumberMin
+  , clampNumberMax
   
   -- * Validation
   , inBoundsInt
@@ -101,6 +103,18 @@ clampInt minVal maxVal n
 clampNumber :: Number -> Number -> Number -> Number
 clampNumber minVal maxVal n
   | n < minVal = minVal
+  | n > maxVal = maxVal
+  | otherwise = n
+
+-- | Clamp a number to minimum only (no upper bound)
+clampNumberMin :: Number -> Number -> Number
+clampNumberMin minVal n
+  | n < minVal = minVal
+  | otherwise = n
+
+-- | Clamp a number to maximum only (no lower bound)
+clampNumberMax :: Number -> Number -> Number
+clampNumberMax maxVal n
   | n > maxVal = maxVal
   | otherwise = n
 
