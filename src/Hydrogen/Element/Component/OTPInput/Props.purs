@@ -2,29 +2,28 @@
 --                                  // hydrogen // element // otpinput // props
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | OTPInput Props — Schema-native property system for OTP components.
+-- | OTPInput Props — Complete Schema-native property system.
 -- |
 -- | ## Design Philosophy
 -- |
 -- | Props are the bridge between user configuration and component rendering.
 -- | Every visual property maps to a Schema pillar atom — no escape hatches.
 -- |
+-- | ## Schema Pillars Used
+-- |
+-- | | Pillar     | Atoms                                        |
+-- | |------------|----------------------------------------------|
+-- | | Color      | RGB, Gradient                                |
+-- | | Dimension  | Pixel, Temporal (Milliseconds)               |
+-- | | Geometry   | Radius, Transform (Scale)                    |
+-- | | Typography | FontSize, FontWeight, FontFamily             |
+-- | | Elevation  | Shadow (LayeredShadow)                       |
+-- | | Motion     | Easing, Transition                           |
+-- | | Attestation| UUID5 (instance identity)                    |
+-- |
 -- | ## Prop Modifier Pattern
 -- |
--- | Components accept `Array (OTPInputProp msg)` which fold over `defaultProps`:
--- |
--- | ```purescript
--- | otpInput
--- |   [ digitCount (OTPDigitCount 6)
--- |   , borderColor brand.inputBorder
--- |   , focusBorderColor brand.primaryColor
--- |   ]
--- | ```
--- |
--- | ## Dependencies
--- |
--- | - Types module for OTPDigitCount, OTPInputType, OTPValue, OTPState
--- | - Schema pillars: Color.RGB, Geometry.Radius, Dimension.Device, Typography
+-- | Components accept `Array (OTPInputProp msg)` which fold over `defaultProps`.
 
 module Hydrogen.Element.Component.OTPInput.Props
   ( -- * Props Record
@@ -40,36 +39,62 @@ module Hydrogen.Element.Component.OTPInput.Props
   , disabledProp
   , stateProp
   , errorMessageProp
+  , successMessageProp
+  , helpTextProp
+  , labelProp
   , focusedIndexProp
   , resendCooldownProp
   , resendRemainingProp
+  , instanceIdProp
   
   -- * Color Atoms
   , backgroundColorProp
   , borderColorProp
   , focusBorderColorProp
+  , hoverBorderColorProp
   , errorBorderColorProp
   , successBorderColorProp
   , filledBorderColorProp
   , textColorProp
   , placeholderColorProp
+  , placeholderCharProp
   , errorTextColorProp
   , successTextColorProp
   , mutedTextColorProp
   , primaryColorProp
+  , focusBackgroundColorProp
+  , hoverBackgroundColorProp
+  , selectionColorProp
+  
+  -- * Gradient Atoms
+  , backgroundGradientProp
+  , focusBackgroundGradientProp
+  
+  -- * Elevation Atoms (Shadows)
+  , shadowProp
+  , focusShadowProp
+  , hoverShadowProp
+  , errorShadowProp
+  , successShadowProp
   
   -- * Geometry Atoms
   , borderRadiusProp
   , borderWidthProp
+  , focusScaleProp
+  , hoverScaleProp
+  , pressScaleProp
   
   -- * Dimension Atoms
   , digitWidthProp
   , digitHeightProp
   , gapProp
+  , separatorWidthProp
   
   -- * Typography Atoms
   , fontSizeProp
   , fontWeightProp
+  , fontFamilyProp
+  , letterSpacingProp
   
   -- * Behavior Props
   , onDigitChangeProp
@@ -78,12 +103,26 @@ module Hydrogen.Element.Component.OTPInput.Props
   , onFocusProp
   , onBlurProp
   , onPasteProp
+  , autoSubmitProp
+  , autoFocusProp
   
-  -- * Animation Props
+  -- * Animation Props (Schema Temporal/Motion)
   , animationEnabledProp
+  , reducedMotionProp
   , shakeDurationProp
   , pulseDurationProp
   , entryDurationProp
+  , transitionDurationProp
+  , transitionEasingProp
+  , staggerDelayProp
+  
+  -- * Separator Props
+  , separatorEnabledProp
+  , separatorPositionsProp
+  , separatorCharProp
+  
+  -- * Cursor Props
+  , cursorStyleProp
   ) where
 
 import Data.Maybe (Maybe(Nothing, Just))
@@ -99,19 +138,28 @@ import Hydrogen.Element.Component.OTPInput.Types
   )
 
 import Hydrogen.Schema.Color.RGB as Color
+import Hydrogen.Schema.Color.Gradient as Gradient
 import Hydrogen.Schema.Geometry.Radius as Geometry
+import Hydrogen.Schema.Geometry.Transform as Transform
 import Hydrogen.Schema.Dimension.Device as Device
+import Hydrogen.Schema.Dimension.Temporal as Temporal
+import Hydrogen.Schema.Elevation.Shadow as Shadow
+import Hydrogen.Schema.Motion.Easing as Easing
 import Hydrogen.Schema.Typography.FontSize as FontSize
+import Hydrogen.Schema.Typography.FontWeight as FontWeight
+import Hydrogen.Schema.Typography.FontFamily as FontFamily
+import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // props record
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Complete OTP input configuration.
+-- | Complete OTP input configuration using Schema atoms.
 -- |
--- | All visual properties are Schema atoms. No strings for colors, sizes, etc.
+-- | All visual properties are typed Schema atoms. No strings for colors, sizes.
+-- | Instance identity via UUID5 ensures uniqueness at billion-agent scale.
 type OTPInputProps msg =
-  { -- Content (using bounded types from Types module)
+  { -- Content (bounded types from Types module)
     digitCount :: OTPDigitCount
   , value :: OTPValue
   , inputType :: OTPInputType
@@ -119,36 +167,62 @@ type OTPInputProps msg =
   , disabled :: Boolean
   , state :: OTPState
   , errorMessage :: Maybe String
+  , successMessage :: Maybe String
+  , helpText :: Maybe String
+  , label :: Maybe String
   , focusedIndex :: Maybe OTPIndex
   , resendCooldown :: Int
   , resendRemaining :: Int
+  , instanceId :: Maybe UUID5.UUID5
   
   -- Color atoms (Schema.Color.RGB)
   , backgroundColor :: Maybe Color.RGB
   , borderColor :: Maybe Color.RGB
   , focusBorderColor :: Maybe Color.RGB
+  , hoverBorderColor :: Maybe Color.RGB
   , errorBorderColor :: Maybe Color.RGB
   , successBorderColor :: Maybe Color.RGB
   , filledBorderColor :: Maybe Color.RGB
   , textColor :: Maybe Color.RGB
   , placeholderColor :: Maybe Color.RGB
+  , placeholderChar :: Maybe Char
   , errorTextColor :: Maybe Color.RGB
   , successTextColor :: Maybe Color.RGB
   , mutedTextColor :: Maybe Color.RGB
   , primaryColor :: Maybe Color.RGB
+  , focusBackgroundColor :: Maybe Color.RGB
+  , hoverBackgroundColor :: Maybe Color.RGB
+  , selectionColor :: Maybe Color.RGB
   
-  -- Geometry atoms (Schema.Geometry.Radius)
+  -- Gradient atoms (Schema.Color.Gradient)
+  , backgroundGradient :: Maybe Gradient.Gradient
+  , focusBackgroundGradient :: Maybe Gradient.Gradient
+  
+  -- Elevation atoms (Schema.Elevation.Shadow)
+  , shadow :: Maybe Shadow.LayeredShadow
+  , focusShadow :: Maybe Shadow.LayeredShadow
+  , hoverShadow :: Maybe Shadow.LayeredShadow
+  , errorShadow :: Maybe Shadow.LayeredShadow
+  , successShadow :: Maybe Shadow.LayeredShadow
+  
+  -- Geometry atoms (Schema.Geometry)
   , borderRadius :: Maybe Geometry.Radius
   , borderWidth :: Maybe Device.Pixel
+  , focusScale :: Maybe Transform.Scale
+  , hoverScale :: Maybe Transform.Scale
+  , pressScale :: Maybe Transform.Scale
   
   -- Dimension atoms (Schema.Dimension.Device)
   , digitWidth :: Maybe Device.Pixel
   , digitHeight :: Maybe Device.Pixel
   , gap :: Maybe Device.Pixel
+  , separatorWidth :: Maybe Device.Pixel
   
-  -- Typography atoms
+  -- Typography atoms (Schema.Typography)
   , fontSize :: Maybe FontSize.FontSize
-  , fontWeight :: Maybe Int
+  , fontWeight :: Maybe FontWeight.FontWeight
+  , fontFamily :: Maybe FontFamily.FontFamily
+  , letterSpacing :: Maybe Device.Pixel
   
   -- Behavior handlers
   , onDigitChange :: Maybe (OTPValue -> msg)
@@ -157,12 +231,26 @@ type OTPInputProps msg =
   , onFocus :: Maybe (OTPIndex -> msg)
   , onBlur :: Maybe (OTPIndex -> msg)
   , onPaste :: Maybe (String -> msg)
+  , autoSubmit :: Boolean
+  , autoFocus :: Boolean
   
-  -- Animation configuration
+  -- Animation configuration (Schema.Dimension.Temporal, Schema.Motion.Easing)
   , animationEnabled :: Boolean
-  , shakeDuration :: Int     -- milliseconds
-  , pulseDuration :: Int     -- milliseconds
-  , entryDuration :: Int     -- milliseconds
+  , reducedMotion :: Boolean
+  , shakeDuration :: Temporal.Milliseconds
+  , pulseDuration :: Temporal.Milliseconds
+  , entryDuration :: Temporal.Milliseconds
+  , transitionDuration :: Temporal.Milliseconds
+  , transitionEasing :: Easing.Easing
+  , staggerDelay :: Temporal.Milliseconds
+  
+  -- Separator configuration (for XXX-XXX patterns)
+  , separatorEnabled :: Boolean
+  , separatorPositions :: Array Int
+  , separatorChar :: Char
+  
+  -- Cursor configuration
+  , cursorStyle :: String
   }
 
 -- | Property modifier function
@@ -171,6 +259,7 @@ type OTPInputProp msg = OTPInputProps msg -> OTPInputProps msg
 -- | Default properties with sensible Schema values.
 -- |
 -- | Uses 6 digits (standard TOTP), empty value, numeric input.
+-- | All durations use Schema.Dimension.Temporal.Milliseconds.
 defaultProps :: forall msg. OTPInputProps msg
 defaultProps =
   { -- Content
@@ -181,36 +270,62 @@ defaultProps =
   , disabled: false
   , state: Idle
   , errorMessage: Nothing
+  , successMessage: Nothing
+  , helpText: Nothing
+  , label: Nothing
   , focusedIndex: Nothing
   , resendCooldown: 60
   , resendRemaining: 0
+  , instanceId: Nothing
   
   -- Colors (Nothing = use theme defaults at render time)
   , backgroundColor: Nothing
   , borderColor: Nothing
   , focusBorderColor: Nothing
+  , hoverBorderColor: Nothing
   , errorBorderColor: Nothing
   , successBorderColor: Nothing
   , filledBorderColor: Nothing
   , textColor: Nothing
   , placeholderColor: Nothing
+  , placeholderChar: Nothing
   , errorTextColor: Nothing
   , successTextColor: Nothing
   , mutedTextColor: Nothing
   , primaryColor: Nothing
+  , focusBackgroundColor: Nothing
+  , hoverBackgroundColor: Nothing
+  , selectionColor: Nothing
+  
+  -- Gradients
+  , backgroundGradient: Nothing
+  , focusBackgroundGradient: Nothing
+  
+  -- Shadows/Elevation
+  , shadow: Nothing
+  , focusShadow: Nothing
+  , hoverShadow: Nothing
+  , errorShadow: Nothing
+  , successShadow: Nothing
   
   -- Geometry
   , borderRadius: Nothing
   , borderWidth: Nothing
+  , focusScale: Nothing
+  , hoverScale: Nothing
+  , pressScale: Nothing
   
   -- Dimensions
   , digitWidth: Nothing
   , digitHeight: Nothing
   , gap: Nothing
+  , separatorWidth: Nothing
   
   -- Typography
   , fontSize: Nothing
   , fontWeight: Nothing
+  , fontFamily: Nothing
+  , letterSpacing: Nothing
   
   -- Behavior
   , onDigitChange: Nothing
@@ -219,12 +334,26 @@ defaultProps =
   , onFocus: Nothing
   , onBlur: Nothing
   , onPaste: Nothing
+  , autoSubmit: false
+  , autoFocus: false
   
-  -- Animation
+  -- Animation (using proper Schema temporal types)
   , animationEnabled: true
-  , shakeDuration: 500
-  , pulseDuration: 300
-  , entryDuration: 150
+  , reducedMotion: false
+  , shakeDuration: Temporal.ms 500.0
+  , pulseDuration: Temporal.ms 300.0
+  , entryDuration: Temporal.ms 150.0
+  , transitionDuration: Temporal.ms 150.0
+  , transitionEasing: Easing.easeOut
+  , staggerDelay: Temporal.ms 50.0
+  
+  -- Separator
+  , separatorEnabled: false
+  , separatorPositions: []
+  , separatorChar: '-'
+  
+  -- Cursor
+  , cursorStyle: "text"
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -259,6 +388,18 @@ stateProp s props = props { state = s }
 errorMessageProp :: forall msg. String -> OTPInputProp msg
 errorMessageProp m props = props { errorMessage = Just m }
 
+-- | Set success message text
+successMessageProp :: forall msg. String -> OTPInputProp msg
+successMessageProp m props = props { successMessage = Just m }
+
+-- | Set help text (e.g., "Code sent to ***1234")
+helpTextProp :: forall msg. String -> OTPInputProp msg
+helpTextProp t props = props { helpText = Just t }
+
+-- | Set label text
+labelProp :: forall msg. String -> OTPInputProp msg
+labelProp l props = props { label = Just l }
+
 -- | Set currently focused digit index
 focusedIndexProp :: forall msg. OTPIndex -> OTPInputProp msg
 focusedIndexProp i props = props { focusedIndex = Just i }
@@ -270,6 +411,10 @@ resendCooldownProp c props = props { resendCooldown = c }
 -- | Set remaining resend cooldown time in seconds
 resendRemainingProp :: forall msg. Int -> OTPInputProp msg
 resendRemainingProp r props = props { resendRemaining = r }
+
+-- | Set instance ID (UUID5) for deterministic identity
+instanceIdProp :: forall msg. UUID5.UUID5 -> OTPInputProp msg
+instanceIdProp id props = props { instanceId = Just id }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // color prop builders
@@ -286,6 +431,10 @@ borderColorProp c props = props { borderColor = Just c }
 -- | Set focused digit border color
 focusBorderColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 focusBorderColorProp c props = props { focusBorderColor = Just c }
+
+-- | Set hovered digit border color
+hoverBorderColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+hoverBorderColorProp c props = props { hoverBorderColor = Just c }
 
 -- | Set error state border color
 errorBorderColorProp :: forall msg. Color.RGB -> OTPInputProp msg
@@ -307,6 +456,10 @@ textColorProp c props = props { textColor = Just c }
 placeholderColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 placeholderColorProp c props = props { placeholderColor = Just c }
 
+-- | Set placeholder character (e.g., '-' or '•')
+placeholderCharProp :: forall msg. Char -> OTPInputProp msg
+placeholderCharProp c props = props { placeholderChar = Just c }
+
 -- | Set error message text color
 errorTextColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 errorTextColorProp c props = props { errorTextColor = Just c }
@@ -323,6 +476,54 @@ mutedTextColorProp c props = props { mutedTextColor = Just c }
 primaryColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 primaryColorProp c props = props { primaryColor = Just c }
 
+-- | Set focused digit background color
+focusBackgroundColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+focusBackgroundColorProp c props = props { focusBackgroundColor = Just c }
+
+-- | Set hovered digit background color
+hoverBackgroundColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+hoverBackgroundColorProp c props = props { hoverBackgroundColor = Just c }
+
+-- | Set text selection color
+selectionColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+selectionColorProp c props = props { selectionColor = Just c }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // gradient prop builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set background gradient (takes precedence over solid color)
+backgroundGradientProp :: forall msg. Gradient.Gradient -> OTPInputProp msg
+backgroundGradientProp g props = props { backgroundGradient = Just g }
+
+-- | Set focused digit background gradient
+focusBackgroundGradientProp :: forall msg. Gradient.Gradient -> OTPInputProp msg
+focusBackgroundGradientProp g props = props { focusBackgroundGradient = Just g }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                      // elevation prop builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set digit box shadow
+shadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
+shadowProp s props = props { shadow = Just s }
+
+-- | Set focused digit box shadow (focus ring effect)
+focusShadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
+focusShadowProp s props = props { focusShadow = Just s }
+
+-- | Set hovered digit box shadow
+hoverShadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
+hoverShadowProp s props = props { hoverShadow = Just s }
+
+-- | Set error state box shadow (red glow)
+errorShadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
+errorShadowProp s props = props { errorShadow = Just s }
+
+-- | Set success state box shadow (green glow)
+successShadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
+successShadowProp s props = props { successShadow = Just s }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // geometry prop builders
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -334,6 +535,18 @@ borderRadiusProp r props = props { borderRadius = Just r }
 -- | Set digit border width
 borderWidthProp :: forall msg. Device.Pixel -> OTPInputProp msg
 borderWidthProp w props = props { borderWidth = Just w }
+
+-- | Set focused digit scale transform
+focusScaleProp :: forall msg. Transform.Scale -> OTPInputProp msg
+focusScaleProp s props = props { focusScale = Just s }
+
+-- | Set hovered digit scale transform
+hoverScaleProp :: forall msg. Transform.Scale -> OTPInputProp msg
+hoverScaleProp s props = props { hoverScale = Just s }
+
+-- | Set pressed digit scale transform
+pressScaleProp :: forall msg. Transform.Scale -> OTPInputProp msg
+pressScaleProp s props = props { pressScale = Just s }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                     // dimension prop builders
@@ -351,6 +564,10 @@ digitHeightProp h props = props { digitHeight = Just h }
 gapProp :: forall msg. Device.Pixel -> OTPInputProp msg
 gapProp g props = props { gap = Just g }
 
+-- | Set separator element width
+separatorWidthProp :: forall msg. Device.Pixel -> OTPInputProp msg
+separatorWidthProp w props = props { separatorWidth = Just w }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                    // typography prop builders
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -359,9 +576,17 @@ gapProp g props = props { gap = Just g }
 fontSizeProp :: forall msg. FontSize.FontSize -> OTPInputProp msg
 fontSizeProp s props = props { fontSize = Just s }
 
--- | Set digit font weight (100-900)
-fontWeightProp :: forall msg. Int -> OTPInputProp msg
+-- | Set digit font weight (Schema.Typography.FontWeight)
+fontWeightProp :: forall msg. FontWeight.FontWeight -> OTPInputProp msg
 fontWeightProp w props = props { fontWeight = Just w }
+
+-- | Set digit font family
+fontFamilyProp :: forall msg. FontFamily.FontFamily -> OTPInputProp msg
+fontFamilyProp f props = props { fontFamily = Just f }
+
+-- | Set digit letter spacing
+letterSpacingProp :: forall msg. Device.Pixel -> OTPInputProp msg
+letterSpacingProp s props = props { letterSpacing = Just s }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // behavior prop builders
@@ -391,6 +616,14 @@ onBlurProp handler props = props { onBlur = Just handler }
 onPasteProp :: forall msg. (String -> msg) -> OTPInputProp msg
 onPasteProp handler props = props { onPaste = Just handler }
 
+-- | Enable auto-submit on completion
+autoSubmitProp :: forall msg. Boolean -> OTPInputProp msg
+autoSubmitProp enabled props = props { autoSubmit = enabled }
+
+-- | Enable auto-focus on mount
+autoFocusProp :: forall msg. Boolean -> OTPInputProp msg
+autoFocusProp enabled props = props { autoFocus = enabled }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                     // animation prop builders
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -399,14 +632,55 @@ onPasteProp handler props = props { onPaste = Just handler }
 animationEnabledProp :: forall msg. Boolean -> OTPInputProp msg
 animationEnabledProp enabled props = props { animationEnabled = enabled }
 
--- | Set error shake animation duration (milliseconds)
-shakeDurationProp :: forall msg. Int -> OTPInputProp msg
-shakeDurationProp ms props = props { shakeDuration = ms }
+-- | Enable reduced motion (respects prefers-reduced-motion)
+reducedMotionProp :: forall msg. Boolean -> OTPInputProp msg
+reducedMotionProp enabled props = props { reducedMotion = enabled }
 
--- | Set success pulse animation duration (milliseconds)
-pulseDurationProp :: forall msg. Int -> OTPInputProp msg
-pulseDurationProp ms props = props { pulseDuration = ms }
+-- | Set error shake animation duration (Schema Milliseconds)
+shakeDurationProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
+shakeDurationProp duration props = props { shakeDuration = duration }
 
--- | Set digit entry animation duration (milliseconds)
-entryDurationProp :: forall msg. Int -> OTPInputProp msg
-entryDurationProp ms props = props { entryDuration = ms }
+-- | Set success pulse animation duration (Schema Milliseconds)
+pulseDurationProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
+pulseDurationProp duration props = props { pulseDuration = duration }
+
+-- | Set digit entry animation duration (Schema Milliseconds)
+entryDurationProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
+entryDurationProp duration props = props { entryDuration = duration }
+
+-- | Set transition duration for state changes (Schema Milliseconds)
+transitionDurationProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
+transitionDurationProp duration props = props { transitionDuration = duration }
+
+-- | Set transition easing curve (Schema Motion.Easing)
+transitionEasingProp :: forall msg. Easing.Easing -> OTPInputProp msg
+transitionEasingProp easing props = props { transitionEasing = easing }
+
+-- | Set stagger delay between digit animations (Schema Milliseconds)
+staggerDelayProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
+staggerDelayProp delay props = props { staggerDelay = delay }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                     // separator prop builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Enable/disable separators (for XXX-XXX patterns)
+separatorEnabledProp :: forall msg. Boolean -> OTPInputProp msg
+separatorEnabledProp enabled props = props { separatorEnabled = enabled }
+
+-- | Set separator positions (indices where separators appear)
+-- | e.g., [3] for 6-digit OTP = XXX-XXX
+separatorPositionsProp :: forall msg. Array Int -> OTPInputProp msg
+separatorPositionsProp positions props = props { separatorPositions = positions }
+
+-- | Set separator character
+separatorCharProp :: forall msg. Char -> OTPInputProp msg
+separatorCharProp c props = props { separatorChar = c }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // cursor prop builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set cursor style (text, pointer, not-allowed)
+cursorStyleProp :: forall msg. String -> OTPInputProp msg
+cursorStyleProp style props = props { cursorStyle = style }
