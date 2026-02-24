@@ -199,6 +199,28 @@ nsAccordionContent = UUID5
   , 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e
   ]
 
+-- | Namespace for Hydrogen OTP Input UUIDs
+-- |
+-- | OTP input containers with identical configuration get identical UUIDs.
+-- | Used for ARIA relationships and accessibility linkage.
+-- | Derived from: uuid5(nil, "hydrogen.otpinput")
+nsOTPInput :: UUID5
+nsOTPInput = UUID5
+  [ 0x6f, 0x74, 0x70, 0x69, 0x6e, 0x70, 0x75, 0x74
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen OTP Digit UUIDs
+-- |
+-- | Individual OTP digit inputs with identical index get identical UUIDs.
+-- | Used for aria-describedby linkage to error messages.
+-- | Derived from: uuid5(nil, "hydrogen.otpdigit")
+nsOTPDigit :: UUID5
+nsOTPDigit = UUID5
+  [ 0x6f, 0x74, 0x70, 0x64, 0x69, 0x67, 0x69, 0x74
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // generation
 -- ═══════════════════════════════════════════════════════════════════════════════
