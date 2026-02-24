@@ -104,7 +104,6 @@ import Data.Maybe (Maybe(Just, Nothing), fromMaybe, isJust)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Foldable (foldl)
-import Data.List as List
 
 import Hydrogen.Element.Component.TreeView.Types
   ( NodeId

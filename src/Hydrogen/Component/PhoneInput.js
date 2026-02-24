@@ -153,7 +153,4 @@ export const destroyPhoneInputImpl = (phoneObj) => {
   }
 };
 
-/**
- * Map implementation for arrays
- */
-export const mapImpl = (f) => (arr) => arr.map(f);
+

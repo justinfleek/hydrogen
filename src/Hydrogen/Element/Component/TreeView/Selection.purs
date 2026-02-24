@@ -34,12 +34,14 @@ module Hydrogen.Element.Component.TreeView.Selection
   , handleToggleSelect
   , handleSelectRange
   , handleSelectAll
+  , handleSelectSubtree
   , handleClearSelection
   
   -- * Checkbox Operations
   , handleCheck
   , handleUncheck
   , handleToggleCheck
+  , handleCheckSubtree
   , handleClearChecked
   , propagateCheckToChildren
   , propagateCheckToParent
@@ -56,6 +58,9 @@ module Hydrogen.Element.Component.TreeView.Selection
   , getSelectedNodes
   , getCheckedNodes
   , getPartiallyCheckedNodes
+  
+  -- * Tree Traversal
+  , subtreeNodes
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -111,7 +116,6 @@ import Hydrogen.Element.Component.TreeView.Node
   , nodeId
   , nodeParent
   , treeNodes
-  , rootNodes
   )
 
 import Hydrogen.Schema.Reactive.SelectionState
@@ -194,6 +198,21 @@ handleSelectAll tree _ =
   in
     foldl (\s nid -> selectNode nid s) emptySelected allIds
 
+-- | Select an entire subtree (node and all descendants)
+-- |
+-- | Useful for "select branch" operations in file managers, etc.
+handleSelectSubtree :: 
+  Tree -> 
+  TreeNode -> 
+  SelectedState -> 
+  SelectedState
+handleSelectSubtree tree node state =
+  let
+    nodes = subtreeNodes tree node
+    nodeIds = map nodeId nodes
+  in
+    foldl (\s nid -> selectNode nid s) state nodeIds
+
 -- | Clear all selections
 handleClearSelection :: SelectedState -> SelectedState
 handleClearSelection = clearSelection
@@ -221,6 +240,24 @@ handleToggleCheck nid state =
     Unchecked -> setCheckState nid Checked state
     Checked -> setCheckState nid Unchecked state
     Indeterminate -> setCheckState nid Checked state
+
+-- | Check an entire subtree (node and all descendants)
+-- |
+-- | Useful for "check all in folder" operations.
+-- | Does NOT propagate to parents — call propagateCheckToParent separately
+-- | if you need to update ancestor indeterminate states.
+handleCheckSubtree :: 
+  Tree -> 
+  TreeNode -> 
+  CheckState -> 
+  CheckedState -> 
+  CheckedState
+handleCheckSubtree tree node targetState state =
+  let
+    nodes = subtreeNodes tree node
+    nodeIds = map nodeId nodes
+  in
+    foldl (\s nid -> setCheckState nid targetState s) state nodeIds
 
 -- | Clear all checkbox states (uncheck everything)
 handleClearChecked :: CheckedState -> CheckedState
@@ -261,6 +298,8 @@ propagateCheckToParent nid tree state =
     foldl (recomputeNodeCheckState tree) state ancestors
 
 -- | Recompute a single node's check state from its children
+-- |
+-- | Uses Schema's computeParentStatus for hierarchical logic.
 recomputeNodeCheckState :: 
   Tree -> 
   CheckedState -> 
@@ -270,19 +309,13 @@ recomputeNodeCheckState tree state node =
   let
     nid = nodeId node
     children = childNodes nid tree
-    childStates = map (\c -> getCheckState (nodeId c) state) children
-    
-    allChecked = all (\cs -> cs == Checked) childStates
-    allUnchecked = all (\cs -> cs == Unchecked) childStates
+    -- Convert children's CheckStates to HierarchicalStatus for Schema computation
+    childStatuses = map (\c -> checkStateToHierarchical (getCheckState (nodeId c) state)) children
     
     newState = 
       if Array.null children
         then getCheckState nid state  -- Leaf: keep current
-        else if allChecked
-          then Checked
-          else if allUnchecked
-            then Unchecked
-            else Indeterminate
+        else hierarchicalToCheckState (computeParentStatus childStatuses)
   in
     setCheckState nid newState state
 

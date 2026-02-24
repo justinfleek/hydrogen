@@ -75,9 +75,9 @@ module Hydrogen.Component.PhoneInput
   , PhoneInputElement
   ) where
 
-import Prelude hiding (map)
+import Prelude
 
-import Data.Array (foldl, filter, find, sortBy, (!!))
+import Data.Array (foldl, filter, find, sortBy)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as String
 import Data.String.Pattern (Pattern(..))
@@ -89,7 +89,6 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA as ARIA
 import Hydrogen.UI.Core (cls)
 import Web.DOM.Element (Element)
-import Web.Event.Event (Event)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -540,8 +539,4 @@ elem x xs = case find (_ == x) xs of
   Just _ -> true
   Nothing -> false
 
--- | Map function for arrays (FFI for performance in DOM operations)
-map :: forall a b. (a -> b) -> Array a -> Array b
-map f xs = mapImpl f xs
 
-foreign import mapImpl :: forall a b. (a -> b) -> Array a -> Array b

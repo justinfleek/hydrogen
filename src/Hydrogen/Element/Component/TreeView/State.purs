@@ -92,6 +92,26 @@ module Hydrogen.Element.Component.TreeView.State
   , clearLoading
   , loadingNodes
   
+  -- * Edit State
+  , EditState
+  , noEdit
+  , beginEditState
+  , updateEditBuffer
+  , getEditingNode
+  , getEditBuffer
+  , isEditing
+  , isEditingNode
+  , clearEditState
+  
+  -- * Hover State
+  , HoverState
+  , noHover
+  , setHover
+  , getHoveredNode
+  , isHovering
+  , isHoveringNode
+  , clearHover
+  
   -- * Complete Tree State
   , TreeViewState
   , initialState
@@ -99,6 +119,7 @@ module Hydrogen.Element.Component.TreeView.State
   , withCheckable
   , withDraggable
   , withSearchable
+  , withEditable
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -462,6 +483,106 @@ loadingNodes :: LoadingState -> Array NodeId
 loadingNodes (LoadingState s) = Set.toUnfoldable s
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                 // edit state
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | State for inline label editing
+-- |
+-- | Tracks which node is being edited and the current edit buffer.
+-- | The buffer holds the in-progress text, separate from the node's actual label.
+type EditState =
+  { editingNode :: Maybe NodeId    -- ^ Node currently being edited (if any)
+  , editBuffer :: String           -- ^ Current text in the edit field
+  , originalValue :: String        -- ^ Original value before edit (for cancel)
+  }
+
+-- | No active edit
+noEdit :: EditState
+noEdit =
+  { editingNode: Nothing
+  , editBuffer: ""
+  , originalValue: ""
+  }
+
+-- | Begin editing a node
+-- |
+-- | Stores the original value so it can be restored on cancel.
+beginEditState :: NodeId -> String -> EditState
+beginEditState nid originalLabel =
+  { editingNode: Just nid
+  , editBuffer: originalLabel
+  , originalValue: originalLabel
+  }
+
+-- | Update the edit buffer
+updateEditBuffer :: String -> EditState -> EditState
+updateEditBuffer newText state = state { editBuffer = newText }
+
+-- | Get the node being edited (if any)
+getEditingNode :: EditState -> Maybe NodeId
+getEditingNode state = state.editingNode
+
+-- | Get the current edit buffer text
+getEditBuffer :: EditState -> String
+getEditBuffer state = state.editBuffer
+
+-- | Check if any node is being edited
+isEditing :: EditState -> Boolean
+isEditing state = case state.editingNode of
+  Just _ -> true
+  Nothing -> false
+
+-- | Check if a specific node is being edited
+isEditingNode :: NodeId -> EditState -> Boolean
+isEditingNode nid state = state.editingNode == Just nid
+
+-- | Clear the edit state (cancel or confirm)
+clearEditState :: EditState -> EditState
+clearEditState _ = noEdit
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                // hover state
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | State for mouse hover tracking
+-- |
+-- | Tracks which node the mouse is currently over.
+-- | Used for hover effects and action button visibility.
+newtype HoverState = HoverState (Maybe NodeId)
+
+derive instance eqHoverState :: Eq HoverState
+
+instance showHoverState :: Show HoverState where
+  show (HoverState Nothing) = "Hover(none)"
+  show (HoverState (Just nid)) = "Hover(" <> show nid <> ")"
+
+-- | No node hovered
+noHover :: HoverState
+noHover = HoverState Nothing
+
+-- | Set the hovered node
+setHover :: NodeId -> HoverState
+setHover nid = HoverState (Just nid)
+
+-- | Get the currently hovered node (if any)
+getHoveredNode :: HoverState -> Maybe NodeId
+getHoveredNode (HoverState m) = m
+
+-- | Check if any node is being hovered
+isHovering :: HoverState -> Boolean
+isHovering (HoverState m) = case m of
+  Just _ -> true
+  Nothing -> false
+
+-- | Check if a specific node is being hovered
+isHoveringNode :: NodeId -> HoverState -> Boolean
+isHoveringNode nid (HoverState m) = m == Just nid
+
+-- | Clear the hover state
+clearHover :: HoverState -> HoverState
+clearHover _ = noHover
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // tree view state
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -476,12 +597,15 @@ type TreeViewState =
   , drag :: DragState
   , search :: SearchState
   , loading :: LoadingState
+  , edit :: EditState
+  , hover :: HoverState
   
   -- Configuration (set at creation, rarely changes)
   , selectionMode :: SelectionMode
   , checkable :: Boolean
   , draggable :: Boolean
   , searchable :: Boolean
+  , editable :: Boolean
   }
 
 -- | Create initial tree view state
@@ -494,11 +618,14 @@ initialState =
   , drag: noDrag
   , search: emptySearch
   , loading: emptyLoading
+  , edit: noEdit
+  , hover: noHover
   
   , selectionMode: SingleSelect
   , checkable: false
   , draggable: false
   , searchable: false
+  , editable: false
   }
 
 -- | Set selection mode
@@ -516,3 +643,7 @@ withDraggable d state = state { draggable = d }
 -- | Enable/disable search
 withSearchable :: Boolean -> TreeViewState -> TreeViewState
 withSearchable s state = state { searchable = s }
+
+-- | Enable/disable inline editing
+withEditable :: Boolean -> TreeViewState -> TreeViewState
+withEditable e state = state { editable = e }

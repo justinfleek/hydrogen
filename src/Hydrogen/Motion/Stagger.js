@@ -232,9 +232,4 @@ export const reverseStagger = (handle) => () => {
   }
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//                                                           // stagger functions
-// ═══════════════════════════════════════════════════════════════════════════════
 
-export const sin = Math.sin;
-export const floor = Math.floor;
