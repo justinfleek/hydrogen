@@ -56,9 +56,10 @@ module Hydrogen.Schema.Dimension.Matrix.Mat4
   , mulPointMat4
   , mulDirectionMat4
   
-  -- * Determinant
+  -- * Determinant and Inverse
   , detMat4
   , isInvertibleMat4
+  , invertMat4
   
   -- * Transform Constructors
   , makeTranslation4
@@ -303,6 +304,56 @@ detMat4 (Mat4 m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33) =
 -- | Proof reference: Mat4.lean IsInvertible
 isInvertibleMat4 :: Mat4 -> Boolean
 isInvertibleMat4 m = detMat4 m /= 0.0
+
+-- | Matrix inverse using adjugate/determinant method
+-- | Returns Nothing if matrix is singular (det = 0)
+-- | Proof reference: Mat4.lean inv, inv_mul_self, mul_inv_self
+-- |
+-- | Formula: A⁻¹ = adj(A) / det(A)
+-- | where adj(A) is the adjugate (transpose of cofactor matrix)
+invertMat4 :: Mat4 -> Maybe Mat4
+invertMat4 (Mat4 m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33) =
+  let
+    -- Compute 2x2 determinants for cofactors
+    s0 = m00 * m11 - m10 * m01
+    s1 = m00 * m12 - m10 * m02
+    s2 = m00 * m13 - m10 * m03
+    s3 = m01 * m12 - m11 * m02
+    s4 = m01 * m13 - m11 * m03
+    s5 = m02 * m13 - m12 * m03
+    c5 = m22 * m33 - m32 * m23
+    c4 = m21 * m33 - m31 * m23
+    c3 = m21 * m32 - m31 * m22
+    c2 = m20 * m33 - m30 * m23
+    c1 = m20 * m32 - m30 * m22
+    c0 = m20 * m31 - m30 * m21
+    
+    -- Determinant via Laplace expansion
+    det = s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0
+  in
+    if det == 0.0
+      then Nothing
+      else
+        let
+          invDet = 1.0 / det
+          -- Adjugate matrix elements (transposed cofactors)
+          r00 = ( m11 * c5 - m12 * c4 + m13 * c3) * invDet
+          r01 = (negate m01 * c5 + m02 * c4 - m03 * c3) * invDet
+          r02 = ( m31 * s5 - m32 * s4 + m33 * s3) * invDet
+          r03 = (negate m21 * s5 + m22 * s4 - m23 * s3) * invDet
+          r10 = (negate m10 * c5 + m12 * c2 - m13 * c1) * invDet
+          r11 = ( m00 * c5 - m02 * c2 + m03 * c1) * invDet
+          r12 = (negate m30 * s5 + m32 * s2 - m33 * s1) * invDet
+          r13 = ( m20 * s5 - m22 * s2 + m23 * s1) * invDet
+          r20 = ( m10 * c4 - m11 * c2 + m13 * c0) * invDet
+          r21 = (negate m00 * c4 + m01 * c2 - m03 * c0) * invDet
+          r22 = ( m30 * s4 - m31 * s2 + m33 * s0) * invDet
+          r23 = (negate m20 * s4 + m21 * s2 - m23 * s0) * invDet
+          r30 = (negate m10 * c3 + m11 * c1 - m12 * c0) * invDet
+          r31 = ( m00 * c3 - m01 * c1 + m02 * c0) * invDet
+          r32 = (negate m30 * s3 + m31 * s1 - m32 * s0) * invDet
+          r33 = ( m20 * s3 - m21 * s1 + m22 * s0) * invDet
+        in Just (Mat4 r00 r01 r02 r03 r10 r11 r12 r13 r20 r21 r22 r23 r30 r31 r32 r33)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // transform constructors

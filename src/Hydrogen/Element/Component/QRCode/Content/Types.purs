@@ -17,24 +17,23 @@
 -- | This module defines the ADT for all supported content types, each with
 -- | its own structured configuration and encoding format.
 -- |
--- | ## Encoding Formats
+-- | ## Module Structure
 -- |
--- | Different content types encode to different URI schemes:
--- | - URL: https://example.com
--- | - Email: mailto:user@example.com?subject=Hello&body=...
--- | - Phone: tel:+1234567890
--- | - SMS: sms:+1234567890?body=...
--- | - WiFi: WIFI:T:WPA;S:NetworkName;P:password;;
--- | - vCard: BEGIN:VCARD\nVERSION:3.0\n...
--- | - vEvent: BEGIN:VCALENDAR\n...
--- | - Geo: geo:40.7128,-74.0060
--- | - Bitcoin: bitcoin:address?amount=...
+-- | This is the orchestrator module that re-exports all content types:
+-- | - Types.Helpers: URI encoding utilities
+-- | - Types.WiFi: WiFi network configuration
+-- | - Types.VCard: Contact cards
+-- | - Types.Calendar: Calendar events
+-- | - Types.Geo: Geographic locations
+-- | - Types.Bitcoin: Cryptocurrency payments
+-- | - Types.Slack: Slack deep links
+-- | - Types.Webhook: Webhook triggers
+-- | - Types.DeepLink: App deep links
 -- |
 -- | ## Dependencies
 -- |
 -- | - Prelude (Eq, Show)
 -- | - Data.Maybe (optional fields)
--- | - Schema.Scheduling (for calendar events)
 
 module Hydrogen.Element.Component.QRCode.Content.Types
   ( -- * Main Content ADT
@@ -62,50 +61,29 @@ module Hydrogen.Element.Component.QRCode.Content.Types
   , smsContent
   , smsWithBody
   
-  -- * WiFi Content
-  , WiFiContent
-  , WiFiSecurity(WEP, WPA, WPA2, WPA3, NoPassword)
-  , wifiContent
-  , wifiHidden
+  -- * WiFi Content (re-exported)
+  , module WiFi
   
-  -- * vCard Contact
-  , VCardContent
-  , vCardContent
-  , vCardFull
+  -- * vCard Contact (re-exported)
+  , module VCard
   
-  -- * Calendar Event
-  , CalendarContent
-  , calendarContent
+  -- * Calendar Event (re-exported)
+  , module Calendar
   
-  -- * Geo Location
-  , GeoContent
-  , geoContent
-  , geoWithAltitude
-  , geoWithQuery
+  -- * Geo Location (re-exported)
+  , module Geo
   
-  -- * Bitcoin/Crypto
-  , BitcoinContent
-  , bitcoinContent
-  , bitcoinWithAmount
-  , bitcoinFull
+  -- * Bitcoin/Crypto (re-exported)
+  , module Bitcoin
   
-  -- * Slack
-  , SlackContent
-  , SlackAction(SlackOpenChannel, SlackComposeMessage, SlackTriggerWorkflow)
-  , slackChannel
-  , slackUser
-  , slackCompose
+  -- * Slack (re-exported)
+  , module Slack
   
-  -- * Webhook
-  , WebhookContent
-  , HTTPMethod(GET, POST, PUT, DELETE, PATCH)
-  , webhookGet
-  , webhookPost
+  -- * Webhook (re-exported)
+  , module Webhook
   
-  -- * Deep Link
-  , DeepLinkContent
-  , deepLink
-  , deepLinkWithFallback
+  -- * Deep Link (re-exported)
+  , module DeepLink
   
   -- * Plain Text
   , textContent
@@ -117,32 +95,82 @@ module Hydrogen.Element.Component.QRCode.Content.Types
 
 import Prelude
   ( class Eq
-  , class Ord
   , class Show
   , show
   , (<>)
-  , (==)
   , (/=)
-  , (&&)
-  , (||)
-  , (+)
-  , (-)
-  , (*)
-  , (/)
-  , (<)
-  , (>)
-  , (<=)
-  , (>=)
+  , (==)
   , map
-  , otherwise
-  , Ordering(LT, EQ, GT)
-  , compare
   )
 
-import Data.Array (intercalate, filter, length)
-import Data.Maybe (Maybe(Just, Nothing), maybe, isJust)
-import Data.String (joinWith, replaceAll, Pattern(Pattern), Replacement(Replacement))
+import Data.Array (filter, length)
+import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
+
+-- Re-exported modules
+import Hydrogen.Element.Component.QRCode.Content.Types.WiFi
+  ( WiFiSecurity(WEP, WPA, WPA2, WPA3, NoPassword)
+  , WiFiContent
+  , wifiContent
+  , wifiHidden
+  , encodeWiFi
+  ) as WiFi
+
+import Hydrogen.Element.Component.QRCode.Content.Types.VCard
+  ( VCardContent
+  , vCardContent
+  , vCardFull
+  , encodeVCard
+  ) as VCard
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Calendar
+  ( CalendarContent
+  , calendarContent
+  , encodeCalendar
+  ) as Calendar
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Geo
+  ( GeoContent
+  , geoContent
+  , geoWithAltitude
+  , geoWithQuery
+  , encodeGeo
+  ) as Geo
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Bitcoin
+  ( BitcoinContent
+  , bitcoinContent
+  , bitcoinWithAmount
+  , bitcoinFull
+  , encodeBitcoin
+  ) as Bitcoin
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Slack
+  ( SlackAction(SlackOpenChannel, SlackComposeMessage, SlackTriggerWorkflow)
+  , SlackContent
+  , slackChannel
+  , slackUser
+  , slackCompose
+  , encodeSlack
+  ) as Slack
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Webhook
+  ( HTTPMethod(GET, POST, PUT, DELETE, PATCH)
+  , WebhookContent
+  , webhookGet
+  , webhookPost
+  , encodeWebhook
+  ) as Webhook
+
+import Hydrogen.Element.Component.QRCode.Content.Types.DeepLink
+  ( DeepLinkContent
+  , deepLink
+  , deepLinkWithFallback
+  , encodeDeepLink
+  ) as DeepLink
+
+import Hydrogen.Element.Component.QRCode.Content.Types.Helpers (encodeURIComponent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // main content
@@ -152,19 +180,19 @@ import Data.Tuple (Tuple(Tuple))
 -- |
 -- | Each variant encodes to a specific URI scheme or data format.
 data QRContent
-  = ContentURL URLContent           -- ^ Web URL (https://, http://)
-  | ContentEmail EmailContent       -- ^ Email (mailto:)
-  | ContentPhone PhoneContent       -- ^ Phone call (tel:)
-  | ContentSMS SMSContent           -- ^ SMS message (sms:)
-  | ContentWiFi WiFiContent         -- ^ WiFi network config
-  | ContentVCard VCardContent       -- ^ Contact card (vCard)
-  | ContentCalendar CalendarContent -- ^ Calendar event (vEvent)
-  | ContentGeo GeoContent           -- ^ Geographic location (geo:)
-  | ContentBitcoin BitcoinContent   -- ^ Bitcoin payment (bitcoin:)
-  | ContentSlack SlackContent       -- ^ Slack deep link
-  | ContentWebhook WebhookContent   -- ^ Webhook trigger URL
-  | ContentDeepLink DeepLinkContent -- ^ App deep link
-  | ContentText String              -- ^ Plain text
+  = ContentURL URLContent              -- ^ Web URL (https://, http://)
+  | ContentEmail EmailContent          -- ^ Email (mailto:)
+  | ContentPhone PhoneContent          -- ^ Phone call (tel:)
+  | ContentSMS SMSContent              -- ^ SMS message (sms:)
+  | ContentWiFi WiFi.WiFiContent       -- ^ WiFi network config
+  | ContentVCard VCard.VCardContent    -- ^ Contact card (vCard)
+  | ContentCalendar Calendar.CalendarContent  -- ^ Calendar event (vEvent)
+  | ContentGeo Geo.GeoContent          -- ^ Geographic location (geo:)
+  | ContentBitcoin Bitcoin.BitcoinContent     -- ^ Bitcoin payment (bitcoin:)
+  | ContentSlack Slack.SlackContent    -- ^ Slack deep link
+  | ContentWebhook Webhook.WebhookContent     -- ^ Webhook trigger URL
+  | ContentDeepLink DeepLink.DeepLinkContent  -- ^ App deep link
+  | ContentText String                 -- ^ Plain text
 
 derive instance eqQRContent :: Eq QRContent
 
@@ -192,14 +220,14 @@ contentToString = case _ of
   ContentEmail c -> encodeEmail c
   ContentPhone c -> encodePhone c
   ContentSMS c -> encodeSMS c
-  ContentWiFi c -> encodeWiFi c
-  ContentVCard c -> encodeVCard c
-  ContentCalendar c -> encodeCalendar c
-  ContentGeo c -> encodeGeo c
-  ContentBitcoin c -> encodeBitcoin c
-  ContentSlack c -> encodeSlack c
-  ContentWebhook c -> encodeWebhook c
-  ContentDeepLink c -> encodeDeepLink c
+  ContentWiFi c -> WiFi.encodeWiFi c
+  ContentVCard c -> VCard.encodeVCard c
+  ContentCalendar c -> Calendar.encodeCalendar c
+  ContentGeo c -> Geo.encodeGeo c
+  ContentBitcoin c -> Bitcoin.encodeBitcoin c
+  ContentSlack c -> Slack.encodeSlack c
+  ContentWebhook c -> Webhook.encodeWebhook c
+  ContentDeepLink c -> DeepLink.encodeDeepLink c
   ContentText t -> t
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -333,440 +361,9 @@ encodeSMS c =
     base <> bodyParam
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // wifi content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | WiFi security type.
-data WiFiSecurity
-  = WEP
-  | WPA
-  | WPA2
-  | WPA3
-  | NoPassword
-
-derive instance eqWiFiSecurity :: Eq WiFiSecurity
-
-instance showWiFiSecurity :: Show WiFiSecurity where
-  show WEP = "WEP"
-  show WPA = "WPA"
-  show WPA2 = "WPA2"
-  show WPA3 = "WPA3"
-  show NoPassword = "nopass"
-
--- | WiFi content configuration.
-type WiFiContent =
-  { ssid :: String            -- ^ Network name
-  , password :: Maybe String  -- ^ Network password
-  , security :: WiFiSecurity  -- ^ Security type
-  , hidden :: Boolean         -- ^ Is network hidden?
-  }
-
--- | Create WiFi content
-wifiContent :: String -> String -> WiFiSecurity -> QRContent
-wifiContent ssid password security = ContentWiFi
-  { ssid
-  , password: Just password
-  , security
-  , hidden: false
-  }
-
--- | Create hidden WiFi content
-wifiHidden :: String -> String -> WiFiSecurity -> QRContent
-wifiHidden ssid password security = ContentWiFi
-  { ssid
-  , password: Just password
-  , security
-  , hidden: true
-  }
-
--- | Encode WiFi to WIFI: format
--- |
--- | Format: WIFI:T:WPA;S:NetworkName;P:password;H:true;;
-encodeWiFi :: WiFiContent -> String
-encodeWiFi c =
-  let
-    secType = case c.security of
-      WEP -> "WEP"
-      WPA -> "WPA"
-      WPA2 -> "WPA"  -- WPA2 uses same tag as WPA
-      WPA3 -> "WPA"  -- WPA3 uses same tag
-      NoPassword -> "nopass"
-    escapedSSID = escapeWiFiSpecial c.ssid
-    escapedPass = maybe "" escapeWiFiSpecial c.password
-    hiddenStr = if c.hidden then "H:true;" else ""
-  in
-    "WIFI:T:" <> secType <> ";S:" <> escapedSSID <> ";P:" <> escapedPass <> ";" <> hiddenStr <> ";"
-
--- | Escape special characters in WiFi strings
-escapeWiFiSpecial :: String -> String
-escapeWiFiSpecial s =
-  replaceAll (Pattern "\\") (Replacement "\\\\")
-    (replaceAll (Pattern ";") (Replacement "\\;")
-      (replaceAll (Pattern ",") (Replacement "\\,")
-        (replaceAll (Pattern "\"") (Replacement "\\\"")
-          (replaceAll (Pattern ":") (Replacement "\\:") s))))
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // vcard content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | vCard content configuration.
-type VCardContent =
-  { firstName :: String
-  , lastName :: String
-  , organization :: Maybe String
-  , title :: Maybe String
-  , email :: Maybe String
-  , phone :: Maybe String
-  , mobile :: Maybe String
-  , address :: Maybe String
-  , website :: Maybe String
-  , note :: Maybe String
-  }
-
--- | Create simple vCard
-vCardContent :: String -> String -> QRContent
-vCardContent firstName lastName = ContentVCard
-  { firstName
-  , lastName
-  , organization: Nothing
-  , title: Nothing
-  , email: Nothing
-  , phone: Nothing
-  , mobile: Nothing
-  , address: Nothing
-  , website: Nothing
-  , note: Nothing
-  }
-
--- | Create full vCard
-vCardFull :: String -> String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> QRContent
-vCardFull firstName lastName organization title email phone mobile address website note = ContentVCard
-  { firstName, lastName, organization, title, email, phone, mobile, address, website, note }
-
--- | Encode vCard to vCard 3.0 format
-encodeVCard :: VCardContent -> String
-encodeVCard c =
-  let
-    lines =
-      [ "BEGIN:VCARD"
-      , "VERSION:3.0"
-      , "N:" <> c.lastName <> ";" <> c.firstName <> ";;;"
-      , "FN:" <> c.firstName <> " " <> c.lastName
-      ] <>
-      maybe [] (\o -> ["ORG:" <> o]) c.organization <>
-      maybe [] (\t -> ["TITLE:" <> t]) c.title <>
-      maybe [] (\e -> ["EMAIL:" <> e]) c.email <>
-      maybe [] (\p -> ["TEL;TYPE=WORK:" <> p]) c.phone <>
-      maybe [] (\m -> ["TEL;TYPE=CELL:" <> m]) c.mobile <>
-      maybe [] (\a -> ["ADR;TYPE=WORK:;;" <> a]) c.address <>
-      maybe [] (\w -> ["URL:" <> w]) c.website <>
-      maybe [] (\n -> ["NOTE:" <> n]) c.note <>
-      [ "END:VCARD" ]
-  in
-    joinWith "\n" lines
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // calendar content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Calendar event content configuration.
--- |
--- | For full calendar integration, use Schema.Scheduling.Event
--- | This is a simplified version for QR encoding.
-type CalendarContent =
-  { title :: String
-  , description :: Maybe String
-  , location :: Maybe String
-  , startDate :: String         -- ^ ISO 8601 format: 20260224T150000Z
-  , endDate :: String           -- ^ ISO 8601 format
-  , allDay :: Boolean
-  }
-
--- | Create calendar event content
-calendarContent :: String -> String -> String -> QRContent
-calendarContent title startDate endDate = ContentCalendar
-  { title
-  , description: Nothing
-  , location: Nothing
-  , startDate
-  , endDate
-  , allDay: false
-  }
-
--- | Encode calendar to vEvent format
-encodeCalendar :: CalendarContent -> String
-encodeCalendar c =
-  let
-    lines =
-      [ "BEGIN:VCALENDAR"
-      , "VERSION:2.0"
-      , "BEGIN:VEVENT"
-      , "SUMMARY:" <> c.title
-      , "DTSTART:" <> c.startDate
-      , "DTEND:" <> c.endDate
-      ] <>
-      maybe [] (\d -> ["DESCRIPTION:" <> d]) c.description <>
-      maybe [] (\l -> ["LOCATION:" <> l]) c.location <>
-      [ "END:VEVENT"
-      , "END:VCALENDAR"
-      ]
-  in
-    joinWith "\n" lines
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // geo content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Geographic location content.
-type GeoContent =
-  { latitude :: Number
-  , longitude :: Number
-  , altitude :: Maybe Number
-  , query :: Maybe String      -- ^ Search query / place name
-  }
-
--- | Create geo content
-geoContent :: Number -> Number -> QRContent
-geoContent latitude longitude = ContentGeo
-  { latitude, longitude, altitude: Nothing, query: Nothing }
-
--- | Create geo content with altitude
-geoWithAltitude :: Number -> Number -> Number -> QRContent
-geoWithAltitude latitude longitude altitude = ContentGeo
-  { latitude, longitude, altitude: Just altitude, query: Nothing }
-
--- | Create geo content with query
-geoWithQuery :: Number -> Number -> String -> QRContent
-geoWithQuery latitude longitude query = ContentGeo
-  { latitude, longitude, altitude: Nothing, query: Just query }
-
--- | Encode geo to geo: URI
-encodeGeo :: GeoContent -> String
-encodeGeo c =
-  let
-    base = "geo:" <> show c.latitude <> "," <> show c.longitude
-    altStr = maybe "" (\a -> "," <> show a) c.altitude
-    queryStr = maybe "" (\q -> "?q=" <> encodeURIComponent q) c.query
-  in
-    base <> altStr <> queryStr
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // bitcoin content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Bitcoin payment content.
-type BitcoinContent =
-  { address :: String
-  , amount :: Maybe Number     -- ^ Amount in BTC
-  , label :: Maybe String      -- ^ Recipient label
-  , message :: Maybe String    -- ^ Payment message
-  }
-
--- | Create bitcoin content
-bitcoinContent :: String -> QRContent
-bitcoinContent address = ContentBitcoin
-  { address, amount: Nothing, label: Nothing, message: Nothing }
-
--- | Create bitcoin with amount
-bitcoinWithAmount :: String -> Number -> QRContent
-bitcoinWithAmount address amount = ContentBitcoin
-  { address, amount: Just amount, label: Nothing, message: Nothing }
-
--- | Create full bitcoin content
-bitcoinFull :: String -> Maybe Number -> Maybe String -> Maybe String -> QRContent
-bitcoinFull address amount label message = ContentBitcoin
-  { address, amount, label, message }
-
--- | Encode bitcoin to bitcoin: URI
-encodeBitcoin :: BitcoinContent -> String
-encodeBitcoin c =
-  let
-    params = filter (\(Tuple _ v) -> v /= "")
-      [ Tuple "amount" (maybe "" show c.amount)
-      , Tuple "label" (maybe "" encodeURIComponent c.label)
-      , Tuple "message" (maybe "" encodeURIComponent c.message)
-      ]
-    paramStr = if length params == 0
-      then ""
-      else "?" <> joinWith "&" (map (\(Tuple k v) -> k <> "=" <> v) params)
-  in
-    "bitcoin:" <> c.address <> paramStr
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // slack content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Slack action type.
-data SlackAction
-  = SlackOpenChannel         -- ^ Just open the channel
-  | SlackComposeMessage      -- ^ Open composer
-  | SlackTriggerWorkflow     -- ^ Trigger a workflow
-
-derive instance eqSlackAction :: Eq SlackAction
-
-instance showSlackAction :: Show SlackAction where
-  show SlackOpenChannel = "open"
-  show SlackComposeMessage = "compose"
-  show SlackTriggerWorkflow = "workflow"
-
--- | Slack deep link content.
-type SlackContent =
-  { workspace :: String        -- ^ Workspace ID or name
-  , channel :: Maybe String    -- ^ Channel name (without #)
-  , user :: Maybe String       -- ^ User ID for DM
-  , message :: Maybe String    -- ^ Pre-filled message
-  , action :: SlackAction
-  }
-
--- | Create Slack channel link
-slackChannel :: String -> String -> QRContent
-slackChannel workspace channel = ContentSlack
-  { workspace
-  , channel: Just channel
-  , user: Nothing
-  , message: Nothing
-  , action: SlackOpenChannel
-  }
-
--- | Create Slack DM link
-slackUser :: String -> String -> QRContent
-slackUser workspace user = ContentSlack
-  { workspace
-  , channel: Nothing
-  , user: Just user
-  , message: Nothing
-  , action: SlackOpenChannel
-  }
-
--- | Create Slack compose link
-slackCompose :: String -> String -> String -> QRContent
-slackCompose workspace channel message = ContentSlack
-  { workspace
-  , channel: Just channel
-  , user: Nothing
-  , message: Just message
-  , action: SlackComposeMessage
-  }
-
--- | Encode Slack to slack:// URI
-encodeSlack :: SlackContent -> String
-encodeSlack c =
-  let
-    base = "slack://channel?team=" <> c.workspace
-    channelPart = maybe "" (\ch -> "&id=" <> ch) c.channel
-    userPart = maybe "" (\u -> "&id=" <> u) c.user
-    -- Note: Slack deep links have limited support for pre-filled messages
-    -- This is a best-effort encoding
-  in
-    base <> channelPart <> userPart
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // webhook content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | HTTP method for webhooks.
-data HTTPMethod
-  = GET
-  | POST
-  | PUT
-  | DELETE
-  | PATCH
-
-derive instance eqHTTPMethod :: Eq HTTPMethod
-
-instance showHTTPMethod :: Show HTTPMethod where
-  show GET = "GET"
-  show POST = "POST"
-  show PUT = "PUT"
-  show DELETE = "DELETE"
-  show PATCH = "PATCH"
-
--- | Webhook trigger content.
--- |
--- | Note: QR codes can only encode URLs. The actual webhook triggering
--- | happens when the user opens the URL, which should point to a service
--- | that performs the webhook call (e.g., a serverless function).
-type WebhookContent =
-  { url :: String
-  , method :: HTTPMethod
-  , description :: String      -- ^ Human-readable description of what happens
-  }
-
--- | Create GET webhook
-webhookGet :: String -> String -> QRContent
-webhookGet url description = ContentWebhook
-  { url, method: GET, description }
-
--- | Create POST webhook
-webhookPost :: String -> String -> QRContent
-webhookPost url description = ContentWebhook
-  { url, method: POST, description }
-
--- | Encode webhook to URL
--- |
--- | The URL should be a trigger endpoint that performs the actual webhook.
-encodeWebhook :: WebhookContent -> String
-encodeWebhook c = c.url
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // deep link content
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | App deep link content.
-type DeepLinkContent =
-  { scheme :: String           -- ^ App URL scheme (e.g., "myapp://")
-  , path :: String             -- ^ Path within the app
-  , params :: Array (Tuple String String)  -- ^ Query parameters
-  , fallbackURL :: Maybe String  -- ^ Web fallback if app not installed
-  }
-
--- | Create simple deep link
-deepLink :: String -> String -> QRContent
-deepLink scheme path = ContentDeepLink
-  { scheme, path, params: [], fallbackURL: Nothing }
-
--- | Create deep link with fallback
-deepLinkWithFallback :: String -> String -> String -> QRContent
-deepLinkWithFallback scheme path fallback = ContentDeepLink
-  { scheme, path, params: [], fallbackURL: Just fallback }
-
--- | Encode deep link to URI
-encodeDeepLink :: DeepLinkContent -> String
-encodeDeepLink c =
-  let
-    base = c.scheme <> c.path
-    paramStr = if length c.params == 0
-      then ""
-      else "?" <> joinWith "&" (map (\(Tuple k v) -> k <> "=" <> encodeURIComponent v) c.params)
-  in
-    base <> paramStr
-
--- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // text content
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Create plain text content
 textContent :: String -> QRContent
 textContent = ContentText
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | URI encode a string component.
--- |
--- | This is a pure PureScript implementation of URI encoding.
--- | Encodes all characters except: A-Z a-z 0-9 - _ . ~
-encodeURIComponent :: String -> String
-encodeURIComponent s =
-  -- For now, a simplified encoding that handles common special characters
-  -- A full implementation would handle all non-unreserved characters
-  replaceAll (Pattern " ") (Replacement "%20")
-    (replaceAll (Pattern "&") (Replacement "%26")
-      (replaceAll (Pattern "=") (Replacement "%3D")
-        (replaceAll (Pattern "?") (Replacement "%3F")
-          (replaceAll (Pattern "#") (Replacement "%23")
-            (replaceAll (Pattern "+") (Replacement "%2B")
-              (replaceAll (Pattern "\n") (Replacement "%0A")
-                (replaceAll (Pattern "\r") (Replacement "%0D") s)))))))
