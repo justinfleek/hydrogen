@@ -65,6 +65,10 @@ module Hydrogen.Element.Component.Toggle
   , defaultProps
   , defaultGroupProps
   
+  -- * Identity Props
+  , value
+  , groupAriaLabel
+  
   -- * State Props
   , pressed
   , isDisabled
@@ -72,13 +76,17 @@ module Hydrogen.Element.Component.Toggle
   -- * Color Atoms
   , backgroundColor
   , pressedBackgroundColor
+  , hoverBackgroundColor
   , textColor
   , pressedTextColor
+  , hoverTextColor
   , borderColor
+  , focusRingColor
   
   -- * Geometry Atoms
   , borderRadius
   , borderWidth
+  , focusRingWidth
   
   -- * Dimension Atoms
   , height
@@ -92,9 +100,14 @@ module Hydrogen.Element.Component.Toggle
   
   -- * Motion Atoms
   , transitionDuration
+  , reducedMotion
+  
+  -- * Accessibility Props
+  , ariaLabel
   
   -- * Behavior Props
   , onPressedChange
+  , onKeyDown
   
   -- * Escape Hatch
   , extraAttributes
@@ -104,6 +117,7 @@ import Prelude
   ( show
   , (<>)
   , not
+  , negate
   )
 
 import Data.Array (foldl)
@@ -116,6 +130,7 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
+import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // toggle props
@@ -123,20 +138,27 @@ import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
 -- | Toggle button properties
 type ToggleProps msg =
-  { -- State
-    pressed :: Boolean
+  { -- Identity (for UUID5 generation)
+    value :: String
+    
+  -- State
+  , pressed :: Boolean
   , disabled :: Boolean
   
   -- Color atoms
   , backgroundColor :: Maybe Color.RGB
   , pressedBackgroundColor :: Maybe Color.RGB
+  , hoverBackgroundColor :: Maybe Color.RGB
   , textColor :: Maybe Color.RGB
   , pressedTextColor :: Maybe Color.RGB
+  , hoverTextColor :: Maybe Color.RGB
   , borderColor :: Maybe Color.RGB
+  , focusRingColor :: Maybe Color.RGB
   
   -- Geometry atoms
   , borderRadius :: Maybe Geometry.Corners
   , borderWidth :: Maybe Device.Pixel
+  , focusRingWidth :: Maybe Device.Pixel
   
   -- Dimension atoms
   , height :: Maybe Device.Pixel
@@ -150,8 +172,13 @@ type ToggleProps msg =
   -- Motion atoms
   , transitionDuration :: Maybe Temporal.Milliseconds
   
+  -- Accessibility
+  , ariaLabel :: Maybe String
+  , reducedMotion :: Boolean
+  
   -- Behavior
   , onPressedChange :: Maybe msg
+  , onKeyDown :: Maybe (String -> msg)
   
   -- Escape hatch
   , extraAttributes :: Array (E.Attribute msg)
@@ -163,22 +190,30 @@ type ToggleProp msg = ToggleProps msg -> ToggleProps msg
 -- | Default properties
 defaultProps :: forall msg. ToggleProps msg
 defaultProps =
-  { pressed: false
+  { value: ""
+  , pressed: false
   , disabled: false
   , backgroundColor: Nothing
   , pressedBackgroundColor: Nothing
+  , hoverBackgroundColor: Nothing
   , textColor: Nothing
   , pressedTextColor: Nothing
+  , hoverTextColor: Nothing
   , borderColor: Nothing
+  , focusRingColor: Nothing
   , borderRadius: Nothing
   , borderWidth: Nothing
+  , focusRingWidth: Nothing
   , height: Nothing
   , paddingX: Nothing
   , paddingY: Nothing
   , fontSize: Nothing
   , fontWeight: Nothing
   , transitionDuration: Nothing
+  , ariaLabel: Nothing
+  , reducedMotion: false
   , onPressedChange: Nothing
+  , onKeyDown: Nothing
   , extraAttributes: []
   }
 
@@ -188,8 +223,11 @@ defaultProps =
 
 -- | Toggle group properties
 type GroupProps msg =
-  { -- Dimension atoms
-    gap :: Maybe Device.Pixel
+  { -- Accessibility
+    ariaLabel :: Maybe String
+    
+  -- Dimension atoms
+  , gap :: Maybe Device.Pixel
   
   -- Escape hatch
   , extraAttributes :: Array (E.Attribute msg)
@@ -201,13 +239,21 @@ type GroupProp msg = GroupProps msg -> GroupProps msg
 -- | Default group properties
 defaultGroupProps :: forall msg. GroupProps msg
 defaultGroupProps =
-  { gap: Nothing
+  { ariaLabel: Nothing
+  , gap: Nothing
   , extraAttributes: []
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // prop builders: state
 -- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set toggle value (identifier for UUID5 generation)
+-- |
+-- | The value is used to generate a deterministic UUID5 id:
+-- | `uuid5(nsToggle, value)` → same value always produces same id.
+value :: forall msg. String -> ToggleProp msg
+value v props = props { value = v }
 
 -- | Set pressed state
 pressed :: forall msg. Boolean -> ToggleProp msg
@@ -229,6 +275,10 @@ backgroundColor c props = props { backgroundColor = Just c }
 pressedBackgroundColor :: forall msg. Color.RGB -> ToggleProp msg
 pressedBackgroundColor c props = props { pressedBackgroundColor = Just c }
 
+-- | Set background color on hover (Color.RGB atom)
+hoverBackgroundColor :: forall msg. Color.RGB -> ToggleProp msg
+hoverBackgroundColor c props = props { hoverBackgroundColor = Just c }
+
 -- | Set text color when not pressed (Color.RGB atom)
 textColor :: forall msg. Color.RGB -> ToggleProp msg
 textColor c props = props { textColor = Just c }
@@ -237,9 +287,17 @@ textColor c props = props { textColor = Just c }
 pressedTextColor :: forall msg. Color.RGB -> ToggleProp msg
 pressedTextColor c props = props { pressedTextColor = Just c }
 
+-- | Set text color on hover (Color.RGB atom)
+hoverTextColor :: forall msg. Color.RGB -> ToggleProp msg
+hoverTextColor c props = props { hoverTextColor = Just c }
+
 -- | Set border color (Color.RGB atom)
 borderColor :: forall msg. Color.RGB -> ToggleProp msg
 borderColor c props = props { borderColor = Just c }
+
+-- | Set focus ring color (Color.RGB atom)
+focusRingColor :: forall msg. Color.RGB -> ToggleProp msg
+focusRingColor c props = props { focusRingColor = Just c }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // prop builders: geometry
@@ -252,6 +310,10 @@ borderRadius r props = props { borderRadius = Just r }
 -- | Set border width (Device.Pixel atom)
 borderWidth :: forall msg. Device.Pixel -> ToggleProp msg
 borderWidth w props = props { borderWidth = Just w }
+
+-- | Set focus ring width (Device.Pixel atom)
+focusRingWidth :: forall msg. Device.Pixel -> ToggleProp msg
+focusRingWidth w props = props { focusRingWidth = Just w }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // prop builders: dimension
@@ -273,6 +335,10 @@ paddingY p props = props { paddingY = Just p }
 gap :: forall msg. Device.Pixel -> GroupProp msg
 gap g props = props { gap = Just g }
 
+-- | Set ARIA label for the toggle group
+groupAriaLabel :: forall msg. String -> GroupProp msg
+groupAriaLabel label props = props { ariaLabel = Just label }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                     // prop builders: typography
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -293,6 +359,18 @@ fontWeight w props = props { fontWeight = Just w }
 transitionDuration :: forall msg. Temporal.Milliseconds -> ToggleProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
+-- | Enable reduced motion (disables transitions)
+reducedMotion :: forall msg. Boolean -> ToggleProp msg
+reducedMotion r props = props { reducedMotion = r }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: accessibility
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set ARIA label for screen readers
+ariaLabel :: forall msg. String -> ToggleProp msg
+ariaLabel label props = props { ariaLabel = Just label }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // prop builders: behavior
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -300,6 +378,10 @@ transitionDuration d props = props { transitionDuration = Just d }
 -- | Set press change handler
 onPressedChange :: forall msg. msg -> ToggleProp msg
 onPressedChange handler props = props { onPressedChange = Just handler }
+
+-- | Set keyboard handler (receives key name: "Enter", "Space", "ArrowLeft", etc.)
+onKeyDown :: forall msg. (String -> msg) -> ToggleProp msg
+onKeyDown handler props = props { onKeyDown = Just handler }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                   // prop builders: escape hatch
@@ -329,10 +411,15 @@ toggle propMods children =
 buildToggleAttrs :: forall msg. ToggleProps msg -> Array (E.Attribute msg)
 buildToggleAttrs props =
   let
+    -- Generate deterministic ID from value using UUID5
+    toggleId = UUID5.toString (UUID5.uuid5 UUID5.nsToggle props.value)
+    
     -- Default colors
     defaultBgColor = Color.rgb 255 255 255        -- White
     defaultPressedBgColor = Color.rgb 226 232 240  -- Light gray
+    defaultHoverBgColor = Color.rgb 241 245 249   -- Very light gray
     defaultTextColor = Color.rgb 71 85 105        -- Dark gray
+    defaultFocusRingColor = Color.rgb 59 130 246  -- Blue
     
     -- Current colors based on pressed state
     currentBgColor = if props.pressed
@@ -342,6 +429,14 @@ buildToggleAttrs props =
     currentTextColor = if props.pressed
       then maybe defaultTextColor (\c -> c) props.pressedTextColor
       else maybe defaultTextColor (\c -> c) props.textColor
+    
+    -- Hover colors (stored as CSS custom properties for :hover pseudo-class)
+    hoverBgColor = maybe defaultHoverBgColor (\c -> c) props.hoverBackgroundColor
+    hoverTxtColor = maybe currentTextColor (\c -> c) props.hoverTextColor
+    
+    -- Focus ring
+    focusColor = maybe defaultFocusRingColor (\c -> c) props.focusRingColor
+    focusWidth = maybe "2px" show props.focusRingWidth
     
     -- Border
     borderStyle = case props.borderColor of
@@ -380,14 +475,33 @@ buildToggleAttrs props =
       Nothing -> [ E.style "font-weight" "500" ]
       Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
     
-    -- Transition
-    transitionValue = maybe "150ms" show props.transitionDuration
+    -- Transition (respects reducedMotion)
+    transitionValue = if props.reducedMotion
+      then "none"
+      else maybe "150ms" show props.transitionDuration
+    
+    -- ARIA label
+    ariaLabelAttr = case props.ariaLabel of
+      Nothing -> []
+      Just label -> [ E.ariaLabel label ]
+    
+    -- CSS custom properties for hover/focus (runtime interprets these)
+    customProperties =
+      [ E.attr "data-hover-bg" (Color.toLegacyCss hoverBgColor)
+      , E.attr "data-hover-color" (Color.toLegacyCss hoverTxtColor)
+      , E.attr "data-focus-ring-color" (Color.toLegacyCss focusColor)
+      , E.attr "data-focus-ring-width" focusWidth
+      ]
     
     -- Core styles
     coreStyles =
-      [ E.type_ "button"
+      [ E.id_ toggleId
+      , E.type_ "button"
       , E.attr "aria-pressed" (if props.pressed then "true" else "false")
+      , E.attr "data-state" (if props.pressed then "on" else "off")
+      , E.attr "data-value" props.value
       , E.disabled props.disabled
+      , E.tabIndex 0
       , E.style "display" "inline-flex"
       , E.style "align-items" "center"
       , E.style "justify-content" "center"
@@ -402,12 +516,19 @@ buildToggleAttrs props =
     
     -- Disabled opacity
     disabledStyle = if props.disabled
-      then [ E.style "opacity" "0.5" ]
+      then [ E.style "opacity" "0.5", E.tabIndex (-1) ]
       else []
     
     -- Click handler
     clickHandler = case props.onPressedChange of
       Just handler -> if not props.disabled then [ E.onClick handler ] else []
+      Nothing -> []
+    
+    -- Keyboard handler (Space and Enter should toggle)
+    keyboardHandler = case props.onKeyDown of
+      Just handler -> if not props.disabled 
+        then [ E.onKeyDown handler ]
+        else []
       Nothing -> []
   in
     coreStyles 
@@ -417,8 +538,11 @@ buildToggleAttrs props =
     <> paddingStyle 
     <> fontSizeStyle 
     <> fontWeightStyle 
+    <> ariaLabelAttr
+    <> customProperties
     <> disabledStyle 
     <> clickHandler 
+    <> keyboardHandler
     <> props.extraAttributes
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -435,12 +559,18 @@ toggleGroup propMods children =
     
     -- Gap
     gapValue = maybe "4px" show props.gap
+    
+    -- ARIA label
+    ariaLabelAttr = case props.ariaLabel of
+      Just label -> [ E.ariaLabel label ]
+      Nothing -> []
   in
     E.div_
       ( [ E.role "group"
         , E.style "display" "inline-flex"
         , E.style "gap" gapValue
         ]
+        <> ariaLabelAttr
         <> props.extraAttributes
       )
       children

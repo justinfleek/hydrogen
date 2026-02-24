@@ -87,10 +87,6 @@ import Prelude
   , (==)
   , (/=)
   , (<>)
-  , (+)
-  , (-)
-  , (>=)
-  , (&&)
   , (||)
   , not
   , map
@@ -100,14 +96,13 @@ import Prelude
   )
 
 import Data.Array as Array
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe, isJust)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Foldable (foldl)
 
 import Hydrogen.Element.Component.TreeView.Types
   ( NodeId
-  , unwrapNodeId
   , NodeIcon
   , Depth
   , incrementDepth

@@ -95,6 +95,13 @@ Value   Name           Payload Size   Description
 0x05    DrawParticle   32 bytes       Point sprite particle
 0x10    PushClip       variable       Push clipping region
 0x11    PopClip        0 bytes        Pop clipping region
+
+v2 Typography as Geometry:
+0x20    DrawGlyphPath         variable   Character as vector bezier paths
+0x21    DrawGlyphInstance     64 bytes   Animated glyph with transform
+0x22    DrawWord              variable   Collection of glyphs with stagger
+0x23    DefinePathData        variable   Shared path data for instancing
+0x24    UpdateAnimationState  variable   Per-frame animation deltas
 ```
 
 ────────────────────────────────────────────────────────────────────────────────
@@ -250,6 +257,44 @@ Offset  Size  Type    Name         Description
 - Z is used for 3D depth, not just ordering
 
 ────────────────────────────────────────────────────────────────────────────────
+                                                          // command: DrawPath
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x04**
+**Payload Size: Variable (20 byte header + optional colors + segment data)**
+
+Draws a vector path composed of bezier segments. Paths can have an optional
+fill and/or stroke. Runtime tessellates paths to triangles for rendering.
+
+**Header (20 bytes):**
+
+```
+Offset  Size  Type    Name           Description
+──────  ────  ────    ────           ───────────
+0       4     u32     segmentCount   Number of path segments
+4       1     u8      fillPresent    1 = has fill color, 0 = no fill
+5       1     u8      strokePresent  1 = has stroke color, 0 = no stroke
+6       2     u16     padding        Alignment padding
+8       4     f32     strokeWidth    Stroke width (pixels)
+12      4     f32     depth          Z-order
+16      4     u32     pickId         Hit-test ID
+```
+
+**Followed by (if fillPresent = 1):**
+- Fill color: 4 × f32 (RGBA, unit interval)
+
+**Followed by (if strokePresent = 1):**
+- Stroke color: 4 × f32 (RGBA, unit interval)
+
+**Followed by:**
+- `segmentCount` path segments (same format as DrawGlyphPath contours)
+
+**Rendering Notes:**
+- Fill uses even-odd or non-zero winding rule (implementation-defined)
+- Stroke is rendered with round joins and caps
+- Both fill and stroke can be present simultaneously
+
+────────────────────────────────────────────────────────────────────────────────
                                                         // command: PushClip
 ────────────────────────────────────────────────────────────────────────────────
 
@@ -260,7 +305,7 @@ Offset  Size  Type    Name         Description
 Pushes a clipping region onto the clip stack. All subsequent commands
 are clipped to this region until PopClip.
 
-**Subtype 0x00 — Rect Clip:**
+**Subtype 0x00 — Rect Clip (36 bytes payload):**
 
 ```
 Offset  Size  Type    Name         Description
@@ -271,10 +316,26 @@ Offset  Size  Type    Name         Description
 8       4     f32     y            Top edge
 12      4     f32     width        Width
 16      4     f32     height       Height
-20      16    Radii4  radii        Corner radii
+20      4     f32     radiusTL     Top-left corner radius
+24      4     f32     radiusTR     Top-right corner radius
+28      4     f32     radiusBR     Bottom-right corner radius
+32      4     f32     radiusBL     Bottom-left corner radius
 ```
 
 **Total size: 4 (header) + 36 = 40 bytes**
+
+**Subtype 0x01 — Path Clip (variable payload):**
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       1     u8      subtype      0x01 = path
+1       3     u8[3]   padding      Alignment padding
+4       4     u32     segmentCount Number of path segments
+8+      var   ...     segments     Path segment data
+```
+
+**Total size: 4 (header) + 8 + segment data**
 
 ────────────────────────────────────────────────────────────────────────────────
                                                          // command: PopClip
@@ -286,15 +347,283 @@ Offset  Size  Type    Name         Description
 
 Pops the current clipping region from the clip stack.
 
+════════════════════════════════════════════════════════════════════════════════
+                                               // v2 typography as geometry
+════════════════════════════════════════════════════════════════════════════════
+
+The v2 Typography commands treat text as pure geometry. Glyphs are bezier
+paths that can be manipulated, extruded, animated, and rendered through the
+same pipeline as all other vector shapes. This unifies typography with the
+broader 3D graphics system.
+
 ────────────────────────────────────────────────────────────────────────────────
-                                                           // command: Noop
+                                                    // command: DrawGlyphPath
 ────────────────────────────────────────────────────────────────────────────────
 
-**Type: 0x00**
-**Payload Size: 0 bytes**
-**Total Size: 4 bytes (header only)**
+**Type: 0x20**
+**Payload Size: Variable (48 byte header + contour data)**
 
-No operation. Can be used as padding or placeholder.
+Defines a single glyph as vector bezier paths. Each glyph consists of one
+or more contours (closed paths). Outer contours define the shape; inner
+contours (counter-clockwise) define holes (like in 'O', 'A', 'B').
+
+**Header (48 bytes):**
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       4     u32     glyphId      Unicode codepoint or internal ID
+4       4     u32     fontId       Font registry index (u32 for billion-agent scale)
+8       2     u16     contourCount Number of contours in glyph
+10      2     u16     padding      Alignment padding
+12      4     f32     minX         Bounding box minimum X
+16      4     f32     minY         Bounding box minimum Y
+20      4     f32     minZ         Bounding box minimum Z (for 3D)
+24      4     f32     maxX         Bounding box maximum X
+28      4     f32     maxY         Bounding box maximum Y
+32      4     f32     maxZ         Bounding box maximum Z
+36      4     f32     advanceWidth Horizontal advance after glyph
+40      4     f32     depth        Z-order
+44      4     u32     pickId       Hit-test ID
+```
+
+**Per-contour header (4 bytes):**
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       2     u16     commandCount Number of path commands
+2       1     u8      isOuter      1 = outer contour, 0 = hole
+3       1     u8      padding      Alignment padding
+```
+
+**Path command format:**
+
+Each command is 4-byte aligned:
+
+```
+Type    Value  Payload          Total Size
+────    ─────  ───────          ──────────
+MoveTo  0x01   x: f32, y: f32   12 bytes
+LineTo  0x02   x: f32, y: f32   12 bytes
+QuadTo  0x03   cx, cy, x, y     20 bytes
+CubicTo 0x04   c1x, c1y, c2x, c2y, x, y  28 bytes
+Close   0x05   (none)           4 bytes
+```
+
+────────────────────────────────────────────────────────────────────────────────
+                                                 // command: DrawGlyphInstance
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x21**
+**Payload Size: 76 bytes**
+**Total Size: 80 bytes (including 4-byte header)**
+
+An instance of a glyph with per-character transform and animation state.
+References shared path data by ID, enabling efficient instanced rendering
+where multiple instances of 'e' share one GlyphPath definition.
+
+```
+Offset  Size  Type    Name           Description
+──────  ────  ────    ────           ───────────
+0       4     u32     pathDataId     Reference to DefinePathData
+4       4     f32     posX           Position X
+8       4     f32     posY           Position Y
+12      4     f32     posZ           Position Z
+16      4     f32     rotX           Rotation X (pitch, degrees)
+20      4     f32     rotY           Rotation Y (yaw, degrees)
+24      4     f32     rotZ           Rotation Z (roll, degrees)
+28      4     f32     scaleX         Scale X
+32      4     f32     scaleY         Scale Y
+36      4     f32     scaleZ         Scale Z
+40      1     u8      r              Red [0-255]
+41      1     u8      g              Green [0-255]
+42      1     u8      b              Blue [0-255]
+43      1     u8      a              Alpha [0-255]
+44      4     f32     animPhase      Animation phase [0.0, 1.0]
+48      4     f32     springVel      Spring velocity
+52      4     f32     springDisp     Spring displacement
+56      4     f32     springTension  Spring tension [0.0, 1.0]
+60      4     f32     springDamping  Spring damping [0.0, 1.0]
+64      4     f32     springMass     Spring mass [0.1, 10.0]
+68      4     f32     depth          Z-order
+72      4     u32     pickId         Hit-test ID
+```
+
+**Animation Notes:**
+- `animPhase` represents normalized time through the animation curve
+- Spring state enables organic motion with damping to prevent infinite oscillation
+- `springDamping` is critical for stability — without it, springs oscillate forever
+- `springMass` affects oscillation frequency (F = ma)
+- Runtime evaluates spring differential equations at render framerate
+
+────────────────────────────────────────────────────────────────────────────────
+                                                      // command: DrawWord
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x22**
+**Payload Size: Variable (40 byte header + glyph data)**
+
+A word is a collection of glyphs with shared animation state. Words are the
+natural unit for stagger animations (e.g., characters revealing left-to-right).
+
+**Header (40 bytes):**
+
+```
+Offset  Size  Type    Name          Description
+──────  ────  ────    ────          ───────────
+0       4     u32     wordId        Unique identifier
+4       2     u16     glyphCount    Number of glyphs in word
+6       1     u8      staggerDir    Stagger direction (see below)
+7       1     u8      easing        Easing function (see below)
+8       4     f32     originX       Word origin X
+12      4     f32     originY       Word origin Y
+16      4     f32     originZ       Word origin Z
+20      4     f32     staggerDelay  Milliseconds between characters
+24      4     u32     staggerSeed   Random seed (for StaggerRandom, 0 otherwise)
+28      1     u8      r             Shared color R
+29      1     u8      g             Shared color G
+30      1     u8      b             Shared color B
+31      1     u8      a             Shared color A
+32      4     f32     depth         Z-order
+36      4     u32     pickId        Hit-test ID
+```
+
+**Followed by:**
+- `glyphCount × 4` bytes: Array of `u32` pathDataIds
+- `glyphCount × 12` bytes: Array of `Point3D` positions
+
+**Stagger Direction (u8):**
+
+```
+Value   Name
+─────   ────
+0       LeftToRight
+1       RightToLeft
+2       CenterOut
+3       EdgesIn
+4       Random (seed stored separately)
+```
+
+**Easing Function (u8):**
+
+```
+Value   Name
+─────   ────
+0       Linear
+1       EaseInQuad
+2       EaseOutQuad
+3       EaseInOutQuad
+4       EaseInCubic
+5       EaseOutCubic
+6       EaseInOutCubic
+7       EaseInElastic
+8       EaseOutElastic
+9       EaseInOutElastic
+10      EaseInBounce
+11      EaseOutBounce
+12      EaseSpring (uses SpringState)
+```
+
+────────────────────────────────────────────────────────────────────────────────
+                                                  // command: DefinePathData
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x23**
+**Payload Size: Variable (32 byte header + command data)**
+
+Defines shared path data that can be referenced by multiple DrawGlyphInstance
+commands. This enables efficient font rendering where each unique glyph shape
+is stored once and instanced many times.
+
+**Header (32 bytes):**
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       4     u32     pathDataId   Unique identifier for referencing
+4       4     u32     commandCount Number of path commands
+8       4     f32     minX         Bounding box minimum X
+12      4     f32     minY         Bounding box minimum Y
+16      4     f32     minZ         Bounding box minimum Z
+20      4     f32     maxX         Bounding box maximum X
+24      4     f32     maxY         Bounding box maximum Y
+28      4     f32     maxZ         Bounding box maximum Z
+```
+
+**Followed by:**
+- `commandCount` path commands (same format as DrawGlyphPath)
+
+**Usage Pattern:**
+1. Emit DefinePathData for each unique glyph shape
+2. Emit DrawGlyphInstance referencing the pathDataId
+3. Runtime caches tessellated geometry by pathDataId
+
+────────────────────────────────────────────────────────────────────────────────
+                                              // command: UpdateAnimationState
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x24**
+**Payload Size: Variable (8 byte header + target data)**
+
+Sends per-frame animation deltas to the runtime. Instead of recomputing and
+transmitting all transforms every frame, send only the changes.
+
+**Header (8 bytes):**
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       2     u16     targetCount  Number of animation targets
+2       1     u8      mode         Update mode (see below)
+3       1     u8      padding      Alignment padding
+4       4     f32     frameTime    Delta time in milliseconds
+```
+
+**Per-target (52 bytes):**
+
+```
+Offset  Size  Type    Name          Description
+──────  ────  ────    ────          ───────────
+0       4     u32     targetId      Which element to animate
+4       1     u8      targetType    Element type (see below)
+5       3     u8[3]   padding       Alignment padding
+8       4     f32     deltaPosX     Position delta X
+12      4     f32     deltaPosY     Position delta Y
+16      4     f32     deltaPosZ     Position delta Z
+20      4     f32     deltaRotX     Rotation delta X
+24      4     f32     deltaRotY     Rotation delta Y
+28      4     f32     deltaRotZ     Rotation delta Z
+32      4     f32     deltaScaleX   Scale delta X
+36      4     f32     deltaScaleY   Scale delta Y
+40      4     f32     deltaScaleZ   Scale delta Z
+44      1     i8      deltaR        Color delta R [-128, 127]
+45      1     i8      deltaG        Color delta G
+46      1     i8      deltaB        Color delta B
+47      1     i8      deltaA        Color delta A
+48      4     f32     phaseAdvance  Animation phase advancement
+```
+
+**Update Mode (u8):**
+
+```
+Value   Name
+─────   ────
+0       Replace   — Replace current state
+1       Additive  — Add to current state
+2       Blend     — Blend with factor (stored separately)
+```
+
+**Target Type (u8):**
+
+```
+Value   Name
+─────   ────
+0       GlyphInstance
+1       Word
+2       PathData
+3       ControlPoint
+```
 
 ────────────────────────────────────────────────────────────────────────────────
                                                               // pick buffer
@@ -350,9 +679,9 @@ The `version` field in the header indicates the format version.
 **Version 1** (current):
 - Initial release
 - Commands: Noop, DrawRect, DrawQuad, DrawGlyph, DrawParticle, PushClip, PopClip
+- v2 Typography: DrawGlyphPath, DrawGlyphInstance, DrawWord, DefinePathData, UpdateAnimationState
 
 **Future versions** may add:
-- New command types (assigned from 0x20+)
 - Extended payloads (with backward-compatible size fields)
 - Compression (indicated via flags)
 

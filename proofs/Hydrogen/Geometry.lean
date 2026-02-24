@@ -22,6 +22,7 @@
   - Mesh        : MeshDescriptor, Submesh, InstanceData
   - Primitives  : Box, Plane, Sphere, Cylinder generators
   - Bounds      : AABB and bounding sphere computation
+  - Texture     : UV wrap modes, bilinear interpolation, mipmapping
   
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -/
@@ -30,3 +31,4 @@ import Hydrogen.Geometry.Vertex
 import Hydrogen.Geometry.Mesh
 import Hydrogen.Geometry.Primitives
 import Hydrogen.Geometry.Bounds
+import Hydrogen.Geometry.Texture

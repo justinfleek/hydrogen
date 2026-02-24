@@ -68,23 +68,17 @@ module Hydrogen.Element.Component.TreeView.Selection
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , Ordering
+  ( Ordering
   , compare
   , (==)
-  , (<>)
-  , (<)
   , (+)
-  , (&&)
-  , (||)
-  , not
+  , (<)
   , map
   )
 
 import Data.Array as Array
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Foldable (foldl, all, any)
+import Data.Foldable (foldl)
 
 import Hydrogen.Element.Component.TreeView.Types
   ( NodeId

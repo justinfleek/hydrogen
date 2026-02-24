@@ -67,6 +67,7 @@ module Hydrogen.GPU.DrawCommand
   
   -- * Quad Parameters (arbitrary 4-point)
   , Point2D
+  , Point3D
   , QuadParams
   , quadParams
   
@@ -86,6 +87,30 @@ module Hydrogen.GPU.DrawCommand
   -- * Clip Operations
   , ClipRegion(..)
   
+  -- * Typography as Geometry (v2 commands)
+  , GlyphPathParams
+  , glyphPathParams
+  , ContourData
+  , BoundingBox3D
+  , GlyphInstanceParams
+  , glyphInstanceParams
+  , Rotation3D
+  , Scale3D
+  , SpringState
+  , WordParams
+  , wordParams
+  , StaggerConfig
+  , StaggerDirection(..)
+  , EasingFunction(..)
+  , PathDataParams
+  , pathDataParams
+  , AnimationStateParams
+  , animationStateParams
+  , AnimationUpdateMode(..)
+  , AnimationTarget
+  , TargetType(..)
+  , ColorDelta
+  
   -- * Command Constructors
   , drawRect
   , drawQuad
@@ -95,6 +120,12 @@ module Hydrogen.GPU.DrawCommand
   , pushClip
   , popClip
   , noop
+  -- v2 constructors
+  , drawGlyphPath
+  , drawGlyphInstance
+  , drawWord
+  , definePathData
+  , updateAnimationState
   
   -- * CommandBuffer Operations
   , emptyBuffer
@@ -156,6 +187,18 @@ unwrapPickId (PickId n) = n
 -- |
 -- | The `msg` type parameter carries the message to dispatch when this
 -- | element is interacted with (via pick buffer).
+-- |
+-- | ## Command Categories
+-- |
+-- | **v1 Primitives (0x00-0x11):**
+-- | - DrawRect, DrawQuad, DrawGlyph (SDF), DrawPath, DrawParticle, Clip ops
+-- |
+-- | **v2 Typography as Geometry (0x20-0x24):**
+-- | - DrawGlyphPath: Character as vector bezier paths
+-- | - DrawGlyphInstance: Animated glyph with per-character transform
+-- | - DrawWord: Collection of glyphs with shared animation state
+-- | - DefinePathData: Shared/deduplicated path data for instancing
+-- | - UpdateAnimationState: Per-frame animation deltas
 data DrawCommand msg
   = DrawRect (RectParams msg)
   | DrawQuad (QuadParams msg)
@@ -165,6 +208,12 @@ data DrawCommand msg
   | PushClip ClipRegion
   | PopClip
   | Noop
+  -- v2: Typography as Geometry
+  | DrawGlyphPath (GlyphPathParams msg)
+  | DrawGlyphInstance (GlyphInstanceParams msg)
+  | DrawWord (WordParams msg)
+  | DefinePathData PathDataParams
+  | UpdateAnimationState AnimationStateParams
 
 -- | A command buffer — array of commands ready for GPU dispatch.
 -- | This is the unit of work passed to the interpreter.
@@ -219,6 +268,13 @@ rectParams x y width height fill =
 type Point2D =
   { x :: Device.Pixel
   , y :: Device.Pixel
+  }
+
+-- | A 3D point for typography geometry.
+type Point3D =
+  { x :: Device.Pixel
+  , y :: Device.Pixel
+  , z :: Device.Pixel
   }
 
 -- | Parameters for drawing an arbitrary quadrilateral.
@@ -389,6 +445,360 @@ data ClipRegion
 derive instance eqClipRegion :: Eq ClipRegion
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                        // v2 typography as geometry parameters
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Opcode 0x20: GlyphPathParams — Single character as vector bezier paths.
+-- |
+-- | This is the core typography-as-geometry primitive. Each glyph is a collection
+-- | of bezier contours (outer paths and counter paths for holes like in 'O', 'A').
+-- | The same tessellation pipeline handles glyphs and all other vector shapes.
+-- |
+-- | ## Wire Format (variable length)
+-- | - glyphId: u32 (Unicode codepoint or internal glyph ID)
+-- | - fontId: u16 (font registry index)
+-- | - contourCount: u16 (number of contours)
+-- | - [contours]: per-contour command arrays
+-- | - boundingBox: 6 × f32 (minX, minY, minZ, maxX, maxY, maxZ)
+-- | - advanceWidth: f32 (horizontal advance after glyph)
+type GlyphPathParams msg =
+  { glyphId :: Int              -- Unicode codepoint or internal glyph index
+  , fontId :: Int               -- Font registry index
+  , contours :: Array ContourData  -- Path data for each contour
+  , bounds :: BoundingBox3D     -- 3D bounding box
+  , advanceWidth :: Device.Pixel   -- Horizontal advance
+  , depth :: Number             -- Z-order
+  , pickId :: Maybe PickId      -- For hit testing
+  , onClick :: Maybe msg        -- Message on click
+  }
+
+-- | Contour data for glyph paths.
+-- |
+-- | Each contour is a closed path. Outer contours are clockwise,
+-- | counter/hole contours are counter-clockwise (winding rule).
+type ContourData =
+  { commands :: Array PathSegment   -- Bezier commands
+  , isOuter :: Boolean              -- true = outer, false = hole
+  }
+
+-- | 3D bounding box for glyph geometry.
+type BoundingBox3D =
+  { minX :: Device.Pixel
+  , minY :: Device.Pixel
+  , minZ :: Device.Pixel
+  , maxX :: Device.Pixel
+  , maxY :: Device.Pixel
+  , maxZ :: Device.Pixel
+  }
+
+-- | Create glyph path parameters with defaults.
+glyphPathParams
+  :: forall msg
+   . Int                    -- glyphId
+  -> Int                    -- fontId
+  -> Array ContourData      -- contours
+  -> Device.Pixel           -- advanceWidth
+  -> GlyphPathParams msg
+glyphPathParams gId fId contours advance =
+  { glyphId: gId
+  , fontId: fId
+  , contours
+  , bounds: defaultBounds
+  , advanceWidth: advance
+  , depth: 0.0
+  , pickId: Nothing
+  , onClick: Nothing
+  }
+  where
+    defaultBounds =
+      { minX: Device.px 0.0, minY: Device.px 0.0, minZ: Device.px 0.0
+      , maxX: Device.px 0.0, maxY: Device.px 0.0, maxZ: Device.px 0.0
+      }
+
+-- | Opcode 0x21: GlyphInstanceParams — Animated glyph with per-character transform.
+-- |
+-- | References a GlyphPath by ID and adds per-instance animation state.
+-- | This enables instanced rendering where the same glyph geometry is shared
+-- | across multiple characters (e.g., all 'e' letters share one GlyphPath).
+-- |
+-- | ## Wire Format (52 bytes fixed)
+-- | - pathDataId: u32 (reference to DefinePathData)
+-- | - transform: 9 × f32 (3×3 matrix: position, rotation, scale)
+-- | - color: 4 × u8 (RGBA)
+-- | - animationPhase: f32 (0.0-1.0 normalized time)
+-- | - springState: 3 × f32 (velocity, displacement, tension)
+type GlyphInstanceParams msg =
+  { pathDataId :: Int           -- Reference to shared path data
+  , position :: Point3D         -- Position in 3D space
+  , rotation :: Rotation3D      -- Euler rotation (degrees)
+  , scale :: Scale3D            -- Non-uniform scale
+  , color :: RGB.RGBA           -- Fill color
+  , animationPhase :: Number    -- 0.0-1.0 normalized time
+  , spring :: SpringState       -- Spring physics state
+  , depth :: Number
+  , pickId :: Maybe PickId
+  , onClick :: Maybe msg
+  }
+
+-- | 3D rotation in degrees (Euler angles).
+type Rotation3D =
+  { x :: Number   -- Pitch
+  , y :: Number   -- Yaw
+  , z :: Number   -- Roll
+  }
+
+-- | Non-uniform 3D scale.
+type Scale3D =
+  { x :: Number
+  , y :: Number
+  , z :: Number
+  }
+
+-- | Spring physics state for animations.
+-- |
+-- | Springs provide organic motion with velocity, displacement, and tension.
+-- | The runtime evaluates spring differential equations at 60fps.
+-- |
+-- | Hooke's Law: F = -tension * displacement - damping * velocity
+-- | Acceleration: a = F / mass
+-- | Without damping, springs oscillate forever. Without mass, frequency is undefined.
+type SpringState =
+  { velocity :: Number      -- Current velocity (can be negative)
+  , displacement :: Number  -- Offset from rest position (can be negative)
+  , tension :: Number       -- Spring stiffness (0.0-1.0, maps to k constant)
+  , damping :: Number       -- Friction coefficient (0.0-1.0, prevents infinite oscillation)
+  , mass :: Number          -- Mass (0.1-10.0, affects oscillation period)
+  }
+
+-- | Create glyph instance parameters with defaults.
+glyphInstanceParams
+  :: forall msg
+   . Int          -- pathDataId
+  -> Point3D      -- position
+  -> RGB.RGBA     -- color
+  -> GlyphInstanceParams msg
+glyphInstanceParams pathId pos color =
+  { pathDataId: pathId
+  , position: pos
+  , rotation: { x: 0.0, y: 0.0, z: 0.0 }
+  , scale: { x: 1.0, y: 1.0, z: 1.0 }
+  , color
+  , animationPhase: 0.0
+  , spring: { velocity: 0.0, displacement: 0.0, tension: 0.5, damping: 0.3, mass: 1.0 }
+  , depth: 0.0
+  , pickId: Nothing
+  , onClick: Nothing
+  }
+
+-- | Opcode 0x22: WordParams — Collection of glyphs forming a word.
+-- |
+-- | Words are the natural unit for stagger animations. A word references
+-- | multiple GlyphInstances and carries shared animation state.
+-- |
+-- | ## Wire Format (variable length)
+-- | - wordId: u32 (unique identifier)
+-- | - glyphCount: u16 (number of glyphs in word)
+-- | - glyphInstanceIds: [u32] (references to GlyphInstance commands)
+-- | - staggerPattern: u8 (enum for stagger direction)
+-- | - staggerDelay: f32 (ms between characters)
+-- | - sharedTransform: 9 × f32 (word-level transform)
+type WordParams msg =
+  { wordId :: Int                   -- Unique identifier
+  , glyphInstances :: Array Int     -- References to GlyphInstance pathDataIds
+  , positions :: Array Point3D      -- Per-glyph positions relative to word origin
+  , origin :: Point3D               -- Word origin in 3D space
+  , stagger :: StaggerConfig        -- Stagger animation config
+  , color :: RGB.RGBA               -- Shared color (can be overridden per-glyph)
+  , depth :: Number
+  , pickId :: Maybe PickId
+  , onClick :: Maybe msg
+  }
+
+-- | Stagger animation configuration.
+type StaggerConfig =
+  { direction :: StaggerDirection   -- Direction pattern
+  , delayMs :: Number               -- Milliseconds between elements
+  , easing :: EasingFunction        -- Easing curve
+  }
+
+-- | Stagger direction patterns.
+data StaggerDirection
+  = StaggerLeftToRight
+  | StaggerRightToLeft
+  | StaggerCenterOut
+  | StaggerEdgesIn
+  | StaggerRandom Int               -- Int is seed for determinism
+
+derive instance eqStaggerDirection :: Eq StaggerDirection
+
+instance showStaggerDirection :: Show StaggerDirection where
+  show StaggerLeftToRight = "StaggerLeftToRight"
+  show StaggerRightToLeft = "StaggerRightToLeft"
+  show StaggerCenterOut = "StaggerCenterOut"
+  show StaggerEdgesIn = "StaggerEdgesIn"
+  show (StaggerRandom seed) = "StaggerRandom(" <> show seed <> ")"
+
+-- | Easing function enumeration.
+-- |
+-- | Standard easing curves. The runtime implements the actual math.
+data EasingFunction
+  = EaseLinear
+  | EaseInQuad
+  | EaseOutQuad
+  | EaseInOutQuad
+  | EaseInCubic
+  | EaseOutCubic
+  | EaseInOutCubic
+  | EaseInElastic
+  | EaseOutElastic
+  | EaseInOutElastic
+  | EaseInBounce
+  | EaseOutBounce
+  | EaseSpring           -- Uses SpringState for physics
+
+derive instance eqEasingFunction :: Eq EasingFunction
+
+instance showEasingFunction :: Show EasingFunction where
+  show EaseLinear = "EaseLinear"
+  show EaseInQuad = "EaseInQuad"
+  show EaseOutQuad = "EaseOutQuad"
+  show EaseInOutQuad = "EaseInOutQuad"
+  show EaseInCubic = "EaseInCubic"
+  show EaseOutCubic = "EaseOutCubic"
+  show EaseInOutCubic = "EaseInOutCubic"
+  show EaseInElastic = "EaseInElastic"
+  show EaseOutElastic = "EaseOutElastic"
+  show EaseInOutElastic = "EaseInOutElastic"
+  show EaseInBounce = "EaseInBounce"
+  show EaseOutBounce = "EaseOutBounce"
+  show EaseSpring = "EaseSpring"
+
+-- | Create word parameters with defaults.
+wordParams
+  :: forall msg
+   . Int                -- wordId
+  -> Array Int          -- glyphInstances
+  -> Array Point3D      -- positions
+  -> Point3D            -- origin
+  -> WordParams msg
+wordParams wId glyphs positions origin =
+  { wordId: wId
+  , glyphInstances: glyphs
+  , positions
+  , origin
+  , stagger: 
+      { direction: StaggerLeftToRight
+      , delayMs: 50.0
+      , easing: EaseOutCubic
+      }
+  , color: RGB.rgba 255 255 255 255
+  , depth: 0.0
+  , pickId: Nothing
+  , onClick: Nothing
+  }
+
+-- | Opcode 0x23: PathDataParams — Shared/deduplicated path data for instancing.
+-- |
+-- | Define path data once, reference many times. This is how fonts work:
+-- | the letter 'e' appears many times in text but its geometry is stored once.
+-- |
+-- | ## Wire Format (variable length)
+-- | - pathDataId: u32 (unique identifier for referencing)
+-- | - commandCount: u32 (number of path commands)
+-- | - [commands]: serialized PathSegment array
+-- | - bounds: 6 × f32 (bounding box)
+type PathDataParams =
+  { pathDataId :: Int           -- Unique identifier
+  , commands :: Array PathSegment  -- The actual path data
+  , bounds :: BoundingBox3D     -- Precomputed bounds
+  }
+
+-- | Create path data parameters.
+pathDataParams
+  :: Int                    -- pathDataId
+  -> Array PathSegment      -- commands
+  -> PathDataParams
+pathDataParams pId commands =
+  { pathDataId: pId
+  , commands
+  , bounds:
+      { minX: Device.px 0.0, minY: Device.px 0.0, minZ: Device.px 0.0
+      , maxX: Device.px 0.0, maxY: Device.px 0.0, maxZ: Device.px 0.0
+      }
+  }
+
+-- | Opcode 0x24: AnimationStateParams — Per-frame animation deltas.
+-- |
+-- | Instead of recomputing all transforms every frame, send deltas.
+-- | The runtime accumulates state efficiently.
+-- |
+-- | ## Wire Format (variable length)
+-- | - targetCount: u16 (number of targets)
+-- | - [targets]: array of AnimationTarget
+type AnimationStateParams =
+  { targets :: Array AnimationTarget  -- What to animate this frame
+  , mode :: AnimationUpdateMode       -- How to apply
+  , frameTime :: Number               -- Delta time in ms
+  }
+
+-- | Individual animation target.
+type AnimationTarget =
+  { targetId :: Int           -- Which element to animate
+  , targetType :: TargetType  -- What kind of element
+  , deltaPosition :: Point3D  -- Position delta
+  , deltaRotation :: Rotation3D  -- Rotation delta
+  , deltaScale :: Scale3D     -- Scale delta
+  , deltaColor :: ColorDelta  -- Color change
+  , phaseAdvance :: Number    -- Animation phase advancement
+  }
+
+-- | Target type for animation routing.
+data TargetType
+  = TargetGlyphInstance
+  | TargetWord
+  | TargetPathData
+  | TargetControlPoint
+
+derive instance eqTargetType :: Eq TargetType
+
+instance showTargetType :: Show TargetType where
+  show TargetGlyphInstance = "TargetGlyphInstance"
+  show TargetWord = "TargetWord"
+  show TargetPathData = "TargetPathData"
+  show TargetControlPoint = "TargetControlPoint"
+
+-- | Color delta for animation (additive).
+type ColorDelta =
+  { r :: Int   -- -255 to 255
+  , g :: Int
+  , b :: Int
+  , a :: Int
+  }
+
+-- | How animation updates are applied.
+data AnimationUpdateMode
+  = AnimationReplace    -- Replace current state
+  | AnimationAdditive   -- Add to current state
+  | AnimationBlend Number  -- Blend with factor (0.0-1.0)
+
+derive instance eqAnimationUpdateMode :: Eq AnimationUpdateMode
+
+instance showAnimationUpdateMode :: Show AnimationUpdateMode where
+  show AnimationReplace = "AnimationReplace"
+  show AnimationAdditive = "AnimationAdditive"
+  show (AnimationBlend factor) = "AnimationBlend(" <> show factor <> ")"
+
+-- | Create animation state parameters with defaults.
+animationStateParams
+  :: Array AnimationTarget
+  -> AnimationStateParams
+animationStateParams targets =
+  { targets
+  , mode: AnimationAdditive
+  , frameTime: 16.666  -- 60fps default
+  }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // command constructors
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -424,6 +834,30 @@ popClip = PopClip
 noop :: forall msg. DrawCommand msg
 noop = Noop
 
+-- ─────────────────────────────────────────────────────────────────────────────────
+--                                                       // v2 command constructors
+-- ─────────────────────────────────────────────────────────────────────────────────
+
+-- | Draw a glyph as vector bezier paths (typography as geometry).
+drawGlyphPath :: forall msg. GlyphPathParams msg -> DrawCommand msg
+drawGlyphPath = DrawGlyphPath
+
+-- | Draw an animated glyph instance referencing shared path data.
+drawGlyphInstance :: forall msg. GlyphInstanceParams msg -> DrawCommand msg
+drawGlyphInstance = DrawGlyphInstance
+
+-- | Draw a word (collection of glyphs with shared animation state).
+drawWord :: forall msg. WordParams msg -> DrawCommand msg
+drawWord = DrawWord
+
+-- | Define shared path data for instancing.
+definePathData :: forall msg. PathDataParams -> DrawCommand msg
+definePathData = DefinePathData
+
+-- | Update animation state for targets.
+updateAnimationState :: forall msg. AnimationStateParams -> DrawCommand msg
+updateAnimationState = UpdateAnimationState
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // command buffer ops
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -446,13 +880,22 @@ concat = Array.concat
 
 -- | Add a pick ID to a command for hit testing.
 withPickId :: forall msg. PickId -> DrawCommand msg -> DrawCommand msg
-withPickId pid = case _ of
+withPickId pid cmd = case cmd of
   DrawRect p -> DrawRect (p { pickId = Just pid })
   DrawQuad p -> DrawQuad (p { pickId = Just pid })
   DrawGlyph p -> DrawGlyph (p { pickId = Just pid })
   DrawPath p -> DrawPath (p { pickId = Just pid })
   DrawParticle p -> DrawParticle (p { pickId = Just pid })
-  other -> other
+  -- v2 typography commands
+  DrawGlyphPath p -> DrawGlyphPath (p { pickId = Just pid })
+  DrawGlyphInstance p -> DrawGlyphInstance (p { pickId = Just pid })
+  DrawWord p -> DrawWord (p { pickId = Just pid })
+  -- Non-interactive commands pass through unchanged
+  DefinePathData pd -> DefinePathData pd
+  UpdateAnimationState as -> UpdateAnimationState as
+  PushClip c -> PushClip c
+  PopClip -> PopClip
+  Noop -> Noop
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // sorting and batching
@@ -469,6 +912,12 @@ getDepth = case _ of
   PushClip _ -> 0.0
   PopClip -> 0.0
   Noop -> 0.0
+  -- v2 typography commands
+  DrawGlyphPath p -> p.depth
+  DrawGlyphInstance p -> p.depth
+  DrawWord p -> p.depth
+  DefinePathData _ -> 0.0      -- Definition command, no depth
+  UpdateAnimationState _ -> 0.0  -- Update command, no depth
 
 -- | Sort commands by depth (painter's algorithm for 2D).
 -- |
@@ -486,6 +935,8 @@ data MaterialKey
   = MaterialSolid
   | MaterialTextured Int  -- texture/atlas ID
   | MaterialClip
+  | MaterialTypography Int  -- fontId for v2 typography geometry
+  | MaterialMeta           -- Non-rendering commands (define, update)
 
 derive instance eqMaterialKey :: Eq MaterialKey
 derive instance ordMaterialKey :: Ord MaterialKey
@@ -501,6 +952,12 @@ getMaterial = case _ of
   PushClip _ -> MaterialClip
   PopClip -> MaterialClip
   Noop -> MaterialSolid
+  -- v2 typography commands
+  DrawGlyphPath p -> MaterialTypography p.fontId
+  DrawGlyphInstance _ -> MaterialSolid  -- Instanced, batches with solids
+  DrawWord _ -> MaterialSolid           -- Composed of instances
+  DefinePathData _ -> MaterialMeta      -- Non-rendering
+  UpdateAnimationState _ -> MaterialMeta  -- Non-rendering
 
 -- | Group commands by material for batched rendering.
 -- |

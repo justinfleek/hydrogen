@@ -108,6 +108,7 @@ import Hydrogen.Element.Component.Kanban.Types
 import Hydrogen.Element.Component.Kanban.Card
   ( KanbanCard
   , CardLabel
+  , Assignee
   , cardIdOf
   , cardTitle
   , cardDescription
@@ -119,6 +120,7 @@ import Hydrogen.Element.Component.Kanban.Card
   , labelText
   , labelColor
   , assigneeName
+  , assigneeAvatar
   , assigneeInitials
   , formatDueDate
   )
@@ -693,25 +695,47 @@ renderCardFooter cfg card =
                       ])
                   [ E.text (formatDueDate dd) ]
               Nothing -> E.empty
-          , -- Assignee avatar
+          , -- Assignee avatar (image if available, initials fallback)
             case mAssignee of
-              Just a ->
-                E.div_
-                  ([ E.title (assigneeName a) ] <> E.styles
-                      [ Tuple "width" "24px"
-                      , Tuple "height" "24px"
-                      , Tuple "border-radius" "9999px"
-                      , Tuple "background-color" (Color.toHex cfg.selectedColor)
-                      , Tuple "color" (Color.toHex cfg.textColor)
-                      , Tuple "display" "flex"
-                      , Tuple "align-items" "center"
-                      , Tuple "justify-content" "center"
-                      , Tuple "font-size" "12px"
-                      , Tuple "font-weight" "500"
-                      ])
-                  [ E.text (assigneeInitials a) ]
+              Just a -> renderAssigneeAvatar cfg a
               Nothing -> E.empty
           ]
+
+-- | Render assignee avatar
+-- |
+-- | Uses avatar image URL if available, otherwise shows initials.
+-- | This implements the full Assignee type: name, avatar, initials.
+renderAssigneeAvatar :: KanbanConfig -> Assignee -> E.Element KanbanMsg
+renderAssigneeAvatar cfg a =
+  case assigneeAvatar a of
+    Just avatarUrl ->
+      -- Render image avatar
+      E.img_
+        ([ E.src avatarUrl
+         , E.alt (assigneeName a)
+         , E.title (assigneeName a)
+         ] <> E.styles
+            [ Tuple "width" "24px"
+            , Tuple "height" "24px"
+            , Tuple "border-radius" "9999px"
+            , Tuple "object-fit" "cover"
+            ])
+    Nothing ->
+      -- Render initials fallback
+      E.div_
+        ([ E.title (assigneeName a) ] <> E.styles
+            [ Tuple "width" "24px"
+            , Tuple "height" "24px"
+            , Tuple "border-radius" "9999px"
+            , Tuple "background-color" (Color.toHex cfg.selectedColor)
+            , Tuple "color" (Color.toHex cfg.textColor)
+            , Tuple "display" "flex"
+            , Tuple "align-items" "center"
+            , Tuple "justify-content" "center"
+            , Tuple "font-size" "12px"
+            , Tuple "font-weight" "500"
+            ])
+        [ E.text (assigneeInitials a) ]
 
 -- | Render card actions (delete button)
 -- |
