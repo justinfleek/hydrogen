@@ -59,6 +59,7 @@ import Prelude
   , show
   , not
   , (<>)
+  , (-)
   )
 
 import Data.Array as Array

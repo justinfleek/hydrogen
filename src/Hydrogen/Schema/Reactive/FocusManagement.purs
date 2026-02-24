@@ -28,10 +28,14 @@ module Hydrogen.Schema.Reactive.FocusManagement
   , FocusRing
   , focusRing
   , defaultFocusRing
+  , accessibleFocusRing
+  , highContrastFocusRing
+  , invertedFocusRing
   , noFocusRing
   , withRingColor
   , withRingWidth
   , withRingOffset
+  , withTwoRing
   -- * Focus Trap Mode
   , FocusTrapMode(..)
   , isHardTrap
@@ -68,6 +72,8 @@ module Hydrogen.Schema.Reactive.FocusManagement
 import Prelude
 
 import Data.Maybe (Maybe(Nothing), isJust)
+
+import Hydrogen.Schema.Color.RGB (RGBA, rgba)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // focus visibility
@@ -172,17 +178,39 @@ isBorderRing _ = false
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Focus ring appearance configuration
+-- |
+-- | ## Research Findings: Accessible Focus Indicators
+-- |
+-- | **WCAG 2.2 Focus Appearance (Level AAA):**
+-- | - Focus indicator must have 3:1 contrast against adjacent colors
+-- | - Minimum 2px thickness
+-- | - Must be visible on both light and dark backgrounds
+-- |
+-- | **Two-Ring Pattern (Figma, VS Code):**
+-- | - Inner ring: Dark color (e.g., #000000)
+-- | - Outer ring: Light color (e.g., #ffffff)
+-- | - Guarantees contrast on ANY background
+-- |
+-- | **Figma's "0px hack":**
+-- | - Focus rings outside auto-layout bounds via 0px spread shadow
+-- | - Prevents layout shift when focus appears
 type FocusRing =
   { style :: FocusRingStyle
-  , color :: String           -- ^ CSS color value
+  , color :: RGBA             -- ^ Primary ring color (Schema atom)
   , width :: Number           -- ^ Ring width in pixels
   , offset :: Number          -- ^ Gap between element and ring in pixels
   , visibility :: FocusVisibility
   , enabled :: Boolean
+  -- Two-ring pattern for accessibility
+  , twoRingEnabled :: Boolean -- ^ Enable two-ring contrast pattern
+  , innerColor :: RGBA        -- ^ Inner ring color (typically dark)
+  , outerColor :: RGBA        -- ^ Outer ring color (typically light)
+  , innerWidth :: Number      -- ^ Inner ring width
+  , outerWidth :: Number      -- ^ Outer ring width
   }
 
 -- | Create focus ring
-focusRing :: FocusRingStyle -> String -> Number -> Number -> FocusRing
+focusRing :: FocusRingStyle -> RGBA -> Number -> Number -> FocusRing
 focusRing style color width offset =
   { style
   , color
@@ -190,18 +218,62 @@ focusRing style color width offset =
   , offset
   , visibility: FocusAuto
   , enabled: true
+  , twoRingEnabled: false
+  , innerColor: rgba 0 0 0 100       -- Black, fully opaque
+  , outerColor: rgba 255 255 255 100 -- White, fully opaque
+  , innerWidth: 2.0
+  , outerWidth: 2.0
   }
 
 -- | Default focus ring (blue outline, auto visibility)
+-- |
+-- | Uses a standard blue (#0066ff = rgb 0 102 255) that works on most backgrounds.
 defaultFocusRing :: FocusRing
-defaultFocusRing = focusRing OutlineRing "#0066ff" 2.0 2.0
+defaultFocusRing = focusRing OutlineRing (rgba 0 102 255 100) 2.0 2.0
+
+-- | Accessible two-ring focus indicator
+-- |
+-- | Uses dark inner ring + light outer ring for contrast on any background.
+-- | Meets WCAG 2.2 Focus Appearance requirements.
+accessibleFocusRing :: FocusRing
+accessibleFocusRing = (focusRing OutlineRing (rgba 0 102 255 100) 2.0 2.0)
+  { twoRingEnabled = true
+  , innerColor = rgba 0 102 255 100   -- Brand blue inner
+  , outerColor = rgba 255 255 255 100 -- White outer for contrast
+  , innerWidth = 2.0
+  , outerWidth = 1.0
+  }
+
+-- | High contrast focus ring (maximum visibility)
+-- |
+-- | Black + white rings for extreme visibility in high contrast mode.
+highContrastFocusRing :: FocusRing
+highContrastFocusRing = (focusRing OutlineRing (rgba 0 0 0 100) 3.0 2.0)
+  { twoRingEnabled = true
+  , innerColor = rgba 0 0 0 100       -- Black inner
+  , outerColor = rgba 255 255 255 100 -- White outer
+  , innerWidth = 2.0
+  , outerWidth = 2.0
+  }
+
+-- | Inverted focus ring for dark backgrounds
+-- |
+-- | White inner + dark outer for dark mode interfaces.
+invertedFocusRing :: FocusRing
+invertedFocusRing = (focusRing OutlineRing (rgba 255 255 255 100) 2.0 2.0)
+  { twoRingEnabled = true
+  , innerColor = rgba 255 255 255 100 -- White inner
+  , outerColor = rgba 0 0 0 100       -- Black outer
+  , innerWidth = 2.0
+  , outerWidth = 1.0
+  }
 
 -- | No focus ring (accessibility concern - use sparingly)
 noFocusRing :: FocusRing
 noFocusRing = defaultFocusRing { enabled = false }
 
 -- | Set ring color
-withRingColor :: String -> FocusRing -> FocusRing
+withRingColor :: RGBA -> FocusRing -> FocusRing
 withRingColor color ring = ring { color = color }
 
 -- | Set ring width
@@ -211,6 +283,14 @@ withRingWidth width ring = ring { width = width }
 -- | Set ring offset
 withRingOffset :: Number -> FocusRing -> FocusRing
 withRingOffset offset ring = ring { offset = offset }
+
+-- | Enable two-ring pattern with specified colors
+withTwoRing :: RGBA -> RGBA -> FocusRing -> FocusRing
+withTwoRing innerCol outerCol ring = ring
+  { twoRingEnabled = true
+  , innerColor = innerCol
+  , outerColor = outerCol
+  }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // focus trap mode
