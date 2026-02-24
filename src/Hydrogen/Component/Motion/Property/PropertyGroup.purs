@@ -47,9 +47,9 @@ module Hydrogen.Component.Motion.Property.PropertyGroup
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetExpanded, ToggleExpanded, SetHasAnimatedChildren)
   , Input
-  , Output(..)
+  , Output(Expanded, Collapsed, HeaderClicked)
   , Slot
   , ChildSlots
   

@@ -67,7 +67,7 @@ module Hydrogen.Schema.Reactive.FocusManagement
 
 import Prelude
 
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(Nothing), isJust)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // focus visibility

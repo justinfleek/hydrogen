@@ -99,7 +99,7 @@ module Hydrogen.Schema.Reactive.Feedback
 import Prelude
 
 import Data.Array (drop, head, length, snoc)
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // feedback type

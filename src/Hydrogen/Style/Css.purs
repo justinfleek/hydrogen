@@ -83,9 +83,9 @@ module Hydrogen.Style.Css
 import Prelude hiding (when)
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Maybe as M
-import Data.Either (Either(..))
+import Data.Either (Either(Left, Right))
 import Data.String as String
 
 -- ═══════════════════════════════════════════════════════════════════════════════

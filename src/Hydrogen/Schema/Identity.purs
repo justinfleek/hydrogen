@@ -96,7 +96,6 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
-  , show
   , otherwise
   , negate
   , mod
@@ -104,7 +103,6 @@ import Prelude
   , (==)
   , (<)
   , (>=)
-  , (-)
   , (+)
   , (*)
   , (/)

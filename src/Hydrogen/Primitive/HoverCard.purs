@@ -56,10 +56,10 @@ module Hydrogen.Primitive.HoverCard
   , onOpenChange
   , className
     -- * Side
-  , Side(..)
+  , Side(Top, Right, Bottom, Left)
   , side
     -- * Alignment
-  , Align(..)
+  , Align(Start, Center, End)
   , align
     -- * Timing
   , openDelay
@@ -72,7 +72,7 @@ module Hydrogen.Primitive.HoverCard
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA as ARIA

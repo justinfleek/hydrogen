@@ -70,7 +70,7 @@ module Hydrogen.Element.Component.TreeView.Accessibility
   , liveRegionAttrs
   
   -- * RTL Support
-  , Direction(..)
+  , Direction(LTR, RTL, Auto)
   , isRTL
   , flipNavigationKey
   , directionAttr

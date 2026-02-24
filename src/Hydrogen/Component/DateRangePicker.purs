@@ -52,7 +52,7 @@ module Hydrogen.Component.DateRangePicker
     -- * Types
   , DateRange
   , PresetRange
-  , ComparisonMode(..)
+  , ComparisonMode(PreviousPeriod, PreviousYear, Custom)
   , defaultPresets
     -- * Props
   , DateRangePickerProps
@@ -96,13 +96,13 @@ module Hydrogen.Component.DateRangePicker
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Effect (Effect)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA as ARIA
-import Hydrogen.Component.Calendar (CalendarDate, WeekStart(..), addDays, addMonths)
+import Hydrogen.Component.Calendar (CalendarDate, WeekStart(Sunday, Monday), addDays, addMonths)
 import Hydrogen.Component.Calendar as Calendar
 import Hydrogen.Component.DatePicker (formatDateString, DateFormat(ISO))
 import Hydrogen.UI.Core (cls)

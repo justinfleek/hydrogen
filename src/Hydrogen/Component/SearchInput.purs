@@ -63,13 +63,13 @@ module Hydrogen.Component.SearchInput
   , onFocus
   , onBlur
     -- * Types
-  , Size(..)
+  , Size(Small, Medium, Large)
   ) where
 
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

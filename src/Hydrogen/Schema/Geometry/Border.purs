@@ -100,7 +100,6 @@ import Prelude
   ( class Eq
   , class Show
   , show
-  , map
   , (==)
   , (*)
   , (<>)
@@ -118,7 +117,6 @@ import Hydrogen.Schema.Dimension.Stroke
 import Hydrogen.Schema.Geometry.Stroke 
   ( StrokeStyle
       ( StyleNone
-      , StyleSolid
       )
   , strokeStyleToCss
   )

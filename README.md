@@ -26,11 +26,11 @@ to multiple render targets:
 
 | Target | Description |
 |--------|-------------|
-| `Hydrogen.Target.Halogen` | Reactive web components via Halogen |
-| `Hydrogen.Target.DOM` | Direct browser DOM manipulation |
+| `Hydrogen.Target.DOM` | Direct browser DOM manipulation with diff/patch |
 | `Hydrogen.Target.Static` | HTML strings for SSG |
 | `Hydrogen.Target.Canvas` | 2D canvas for motion graphics |
 | `Hydrogen.Target.WebGL` | 3D rendering for spatial UI |
+| `Hydrogen.Target.Halogen` | Legacy adapter (deprecating) |
 
 This follows libevring's pattern: **separate what from how**. Elements describe
 *what* to render. Targets handle *how* to render it.
@@ -162,9 +162,12 @@ htmlString = TS.render myCard
 
 - **[Schema Reference](docs/SCHEMA.md)** - Complete pillar enumeration
 - **[Design Ontology](docs/design-ontology.md)** - Type-safe primitives
+- **[Component Architecture](docs/COMPONENT_ARCHITECTURE.md)** - Schema-native components
 - **[Query Guide](docs/query.md)** - Caching, deduplication, pagination
 - **[Router Guide](docs/router.md)** - Route ADTs, metadata, navigation
 - **[SSG Guide](docs/ssg.md)** - Static generation
+- **[Proofs Guide](docs/PROOFS.md)** - Lean4 formal verification
+- **[Runtime Spec](docs/RUNTIME_SPEC.md)** - Diff/patch runtime architecture
 
 ## License
 

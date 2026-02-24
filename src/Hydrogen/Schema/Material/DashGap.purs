@@ -48,7 +48,7 @@ derive instance eqDashGap :: Eq DashGap
 derive instance ordDashGap :: Ord DashGap
 
 instance showDashGap :: Show DashGap where
-  show (DashGap g) = show g
+  show (DashGap g) = "DashGap " <> show g
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

@@ -36,7 +36,7 @@ module Hydrogen.Component.Avatar
   , src
   , alt
     -- * Sizes
-  , AvatarSize(..)
+  , AvatarSize(Xs, Sm, Md, Lg, Xl, Xxl)
   ) where
 
 import Prelude

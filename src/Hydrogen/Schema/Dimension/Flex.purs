@@ -45,7 +45,7 @@ import Prelude
   , (<<<)
   )
 
-import Data.Array (range, (..))
+import Data.Array ((..))
 import Data.Int (toNumber)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

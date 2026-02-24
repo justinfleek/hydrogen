@@ -59,14 +59,14 @@ module Hydrogen.Component.PasswordInput
   , onChange
   , onToggle
     -- * Types
-  , PasswordStrength(..)
+  , PasswordStrength(VeryWeak, Weak, Fair, Strong, VeryStrong)
   , calculateStrength
   ) where
 
 import Prelude
 
 import Data.Array (foldl, length)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Data.String.Regex (test)
 import Data.String.Regex.Flags (noFlags)

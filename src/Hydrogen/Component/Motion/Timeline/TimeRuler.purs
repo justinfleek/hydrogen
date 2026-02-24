@@ -37,10 +37,10 @@ module Hydrogen.Component.Motion.Timeline.TimeRuler
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetCurrentFrame, SetZoomLevel, SetDisplayMode, Refresh)
   , Input
-  , Output(..)
-  , TimeDisplayMode(..)
+  , Output(Seek, ScrubStart, ScrubEnd)
+  , TimeDisplayMode(FramesMode, TimecodeMode, SecondsMode)
   , Slot
   
   -- * Slot Type

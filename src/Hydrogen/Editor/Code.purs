@@ -99,13 +99,13 @@ module Hydrogen.Editor.Code
     codeEditor
   , diffEditor
     -- * Language Types
-  , Language(..)
+  , Language(JavaScript, TypeScript, HTML, CSS, JSON, Markdown, PureScript, PlainText)
   , detectLanguage
     -- * Theme Types
-  , Theme(..)
+  , Theme(Light, Dark)
     -- * Marker Types
   , Marker
-  , MarkerSeverity(..)
+  , MarkerSeverity(Error, Warning, Info, Hint)
   , errorMarker
   , warningMarker
   , infoMarker
@@ -178,9 +178,9 @@ module Hydrogen.Editor.Code
 import Prelude hiding (map)
 
 import Data.Array (foldl, filter)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
-import Data.String.Pattern (Pattern(..))
+import Data.String.Pattern (Pattern(Pattern))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

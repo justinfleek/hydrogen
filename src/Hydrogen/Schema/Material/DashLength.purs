@@ -48,7 +48,7 @@ derive instance eqDashLength :: Eq DashLength
 derive instance ordDashLength :: Ord DashLength
 
 instance showDashLength :: Show DashLength where
-  show (DashLength l) = show l
+  show (DashLength l) = "DashLength " <> show l
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

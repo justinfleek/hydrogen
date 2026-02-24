@@ -46,7 +46,7 @@ derive instance eqFilterGrayscale :: Eq FilterGrayscale
 derive instance ordFilterGrayscale :: Ord FilterGrayscale
 
 instance showFilterGrayscale :: Show FilterGrayscale where
-  show (FilterGrayscale g) = show g
+  show (FilterGrayscale g) = "FilterGrayscale " <> show g
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

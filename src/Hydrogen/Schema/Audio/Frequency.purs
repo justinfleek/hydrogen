@@ -109,7 +109,7 @@ module Hydrogen.Schema.Audio.Frequency
 import Prelude
 
 import Data.Int as Int
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
 
 -- ═══════════════════════════════════════════════════════════════════════════════

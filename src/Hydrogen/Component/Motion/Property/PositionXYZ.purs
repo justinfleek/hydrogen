@@ -59,9 +59,9 @@ module Hydrogen.Component.Motion.Property.PositionXYZ
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetPosition, GetPosition, SetLinked, SetDisabled)
   , Input
-  , Output(..)
+  , Output(PositionChanged, PositionChanging, ScrubStart, ScrubEnd, LinkedToggled)
   , Position3D
   , Slot
   

@@ -64,7 +64,6 @@ module Hydrogen.Element.Component.OTPInput.Props
   , primaryColorProp
   , focusBackgroundColorProp
   , hoverBackgroundColorProp
-  , selectionColorProp
   
   -- * Gradient Atoms
   , backgroundGradientProp
@@ -103,6 +102,11 @@ module Hydrogen.Element.Component.OTPInput.Props
   , onFocusProp
   , onBlurProp
   , onPasteProp
+  , onDigitInputProp
+  , onDigitDeleteProp
+  , onDigitKeyDownProp
+  , onDigitFocusProp
+  , onDigitBlurProp
   , autoSubmitProp
   , autoFocusProp
   
@@ -120,6 +124,11 @@ module Hydrogen.Element.Component.OTPInput.Props
   , separatorEnabledProp
   , separatorPositionsProp
   , separatorCharProp
+  , separatorColorProp
+  
+  -- * Label and Behavior Props
+  , labelColorProp
+  , autoAdvanceProp
   
   -- * Cursor Props
   , cursorStyleProp
@@ -192,7 +201,6 @@ type OTPInputProps msg =
   , primaryColor :: Maybe Color.RGB
   , focusBackgroundColor :: Maybe Color.RGB
   , hoverBackgroundColor :: Maybe Color.RGB
-  , selectionColor :: Maybe Color.RGB
   
   -- Gradient atoms (Schema.Color.Gradient)
   , backgroundGradient :: Maybe Gradient.Gradient
@@ -231,6 +239,15 @@ type OTPInputProps msg =
   , onFocus :: Maybe (OTPIndex -> msg)
   , onBlur :: Maybe (OTPIndex -> msg)
   , onPaste :: Maybe (String -> msg)
+  
+  -- Raw event handlers (more granular control)
+  , onDigitInput :: Maybe (OTPIndex -> Char -> msg)
+  , onDigitDelete :: Maybe (OTPIndex -> msg)
+  , onDigitKeyDown :: Maybe (OTPIndex -> String -> msg)
+  , onDigitFocus :: Maybe (OTPIndex -> msg)
+  , onDigitBlur :: Maybe (OTPIndex -> msg)
+  
+  -- Behavior flags
   , autoSubmit :: Boolean
   , autoFocus :: Boolean
   
@@ -248,6 +265,13 @@ type OTPInputProps msg =
   , separatorEnabled :: Boolean
   , separatorPositions :: Array Int
   , separatorChar :: Char
+  , separatorColor :: Maybe Color.RGB
+  
+  -- Label and help text colors
+  , labelColor :: Maybe Color.RGB
+  
+  -- Auto-advance behavior (focus moves to next digit automatically)
+  , autoAdvance :: Boolean
   
   -- Cursor configuration
   , cursorStyle :: String
@@ -295,7 +319,6 @@ defaultProps =
   , primaryColor: Nothing
   , focusBackgroundColor: Nothing
   , hoverBackgroundColor: Nothing
-  , selectionColor: Nothing
   
   -- Gradients
   , backgroundGradient: Nothing
@@ -334,6 +357,11 @@ defaultProps =
   , onFocus: Nothing
   , onBlur: Nothing
   , onPaste: Nothing
+  , onDigitInput: Nothing
+  , onDigitDelete: Nothing
+  , onDigitKeyDown: Nothing
+  , onDigitFocus: Nothing
+  , onDigitBlur: Nothing
   , autoSubmit: false
   , autoFocus: false
   
@@ -351,6 +379,13 @@ defaultProps =
   , separatorEnabled: false
   , separatorPositions: []
   , separatorChar: '-'
+  , separatorColor: Nothing
+  
+  -- Label and help text colors
+  , labelColor: Nothing
+  
+  -- Auto-advance (default true for typical OTP UX)
+  , autoAdvance: true
   
   -- Cursor
   , cursorStyle: "text"
@@ -484,10 +519,6 @@ focusBackgroundColorProp c props = props { focusBackgroundColor = Just c }
 hoverBackgroundColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 hoverBackgroundColorProp c props = props { hoverBackgroundColor = Just c }
 
--- | Set text selection color
-selectionColorProp :: forall msg. Color.RGB -> OTPInputProp msg
-selectionColorProp c props = props { selectionColor = Just c }
-
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // gradient prop builders
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -616,6 +647,29 @@ onBlurProp handler props = props { onBlur = Just handler }
 onPasteProp :: forall msg. (String -> msg) -> OTPInputProp msg
 onPasteProp handler props = props { onPaste = Just handler }
 
+-- | Set handler for digit input (character entered)
+-- | Called with (index, character) when a character is entered
+onDigitInputProp :: forall msg. (OTPIndex -> Char -> msg) -> OTPInputProp msg
+onDigitInputProp handler props = props { onDigitInput = Just handler }
+
+-- | Set handler for digit delete (backspace)
+-- | Called with index when backspace is pressed at that digit
+onDigitDeleteProp :: forall msg. (OTPIndex -> msg) -> OTPInputProp msg
+onDigitDeleteProp handler props = props { onDigitDelete = Just handler }
+
+-- | Set handler for digit keydown (any key)
+-- | Called with (index, keyCode) for any keypress
+onDigitKeyDownProp :: forall msg. (OTPIndex -> String -> msg) -> OTPInputProp msg
+onDigitKeyDownProp handler props = props { onDigitKeyDown = Just handler }
+
+-- | Set handler for digit focus (explicit)
+onDigitFocusProp :: forall msg. (OTPIndex -> msg) -> OTPInputProp msg
+onDigitFocusProp handler props = props { onDigitFocus = Just handler }
+
+-- | Set handler for digit blur (explicit)
+onDigitBlurProp :: forall msg. (OTPIndex -> msg) -> OTPInputProp msg
+onDigitBlurProp handler props = props { onDigitBlur = Just handler }
+
 -- | Enable auto-submit on completion
 autoSubmitProp :: forall msg. Boolean -> OTPInputProp msg
 autoSubmitProp enabled props = props { autoSubmit = enabled }
@@ -676,6 +730,24 @@ separatorPositionsProp positions props = props { separatorPositions = positions 
 -- | Set separator character
 separatorCharProp :: forall msg. Char -> OTPInputProp msg
 separatorCharProp c props = props { separatorChar = c }
+
+-- | Set separator color (Schema Color.RGB)
+separatorColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+separatorColorProp c props = props { separatorColor = Just c }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                    // label and text prop builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Set label color (Schema Color.RGB)
+labelColorProp :: forall msg. Color.RGB -> OTPInputProp msg
+labelColorProp c props = props { labelColor = Just c }
+
+-- | Enable/disable auto-advance behavior
+-- |
+-- | When true (default), focus automatically advances to next digit after entry.
+autoAdvanceProp :: forall msg. Boolean -> OTPInputProp msg
+autoAdvanceProp enabled props = props { autoAdvance = enabled }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // cursor prop builders

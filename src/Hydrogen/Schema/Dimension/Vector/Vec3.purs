@@ -38,7 +38,6 @@ import Prelude
   , class Ring
   , class Semiring
   , class Show
-  , map
   , negate
   , one
   , show

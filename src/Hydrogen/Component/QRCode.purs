@@ -81,10 +81,10 @@ module Hydrogen.Component.QRCode
   , facingMode
   , scannerClassName
     -- * Types
-  , ErrorCorrectionLevel(..)
-  , ScanFormat(..)
+  , ErrorCorrectionLevel(Low, Medium, Quartile, High)
+  , ScanFormat(QR, EAN8, EAN13, Code128, Code39, UPC_A, UPC_E, DataMatrix, PDF417)
   , ScanResult
-  , FacingMode(..)
+  , FacingMode(Front, Back)
     -- * FFI
   , QRCodeElement
   , ScannerElement
@@ -99,7 +99,7 @@ module Hydrogen.Component.QRCode
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

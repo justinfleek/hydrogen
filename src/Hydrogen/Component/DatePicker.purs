@@ -54,8 +54,8 @@ module Hydrogen.Component.DatePicker
     datePicker
   , datePickerWithLabel
     -- * Types
-  , DateFormat(..)
-  , ValidationError(..)
+  , DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom)
+  , ValidationError(InvalidFormat, DateOutOfRange, DateDisabled, EmptyValue)
     -- * Props
   , DatePickerProps
   , DatePickerProp

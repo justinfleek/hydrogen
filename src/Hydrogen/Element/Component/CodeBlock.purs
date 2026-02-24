@@ -43,8 +43,8 @@ module Hydrogen.Element.Component.CodeBlock
     codeBlock
   , inlineCode
     -- * Types
-  , Language(..)
-  , Theme(..)
+  , Language(PlainText, JavaScript, TypeScript, PureScript, Haskell, Python, Rust, Go, HTMLLang, CSSLang, JSON, YAML, Markdown, Bash, SQL)
+  , Theme(Light, Dark, Auto)
     -- * Props
   , CodeBlockProps
   , CodeBlockProp

@@ -20,6 +20,7 @@ module Hydrogen.Schema.Material.FilterHighlights
   , normal
   , recovered
   , boosted
+  , invert
   ) where
 
 import Prelude
@@ -46,7 +47,7 @@ derive instance eqFilterHighlights :: Eq FilterHighlights
 derive instance ordFilterHighlights :: Ord FilterHighlights
 
 instance showFilterHighlights :: Show FilterHighlights where
-  show (FilterHighlights h) = show h
+  show (FilterHighlights h) = "FilterHighlights " <> show h
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -71,6 +72,12 @@ recovered = FilterHighlights (-0.5)
 -- | Boosted highlights (brighter)
 boosted :: FilterHighlights
 boosted = FilterHighlights 0.5
+
+-- | Invert the highlights adjustment
+-- |
+-- | Converts boost to recovery and vice versa.
+invert :: FilterHighlights -> FilterHighlights
+invert (FilterHighlights h) = FilterHighlights (negate h)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

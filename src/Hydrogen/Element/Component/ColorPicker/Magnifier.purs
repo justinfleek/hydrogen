@@ -44,7 +44,7 @@ module Hydrogen.Element.Component.ColorPicker.Magnifier
   , centerColor
   
   -- * Shape Type
-  , LoupeShape(..)
+  , LoupeShape(Circle, Square)
   
   -- * Zoom Bounds
   , ZoomLevel

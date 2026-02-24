@@ -49,7 +49,7 @@ derive instance eqNoisePersistence :: Eq NoisePersistence
 derive instance ordNoisePersistence :: Ord NoisePersistence
 
 instance showNoisePersistence :: Show NoisePersistence where
-  show (NoisePersistence p) = show p
+  show (NoisePersistence p) = "NoisePersistence " <> show p
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

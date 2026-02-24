@@ -35,7 +35,7 @@ module Hydrogen.Error.Boundary
     ErrorBoundary
   , BoundaryConfig
   , RetryConfig
-  , RecoveryStrategy(..)
+  , RecoveryStrategy(Fallback, Retry, Ignore, Propagate)
     -- * Error Boundaries
   , withFallback
   , withFallbackPure
@@ -61,9 +61,9 @@ module Hydrogen.Error.Boundary
 import Prelude
 
 import Data.Array as Array
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Time.Duration (Milliseconds(..))
+import Data.Either (Either(Left, Right))
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Aff (Aff, delay, throwError)
 import Effect.Aff as Aff

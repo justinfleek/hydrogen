@@ -41,9 +41,9 @@ module Hydrogen.Component.Motion.Curve.CurveHandle
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetHandlePosition, GetHandlePosition)
   , Input
-  , Output(..)
+  , Output(HandleMoved, HandleMoving, DragStart, DragEnd)
   , Slot
   
   -- * Slot Type

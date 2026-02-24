@@ -66,7 +66,7 @@ module Hydrogen.Element.Component.AlertDialog
   , onCancel
   , onClose
     -- * Variants
-  , AlertDialogVariant(..)
+  , AlertDialogVariant(Default, Destructive, Warning, Info)
   ) where
 
 import Prelude

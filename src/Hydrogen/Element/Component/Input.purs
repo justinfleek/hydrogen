@@ -87,7 +87,7 @@ module Hydrogen.Element.Component.Input
   , textareaWithLabel
   
   -- * Types
-  , InputType(..)
+  , InputType(Text, Password, Email, Number, Tel, Url, Search, Date, Time, DatetimeLocal, Month, Week, Color, File, Hidden)
   
   -- * Props
   , InputProps

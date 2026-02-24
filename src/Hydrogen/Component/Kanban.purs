@@ -120,7 +120,7 @@ module Hydrogen.Component.Kanban
     -- * Types
   , Swimlane
   , CardLabel
-  , Priority(..)
+  , Priority(PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent)
   , CardMoveEvent
   , ColumnMoveEvent
     -- * FFI
@@ -132,7 +132,7 @@ module Hydrogen.Component.Kanban
 import Prelude
 
 import Data.Array (foldl, length, null)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn3)
 import Halogen.HTML as HH

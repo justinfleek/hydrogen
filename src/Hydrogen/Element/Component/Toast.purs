@@ -56,7 +56,7 @@ module Hydrogen.Element.Component.Toast
   , toastClose
   
   -- * Types
-  , ToastPosition(..)
+  , ToastPosition(TopRight, TopLeft, TopCenter, BottomRight, BottomLeft, BottomCenter)
   , ToastActionConfig
   
   -- * Toast Props

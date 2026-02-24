@@ -63,6 +63,6 @@ module Hydrogen.Schema.Motion
 -- Only export types, not functions with name collisions
 import Hydrogen.Schema.Motion.Timecode (Timecode, TimecodeComponents) as Timecode
 import Hydrogen.Schema.Motion.TimeRange (TimeRange) as TimeRange
-import Hydrogen.Schema.Motion.Keyframe (Keyframe, KeyframeId, KeyframeValue, Tangent, InterpolationType(..)) as Keyframe
+import Hydrogen.Schema.Motion.Keyframe (Keyframe, KeyframeId, KeyframeValue, Tangent, InterpolationType(Linear, Bezier, Hold, Auto)) as Keyframe
 import Hydrogen.Schema.Motion.Easing (Easing, CubicBezier) as Easing
 import Hydrogen.Schema.Motion.ZoomLevel (ZoomLevel) as ZoomLevel

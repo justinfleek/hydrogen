@@ -53,7 +53,7 @@ module Hydrogen.Element.Component.LoadingBar
   , loadingBarInline
   
   -- * Types
-  , Position(..)
+  , Position(Top, Bottom, Inline)
   
   -- * Props
   , LoadingBarProps

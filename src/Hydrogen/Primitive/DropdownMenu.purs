@@ -92,14 +92,14 @@ module Hydrogen.Primitive.DropdownMenu
   , shortcut
   , className
     -- * Positioning
-  , Side(..)
-  , Align(..)
+  , Side(Top, Right, Bottom, Left)
+  , Align(Start, Center, End)
   ) where
 
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

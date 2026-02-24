@@ -53,8 +53,8 @@ module Hydrogen.Offline.ServiceWorker
 
 import Prelude
 
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
+import Data.Either (Either(Left, Right))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Aff (Aff, makeAff, nonCanceler)
 import Effect.Exception (Error)

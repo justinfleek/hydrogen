@@ -54,9 +54,9 @@ module Hydrogen.Component.Motion.Timeline.AnimationTimeline
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetCurrentFrame, Play, Pause, Stop, SetZoomLevel, GetCurrentFrame, GetPlaybackState, GetSelectedLayers, GetSelectedKeyframes)
   , Input
-  , Output(..)
+  , Output(FrameChanged, PlaybackStateChanged, SelectionChanged, ZoomChanged, WorkAreaChanged, LayerTrimmed)
   , LayerData
   , Slot
   

@@ -103,8 +103,8 @@ import Hydrogen.Element.Component.TreeView.Node
   )
 
 import Hydrogen.Schema.Graph.NodeContent
-  ( ContentSlot(..)
-  , ContentTemplate(..)
+  ( ContentSlot(SlotLeading, SlotIcon, SlotMain, SlotSubtitle, SlotTrailing, SlotActions, SlotBelow, SlotOverlay, SlotBackground)
+  , ContentTemplate(TemplateTextOnly, TemplateIconText, TemplateTitleSubtitle, TemplateCard, TemplateAvatar, TemplateMetric, TemplateProgress, TemplateThumbnail, TemplateCustom)
   ) as Schema
 
 -- ═══════════════════════════════════════════════════════════════════════════════

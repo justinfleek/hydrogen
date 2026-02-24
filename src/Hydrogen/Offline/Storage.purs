@@ -2,90 +2,117 @@
 --                                                        // hydrogen // storage
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Offline storage with IndexedDB
+-- | Offline storage — Pure Data
 -- |
--- | Type-safe wrapper around IndexedDB for offline-first applications.
+-- | Storage operations are modeled as **pure data commands**.
+-- | The runtime interprets commands and produces results as messages.
 -- |
--- | ## Usage
+-- | This is storage-backend agnostic: the runtime can implement using
+-- | IndexedDB, SQLite, filesystem, distributed storage, etc.
+-- |
+-- | ## Pure Data Model
 -- |
 -- | ```purescript
 -- | import Hydrogen.Offline.Storage as Storage
 -- |
--- | -- Open a database
--- | db <- Storage.open "myapp" 1
--- |   [ Storage.store "users" { keyPath: "id" }
--- |   , Storage.store "posts" { keyPath: "id", autoIncrement: true }
--- |   ]
+-- | -- Define a storage command
+-- | fetchUser :: String -> Storage.StorageCommand User
+-- | fetchUser userId = Storage.Get
+-- |   { store: "users"
+-- |   , key: userId
+-- |   }
 -- |
--- | -- Store data
--- | Storage.put db "users" user
+-- | -- Handle storage result in update
+-- | update :: Msg -> Model -> Model
+-- | update (GotUser result) model = case result of
+-- |   Storage.Found user -> model { user = Just user }
+-- |   Storage.NotFound -> model { error = Just "User not found" }
+-- |   Storage.StorageError err -> model { error = Just err }
 -- |
--- | -- Get data
--- | maybeUser <- Storage.get db "users" "user-123"
--- |
--- | -- Query all
--- | users <- Storage.getAll db "users"
--- |
--- | -- Delete
--- | Storage.delete db "users" "user-123"
+-- | -- Batch operations
+-- | syncData :: Storage.StorageCommand (Array Post)
+-- | syncData = Storage.GetAll { store: "posts" }
 -- | ```
 module Hydrogen.Offline.Storage
-  ( -- * Types
-    Database
+  ( -- * Storage Command (Pure Data)
+    StorageCommand(..)
   , StoreName
+  , StoreKey
+    -- * Store Configuration (Pure Data)
   , StoreConfig
   , IndexConfig
-    -- * Database Operations
-  , open
-  , close
-  , deleteDatabase
-    -- * Store Configuration
-  , store
-  , storeWithIndex
-    -- * CRUD Operations
+  , defaultStoreConfig
+  , storeWithKeyPath
+  , storeWithAutoIncrement
+    -- * Storage Result (Pure Data)
+  , StorageResult(..)
+  , StorageError(..)
+    -- * Command Builders (Pure Functions)
   , put
   , get
   , getAll
   , getAllByIndex
   , delete
   , clear
-    -- * Transactions
-  , transaction
-  , TransactionMode(..)
-    -- * Utilities
   , count
   , keys
   , exists
+    -- * Database Schema (Pure Data)
+  , DatabaseSchema
+  , SchemaStore
+  , schema
+  , addStore
+  , addStoreWithIndexes
+    -- * Transaction Mode (Pure Data)
+  , TransactionMode(..)
+  , Transaction
+  , transaction
+  , addCommand
   ) where
 
 import Prelude
 
-import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
 import Data.Array as Array
-import Data.Either (Either(..), hush)
-import Data.Maybe (Maybe(..))
-import Effect (Effect)
-import Effect.Aff (Aff, makeAff, nonCanceler)
-import Effect.Class (liftEffect)
-import Effect.Exception (Error)
+import Data.Maybe (Maybe(Just, Nothing))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | IndexedDB database wrapper
-foreign import data Database :: Type
-
--- | Object store name
+-- | Store name — type alias for clarity
 type StoreName = String
 
--- | Store configuration
+-- | Store key — type alias for clarity
+type StoreKey = String
+
+-- | Store configuration — pure data
 type StoreConfig =
   { keyPath :: Maybe String
   , autoIncrement :: Boolean
   }
 
--- | Index configuration
+-- | Default store configuration
+defaultStoreConfig :: StoreConfig
+defaultStoreConfig =
+  { keyPath: Nothing
+  , autoIncrement: false
+  }
+
+-- | Create store config with key path
+storeWithKeyPath :: String -> StoreConfig
+storeWithKeyPath path =
+  { keyPath: Just path
+  , autoIncrement: false
+  }
+
+-- | Create store config with auto-increment
+storeWithAutoIncrement :: StoreConfig
+storeWithAutoIncrement =
+  { keyPath: Nothing
+  , autoIncrement: true
+  }
+
+-- | Index configuration — pure data
 type IndexConfig =
   { name :: String
   , keyPath :: String
@@ -93,214 +120,217 @@ type IndexConfig =
   , multiEntry :: Boolean
   }
 
--- | Transaction mode
+-- | Transaction mode — pure enum
 data TransactionMode
   = ReadOnly
   | ReadWrite
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // FFI
--- ═══════════════════════════════════════════════════════════════════════════════
+derive instance eqTransactionMode :: Eq TransactionMode
 
-foreign import openImpl 
-  :: String 
-  -> Int 
-  -> Array { name :: String, config :: StoreConfig, indexes :: Array IndexConfig }
-  -> (Error -> Effect Unit)
-  -> (Database -> Effect Unit)
-  -> Effect Unit
-
-foreign import closeImpl :: Database -> Effect Unit
-
-foreign import deleteDatabaseImpl 
-  :: String 
-  -> (Error -> Effect Unit) 
-  -> Effect Unit 
-  -> Effect Unit
-
-foreign import putImpl 
-  :: Database 
-  -> String 
-  -> Json 
-  -> (Error -> Effect Unit)
-  -> Effect Unit
-  -> Effect Unit
-
-foreign import getImpl 
-  :: Database 
-  -> String 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> (Json -> Effect Unit)
-  -> Effect Unit
-  -> Effect Unit
-
-foreign import getAllImpl 
-  :: Database 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> (Array Json -> Effect Unit)
-  -> Effect Unit
-
-foreign import getAllByIndexImpl 
-  :: Database 
-  -> String 
-  -> String  -- Index name
-  -> String  -- Value
-  -> (Error -> Effect Unit)
-  -> (Array Json -> Effect Unit)
-  -> Effect Unit
-
-foreign import deleteImpl 
-  :: Database 
-  -> String 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> Effect Unit
-  -> Effect Unit
-
-foreign import clearImpl 
-  :: Database 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> Effect Unit
-  -> Effect Unit
-
-foreign import countImpl 
-  :: Database 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> (Int -> Effect Unit)
-  -> Effect Unit
-
-foreign import keysImpl 
-  :: Database 
-  -> String 
-  -> (Error -> Effect Unit)
-  -> (Array String -> Effect Unit)
-  -> Effect Unit
+instance showTransactionMode :: Show TransactionMode where
+  show ReadOnly = "ReadOnly"
+  show ReadWrite = "ReadWrite"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // database operations
+--                                                           // storage commands
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Create a store configuration
-store :: StoreName -> StoreConfig -> { name :: String, config :: StoreConfig, indexes :: Array IndexConfig }
-store name config = { name, config, indexes: [] }
+-- | Storage command — pure data describing a storage operation
+-- |
+-- | The runtime interprets these commands and produces StorageResult values.
+-- | The `a` type parameter is the expected result type (phantom for type safety).
+data StorageCommand a
+  = Put
+    { store :: StoreName
+    , key :: Maybe StoreKey     -- Nothing = auto-generate
+    , value :: a
+    }
+  | Get
+    { store :: StoreName
+    , key :: StoreKey
+    }
+  | GetAll
+    { store :: StoreName
+    }
+  | GetAllByIndex
+    { store :: StoreName
+    , indexName :: String
+    , indexValue :: String
+    }
+  | Delete
+    { store :: StoreName
+    , key :: StoreKey
+    }
+  | Clear
+    { store :: StoreName
+    }
+  | Count
+    { store :: StoreName
+    }
+  | Keys
+    { store :: StoreName
+    }
+  | Exists
+    { store :: StoreName
+    , key :: StoreKey
+    }
 
--- | Create a store with indexes
-storeWithIndex :: StoreName -> StoreConfig -> Array IndexConfig -> { name :: String, config :: StoreConfig, indexes :: Array IndexConfig }
-storeWithIndex name config indexes = { name, config, indexes }
+derive instance eqStorageCommand :: Eq a => Eq (StorageCommand a)
 
--- | Open or create a database
-open 
-  :: String  -- Database name
-  -> Int     -- Version
-  -> Array { name :: String, config :: StoreConfig, indexes :: Array IndexConfig }
-  -> Aff Database
-open name version stores = makeAff \callback -> do
-  openImpl name version stores
-    (\err -> callback (Left err))
-    (\db -> callback (Right db))
-  pure nonCanceler
-
--- | Close database connection
-close :: Database -> Effect Unit
-close = closeImpl
-
--- | Delete entire database
-deleteDatabase :: String -> Aff Unit
-deleteDatabase name = makeAff \callback -> do
-  deleteDatabaseImpl name
-    (\err -> callback (Left err))
-    (callback (Right unit))
-  pure nonCanceler
+instance showStorageCommand :: Show a => Show (StorageCommand a) where
+  show (Put r) = "Put { store: " <> r.store <> ", value: " <> show r.value <> " }"
+  show (Get r) = "Get { store: " <> r.store <> ", key: " <> r.key <> " }"
+  show (GetAll r) = "GetAll { store: " <> r.store <> " }"
+  show (GetAllByIndex r) = "GetAllByIndex { store: " <> r.store <> ", index: " <> r.indexName <> " }"
+  show (Delete r) = "Delete { store: " <> r.store <> ", key: " <> r.key <> " }"
+  show (Clear r) = "Clear { store: " <> r.store <> " }"
+  show (Count r) = "Count { store: " <> r.store <> " }"
+  show (Keys r) = "Keys { store: " <> r.store <> " }"
+  show (Exists r) = "Exists { store: " <> r.store <> ", key: " <> r.key <> " }"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // crud operations
+--                                                            // storage results
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Put (insert or update) a value
-put :: forall a. EncodeJson a => Database -> StoreName -> a -> Aff Unit
-put db storeName value = makeAff \callback -> do
-  putImpl db storeName (encodeJson value)
-    (\err -> callback (Left err))
-    (callback (Right unit))
-  pure nonCanceler
+-- | Storage error — pure data
+data StorageError
+  = NotFound
+  | StoreNotFound String
+  | KeyError String
+  | SerializationError String
+  | QuotaExceeded
+  | TransactionAborted
+  | UnknownError String
 
--- | Get a value by key
-get :: forall a. DecodeJson a => Database -> StoreName -> String -> Aff (Maybe a)
-get db storeName key = makeAff \callback -> do
-  getImpl db storeName key
-    (\err -> callback (Left err))
-    (\json -> callback (Right (hush $ decodeJson json)))
-    (callback (Right Nothing))
-  pure nonCanceler
+derive instance eqStorageError :: Eq StorageError
 
--- | Get all values from a store
-getAll :: forall a. DecodeJson a => Database -> StoreName -> Aff (Array a)
-getAll db storeName = makeAff \callback -> do
-  getAllImpl db storeName
-    (\err -> callback (Left err))
-    (\jsons -> callback (Right (Array.mapMaybe (hush <<< decodeJson) jsons)))
-  pure nonCanceler
+instance showStorageError :: Show StorageError where
+  show NotFound = "NotFound"
+  show (StoreNotFound s) = "StoreNotFound: " <> s
+  show (KeyError s) = "KeyError: " <> s
+  show (SerializationError s) = "SerializationError: " <> s
+  show QuotaExceeded = "QuotaExceeded"
+  show TransactionAborted = "TransactionAborted"
+  show (UnknownError s) = "UnknownError: " <> s
 
--- | Get all values matching an index
-getAllByIndex :: forall a. DecodeJson a => Database -> StoreName -> String -> String -> Aff (Array a)
-getAllByIndex db storeName indexName value = makeAff \callback -> do
-  getAllByIndexImpl db storeName indexName value
-    (\err -> callback (Left err))
-    (\jsons -> callback (Right (Array.mapMaybe (hush <<< decodeJson) jsons)))
-  pure nonCanceler
+-- | Storage result — pure data representing operation outcome
+data StorageResult a
+  = Found a                     -- ^ Value found
+  | Success                     -- ^ Operation succeeded (put, delete, clear)
+  | CountResult Int             -- ^ Count result
+  | KeysResult (Array StoreKey) -- ^ Keys result
+  | ExistsResult Boolean        -- ^ Exists check result
+  | AllFound (Array a)          -- ^ GetAll result
+  | Error StorageError          -- ^ Operation failed
 
--- | Delete a value by key
-delete :: Database -> StoreName -> String -> Aff Unit
-delete db storeName key = makeAff \callback -> do
-  deleteImpl db storeName key
-    (\err -> callback (Left err))
-    (callback (Right unit))
-  pure nonCanceler
+derive instance eqStorageResult :: Eq a => Eq (StorageResult a)
 
--- | Clear all values from a store
-clear :: Database -> StoreName -> Aff Unit
-clear db storeName = makeAff \callback -> do
-  clearImpl db storeName
-    (\err -> callback (Left err))
-    (callback (Right unit))
-  pure nonCanceler
+instance showStorageResult :: Show a => Show (StorageResult a) where
+  show (Found a) = "Found " <> show a
+  show Success = "Success"
+  show (CountResult n) = "CountResult " <> show n
+  show (KeysResult ks) = "KeysResult " <> show ks
+  show (ExistsResult b) = "ExistsResult " <> show b
+  show (AllFound as) = "AllFound " <> show as
+  show (Error e) = "Error " <> show e
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // command builders
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Create a put command
+put :: forall a. StoreName -> a -> StorageCommand a
+put store value = Put { store, key: Nothing, value }
+
+-- | Create a get command
+get :: forall a. StoreName -> StoreKey -> StorageCommand a
+get store key = Get { store, key }
+
+-- | Create a get-all command
+getAll :: forall a. StoreName -> StorageCommand a
+getAll store = GetAll { store }
+
+-- | Create a get-all-by-index command
+getAllByIndex :: forall a. StoreName -> String -> String -> StorageCommand a
+getAllByIndex store indexName indexValue = 
+  GetAllByIndex { store, indexName, indexValue }
+
+-- | Create a delete command
+delete :: forall a. StoreName -> StoreKey -> StorageCommand a
+delete store key = Delete { store, key }
+
+-- | Create a clear command
+clear :: forall a. StoreName -> StorageCommand a
+clear store = Clear { store }
+
+-- | Create a count command
+count :: forall a. StoreName -> StorageCommand a
+count store = Count { store }
+
+-- | Create a keys command
+keys :: forall a. StoreName -> StorageCommand a
+keys store = Keys { store }
+
+-- | Create an exists command
+exists :: forall a. StoreName -> StoreKey -> StorageCommand a
+exists store key = Exists { store, key }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // database schema
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Store definition in schema
+type SchemaStore =
+  { name :: StoreName
+  , config :: StoreConfig
+  , indexes :: Array IndexConfig
+  }
+
+-- | Database schema — pure data describing database structure
+type DatabaseSchema =
+  { name :: String
+  , version :: Int
+  , stores :: Array SchemaStore
+  }
+
+-- | Create empty database schema
+schema :: String -> Int -> DatabaseSchema
+schema name version =
+  { name
+  , version
+  , stores: []
+  }
+
+-- | Add a store to schema
+addStore :: StoreName -> StoreConfig -> DatabaseSchema -> DatabaseSchema
+addStore name config db =
+  db { stores = Array.snoc db.stores { name, config, indexes: [] } }
+
+-- | Add a store with indexes to schema
+addStoreWithIndexes :: StoreName -> StoreConfig -> Array IndexConfig -> DatabaseSchema -> DatabaseSchema
+addStoreWithIndexes name config indexes db =
+  db { stores = Array.snoc db.stores { name, config, indexes } }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // transactions
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Execute operations in a transaction
-transaction :: forall a. Database -> Array StoreName -> TransactionMode -> Aff a -> Aff a
-transaction _db _stores _mode action = action  -- Simplified - actual impl would wrap in transaction
+-- | Transaction — pure data grouping multiple commands
+type Transaction a =
+  { stores :: Array StoreName
+  , mode :: TransactionMode
+  , commands :: Array (StorageCommand a)
+  }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- | Create a transaction
+transaction :: forall a. Array StoreName -> TransactionMode -> Transaction a
+transaction stores mode =
+  { stores
+  , mode
+  , commands: []
+  }
 
--- | Count entries in a store
-count :: Database -> StoreName -> Aff Int
-count db storeName = makeAff \callback -> do
-  countImpl db storeName
-    (\err -> callback (Left err))
-    (\n -> callback (Right n))
-  pure nonCanceler
-
--- | Get all keys from a store
-keys :: Database -> StoreName -> Aff (Array String)
-keys db storeName = makeAff \callback -> do
-  keysImpl db storeName
-    (\err -> callback (Left err))
-    (\ks -> callback (Right ks))
-  pure nonCanceler
-
--- | Check if a key exists
-exists :: Database -> StoreName -> String -> Aff Boolean
-exists db storeName key = do
-  result <- get db storeName key :: Aff (Maybe Json)
-  pure $ case result of
-    Just _ -> true
-    Nothing -> false
+-- | Add a command to a transaction
+addCommand :: forall a. StorageCommand a -> Transaction a -> Transaction a
+addCommand cmd tx =
+  tx { commands = Array.snoc tx.commands cmd }

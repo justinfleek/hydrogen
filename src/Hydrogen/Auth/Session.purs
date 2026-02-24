@@ -36,8 +36,8 @@ module Hydrogen.Auth.Session
     Session
   , SessionConfig
   , AuthTokens
-  , StorageType(..)
-  , AuthState(..)
+  , StorageType(LocalStorage, SessionStorage, MemoryOnly)
+  , AuthState(Unauthenticated, Authenticating, Authenticated, Refreshing, Expired)
     -- * Session Management
   , create
   , setTokens
@@ -63,8 +63,8 @@ import Data.Argonaut (class DecodeJson, class EncodeJson, decodeJson, encodeJson
 import Data.Array as Array
 import Data.Either (hush)
 import Data.Foldable (traverse_)
-import Data.Maybe (Maybe(..), isJust)
-import Data.Time.Duration (Milliseconds(..))
+import Data.Maybe (Maybe(Nothing, Just), isJust)
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Aff (Aff, delay, launchAff_)
 import Effect.Class (liftEffect)

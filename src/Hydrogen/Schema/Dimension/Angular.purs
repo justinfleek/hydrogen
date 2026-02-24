@@ -76,13 +76,10 @@ import Prelude
   , class Ring
   , class Semiring
   , class Show
-  , add
   , identity
-  , mul
   , negate
   , one
   , show
-  , sub
   , zero
   , (+)
   , (-)

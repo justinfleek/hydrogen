@@ -50,8 +50,7 @@ module Hydrogen.Schema.Bounded
   ) where
 
 import Prelude
-  ( class Ord
-  , otherwise
+  ( otherwise
   , not
   , negate
   , (&&)

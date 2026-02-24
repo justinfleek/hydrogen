@@ -35,7 +35,7 @@ module Hydrogen.Form.Field
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.UI.Core (cls)

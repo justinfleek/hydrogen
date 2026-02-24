@@ -78,7 +78,18 @@ module Hydrogen.Geo.AddressInput
   , Place
   , Address
   , AddressComponent
-  , ComponentType(..)
+  , ComponentType
+      ( StreetNumber
+      , StreetName
+      , Neighborhood
+      , City
+      , County
+      , State
+      , Country
+      , PostalCode
+      , PlusCode
+      , Other
+      )
     -- * Geocoding
   , geocode
   , reverseGeocode
@@ -105,8 +116,8 @@ import Prelude
 
 import Data.Argonaut (Json)
 import Data.Array (foldl, filter, find, take)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Either (Either(Left, Right))
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)

@@ -56,7 +56,7 @@ module Hydrogen.Analytics.Tracker
   , trackCheckout
     -- * Core Web Vitals
   , WebVitals
-  , WebVitalMetric(..)
+  , WebVitalMetric(LCP, FID, CLS, FCP, TTFB, INP)
   , trackWebVitals
   , trackVital
   , onVital
@@ -69,7 +69,7 @@ module Hydrogen.Analytics.Tracker
   , mixpanel
   , customProvider
     -- * Privacy
-  , PrivacyMode(..)
+  , PrivacyMode(FullTracking, AnonymousOnly, NoTracking)
   , setPrivacyMode
   , optOut
   , optIn
@@ -89,9 +89,9 @@ import Data.Array as Array
 import Data.Foldable (for_)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Traversable (traverse)
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)

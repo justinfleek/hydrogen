@@ -72,7 +72,7 @@ module Hydrogen.Component.TagInput
   , onInputChange
   , renderTag
     -- * Variants
-  , TagVariant(..)
+  , TagVariant(Default, Primary, Secondary, Destructive, Outline)
   , tagVariant
   ) where
 
@@ -80,7 +80,7 @@ import Prelude
 
 import Data.Array (foldl)
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

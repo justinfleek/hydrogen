@@ -109,11 +109,11 @@ module Hydrogen.Component.TreeView
   , loading
   , nodeClassName
     -- * Types
-  , SelectionMode(..)
-  , NodeIcon(..)
-  , CheckState(..)
+  , SelectionMode(SingleSelect, MultiSelect, NoSelect)
+  , NodeIcon(FolderIcon, FolderOpenIcon, FileIcon, FileTextIcon, FileCodeIcon, CustomIcon)
+  , CheckState(Unchecked, Checked, Indeterminate)
   , TreeNodeData
-  , DropPosition(..)
+  , DropPosition(Before, After, Inside)
     -- * FFI
   , TreeViewElement
   , initDragDrop
@@ -123,7 +123,7 @@ module Hydrogen.Component.TreeView
 import Prelude
 
 import Data.Array (foldl, length, null)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

@@ -36,7 +36,7 @@ module Hydrogen.Element.Component.ColorPicker.Harmony
   , defaultHarmonyProps
   
   -- * Harmony Types
-  , HarmonyType(..)
+  , HarmonyType(Complementary, Analogous, Triadic, SplitComplementary, Tetradic, Square, Monochromatic)
   
   -- * Prop Builders
   , baseColor

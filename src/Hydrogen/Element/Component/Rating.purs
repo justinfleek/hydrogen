@@ -60,9 +60,9 @@ module Hydrogen.Element.Component.Rating
   , ratingClassName
   , onRatingChange
     -- * Types
-  , RatingIcon(..)
-  , RatingSize(..)
-  , FillLevel(..)
+  , RatingIcon(Star, Heart, Emoji, Custom)
+  , RatingSize(Small, Medium, Large)
+  , FillLevel(Empty, Half, Full)
   ) where
 
 import Prelude

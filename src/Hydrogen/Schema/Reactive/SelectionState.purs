@@ -67,7 +67,7 @@ module Hydrogen.Schema.Reactive.SelectionState
 import Prelude
 
 import Data.Array (concat, elem, filter, length, nub, range, sort, (..))
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // selection mode

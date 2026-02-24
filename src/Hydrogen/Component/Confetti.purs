@@ -78,8 +78,8 @@ module Hydrogen.Component.Confetti
   , scalar
   , className
     -- * Types
-  , Effect(..)
-  , Shape(..)
+  , Effect(Burst, Cannon, Fireworks, Snow)
+  , Shape(Square, Circle, Star)
   , Origin
     -- * FFI
   , ConfettiInstance
@@ -93,7 +93,7 @@ module Hydrogen.Component.Confetti
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect as Eff
 import Effect.Uncurried (EffectFn1)
 import Halogen.HTML as HH

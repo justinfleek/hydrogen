@@ -112,6 +112,8 @@ import Prelude
 import Data.Int (toNumber) as Int
 import Data.Number (abs) as Number
 
+import Hydrogen.Animation.Types as AnimTypes
+
 import Hydrogen.Schema.Typography.TextIndex
   ( CharacterIndex
   , WordIndex
@@ -371,66 +373,44 @@ selectEveryNth target n offset sel = case target of
 --                                                            // stagger patterns
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Direction for linear stagger patterns.
-data StaggerDirection
-  = StaggerLTR         -- Left to right
-  | StaggerRTL         -- Right to left
-  | StaggerTTB         -- Top to bottom
-  | StaggerBTT         -- Bottom to top
-
-derive instance eqStaggerDirection :: Eq StaggerDirection
-derive instance ordStaggerDirection :: Ord StaggerDirection
-
-instance showStaggerDirection :: Show StaggerDirection where
-  show StaggerLTR = "ltr"
-  show StaggerRTL = "rtl"
-  show StaggerTTB = "ttb"
-  show StaggerBTT = "btt"
-
--- | Stagger pattern defining how animation timing spreads.
+-- | Re-export canonical StaggerDirection from Animation.Types.
 -- |
--- | The delay parameter is in milliseconds.
-data StaggerPattern
-  = LinearStagger StaggerDirection Number    -- direction, delay per element
-  | CenterOutStagger Number                  -- delay per distance from center
-  | EdgesInStagger Number                    -- delay per distance from edges
-  | RandomStagger Int Number                 -- seed, max delay
-  | CustomStagger (Int -> Int -> Number)     -- function(index, total) -> delay
+-- | Variants:
+-- | - StaggerLeftToRight, StaggerRightToLeft
+-- | - StaggerCenterOut, StaggerEdgesIn
+-- | - StaggerTopToBottom, StaggerBottomToTop
+-- | - StaggerRandom Int (seed for determinism)
+type StaggerDirection = AnimTypes.StaggerDirection
 
--- Cannot derive Eq for functions, so manual instance
-instance eqStaggerPattern :: Eq StaggerPattern where
-  eq (LinearStagger d1 n1) (LinearStagger d2 n2) = d1 == d2 && n1 == n2
-  eq (CenterOutStagger n1) (CenterOutStagger n2) = n1 == n2
-  eq (EdgesInStagger n1) (EdgesInStagger n2) = n1 == n2
-  eq (RandomStagger s1 n1) (RandomStagger s2 n2) = s1 == s2 && n1 == n2
-  eq _ _ = false
-
-instance showStaggerPattern :: Show StaggerPattern where
-  show (LinearStagger dir delay) = "linear-" <> show dir <> "(" <> show delay <> "ms)"
-  show (CenterOutStagger delay) = "center-out(" <> show delay <> "ms)"
-  show (EdgesInStagger delay) = "edges-in(" <> show delay <> "ms)"
-  show (RandomStagger seed maxDelay) = "random(seed=" <> show seed <> ", max=" <> show maxDelay <> "ms)"
-  show (CustomStagger _) = "custom"
+-- | Re-export canonical StaggerPattern from Animation.Types.
+-- |
+-- | Variants:
+-- | - LinearStagger StaggerDirection Number
+-- | - CenterOutStagger Number
+-- | - EdgesInStagger Number
+-- | - RandomStagger Int Number
+-- | - CustomStagger (Int -> Int -> Number)
+type StaggerPattern = AnimTypes.StaggerPattern
 
 -- | Left-to-right stagger.
 staggerLeftToRight :: Number -> StaggerPattern
-staggerLeftToRight = LinearStagger StaggerLTR
+staggerLeftToRight delay = AnimTypes.LinearStagger AnimTypes.StaggerLeftToRight delay
 
 -- | Right-to-left stagger.
 staggerRightToLeft :: Number -> StaggerPattern
-staggerRightToLeft = LinearStagger StaggerRTL
+staggerRightToLeft delay = AnimTypes.LinearStagger AnimTypes.StaggerRightToLeft delay
 
 -- | Center-out stagger (middle elements first, edges last).
 staggerCenterOut :: Number -> StaggerPattern
-staggerCenterOut = CenterOutStagger
+staggerCenterOut = AnimTypes.CenterOutStagger
 
 -- | Edges-in stagger (edge elements first, center last).
 staggerEdgesIn :: Number -> StaggerPattern
-staggerEdgesIn = EdgesInStagger
+staggerEdgesIn = AnimTypes.EdgesInStagger
 
 -- | Random stagger with deterministic seed.
 staggerRandom :: Int -> Number -> StaggerPattern
-staggerRandom = RandomStagger
+staggerRandom = AnimTypes.RandomStagger
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // selector predicates
@@ -503,26 +483,28 @@ matchesCharRange idx range = case range of
 -- | Returns delay in milliseconds.
 computeStaggerDelay :: StaggerPattern -> Int -> Int -> Number
 computeStaggerDelay pattern idx total = case pattern of
-  LinearStagger StaggerLTR delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerLeftToRight delay ->
     Int.toNumber idx * delay
     
-  LinearStagger StaggerRTL delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerRightToLeft delay ->
     Int.toNumber (total - 1 - idx) * delay
     
-  LinearStagger StaggerTTB delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerTopToBottom delay ->
     Int.toNumber idx * delay
     
-  LinearStagger StaggerBTT delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerBottomToTop delay ->
     Int.toNumber (total - 1 - idx) * delay
     
-  CenterOutStagger delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerCenterOut delay ->
+    -- Center-out as linear variant: center elements first
     let
       center = Int.toNumber (total - 1) / 2.0
       distance = Number.abs (Int.toNumber idx - center)
     in
       distance * delay
       
-  EdgesInStagger delay ->
+  AnimTypes.LinearStagger AnimTypes.StaggerEdgesIn delay ->
+    -- Edges-in as linear variant: edge elements first
     let
       center = Int.toNumber (total - 1) / 2.0
       maxDist = center
@@ -530,7 +512,29 @@ computeStaggerDelay pattern idx total = case pattern of
     in
       (maxDist - distance) * delay
       
-  RandomStagger seed maxDelay ->
+  AnimTypes.LinearStagger (AnimTypes.StaggerRandom seed) delay ->
+    -- Random direction within linear: use seed for determinism
+    let
+      hash = ((idx * 1664525) + seed) `mod` 1000
+    in
+      Int.toNumber hash / 1000.0 * delay
+    
+  AnimTypes.CenterOutStagger delay ->
+    let
+      center = Int.toNumber (total - 1) / 2.0
+      distance = Number.abs (Int.toNumber idx - center)
+    in
+      distance * delay
+      
+  AnimTypes.EdgesInStagger delay ->
+    let
+      center = Int.toNumber (total - 1) / 2.0
+      maxDist = center
+      distance = Number.abs (Int.toNumber idx - center)
+    in
+      (maxDist - distance) * delay
+      
+  AnimTypes.RandomStagger seed maxDelay ->
     -- Deterministic pseudo-random using simple hash
     -- Using 1664525 (linear congruential generator constant that fits in Int32)
     let
@@ -538,5 +542,5 @@ computeStaggerDelay pattern idx total = case pattern of
     in
       Int.toNumber hash / 1000.0 * maxDelay
       
-  CustomStagger fn ->
+  AnimTypes.CustomStagger fn ->
     fn idx total

@@ -76,7 +76,7 @@ module Hydrogen.Element.Component.TreeView.Viewport
   , simplifiedNode
   
   -- * Viewport Events
-  , ViewportEvent(..)
+  , ViewportEvent(Pan, Zoom, ZoomToLevel, FitAll, CenterOn, ResetView)
   , handleViewportEvent
   ) where
 

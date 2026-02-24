@@ -19,6 +19,7 @@ module Hydrogen.Schema.Material.DashOffset
   , toNumber
   , bounds
   , zero
+  , invert
   ) where
 
 import Prelude
@@ -45,7 +46,7 @@ derive instance eqDashOffset :: Eq DashOffset
 derive instance ordDashOffset :: Ord DashOffset
 
 instance showDashOffset :: Show DashOffset where
-  show (DashOffset o) = show o
+  show (DashOffset o) = "DashOffset " <> show o
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -64,6 +65,12 @@ dashOffset n = DashOffset (Bounded.ensureFinite n 0.0)
 -- | No offset (pattern starts at beginning)
 zero :: DashOffset
 zero = DashOffset 0.0
+
+-- | Invert the offset direction
+-- |
+-- | Useful for reversing animation direction of marching ants effects.
+invert :: DashOffset -> DashOffset
+invert (DashOffset o) = DashOffset (negate o)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

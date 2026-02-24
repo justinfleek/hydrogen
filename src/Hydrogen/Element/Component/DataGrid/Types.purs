@@ -21,19 +21,19 @@
 
 module Hydrogen.Element.Component.DataGrid.Types
   ( -- * Cell Type Enum
-    CellType(..)
+    CellType(CellText, CellNumber, CellDate, CellBoolean, CellLink, CellBadge, CellActions, CellCustom)
   
     -- * Fixed Position Enum
-  , FixedPosition(..)
+  , FixedPosition(FixedLeft, FixedRight, NotFixed)
   
     -- * Sort Direction Enum
-  , SortDirection(..)
+  , SortDirection(Ascending, Descending)
   
     -- * Selection Mode Enum
-  , SelectionMode(..)
+  , SelectionMode(NoSelection, SingleSelect, MultiSelect, CheckboxSelect)
   
     -- * Filter Value ADT
-  , FilterValue(..)
+  , FilterValue(TextFilter, NumberFilter, BooleanFilter, SelectFilter, DateRangeFilter)
   
     -- * Sort Configuration
   , SortConfig
@@ -42,7 +42,7 @@ module Hydrogen.Element.Component.DataGrid.Types
   , VirtualScrollConfig
   
     -- * Pagination Configuration
-  , PaginationConfig(..)
+  , PaginationConfig(NoPagination, BuiltIn, External)
   
     -- * Cell Context
   , CellContext

@@ -44,20 +44,20 @@ module Hydrogen.Component.Button
   , type_
   , shadow
     -- * Variants
-  , ButtonVariant(..)
+  , ButtonVariant(Default, Destructive, Outline, Secondary, Ghost, Link)
   , variantClasses
     -- * Sizes
-  , ButtonSize(..)
+  , ButtonSize(Sm, Md, Lg, Icon)
   , sizeClasses
     -- * Types
-  , ButtonType(..)
+  , ButtonType(TypeButton, TypeSubmit, TypeReset)
   , buttonTypeStr
   ) where
 
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

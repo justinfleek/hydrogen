@@ -2,63 +2,56 @@
 --                                                       // hydrogen // presence
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Enter/exit animations for components
+-- | Enter/exit animations for components — Pure Data
 -- |
 -- | AnimatePresence enables animations when components mount and unmount,
 -- | with support for exit animations and layout transitions.
+-- |
+-- | All presence state is **pure data**. No imperative mutations.
+-- | Transitions happen via messages flowing through the update cycle.
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Motion.Presence as P
 -- |
--- | -- Animate mounting/unmounting
--- | P.animatePresence
--- |   { mode: P.Sync
--- |   , initial: true
+-- | -- Define motion element as pure data
+-- | myModal :: forall msg. Boolean -> P.MotionElement msg
+-- | myModal isVisible =
+-- |   { presence: if isVisible then P.Present else P.Exiting
+-- |   , initial: P.variant { opacity: 0.0, scale: 0.9 }
+-- |   , animate: P.variant { opacity: 1.0, scale: 1.0 }
+-- |   , exit: P.variant { opacity: 0.0, scale: 0.9 }
+-- |   , key: Just "modal"
+-- |   , onStart: Nothing
+-- |   , onComplete: Nothing
 -- |   }
--- |   [ when showModal $
--- |       P.motion
--- |         { initial: P.variant { opacity: 0.0, scale: 0.9 }
--- |         , animate: P.variant { opacity: 1.0, scale: 1.0 }
--- |         , exit: P.variant { opacity: 0.0, scale: 0.9 }
--- |         }
--- |         modalContent
--- |   ]
 -- |
--- | -- Wait for exit before entering new content
--- | P.animatePresence { mode: P.Wait, initial: false }
--- |   [ P.motion
--- |       { key: currentPage
--- |       , initial: P.slideIn P.FromRight
--- |       , exit: P.slideOut P.ToLeft
--- |       }
--- |       pageContent
--- |   ]
--- |
--- | -- With callbacks
--- | P.motion
--- |   { onAnimationStart: Console.log "Started"
--- |   , onAnimationComplete: Console.log "Done"
--- |   }
--- |   content
+-- | -- Compute current variant based on presence state
+-- | currentVariant :: P.MotionElement msg -> P.Variant
+-- | currentVariant el = case el.presence of
+-- |   P.Entering -> P.interpolate 0.0 el.initial el.animate
+-- |   P.Present -> el.animate
+-- |   P.Exiting -> el.exit
 -- | ```
 module Hydrogen.Motion.Presence
-  ( -- * AnimatePresence
-    AnimatePresenceConfig
+  ( -- * Presence State (Pure Data)
+    PresenceState(..)
+  , isVisible
+  , isAnimating
+    -- * Motion Element (Pure Data)
+  , MotionElement
+  , defaultMotionElement
+    -- * Presence Mode
   , PresenceMode(..)
-  , animatePresence
-  , defaultPresenceConfig
-    -- * Motion Component
-  , MotionConfig
-  , motion
-  , motionDiv
-  , motionSpan
-  , defaultMotionConfig
-    -- * Variants
+    -- * Variants (Pure Data)
   , Variant
   , variant
   , emptyVariant
+  , variantWithOpacity
+  , variantWithScale
+  , variantWithTranslate
+  , variantWithRotate
     -- * Preset Variants
   , fadeIn
   , fadeOut
@@ -74,34 +67,61 @@ module Hydrogen.Motion.Presence
   , withDuration
   , withDelay
   , withEasing
-    -- * Presence State
-  , PresenceState(..)
-  , usePresence
-    -- * Callbacks
-  , onAnimationStart
-  , onAnimationComplete
-  , onExitComplete
-    -- * Layout Animation
-  , layoutId
-  , layoutGroup
+    -- * Variant Interpolation
+  , interpolate
+  , interpolateNumber
+    -- * Presence Transitions (Pure Functions)
+  , transitionTo
+  , enter
+  , present
+  , exit
+    -- * Serialization (for renderers)
+  , variantToRecord
+  , variantToCss
   ) where
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
-import Effect (Effect)
-import Effect.Ref (Ref)
-import Effect.Ref as Ref
-import Halogen.HTML as HH
-import Halogen.HTML.Properties as HP
-import Web.DOM.Element (Element)
+import Data.Array as Array
+import Data.Foldable (intercalate)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Time.Duration (Milliseconds(Milliseconds))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Animation presence mode
+-- | Presence state for a component — pure enum
+-- |
+-- | This is pure data representing where a component is in its lifecycle.
+-- | State transitions are computed, not mutated.
+data PresenceState
+  = Entering    -- ^ Component is animating into view
+  | Present     -- ^ Component is fully visible
+  | Exiting     -- ^ Component is animating out of view
+  | Absent      -- ^ Component is not rendered
+
+derive instance eqPresenceState :: Eq PresenceState
+derive instance ordPresenceState :: Ord PresenceState
+
+instance showPresenceState :: Show PresenceState where
+  show Entering = "Entering"
+  show Present = "Present"
+  show Exiting = "Exiting"
+  show Absent = "Absent"
+
+-- | Check if presence state is visible (should render)
+isVisible :: PresenceState -> Boolean
+isVisible Absent = false
+isVisible _ = true
+
+-- | Check if presence state is animating
+isAnimating :: PresenceState -> Boolean
+isAnimating Entering = true
+isAnimating Exiting = true
+isAnimating _ = false
+
+-- | Animation presence mode — pure enum
 data PresenceMode
   = Sync       -- ^ Enter and exit simultaneously
   | Wait       -- ^ Wait for exit before entering
@@ -114,34 +134,7 @@ instance showPresenceMode :: Show PresenceMode where
   show Wait = "Wait"
   show PopLayout = "PopLayout"
 
--- | Presence state for a component
-data PresenceState
-  = Entering    -- ^ Component is entering
-  | Present     -- ^ Component is fully present
-  | Exiting     -- ^ Component is exiting
-
-derive instance eqPresenceState :: Eq PresenceState
-
-instance showPresenceState :: Show PresenceState where
-  show Entering = "Entering"
-  show Present = "Present"
-  show Exiting = "Exiting"
-
--- | Animation variant (CSS properties)
-type Variant =
-  { opacity :: Maybe Number
-  , scale :: Maybe Number
-  , scaleX :: Maybe Number
-  , scaleY :: Maybe Number
-  , x :: Maybe Number
-  , y :: Maybe Number
-  , rotate :: Maybe Number
-  , duration :: Maybe Number     -- milliseconds
-  , delay :: Maybe Number        -- milliseconds
-  , easing :: Maybe String       -- CSS easing function
-  }
-
--- | Direction for slide animations
+-- | Direction for slide animations — pure enum
 data Direction
   = FromTop
   | FromBottom
@@ -154,132 +147,38 @@ data Direction
 
 derive instance eqDirection :: Eq Direction
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // animate presence
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | AnimatePresence configuration
-type AnimatePresenceConfig =
-  { mode :: PresenceMode
-  , initial :: Boolean           -- ^ Animate on initial mount
-  , onExitComplete :: Effect Unit
-  }
-
--- | Default presence configuration
-defaultPresenceConfig :: AnimatePresenceConfig
-defaultPresenceConfig =
-  { mode: Sync
-  , initial: true
-  , onExitComplete: pure unit
-  }
-
--- | AnimatePresence wrapper component
-animatePresence
-  :: forall w i
-   . AnimatePresenceConfig
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-animatePresence config children =
-  HH.div
-    [ HP.attr (HH.AttrName "data-animate-presence") "true"
-    , HP.attr (HH.AttrName "data-presence-mode") (modeToString config.mode)
-    , HP.attr (HH.AttrName "data-presence-initial") (show config.initial)
-    ]
-    children
-  where
-  modeToString Sync = "sync"
-  modeToString Wait = "wait"
-  modeToString PopLayout = "pop-layout"
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // motion component
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Motion component configuration
-type MotionConfig =
-  { initial :: Variant           -- ^ Initial state (before entering)
-  , animate :: Variant           -- ^ Animate to this state
-  , exit :: Variant              -- ^ Exit animation state
-  , key :: Maybe String          -- ^ Unique key for presence tracking
-  , onAnimationStart :: Effect Unit
-  , onAnimationComplete :: Effect Unit
-  }
-
--- | Default motion configuration
-defaultMotionConfig :: MotionConfig
-defaultMotionConfig =
-  { initial: emptyVariant
-  , animate: emptyVariant
-  , exit: emptyVariant
-  , key: Nothing
-  , onAnimationStart: pure unit
-  , onAnimationComplete: pure unit
-  }
-
--- | Motion wrapper (generic element)
-motion
-  :: forall w i
-   . MotionConfig
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-motion config children =
-  HH.div
-    ( [ HP.attr (HH.AttrName "data-motion") "true"
-      , HP.attr (HH.AttrName "data-motion-initial") (variantToString config.initial)
-      , HP.attr (HH.AttrName "data-motion-animate") (variantToString config.animate)
-      , HP.attr (HH.AttrName "data-motion-exit") (variantToString config.exit)
-      , HP.style (variantToInitialStyle config.initial)
-      ] <> keyAttr config.key
-    )
-    children
-  where
-  keyAttr (Just k) = [HP.attr (HH.AttrName "data-motion-key") k]
-  keyAttr Nothing = []
-
--- | Motion div element
-motionDiv
-  :: forall w i
-   . MotionConfig
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-motionDiv config children =
-  HH.div
-    ( [ HP.attr (HH.AttrName "data-motion") "true"
-      , HP.attr (HH.AttrName "data-motion-initial") (variantToString config.initial)
-      , HP.attr (HH.AttrName "data-motion-animate") (variantToString config.animate)
-      , HP.attr (HH.AttrName "data-motion-exit") (variantToString config.exit)
-      , HP.style (variantToInitialStyle config.initial)
-      ] <> keyAttr config.key
-    )
-    children
-  where
-  keyAttr (Just k) = [HP.attr (HH.AttrName "data-motion-key") k]
-  keyAttr Nothing = []
-
--- | Motion span element
-motionSpan
-  :: forall w i
-   . MotionConfig
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-motionSpan config children =
-  HH.span
-    [ HP.attr (HH.AttrName "data-motion") "true"
-    , HP.attr (HH.AttrName "data-motion-initial") (variantToString config.initial)
-    , HP.attr (HH.AttrName "data-motion-animate") (variantToString config.animate)
-    , HP.attr (HH.AttrName "data-motion-exit") (variantToString config.exit)
-    , HP.style (variantToInitialStyle config.initial)
-    ]
-    children
+instance showDirection :: Show Direction where
+  show FromTop = "FromTop"
+  show FromBottom = "FromBottom"
+  show FromLeft = "FromLeft"
+  show FromRight = "FromRight"
+  show ToTop = "ToTop"
+  show ToBottom = "ToBottom"
+  show ToLeft = "ToLeft"
+  show ToRight = "ToRight"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // variants
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Create a variant with specified properties
-variant
-  :: { opacity :: Number, scale :: Number }
-  -> Variant
+-- | Animation variant — pure data describing CSS transform properties
+-- |
+-- | All fields are optional. Only specified fields are applied.
+type Variant =
+  { opacity :: Maybe Number
+  , scale :: Maybe Number
+  , scaleX :: Maybe Number
+  , scaleY :: Maybe Number
+  , x :: Maybe Number          -- translateX in pixels
+  , y :: Maybe Number          -- translateY in pixels
+  , rotate :: Maybe Number     -- rotation in degrees
+  , duration :: Maybe Number   -- milliseconds
+  , delay :: Maybe Number      -- milliseconds
+  , easing :: Maybe String     -- CSS easing function
+  }
+
+-- | Create a variant with opacity and scale
+variant :: { opacity :: Number, scale :: Number } -> Variant
 variant v =
   { opacity: Just v.opacity
   , scale: Just v.scale
@@ -307,6 +206,22 @@ emptyVariant =
   , delay: Nothing
   , easing: Nothing
   }
+
+-- | Create variant with just opacity
+variantWithOpacity :: Number -> Variant
+variantWithOpacity o = emptyVariant { opacity = Just o }
+
+-- | Create variant with just scale
+variantWithScale :: Number -> Variant
+variantWithScale s = emptyVariant { scale = Just s }
+
+-- | Create variant with translation
+variantWithTranslate :: Number -> Number -> Variant
+variantWithTranslate tx ty = emptyVariant { x = Just tx, y = Just ty }
+
+-- | Create variant with rotation (degrees)
+variantWithRotate :: Number -> Variant
+variantWithRotate r = emptyVariant { rotate = Just r }
 
 -- | Fade in variant
 fadeIn :: Variant
@@ -348,7 +263,7 @@ scaleIn = emptyVariant { scale = Just 1.0, opacity = Just 1.0 }
 scaleOut :: Variant
 scaleOut = emptyVariant { scale = Just 0.0, opacity = Just 0.0 }
 
--- | Pop in (scale with overshoot feel)
+-- | Pop in (scale with overshoot easing)
 popIn :: Variant
 popIn = emptyVariant
   { scale = Just 1.0
@@ -396,112 +311,167 @@ withDelay (Milliseconds ms) v = v { delay = Just ms }
 
 -- | Add easing to a variant
 withEasing :: String -> Variant -> Variant
-withEasing easing v = v { easing = Just easing }
+withEasing e v = v { easing = Just e }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // presence state
+--                                                       // variant interpolation
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Hook to access presence state
-foreign import usePresenceImpl :: Element -> Effect { state :: String, isPresent :: Boolean }
+-- | Interpolate between two numbers
+interpolateNumber :: Number -> Number -> Number -> Number
+interpolateNumber t a b = a + (b - a) * t
 
-usePresence :: Element -> Effect { state :: PresenceState, isPresent :: Boolean }
-usePresence element = do
-  result <- usePresenceImpl element
-  pure
-    { state: stateFromString result.state
-    , isPresent: result.isPresent
-    }
+-- | Interpolate between two variants
+-- |
+-- | `t` is progress from 0.0 to 1.0
+interpolate :: Number -> Variant -> Variant -> Variant
+interpolate t v1 v2 =
+  { opacity: lerpMaybe v1.opacity v2.opacity
+  , scale: lerpMaybe v1.scale v2.scale
+  , scaleX: lerpMaybe v1.scaleX v2.scaleX
+  , scaleY: lerpMaybe v1.scaleY v2.scaleY
+  , x: lerpMaybe v1.x v2.x
+  , y: lerpMaybe v1.y v2.y
+  , rotate: lerpMaybe v1.rotate v2.rotate
+  , duration: v2.duration   -- Use target duration
+  , delay: v2.delay         -- Use target delay
+  , easing: v2.easing       -- Use target easing
+  }
   where
-  stateFromString "entering" = Entering
-  stateFromString "exiting" = Exiting
-  stateFromString _ = Present
+  lerpMaybe :: Maybe Number -> Maybe Number -> Maybe Number
+  lerpMaybe (Just a) (Just b) = Just (interpolateNumber t a b)
+  lerpMaybe Nothing (Just b) = Just b
+  lerpMaybe (Just a) Nothing = Just a
+  lerpMaybe Nothing Nothing = Nothing
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // callbacks
+--                                                             // motion element
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Set animation start callback
-onAnimationStart :: forall r i. Effect Unit -> HH.IProp r i
-onAnimationStart _ = HP.attr (HH.AttrName "data-motion-on-start") "true"
+-- | Motion element — pure data describing an animated component
+-- |
+-- | The `msg` type parameter allows specifying callback messages.
+-- | These are pure data — they get dispatched by the runtime, not executed here.
+type MotionElement msg =
+  { presence :: PresenceState       -- ^ Current presence state
+  , initial :: Variant              -- ^ Initial state (before entering)
+  , animate :: Variant              -- ^ Target animate state
+  , exit :: Variant                 -- ^ Exit animation state
+  , key :: Maybe String             -- ^ Unique key for presence tracking
+  , onStart :: Maybe msg            -- ^ Message to dispatch on animation start
+  , onComplete :: Maybe msg         -- ^ Message to dispatch on animation complete
+  }
 
--- | Set animation complete callback
-onAnimationComplete :: forall r i. Effect Unit -> HH.IProp r i
-onAnimationComplete _ = HP.attr (HH.AttrName "data-motion-on-complete") "true"
-
--- | Set exit complete callback
-onExitComplete :: forall r i. Effect Unit -> HH.IProp r i
-onExitComplete _ = HP.attr (HH.AttrName "data-motion-on-exit") "true"
+-- | Default motion element
+defaultMotionElement :: forall msg. MotionElement msg
+defaultMotionElement =
+  { presence: Present
+  , initial: emptyVariant
+  , animate: emptyVariant
+  , exit: emptyVariant
+  , key: Nothing
+  , onStart: Nothing
+  , onComplete: Nothing
+  }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // layout animation
+--                                                        // presence transitions
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Set layout ID for shared layout animations
-layoutId :: forall r i. String -> HH.IProp r i
-layoutId id = HP.attr (HH.AttrName "data-layout-id") id
+-- | Transition presence state — pure function
+transitionTo :: forall msg. PresenceState -> MotionElement msg -> MotionElement msg
+transitionTo newState el = el { presence = newState }
 
--- | Set layout group
-layoutGroup :: forall r i. String -> HH.IProp r i
-layoutGroup group = HP.attr (HH.AttrName "data-layout-group") group
+-- | Transition to entering state
+enter :: forall msg. MotionElement msg -> MotionElement msg
+enter = transitionTo Entering
+
+-- | Transition to present state
+present :: forall msg. MotionElement msg -> MotionElement msg
+present = transitionTo Present
+
+-- | Transition to exiting state
+exit :: forall msg. MotionElement msg -> MotionElement msg
+exit = transitionTo Exiting
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // internals
+--                                                              // serialization
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert variant to JSON string for data attribute
-variantToString :: Variant -> String
-variantToString v = 
-  "{" <> intercalate "," (filterEmpty
-    [ prop "opacity" v.opacity
-    , prop "scale" v.scale
-    , prop "scaleX" v.scaleX
-    , prop "scaleY" v.scaleY
-    , prop "x" v.x
-    , prop "y" v.y
-    , prop "rotate" v.rotate
-    , prop "duration" v.duration
-    , prop "delay" v.delay
-    , propStr "easing" v.easing
-    ]) <> "}"
-  where
-  prop :: String -> Maybe Number -> String
-  prop name (Just n) = "\"" <> name <> "\":" <> show n
-  prop _ Nothing = ""
-  
-  propStr :: String -> Maybe String -> String
-  propStr name (Just s) = "\"" <> name <> "\":\"" <> s <> "\""
-  propStr _ Nothing = ""
-  
-  filterEmpty :: Array String -> Array String
-  filterEmpty = filter (\s -> s /= "")
-  
-  filter :: forall a. (a -> Boolean) -> Array a -> Array a
-  filter _ [] = []
-  filter pred arr = filterImpl pred arr
-  
-  intercalate :: String -> Array String -> String
-  intercalate _ [] = ""
-  intercalate sep arr = intercalateImpl sep arr
+-- | Convert variant to a record for renderer consumption
+variantToRecord :: Variant -> 
+  { opacity :: Number
+  , scale :: Number
+  , scaleX :: Number
+  , scaleY :: Number
+  , x :: Number
+  , y :: Number
+  , rotate :: Number
+  , duration :: Number
+  , delay :: Number
+  , easing :: String
+  }
+variantToRecord v =
+  { opacity: fromMaybe 1.0 v.opacity
+  , scale: fromMaybe 1.0 v.scale
+  , scaleX: fromMaybe 1.0 v.scaleX
+  , scaleY: fromMaybe 1.0 v.scaleY
+  , x: fromMaybe 0.0 v.x
+  , y: fromMaybe 0.0 v.y
+  , rotate: fromMaybe 0.0 v.rotate
+  , duration: fromMaybe 300.0 v.duration
+  , delay: fromMaybe 0.0 v.delay
+  , easing: fromMaybe "ease" v.easing
+  }
 
-foreign import filterImpl :: forall a. (a -> Boolean) -> Array a -> Array a
-foreign import intercalateImpl :: String -> Array String -> String
-
--- | Convert variant to initial inline style
-variantToInitialStyle :: Variant -> String
-variantToInitialStyle v =
-  intercalateImpl "; " (filterImpl (\s -> s /= "")
+-- | Convert variant to CSS style string (for legacy renderers)
+variantToCss :: Variant -> String
+variantToCss v =
+  intercalate "; " (Array.filter (\s -> s /= "")
     [ styleProp "opacity" v.opacity
-    , stylePropTransform "scale" v.scale
-    , stylePropPx "translateX" v.x
-    , stylePropPx "translateY" v.y
+    , transformProp v
+    , transitionProp v
     ])
   where
+  styleProp :: String -> Maybe Number -> String
   styleProp name (Just n) = name <> ": " <> show n
   styleProp _ Nothing = ""
   
-  stylePropTransform name (Just n) = "transform: " <> name <> "(" <> show n <> ")"
-  stylePropTransform _ Nothing = ""
+  transformProp :: Variant -> String
+  transformProp var =
+    let
+      parts = Array.filter (\s -> s /= "")
+        [ case var.scale of
+            Just s -> "scale(" <> show s <> ")"
+            Nothing -> ""
+        , case var.scaleX of
+            Just s -> "scaleX(" <> show s <> ")"
+            Nothing -> ""
+        , case var.scaleY of
+            Just s -> "scaleY(" <> show s <> ")"
+            Nothing -> ""
+        , case var.x of
+            Just x -> "translateX(" <> show x <> "px)"
+            Nothing -> ""
+        , case var.y of
+            Just y -> "translateY(" <> show y <> "px)"
+            Nothing -> ""
+        , case var.rotate of
+            Just r -> "rotate(" <> show r <> "deg)"
+            Nothing -> ""
+        ]
+    in
+      if Array.null parts
+        then ""
+        else "transform: " <> intercalate " " parts
   
-  stylePropPx name (Just n) = "transform: " <> name <> "(" <> show n <> "px)"
-  stylePropPx _ Nothing = ""
+  transitionProp :: Variant -> String
+  transitionProp var = case var.duration of
+    Just d -> 
+      let dur = show d <> "ms"
+          ease = fromMaybe "ease" var.easing
+          del = case var.delay of
+            Just dl -> " " <> show dl <> "ms"
+            Nothing -> ""
+      in "transition: all " <> dur <> " " <> ease <> del
+    Nothing -> ""

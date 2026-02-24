@@ -17,25 +17,24 @@ import Control.Alt ((<|>))
 import Control.Plus (empty)
 import Data.Array as Array
 import Data.Array.NonEmpty as NEA
-import Data.Either (Either(..), isLeft, isRight)
+import Data.Either (Either(Left, Right), isLeft, isRight)
 import Data.Foldable (foldl, foldr, sum)
 import Data.Int (floor, toNumber)
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe, isJust)
 
 import Data.String as String
 import Data.Traversable (sequence, traverse)
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Hydrogen.Data.Format as Format
-import Hydrogen.Data.RemoteData (RemoteData(..))
+import Hydrogen.Data.RemoteData (RemoteData(NotAsked, Loading, Failure, Success))
 import Hydrogen.Data.RemoteData as RD
 import Hydrogen.Form.Validation as V
 import Hydrogen.Style.Color as Color
 import Test.QuickCheck (class Arbitrary, Result, arbitrary, quickCheck, quickCheckGen, (<?>), (===))
 import Test.QuickCheck.Gen (Gen, chooseInt, elements, frequency, oneOf, resize, sized, vectorOf)
-import Test.Spec.Reporter.Console (consoleReporter)
-import Test.Spec.Runner (runSpec)
+
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.QuickCheck (quickCheck) as Spec

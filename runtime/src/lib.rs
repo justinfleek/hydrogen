@@ -33,6 +33,7 @@ mod binary;
 mod commands;
 mod renderer;
 mod shaders;
+mod tessellate;
 
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;

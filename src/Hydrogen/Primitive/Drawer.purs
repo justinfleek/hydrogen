@@ -58,10 +58,10 @@ module Hydrogen.Primitive.Drawer
   , onClose
   , className
     -- * Side
-  , Side(..)
+  , Side(Left, Right, Top, Bottom)
   , side
     -- * Size
-  , Size(..)
+  , Size(Small, Medium, Large, Full)
   , size
     -- * Options
   , closeOnEscape
@@ -73,7 +73,7 @@ module Hydrogen.Primitive.Drawer
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

@@ -46,7 +46,7 @@ derive instance eqFilterFade :: Eq FilterFade
 derive instance ordFilterFade :: Ord FilterFade
 
 instance showFilterFade :: Show FilterFade where
-  show (FilterFade f) = show f
+  show (FilterFade f) = "FilterFade " <> show f
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

@@ -55,7 +55,21 @@
 
 module Hydrogen.GPU.DrawCommand
   ( -- * Core Types
-    DrawCommand(..)
+    DrawCommand
+      ( DrawRect
+      , DrawQuad
+      , DrawGlyph
+      , DrawPath
+      , DrawParticle
+      , PushClip
+      , PopClip
+      , Noop
+      , DrawGlyphPath
+      , DrawGlyphInstance
+      , DrawWord
+      , DefinePathData
+      , UpdateAnimationState
+      )
   , CommandBuffer
   , PickId
   , pickId
@@ -77,7 +91,7 @@ module Hydrogen.GPU.DrawCommand
   
   -- * Path Parameters (vector paths)
   , PathParams
-  , PathSegment(..)
+  , PathSegment(MoveTo, LineTo, QuadraticTo, CubicTo, ClosePath)
   , pathParams
   
   -- * Particle Parameters (billion-agent viz)
@@ -85,7 +99,7 @@ module Hydrogen.GPU.DrawCommand
   , particleParams
   
   -- * Clip Operations
-  , ClipRegion(..)
+  , ClipRegion(ClipRect, ClipPath)
   
   -- * Typography as Geometry (v2 commands)
   , GlyphPathParams
@@ -100,15 +114,15 @@ module Hydrogen.GPU.DrawCommand
   , WordParams
   , wordParams
   , StaggerConfig
-  , StaggerDirection(..)
-  , EasingFunction(..)
+  , StaggerDirection
+  , EasingFunction
   , PathDataParams
   , pathDataParams
   , AnimationStateParams
   , animationStateParams
-  , AnimationUpdateMode(..)
+  , AnimationUpdateMode(AnimationReplace, AnimationAdditive, AnimationBlend)
   , AnimationTarget
-  , TargetType(..)
+  , TargetType(TargetGlyphInstance, TargetWord, TargetPathData, TargetControlPoint)
   , ColorDelta
   
   -- * Command Constructors
@@ -137,6 +151,28 @@ module Hydrogen.GPU.DrawCommand
   -- * Sorting & Batching (for interpreter)
   , sortByDepth
   , batchByMaterial
+
+  -- * Backward-Compatible Constructors
+  , staggerLeftToRight
+  , staggerRightToLeft
+  , staggerCenterOut
+  , staggerEdgesIn
+  , staggerTopToBottom
+  , staggerBottomToTop
+  , staggerRandom
+  , easeLinear
+  , easeInQuad
+  , easeOutQuad
+  , easeInOutQuad
+  , easeInCubic
+  , easeOutCubic
+  , easeInOutCubic
+  , easeInElastic
+  , easeOutElastic
+  , easeInOutElastic
+  , easeInBounce
+  , easeOutBounce
+  , easeSpring
   ) where
 
 import Prelude
@@ -159,6 +195,7 @@ import Data.Ord (comparing)
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Radius
+import Hydrogen.Animation.Types as AnimTypes
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // core types
@@ -622,56 +659,102 @@ type StaggerConfig =
   }
 
 -- | Stagger direction patterns.
-data StaggerDirection
-  = StaggerLeftToRight
-  | StaggerRightToLeft
-  | StaggerCenterOut
-  | StaggerEdgesIn
-  | StaggerRandom Int               -- Int is seed for determinism
+-- |
+-- | Re-exported from Hydrogen.Animation.Types for backward compatibility.
+-- | New code should import from Animation.Types directly.
+-- |
+-- | Variants:
+-- | - StaggerLeftToRight, StaggerRightToLeft
+-- | - StaggerCenterOut, StaggerEdgesIn
+-- | - StaggerTopToBottom, StaggerBottomToTop
+-- | - StaggerRandom Int (seed for determinism)
+type StaggerDirection = AnimTypes.StaggerDirection
 
-derive instance eqStaggerDirection :: Eq StaggerDirection
+-- | Re-exported StaggerDirection constructors for backward compatibility.
+-- | Consumers can use: DC.StaggerLeftToRight, DC.StaggerRightToLeft, etc.
+staggerLeftToRight :: StaggerDirection
+staggerLeftToRight = AnimTypes.StaggerLeftToRight
 
-instance showStaggerDirection :: Show StaggerDirection where
-  show StaggerLeftToRight = "StaggerLeftToRight"
-  show StaggerRightToLeft = "StaggerRightToLeft"
-  show StaggerCenterOut = "StaggerCenterOut"
-  show StaggerEdgesIn = "StaggerEdgesIn"
-  show (StaggerRandom seed) = "StaggerRandom(" <> show seed <> ")"
+staggerRightToLeft :: StaggerDirection
+staggerRightToLeft = AnimTypes.StaggerRightToLeft
+
+staggerCenterOut :: StaggerDirection
+staggerCenterOut = AnimTypes.StaggerCenterOut
+
+staggerEdgesIn :: StaggerDirection
+staggerEdgesIn = AnimTypes.StaggerEdgesIn
+
+staggerTopToBottom :: StaggerDirection
+staggerTopToBottom = AnimTypes.StaggerTopToBottom
+
+staggerBottomToTop :: StaggerDirection
+staggerBottomToTop = AnimTypes.StaggerBottomToTop
+
+staggerRandom :: Int -> StaggerDirection
+staggerRandom = AnimTypes.StaggerRandom
 
 -- | Easing function enumeration.
 -- |
--- | Standard easing curves. The runtime implements the actual math.
-data EasingFunction
-  = EaseLinear
-  | EaseInQuad
-  | EaseOutQuad
-  | EaseInOutQuad
-  | EaseInCubic
-  | EaseOutCubic
-  | EaseInOutCubic
-  | EaseInElastic
-  | EaseOutElastic
-  | EaseInOutElastic
-  | EaseInBounce
-  | EaseOutBounce
-  | EaseSpring           -- Uses SpringState for physics
+-- | Re-exported from Hydrogen.Animation.Types for backward compatibility.
+-- | This is a type alias to EasingId, the wire-format subset.
+-- | New code should import EasingId from Animation.Types directly.
+type EasingFunction = AnimTypes.EasingId
 
-derive instance eqEasingFunction :: Eq EasingFunction
+-- | Re-exported EasingFunction constructors for backward compatibility.
+-- | Consumers can use: DC.EasingIdLinear, DC.EasingIdInQuad, etc.
+easingIdLinear :: EasingFunction
+easingIdLinear = AnimTypes.EasingIdLinear
 
-instance showEasingFunction :: Show EasingFunction where
-  show EaseLinear = "EaseLinear"
-  show EaseInQuad = "EaseInQuad"
-  show EaseOutQuad = "EaseOutQuad"
-  show EaseInOutQuad = "EaseInOutQuad"
-  show EaseInCubic = "EaseInCubic"
-  show EaseOutCubic = "EaseOutCubic"
-  show EaseInOutCubic = "EaseInOutCubic"
-  show EaseInElastic = "EaseInElastic"
-  show EaseOutElastic = "EaseOutElastic"
-  show EaseInOutElastic = "EaseInOutElastic"
-  show EaseInBounce = "EaseInBounce"
-  show EaseOutBounce = "EaseOutBounce"
-  show EaseSpring = "EaseSpring"
+easingIdInQuad :: EasingFunction
+easingIdInQuad = AnimTypes.EasingIdInQuad
+
+easingIdOutQuad :: EasingFunction
+easingIdOutQuad = AnimTypes.EasingIdOutQuad
+
+easingIdInOutQuad :: EasingFunction
+easingIdInOutQuad = AnimTypes.EasingIdInOutQuad
+
+easingIdInCubic :: EasingFunction
+easingIdInCubic = AnimTypes.EasingIdInCubic
+
+easingIdOutCubic :: EasingFunction
+easingIdOutCubic = AnimTypes.EasingIdOutCubic
+
+easingIdInOutCubic :: EasingFunction
+easingIdInOutCubic = AnimTypes.EasingIdInOutCubic
+
+easingIdInElastic :: EasingFunction
+easingIdInElastic = AnimTypes.EasingIdInElastic
+
+easingIdOutElastic :: EasingFunction
+easingIdOutElastic = AnimTypes.EasingIdOutElastic
+
+easingIdInOutElastic :: EasingFunction
+easingIdInOutElastic = AnimTypes.EasingIdInOutElastic
+
+easingIdInBounce :: EasingFunction
+easingIdInBounce = AnimTypes.EasingIdInBounce
+
+easingIdOutBounce :: EasingFunction
+easingIdOutBounce = AnimTypes.EasingIdOutBounce
+
+easingIdSpring :: EasingFunction
+easingIdSpring = AnimTypes.EasingIdSpring
+
+-- | Backward compatible aliases (old Ease* names)
+easeLinear = easingIdLinear
+easeInQuad = easingIdInQuad
+easeOutQuad = easingIdOutQuad
+easeInOutQuad = easingIdInOutQuad
+easeInCubic = easingIdInCubic
+easeOutCubic = easingIdOutCubic
+easeInOutCubic = easingIdInOutCubic
+easeInElastic = easingIdInElastic
+easeOutElastic = easingIdOutElastic
+easeInOutElastic = easingIdInOutElastic
+easeInBounce = easingIdInBounce
+easeOutBounce = easingIdOutBounce
+easeSpring = easingIdSpring
 
 -- | Create word parameters with defaults.
 wordParams
@@ -687,9 +770,9 @@ wordParams wId glyphs positions origin =
   , positions
   , origin
   , stagger: 
-      { direction: StaggerLeftToRight
+      { direction: staggerLeftToRight
       , delayMs: 50.0
-      , easing: EaseOutCubic
+      , easing: easeOutCubic
       }
   , color: RGB.rgba 255 255 255 255
   , depth: 0.0

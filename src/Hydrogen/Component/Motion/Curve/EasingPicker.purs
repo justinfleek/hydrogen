@@ -35,11 +35,11 @@ module Hydrogen.Component.Motion.Curve.EasingPicker
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetSelected, GetSelected, SetDisabled, Open, Close)
   , Input
-  , Output(..)
+  , Output(EasingSelected, Opened, Closed)
   , Slot
-  , EasingCategory(..)
+  , EasingCategory(Standard, Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back)
   
   -- * Slot Type
   , _easingPicker

@@ -355,6 +355,201 @@ theorem det_makeRotationZ (angle : ℝ) : det (makeRotationZ angle) = 1 := by
   have h := Real.cos_sq_add_sin_sq angle
   linear_combination h
 
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- INVERSE (NVIDIA PPISP METHOD)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-! ## Matrix Inverse using Cofactor/Adjugate Method
+
+The inverse of a 3x3 matrix M is computed as:
+  M⁻¹ = adj(M) / det(M)
+
+Where adj(M) is the adjugate (transpose of cofactor matrix).
+
+NVIDIA PPISP uses this exact formula in `matrix_inverse_3x3`:
+  - Compute determinant
+  - Compute cofactor matrix  
+  - Transpose (adjugate)
+  - Divide by determinant
+
+The cofactors are the 2x2 minor determinants with appropriate signs:
+  C_ij = (-1)^(i+j) * det(M_ij)
+
+Where M_ij is the submatrix with row i and column j removed. -/
+
+/-- Cofactor C(0,0): submatrix excluding row 0, col 0 -/
+def cofactor00 (m : Mat3) : ℝ := m.m11 * m.m22 - m.m12 * m.m21
+
+/-- Cofactor C(0,1): submatrix excluding row 0, col 1, with sign flip -/
+def cofactor01 (m : Mat3) : ℝ := -(m.m10 * m.m22 - m.m12 * m.m20)
+
+/-- Cofactor C(0,2): submatrix excluding row 0, col 2 -/
+def cofactor02 (m : Mat3) : ℝ := m.m10 * m.m21 - m.m11 * m.m20
+
+/-- Cofactor C(1,0): submatrix excluding row 1, col 0, with sign flip -/
+def cofactor10 (m : Mat3) : ℝ := -(m.m01 * m.m22 - m.m02 * m.m21)
+
+/-- Cofactor C(1,1): submatrix excluding row 1, col 1 -/
+def cofactor11 (m : Mat3) : ℝ := m.m00 * m.m22 - m.m02 * m.m20
+
+/-- Cofactor C(1,2): submatrix excluding row 1, col 2, with sign flip -/
+def cofactor12 (m : Mat3) : ℝ := -(m.m00 * m.m21 - m.m01 * m.m20)
+
+/-- Cofactor C(2,0): submatrix excluding row 2, col 0 -/
+def cofactor20 (m : Mat3) : ℝ := m.m01 * m.m12 - m.m02 * m.m11
+
+/-- Cofactor C(2,1): submatrix excluding row 2, col 1, with sign flip -/
+def cofactor21 (m : Mat3) : ℝ := -(m.m00 * m.m12 - m.m02 * m.m10)
+
+/-- Cofactor C(2,2): submatrix excluding row 2, col 2 -/
+def cofactor22 (m : Mat3) : ℝ := m.m00 * m.m11 - m.m01 * m.m10
+
+/-- Cofactor matrix (before transpose) -/
+def cofactorMatrix (m : Mat3) : Mat3 :=
+  ⟨cofactor00 m, cofactor01 m, cofactor02 m,
+   cofactor10 m, cofactor11 m, cofactor12 m,
+   cofactor20 m, cofactor21 m, cofactor22 m⟩
+
+/-- Adjugate matrix (transpose of cofactor matrix).
+    
+    adj(M) is the matrix such that M × adj(M) = det(M) × I -/
+def adjugate (m : Mat3) : Mat3 := transpose (cofactorMatrix m)
+
+/-- Matrix inverse: M⁻¹ = adj(M) / det(M)
+    
+    This is the NVIDIA formula from matrix_inverse_3x3.
+    Requires det(M) ≠ 0 for correctness. -/
+noncomputable def inverse (m : Mat3) : Mat3 :=
+  let d := det m
+  let adj := adjugate m
+  scale (1 / d) adj
+
+/-- Determinant equals expansion along first row using cofactors -/
+theorem det_cofactor_expansion (m : Mat3) :
+    det m = m.m00 * cofactor00 m + m.m01 * cofactor01 m + m.m02 * cofactor02 m := by
+  simp only [det, cofactor00, cofactor01, cofactor02]
+  ring
+
+/-- The adjugate formula: M × adj(M) = det(M) × I -/
+theorem mul_adjugate (m : Mat3) : mul m (adjugate m) = scale (det m) identity := by
+  simp only [mul, adjugate, transpose, cofactorMatrix, scale, identity,
+             cofactor00, cofactor01, cofactor02, cofactor10, cofactor11, cofactor12,
+             cofactor20, cofactor21, cofactor22, det]
+  ext <;> ring
+
+/-- The adjugate formula (left): adj(M) × M = det(M) × I -/
+theorem adjugate_mul (m : Mat3) : mul (adjugate m) m = scale (det m) identity := by
+  simp only [mul, adjugate, transpose, cofactorMatrix, scale, identity,
+             cofactor00, cofactor01, cofactor02, cofactor10, cofactor11, cofactor12,
+             cofactor20, cofactor21, cofactor22, det]
+  ext <;> ring
+
+/-- For invertible matrices: M × M⁻¹ = I -/
+theorem mul_inverse (m : Mat3) (h : Invertible m) : mul m (inverse m) = identity := by
+  simp only [inverse, Invertible] at *
+  have hdet : det m ≠ 0 := h
+  -- inverse = (1/det) * adj
+  -- M × inverse = M × ((1/det) * adj) = (1/det) * (M × adj) = (1/det) * (det * I) = I
+  calc mul m (scale (1 / det m) (adjugate m))
+      = scale (1 / det m) (mul m (adjugate m)) := by
+        simp only [mul, scale, adjugate, transpose, cofactorMatrix,
+                   cofactor00, cofactor01, cofactor02, cofactor10, cofactor11, cofactor12,
+                   cofactor20, cofactor21, cofactor22]
+        ext <;> ring
+    _ = scale (1 / det m) (scale (det m) identity) := by rw [mul_adjugate]
+    _ = identity := by
+        simp only [scale, identity]
+        ext <;> field_simp
+
+/-- For invertible matrices: M⁻¹ × M = I -/
+theorem inverse_mul (m : Mat3) (h : Invertible m) : mul (inverse m) m = identity := by
+  simp only [inverse, Invertible] at *
+  have hdet : det m ≠ 0 := h
+  calc mul (scale (1 / det m) (adjugate m)) m
+      = scale (1 / det m) (mul (adjugate m) m) := by
+        simp only [mul, scale, adjugate, transpose, cofactorMatrix,
+                   cofactor00, cofactor01, cofactor02, cofactor10, cofactor11, cofactor12,
+                   cofactor20, cofactor21, cofactor22]
+        ext <;> ring
+    _ = scale (1 / det m) (scale (det m) identity) := by rw [adjugate_mul]
+    _ = identity := by
+        simp only [scale, identity]
+        ext <;> field_simp
+
+/-- The determinant of the inverse is 1/det -/
+theorem det_inverse (m : Mat3) (h : Invertible m) : det (inverse m) = 1 / det m := by
+  -- det(M × M⁻¹) = det(I) = 1
+  -- det(M) × det(M⁻¹) = 1
+  -- det(M⁻¹) = 1/det(M)
+  have hdet : det m ≠ 0 := h
+  have h1 : det (mul m (inverse m)) = 1 := by rw [mul_inverse m h]; exact det_identity
+  rw [det_mul] at h1
+  field_simp at h1 ⊢
+  linarith
+
+/-- Inverse is involutive: (M⁻¹)⁻¹ = M -/
+theorem inverse_inverse (m : Mat3) (h : Invertible m) : inverse (inverse m) = m := by
+  -- M⁻¹ × (M⁻¹)⁻¹ = I, but also M⁻¹ × M = I
+  -- So (M⁻¹)⁻¹ = M
+  have hdet : det m ≠ 0 := h
+  have hinv_inv : Invertible (inverse m) := by
+    simp only [Invertible]
+    rw [det_inverse m h]
+    intro hcontra
+    have hone : (1 : ℝ) = det m * (1 / det m) := by field_simp
+    rw [hcontra] at hone
+    simp at hone
+  -- We prove by showing both are right inverses of inverse m
+  have h1 : mul (inverse m) (inverse (inverse m)) = identity := mul_inverse (inverse m) hinv_inv
+  have h2 : mul (inverse m) m = identity := inverse_mul m h
+  -- Since inverse m is invertible, left multiplication is injective
+  -- From h1 and h2, inverse (inverse m) = m
+  calc inverse (inverse m) 
+      = mul identity (inverse (inverse m)) := by rw [mul_identity_left]
+    _ = mul (mul m (inverse m)) (inverse (inverse m)) := by rw [mul_inverse m h]
+    _ = mul m (mul (inverse m) (inverse (inverse m))) := by rw [mul_assoc]
+    _ = mul m identity := by rw [h1]
+    _ = m := by rw [mul_identity_right]
+
+/-- Inverse reverses multiplication: (AB)⁻¹ = B⁻¹A⁻¹ -/
+theorem inverse_mul_eq (a b : Mat3) (ha : Invertible a) (hb : Invertible b) :
+    inverse (mul a b) = mul (inverse b) (inverse a) := by
+  -- Show that (B⁻¹A⁻¹) is the inverse of AB
+  have hab : Invertible (mul a b) := by
+    simp only [Invertible]
+    rw [det_mul]
+    have hda : det a ≠ 0 := ha
+    have hdb : det b ≠ 0 := hb
+    exact mul_ne_zero hda hdb
+  -- (AB) × (B⁻¹A⁻¹) = A(B × B⁻¹)A⁻¹ = A × I × A⁻¹ = A × A⁻¹ = I
+  have h1 : mul (mul a b) (mul (inverse b) (inverse a)) = identity := by
+    calc mul (mul a b) (mul (inverse b) (inverse a))
+        = mul a (mul (mul b (inverse b)) (inverse a)) := by
+          rw [mul_assoc, mul_assoc, ←mul_assoc b]
+      _ = mul a (mul identity (inverse a)) := by rw [mul_inverse b hb]
+      _ = mul a (inverse a) := by rw [mul_identity_left]
+      _ = identity := by rw [mul_inverse a ha]
+  -- By uniqueness: if X × Y = I and Y is invertible, then X = Y⁻¹
+  -- We show (B⁻¹A⁻¹) × (AB) = I, then use mul_inverse to conclude
+  have h2 : mul (mul (inverse b) (inverse a)) (mul a b) = identity := by
+    calc mul (mul (inverse b) (inverse a)) (mul a b)
+        = mul (inverse b) (mul (mul (inverse a) a) b) := by
+          rw [mul_assoc, mul_assoc, ←mul_assoc (inverse a)]
+      _ = mul (inverse b) (mul identity b) := by rw [inverse_mul a ha]
+      _ = mul (inverse b) b := by rw [mul_identity_left]
+      _ = identity := by rw [inverse_mul b hb]
+  -- Now: (AB)⁻¹ = (B⁻¹A⁻¹) because (B⁻¹A⁻¹) is both left and right inverse of (AB)
+  -- Using h2: (B⁻¹A⁻¹) × (AB) = I, so (B⁻¹A⁻¹) = (AB)⁻¹
+  symm
+  calc mul (inverse b) (inverse a)
+      = mul (mul (inverse b) (inverse a)) identity := by rw [mul_identity_right]
+    _ = mul (mul (inverse b) (inverse a)) (mul (mul a b) (inverse (mul a b))) := by 
+        rw [mul_inverse (mul a b) hab]
+    _ = mul (mul (mul (inverse b) (inverse a)) (mul a b)) (inverse (mul a b)) := by 
+        rw [←mul_assoc]
+    _ = mul identity (inverse (mul a b)) := by rw [h2]
+    _ = inverse (mul a b) := by rw [mul_identity_left]
+
 end Mat3
 
 end Hydrogen.Math

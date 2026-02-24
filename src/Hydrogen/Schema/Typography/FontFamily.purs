@@ -39,7 +39,7 @@ module Hydrogen.Schema.Typography.FontFamily
 
 import Prelude
 
-import Data.String (contains, Pattern(..))
+import Data.String (contains, Pattern(Pattern))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // font family

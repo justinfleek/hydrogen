@@ -47,7 +47,7 @@ module Hydrogen.Element.Component.Separator
   , separatorWithLabel
   
   -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   
   -- * Props
   , SeparatorProps

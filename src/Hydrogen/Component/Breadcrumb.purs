@@ -51,7 +51,7 @@ module Hydrogen.Component.Breadcrumb
 import Prelude
 
 import Data.Array (foldl, length, take, drop)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

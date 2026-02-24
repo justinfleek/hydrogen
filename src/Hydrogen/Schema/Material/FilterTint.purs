@@ -20,6 +20,7 @@ module Hydrogen.Schema.Material.FilterTint
   , neutral
   , green
   , magenta
+  , invert
   ) where
 
 import Prelude
@@ -46,7 +47,7 @@ derive instance eqFilterTint :: Eq FilterTint
 derive instance ordFilterTint :: Ord FilterTint
 
 instance showFilterTint :: Show FilterTint where
-  show (FilterTint t) = show t
+  show (FilterTint t) = "FilterTint " <> show t
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -71,6 +72,12 @@ green = FilterTint (-0.5)
 -- | Magenta tint
 magenta :: FilterTint
 magenta = FilterTint 0.5
+
+-- | Invert the tint
+-- |
+-- | Converts green to magenta and vice versa.
+invert :: FilterTint -> FilterTint
+invert (FilterTint t) = FilterTint (negate t)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

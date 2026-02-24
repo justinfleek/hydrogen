@@ -56,6 +56,9 @@ theorem ext {a b : Vec3} (hx : a.x = b.x) (hy : a.y = b.y) (hz : a.z = b.z) : a 
 /-- Zero vector -/
 def zero : Vec3 := ⟨0, 0, 0⟩
 
+/-- Struct notation equals constructor notation for zero -/
+theorem zero_eq : ({ x := 0, y := 0, z := 0 } : Vec3) = zero := rfl
+
 /-- Unit vectors -/
 def unitX : Vec3 := ⟨1, 0, 0⟩
 def unitY : Vec3 := ⟨0, 1, 0⟩

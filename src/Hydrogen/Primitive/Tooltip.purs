@@ -30,7 +30,7 @@ module Hydrogen.Primitive.Tooltip
   , open
   , className
     -- * Side
-  , Side(..)
+  , Side(Top, Right, Bottom, Left)
   ) where
 
 import Prelude

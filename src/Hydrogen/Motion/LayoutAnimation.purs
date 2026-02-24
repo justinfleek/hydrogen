@@ -80,9 +80,9 @@ module Hydrogen.Motion.LayoutAnimation
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Time.Duration (Milliseconds(Milliseconds))
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

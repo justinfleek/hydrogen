@@ -97,7 +97,7 @@ module Hydrogen.Element.Component.Button
   , loadingSpinner
   
   -- * Types
-  , ButtonType(..)
+  , ButtonType(TypeButton, TypeSubmit, TypeReset)
   
   -- * Props
   , ButtonProps

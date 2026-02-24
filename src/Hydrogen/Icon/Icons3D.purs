@@ -160,8 +160,8 @@ import Hydrogen.Icon.Icon3D
   , zero3
   , vec3
   , euler
-  , BrandSlot(..)
-  , MaterialVariant(..)
+  , BrandSlot(Primary, Secondary, Accent, Neutral)
+  , MaterialVariant(MatteVariant, GlossyVariant, ChromeVariant, MetallicVariant, SoftVariant)
   )
 import Data.Number (pi)
 

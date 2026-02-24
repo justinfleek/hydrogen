@@ -20,6 +20,7 @@ module Hydrogen.Schema.Material.FilterTemperature
   , neutral
   , cool
   , warm
+  , invert
   ) where
 
 import Prelude
@@ -46,7 +47,7 @@ derive instance eqFilterTemperature :: Eq FilterTemperature
 derive instance ordFilterTemperature :: Ord FilterTemperature
 
 instance showFilterTemperature :: Show FilterTemperature where
-  show (FilterTemperature t) = show t
+  show (FilterTemperature t) = "FilterTemperature " <> show t
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -71,6 +72,12 @@ cool = FilterTemperature (-0.5)
 -- | Warm (more orange)
 warm :: FilterTemperature
 warm = FilterTemperature 0.5
+
+-- | Invert the temperature
+-- |
+-- | Converts warm to cool and vice versa.
+invert :: FilterTemperature -> FilterTemperature
+invert (FilterTemperature t) = FilterTemperature (negate t)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

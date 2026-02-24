@@ -54,9 +54,9 @@ module Hydrogen.Component.Toggle
   , toggleGroup
   , toggleItem
     -- * Types
-  , ToggleVariant(..)
-  , ToggleSize(..)
-  , ToggleGroupType(..)
+  , ToggleVariant(Default, Outline)
+  , ToggleSize(Sm, Md, Lg)
+  , ToggleGroupType(Single, Multiple)
     -- * Toggle Props
   , ToggleProps
   , ToggleProp
@@ -83,7 +83,7 @@ module Hydrogen.Component.Toggle
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

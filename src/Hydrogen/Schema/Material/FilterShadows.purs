@@ -20,6 +20,7 @@ module Hydrogen.Schema.Material.FilterShadows
   , normal
   , crushed
   , lifted
+  , invert
   ) where
 
 import Prelude
@@ -46,7 +47,7 @@ derive instance eqFilterShadows :: Eq FilterShadows
 derive instance ordFilterShadows :: Ord FilterShadows
 
 instance showFilterShadows :: Show FilterShadows where
-  show (FilterShadows s) = show s
+  show (FilterShadows s) = "FilterShadows " <> show s
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
@@ -71,6 +72,12 @@ crushed = FilterShadows (-0.5)
 -- | Lifted shadows (brighter)
 lifted :: FilterShadows
 lifted = FilterShadows 0.5
+
+-- | Invert the shadow adjustment
+-- |
+-- | Converts lift to crush and vice versa.
+invert :: FilterShadows -> FilterShadows
+invert (FilterShadows s) = FilterShadows (negate s)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

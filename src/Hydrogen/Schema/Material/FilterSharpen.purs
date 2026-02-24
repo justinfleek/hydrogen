@@ -46,7 +46,7 @@ derive instance eqFilterSharpen :: Eq FilterSharpen
 derive instance ordFilterSharpen :: Ord FilterSharpen
 
 instance showFilterSharpen :: Show FilterSharpen where
-  show (FilterSharpen s) = show s
+  show (FilterSharpen s) = "FilterSharpen " <> show s
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

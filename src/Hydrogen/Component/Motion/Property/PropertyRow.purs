@@ -46,9 +46,9 @@ module Hydrogen.Component.Motion.Property.PropertyRow
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetAnimated, SetExpression, SetSelected, SetDisabled)
   , Input
-  , Output(..)
+  , Output(ToggleAnimation, RowSelected, RowDoubleClicked, ExpressionClicked)
   , Slot
   , ChildSlots
   

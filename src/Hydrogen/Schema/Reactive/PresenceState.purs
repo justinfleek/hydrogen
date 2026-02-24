@@ -66,7 +66,7 @@ module Hydrogen.Schema.Reactive.PresenceState
 import Prelude
 
 import Data.Array (filter, length, snoc)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // presence phase

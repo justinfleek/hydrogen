@@ -91,9 +91,9 @@ module Hydrogen.Document.MarkdownEditor
   , onSave
   , onFullscreenChange
     -- * Types
-  , ViewMode(..)
-  , KeyBindings(..)
-  , ToolbarAction(..)
+  , ViewMode(SplitView, EditorOnly, PreviewOnly)
+  , KeyBindings(Default, Vim, Emacs)
+  , ToolbarAction(Bold, Italic, Strikethrough, Heading1, Heading2, Heading3, BulletList, NumberedList, TaskList, Blockquote, CodeBlock, InlineCode, Link, Image, Table, HorizontalRule, Undo, Redo)
   , EditorStats
   , ImageUploadResult
     -- * Rendering
@@ -115,7 +115,7 @@ module Hydrogen.Document.MarkdownEditor
 import Prelude
 
 import Data.Array (foldl, length)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String (length) as String
 import Data.String.CodeUnits (toCharArray)
 import Effect (Effect)

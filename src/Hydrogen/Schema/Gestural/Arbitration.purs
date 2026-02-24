@@ -358,6 +358,11 @@ activeGestures as = as.active
 failedGestures :: ArbitrationState -> Array GestureId
 failedGestures as = as.failed
 
+-- | Is gesture ID not among active gestures?
+-- | Returns true if gesture is either deferred, failed, or not yet active.
+isNotActive :: GestureId -> ArbitrationState -> Boolean
+isNotActive gid as = notElem gid as.active
+
 -- | Resolve conflict between gestures
 resolveConflict :: GestureId -> GestureId -> ArbitrationState -> ArbiterDecision
 resolveConflict challenger incumbent as =

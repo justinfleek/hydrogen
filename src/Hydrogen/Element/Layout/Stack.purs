@@ -63,8 +63,8 @@ module Hydrogen.Element.Layout.Stack
   -- * Types
   , StackProps
   , StackProp
-  , Alignment(..)
-  , Justification(..)
+  , Alignment(AlignStart, AlignCenter, AlignEnd, AlignStretch, AlignBaseline)
+  , Justification(JustifyStart, JustifyCenter, JustifyEnd, SpaceBetween, SpaceAround, SpaceEvenly)
   
   -- * Props: Layout
   , gap

@@ -44,10 +44,10 @@ module Hydrogen.Component.Motion.Curve.EasingPreview
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetEasing, GetEasing)
   , Input
-  , Output(..)
-  , Size(..)
+  , Output(Clicked, Hovered, Unhovered)
+  , Size(Small, Medium, Large)
   , Slot
   
   -- * Slot Type

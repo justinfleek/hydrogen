@@ -54,8 +54,8 @@ module Hydrogen.Component.TimePicker
   , timePickerInline
     -- * Types
   , Time
-  , HourFormat(..)
-  , Period(..)
+  , HourFormat(Hour12, Hour24)
+  , Period(AM, PM)
     -- * Props
   , TimePickerProps
   , TimePickerProp

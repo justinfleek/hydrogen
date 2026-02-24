@@ -45,10 +45,10 @@ module Hydrogen.Component.Motion.Curve.CurveKeyframe
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetPosition, GetPosition, SetSelected, SetInterpolation)
   , Input
-  , Output(..)
-  , Interpolation(..)
+  , Output(Selected, Moved, Moving, DragStart, DragEnd, DoubleClicked, ContextMenuRequested)
+  , Interpolation(Linear, Bezier, Hold)
   , Slot
   
   -- * Slot Type

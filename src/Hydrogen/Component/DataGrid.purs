@@ -101,8 +101,8 @@ module Hydrogen.Component.DataGrid
   , headerRenderer
   , editable
     -- * Column Types
-  , CellType(..)
-  , FixedPosition(..)
+  , CellType(Text, Number, Date, Boolean, Link, Badge, Actions, Custom)
+  , FixedPosition(FixedLeft, FixedRight, NotFixed)
     -- * Grid Props
   , GridProps
   , GridProp
@@ -119,7 +119,7 @@ module Hydrogen.Component.DataGrid
   , onColumnReorder
     -- * Selection
   , selectionMode
-  , SelectionMode(..)
+  , SelectionMode(NoSelection, SingleSelect, MultiSelect, CheckboxSelect)
   , selectedRows
     -- * Expansion
   , expandable
@@ -127,7 +127,7 @@ module Hydrogen.Component.DataGrid
   , expandedContent
     -- * Pagination
   , pagination
-  , PaginationConfig(..)
+  , PaginationConfig(NoPagination, BuiltIn, External)
   , pageSize
   , currentPage
   , totalRows
@@ -138,11 +138,11 @@ module Hydrogen.Component.DataGrid
     -- * Filtering
   , globalSearch
   , columnFilters
-  , FilterValue(..)
+  , FilterValue(TextFilter, NumberFilter, BooleanFilter, SelectFilter, DateRangeFilter)
     -- * Sorting
   , sortConfig
   , SortConfig
-  , SortDirection(..)
+  , SortDirection(Ascending, Descending)
     -- * States
   , loading
   , emptyState
@@ -165,12 +165,12 @@ import Prelude
 import Data.Argonaut (class EncodeJson, encodeJson, stringify)
 import Data.Array (filter, foldl, length, mapWithIndex, sortBy, take, drop, (:))
 import Data.Array as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Number (fromString) as Number
 
-import Data.String (Pattern(..), contains, toLower)
+import Data.String (Pattern(Pattern), contains, toLower)
 import Data.String as String
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Foreign.Object (Object)
 import Foreign.Object as Object

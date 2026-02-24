@@ -62,10 +62,10 @@ module Hydrogen.Primitive.Popover
   , onClose
   , className
     -- * Placement
-  , Placement(..)
+  , Placement(TopStart, TopCenter, TopEnd, BottomStart, BottomCenter, BottomEnd, LeftStart, LeftCenter, LeftEnd, RightStart, RightCenter, RightEnd)
   , placement
     -- * Trigger Mode
-  , TriggerMode(..)
+  , TriggerMode(Click, Hover, Focus, Manual)
   , triggerMode
     -- * Options
   , closeOnEscape
@@ -80,7 +80,7 @@ module Hydrogen.Primitive.Popover
 import Prelude
 
 import Data.Array (foldl, null)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

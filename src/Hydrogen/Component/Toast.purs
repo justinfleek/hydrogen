@@ -70,8 +70,8 @@ module Hydrogen.Component.Toast
   , position
   , maxVisible
     -- * Types
-  , ToastVariant(..)
-  , ToastPosition(..)
+  , ToastVariant(Default, Success, Error, Warning, Info)
+  , ToastPosition(TopRight, TopLeft, TopCenter, BottomRight, BottomLeft, BottomCenter)
   , ToastId
     -- * FFI
   , ToastTimerId
@@ -80,7 +80,7 @@ module Hydrogen.Component.Toast
 import Prelude
 
 import Data.Array (foldl, take)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)
 import Halogen.HTML as HH

@@ -62,7 +62,7 @@ module Hydrogen.Interaction.Sortable
     -- * List Props
   , listId
   , direction
-  , Direction(..)
+  , Direction(Vertical, Horizontal)
   , onReorder
   , onSortStart
   , onSortMove
@@ -101,7 +101,7 @@ module Hydrogen.Interaction.Sortable
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

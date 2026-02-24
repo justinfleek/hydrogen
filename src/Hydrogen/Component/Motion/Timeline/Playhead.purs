@@ -47,9 +47,9 @@ module Hydrogen.Component.Motion.Timeline.Playhead
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetCurrentFrame, NudgeFrame)
   , Input
-  , Output(..)
+  , Output(DragStart, Dragging, DragEnd, NudgeRequested)
   , Slot
   
   -- * Slot Type

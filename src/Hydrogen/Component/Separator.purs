@@ -30,7 +30,7 @@ module Hydrogen.Component.Separator
   , orientation
   , className
     -- * Orientation
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   ) where
 
 import Prelude

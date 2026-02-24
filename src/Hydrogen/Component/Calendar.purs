@@ -46,8 +46,8 @@ module Hydrogen.Component.Calendar
     -- * Types
   , CalendarDate
   , DateRange
-  , SelectionMode(..)
-  , WeekStart(..)
+  , SelectionMode(Single, Range, Multiple)
+  , WeekStart(Sunday, Monday)
     -- * Props
   , CalendarProps
   , CalendarProp
@@ -91,7 +91,7 @@ module Hydrogen.Component.Calendar
     -- * Month Grid
   , MonthGrid
   , MonthWeek
-  , MonthDay(..)
+  , MonthDay(DayEmpty, DayDate, DayDateDisabled)
   , buildMonthGrid
   ) where
 
@@ -99,7 +99,7 @@ import Prelude
 
 import Data.Array (foldl, range, snoc)
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Int (rem)
 import Effect (Effect)
 import Halogen.HTML as HH

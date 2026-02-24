@@ -57,9 +57,9 @@ import Prelude
 
 import Data.Array as Array
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson, stringify, parseJson)
-import Data.Either (Either(..), hush)
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
+import Data.Either (Either(Left, Right), hush)
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Aff (Aff, delay, launchAff_)
 import Effect.Class (liftEffect)

@@ -2,380 +2,364 @@
 --                                                         // hydrogen // portal
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Portal system for rendering content outside the component tree
+-- | Portal system for layered rendering — Pure Data
 -- |
--- | Portals allow components to render content into a different part of the
--- | DOM, useful for modals, tooltips, dropdowns, and notifications that need
--- | to escape overflow:hidden or stacking context issues.
+-- | Portals model **content that renders at a different layer** from its
+-- | logical position in the component tree. This is pure data describing
+-- | layering intent; the runtime interprets it for actual rendering.
 -- |
--- | ## Usage
+-- | ## Pure Data Model
+-- |
+-- | Instead of imperative DOM manipulation, portals are described as:
+-- |
+-- | 1. **LayerLevel** — Which layer to render to (z-index tier)
+-- | 2. **PortalContent** — What to render in the portal
+-- | 3. **StackingContext** — The current state of all layers
 -- |
 -- | ```purescript
 -- | import Hydrogen.Portal.Layer as Portal
 -- |
--- | -- Initialize the portal system
--- | portalRoot <- Portal.createRoot
+-- | -- Define a modal that renders in the Modal layer
+-- | myModal :: forall msg. Model -> Portal.PortalContent msg
+-- | myModal model =
+-- |   Portal.portalContent
+-- |     { level: Portal.Modal
+-- |     , key: "my-modal"
+-- |     , trapFocus: true
+-- |     , ariaLabel: Just "Confirmation dialog"
+-- |     }
+-- |     [ modalContent model ]
 -- |
--- | -- Create a layer for modals (high z-index)
--- | modalLayer <- Portal.createLayer portalRoot { level: Portal.Modal }
--- |
--- | -- Render content to the layer
--- | Portal.mount modalLayer myModalComponent
--- |
--- | -- Clean up
--- | Portal.unmount modalLayer
--- | Portal.destroyRoot portalRoot
+-- | -- In your view, portals are collected at the top level
+-- | view :: Model -> Element msg
+-- | view model = 
+-- |   Portal.withPortals
+-- |     [ when model.showModal (myModal model) ]
+-- |     (mainContent model)
 -- | ```
 module Hydrogen.Portal.Layer
-  ( -- * Portal Root
-    PortalRoot
-  , createRoot
-  , createRootIn
-  , destroyRoot
-    -- * Layers
-  , Layer
-  , LayerLevel(..)
-  , LayerConfig
-  , createLayer
-  , createLayerWithConfig
-  , destroyLayer
-    -- * Mounting
-  , mount
-  , mountWithKey
-  , unmount
-  , unmountAll
-    -- * Stacking Context
+  ( -- * Layer Levels (Pure Data)
+    LayerLevel(..)
+  , layerZIndex
+  , compareLayerLevel
+    -- * Portal Content (Pure Data)
+  , PortalContent
+  , PortalKey
+  , portalContent
+  , emptyPortal
+    -- * Portal Configuration (Pure Data)
+  , PortalConfig
+  , defaultPortalConfig
+  , withAriaLabel
+  , withClassName
+  , withTrapFocus
+    -- * Stacking Context (Pure Data)
   , StackingContext
-  , getStackingContext
-  , bringToFront
-  , sendToBack
-  , getZIndex
-    -- * Portal Component
-  , portal
-  , portalWithLayer
-    -- * Focus Management
-  , trapFocus
-  , releaseFocus
-  , restoreFocus
+  , StackedLayer
+  , emptyStackingContext
+  , addLayer
+  , removeLayer
+  , getTopLayer
+  , getAllLayers
+  , isTopLayer
+    -- * Focus State (Pure Data)
+  , FocusState
+  , FocusTrap
+  , defaultFocusState
+  , createFocusTrap
+  , releaseFocusTrap
+  , focusedLayerKey
+    -- * Portal Operations (Pure Functions)
+  , collectPortals
+  , mergePortals
+  , sortByLevel
+  , filterByLevel
   ) where
 
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
-import Data.Map as Map
-import Effect (Effect)
-import Effect.Ref (Ref)
-import Effect.Ref as Ref
-import Halogen as H
-import Halogen.HTML as HH
-import Halogen.HTML.Properties as HP
-import Web.DOM.Element (Element)
-import Web.DOM.Document (Document)
-import Web.DOM.Node (Node)
+import Data.Foldable (foldl)
+import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════
--- Portal Root
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                // layer levels
+-- ═══════════════════════════════════════════════════════════════════════════════
 
--- | The root container for all portal layers
--- | Typically mounted at the end of <body>
-type PortalRoot =
-  { element :: Element
-  , layers :: Ref (Map.Map String Layer)
-  , counter :: Ref Int
-  }
-
--- | Create a portal root, appending to document body
-foreign import createRootImpl :: Effect Element
-
-createRoot :: Effect PortalRoot
-createRoot = do
-  element <- createRootImpl
-  layers <- Ref.new Map.empty
-  counter <- Ref.new 0
-  pure { element, layers, counter }
-
--- | Create a portal root in a specific element
-foreign import createRootInImpl :: Element -> Effect Element
-
-createRootIn :: Element -> Effect PortalRoot
-createRootIn parent = do
-  element <- createRootInImpl parent
-  layers <- Ref.new Map.empty
-  counter <- Ref.new 0
-  pure { element, layers, counter }
-
--- | Destroy the portal root and all its layers
-foreign import destroyRootImpl :: Element -> Effect Unit
-
-destroyRoot :: PortalRoot -> Effect Unit
-destroyRoot root = do
-  layers <- Ref.read root.layers
-  -- Clean up all layers
-  let layerArray = Array.fromFoldable $ Map.values layers
-  traverse_ destroyLayer layerArray
-  destroyRootImpl root.element
-  where
-  traverse_ :: forall a. (a -> Effect Unit) -> Array a -> Effect Unit
-  traverse_ f arr = void $ traverseImpl f arr
-
-foreign import traverseImpl :: forall a. (a -> Effect Unit) -> Array a -> Effect (Array Unit)
-
--- ═══════════════════════════════════════════════════════════════════════════
--- Layers
--- ═══════════════════════════════════════════════════════════════════════════
-
--- | Predefined layer levels for common use cases
+-- | Predefined layer levels — pure enum
+-- |
+-- | Each level maps to a z-index tier. Content at higher levels
+-- | renders above content at lower levels.
 data LayerLevel
-  = Dropdown    -- ^ z-index: 1000 - Dropdowns, select menus
+  = Base        -- ^ z-index: 0 - Normal document flow
+  | Dropdown    -- ^ z-index: 1000 - Dropdowns, select menus
   | Sticky      -- ^ z-index: 1100 - Sticky headers, fixed elements
-  | Popover     -- ^ z-index: 1200 - Popovers, tooltips
+  | Popover     -- ^ z-index: 1200 - Popovers, context menus
   | Modal       -- ^ z-index: 1300 - Modal dialogs
   | Toast       -- ^ z-index: 1400 - Toast notifications
-  | Tooltip     -- ^ z-index: 1500 - Tooltips (highest)
+  | Tooltip     -- ^ z-index: 1500 - Tooltips (highest standard)
+  | Overlay     -- ^ z-index: 1600 - Full-screen overlays
   | Custom Int  -- ^ Custom z-index value
 
 derive instance eqLayerLevel :: Eq LayerLevel
-derive instance ordLayerLevel :: Ord LayerLevel
 
--- | Get the z-index for a layer level
-layerLevelToZIndex :: LayerLevel -> Int
-layerLevelToZIndex = case _ of
+instance ordLayerLevel :: Ord LayerLevel where
+  compare a b = compare (layerZIndex a) (layerZIndex b)
+
+instance showLayerLevel :: Show LayerLevel where
+  show Base = "Base"
+  show Dropdown = "Dropdown"
+  show Sticky = "Sticky"
+  show Popover = "Popover"
+  show Modal = "Modal"
+  show Toast = "Toast"
+  show Tooltip = "Tooltip"
+  show Overlay = "Overlay"
+  show (Custom n) = "Custom " <> show n
+
+-- | Get the z-index for a layer level — pure function
+layerZIndex :: LayerLevel -> Int
+layerZIndex = case _ of
+  Base -> 0
   Dropdown -> 1000
   Sticky -> 1100
   Popover -> 1200
   Modal -> 1300
   Toast -> 1400
   Tooltip -> 1500
+  Overlay -> 1600
   Custom n -> n
 
--- | A layer within the portal system
-type Layer =
-  { id :: String
-  , element :: Element
-  , level :: LayerLevel
-  , mounted :: Ref (Map.Map String Node)
-  }
+-- | Compare two layer levels — pure function
+compareLayerLevel :: LayerLevel -> LayerLevel -> Ordering
+compareLayerLevel = compare
 
--- | Configuration for creating a layer
-type LayerConfig =
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // portal content
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Portal key for identity tracking
+type PortalKey = String
+
+-- | Portal configuration — pure data
+type PortalConfig =
   { level :: LayerLevel
+  , key :: PortalKey
   , className :: Maybe String
   , ariaLabel :: Maybe String
+  , ariaModal :: Boolean
   , trapFocus :: Boolean
+  , closeOnEscape :: Boolean
+  , closeOnBackdropClick :: Boolean
   }
 
--- | Default layer configuration
-defaultLayerConfig :: LayerConfig
-defaultLayerConfig =
+-- | Default portal configuration
+defaultPortalConfig :: PortalConfig
+defaultPortalConfig =
   { level: Modal
+  , key: ""
   , className: Nothing
   , ariaLabel: Nothing
+  , ariaModal: false
   , trapFocus: false
+  , closeOnEscape: false
+  , closeOnBackdropClick: false
   }
 
--- | Create a layer with default config
-createLayer :: PortalRoot -> LayerLevel -> Effect Layer
-createLayer root level = createLayerWithConfig root
-  { level
-  , className: Nothing
-  , ariaLabel: Nothing
-  , trapFocus: false
+-- | Add aria-label to config — pure function
+withAriaLabel :: String -> PortalConfig -> PortalConfig
+withAriaLabel label config = config { ariaLabel = Just label }
+
+-- | Add className to config — pure function
+withClassName :: String -> PortalConfig -> PortalConfig
+withClassName cls config = config { className = Just cls }
+
+-- | Enable focus trap — pure function
+withTrapFocus :: PortalConfig -> PortalConfig
+withTrapFocus config = config { trapFocus = true }
+
+-- | Portal content — pure data describing what to render in a portal
+-- |
+-- | The `msg` type parameter allows specifying callback messages.
+type PortalContent msg =
+  { config :: PortalConfig
+  , children :: Array msg    -- Placeholder for Element msg in real impl
+  , visible :: Boolean
   }
 
--- | Create a layer with custom configuration
-foreign import createLayerImpl
-  :: Element
-  -> String
-  -> Int
-  -> Maybe String
-  -> Maybe String
-  -> Boolean
-  -> Effect Element
+-- | Create portal content — pure function
+portalContent 
+  :: forall msg
+   . PortalConfig 
+  -> Array msg 
+  -> PortalContent msg
+portalContent config children =
+  { config
+  , children
+  , visible: true
+  }
 
-createLayerWithConfig :: PortalRoot -> LayerConfig -> Effect Layer
-createLayerWithConfig root config = do
-  n <- Ref.read root.counter
-  Ref.write (n + 1) root.counter
-  let id = "portal-layer-" <> show n
-  element <- createLayerImpl
-    root.element
-    id
-    (layerLevelToZIndex config.level)
-    config.className
-    config.ariaLabel
-    config.trapFocus
-  mounted <- Ref.new Map.empty
-  let layer = { id, element, level: config.level, mounted }
-  Ref.modify_ (Map.insert id layer) root.layers
-  pure layer
+-- | Empty portal (not rendered)
+emptyPortal :: forall msg. PortalContent msg
+emptyPortal =
+  { config: defaultPortalConfig
+  , children: []
+  , visible: false
+  }
 
--- | Destroy a layer and all its mounted content
-foreign import destroyLayerImpl :: Element -> Effect Unit
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // stacking context
+-- ═══════════════════════════════════════════════════════════════════════════════
 
-destroyLayer :: Layer -> Effect Unit
-destroyLayer layer = do
-  unmountAll layer
-  destroyLayerImpl layer.element
+-- | A layer in the stacking context — pure data
+type StackedLayer =
+  { key :: PortalKey
+  , level :: LayerLevel
+  , zIndex :: Int
+  , hasFocusTrap :: Boolean
+  , order :: Int          -- Order within same level
+  }
 
--- ═══════════════════════════════════════════════════════════════════════════
--- Mounting Content
--- ═══════════════════════════════════════════════════════════════════════════
-
--- | Mount a DOM node to a layer
-foreign import mountImpl :: Element -> Node -> Effect Unit
-
-mount :: Layer -> Node -> Effect String
-mount layer node = do
-  n <- Map.size <$> Ref.read layer.mounted
-  let key = "portal-content-" <> show n
-  mountWithKey layer key node
-  pure key
-
--- | Mount a DOM node with a specific key (for updates)
-mountWithKey :: Layer -> String -> Node -> Effect Unit
-mountWithKey layer key node = do
-  -- Unmount any existing content with this key
-  existing <- Map.lookup key <$> Ref.read layer.mounted
-  case existing of
-    Just existingNode -> unmountNodeImpl layer.element existingNode
-    Nothing -> pure unit
-  -- Mount new content
-  mountImpl layer.element node
-  Ref.modify_ (Map.insert key node) layer.mounted
-
--- | Unmount content by key
-foreign import unmountNodeImpl :: Element -> Node -> Effect Unit
-
-unmount :: Layer -> String -> Effect Unit
-unmount layer key = do
-  existing <- Map.lookup key <$> Ref.read layer.mounted
-  case existing of
-    Just node -> do
-      unmountNodeImpl layer.element node
-      Ref.modify_ (Map.delete key) layer.mounted
-    Nothing -> pure unit
-
--- | Unmount all content from a layer
-foreign import unmountAllImpl :: Element -> Effect Unit
-
-unmountAll :: Layer -> Effect Unit
-unmountAll layer = do
-  unmountAllImpl layer.element
-  Ref.write Map.empty layer.mounted
-
--- ═══════════════════════════════════════════════════════════════════════════
--- Stacking Context
--- ═══════════════════════════════════════════════════════════════════════════
-
--- | Represents the stacking context state
+-- | Stacking context — pure data representing all active layers
+-- |
+-- | This is computed from all active portals and passed through
+-- | the application state.
 type StackingContext =
-  { layers :: Array { id :: String, level :: LayerLevel, zIndex :: Int }
-  , topLayer :: Maybe String
+  { layers :: Array StackedLayer
+  , topLayerKey :: Maybe PortalKey
+  , nextOrder :: Int
   }
 
--- | Get the current stacking context
-getStackingContext :: PortalRoot -> Effect StackingContext
-getStackingContext root = do
-  layers <- Ref.read root.layers
-  let 
-    layerArray = Array.fromFoldable $ Map.values layers
-    layerList = map (\layer ->
-      { id: layer.id
-      , level: layer.level
-      , zIndex: layerLevelToZIndex layer.level
-      }) layerArray
-    sorted = sortByImpl _.zIndex layerList
-    topLayer = case lastImpl sorted of
-      Just l -> Just l.id
+-- | Empty stacking context
+emptyStackingContext :: StackingContext
+emptyStackingContext =
+  { layers: []
+  , topLayerKey: Nothing
+  , nextOrder: 0
+  }
+
+-- | Add a layer to the stacking context — pure function
+addLayer :: PortalConfig -> StackingContext -> StackingContext
+addLayer config ctx =
+  let
+    newLayer =
+      { key: config.key
+      , level: config.level
+      , zIndex: layerZIndex config.level
+      , hasFocusTrap: config.trapFocus
+      , order: ctx.nextOrder
+      }
+    newLayers = Array.snoc ctx.layers newLayer
+    sortedLayers = sortByZIndexAndOrder newLayers
+    topKey = case Array.last sortedLayers of
+      Just l -> Just l.key
       Nothing -> Nothing
-  pure { layers: sorted, topLayer }
+  in
+    ctx
+      { layers = sortedLayers
+      , topLayerKey = topKey
+      , nextOrder = ctx.nextOrder + 1
+      }
 
-foreign import sortByImpl :: forall a. (a -> Int) -> Array a -> Array a
-foreign import lastImpl :: forall a. Array a -> Maybe a
+-- | Remove a layer from the stacking context — pure function
+removeLayer :: PortalKey -> StackingContext -> StackingContext
+removeLayer key ctx =
+  let
+    newLayers = Array.filter (\l -> l.key /= key) ctx.layers
+    topKey = case Array.last newLayers of
+      Just l -> Just l.key
+      Nothing -> Nothing
+  in
+    ctx { layers = newLayers, topLayerKey = topKey }
 
--- | Bring a layer to the front (increase z-index temporarily)
-foreign import bringToFrontImpl :: Element -> Effect Unit
+-- | Get the top layer — pure function
+getTopLayer :: StackingContext -> Maybe StackedLayer
+getTopLayer ctx = Array.last ctx.layers
 
-bringToFront :: Layer -> Effect Unit
-bringToFront layer = bringToFrontImpl layer.element
+-- | Get all layers — pure function
+getAllLayers :: StackingContext -> Array StackedLayer
+getAllLayers = _.layers
 
--- | Send a layer to the back of its level
-foreign import sendToBackImpl :: Element -> Int -> Effect Unit
+-- | Check if a layer is the top layer — pure function
+isTopLayer :: PortalKey -> StackingContext -> Boolean
+isTopLayer key ctx = ctx.topLayerKey == Just key
 
-sendToBack :: Layer -> Effect Unit
-sendToBack layer = sendToBackImpl layer.element (layerLevelToZIndex layer.level)
+-- | Sort layers by z-index and order — pure function
+sortByZIndexAndOrder :: Array StackedLayer -> Array StackedLayer
+sortByZIndexAndOrder = Array.sortBy compareLayers
+  where
+  compareLayers a b =
+    case compare a.zIndex b.zIndex of
+      EQ -> compare a.order b.order
+      other -> other
 
--- | Get the current z-index of a layer
-foreign import getZIndexImpl :: Element -> Effect Int
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                 // focus state
+-- ═══════════════════════════════════════════════════════════════════════════════
 
-getZIndex :: Layer -> Effect Int
-getZIndex layer = getZIndexImpl layer.element
+-- | Focus trap — pure data describing a focus trap
+type FocusTrap =
+  { layerKey :: PortalKey
+  , previousFocusKey :: Maybe String   -- Element to restore focus to
+  }
 
--- ═══════════════════════════════════════════════════════════════════════════
--- Portal Component
--- ═══════════════════════════════════════════════════════════════════════════
+-- | Focus state — pure data tracking focus traps
+type FocusState =
+  { activeTraps :: Array FocusTrap
+  , focusedLayerKey :: Maybe PortalKey
+  }
 
--- | A simple portal wrapper for Halogen components
--- | Renders children into a portal layer
-portal
-  :: forall w i
-   . LayerLevel
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-portal level children =
-  HH.div
-    [ HP.attr (HH.AttrName "data-portal") "true"
-    , HP.attr (HH.AttrName "data-portal-level") (show $ layerLevelToZIndex level)
-    ]
-    children
+-- | Default focus state
+defaultFocusState :: FocusState
+defaultFocusState =
+  { activeTraps: []
+  , focusedLayerKey: Nothing
+  }
 
--- | Portal with explicit layer reference
-portalWithLayer
-  :: forall w i
-   . Layer
-  -> Array (HH.HTML w i)
-  -> HH.HTML w i
-portalWithLayer layer children =
-  HH.div
-    [ HP.attr (HH.AttrName "data-portal") "true"
-    , HP.attr (HH.AttrName "data-portal-layer") layer.id
-    ]
-    children
+-- | Create a focus trap — pure function
+createFocusTrap :: PortalKey -> Maybe String -> FocusState -> FocusState
+createFocusTrap layerKey previousFocus state =
+  let
+    trap = { layerKey, previousFocusKey: previousFocus }
+  in
+    state
+      { activeTraps = Array.snoc state.activeTraps trap
+      , focusedLayerKey = Just layerKey
+      }
 
--- ═══════════════════════════════════════════════════════════════════════════
--- Focus Management
--- ═══════════════════════════════════════════════════════════════════════════
+-- | Release a focus trap — pure function
+releaseFocusTrap :: PortalKey -> FocusState -> FocusState
+releaseFocusTrap key state =
+  let
+    newTraps = Array.filter (\t -> t.layerKey /= key) state.activeTraps
+    newFocusedKey = case Array.last newTraps of
+      Just t -> Just t.layerKey
+      Nothing -> Nothing
+  in
+    state { activeTraps = newTraps, focusedLayerKey = newFocusedKey }
 
--- | Trap focus within a layer (for modal dialogs)
-foreign import trapFocusImpl :: Element -> Effect (Effect Unit)
+-- | Get the currently focused layer key — pure function
+focusedLayerKey :: FocusState -> Maybe PortalKey
+focusedLayerKey = _.focusedLayerKey
 
-trapFocus :: Layer -> Effect (Effect Unit)
-trapFocus layer = trapFocusImpl layer.element
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // portal operations
+-- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Release focus trap
-foreign import releaseFocusImpl :: Element -> Effect Unit
+-- | Collect all visible portals — pure function
+collectPortals :: forall msg. Array (PortalContent msg) -> Array (PortalContent msg)
+collectPortals = Array.filter _.visible
 
-releaseFocus :: Layer -> Effect Unit
-releaseFocus layer = releaseFocusImpl layer.element
+-- | Merge multiple portal arrays — pure function
+mergePortals :: forall msg. Array (Array (PortalContent msg)) -> Array (PortalContent msg)
+mergePortals = foldl (<>) []
 
--- | Restore focus to previously focused element
-foreign import restoreFocusImpl :: Effect Unit
+-- | Sort portals by layer level — pure function
+sortByLevel :: forall msg. Array (PortalContent msg) -> Array (PortalContent msg)
+sortByLevel = Array.sortBy comparePortals
+  where
+  comparePortals a b = compare a.config.level b.config.level
 
-restoreFocus :: Effect Unit
-restoreFocus = restoreFocusImpl
-
--- ═══════════════════════════════════════════════════════════════════════════
--- Show Instance
--- ═══════════════════════════════════════════════════════════════════════════
-
-instance showLayerLevel :: Show LayerLevel where
-  show = case _ of
-    Dropdown -> "Dropdown"
-    Sticky -> "Sticky"
-    Popover -> "Popover"
-    Modal -> "Modal"
-    Toast -> "Toast"
-    Tooltip -> "Tooltip"
-    Custom n -> "Custom " <> show n
+-- | Filter portals by level — pure function
+filterByLevel :: forall msg. LayerLevel -> Array (PortalContent msg) -> Array (PortalContent msg)
+filterByLevel level = Array.filter (\p -> p.config.level == level)

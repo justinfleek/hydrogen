@@ -131,7 +131,7 @@ module Hydrogen.Media.FileBrowser
 import Prelude
 
 import Data.Array (foldl, length, null)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)
 import Halogen.HTML as HH
@@ -654,6 +654,13 @@ fileGrid props fileList =
     gridClasses = "file-grid grid gap-4"
     gridStyle = "grid-template-columns: repeat(auto-fill, minmax(" <> show props.thumbnailSize <> "px, 1fr))"
     
+    emptyState =
+      HH.div
+        [ cls [ "flex flex-col items-center justify-center py-16 text-muted-foreground" ] ]
+        [ HH.span [ cls [ "text-4xl mb-4" ] ] [ HH.text "E" ]
+        , HH.p [ cls [ "text-sm" ] ] [ HH.text "No files in this folder" ]
+        ]
+    
     renderGridItem :: FileEntry -> HH.HTML w i
     renderGridItem entry =
       let
@@ -694,12 +701,15 @@ fileGrid props fileList =
               [ HH.text entry.name ]
           ]
   in
-    HH.div
-      [ cls [ gridClasses ]
-      , HP.attr (HH.AttrName "style") gridStyle
-      , ARIA.role "grid"
-      ]
-      (map renderGridItem fileList)
+    if null fileList
+      then emptyState
+      else
+        HH.div
+          [ cls [ gridClasses ]
+          , HP.attr (HH.AttrName "style") gridStyle
+          , ARIA.role "grid"
+          ]
+          (map renderGridItem fileList)
 
 -- | File list view component
 -- |
@@ -708,6 +718,13 @@ fileListView :: forall w i. FileBrowserProps i -> Array FileEntry -> HH.HTML w i
 fileListView props fileList =
   let
     listClasses = "file-list-view"
+    
+    emptyState =
+      HH.div
+        [ cls [ "flex flex-col items-center justify-center py-16 text-muted-foreground" ] ]
+        [ HH.span [ cls [ "text-4xl mb-4" ] ] [ HH.text "E" ]
+        , HH.p [ cls [ "text-sm" ] ] [ HH.text "No files in this folder" ]
+        ]
     
     -- Header row
     headerRow =
@@ -760,11 +777,14 @@ fileListView props fileList =
               [ HH.text entry.modified ]
           ]
   in
-    HH.div
-      [ cls [ listClasses ]
-      , ARIA.role "table"
-      ]
-      ([ headerRow ] <> map renderListItem fileList)
+    if null fileList
+      then emptyState
+      else
+        HH.div
+          [ cls [ listClasses ]
+          , ARIA.role "table"
+          ]
+          ([ headerRow ] <> map renderListItem fileList)
 
 -- | Breadcrumbs component
 -- |

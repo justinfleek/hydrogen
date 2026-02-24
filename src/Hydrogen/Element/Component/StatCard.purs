@@ -52,9 +52,9 @@ module Hydrogen.Element.Component.StatCard
     -- * Types
   , StatCardConfig
   , StatTrend
-  , TrendDirection(..)
-  , Size(..)
-  , Variant(..)
+  , TrendDirection(Up, Down, Neutral)
+  , Size(Small, Medium, Large)
+  , Variant(Default, Filled, Outlined, Ghost)
     -- * Props
   , StatCardProps
   , StatCardProp

@@ -41,7 +41,7 @@ module Hydrogen.Schema.Reactive.DataState
 import Prelude
 
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing))
 import Hydrogen.Math.Core (pow)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

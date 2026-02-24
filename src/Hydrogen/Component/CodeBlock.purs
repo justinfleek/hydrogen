@@ -42,7 +42,7 @@ module Hydrogen.Component.CodeBlock
   , inlineCode
   , codeBlockWithHeader
     -- * Types
-  , Language(..)
+  , Language(PlainText, JavaScript, TypeScript, PureScript, Haskell, Python, Rust, Go, HTML, CSS, JSON, YAML, Markdown, Bash, SQL)
     -- * Props
   , CodeBlockProps
   , CodeBlockProp
@@ -60,13 +60,13 @@ module Hydrogen.Component.CodeBlock
   , className
   , onCopy
     -- * Theme
-  , Theme(..)
+  , Theme(Light, Dark, Auto)
   ) where
 
 import Prelude
 
 import Data.Array (foldl, mapWithIndex, elem)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

@@ -109,9 +109,9 @@ import Hydrogen.Schema.Graph.Layout
 
 import Hydrogen.Schema.Graph.Connection
   ( ConnectionStyle
-  , ConnectionRouting(..)
-  , TerminalStyle(..)
-  , StrokePattern(..)
+  , ConnectionRouting(RoutingStraight, RoutingCurved, RoutingOrthogonal, RoutingDiagonal, RoutingStep, RoutingBundle, RoutingArc, RoutingSpline)
+  , TerminalStyle(TerminalNone, TerminalArrow, TerminalArrowFilled, TerminalArrowOpen, TerminalDot, TerminalDotFilled, TerminalDiamond, TerminalSquare, TerminalBar)
+  , StrokePattern(StrokeSolid, StrokeDashed, StrokeDotted, StrokeDashDot, StrokeCustom)
   , defaultConnectionStyle
   ) as Schema
 

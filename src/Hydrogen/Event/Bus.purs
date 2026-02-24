@@ -81,7 +81,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.Time.Duration (Milliseconds(Milliseconds)) as Duration
 import Data.Traversable (traverse) as Traversable
 import Effect (Effect)
-import Effect.Aff (Aff, Milliseconds(..), delay)
+import Effect.Aff (Aff, Milliseconds(Milliseconds), delay)
 import Effect.Class (liftEffect)
 import Effect.Now (now) as Now
 import Effect.Ref (Ref)

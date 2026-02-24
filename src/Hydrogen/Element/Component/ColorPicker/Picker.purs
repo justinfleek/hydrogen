@@ -51,7 +51,7 @@ module Hydrogen.Element.Component.ColorPicker.Picker
   , rgbaToHsl
   
   -- * Messages
-  , PickerMsg(..)
+  , PickerMsg(SetColor, SetHue, SetSaturation, SetLightness, SetOpacity, SetTab, SetCursor, ToggleMagnifier, SelectSwatch, SelectHarmony, CopyValue, ActivateEyedropper)
   
   -- * Prop Builders
   , initialColor
@@ -70,7 +70,7 @@ module Hydrogen.Element.Component.ColorPicker.Picker
   , onMsg
   
   -- * Tabs
-  , PickerTab(..)
+  , PickerTab(TabWheel, TabSliders, TabSwatches, TabHarmony)
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════

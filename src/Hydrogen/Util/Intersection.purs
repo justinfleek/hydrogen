@@ -54,7 +54,7 @@ module Hydrogen.Util.Intersection
 
 import Prelude hiding (when)
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Web.DOM.Element (Element)
 

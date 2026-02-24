@@ -29,10 +29,14 @@ module Hydrogen.Element.Component.OTPInput.Digit
   -- * Style Computation
   , getDigitBorderColor
   , getDigitBackgroundColor
+  , getDigitBackgroundStyle
   , getDigitTextColor
   , getDefaultBorderColor
   , getDefaultTextColor
   , getFocusRingStyle
+  , getDigitShadow
+  , getDigitTransform
+  , getTransitionStyle
   
   -- * State Helpers
   , isDigitFocused
@@ -45,6 +49,7 @@ import Prelude
   , (==)
   , (<>)
   , (+)
+  , not
   )
 
 import Data.Maybe (Maybe(Nothing, Just))
@@ -52,8 +57,14 @@ import Data.String.CodeUnits as SCU
 
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as Color
+import Hydrogen.Schema.Color.Gradient as Gradient
 import Hydrogen.Schema.Geometry.Radius as Geometry
+import Hydrogen.Schema.Geometry.Transform as Transform
+import Hydrogen.Schema.Elevation.Shadow as Shadow
+import Hydrogen.Schema.Motion.Easing as Easing
 import Hydrogen.Schema.Typography.FontSize as FontSize
+import Hydrogen.Schema.Typography.FontWeight as FontWeight
+import Hydrogen.Schema.Typography.FontFamily as FontFamily
 
 import Hydrogen.Element.Component.OTPInput.Types
   ( OTPDigit(OTPDigit)
@@ -75,6 +86,11 @@ import Hydrogen.Element.Component.OTPInput.Validation
   , getAutoComplete
   )
 
+import Hydrogen.Element.Component.OTPInput.Animation
+  ( computeDigitAnimationState
+  , getAnimationDataAttrs
+  )
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // digit rendering
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -88,7 +104,7 @@ renderDigit props idx =
     digit = getDigitAt boundedIndex props.value
     isFocused = isDigitFocused props boundedIndex
     hasFill = isDigitFilled digit
-    displayValue = getDigitDisplayValue props.masked digit
+    displayValue = getDigitDisplayValue props.masked props.placeholderChar digit
   in
     renderDigitInput props boundedIndex digit isFocused hasFill displayValue
 
@@ -102,10 +118,31 @@ renderDigitInput
   -> Boolean 
   -> String 
   -> E.Element msg
-renderDigitInput props idx _digit isFocused hasFill displayValue =
+renderDigitInput props idx digit isFocused hasFill displayValue =
   let
     idxInt = unwrapOTPIndex idx
     totalDigits = unwrapDigitCount props.digitCount
+    
+    -- Compute animation state and get pure animation data
+    animState = computeDigitAnimationState props.state digit hasFill
+    animationDataAttrs = getAnimationDataAttrs props animState
+    
+    -- Event handlers - only attach if provided
+    inputHandler = case props.onDigitInput of
+      Nothing -> []
+      Just handler -> [ E.onInput (\value -> handler idx (getFirstChar value)) ]
+    
+    keyDownHandler = case props.onDigitKeyDown of
+      Nothing -> []
+      Just handler -> [ E.onKeyDown (\key -> handler idx key) ]
+    
+    focusHandler = case props.onDigitFocus of
+      Nothing -> []
+      Just handler -> [ E.onFocus (handler idx) ]
+    
+    blurHandler = case props.onDigitBlur of
+      Nothing -> []
+      Just handler -> [ E.onBlur (handler idx) ]
   in
     E.input_
       ( [ -- Core attributes
@@ -128,19 +165,27 @@ renderDigitInput props idx _digit isFocused hasFill displayValue =
         , E.style "text-align" "center"
         , E.style "font-size" (getFontSize props)
         , E.style "font-weight" (getFontWeight props)
-        , E.style "font-family" "inherit"
+        , E.style "font-family" (getFontFamily props)
+        , E.style "letter-spacing" (getLetterSpacing props)
         , E.style "border-style" "solid"
         , E.style "border-width" (getBorderWidth props)
         , E.style "border-radius" (getBorderRadius props)
         , E.style "outline" "none"
-        , E.style "transition" "border-color 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out"
+        , E.style "transition" (getTransitionStyle props)
         , E.style "caret-color" "transparent"
         
         -- Computed styles based on state
         , E.style "border-color" (getDigitBorderColor props hasFill isFocused)
-        , E.style "background-color" (getDigitBackgroundColor props)
-        , E.style "color" (getDigitTextColor props)
+        , E.style "background" (getDigitBackgroundStyle props isFocused)
+        , E.style "color" (getDigitTextColor props hasFill)
+        , E.style "box-shadow" (getDigitShadow props isFocused false)
+        , E.style "transform" (getDigitTransform props isFocused false false)
         ]
+        <> inputHandler
+        <> keyDownHandler
+        <> focusHandler
+        <> blurHandler
+        <> animationDataAttrs
         <> getFocusRingStyle props isFocused
         <> getDisabledStyles props
       )
@@ -197,24 +242,30 @@ getDigitBackgroundColor props =
 
 -- | Get digit text color
 -- |
+-- | If hasFill is false and placeholderChar is set, uses placeholderColor.
 -- | All OTPState variants handled explicitly for exhaustiveness.
-getDigitTextColor :: forall msg. OTPInputProps msg -> String
-getDigitTextColor props =
-  case props.state of
-    Error ->
-      case props.errorTextColor of
-        Just c -> Color.toLegacyCss c
-        Nothing -> getDefaultTextColor props
-    Success ->
-      case props.successTextColor of
-        Just c -> Color.toLegacyCss c
-        Nothing -> getDefaultTextColor props
-    Verifying ->
-      getDefaultTextColor props
-    Idle ->
-      getDefaultTextColor props
-    Entering ->
-      getDefaultTextColor props
+getDigitTextColor :: forall msg. OTPInputProps msg -> Boolean -> String
+getDigitTextColor props hasFill =
+  -- If showing placeholder (no fill), use placeholder color
+  if not hasFill
+    then case props.placeholderColor of
+      Just c -> Color.toLegacyCss c
+      Nothing -> getDefaultTextColor props
+    else case props.state of
+      Error ->
+        case props.errorTextColor of
+          Just c -> Color.toLegacyCss c
+          Nothing -> getDefaultTextColor props
+      Success ->
+        case props.successTextColor of
+          Just c -> Color.toLegacyCss c
+          Nothing -> getDefaultTextColor props
+      Verifying ->
+        getDefaultTextColor props
+      Idle ->
+        getDefaultTextColor props
+      Entering ->
+        getDefaultTextColor props
 
 -- | Get default text color
 getDefaultTextColor :: forall msg. OTPInputProps msg -> String
@@ -250,13 +301,23 @@ isDigitFilled :: OTPDigit -> Boolean
 isDigitFilled (OTPDigit Nothing) = false
 isDigitFilled (OTPDigit (Just _)) = true
 
--- | Get display value for a digit (handles masking)
-getDigitDisplayValue :: Boolean -> OTPDigit -> String
-getDigitDisplayValue _ (OTPDigit Nothing) = ""
-getDigitDisplayValue masked (OTPDigit (Just c)) =
+-- | Get display value for a digit (handles masking and placeholder)
+getDigitDisplayValue :: Boolean -> Maybe Char -> OTPDigit -> String
+getDigitDisplayValue _ placeholder (OTPDigit Nothing) = 
+  case placeholder of
+    Nothing -> ""
+    Just p -> SCU.singleton p
+getDigitDisplayValue masked _ (OTPDigit (Just c)) =
   if masked
     then "•"
     else SCU.singleton c
+
+-- | Get first character from input value string
+getFirstChar :: String -> Char
+getFirstChar str =
+  case SCU.uncons str of
+    Nothing -> ' '
+    Just { head } -> head
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // dimension helpers
@@ -283,12 +344,26 @@ getFontSize props =
     Just s -> FontSize.toLegacyCss s
     Nothing -> "20px"
 
--- | Get font weight CSS value
+-- | Get font weight CSS value (using Schema.Typography.FontWeight)
 getFontWeight :: forall msg. OTPInputProps msg -> String
 getFontWeight props =
   case props.fontWeight of
-    Just w -> show w
+    Just w -> FontWeight.toLegacyCss w
     Nothing -> "600"
+
+-- | Get font family CSS value
+getFontFamily :: forall msg. OTPInputProps msg -> String
+getFontFamily props =
+  case props.fontFamily of
+    Just f -> FontFamily.toLegacyCss f
+    Nothing -> "inherit"
+
+-- | Get letter spacing CSS value
+getLetterSpacing :: forall msg. OTPInputProps msg -> String
+getLetterSpacing props =
+  case props.letterSpacing of
+    Just s -> show s
+    Nothing -> "normal"
 
 -- | Get border width CSS value
 getBorderWidth :: forall msg. OTPInputProps msg -> String
@@ -312,4 +387,100 @@ getDisabledStyles props =
       [ E.style "opacity" "0.5"
       , E.style "cursor" "not-allowed"
       ]
-    else []
+    else [ E.style "cursor" props.cursorStyle ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // advanced rendering
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Get digit background style (solid color or gradient)
+-- |
+-- | Gradient takes precedence over solid color when both are provided.
+getDigitBackgroundStyle :: forall msg. OTPInputProps msg -> Boolean -> String
+getDigitBackgroundStyle props isFocused =
+  -- Check for focus gradient first
+  if isFocused
+    then case props.focusBackgroundGradient of
+           Just g -> Gradient.toLegacyCss g
+           Nothing -> case props.focusBackgroundColor of
+                        Just c -> Color.toLegacyCss c
+                        Nothing -> getBackgroundFallback props
+    else getBackgroundFallback props
+  where
+    getBackgroundFallback p = case p.backgroundGradient of
+      Just g -> Gradient.toLegacyCss g
+      Nothing -> getDigitBackgroundColor p
+
+-- | Get digit shadow based on state
+-- |
+-- | All OTPState variants handled explicitly for exhaustiveness.
+getDigitShadow :: forall msg. OTPInputProps msg -> Boolean -> Boolean -> String
+getDigitShadow props isFocused isHovered =
+  if isFocused
+    then case props.focusShadow of
+           Just s -> Shadow.layeredToLegacyCss s
+           Nothing -> case props.shadow of
+                        Just s -> Shadow.layeredToLegacyCss s
+                        Nothing -> "none"
+    else case props.state of
+      Error ->
+        case props.errorShadow of
+          Just s -> Shadow.layeredToLegacyCss s
+          Nothing -> "none"
+      Success ->
+        case props.successShadow of
+          Just s -> Shadow.layeredToLegacyCss s
+          Nothing -> "none"
+      Verifying ->
+        getDefaultShadow props isHovered
+      Idle ->
+        getDefaultShadow props isHovered
+      Entering ->
+        getDefaultShadow props isHovered
+  where
+    getDefaultShadow p hovered =
+      if hovered
+        then case p.hoverShadow of
+               Just s -> Shadow.layeredToLegacyCss s
+               Nothing -> case p.shadow of
+                            Just s -> Shadow.layeredToLegacyCss s
+                            Nothing -> "none"
+        else case p.shadow of
+               Just s -> Shadow.layeredToLegacyCss s
+               Nothing -> "none"
+
+-- | Get digit transform based on state
+-- |
+-- | All OTPState variants handled explicitly for exhaustiveness.
+getDigitTransform :: forall msg. OTPInputProps msg -> Boolean -> Boolean -> Boolean -> String
+getDigitTransform props isFocused isHovered isPressed =
+  if isPressed
+    then case props.pressScale of
+           Just s -> Transform.scaleToLegacyCss s
+           Nothing -> "scale(0.98)"
+    else if isFocused
+      then case props.focusScale of
+             Just s -> Transform.scaleToLegacyCss s
+             Nothing -> "scale(1)"
+      else if isHovered
+        then case props.hoverScale of
+               Just s -> Transform.scaleToLegacyCss s
+               Nothing -> "scale(1)"
+        else "scale(1)"
+
+-- | Get transition style using Schema temporal/easing atoms
+getTransitionStyle :: forall msg. OTPInputProps msg -> String
+getTransitionStyle props =
+  let
+    duration = show props.transitionDuration
+    easing = Easing.toLegacyCssString props.transitionEasing
+    transitionValue = 
+      "border-color " <> duration <> " " <> easing <>
+      ", background-color " <> duration <> " " <> easing <>
+      ", box-shadow " <> duration <> " " <> easing <>
+      ", transform " <> duration <> " " <> easing <>
+      ", background " <> duration <> " " <> easing
+  in
+    transitionValue
+
+

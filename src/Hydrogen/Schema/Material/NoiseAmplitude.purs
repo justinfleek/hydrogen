@@ -47,7 +47,7 @@ derive instance eqNoiseAmplitude :: Eq NoiseAmplitude
 derive instance ordNoiseAmplitude :: Ord NoiseAmplitude
 
 instance showNoiseAmplitude :: Show NoiseAmplitude where
-  show (NoiseAmplitude a) = show a
+  show (NoiseAmplitude a) = "NoiseAmplitude " <> show a
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors
