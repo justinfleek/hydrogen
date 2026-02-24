@@ -24,6 +24,8 @@ module Hydrogen.Schema.Reactive
   , module Hydrogen.Schema.Reactive.ScrollState
   , module Hydrogen.Schema.Reactive.Feedback
   , module Hydrogen.Schema.Reactive.ButtonSemantics
+  , module Hydrogen.Schema.Reactive.Viewport
+  , module Hydrogen.Schema.Reactive.ContainerQuery
   ) where
 
 import Hydrogen.Schema.Reactive.Flags
@@ -40,3 +42,5 @@ import Hydrogen.Schema.Reactive.DragState
 import Hydrogen.Schema.Reactive.ScrollState
 import Hydrogen.Schema.Reactive.Feedback
 import Hydrogen.Schema.Reactive.ButtonSemantics
+import Hydrogen.Schema.Reactive.Viewport
+import Hydrogen.Schema.Reactive.ContainerQuery
