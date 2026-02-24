@@ -60,7 +60,7 @@ module Hydrogen.Element.Component.Sheet
   , className
   , onClose
     -- * Types
-  , Side(..)
+  , Side(SheetTop, SheetRight, SheetBottom, SheetLeft)
   ) where
 
 import Prelude

@@ -98,7 +98,6 @@ import Prelude
   , class Ord
   , class Show
   , show
-  , otherwise
   , (==)
   , (<)
   , (>)
@@ -314,7 +313,7 @@ miterLimit :: Number -> MiterLimit
 miterLimit n
   | n < 1.0 = MiterLimit 1.0
   | n > 100.0 = MiterLimit 100.0
-  | otherwise = MiterLimit n
+  | true = MiterLimit n
 
 -- | Default miter limit (4.0, CSS/SVG default)
 -- | Converts to bevel at angles below ~29 degrees

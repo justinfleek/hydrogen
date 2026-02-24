@@ -26,7 +26,7 @@
 -- | ```
 module Hydrogen.Form.Validation
   ( -- * Validation Result
-    ValidationResult(..)
+    ValidationResult(Valid, Invalid)
   , isValid
   , isInvalid
   , getErrors
@@ -59,9 +59,9 @@ module Hydrogen.Form.Validation
 import Prelude hiding (min, max, when)
 
 import Data.Array as Array
-import Data.Either (Either(..))
+import Data.Either (Either(Left, Right))
 import Data.Int as Int
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Number as Number
 import Data.String as String
 import Data.String.Regex as Regex

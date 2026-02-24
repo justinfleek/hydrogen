@@ -102,7 +102,7 @@ module Hydrogen.Element.Component.ColorPicker
   , onModeToggle
   
   -- * Types
-  , ColorMode(..)
+  , ColorMode(ModeHSL, ModeRGB, ModeHWB, ModeOKLAB, ModeOKLCH)
   , modeName
   ) where
 

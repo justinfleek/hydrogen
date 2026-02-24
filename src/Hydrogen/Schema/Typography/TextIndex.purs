@@ -102,7 +102,7 @@ import Prelude
   , (<>)
   )
 
-import Data.Maybe (Maybe(Just, Nothing))
+import Data.Maybe (Maybe)
 
 import Hydrogen.Schema.Bounded as Bounded
 

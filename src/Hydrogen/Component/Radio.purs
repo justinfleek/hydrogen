@@ -52,8 +52,8 @@ module Hydrogen.Component.Radio
   , radio
   , radioWithLabel
     -- * Types
-  , Orientation(..)
-  , RadioVariant(..)
+  , Orientation(Horizontal, Vertical)
+  , RadioVariant(Default, Primary, Accent)
     -- * Props
   , RadioGroupProps
   , RadioGroupProp
@@ -77,7 +77,7 @@ module Hydrogen.Component.Radio
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

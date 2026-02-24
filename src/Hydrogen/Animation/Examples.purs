@@ -15,16 +15,16 @@ import Data.Array (mapWithIndex, replicate)
 
 import Hydrogen.Animation.Algebra
   ( Animation
-  , AnimationPath(..)
-  , BezierCurve(..)
-  , Duration(..)
-  , Easing(..)
+  , AnimationPath(AnimationPath)
+  , BezierCurve(BezierCurve)
+  , Duration(Duration)
+  , Easing(Linear, EaseIn, EaseOut, EaseInOut, EaseOutCubic, EaseInOutCubic, EaseOutBack, Spring, CubicBezier)
   , Opacity
-  , PathSegment(..)
+  , PathSegment(MoveTo, LineTo, QuadraticTo, CubicTo, ArcTo, ClosePath)
   , Progress
-  , SpringConfig(..)
-  , StaggerDirection(..)
-  , StaggerPattern(..)
+  , SpringConfig(SpringConfig)
+  , StaggerDirection(LeftToRight, RightToLeft, CenterOut, EdgesIn)
+  , StaggerPattern(LinearStagger, RandomStagger)
   , Transform2D
   , Transform3D
   , applyStagger

@@ -56,7 +56,7 @@ module Hydrogen.Schema.Reactive.NetworkState
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // connection status

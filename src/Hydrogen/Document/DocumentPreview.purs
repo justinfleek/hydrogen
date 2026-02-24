@@ -78,8 +78,8 @@ module Hydrogen.Document.DocumentPreview
   , onDownload
   , onOpenInNew
     -- * Types
-  , FileType(..)
-  , PreviewState(..)
+  , FileType(Image, Video, Audio, PDF, Text, Code, Markdown, Office, Archive, Unknown)
+  , PreviewState(Loading, Loaded, Error)
   , FileInfo
     -- * Detection
   , detectFileType
@@ -94,8 +94,8 @@ module Hydrogen.Document.DocumentPreview
 import Prelude
 
 import Data.Array (elem, foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String (Pattern(..), split, toLower)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
+import Data.String (Pattern(Pattern), split, toLower)
 import Data.String as String
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)

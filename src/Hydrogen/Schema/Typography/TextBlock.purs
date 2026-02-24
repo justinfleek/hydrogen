@@ -81,7 +81,6 @@ import Prelude
   , (-)
   , (*)
   , (<>)
-  , (==)
   , bind
   )
 
@@ -101,7 +100,6 @@ import Hydrogen.Schema.Typography.GlyphGeometry (GlyphPath, GlyphBounds, emptyBo
 import Hydrogen.Schema.Typography.TextIndex
   ( WordIndex(WordIndex)
   , LineIndex(LineIndex)
-  , CharacterIndex
   , TextAddress
   , unwrapWordIndex
   , unwrapLineIndex

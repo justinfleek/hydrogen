@@ -43,7 +43,7 @@ module Hydrogen.Realtime.SSE
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

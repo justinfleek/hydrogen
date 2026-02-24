@@ -63,7 +63,7 @@ module Hydrogen.Interaction.DragDrop
   , showGhost
   , ghostOpacity
   , axis
-  , Axis(..)
+  , Axis(AxisNone, AxisX, AxisY)
   , bounds
   , Bounds
   , handleSelector
@@ -111,7 +111,7 @@ module Hydrogen.Interaction.DragDrop
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Foreign (Foreign)
 import Halogen.HTML as HH

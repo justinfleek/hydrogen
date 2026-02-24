@@ -102,7 +102,7 @@ import Prelude
 
 import Data.Array (last, length)
 import Data.Int (floor)
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // playback status

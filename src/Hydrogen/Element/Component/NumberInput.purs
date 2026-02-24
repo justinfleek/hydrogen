@@ -70,7 +70,7 @@ module Hydrogen.Element.Component.NumberInput
   , onIncrement
   , onDecrement
     -- * Types
-  , ButtonPosition(..)
+  , ButtonPosition(Sides, Stacked, NoButtons)
   ) where
 
 import Prelude

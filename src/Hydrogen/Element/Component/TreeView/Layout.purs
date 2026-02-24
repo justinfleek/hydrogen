@@ -139,8 +139,8 @@ import Hydrogen.Element.Component.TreeView.State
 
 import Hydrogen.Schema.Graph.Layout
   ( LayoutConfig
-  , LayoutAlgorithm(..)
-  , NodeSizing(..)
+  , LayoutAlgorithm(IndentedList, Outline, Radial, Sunburst, CirclePack, Treemap, Icicle, Partition, Tidy, Cluster, Dendrogram, OrgChart, MindMap, Force, HierarchicalForce)
+  , NodeSizing(FixedSize, FitContent, Proportional, AspectRatio)
   , NodePosition
   , siblingGap
   , levelGap
@@ -150,7 +150,7 @@ import Hydrogen.Schema.Graph.Layout
   , innerRadius
   , outerRadius
   , TreemapParams
-  , TreemapAlgorithm(..)
+  , TreemapAlgorithm(Squarify, Binary, Slice, Dice, SliceDice)
   , nodePosition
   ) as Schema
 

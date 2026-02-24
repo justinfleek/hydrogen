@@ -151,6 +151,18 @@ import Hydrogen.Element.Component.OTPInput.Props
   , shakeDurationProp
   , pulseDurationProp
   , entryDurationProp
+  -- New props
+  , separatorEnabledProp
+  , separatorPositionsProp
+  , separatorCharProp
+  , separatorColorProp
+  , labelColorProp
+  , autoAdvanceProp
+  , reducedMotionProp
+  , transitionDurationProp
+  , transitionEasingProp
+  , staggerDelayProp
+  , cursorStyleProp
   ) as Props
 
 import Hydrogen.Element.Component.OTPInput.Validation
@@ -173,29 +185,40 @@ import Hydrogen.Element.Component.OTPInput.Digit
   , renderDigitInput
   , getDigitBorderColor
   , getDigitBackgroundColor
+  , getDigitBackgroundStyle
   , getDigitTextColor
   , getDefaultBorderColor
   , getDefaultTextColor
   , getFocusRingStyle
+  , getDigitShadow
+  , getDigitTransform
+  , getTransitionStyle
   , isDigitFocused
   , isDigitFilled
   , getDigitDisplayValue
   ) as Digit
 
 import Hydrogen.Element.Component.OTPInput.Animation
-  ( getAnimationStyles
-  , getShakeAnimation
-  , getPulseAnimation
-  , getEntryAnimation
-  , getLoadingAnimation
+  ( OTPAnimation(OTPAnimation)
+  , OTPAnimationProperty(TranslateX, TranslateY, Scale, ScaleX, ScaleY, Opacity, Rotate)
+  , OTPKeyframe(OTPKeyframe)
+  , OTPIterationCount(Once, Times, Infinite)
+  , OTPFillMode(FillNone, FillForwards, FillBackwards, FillBoth)
+  , shakeAnimation
+  , pulseAnimation
+  , entryAnimation
+  , loadingAnimation
+  , getAnimation
+  , getAnimationData
+  , getAnimationDataAttrs
   , computeDigitAnimationState
   , shouldAnimate
-  , shakeKeyframes
-  , pulseKeyframes
-  , entryKeyframes
-  , loadingKeyframes
-  , getEasing
-  , formatDuration
+  , animationProperty
+  , animationKeyframes
+  , animationDuration
+  , animationEasing
+  , animationIterations
+  , animationFillMode
   ) as Animation
 
 import Hydrogen.Element.Component.OTPInput.Accessibility
@@ -211,15 +234,33 @@ import Hydrogen.Element.Component.OTPInput.Accessibility
   , getErrorMessageId
   , getDigitId
   , getGroupId
+  -- New exports
+  , getReducedMotionAttrs
+  , getMotionSafeStyles
+  , getKeyboardHintText
+  , getNavigationInstructions
+  , getFocusTrapAttrs
+  , getTimerA11yAttrs
+  , getExpirationAnnouncementText
+  , getAutoAdvanceHintText
+  , getAutoAdvanceAttrs
+  , getScreenReaderInstructions
+  , getHelpTextId
+  , getSuccessMessageId
   ) as Accessibility
 
 import Hydrogen.Element.Component.OTPInput.Render
   ( otpInput
   , otpInputWithResend
   , renderDigitsRow
+  , renderDigitsWithSeparator
+  , renderSeparator
+  , renderLabel
+  , renderHelpText
   , renderErrorMessage
+  , renderSuccessMessage
   , renderResendSection
   , renderLiveRegion
-  , renderAnimationStyles
+  , renderScreenReaderHint
   , generateInstanceId
   ) as Render

@@ -79,7 +79,7 @@ module Hydrogen.Element.Component.TreeView.Animation
   , withEasing
   
   -- * Easing Functions
-  , Easing(..)
+  , Easing(Linear, EaseIn, EaseOut, EaseInOut, EaseSpring, EaseBounce, EaseElastic)
   , easeLinear
   , easeInOut
   , easeOut

@@ -66,8 +66,8 @@ module Hydrogen.Component.Rating
   , className
   , onChange
     -- * Types
-  , RatingIcon(..)
-  , RatingSize(..)
+  , RatingIcon(Star, Heart, Emoji, Custom)
+  , RatingSize(Small, Medium, Large)
   ) where
 
 import Prelude
@@ -75,7 +75,7 @@ import Prelude
 import Data.Array (foldl, range)
 import Data.Functor (map)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

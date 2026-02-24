@@ -130,8 +130,6 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
-  , class Semiring
-  , class Ring
   , show
   , (+)
   , (-)
@@ -142,12 +140,9 @@ import Prelude
   , (>)
   , (<)
   , negate
-  , map
   )
 
 import Data.Array (length) as Array
-import Data.Int (toNumber) as Int
-import Data.Newtype (class Newtype)
 
 import Hydrogen.Schema.Dimension.Device (Pixel(Pixel))
 import Hydrogen.Schema.Geometry.Radius (Corners) as Radius

@@ -101,9 +101,9 @@ module Hydrogen.Primitive.Command
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
-import Data.String.Pattern (Pattern(..))
+import Data.String.Pattern (Pattern(Pattern))
 import Effect (Effect)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

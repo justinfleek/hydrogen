@@ -73,7 +73,7 @@ module Hydrogen.Component.Textarea
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.String (length) as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

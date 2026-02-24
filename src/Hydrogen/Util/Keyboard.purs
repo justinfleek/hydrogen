@@ -74,9 +74,9 @@ module Hydrogen.Util.Keyboard
 import Prelude hiding (when)
 
 import Data.Array (filter, elem)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
-import Data.String.Pattern (Pattern(..))
+import Data.String.Pattern (Pattern(Pattern))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

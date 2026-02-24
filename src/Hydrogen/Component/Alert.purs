@@ -36,7 +36,7 @@ module Hydrogen.Component.Alert
   , variant
   , className
     -- * Variants
-  , AlertVariant(..)
+  , AlertVariant(Default, Destructive, Success, Warning)
   ) where
 
 import Prelude

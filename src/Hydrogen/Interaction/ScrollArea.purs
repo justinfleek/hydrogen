@@ -41,7 +41,7 @@ module Hydrogen.Interaction.ScrollArea
   , scrollShadows
     -- * Types
   , ScrollAreaState
-  , ScrollbarOrientation(..)
+  , ScrollbarOrientation(Vertical, Horizontal)
     -- * Props
   , ScrollAreaProps
   , ScrollAreaProp
@@ -79,7 +79,7 @@ module Hydrogen.Interaction.ScrollArea
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

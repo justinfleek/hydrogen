@@ -116,7 +116,7 @@ module Hydrogen.ThreeD.Canvas3D
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Foreign (Foreign)
 import Halogen.HTML as HH

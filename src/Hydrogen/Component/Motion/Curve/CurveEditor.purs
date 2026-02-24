@@ -50,9 +50,9 @@ module Hydrogen.Component.Motion.Curve.CurveEditor
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetEasing, GetEasing, SetDimensions)
   , Input
-  , Output(..)
+  , Output(EasingChanged, EasingChanging, EditStart, EditEnd)
   , Slot
   
   -- * Slot Type

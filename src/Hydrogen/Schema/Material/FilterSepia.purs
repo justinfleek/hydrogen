@@ -46,7 +46,7 @@ derive instance eqFilterSepia :: Eq FilterSepia
 derive instance ordFilterSepia :: Ord FilterSepia
 
 instance showFilterSepia :: Show FilterSepia where
-  show (FilterSepia s) = show s
+  show (FilterSepia s) = "FilterSepia " <> show s
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

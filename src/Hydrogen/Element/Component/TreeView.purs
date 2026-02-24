@@ -472,7 +472,7 @@ import Hydrogen.Element.Component.TreeView.Viewport
   , shouldShowLabel
   , shouldShowIcon
   , simplifiedNode
-  , ViewportEvent(..)
+  , ViewportEvent(Pan, Zoom, ZoomToLevel, FitAll, CenterOn, ResetView)
   , handleViewportEvent
   ) as Viewport
 
@@ -514,7 +514,7 @@ import Hydrogen.Element.Component.TreeView.Animation
   , noAnimations
   , withDuration
   , withEasing
-  , Easing(..)
+  , Easing(Linear, EaseIn, EaseOut, EaseInOut, EaseSpring, EaseBounce, EaseElastic)
   , easeLinear
   , easeInOut
   , easeOut
@@ -551,7 +551,7 @@ import Hydrogen.Element.Component.TreeView.Accessibility
   , politeRegion
   , assertiveRegion
   , liveRegionAttrs
-  , Direction(..)
+  , Direction(LTR, RTL, Auto)
   , isRTL
   , flipNavigationKey
   , directionAttr

@@ -19,26 +19,26 @@ module Hydrogen.Animation.Laws
 
 import Hydrogen.Animation.Algebra 
   ( -- Time primitives
-    Duration(..)
+    Duration(Duration)
   , Milliseconds
-  , Progress(..)
+  , Progress(Progress)
   , normalizeProgress
   
   -- Easing
-  , Easing(..)
+  , Easing(Linear, EaseIn, EaseOut, EaseInOut, EaseInQuad, EaseOutQuad, EaseInOutQuad, EaseInCubic, EaseOutCubic, EaseInOutCubic, EaseInQuart, EaseOutQuart, EaseInOutQuart, EaseInQuint, EaseOutQuint, EaseInOutQuint, EaseInExpo, EaseOutExpo, EaseInOutExpo, EaseInCirc, EaseOutCirc, EaseInOutCirc, EaseInBack, EaseOutBack, EaseInOutBack, EaseInElastic, EaseOutElastic, EaseInOutElastic, EaseInBounce, EaseOutBounce, EaseInOutBounce, Spring, CubicBezier, Steps, Custom)
   , EasingFunction
   , applyEasing
-  , SpringConfig(..)
-  , BezierCurve(..)
+  , SpringConfig(SpringConfig)
+  , BezierCurve(BezierCurve)
   
   -- Transforms
-  , Transform2D(..)
-  , Transform3D(..)
-  , TransformOrigin(..)
-  , Opacity(..)
+  , Transform2D(Transform2D)
+  , Transform3D(Transform3D)
+  , TransformOrigin(TransformOrigin)
+  , Opacity(Opacity)
   
   -- Core animation type
-  , Animation(..)
+  , Animation(Animation)
   , AnimationF
   , runAnimation
   , duration
@@ -54,8 +54,8 @@ import Hydrogen.Animation.Algebra
   , repeat
   
   -- Stagger patterns
-  , StaggerPattern(..)
-  , StaggerDirection(..)
+  , StaggerPattern(LinearStagger, RandomStagger, CustomStagger)
+  , StaggerDirection(LeftToRight, RightToLeft, CenterOut, EdgesIn)
   , applyStagger
   
   -- Transform animations
@@ -72,14 +72,14 @@ import Hydrogen.Animation.Algebra
   
   -- Path animations
   , Point2D
-  , PathSegment(..)
-  , AnimationPath(..)
+  , PathSegment(MoveTo, LineTo, QuadraticTo, CubicTo, ArcTo, ClosePath)
+  , AnimationPath(AnimationPath)
   , followPath
   , morphPath
   
   -- Character/Word targeting
-  , AnimationTarget(..)
-  , TargetSelector(..)
+  , AnimationTarget(TargetCharacter, TargetWord, TargetLine, TargetRange, TargetAll)
+  , TargetSelector(SelectAll, SelectOdd, SelectEven, SelectEvery, SelectRange, SelectIndices, SelectWhere)
   , targeted
   ) as Hydrogen.Animation.Algebra
 

@@ -90,8 +90,8 @@ module Hydrogen.Element.Component.ChatBubble
   , dateDivider
   
   -- * Types
-  , Direction(..)
-  , Status(..)
+  , Direction(Sent, Received)
+  , Status(Sending, SentStatus, Delivered, Read, Failed)
   
   -- * Props
   , ChatBubbleProps

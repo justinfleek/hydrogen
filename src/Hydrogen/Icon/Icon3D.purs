@@ -53,16 +53,16 @@ module Hydrogen.Icon.Icon3D
   , palette
   , BrandPalette
   , defaultPalette
-  , BrandSlot(..)
+  , BrandSlot(Primary, Secondary, Accent, Neutral)
     -- * Icon Styles (icoon.co inspired)
-  , IconStyle(..)
+  , IconStyle(DarkChrome, DarkOrange, BlueMetal, Isometric, Bold)
   , style
     -- * Icon Sizes
-  , Icon3DSize(..)
+  , Icon3DSize(Xs, Sm, Md, Lg, Xl, Xxl, Custom)
   , iconSizeScale
     -- * Materials
   , Icon3DMaterial
-  , MaterialVariant(..)
+  , MaterialVariant(MatteVariant, GlossyVariant, ChromeVariant, MetallicVariant, SoftVariant)
   , defaultMaterial
   , metallic
   , glass
@@ -83,7 +83,7 @@ module Hydrogen.Icon.Icon3D
   , softClay
   , softPastel
     -- * Animations
-  , Icon3DAnimation(..)
+  , Icon3DAnimation(Rotate, RotateX, RotateZ, Bounce, Pulse, Float, Spin, Wobble, Flip, CustomAnimation)
     -- * Icon Rendering
   , icon3D
   , icon3DWith
@@ -92,7 +92,7 @@ module Hydrogen.Icon.Icon3D
   , iconPart
   , iconMulti
     -- * Primitive Builders
-  , IconPrimitive(..)
+  , IconPrimitive(PrimitiveBox, PrimitiveRoundedBox, PrimitiveSphere, PrimitiveCylinder, PrimitiveCapsule, PrimitiveCone, PrimitiveTorus, PrimitivePlane, PrimitiveGroup)
   , primitiveBox
   , primitiveRoundedBox
   , primitiveSphere
@@ -115,7 +115,7 @@ module Hydrogen.Icon.Icon3D
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.UI.Core (cls)

@@ -55,7 +55,7 @@ module Hydrogen.Layout.Grid
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Hydrogen.UI.Core (cls)
 

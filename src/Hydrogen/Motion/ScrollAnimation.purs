@@ -2,88 +2,102 @@
 --                                                 // hydrogen // scroll-animation
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Scroll-triggered animations
+-- | Scroll-triggered animations — Pure Data
 -- |
--- | Intersection Observer based scroll animations with parallax support,
--- | progress tracking, and animation presets.
+-- | Scroll state and viewport intersection are modeled as **pure data**.
+-- | The runtime provides scroll position updates; animation logic is computed
+-- | from pure functions.
+-- |
+-- | ## Pure Data Model
+-- |
+-- | Instead of subscribing to scroll events imperatively, you define:
+-- |
+-- | 1. **ScrollState** — Pure data representing scroll position and direction
+-- | 2. **ViewportState** — Pure data representing element visibility
+-- | 3. **ScrollAnimationConfig** — Pure data describing animation triggers
+-- |
+-- | The runtime observes scroll events and updates state. Your view function
+-- | receives current state and returns elements with computed properties.
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Motion.ScrollAnimation as SA
 -- |
--- | -- Trigger animation when element enters viewport
--- | SA.onEnterViewport element
--- |   { animation: SA.FadeIn
+-- | -- Define scroll animation as pure data
+-- | scrollFadeIn :: SA.ScrollAnimationConfig
+-- | scrollFadeIn =
+-- |   { preset: SA.FadeInUp
 -- |   , threshold: 0.2        -- 20% visible
 -- |   , once: true            -- Only animate once
 -- |   , delay: Milliseconds 0.0
 -- |   }
 -- |
--- | -- Progress-based animation (parallax)
--- | SA.onScrollProgress element
--- |   { onProgress: \progress -> setTransform ("translateY(" <> show (progress * 50.0) <> "px)")
--- |   , start: 0.0            -- Start when element enters bottom
--- |   , end: 1.0              -- End when element leaves top
--- |   }
+-- | -- Compute animation state from viewport intersection
+-- | animationState :: SA.ViewportState -> SA.AnimationClasses
+-- | animationState vs =
+-- |   if vs.isIntersecting && vs.ratio >= 0.2
+-- |     then SA.presetToClasses SA.FadeInUp
+-- |     else SA.initialClasses SA.FadeInUp
 -- |
--- | -- Smooth scroll to element
--- | SA.scrollToElement element { behavior: SA.Smooth, block: SA.Center }
--- |
--- | -- Detect scroll direction
--- | SA.onScrollDirection
--- |   { onUp: Console.log "Scrolling up"
--- |   , onDown: Console.log "Scrolling down"
--- |   }
+-- | -- Progress-based parallax (pure computation)
+-- | parallaxOffset :: SA.ScrollState -> Number
+-- | parallaxOffset ss = ss.progress * 50.0  -- 50px parallax
 -- | ```
 module Hydrogen.Motion.ScrollAnimation
-  ( -- * Animation Presets
+  ( -- * Animation Presets (Pure Data)
     AnimationPreset(..)
+  , AnimationClasses
   , presetToClasses
-    -- * Viewport Trigger
-  , ViewportConfig
-  , onEnterViewport
-  , onExitViewport
-  , onViewportChange
-  , defaultViewportConfig
-    -- * Progress Animation
-  , ProgressConfig
-  , onScrollProgress
-  , defaultProgressConfig
-    -- * Scroll Direction
+  , initialClasses
+    -- * Scroll State (Pure Data)
+  , ScrollState
+  , defaultScrollState
   , ScrollDirection(..)
-  , DirectionConfig
-  , onScrollDirection
-  , getScrollDirection
-    -- * Smooth Scroll
+  , scrollDirection
+  , scrollProgress
+  , scrollVelocity
+    -- * Viewport State (Pure Data)
+  , ViewportState
+  , defaultViewportState
+  , isInViewport
+  , viewportRatio
+    -- * Scroll Animation Config (Pure Data)
+  , ScrollAnimationConfig
+  , defaultScrollAnimationConfig
+  , ViewportConfig
+  , defaultViewportConfig
+  , ProgressConfig
+  , defaultProgressConfig
+    -- * Animation Computation (Pure Functions)
+  , computeAnimationState
+  , computeProgress
+  , computeParallaxOffset
+  , computeOpacityFromProgress
+  , computeTransformFromProgress
+    -- * Scroll Behavior (Pure Data)
   , ScrollBehavior(..)
   , ScrollBlock(..)
   , ScrollInline(..)
-  , ScrollOptions
-  , scrollToElement
+  , ScrollTarget
   , scrollToTop
   , scrollToPosition
-  , defaultScrollOptions
-    -- * Observer Management
-  , ScrollObserver
-  , disconnectObserver
-  , reconnectObserver
+  , scrollToElement
+    -- * Direction Detection (Pure Functions)
+  , detectDirection
+  , directionChanged
   ) where
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
-import Effect (Effect)
-import Effect.Ref (Ref)
-import Effect.Ref as Ref
-import Web.DOM.Element (Element)
+import Data.Time.Duration (Milliseconds(Milliseconds))
+import Data.Number (abs) as Math
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // animation presets
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Predefined animation presets
+-- | Predefined animation presets — pure enum
 data AnimationPreset
   = FadeIn           -- ^ Fade in from transparent
   | FadeInUp         -- ^ Fade in while sliding up
@@ -122,8 +136,14 @@ instance showAnimationPreset :: Show AnimationPreset where
   show Bounce = "Bounce"
   show (Custom c) = "Custom " <> c
 
--- | Convert preset to Tailwind/CSS animation classes
-presetToClasses :: AnimationPreset -> { initial :: String, animate :: String }
+-- | Animation CSS classes — pure data
+type AnimationClasses =
+  { initial :: String
+  , animate :: String
+  }
+
+-- | Convert preset to animation classes
+presetToClasses :: AnimationPreset -> AnimationClasses
 presetToClasses = case _ of
   FadeIn ->
     { initial: "opacity-0"
@@ -190,141 +210,15 @@ presetToClasses = case _ of
     , animate: cls
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // viewport trigger
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Scroll observer handle
-foreign import data ScrollObserver :: Type
-
--- | Viewport trigger configuration
-type ViewportConfig =
-  { animation :: AnimationPreset
-  , threshold :: Number            -- ^ 0.0 to 1.0 (percentage visible)
-  , rootMargin :: String           -- ^ CSS margin around viewport
-  , once :: Boolean                -- ^ Only trigger once
-  , delay :: Milliseconds          -- ^ Delay before animation
-  , onEnter :: Effect Unit         -- ^ Called when entering viewport
-  , onExit :: Effect Unit          -- ^ Called when exiting viewport
-  }
-
--- | Default viewport configuration
-defaultViewportConfig :: ViewportConfig
-defaultViewportConfig =
-  { animation: FadeInUp
-  , threshold: 0.1
-  , rootMargin: "0px"
-  , once: true
-  , delay: Milliseconds 0.0
-  , onEnter: pure unit
-  , onExit: pure unit
-  }
-
--- | Trigger animation when element enters viewport
-foreign import onEnterViewportImpl
-  :: Element
-  -> { animation :: { initial :: String, animate :: String }
-     , threshold :: Number
-     , rootMargin :: String
-     , once :: Boolean
-     , delay :: Number
-     , onEnter :: Effect Unit
-     , onExit :: Effect Unit
-     }
-  -> Effect ScrollObserver
-
-onEnterViewport :: Element -> ViewportConfig -> Effect ScrollObserver
-onEnterViewport element config =
-  onEnterViewportImpl element
-    { animation: presetToClasses config.animation
-    , threshold: config.threshold
-    , rootMargin: config.rootMargin
-    , once: config.once
-    , delay: unwrapMs config.delay
-    , onEnter: config.onEnter
-    , onExit: config.onExit
-    }
-  where
-  unwrapMs (Milliseconds ms) = ms
-
--- | Trigger callback when element exits viewport
-foreign import onExitViewportImpl
-  :: Element
-  -> { threshold :: Number
-     , rootMargin :: String
-     , onExit :: Effect Unit
-     }
-  -> Effect ScrollObserver
-
-onExitViewport :: Element -> { threshold :: Number, onExit :: Effect Unit } -> Effect ScrollObserver
-onExitViewport element config =
-  onExitViewportImpl element
-    { threshold: config.threshold
-    , rootMargin: "0px"
-    , onExit: config.onExit
-    }
-
--- | Trigger callback on viewport enter/exit with visibility state
-foreign import onViewportChangeImpl
-  :: Element
-  -> { threshold :: Number
-     , rootMargin :: String
-     , onChange :: Boolean -> Number -> Effect Unit
-     }
-  -> Effect ScrollObserver
-
-onViewportChange
-  :: Element
-  -> { threshold :: Number
-     , onChange :: Boolean -> Number -> Effect Unit  -- ^ isVisible, intersectionRatio
-     }
-  -> Effect ScrollObserver
-onViewportChange element config =
-  onViewportChangeImpl element
-    { threshold: config.threshold
-    , rootMargin: "0px"
-    , onChange: config.onChange
-    }
+-- | Get initial classes for a preset
+initialClasses :: AnimationPreset -> String
+initialClasses preset = (presetToClasses preset).initial
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // progress animation
+--                                                              // scroll state
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Progress-based animation configuration
-type ProgressConfig =
-  { onProgress :: Number -> Effect Unit  -- ^ Progress 0.0 to 1.0
-  , start :: Number                      -- ^ When to start (viewport position)
-  , end :: Number                        -- ^ When to end (viewport position)
-  , clamp :: Boolean                     -- ^ Clamp progress to 0-1 range
-  }
-
--- | Default progress configuration
-defaultProgressConfig :: ProgressConfig
-defaultProgressConfig =
-  { onProgress: \_ -> pure unit
-  , start: 0.0
-  , end: 1.0
-  , clamp: true
-  }
-
--- | Track scroll progress for parallax effects
-foreign import onScrollProgressImpl
-  :: Element
-  -> { onProgress :: Number -> Effect Unit
-     , start :: Number
-     , end :: Number
-     , clamp :: Boolean
-     }
-  -> Effect ScrollObserver
-
-onScrollProgress :: Element -> ProgressConfig -> Effect ScrollObserver
-onScrollProgress = onScrollProgressImpl
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // scroll direction
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Scroll direction
+-- | Scroll direction — pure enum
 data ScrollDirection
   = ScrollingUp
   | ScrollingDown
@@ -337,40 +231,222 @@ instance showScrollDirection :: Show ScrollDirection where
   show ScrollingDown = "ScrollingDown"
   show NotScrolling = "NotScrolling"
 
--- | Direction detection configuration
-type DirectionConfig =
-  { onUp :: Effect Unit
-  , onDown :: Effect Unit
-  , threshold :: Number      -- ^ Minimum scroll delta to trigger
+-- | Scroll state — pure data representing current scroll position
+-- |
+-- | This is provided by the runtime and passed to your view functions.
+type ScrollState =
+  { scrollY :: Number            -- ^ Current vertical scroll position (pixels)
+  , scrollX :: Number            -- ^ Current horizontal scroll position (pixels)
+  , maxScrollY :: Number         -- ^ Maximum vertical scroll (document height - viewport height)
+  , maxScrollX :: Number         -- ^ Maximum horizontal scroll
+  , previousY :: Number          -- ^ Previous scroll Y (for direction detection)
+  , previousX :: Number          -- ^ Previous scroll X
+  , viewportHeight :: Number     -- ^ Viewport height in pixels
+  , viewportWidth :: Number      -- ^ Viewport width in pixels
+  , timestamp :: Number          -- ^ Timestamp of last scroll event (ms)
   }
 
--- | Subscribe to scroll direction changes
-foreign import onScrollDirectionImpl
-  :: { onUp :: Effect Unit
-     , onDown :: Effect Unit
-     , threshold :: Number
-     }
-  -> Effect (Effect Unit)  -- ^ Returns unsubscribe function
+-- | Default scroll state
+defaultScrollState :: ScrollState
+defaultScrollState =
+  { scrollY: 0.0
+  , scrollX: 0.0
+  , maxScrollY: 0.0
+  , maxScrollX: 0.0
+  , previousY: 0.0
+  , previousX: 0.0
+  , viewportHeight: 0.0
+  , viewportWidth: 0.0
+  , timestamp: 0.0
+  }
 
-onScrollDirection :: DirectionConfig -> Effect (Effect Unit)
-onScrollDirection = onScrollDirectionImpl
+-- | Compute scroll direction from state — pure function
+scrollDirection :: ScrollState -> ScrollDirection
+scrollDirection state
+  | state.scrollY > state.previousY = ScrollingDown
+  | state.scrollY < state.previousY = ScrollingUp
+  | otherwise = NotScrolling
 
--- | Get current scroll direction
-foreign import getScrollDirectionImpl :: Effect String
+-- | Compute overall scroll progress (0.0 to 1.0) — pure function
+scrollProgress :: ScrollState -> Number
+scrollProgress state
+  | state.maxScrollY <= 0.0 = 0.0
+  | otherwise = clampNumber 0.0 1.0 (state.scrollY / state.maxScrollY)
 
-getScrollDirection :: Effect ScrollDirection
-getScrollDirection = do
-  dir <- getScrollDirectionImpl
-  pure case dir of
-    "up" -> ScrollingUp
-    "down" -> ScrollingDown
-    _ -> NotScrolling
+-- | Compute scroll velocity (pixels per ms) — pure function
+scrollVelocity :: ScrollState -> Number -> Number
+scrollVelocity state deltaTime
+  | deltaTime <= 0.0 = 0.0
+  | otherwise = Math.abs (state.scrollY - state.previousY) / deltaTime
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // smooth scroll
+--                                                             // viewport state
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Scroll behavior
+-- | Viewport state for an element — pure data
+-- |
+-- | Describes how an element intersects with the viewport.
+type ViewportState =
+  { isIntersecting :: Boolean    -- ^ Element is at least partially visible
+  , ratio :: Number              -- ^ Intersection ratio (0.0 to 1.0)
+  , boundingTop :: Number        -- ^ Top edge relative to viewport
+  , boundingBottom :: Number     -- ^ Bottom edge relative to viewport
+  , boundingLeft :: Number       -- ^ Left edge relative to viewport
+  , boundingRight :: Number      -- ^ Right edge relative to viewport
+  , isFullyVisible :: Boolean    -- ^ Element is completely visible
+  , hasTriggered :: Boolean      -- ^ Animation has already triggered (for once mode)
+  }
+
+-- | Default viewport state
+defaultViewportState :: ViewportState
+defaultViewportState =
+  { isIntersecting: false
+  , ratio: 0.0
+  , boundingTop: 0.0
+  , boundingBottom: 0.0
+  , boundingLeft: 0.0
+  , boundingRight: 0.0
+  , isFullyVisible: false
+  , hasTriggered: false
+  }
+
+-- | Check if element is in viewport — pure function
+isInViewport :: ViewportState -> Boolean
+isInViewport = _.isIntersecting
+
+-- | Get viewport intersection ratio — pure function
+viewportRatio :: ViewportState -> Number
+viewportRatio = _.ratio
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                      // animation configuration
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Scroll animation configuration — pure data
+type ScrollAnimationConfig =
+  { preset :: AnimationPreset
+  , threshold :: Number          -- ^ Visibility threshold (0.0 to 1.0)
+  , once :: Boolean              -- ^ Only animate once
+  , delay :: Milliseconds        -- ^ Delay before animation
+  }
+
+-- | Default scroll animation config
+defaultScrollAnimationConfig :: ScrollAnimationConfig
+defaultScrollAnimationConfig =
+  { preset: FadeInUp
+  , threshold: 0.1
+  , once: true
+  , delay: Milliseconds 0.0
+  }
+
+-- | Viewport trigger configuration — pure data
+type ViewportConfig =
+  { animation :: AnimationPreset
+  , threshold :: Number
+  , rootMargin :: String
+  , once :: Boolean
+  , delay :: Milliseconds
+  }
+
+-- | Default viewport configuration
+defaultViewportConfig :: ViewportConfig
+defaultViewportConfig =
+  { animation: FadeInUp
+  , threshold: 0.1
+  , rootMargin: "0px"
+  , once: true
+  , delay: Milliseconds 0.0
+  }
+
+-- | Progress-based animation configuration — pure data
+type ProgressConfig =
+  { start :: Number              -- ^ Progress start (0.0 to 1.0)
+  , end :: Number                -- ^ Progress end (0.0 to 1.0)
+  , clampOutput :: Boolean       -- ^ Clamp output to 0-1 range
+  }
+
+-- | Default progress configuration
+defaultProgressConfig :: ProgressConfig
+defaultProgressConfig =
+  { start: 0.0
+  , end: 1.0
+  , clampOutput: true
+  }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // animation computation
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Compute animation state from viewport state — pure function
+-- |
+-- | Returns the CSS classes to apply based on visibility.
+computeAnimationState 
+  :: ScrollAnimationConfig 
+  -> ViewportState 
+  -> AnimationClasses
+computeAnimationState config vs =
+  let
+    shouldAnimate = vs.isIntersecting 
+                 && vs.ratio >= config.threshold
+                 && (not config.once || not vs.hasTriggered)
+    classes = presetToClasses config.preset
+  in
+    if shouldAnimate
+      then classes
+      else { initial: classes.initial, animate: classes.initial }
+
+-- | Compute progress value from scroll state — pure function
+-- |
+-- | Maps scroll progress to output range based on config.
+computeProgress :: ProgressConfig -> ScrollState -> Number
+computeProgress config state =
+  let
+    rawProgress = scrollProgress state
+    -- Map from [start, end] to [0, 1]
+    normalizedProgress = (rawProgress - config.start) / (config.end - config.start)
+    output = if config.clampOutput
+               then clampNumber 0.0 1.0 normalizedProgress
+               else normalizedProgress
+  in
+    output
+
+-- | Compute parallax offset from progress — pure function
+computeParallaxOffset :: Number -> Number -> Number
+computeParallaxOffset progress maxOffset = progress * maxOffset
+
+-- | Compute opacity from progress — pure function
+computeOpacityFromProgress :: Number -> Number
+computeOpacityFromProgress = clampNumber 0.0 1.0
+
+-- | Compute transform string from progress — pure function
+computeTransformFromProgress 
+  :: { translateY :: Number, scale :: Number } 
+  -> Number 
+  -> String
+computeTransformFromProgress config progress =
+  "translateY(" <> show (config.translateY * (1.0 - progress)) <> "px) " <>
+  "scale(" <> show (1.0 - (1.0 - config.scale) * (1.0 - progress)) <> ")"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // direction helpers
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Detect direction from two scroll positions — pure function
+detectDirection :: Number -> Number -> ScrollDirection
+detectDirection previousY currentY
+  | currentY > previousY = ScrollingDown
+  | currentY < previousY = ScrollingUp
+  | otherwise = NotScrolling
+
+-- | Check if direction changed — pure function
+directionChanged :: ScrollDirection -> ScrollDirection -> Boolean
+directionChanged prev curr = prev /= curr && curr /= NotScrolling
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // scroll targets
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Scroll behavior — pure enum
 data ScrollBehavior
   = Smooth
   | Instant
@@ -378,7 +454,12 @@ data ScrollBehavior
 
 derive instance eqScrollBehavior :: Eq ScrollBehavior
 
--- | Vertical alignment
+instance showScrollBehavior :: Show ScrollBehavior where
+  show Smooth = "smooth"
+  show Instant = "instant"
+  show Auto = "auto"
+
+-- | Vertical alignment — pure enum
 data ScrollBlock
   = BlockStart
   | BlockCenter
@@ -387,7 +468,13 @@ data ScrollBlock
 
 derive instance eqScrollBlock :: Eq ScrollBlock
 
--- | Horizontal alignment
+instance showScrollBlock :: Show ScrollBlock where
+  show BlockStart = "start"
+  show BlockCenter = "center"
+  show BlockEnd = "end"
+  show BlockNearest = "nearest"
+
+-- | Horizontal alignment — pure enum
 data ScrollInline
   = InlineStart
   | InlineCenter
@@ -396,76 +483,62 @@ data ScrollInline
 
 derive instance eqScrollInline :: Eq ScrollInline
 
--- | Scroll options
-type ScrollOptions =
-  { behavior :: ScrollBehavior
+instance showScrollInline :: Show ScrollInline where
+  show InlineStart = "start"
+  show InlineCenter = "center"
+  show InlineEnd = "end"
+  show InlineNearest = "nearest"
+
+-- | Scroll target — pure data describing where to scroll
+-- |
+-- | The runtime interprets this and performs the scroll action.
+type ScrollTarget =
+  { x :: Number
+  , y :: Number
+  , behavior :: ScrollBehavior
   , block :: ScrollBlock
   , inline :: ScrollInline
   }
 
--- | Default scroll options
-defaultScrollOptions :: ScrollOptions
-defaultScrollOptions =
-  { behavior: Smooth
+-- | Create scroll target for top of page
+scrollToTop :: ScrollBehavior -> ScrollTarget
+scrollToTop behavior =
+  { x: 0.0
+  , y: 0.0
+  , behavior: behavior
   , block: BlockStart
+  , inline: InlineStart
+  }
+
+-- | Create scroll target for specific position
+scrollToPosition :: Number -> Number -> ScrollBehavior -> ScrollTarget
+scrollToPosition x y behavior =
+  { x: x
+  , y: y
+  , behavior: behavior
+  , block: BlockStart
+  , inline: InlineStart
+  }
+
+-- | Create scroll target for element (by ID)
+-- |
+-- | The runtime resolves the element ID to a position.
+scrollToElement :: String -> ScrollBehavior -> ScrollBlock -> ScrollTarget
+scrollToElement _elementId behavior block =
+  { x: 0.0
+  , y: 0.0
+  , behavior: behavior
+  , block: block
   , inline: InlineNearest
   }
 
-behaviorToString :: ScrollBehavior -> String
-behaviorToString Smooth = "smooth"
-behaviorToString Instant = "instant"
-behaviorToString Auto = "auto"
-
-blockToString :: ScrollBlock -> String
-blockToString BlockStart = "start"
-blockToString BlockCenter = "center"
-blockToString BlockEnd = "end"
-blockToString BlockNearest = "nearest"
-
-inlineToString :: ScrollInline -> String
-inlineToString InlineStart = "start"
-inlineToString InlineCenter = "center"
-inlineToString InlineEnd = "end"
-inlineToString InlineNearest = "nearest"
-
--- | Smooth scroll to an element
-foreign import scrollToElementImpl
-  :: Element
-  -> { behavior :: String
-     , block :: String
-     , inline :: String
-     }
-  -> Effect Unit
-
-scrollToElement :: Element -> ScrollOptions -> Effect Unit
-scrollToElement element opts =
-  scrollToElementImpl element
-    { behavior: behaviorToString opts.behavior
-    , block: blockToString opts.block
-    , inline: inlineToString opts.inline
-    }
-
--- | Scroll to top of page
-foreign import scrollToTopImpl :: String -> Effect Unit
-
-scrollToTop :: ScrollBehavior -> Effect Unit
-scrollToTop behavior = scrollToTopImpl (behaviorToString behavior)
-
--- | Scroll to specific position
-foreign import scrollToPositionImpl
-  :: { x :: Number, y :: Number }
-  -> String
-  -> Effect Unit
-
-scrollToPosition :: { x :: Number, y :: Number } -> ScrollBehavior -> Effect Unit
-scrollToPosition pos behavior = scrollToPositionImpl pos (behaviorToString behavior)
-
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // observer management
+--                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Disconnect an observer (pause observation)
-foreign import disconnectObserver :: ScrollObserver -> Effect Unit
-
--- | Reconnect a disconnected observer
-foreign import reconnectObserver :: ScrollObserver -> Effect Unit
+-- | Clamp a number to a range — pure function
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber minVal maxVal val
+  | val < minVal = minVal
+  | val > maxVal = maxVal
+  | otherwise = val

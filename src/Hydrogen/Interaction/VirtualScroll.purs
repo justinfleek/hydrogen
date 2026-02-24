@@ -46,8 +46,8 @@ module Hydrogen.Interaction.VirtualScroll
   , virtualGrid
     -- * Types
   , VirtualScrollState
-  , ItemHeight(..)
-  , ScrollDirection(..)
+  , ItemHeight(Fixed, Variable, Dynamic)
+  , ScrollDirection(Vertical, Horizontal, Both)
   , VisibleRange
     -- * Props
   , VirtualScrollProps
@@ -92,7 +92,7 @@ import Prelude
 import Data.Array (foldl, range, length)
 import Data.Array as Array
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

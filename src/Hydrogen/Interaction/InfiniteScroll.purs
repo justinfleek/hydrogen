@@ -52,8 +52,8 @@ module Hydrogen.Interaction.InfiniteScroll
   , endOfList
   , errorState
     -- * Types
-  , LoadDirection(..)
-  , InfiniteScrollState(..)
+  , LoadDirection(LoadDown, LoadUp, LoadBoth)
+  , InfiniteScrollState(Idle, Loading, Error, EndReached)
     -- * Props
   , InfiniteScrollProps
   , InfiniteScrollProp
@@ -92,7 +92,7 @@ module Hydrogen.Interaction.InfiniteScroll
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

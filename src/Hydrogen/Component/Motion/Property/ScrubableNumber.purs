@@ -40,9 +40,9 @@ module Hydrogen.Component.Motion.Property.ScrubableNumber
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetValue, GetValue, SetBounds, SetDisabled)
   , Input
-  , Output(..)
+  , Output(ValueChanged, ValueChanging, ScrubStart, ScrubEnd)
   , Slot
   
   -- * Slot Type

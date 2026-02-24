@@ -33,7 +33,7 @@ module Hydrogen.A11y.Focus
   , skipLink
   , focusableProps
     -- * Tab Index
-  , TabIndex(..)
+  , TabIndex(TabIndexAuto, TabIndexFocusable, TabIndexNot, TabIndexCustom)
   , tabIndex
   ) where
 

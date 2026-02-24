@@ -49,10 +49,10 @@ module Hydrogen.Component.Motion.Timeline.PropertyTrack
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetExpanded, SetKeyframes, GetKeyframes)
   , Input
-  , Output(..)
-  , PropertyId(..)
+  , Output(ExpandToggled, KeyframeSelected, KeyframeDoubleClicked, AddKeyframeRequested, PropertyNameClicked, ExpressionClicked)
+  , PropertyId(PropertyId)
   , Slot
   
   -- * Slot Type

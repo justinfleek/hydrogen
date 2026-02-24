@@ -91,9 +91,9 @@ module Hydrogen.Component.Signature
   , StrokeData
   , Point
   , Stroke
-  , GuideStyle(..)
-  , ToolbarPosition(..)
-  , ExportFormat(..)
+  , GuideStyle(Dotted, Dashed, Solid, Hidden)
+  , ToolbarPosition(Top, Bottom)
+  , ExportFormat(PNG, SVG, JSON)
     -- * FFI
   , SignatureElement
   , initSignaturePad
@@ -108,7 +108,7 @@ module Hydrogen.Component.Signature
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

@@ -53,7 +53,7 @@ module Hydrogen.Feature.Flags
   , trackExposure
     -- * Targeting
   , TargetingRule
-  , TargetingCondition(..)
+  , TargetingCondition(Percentage, UserIds, UserAttribute, Environment, Always, Never, AllOf, AnyOf)
   , TargetingContext
   , percentage
   , userIds
@@ -65,7 +65,7 @@ module Hydrogen.Feature.Flags
   , anyOf
     -- * Flag Definitions
   , FlagDefinition
-  , FlagValue(..)
+  , FlagValue(BoolValue, StringValue, NumberValue, JsonValue)
   , defineBoolFlag
   , defineStringFlag
   , defineNumberFlag
@@ -92,8 +92,8 @@ import Data.Array as Array
 import Data.Int (toNumber) as Int
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff as Aff

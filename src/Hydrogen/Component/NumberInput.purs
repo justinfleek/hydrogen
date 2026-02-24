@@ -77,13 +77,13 @@ module Hydrogen.Component.NumberInput
   , onBlur
   , onFocus
     -- * Types
-  , ButtonPosition(..)
+  , ButtonPosition(Sides, Right, None)
   ) where
 
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Number as Number
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE

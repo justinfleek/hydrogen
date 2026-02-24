@@ -74,11 +74,9 @@ import Prelude
   , class Show
   , show
   , map
-  , negate
   , (+)
   , (-)
   , (<>)
-  , (==)
   )
 
 import Data.Array as Array
@@ -90,11 +88,8 @@ import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Typography.GlyphGeometry
   ( GlyphPath
   , GlyphBounds
-  , glyphBounds
   , emptyBounds
   , unionBounds
-  , boundsWidth
-  , boundsHeight
   )
 import Hydrogen.Schema.Typography.TextIndex
   ( CharacterIndex(CharacterIndex)

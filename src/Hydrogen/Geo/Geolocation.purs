@@ -60,7 +60,7 @@ module Hydrogen.Geo.Geolocation
   , timeout
   , maximumAge
     -- * Error Types
-  , PositionError(..)
+  , PositionError(PermissionDenied, PositionUnavailable, Timeout, UnknownError)
   , errorMessage
   , errorCode
     -- * Getting Position
@@ -80,7 +80,7 @@ module Hydrogen.Geo.Geolocation
   , HeadingInfo
     -- * Geofencing
   , Geofence
-  , GeofenceEvent(..)
+  , GeofenceEvent(Enter, Exit, Dwell)
   , watchGeofence
   , createGeofence
   , isInsideGeofence
@@ -95,8 +95,8 @@ module Hydrogen.Geo.Geolocation
 import Prelude
 
 import Data.Array (foldl)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
+import Data.Either (Either(Left, Right))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)

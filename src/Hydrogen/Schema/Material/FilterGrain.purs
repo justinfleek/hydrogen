@@ -47,7 +47,7 @@ derive instance eqFilterGrain :: Eq FilterGrain
 derive instance ordFilterGrain :: Ord FilterGrain
 
 instance showFilterGrain :: Show FilterGrain where
-  show (FilterGrain g) = show g
+  show (FilterGrain g) = "FilterGrain " <> show g
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

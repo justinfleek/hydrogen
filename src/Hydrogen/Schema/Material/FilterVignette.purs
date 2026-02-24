@@ -48,7 +48,7 @@ derive instance eqFilterVignette :: Eq FilterVignette
 derive instance ordFilterVignette :: Ord FilterVignette
 
 instance showFilterVignette :: Show FilterVignette where
-  show (FilterVignette v) = show v
+  show (FilterVignette v) = "FilterVignette " <> show v
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

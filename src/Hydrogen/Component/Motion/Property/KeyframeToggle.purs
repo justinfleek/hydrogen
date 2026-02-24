@@ -39,9 +39,9 @@ module Hydrogen.Component.Motion.Property.KeyframeToggle
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetAnimated, SetHasKeyframe, SetDisabled)
   , Input
-  , Output(..)
+  , Output(ToggleAnimation, AddKeyframe, RemoveKeyframe)
   , Slot
   
   -- * Slot Type

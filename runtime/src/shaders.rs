@@ -143,6 +143,70 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
 }
 "#;
 
+/// Shader for rendering filled paths (typography as geometry).
+pub const PATH_SHADER: &str = r#"
+// Uniforms
+struct Uniforms {
+    resolution: vec2<f32>,
+    _padding: vec2<f32>,
+}
+
+@group(0) @binding(0) var<uniform> uniforms: Uniforms;
+
+// Vertex input
+struct VertexInput {
+    @location(0) position: vec2<f32>,    // vertex position
+    @location(1) transform: vec4<f32>,   // position.xy, scale.xy
+    @location(2) rotation: vec3<f32>,    // rotation.xyz (degrees)
+    @location(3) color: vec4<f32>,       // r, g, b, a
+    @location(4) depth_pick: vec2<f32>,  // depth, pick_id
+}
+
+// Vertex output
+struct VertexOutput {
+    @builtin(position) clip_position: vec4<f32>,
+    @location(0) color: vec4<f32>,
+    @location(1) pick_id: f32,
+}
+
+// Rotation matrix for Z rotation (2D)
+fn rotate_z(angle_deg: f32) -> mat2x2<f32> {
+    let angle = radians(angle_deg);
+    let c = cos(angle);
+    let s = sin(angle);
+    return mat2x2<f32>(c, -s, s, c);
+}
+
+@vertex
+fn vs_main(input: VertexInput) -> VertexOutput {
+    var output: VertexOutput;
+    
+    // Apply scale
+    var pos = input.position * input.transform.zw;
+    
+    // Apply Z rotation (2D rotation in the XY plane)
+    pos = rotate_z(input.rotation.z) * pos;
+    
+    // Apply translation
+    pos = pos + input.transform.xy;
+    
+    // Convert to clip space
+    let x = (pos.x / uniforms.resolution.x) * 2.0 - 1.0;
+    let y = 1.0 - (pos.y / uniforms.resolution.y) * 2.0;
+    
+    output.clip_position = vec4<f32>(x, y, input.depth_pick.x, 1.0);
+    output.color = input.color;
+    output.pick_id = input.depth_pick.y;
+    
+    return output;
+}
+
+@fragment
+fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    return input.color;
+}
+"#;
+
 /// Shader for particle rendering (point sprites).
 pub const PARTICLE_SHADER: &str = r#"
 // Uniforms

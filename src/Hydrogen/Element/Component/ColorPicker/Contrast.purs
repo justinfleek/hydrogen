@@ -43,7 +43,7 @@ module Hydrogen.Element.Component.ColorPicker.Contrast
   , meetsAAALarge
   
   -- * Grade Type
-  , WCAGGrade(..)
+  , WCAGGrade(Fail, AALarge, AA, AAALarge, AAA)
   , gradeFor
   ) where
 

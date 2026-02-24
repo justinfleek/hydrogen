@@ -56,7 +56,7 @@ module Hydrogen.Component.LoadingBar
   , striped
   , className
     -- * Types
-  , Position(..)
+  , Position(Top, Bottom, Inline)
   ) where
 
 import Prelude

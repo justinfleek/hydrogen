@@ -49,7 +49,7 @@ module Hydrogen.Element.Component.Stepper
   , stepNavigation
     -- * Step Types
   , Step
-  , StepStatus(..)
+  , StepStatus(Completed, Current, Upcoming, Error)
   , step
   , stepWithIcon
     -- * Props
@@ -72,7 +72,7 @@ module Hydrogen.Element.Component.Stepper
   , previousLabel
   , completeLabel
     -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   ) where
 
 import Prelude

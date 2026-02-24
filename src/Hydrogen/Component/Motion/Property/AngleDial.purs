@@ -44,9 +44,9 @@ module Hydrogen.Component.Motion.Property.AngleDial
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetValue, GetValue, SetBounds)
   , Input
-  , Output(..)
+  , Output(ValueChanged, ValueChanging, DragStart, DragEnd)
   , Slot
   
   -- * Slot Type

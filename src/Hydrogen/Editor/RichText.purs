@@ -148,18 +148,18 @@ module Hydrogen.Editor.RichText
   , ariaLabel
   , ariaDescribedBy
     -- * Types
-  , EditorContent(..)
-  , ContentNode(..)
-  , Mark(..)
-  , TextAlign(..)
-  , HeadingLevel(..)
-  , ListType(..)
-  , SlashCommand(..)
-  , Mention(..)
-  , Selection(..)
-  , ToolbarState(..)
+  , EditorContent(HtmlContent, JsonContent)
+  , ContentNode(TextNode, ParagraphNode, HeadingNode, BulletListNode, OrderedListNode, TaskListNode, ListItemNode, BlockquoteNode, CodeBlockNode, ImageNode, LinkNode, TableNode, HorizontalRuleNode, MentionNode)
+  , Mark(Bold, Italic, Underline, Strikethrough, Code, Link)
+  , TextAlign(AlignLeft, AlignCenter, AlignRight, AlignJustify)
+  , HeadingLevel(H1, H2, H3)
+  , ListType(BulletList, NumberedList, TaskList)
+  , SlashCommand
+  , Mention
+  , Selection
+  , ToolbarState
     -- * Commands
-  , EditorCommand(..)
+  , EditorCommand(CmdBold, CmdItalic, CmdUnderline, CmdStrikethrough, CmdCode, CmdHeading, CmdParagraph, CmdBulletList, CmdOrderedList, CmdTaskList, CmdAlign, CmdLink, CmdImage, CmdTable, CmdCodeBlock, CmdBlockquote, CmdHorizontalRule, CmdUndo, CmdRedo, CmdFocus, CmdBlur)
   , formatBold
   , formatItalic
   , formatUnderline
@@ -200,7 +200,7 @@ module Hydrogen.Editor.RichText
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3, runEffectFn1, runEffectFn2, runEffectFn3)

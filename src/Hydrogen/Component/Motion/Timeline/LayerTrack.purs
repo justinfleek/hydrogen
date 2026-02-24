@@ -54,12 +54,12 @@ module Hydrogen.Component.Motion.Timeline.LayerTrack
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetSelected, SetExpanded, SetTimeRange, GetTimeRange)
   , Input
-  , Output(..)
-  , LayerId(..)
+  , Output(Selected, ExpandToggled, InPointChanged, OutPointChanged, Moved, DragStarted, DragEnded, DoubleClicked, ContextMenuRequested)
+  , LayerId(LayerId)
   , Slot
-  , DragMode(..)
+  , DragMode(DragInPoint, DragOutPoint, DragBody, NoDrag)
   
   -- * Slot Type
   , _layerTrack

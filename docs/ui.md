@@ -131,24 +131,27 @@ import Hydrogen.UI.Error (emptyState)
 emptyState "No items yet" "Create your first item to get started"
 ```
 
-## Usage with QueryResult
+## Usage with RemoteData
 
 ```purescript
 import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData as RD
 import Hydrogen.UI.Loading (loadingState)
 import Hydrogen.UI.Error (errorState)
 
-render result = Q.fold
-  { idle: mempty
-  , loading: \mStale -> case mStale of
-      Nothing -> loadingState "Loading..."
-      Just data -> renderData data <> loadingBadge  -- Stale-while-revalidate
-  , error: \msg mStale ->
-      errorState msg <> maybe mempty renderData mStale
-  , success: renderData
-  }
-  result
+render state = 
+  if state.isFetching && Q.hasData state
+    -- Stale-while-revalidate: show old data with refresh indicator
+    then renderData (Q.getData state) <> loadingBadge
+    else Q.foldData state
+      { notAsked: mempty
+      , loading: loadingState "Loading..."
+      , failure: \msg -> errorState msg
+      , success: renderData
+      }
 ```
+
+See [Query Guide](query.md) for full RemoteData + QueryState documentation.
 
 ## Styling Notes
 

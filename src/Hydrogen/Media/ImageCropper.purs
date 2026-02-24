@@ -129,9 +129,9 @@ module Hydrogen.Media.ImageCropper
 import Prelude
 
 import Data.Array as Array
-import Data.Functor (map)
+
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Foreign (Foreign)

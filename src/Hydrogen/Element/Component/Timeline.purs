@@ -65,8 +65,8 @@ module Hydrogen.Element.Component.Timeline
   , onToggle
   , itemClassName
     -- * Types
-  , Orientation(..)
-  , ItemState(..)
+  , Orientation(Vertical, Horizontal)
+  , ItemState(Pending, Active, Completed)
   ) where
 
 import Prelude

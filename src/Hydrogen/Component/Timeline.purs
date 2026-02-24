@@ -99,16 +99,16 @@ module Hydrogen.Component.Timeline
   , onToggle
   , itemClassName
     -- * Types
-  , Orientation(..)
-  , ItemState(..)
-  , Side(..)
-  , LineStyle(..)
+  , Orientation(Vertical, Horizontal)
+  , ItemState(Pending, Active, Completed)
+  , Side(Left, Right, Auto)
+  , LineStyle(Solid, Dashed, Dotted)
   ) where
 
 import Prelude
 
 import Data.Array (foldl, mapWithIndex)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

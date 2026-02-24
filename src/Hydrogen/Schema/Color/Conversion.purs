@@ -114,7 +114,7 @@ import Prelude
   )
 
 import Data.Int as Int
-import Data.Number (abs, pow, sqrt)
+import Data.Number (abs, pow)
 import Data.String (take, drop)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Hydrogen.Math.Core as Math

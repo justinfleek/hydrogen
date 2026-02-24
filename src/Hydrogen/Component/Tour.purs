@@ -104,8 +104,8 @@ module Hydrogen.Component.Tour
   , offset
   , tooltipClassName
     -- * Types
-  , Placement(..)
-  , ScrollBehavior(..)
+  , Placement(Top, TopStart, TopEnd, Bottom, BottomStart, BottomEnd, Left, LeftStart, LeftEnd, Right, RightStart, RightEnd)
+  , ScrollBehavior(Smooth, Instant, None)
     -- * FFI
   , TourElement
   , initTour
@@ -122,7 +122,7 @@ module Hydrogen.Component.Tour
 import Prelude
 
 import Data.Array (foldl, index, length, mapWithIndex, replicate)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

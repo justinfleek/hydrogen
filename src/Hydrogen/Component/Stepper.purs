@@ -55,7 +55,7 @@ module Hydrogen.Component.Stepper
   , stepNavigation
     -- * Step Types
   , Step
-  , StepStatus(..)
+  , StepStatus(Completed, Current, Upcoming, Error)
   , step
   , stepWithIcon
     -- * Props
@@ -77,14 +77,14 @@ module Hydrogen.Component.Stepper
   , onComplete
   , validateStep
     -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   ) where
 
 import Prelude
 
 import Data.Array (foldl, length, (!!))
 import Data.Array as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

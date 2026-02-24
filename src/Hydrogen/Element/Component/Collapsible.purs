@@ -70,7 +70,7 @@ module Hydrogen.Element.Component.Collapsible
   , triggerClassName
   , contentClassName
     -- * Types
-  , IconPosition(..)
+  , IconPosition(IconLeft, IconRight)
   ) where
 
 import Prelude

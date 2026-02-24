@@ -68,7 +68,7 @@ import Prelude
 
 import Data.Array (filter, snoc, find, uncons) as Array
 import Data.Foldable (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // types

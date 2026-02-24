@@ -106,8 +106,8 @@ module Hydrogen.Component.Carousel
     -- * Prop Builders - Slide
   , slideClassName
     -- * Types
-  , Transition(..)
-  , ThumbnailPosition(..)
+  , Transition(Slide, Fade, None)
+  , ThumbnailPosition(Top, Bottom, Left, Right)
   , Breakpoint
     -- * FFI
   , CarouselElement
@@ -119,7 +119,7 @@ import Prelude
 
 import Data.Array (foldl, length, mapWithIndex, range)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn3)
 import Halogen.HTML as HH

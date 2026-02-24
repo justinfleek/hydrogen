@@ -48,29 +48,93 @@ CIC (Inductive Constructions)         ← Coq/Rocq, Lean 4, Agda, Idris 2
 proofs/
 ├── Hydrogen.lean                    # Root module
 └── Hydrogen/
-    └── Schema/
-        └── Color/
-            ├── Hue.lean             # Hue rotation properties (5 axioms)
-            └── Conversions.lean     # Color space conversions (8 theorems)
+    ├── Math/                        # 17 modules
+    │   ├── Bounded.lean             # Bounded numeric types (30+ theorems, 0 axioms)
+    │   ├── Vec2.lean                # 2D vectors
+    │   ├── Vec3.lean                # 3D vectors (93 theorems, 0 axioms)
+    │   ├── Vec4.lean                # 4D vectors
+    │   ├── Mat3.lean                # 3x3 matrices
+    │   ├── Mat4.lean                # 4x4 matrices
+    │   ├── Mat4Inverse.lean         # Matrix inversion
+    │   ├── Mat4Projection.lean      # Projection matrices
+    │   ├── Quaternion.lean          # Rotation quaternions
+    │   ├── Euler.lean               # Euler angles
+    │   ├── Ray.lean                 # Ray casting
+    │   ├── Plane.lean               # Plane geometry
+    │   ├── Sphere.lean              # Sphere geometry
+    │   ├── Triangle.lean            # Triangle geometry
+    │   ├── Frustum.lean             # View frustum
+    │   ├── Box3.lean                # Bounding boxes
+    │   ├── Constraint.lean          # Physics constraints
+    │   ├── Force.lean               # Physics forces
+    │   └── Integration.lean         # Physics integration
+    │
+    ├── Schema/
+    │   └── Color/
+    │       ├── Hue.lean             # Hue rotation (8 theorems, 0 axioms) ✓
+    │       ├── Conversions.lean     # Color conversions (10 proven, 16 axioms)
+    │       └── Real.lean            # Real number helpers
+    │
+    ├── Geometry/                    # 5 modules
+    │   ├── Bounds.lean
+    │   ├── Mesh.lean
+    │   ├── Primitives.lean
+    │   ├── Texture.lean
+    │   └── Vertex.lean
+    │
+    ├── Material/                    # 5 modules
+    │   ├── BRDF.lean
+    │   ├── ISP.lean
+    │   ├── Layer.lean
+    │   ├── Sparkle.lean
+    │   └── Types.lean
+    │
+    ├── Light/                       # 6 modules
+    │   ├── Attenuation.lean
+    │   ├── Directional.lean
+    │   ├── Point.lean
+    │   ├── Shadow.lean
+    │   ├── Spot.lean
+    │   └── Types.lean
+    │
+    ├── Camera/                      # 3 modules
+    │   ├── Lens.lean
+    │   ├── Projection.lean
+    │   └── Types.lean
+    │
+    ├── Scene/                       # 4 modules
+    │   ├── Diff.lean
+    │   ├── Graph.lean
+    │   ├── Node.lean
+    │   └── Resource.lean
+    │
+    └── WorldModel/                  # 5 modules
+        ├── Attention.lean
+        ├── Consensus.lean
+        ├── Integrity.lean
+        ├── Pose.lean
+        └── Rights.lean
 ```
+
+**Total:** 59 Lean proof files
 
 ## CURRENT PROOF STATUS
 
-### Hue.lean (5 Axioms)
+### Hue.lean (0 Axioms — FULLY VERIFIED)
 
-**What we state (axioms requiring group theory proofs):**
-1. `rotate_zero` - Rotation by 0 is identity
-2. `rotate_assoc` - Rotation is associative
-3. `rotate_360` - Full rotation returns to start
-4. `rotate_comm` - Rotation is commutative
-5. `complement_involutive` - Complement applied twice is identity
+**All theorems proven constructively:**
+1. `ext` - Hue equality depends only on degrees
+2. `normalize_idempotent` - Normalization is idempotent for bounded values
+3. `make_of_bounded` - Smart constructor preserves bounded values
+4. `rotate_zero` - Identity: rotate h 0 = h
+5. `rotate_assoc` - Associativity: rotate (rotate h a) b = rotate h (a + b)
+6. `rotate_360` - Full rotation: rotate h 360 = h
+7. `complement_involutive` - complement (complement h) = h
+8. `rotate_comm` - Commutativity of rotation
 
-**Why axiomatized:** These are properties of integers modulo 360. Full proofs
-would require formalizing ℤ/360ℤ as a cyclic group and proving these as
-theorems of group theory.
+**Previous state:** 5 axioms (now all proven using omega tactic)
 
-**Safety:** These are mathematically trivial (rotation on a circle). The axioms
-are safe because the properties hold by definition of modular arithmetic.
+**Status:** ✓ FULLY VERIFIED - ALL THEOREMS PROVEN (NO AXIOMS)
 
 ### Conversions.lean (8 Proven Theorems, 0 `sorry`)
 

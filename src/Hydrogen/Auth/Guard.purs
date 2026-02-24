@@ -43,7 +43,7 @@ module Hydrogen.Auth.Guard
   , whenAuthenticated
   , unlessAuthenticated
     -- * Types
-  , GuardResult(..)
+  , GuardResult(Allowed, NotAuthenticated, NotAuthorized)
   , class HasRole
   , getRoles
   , class HasPermission
@@ -53,10 +53,10 @@ module Hydrogen.Auth.Guard
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Halogen.HTML as HH
-import Hydrogen.Auth.Session (Session, AuthState(..), getAuthState, getUser)
+import Hydrogen.Auth.Session (Session, AuthState(Unauthenticated, Authenticating, Authenticated, Refreshing, Expired), getAuthState, getUser)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types

@@ -32,7 +32,7 @@ import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat
 import Hydrogen.Schema.Color.Lightness as Light
-import Hydrogen.Schema.Color.Temperature (Temperature(..), temperatureFromHSL)
+import Hydrogen.Schema.Color.Temperature (Temperature(VeryCool, Cool, Warm, VeryWarm), temperatureFromHSL)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // color psychology

@@ -78,9 +78,9 @@ module Hydrogen.Component.PhoneInput
 import Prelude
 
 import Data.Array (foldl, filter, find, sortBy)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
-import Data.String.Pattern (Pattern(..))
+import Data.String.Pattern (Pattern(Pattern))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)
 import Halogen.HTML as HH

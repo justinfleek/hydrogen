@@ -54,7 +54,7 @@ module Hydrogen.Element.Component.Pagination
   , paginationClassName
   , onPageChange
     -- * Types
-  , PageItem(..)
+  , PageItem(Page, Ellipsis)
   ) where
 
 import Prelude

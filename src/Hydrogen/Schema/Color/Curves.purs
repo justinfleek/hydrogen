@@ -29,7 +29,7 @@ import Prelude
 
 import Data.Array (sortBy, uncons)
 import Data.Int (round, toNumber)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Color.Channel (Channel, channel, unwrap)
 import Hydrogen.Schema.Color.RGB (RGB, red, green, blue, rgbFromChannels)
 

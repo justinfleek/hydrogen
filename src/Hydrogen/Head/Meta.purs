@@ -62,7 +62,7 @@ module Hydrogen.Head.Meta
 import Prelude
 
 import Data.Argonaut (class EncodeJson, encodeJson, stringify)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

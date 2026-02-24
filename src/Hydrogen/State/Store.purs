@@ -65,7 +65,7 @@ module Hydrogen.State.Store
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)

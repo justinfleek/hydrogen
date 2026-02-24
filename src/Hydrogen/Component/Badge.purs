@@ -29,7 +29,7 @@ module Hydrogen.Component.Badge
   , variant
   , className
     -- * Variants
-  , BadgeVariant(..)
+  , BadgeVariant(Default, Secondary, Destructive, Outline, Success, Warning)
   ) where
 
 import Prelude

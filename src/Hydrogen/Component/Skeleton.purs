@@ -84,8 +84,8 @@ module Hydrogen.Component.Skeleton
   , gap
   , className
     -- * Types
-  , Animation(..)
-  , Direction(..)
+  , Animation(Pulse, Shimmer, Wave, None)
+  , Direction(Horizontal, Vertical)
   ) where
 
 import Prelude

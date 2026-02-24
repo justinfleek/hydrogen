@@ -77,18 +77,12 @@ import Prelude
   , class Show
   , show
   , map
-  , negate
   , (+)
   , (-)
-  , (*)
   , (<>)
   , (==)
   , (>)
   , (<)
-  , (>=)
-  , (<=)
-  , (&&)
-  , (||)
   )
 
 import Data.Array as Array

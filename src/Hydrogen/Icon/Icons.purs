@@ -145,7 +145,7 @@ module Hydrogen.Icon.Icons
 
 import Halogen.HTML as HH
 import Hydrogen.Icon.Icon (IconProp, iconWith, pathElement, circleElement, lineElement, polylineElement, rectElement)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // actions

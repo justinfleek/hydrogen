@@ -111,7 +111,7 @@ import Prelude
 
 import Data.Array (foldl, length, mapWithIndex, (!!))
 import Data.Int (round)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
@@ -249,6 +249,34 @@ foreign import shareImageImpl :: EffectFn1 ShareData Unit
 
 -- | FFI: Destroy gallery
 foreign import destroyGalleryImpl :: EffectFn1 GalleryElement Unit
+
+-- | Initialize gallery element
+initGallery :: String -> GalleryConfig -> Effect GalleryElement
+initGallery selector config = runEffectFn2 initGalleryImpl selector config
+
+-- | Setup touch/mouse gestures on gallery element
+setupGestures :: GalleryElement -> Effect Unit
+setupGestures el = runEffectFn1 setupGesturesImpl el
+
+-- | Set zoom level on gallery element
+setZoom :: GalleryElement -> Number -> Effect Unit
+setZoom el level = runEffectFn2 setZoomImpl el level
+
+-- | Set pan position on gallery element
+setPan :: GalleryElement -> { x :: Number, y :: Number } -> Effect Unit
+setPan el pos = runEffectFn2 setPanImpl el pos
+
+-- | Download image from URL
+downloadImage :: String -> Effect Unit
+downloadImage url = runEffectFn1 downloadImageImpl url
+
+-- | Share image via Web Share API
+shareImage :: ShareData -> Effect Unit
+shareImage shareData = runEffectFn1 shareImageImpl shareData
+
+-- | Destroy gallery and clean up resources
+destroyGallery :: GalleryElement -> Effect Unit
+destroyGallery el = runEffectFn1 destroyGalleryImpl el
 
 -- Internal config types for FFI
 type GalleryConfig =
@@ -730,6 +758,9 @@ lightbox props state =
                     , ARIA.label "Zoom out"
                     ]
                     [ zoomOutIcon ]
+                , HH.span
+                    [ cls [ "text-white/80 text-xs min-w-[3rem] text-center" ] ]
+                    [ HH.text (show (round (state.zoom * 100.0)) <> "%") ]
                 , HH.button
                     [ cls [ "p-2 text-white/80 hover:text-white transition-colors" ]
                     , ARIA.label "Zoom in"

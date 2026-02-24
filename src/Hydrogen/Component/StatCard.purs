@@ -48,9 +48,9 @@ module Hydrogen.Component.StatCard
     -- * Types
   , StatCardConfig
   , StatTrend
-  , TrendDirection(..)
-  , Size(..)
-  , Variant(..)
+  , TrendDirection(Up, Down, Neutral)
+  , Size(Small, Medium, Large)
+  , Variant(Default, Filled, Outlined, Ghost)
     -- * Props
   , StatCardProps
   , StatCardProp
@@ -71,7 +71,7 @@ module Hydrogen.Component.StatCard
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.UI.Core (cls)

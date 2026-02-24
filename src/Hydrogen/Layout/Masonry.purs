@@ -61,7 +61,7 @@ module Hydrogen.Layout.Masonry
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, runEffectFn1)
 import Halogen.HTML as HH

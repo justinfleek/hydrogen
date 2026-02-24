@@ -36,7 +36,7 @@ module Hydrogen.Icon.Icon
   , ariaLabel
   , ariaHidden
     -- * Icon Sizes
-  , IconSize(..)
+  , IconSize(Xs, Sm, Md, Lg, Xl, Xxl, Custom)
   , iconSizeClass
   , iconSizePx
     -- * Icon Rendering
@@ -56,7 +56,7 @@ module Hydrogen.Icon.Icon
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Hydrogen.UI.Core (svgNS, svgCls)

@@ -68,7 +68,21 @@ module Hydrogen.GPU.Binary
   ( -- * Types
     Bytes
   , Header
-  , CommandType(..)
+  , CommandType
+      ( CmdNoop
+      , CmdDrawRect
+      , CmdDrawQuad
+      , CmdDrawGlyph
+      , CmdDrawPath
+      , CmdDrawParticle
+      , CmdPushClip
+      , CmdPopClip
+      , CmdDrawGlyphPath
+      , CmdDrawGlyphInstance
+      , CmdDrawWord
+      , CmdDefinePathData
+      , CmdUpdateAnimationState
+      )
   
   -- * Constants
   , magic
@@ -148,6 +162,7 @@ import Data.Int.Bits (shl, shr, (.&.), (.|.))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (Tuple(Tuple))
 import Hydrogen.GPU.DrawCommand as DC
+import Hydrogen.Animation.Types as AnimTypes
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Color.Channel as Channel
 import Hydrogen.Schema.Color.Opacity as Opacity
@@ -877,7 +892,7 @@ serializeWord p =
 -- | Extract seed from StaggerDirection (0 for non-random).
 getStaggerSeed :: DC.StaggerDirection -> Int
 getStaggerSeed = case _ of
-  DC.StaggerRandom seed -> seed
+  AnimTypes.StaggerRandom seed -> seed
   _ -> 0
 
 -- | Serialize a 3D point.
@@ -959,28 +974,30 @@ serializeAnimTarget t =
 -- | Encode StaggerDirection to u8.
 staggerDirToInt :: DC.StaggerDirection -> Int
 staggerDirToInt = case _ of
-  DC.StaggerLeftToRight -> 0
-  DC.StaggerRightToLeft -> 1
-  DC.StaggerCenterOut -> 2
-  DC.StaggerEdgesIn -> 3
-  DC.StaggerRandom _ -> 4  -- Seed stored separately if needed
+  AnimTypes.StaggerLeftToRight -> 0
+  AnimTypes.StaggerRightToLeft -> 1
+  AnimTypes.StaggerCenterOut -> 2
+  AnimTypes.StaggerEdgesIn -> 3
+  AnimTypes.StaggerTopToBottom -> 4
+  AnimTypes.StaggerBottomToTop -> 5
+  AnimTypes.StaggerRandom _ -> 6  -- Seed stored separately if needed
 
 -- | Encode EasingFunction to u8.
 easingToInt :: DC.EasingFunction -> Int
 easingToInt = case _ of
-  DC.EaseLinear -> 0
-  DC.EaseInQuad -> 1
-  DC.EaseOutQuad -> 2
-  DC.EaseInOutQuad -> 3
-  DC.EaseInCubic -> 4
-  DC.EaseOutCubic -> 5
-  DC.EaseInOutCubic -> 6
-  DC.EaseInElastic -> 7
-  DC.EaseOutElastic -> 8
-  DC.EaseInOutElastic -> 9
-  DC.EaseInBounce -> 10
-  DC.EaseOutBounce -> 11
-  DC.EaseSpring -> 12
+  AnimTypes.EasingIdLinear -> 0
+  AnimTypes.EasingIdInQuad -> 1
+  AnimTypes.EasingIdOutQuad -> 2
+  AnimTypes.EasingIdInOutQuad -> 3
+  AnimTypes.EasingIdInCubic -> 4
+  AnimTypes.EasingIdOutCubic -> 5
+  AnimTypes.EasingIdInOutCubic -> 6
+  AnimTypes.EasingIdInElastic -> 7
+  AnimTypes.EasingIdOutElastic -> 8
+  AnimTypes.EasingIdInOutElastic -> 9
+  AnimTypes.EasingIdInBounce -> 10
+  AnimTypes.EasingIdOutBounce -> 11
+  AnimTypes.EasingIdSpring -> 12
 
 -- | Encode AnimationUpdateMode to u8.
 animModeToInt :: DC.AnimationUpdateMode -> Int

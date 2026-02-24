@@ -51,7 +51,7 @@ module Hydrogen.Element.Component.Radio
   , radioItem
   
   -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   
   -- * Radio Props
   , RadioProps

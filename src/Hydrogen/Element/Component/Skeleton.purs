@@ -65,8 +65,8 @@ module Hydrogen.Element.Component.Skeleton
   , avatarWithText
   
   -- * Types
-  , Animation(..)
-  , Direction(..)
+  , Animation(Pulse, Shimmer, None)
+  , Direction(Horizontal, Vertical)
   
   -- * Props
   , SkeletonProps

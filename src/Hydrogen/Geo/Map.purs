@@ -97,7 +97,7 @@ module Hydrogen.Geo.Map
   , scaleControl
   , attributionControl
   , fullscreenControl
-  , ZoomControlPosition(..)
+  , ZoomControlPosition(TopLeft, TopRight, BottomLeft, BottomRight)
     -- * Markers
   , markers
   , marker
@@ -124,7 +124,7 @@ module Hydrogen.Geo.Map
   , polygon
   , rectangle
   , circle
-  , ShapeConfig(..)
+  , ShapeConfig(PolylineShape, PolygonShape, RectangleShape, CircleShape)
   , ShapeStyle
   , ShapeProp
   , strokeColor
@@ -188,7 +188,7 @@ import Prelude
 
 import Data.Argonaut (Json)
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Foreign (Foreign)

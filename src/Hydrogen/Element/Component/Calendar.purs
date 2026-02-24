@@ -72,12 +72,12 @@ module Hydrogen.Element.Component.Calendar
   -- * Types
   , CalendarDate
   , DateRange
-  , SelectionMode(..)
-  , WeekStart(..)
-  , MonthDay(..)
+  , SelectionMode(Single, Range, Multiple)
+  , WeekStart(Sunday, Monday)
+  , MonthDay(DayEmpty, DayDate)
   , MonthWeek
   , MonthGrid
-  , Locale(..)
+  , Locale(EnUS, EnGB, De, Fr, Es, Ja, Zh)
   
   -- * Locale Helpers
   , monthName

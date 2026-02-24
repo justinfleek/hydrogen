@@ -115,7 +115,7 @@ import Prelude
 import Data.Array (length, foldl)
 import Data.Array as Array
 import Data.Int as Int
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Data.Newtype (class Newtype, unwrap)
 import Data.Ord (abs)
 

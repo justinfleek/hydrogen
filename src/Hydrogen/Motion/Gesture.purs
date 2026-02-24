@@ -96,8 +96,8 @@ module Hydrogen.Motion.Gesture
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
-import Data.Time.Duration (Milliseconds(..))
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

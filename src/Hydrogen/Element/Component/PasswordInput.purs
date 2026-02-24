@@ -77,7 +77,7 @@ module Hydrogen.Element.Component.PasswordInput
   , passwordStrengthBar
   
   -- * Types
-  , PasswordStrength(..)
+  , PasswordStrength(VeryWeak, Weak, Fair, Strong, VeryStrong)
   , calculateStrength
   , strengthLabel
   

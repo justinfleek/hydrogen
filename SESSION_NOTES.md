@@ -1,6 +1,6 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-23
+**Last Updated:** 2026-02-24
 **Build Status:** Zero warnings, zero errors
 
 ---
@@ -13,9 +13,9 @@ Port remaining Halogen-based components (`Hydrogen.Component.*`) to Schema-nativ
 
 ## Key Constraints
 
-- **Pure Schema, no Tailwind**: Components must use Schema atoms exclusively
-- **No escape hatches**: No `extraAttributes` — everything must be fully deterministic
-- **No JS FFI**: FFI only at true system boundaries (Target.DOM runtime), never in components
+- **Pure Schema, no Tailwind**: Components use Schema atoms for all visual properties
+- **extraAttributes for edge cases**: Escape hatch exists but should be used sparingly (testing, a11y)
+- **No JS FFI in components**: FFI only at true system boundaries (Target.DOM runtime)
 - **Pure PureScript locale data**: Use lookup tables for locale strings, not JavaScript's Intl API
 - **500 line max per file**: Files must be split when exceeding this limit
 - **Explicit imports only**: Never use `(..)` imports — they are canaries for incomplete work
@@ -34,95 +34,81 @@ nix develop --command spago build
 
 ## Component Porting Status
 
-### Ported to Element (40 components)
+### Ported to Element (49 components)
 
-| Component | Element Lines | Status |
-|-----------|---------------|--------|
-| Alert | 382 | Complete |
-| AlertDialog | 440 | Complete |
-| AutoComplete | 824 | Complete |
-| Avatar | 328 | Complete |
-| Badge | 297 | Complete |
-| Breadcrumb | 277 | Complete |
-| Button | 681 | Complete |
-| Calendar | 1,726 | Complete |
-| Card | 531 | Complete |
-| ChatBubble | 813 | Complete |
-| Checkbox | 412 | Complete |
-| CodeBlock | 400 | Complete |
-| Collapsible | 314 | Complete |
-| ColorPicker | 968 | Complete |
-| DataGrid | 939 + subs | Complete |
-| DatePicker | 1,081 (split) | Complete |
-| Input | 713 | Complete |
-| LoadingBar | 317 | Complete |
-| NumberInput | 522 | Complete |
-| Pagination | 558 | Complete |
-| PasswordInput | 891 | Complete |
-| Progress | 314 | Complete |
-| Radio | 549 | Complete |
-| Rating | 384 | Complete |
-| SearchInput | 816 | Complete |
-| Select | 496 | Complete |
-| Separator | 297 | Complete |
-| Sheet | 369 | Complete |
-| Skeleton | 457 | Complete |
-| Slider | 428 | Complete |
-| StatCard | 446 | Complete |
-| Stepper | 562 | Complete |
-| Switch | 383 | Complete |
-| Table | 155 | Complete |
-| TagInput | 734 | Complete |
-| Textarea | 836 | Complete |
-| Timeline | 361 | Complete |
-| TimePicker | 1,231 (split) | Complete |
-| Toast | 684 | Complete |
-| Toggle | 446 | Complete |
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Accordion | Complete | Element-only (new) |
+| Alert | Complete | |
+| AlertDialog | Complete | |
+| AutoComplete | Complete | |
+| Avatar | Complete | |
+| Badge | Complete | |
+| Breadcrumb | Complete | |
+| Button | Complete | |
+| Calendar | Complete | |
+| Card | Complete | + submodules (Shape, Media, Hover, Badge) |
+| Carousel | Complete | + submodules (Gestures, Transitions, Effects) |
+| ChatBubble | Complete | |
+| Checkbox | Complete | |
+| CodeBlock | Complete | |
+| Collapsible | Complete | |
+| ColorPicker | Complete | |
+| DataGrid | Complete | + submodules (Types, Cell, Column, Processing) |
+| DatePicker | Complete | + submodules (Types, Format, Render) |
+| DateRangePicker | Complete | + submodules (Types, Presets, Render) |
+| GradientEditor | Complete | |
+| Input | Complete | |
+| Kanban | Complete | + submodules (Types, State, Render, Card, Column) |
+| LoadingBar | Complete | |
+| NumberInput | Complete | |
+| OTPInput | Complete | + submodules (Types, Props, Render, Digit, Animation, Validation, Accessibility) |
+| Pagination | Complete | |
+| PasswordInput | Complete | |
+| Progress | Complete | |
+| Radio | Complete | |
+| Rating | Complete | |
+| SearchInput | Complete | |
+| Select | Complete | |
+| Separator | Complete | |
+| Sheet | Complete | |
+| Skeleton | Complete | |
+| Slider | Complete | |
+| StatCard | Complete | |
+| Stepper | Complete | |
+| Swatch | Complete | Element-only (new) |
+| Switch | Complete | |
+| Table | Complete | |
+| Tabs | Complete | Element-only (new) |
+| TagInput | Complete | |
+| Textarea | Complete | |
+| Timeline | Complete | |
+| TimePicker | Complete | + submodules (Types, Format, Render) |
+| Toast | Complete | |
+| Toggle | Complete | |
+| TreeView | Complete | + submodules (Types, State, Node, Render, Selection, Navigation, Layout, DragDrop, Animation, InlineEdit, Content, Accessibility, Connection, Viewport) |
 
-### Not Yet Ported (31 components, ~10,777 lines)
-
-#### High Priority — Date/Time (use new Scheduling schema)
-
-| Component | Halogen Lines | Notes |
-|-----------|---------------|-------|
-| DateRangePicker | 675 | Uses Calendar internally |
-
-#### Medium Priority — Complex Interactive
-
-| Component | Halogen Lines | Notes |
-|-----------|---------------|-------|
-| Carousel | 631 | Touch/swipe gestures |
-| Kanban | 701 | Drag-drop board |
-| TreeView | 596 | Hierarchical data |
-| Tour | 666 | Onboarding overlay |
-
-#### Medium Priority — Specialized Inputs
-
-| Component | Halogen Lines | Notes |
-|-----------|---------------|-------|
-| OTPInput | 326 | Multi-digit verification |
-| PhoneInput | 547 | International format |
-| CreditCard | 802 | Card detection/formatting |
-| Signature | 701 | Canvas drawing |
-
-#### Lower Priority — Visual Effects
+### Not Yet Ported (7 components)
 
 | Component | Halogen Lines | Notes |
 |-----------|---------------|-------|
 | Confetti | 398 | Particle system |
-| QRCode | 638 | Image generation |
-| GradientEditor | 226 | Color stops editor |
+| CreditCard | 802 | Card detection/formatting |
 | MeshGradientRenderer | 155 | Complex gradient |
+| PhoneInput | 547 | International format |
+| QRCode | 638 | Image generation |
+| Signature | 701 | Canvas drawing |
+| Tour | 666 | Onboarding overlay |
 
-#### Motion Subsystem (18 components, 7,741 lines)
+### Motion Subsystem — Not Yet Ported (19 Halogen components)
 
-**Curve/** (6 components, 2,486 lines)
+**Curve/** (6 components)
 - BezierCurve, CurveEditor, CurveHandle, CurveKeyframe, EasingPicker, EasingPreview
 
-**Property/** (6 components, 2,499 lines)
-- AngleDial, KeyframeToggle, PositionXY, PropertyGroup, PropertyRow, ScrubableNumber
+**Property/** (7 components)
+- AngleDial, KeyframeToggle, PositionXY, PositionXYZ, PropertyGroup, PropertyRow, ScrubableNumber
 
-**Timeline/** (6 components, 2,756 lines)
+**Timeline/** (6 components)
 - AnimationTimeline, KeyframeMarker, LayerTrack, Playhead, PropertyTrack, TimeRuler
 
 ---
@@ -216,12 +202,16 @@ New modules in `src/Hydrogen/Schema/Temporal/`:
 
 ## Recommended Next Steps (Priority Order)
 
-### 1. Port Date/Time Components (uses new Scheduling schema)
+### 1. Port Remaining 7 Components
 
 ```
-DatePicker.purs → Element/Component/DatePicker.purs
-DateRangePicker.purs → Element/Component/DateRangePicker.purs  
-TimePicker.purs → Element/Component/TimePicker.purs
+Confetti.purs → Element/Component/Confetti.purs
+CreditCard.purs → Element/Component/CreditCard.purs
+MeshGradientRenderer.purs → Element/Component/MeshGradientRenderer.purs
+PhoneInput.purs → Element/Component/PhoneInput.purs
+QRCode.purs → Element/Component/QRCode.purs
+Signature.purs → Element/Component/Signature.purs
+Tour.purs → Element/Component/Tour.purs
 ```
 
 ### 2. Create Missing Schema Pillars
@@ -251,19 +241,12 @@ Start with highest-impact:
 - `Hydrogen/API/Client.purs`
 - `Hydrogen/HTML/Renderer.purs`
 
-### 4. Port Complex Interactive Components
+### 4. Port Motion Subsystem
 
-```
-Carousel.purs → Uses Gestural/Swipe
-Kanban.purs → Uses DragDrop
-TreeView.purs → Recursive rendering
-```
-
-### 5. Port Motion Subsystem
-
-This is a large undertaking (7,741 lines). Consider:
+This is the largest remaining undertaking (19 Halogen components). Consider:
 - Start with core timeline components
 - Bezier/easing can reuse Schema/Motion/Easing
+- Property/ components are good candidates for early porting
 
 ---
 

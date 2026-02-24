@@ -86,7 +86,7 @@ import Prelude
   , (<>)
   )
 
-import Data.Int (round, toNumber, hexadecimal, toStringAs) as Int
+import Data.Int as Int
 import Hydrogen.Schema.Color.Channel as Ch
 import Hydrogen.Schema.Color.Opacity as Op
 import Hydrogen.Schema.Color.RGB as RGB

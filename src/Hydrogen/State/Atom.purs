@@ -62,8 +62,8 @@ import Prelude
 
 import Data.Array as Array
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)

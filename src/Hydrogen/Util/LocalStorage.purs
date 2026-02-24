@@ -59,7 +59,7 @@ import Prelude hiding (void)
 
 import Data.Argonaut (class DecodeJson, class EncodeJson, decodeJson, encodeJson, parseJson, stringify)
 import Data.Either (hush)
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
 import Effect (Effect)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

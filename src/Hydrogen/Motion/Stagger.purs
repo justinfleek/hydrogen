@@ -74,7 +74,7 @@ import Prelude
 
 import Data.Int (toNumber) as Int
 import Data.Number (sin, floor) as Number
-import Data.Time.Duration (Milliseconds(..))
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

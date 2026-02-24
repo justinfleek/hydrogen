@@ -100,15 +100,15 @@ module Hydrogen.Document.PDFViewer
   , onError
   , onLoadProgress
     -- * Types
-  , ZoomMode(..)
-  , PageMode(..)
-  , AnnotationMode(..)
+  , ZoomMode(ZoomActual, ZoomFitWidth, ZoomFitPage, ZoomPercent)
+  , PageMode(SinglePage, TwoPage, Continuous)
+  , AnnotationMode(NoAnnotation, Highlight, Underline, Comment)
   , Annotation
-  , AnnotationType(..)
-  , Outline(..)
+  , AnnotationType(HighlightAnnotation, UnderlineAnnotation, CommentAnnotation)
+  , Outline(Outline)
   , unwrapOutline
   , LoadProgress
-  , PDFError(..)
+  , PDFError(LoadError, RenderError, PasswordRequired, InvalidPDF, NetworkError)
     -- * FFI
   , PDFDocument
   , PDFPage
@@ -125,7 +125,7 @@ module Hydrogen.Document.PDFViewer
 import Prelude
 
 import Data.Array (foldl, length, mapWithIndex, range, (!!))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

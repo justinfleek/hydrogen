@@ -49,7 +49,7 @@ derive instance eqBorderWidth :: Eq BorderWidth
 derive instance ordBorderWidth :: Ord BorderWidth
 
 instance showBorderWidth :: Show BorderWidth where
-  show (BorderWidth w) = show w
+  show (BorderWidth w) = "BorderWidth " <> show w
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

@@ -56,7 +56,7 @@ module Hydrogen.Element.Component.ColorPicker.Wheel
   , onColorChange
   
   -- * Wheel Mode
-  , WheelMode(..)
+  , WheelMode(WheelRing, WheelDisc)
   , wheelMode
   ) where
 

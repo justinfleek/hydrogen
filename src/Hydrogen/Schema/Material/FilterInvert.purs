@@ -46,7 +46,7 @@ derive instance eqFilterInvert :: Eq FilterInvert
 derive instance ordFilterInvert :: Ord FilterInvert
 
 instance showFilterInvert :: Show FilterInvert where
-  show (FilterInvert i) = show i
+  show (FilterInvert i) = "FilterInvert " <> show i
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // constructors

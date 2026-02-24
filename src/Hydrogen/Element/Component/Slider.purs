@@ -99,7 +99,7 @@ module Hydrogen.Element.Component.Slider
   , sliderAriaLabel
   
   -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   ) where
 
 import Prelude

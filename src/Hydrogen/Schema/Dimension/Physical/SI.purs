@@ -133,13 +133,8 @@ import Prelude
   , class Ring
   , class Semiring
   , class Show
-  , add
-  , mul
   , negate
-  , one
   , show
-  , sub
-  , zero
   , (+)
   , (-)
   , (*)

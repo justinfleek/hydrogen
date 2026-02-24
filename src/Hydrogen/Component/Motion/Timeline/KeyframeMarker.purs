@@ -43,9 +43,9 @@ module Hydrogen.Component.Motion.Timeline.KeyframeMarker
     component
   
   -- * Types
-  , Query(..)
+  , Query(SetSelected, SetFrame, GetFrame)
   , Input
-  , Output(..)
+  , Output(Selected, DragStart, Dragging, DragEnd, ContextMenu, DoubleClick)
   , Slot
   
   -- * Slot Type

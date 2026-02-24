@@ -70,7 +70,7 @@ module Hydrogen.Element.Input.Slider
   , stepValue
   
   -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
   , Percent
   , mkPercent
   , unwrapPercent

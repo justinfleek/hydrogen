@@ -60,7 +60,7 @@ module Hydrogen.Chart.PieChart
   , PieSlice
   , ComputedSlice
     -- * Label Position
-  , LabelPosition(..)
+  , LabelPosition(Inside, Outside, None)
     -- * Prop Builders
   , colors
   , showLabels
@@ -78,7 +78,7 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (foldl, sum)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Number (cos, sin, pi)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

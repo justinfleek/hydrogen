@@ -51,7 +51,7 @@ module Hydrogen.Chart.AreaChart
   , AreaSeries
   , DataPoint
     -- * Curve Types
-  , CurveType(..)
+  , CurveType(Linear, Bezier, Step)
     -- * Prop Builders
   , curveType
   , showGrid
@@ -67,7 +67,7 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (foldl, maximum, minimum, sum)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Number (abs)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP

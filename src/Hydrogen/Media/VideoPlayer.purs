@@ -131,7 +131,7 @@ import Prelude
 
 import Data.Array (foldl)
 import Data.Int (round, floor)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

@@ -14,6 +14,7 @@
   │ Camera          │ Types, Lens, Projection (FOV ↔ focal length, matrices)  │
   │ Light           │ Types, Attenuation, Directional, Point, Spot, Shadow    │
   │ Material        │ Types, Layer, BRDF, Sparkle, ISP (NVIDIA PPISP-based)   │
+  │ WorldModel      │ Pose, Attention (AnchorWeave-based spatial memory)      │
   └─────────────────────────────────────────────────────────────────────────────┘
   
   Status: 
@@ -24,6 +25,7 @@
     - Camera: 3 modules complete (camera system with proven invariants)
     - Light: 6 modules complete (light system with attenuation proofs)
     - Material: 5 modules complete (PBR + sparkle + ISP)
+    - WorldModel: 2 modules (spatial memory security proofs)
 -/
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -68,3 +70,9 @@ import Hydrogen.Light
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Material
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- WORLDMODEL (Spatial Memory Security for Virtual Environments)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+import Hydrogen.WorldModel

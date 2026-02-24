@@ -70,8 +70,8 @@ module Hydrogen.Component.CreditCard
   , onChange
   , onValidate
     -- * Types
-  , CardType(..)
-  , CardField(..)
+  , CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
+  , CardField(CardNumber, Expiry, Cvv, Cardholder, NoField)
   , CreditCardValue
   , CardValidation
     -- * Utilities
@@ -89,9 +89,9 @@ import Prelude
 
 import Data.Array (foldl, (!!))
 import Data.Int (fromString)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
-import Data.String.Pattern (Pattern(..))
+import Data.String.Pattern (Pattern(Pattern))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)
 import Halogen.HTML as HH

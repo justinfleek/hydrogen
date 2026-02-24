@@ -28,7 +28,7 @@
 module Hydrogen.A11y.Announce
   ( -- * Live Regions
     liveRegion
-  , Politeness(..)
+  , Politeness(Off, Polite, Assertive)
     -- * Semantic Announcements
   , status
   , alert

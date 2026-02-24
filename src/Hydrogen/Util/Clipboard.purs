@@ -50,8 +50,8 @@ module Hydrogen.Util.Clipboard
 import Prelude
 
 import Data.Array (foldl)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
+import Data.Either (Either(Left, Right))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Exception (Error)
 import Halogen.HTML as HH

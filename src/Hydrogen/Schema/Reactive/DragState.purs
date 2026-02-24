@@ -83,7 +83,7 @@ module Hydrogen.Schema.Reactive.DragState
 import Prelude
 
 import Data.Array (elem)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core (sqrt)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

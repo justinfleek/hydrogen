@@ -63,7 +63,7 @@ module Hydrogen.Component.Slider
   , ariaLabelMin
   , ariaLabelMax
     -- * Types
-  , Orientation(..)
+  , Orientation(Horizontal, Vertical)
     -- * FFI
   , SliderElement
   ) where
@@ -72,7 +72,7 @@ import Prelude
 
 import Data.Array (foldl, range)
 import Data.Int (round)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
 import Halogen.HTML as HH

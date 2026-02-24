@@ -70,7 +70,7 @@ import Prelude
 import Data.Array as Array
 import Data.Int (toNumber)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
 import Data.String.Regex (Regex, regex, replace)
 import Data.String.Regex.Flags (global)

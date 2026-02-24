@@ -78,7 +78,7 @@ module Hydrogen.Component.Collapsible
   , triggerClassName
   , contentClassName
     -- * Types
-  , IconPosition(..)
+  , IconPosition(IconLeft, IconRight)
     -- * FFI
   , CollapsibleElement
   , initCollapsible
@@ -91,7 +91,7 @@ module Hydrogen.Component.Collapsible
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2)
 import Halogen.HTML as HH

@@ -107,7 +107,7 @@ module Hydrogen.ThreeD.Model
 import Prelude
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Foreign (Foreign)
