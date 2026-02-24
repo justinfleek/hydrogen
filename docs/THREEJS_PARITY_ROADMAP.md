@@ -2,7 +2,7 @@
 
 > EVERYTHING. Norman Stansfield energy.
 
-## Status: PHASE 1-3 COMPLETE — Proofs finished, PureScript generation next
+## Status: PHASES 1-5 COMPLETE — Total parity analysis done, ~747 functions cataloged for complete Three.js replacement
 
 ---
 
@@ -17,8 +17,24 @@ This section tracks what we ACTUALLY have across the Hydrogen codebase.
 | Layer | Files | Lines | Status |
 |-------|-------|-------|--------|
 | **Lean4 Proofs** | 50+ | ~15,000+ | ✅ COMPLETE (0 sorry) |
+| **WebGPU Geometry** | 7 | ~1,500 | ✅ 15/21 Three.js parity (71%) |
 | **PureScript FFI** | 6 | ~2,500 | ⚠️ Three.js wrapper (TO REPLACE) |
 | **PureScript Pure** | 1 | ~700 | ✅ Math/Core.purs |
+
+### WebGPU Geometry Generators (NEW)
+
+**Location:** `src/Hydrogen/GPU/WebGPU/Scene3D/Geometry/`
+
+| Module | Lines | Generators |
+|--------|-------|------------|
+| Core.purs | 125 | MeshData type, utilities |
+| Count.purs | 59 | Vertex/index formulas (Lean proofs) |
+| Basic.purs | 170 | Box, Plane |
+| Curved.purs | 414 | Sphere, Cylinder, Cone, Circle, Ring, Torus, Capsule |
+| Platonic.purs | 411 | Icosahedron, Octahedron, Tetrahedron, Dodecahedron |
+| Procedural.purs | 201 | TorusKnot, Lathe |
+
+**Test coverage:** 544/544 tests pass (2 pending)
 
 ### Lean4 Proofs (proofs/Hydrogen/)
 
@@ -587,6 +603,47 @@ dispose, merge, groups, addGroup, clearGroups
 - Bounding box/sphere correctly contains all vertices
 
 ### 3.2 Primitive Geometries
+
+**HYDROGEN IMPLEMENTATION STATUS: 15/21 (71%)**
+
+*Last updated: 2026-02-24*
+
+| Geometry | Hydrogen | Module | Notes |
+|----------|:--------:|--------|-------|
+| `BoxGeometry` | ✅ | Basic.purs | Full segment support |
+| `PlaneGeometry` | ✅ | Basic.purs | Full segment support |
+| `CircleGeometry` | ✅ | Curved.purs | With theta arc support |
+| `RingGeometry` | ✅ | Curved.purs | With theta arc support |
+| `SphereGeometry` | ✅ | Curved.purs | Full phi/theta support |
+| `CylinderGeometry` | ✅ | Curved.purs | With caps, arc support |
+| `ConeGeometry` | ✅ | Curved.purs | Via cylinder with radiusTop=0 |
+| `CapsuleGeometry` | ✅ | Curved.purs | Hemisphere caps + body |
+| `TorusGeometry` | ✅ | Curved.purs | With arc support |
+| `TorusKnotGeometry` | ✅ | Procedural.purs | Full p,q knot parameters |
+| `DodecahedronGeometry` | ✅ | Platonic.purs | With subdivision |
+| `IcosahedronGeometry` | ✅ | Platonic.purs | With subdivision |
+| `OctahedronGeometry` | ✅ | Platonic.purs | With subdivision |
+| `TetrahedronGeometry` | ✅ | Platonic.purs | With subdivision |
+| `LatheGeometry` | ✅ | Procedural.purs | 2D profile revolution |
+| `PolyhedronGeometry` | ❌ | — | Internal only (subdividePolyhedron) |
+| `ExtrudeGeometry` | ❌ | — | Requires Path/Shape system |
+| `ShapeGeometry` | ❌ | — | Requires Path/Shape system |
+| `TubeGeometry` | ❌ | — | Requires 3D Curve system |
+| `EdgesGeometry` | ❌ | — | Utility (edge extraction) |
+| `WireframeGeometry` | ❌ | — | Utility (triangle→lines) |
+
+**REMAINING WORK:**
+
+| Geometry | Blocker | Effort |
+|----------|---------|--------|
+| `PolyhedronGeometry` | None (expose internal) | Low |
+| `EdgesGeometry` | None | Low |
+| `WireframeGeometry` | None | Low |
+| `ExtrudeGeometry` | Path/Shape system | High |
+| `ShapeGeometry` | Path/Shape system | High |
+| `TubeGeometry` | 3D Curve system | Medium |
+
+**Original Three.js Reference:**
 
 | Geometry | Parameters | Vertices | Triangles |
 |----------|------------|----------|-----------|
@@ -1833,12 +1890,628 @@ PHASE 6: PureScript Generation ⏳ NEXT
 | 10. Extras | 82 | varies | ~10 | ~0 |
 | **TOTAL** | **~280** | **~1,900+** | **~260** | **~197** ✅ |
 
-**Proof Progress: ~76% complete**
+**Proof Progress: ~76% complete (197/260)**
 
-Remaining work is primarily in:
-- Animation (skeletal, keyframes)
-- Core Objects (Object3D scene graph methods)
-- Some Math utilities (random, power-of-two)
+Remaining proofs primarily in:
+- Animation (skeletal, keyframes) — ~21 proofs
+- Core Objects (Object3D scene graph methods) — ~27 proofs
+- Some Math utilities (random, power-of-two) — ~10 proofs
+
+---
+
+## COMPLETE PARITY GAP ANALYSIS
+
+*Council audit completed: 2026-02-24*
+
+Total scan of the entire codebase against Three.js r170 API. Every function,
+every type, every gap cataloged. This section defines EVERYTHING needed to
+completely replace the ThreeD/ FFI wrappers and achieve full Three.js parity.
+
+### Summary of Gaps
+
+| Domain | New Functions | New Types | CRITICAL | HIGH | MEDIUM | LOW | Lean4 Proofs |
+|--------|-------------|-----------|----------|------|--------|-----|-------------|
+| Math Foundation | 184 | 10 | 23 | 72 | 53 | 40 | 33 |
+| Geometry & Scene | 141 | 8 | 38 | 53 | 30 | 20 | 29 |
+| Materials & Rendering | 211 | 25 | 42 | 68 | 55 | 46 | 18 |
+| Animation & Extras | 211 | 15 | 86 | 64 | 35 | 14 | 16 |
+| **TOTAL** | **~747** | **~58** | **189** | **257** | **173** | **120** | **~96** |
+
+### What Already Exists (Pure)
+
+Before listing gaps, the audit confirmed these are COMPLETE and pure:
+
+- **Math/Core.purs** — 50+ functions, all Taylor series / Newton-Raphson (no FFI)
+- **Vec2/Vec3/Vec4** — core operations (add, sub, scale, dot, cross, normalize, lerp, distance)
+- **Mat3/Mat4** — multiply, determinant, inverse, transpose, rotation, projection (ALL PROVEN)
+- **Quaternion** — multiply, slerp, conjugate, inverse, toMat4, rotateVec3 (ALL PROVEN)
+- **Euler** — all 6 rotation orders, toMat3/Mat4/Quaternion (ALL PROVEN)
+- **Box3/Sphere/Plane/Ray/Triangle/Frustum** — core operations (ALL PROVEN)
+- **GPU Scene3D** — Scene3D, Camera3D, Light3D (5 types), Material3D (3 types), Mesh3D (17 types)
+- **GPU WebGPU** — complete type system (909 lines), device management, shaders, pipeline, render commands
+- **GPU Geometry** — 15/21 primitive generators with 544/544 tests passing
+- **Schema Spatial** — 11 PBR atoms (Roughness, Metallic, IOR, etc.) all bounded
+- **Schema Color** — 10+ color spaces with conversion, 10 Lean4 proofs
+- **Rust/WASM Runtime** — binary parser, tessellator, WebGPU renderer
+
+---
+
+### GAP 1: MATH FOUNDATION — 184 functions, 10 new types
+
+#### 1A. Vector Operations Missing (66 functions)
+
+**CRITICAL — blocks FFI replacement:**
+
+| Function | Module | Signature | Description |
+|----------|--------|-----------|-------------|
+| `applyMat3Vec2` | Vec2 | `Mat3 -> Vec2 Number -> Vec2 Number` | Transform Vec2 by Mat3 (2D homogeneous) |
+| `applyMat4Vec3` | Vec3 | `Mat4 -> Vec3 Number -> Vec3 Number` | Transform Vec3 by Mat4 as position (w=1) |
+| `applyQuaternionVec3` | Vec3 | `Quaternion -> Vec3 Number -> Vec3 Number` | Re-export of `rotateVec3` from Quaternion |
+| `transformDirectionVec3` | Vec3 | `Mat4 -> Vec3 Number -> Vec3 Number` | Transform direction by upper-3x3, normalize |
+| `setFromMatrixPositionVec3` | Vec3 | `Mat4 -> Vec3 Number` | Extract translation from Mat4 |
+| `setFromMatrixScaleVec3` | Vec3 | `Mat4 -> Vec3 Number` | Extract scale factors from Mat4 |
+| `applyMat4Vec4` | Vec4 | `Mat4 -> Vec4 Number -> Vec4 Number` | Re-export of `mulVec4Mat4` from Mat4 |
+
+**HIGH — full API surface (per vector type):**
+- `minVec{2,3,4}` / `maxVec{2,3,4}` — component-wise min/max
+- `clampVec{2,3,4}` — component-wise clamp to range
+- `floorVec{2,3,4}` / `ceilVec{2,3,4}` / `roundVec{2,3,4}` — component-wise rounding
+- `divideScalarVec{2,3,4}` — divide by scalar
+- `getComponentVec{2,3,4}` / `setComponentVec{2,3,4}` — indexed access
+- `equalsEpsilonVec{2,3,4}` — approximate equality
+- `angleToVec3` — angle between vectors
+- `manhattanLengthVec3` / `manhattanDistanceToVec3`
+- `setFromSphericalVec3` / `setFromCylindricalVec3`
+- `setFromMatrixColumnVec3`
+- `rotateAroundVec2`
+
+**MEDIUM:** addScalar, subScalar, clampScalar, clampLength, roundToZero, projectOnPlane
+**LOW:** random, randomDirection, width/height aliases
+
+#### 1B. Matrix Operations Missing (24 functions)
+
+**CRITICAL:**
+
+| Function | Module | Signature | Description |
+|----------|--------|-----------|-------------|
+| `decomposeMat4` | Mat4 | `Mat4 -> { position :: Vec3, quaternion :: Quaternion, scale :: Vec3 }` | **THE KEY FUNCTION** — decompose TRS matrix |
+| `composeMat4` | Mat4 | `Vec3 -> Quaternion -> Vec3 -> Mat4` | Compose from position + rotation + scale |
+| `makeRotationAxisMat4` | Mat4 | `Vec3 -> Number -> Mat4` | Rotation around arbitrary axis |
+| `makeRotationFromQuaternionMat4` | Mat4 | `Quaternion -> Mat4` | Re-export of `toMat4Quaternion` |
+| `makeRotationFromEulerMat4` | Mat4 | `Euler -> Mat4` | Re-export of `toMat4Euler` |
+| `extractRotationMat4` | Mat4 | `Mat4 -> Mat4` | Extract rotation (remove scale) |
+| `setFromMat4Mat3` | Mat3 | `Mat4 -> Mat3` | Extract upper-left 3x3 |
+| `getNormalMatrixMat3` | Mat3 | `Mat4 -> Mat3` | transpose(inverse(upper 3x3)) for lighting |
+
+**HIGH:** extractBasis, makeBasis, premultiply, maxScaleOnAxis, equalsEpsilon, toArray/fromArray
+**MEDIUM:** setFromMat3Mat4, copyPosition, makeShear, setUvTransform
+
+#### 1C. Rotation Operations Missing (16 functions)
+
+**CRITICAL:**
+
+| Function | Module | Signature | Description |
+|----------|--------|-----------|-------------|
+| `setFromEulerQuaternion` | Quaternion | `Euler -> Quaternion` | Re-export of `toQuaternionEuler` |
+| `setFromRotationMatrixQuaternion` | Quaternion | `Mat4 -> Quaternion` | Extract rotation from matrix (Shepperd) |
+| `setFromUnitVectorsQuaternion` | Quaternion | `Vec3 -> Vec3 -> Quaternion` | Quaternion rotating `from` to `to` |
+| `setFromRotationMatrixEuler` | Euler | `Mat4 -> RotationOrder -> Euler` | Extract Euler from rotation matrix |
+| `setFromQuaternionEuler` | Euler | `Quaternion -> RotationOrder -> Euler` | Extract Euler from quaternion |
+
+**HIGH:** angleToQuaternion, rotateTowards, premultiply, toMat3Quaternion, equalsEpsilon
+
+#### 1D. New Types Needed
+
+| Type | Module | Priority | Description |
+|------|--------|----------|-------------|
+| `Spherical` | Schema/Dimension/Coordinate/ | HIGH | `{ radius, phi, theta }` — for orbit camera |
+| `Cylindrical` | Schema/Dimension/Coordinate/ | MEDIUM | `{ radius, theta, y }` — coordinate conversions |
+| `Box2` | Schema/Geometry/ | HIGH | 2D AABB (22 functions) |
+| `Line3` | Schema/Geometry/ | HIGH | 3D line segment (12 functions) |
+| `Mat2` | Schema/Dimension/Matrix/ | LOW | 2x2 matrix (10 functions) |
+| `SphericalHarmonics3` | Schema/Dimension/Lighting/ | LOW | 9 Vec3 coefficients for irradiance |
+| `LinearInterpolant` | Schema/Dimension/Interpolant/ | HIGH | Linear keyframe interpolation |
+| `CubicInterpolant` | Schema/Dimension/Interpolant/ | MEDIUM | Cubic spline interpolation |
+| `DiscreteInterpolant` | Schema/Dimension/Interpolant/ | MEDIUM | Step function interpolation |
+| `QuaternionLinearInterpolant` | Schema/Dimension/Interpolant/ | MEDIUM | Quaternion SLERP interpolation |
+
+#### 1E. Math Utilities Missing (12 functions)
+
+| Function | Priority | Description |
+|----------|----------|-------------|
+| `seededRandom` | MEDIUM | Deterministic PRNG from seed |
+| `isPowerOfTwo` | HIGH | Check if integer is 2^n |
+| `ceilPowerOfTwo` / `floorPowerOfTwo` | HIGH | Next/previous power of two |
+| `pingpong` | MEDIUM | Triangle wave oscillation |
+| `euclideanMod` | HIGH | Always non-negative modulus |
+| `randInt` / `randFloat` / `randFloatSpread` | MEDIUM | Seeded random variants |
+| `denormalize` / `normalizeToRange` | MEDIUM | [0,1] range mapping |
+
+---
+
+### GAP 2: GEOMETRY PRIMITIVES — 50 functions, 2 new types
+
+#### 2A. Ray Intersection (THE BIG GAP) — 15 functions
+
+**Every ray intersection algorithm is missing from PureScript.** The Lean4 proofs
+exist (Ray.lean) but the PureScript implementations have not been generated.
+
+| Function | Signature | Priority | Lean4 Proof |
+|----------|-----------|----------|-------------|
+| `intersectSpherePar` | `Ray -> Sphere -> Maybe Number` | **CRITICAL** | `intersectSphere_pointAt_onSphere` |
+| `intersectSpherePoint` | `Ray -> Sphere -> Maybe (Vec3 Number)` | **CRITICAL** | derives from above |
+| `intersectBoxPar` | `Ray -> Box3 -> Maybe Number` | **CRITICAL** | `intersectBox_pointAt_inside` |
+| `intersectBoxPoint` | `Ray -> Box3 -> Maybe (Vec3 Number)` | **CRITICAL** | derives from above |
+| `intersectTrianglePar` | `Ray -> Triangle -> Boolean -> Maybe Number` | **CRITICAL** | `intersectTriangle_pointAt_onTriangle` |
+| `intersectTrianglePoint` | `Ray -> Triangle -> Boolean -> Maybe (Vec3 Number)` | **CRITICAL** | derives from above |
+| `intersectPlanePar` | `Ray -> Plane -> Maybe Number` | **CRITICAL** | `intersectPlane_pointAt_onPlane` |
+| `intersectPlanePoint` | `Ray -> Plane -> Maybe (Vec3 Number)` | **CRITICAL** | derives from above |
+| `intersectsRaySphere` | `Ray -> Sphere -> Boolean` | HIGH | derives |
+| `intersectsRayBox` | `Ray -> Box3 -> Boolean` | HIGH | derives |
+| `intersectsRayPlane` | `Ray -> Plane -> Boolean` | HIGH | derives |
+| `distanceToPlanePar` | `Ray -> Plane -> Maybe Number` | HIGH | — |
+| `distanceSqToSegment` | `Ray -> Vec3 -> Vec3 -> Record` | HIGH | `nonneg` |
+| `applyMatrix4Ray` | `Mat4 -> Ray -> Ray` | **CRITICAL** | `identity` |
+| `equalsRay` | `Ray -> Ray -> Boolean` | LOW | — |
+
+`intersectTrianglePar` (Moller-Trumbore) is the most performance-critical function.
+Called once per triangle per ray in the raycasting pipeline.
+
+#### 2B. Geometry Primitive Gaps (35 functions)
+
+**Box3 missing (8):** `box3FromPoints` (CRITICAL), `applyMatrix4Box3` (CRITICAL),
+`intersectsTriangleBox3` (CRITICAL — SAT), `intersectsSphereBox3` (HIGH),
+`intersectsPlaneBox3` (HIGH), `getBoundingSphereBox3` (HIGH), `getParameterBox3`,
+`equalsBox3`
+
+**Sphere missing (8):** `sphereFromPoints` (CRITICAL), `applyMatrix4Sphere` (CRITICAL),
+`sphereFromBox`, `clampPointSphere`, `getBoundingBoxSphere`, `intersectsBoxSphere`,
+`intersectsPlaneSphere`, `equalsSphere`
+
+**Plane missing (6):** `normalizePlane` (CRITICAL), `intersectLinePlane` (CRITICAL),
+`applyMatrix4Plane` (CRITICAL), `intersectsBoxPlane`, `intersectsSpherePlane`, `equalsPlane`
+
+**Triangle missing (10):** `barycoordTriangle` (CRITICAL — from arbitrary point),
+`containsPointTriangle` (CRITICAL), `closestPointToPointTriangle` (CRITICAL — Voronoi),
+`getPlaneTriangle` (HIGH), `isFrontFacing`, `getUVTriangle`, `getInterpolation`,
+`normalTriangle`, `intersectsBoxTriangle`, `equalsTriangle`
+
+**Frustum missing (3):** `frustumFromProjectionMatrix` (CRITICAL — Gribb-Hartmann),
+`intersectsObjectFrustum`, `intersectsSpriteFrustum`
+
+---
+
+### GAP 3: CORE OBJECTS — 56 functions, 6 new modules
+
+**These modules DO NOT EXIST yet.** They are required for FFI replacement.
+
+#### 3A. Object3D — Scene Graph Node (`GPU/Scene3D/Object3D.purs`)
+
+Pure rose tree replacing Three.js's mutable Object3D:
+
+```purescript
+type Object3D msg =
+  { id :: UUID5, name :: String
+  , position :: Vec3 Number, rotation :: Quaternion, scale :: Vec3 Number
+  , matrix :: Mat4, matrixWorld :: Mat4
+  , visible :: Boolean, renderOrder :: Int, layers :: Layers
+  , castShadow :: Boolean, receiveShadow :: Boolean, frustumCulled :: Boolean
+  , children :: Array (SceneNode msg)
+  }
+
+data SceneNode msg
+  = MeshNode (Object3D msg) (MeshParams msg)
+  | LightNode (Object3D msg) Light3D
+  | CameraNode (Object3D msg) Camera3D
+  | GroupNode (Object3D msg)
+  | SceneRoot (Object3D msg) SceneEnvironment
+```
+
+**CRITICAL functions (21):**
+- `defaultObject3D`, `updateMatrix`, `updateMatrixWorld`, `updateWorldMatrixTree`
+- `addChild`, `removeChild`, `traverseTree`, `traverseVisible`
+- `localToWorld`, `worldToLocal`, `lookAtObject3D`
+- `getWorldPosition`, `getWorldQuaternion`, `getWorldScale`, `getWorldDirection`
+- `decomposeMatrix` (depends on `decomposeMat4`)
+- `flattenSceneGraph` — converts tree to flat `Scene3D` for existing render pipeline
+- `findByName`, `findById`
+
+#### 3B. Layers (`GPU/Scene3D/Layers.purs`)
+
+32-bit visibility bitmask. 10 functions: `enableLayer`, `disableLayer`, `toggleLayer`,
+`setLayer`, `testLayers`, `isLayerEnabled`, `layersDefault`, `layersAll`, `layersNone`
+
+#### 3C. Raycaster (`GPU/Scene3D/Raycaster.purs`)
+
+**CRITICAL for FFI replacement.** This is how all mouse/touch interaction works.
+
+| Function | Priority | Description |
+|----------|----------|-------------|
+| `rayFromCamera` | **CRITICAL** | Construct ray from camera through NDC point |
+| `intersectMesh` | **CRITICAL** | Ray-mesh intersection (iterate triangles) |
+| `intersectObject` | **CRITICAL** | Ray-scene node (transform ray, test geometry) |
+| `intersectObjects` | **CRITICAL** | Batch intersection, sorted by distance |
+| `nearestIntersection` | HIGH | Get closest hit |
+| `filterByLayers` | HIGH | Filter by layer mask |
+
+Depends on: Ray intersection functions (Gap 2A), Object3D, Camera3D
+
+#### 3D. Scene Environment, Fog, Clock, EventDispatcher
+
+- `SceneEnvironment` — background + fog + environment map
+- `Fog3D` — `LinearFog` and `ExponentialFog` variants
+- `Clock` — pure time tracking (6 functions)
+- `EventDispatcher` — pure pub-sub (LOW priority, TEA subsumes it)
+
+---
+
+### GAP 4: MATERIALS — 67 items (13 material types, 12 PBR properties, 21 base properties)
+
+#### 4A. Missing Material Types
+
+| Material | Priority | WGSL Shader Needed | Description |
+|----------|----------|-------------------|-------------|
+| `PhongMaterial3D` | **CRITICAL** | Yes — Blinn-Phong | FFI exposes `phongMaterial`, needs pure replacement |
+| `ToonMaterial3D` | HIGH | Yes — cel shading | Gradient-based quantized lighting |
+| `MatcapMaterial3D` | HIGH | Yes — matcap lookup | Texture-based lighting (no light calculation) |
+| `LambertMaterial3D` | MEDIUM | Yes — N dot L diffuse | Simple diffuse, cheaper than PBR |
+| `NormalMaterial3D` | MEDIUM | Yes — normal-to-color | Debug visualization |
+| `DepthMaterial3D` | MEDIUM | Yes — depth encode | Shadow maps, SSAO pre-pass |
+| `DistanceMaterial3D` | MEDIUM | Yes — distance encode | Point light shadow cubemaps |
+| `LineBasicMaterial3D` | HIGH | Yes — line topology | Line rendering |
+| `LineDashedMaterial3D` | MEDIUM | Yes — dashed discard | Dashed lines |
+| `PointsMaterial3D` | HIGH | Yes — point sprites | Point cloud rendering |
+| `SpriteMaterial3D` | MEDIUM | Yes — billboard | Always-facing-camera quads |
+| `ShaderMaterial3D` | HIGH | No (user-supplied) | Custom shader wrapper |
+| `ShadowMaterial3D` | LOW | Yes — shadow-only | Shadow receiver, invisible otherwise |
+
+#### 4B. Missing PBR Properties on PhysicalMaterial3D
+
+| Property | Type | Priority | Description |
+|----------|------|----------|-------------|
+| `sheenRoughness` | `Number [0,1]` | HIGH | Roughness of sheen layer |
+| `sheenColor` | `RGBA` | HIGH | Sheen color tint |
+| `specularIntensity` | `Number [0,1]` | HIGH | Specular strength |
+| `specularColor` | `RGBA` | HIGH | Specular tint |
+| `attenuationDistance` | `Meter` | HIGH | Volume absorption distance |
+| `attenuationColor` | `RGBA` | HIGH | Volume absorption color |
+| `iridescence` | `Number [0,1]` | MEDIUM | Thin-film interference |
+| `iridescenceIOR` | `Number [1,3]` | MEDIUM | Thin-film IOR |
+| `iridescenceThicknessRange` | `{ min, max }` | MEDIUM | Film thickness range |
+| `anisotropyRotation` | `Number [0,2pi]` | MEDIUM | Anisotropy direction |
+| `clearcoatNormalScale` | `Vec2 Number` | MEDIUM | Clearcoat normal strength |
+| `dispersion` | `Number [0,1]` | LOW | Chromatic dispersion |
+
+#### 4C. Missing Material Base Properties
+
+**HIGH:** `MaterialSide` (FrontSide/BackSide/DoubleSide), `BlendingMode`,
+`alphaTest`, `depthTest`, `depthWrite`, `flatShading`
+
+**MEDIUM:** `depthFunc`, `polygonOffset` + factor/units, `colorWrite`
+
+**LOW:** stencil operations (stencilWrite, stencilFunc, stencilRef, stencilOps)
+
+---
+
+### GAP 5: TEXTURES — Entirely new module (~26 types)
+
+The texture system does not exist in pure PureScript. `GPU/WebGPU/Types.purs`
+has low-level descriptors but no scene-level abstraction.
+
+**CRITICAL types:**
+- `Texture3D` — ADT with 8 variants (Image, Cube, Data, Video, Canvas, Compressed, Depth, RenderTarget)
+- `TextureRef` — opaque handle to loaded texture
+- `TextureSource` — URL, raw data, or canvas reference
+- `WrapMode` — Repeat, ClampToEdge, MirroredRepeat
+- `FilterMode` — Nearest, Linear, mipmap variants
+- `TextureSlot` — 25 texture slots (map, normalMap, roughnessMap, etc.)
+- `MaterialTextures` — maps texture refs to material slots
+- `textureToGPUSampler` / `textureToGPUDescriptor` — bridge to WebGPU
+
+---
+
+### GAP 6: LIGHTS — 8 items
+
+- `RectAreaLight3D` — rectangular area light (HIGH, needs LTC shader)
+- `LightProbe3D` — spherical harmonics (MEDIUM)
+- `ShadowConfig` — first-class shadow configuration (CRITICAL)
+- `ShadowType` — BasicShadow / PCFShadow / PCFSoftShadow / VSMShadow (CRITICAL)
+- `ShadowCamera` — perspective or orthographic for shadow map (CRITICAL)
+- Physical light units: `Candela`, `Lux`, `Nit` (MEDIUM)
+
+---
+
+### GAP 7: CAMERAS — 10 items
+
+- `ArrayCamera3D` — multi-viewport (LOW)
+- `CubeCamera3D` — cubemap rendering for reflections (MEDIUM)
+- `StereoCamera3D` — VR stereo pair (LOW)
+- `ViewOffset` — sub-rectangle rendering (MEDIUM)
+- `updateProjectionMatrix` — public function on Camera3D (CRITICAL)
+- `extractFrustumPlanes` — Gribb-Hartmann from view-projection (HIGH)
+- `filmGauge` / `filmOffset` — shift lens (LOW)
+
+---
+
+### GAP 8: CONTROLS — 17 functions, pure state machines
+
+**CRITICAL — OrbitControls (8 functions):**
+- `OrbitControlState` — spherical coords, damping, bounds
+- `defaultOrbitState`, `orbitUpdate`, `orbitRotate`, `orbitZoom`, `orbitPan`
+- `orbitToCamera` — extract Camera3D from orbit state
+- `processOrbitInput` — route input events
+- `ControlInputEvent` — unified input ADT (MouseDown/Up/Move/Wheel, KeyDown/Up, Touch)
+
+**HIGH — FlyControls (5 functions):**
+- `FlyControlState`, `defaultFlyState`, `flyUpdate`, `flyToCamera`, `FlyInputState`
+
+**HIGH — FirstPersonControls (4 functions):**
+- `FirstPersonControlState`, `defaultFirstPersonState`, `firstPersonUpdate`, `firstPersonToCamera`
+
+**MEDIUM — TransformGizmo (6 functions):**
+- `TransformGizmoState`, `TransformMode3D`, `GizmoAxis`, `gizmoHitTest`, `gizmoApplyDrag`
+
+---
+
+### GAP 9: RENDERER & POST-PROCESSING — 40 items
+
+**CRITICAL:**
+- `RenderTarget` — offscreen rendering (shadow maps, post-processing)
+- `RenderPass` — ADT (GeometryPass, ShadowPass, PostProcessPass, PickPass)
+- `RenderPipeline` — ordered array of passes
+- `PostProcessEffect` — ADT (Bloom, SSAO, FXAA, Tonemap, DOF, Outline, etc.)
+- `RendererConfig` — complete renderer configuration
+- Additional tonemap shaders: Reinhard, Cineon, AgX, Neutral, Linear (ACES exists)
+
+**HIGH:**
+- `BloomParams` — Kawase blur + bright-pass
+- `SSAOParams` — kernel size, radius, intensity
+- `FXAAParams` — FXAA 3.11
+- `ColorGradingParams` — brightness, contrast, saturation, hue
+- `AnimationState` / `animationTick` — animation loop state
+- `ResourceRegistry` / `DisposeCommand` — GPU resource lifecycle
+
+---
+
+### GAP 10: ANIMATION SYSTEM — 55 functions, entirely new
+
+**The entire skeletal animation system needs to be built in pure PureScript.**
+
+#### 10A. Core Animation (30 CRITICAL functions)
+
+- `InterpolateMode` — Discrete / Linear / Smooth
+- `Interpolant` — base state + evaluators (linear, cubic, discrete, quaternion)
+- `KeyframeTrack` — times + values + interpolation mode
+- Track types: Number, Vector, Quaternion, Color, Boolean, String
+- `AnimationClip` — name + duration + tracks array
+- `AnimationActionState` — pure playback state (loop, weight, fade, warp)
+- `MixerState` — array of action states
+- `updateMixer` — advance all actions by delta
+- `sampleActions` — evaluate all active tracks, return values for runtime
+
+#### 10B. Skeleton / Skinning (13 functions)
+
+- `Bone` — joint with parent index + local transform
+- `Skeleton` — bone array + inverse bind matrices
+- `SkinnedMeshState` — skeleton + bind matrix
+- `computeSkinning` — `vertex' = SUM(weight[i] * boneMatrix[i] * bindInverse[i] * vertex)`
+- `normalizeSkinWeights` — ensure weights sum to 1
+- `calculateInverses` / `updateSkeleton` / `poseSkeleton`
+
+#### 10C. PropertyBinding (3 functions)
+
+- `PropertyPath` — parsed binding path
+- `parsePropertyPath` — parse "bones[2].position[1]" syntax
+- `propertyPathToString`
+
+---
+
+### GAP 11: CURVES & PATHS — 45 functions
+
+**CRITICAL — blocks ExtrudeGeometry, ShapeGeometry, TubeGeometry.**
+
+#### 11A. Curve Types
+
+- `Curve2D` / `Curve3D` — ADT for all curve variants
+- `LineCurve2D` / `LineCurve3D`
+- `QuadBezier2D` / `QuadBezier3D`
+- `CubicBezier2D` / `CubicBezier3D`
+- `EllipseCurve` (covers ArcCurve)
+- `SplineCurve2D`
+- `CatmullRom3D` — centripetal / chordal / catmullrom
+
+#### 11B. Curve Operations
+
+- `getPoint2D` / `getPoint3D` — evaluate at parameter t
+- `getCurveLength2D` / `getCurveLength3D` — arc length
+- `getPointAtArcLength2D` / `getPointAtArcLength3D` — uniform sampling
+- `getTangent2D` / `getTangent3D` — unit tangent
+- `computeFrenetFrames` — **CRITICAL for TubeGeometry** (T, N, B frames)
+
+#### 11C. Path & Shape
+
+- `Path2D` — moveTo, lineTo, quadraticCurveTo, bezierCurveTo, arc, absarc, ellipse
+- `Shape` — Path2D with holes
+- `signedArea` / `isClockwise` — winding direction
+- `triangulateShape` — **ear-clipping triangulation** (CRITICAL, ~200 lines)
+
+---
+
+### GAP 12: REMAINING GEOMETRIES — 7 generators
+
+| Geometry | Blockers | Effort | Priority |
+|----------|----------|--------|----------|
+| `PolyhedronGeometry` | None (expose existing subdivide) | Small | HIGH |
+| `ShapeGeometry` | Shape + triangulateShape | Large | **CRITICAL** |
+| `ExtrudeGeometry` | Shape + triangulateShape + Curves | Large | **CRITICAL** |
+| `TubeGeometry` | Curve3D + computeFrenetFrames | Large | HIGH |
+| `EdgesGeometry` | None | Medium | MEDIUM |
+| `WireframeGeometry` | None | Medium | MEDIUM |
+
+---
+
+### GAP 13: LOADERS — 17 types
+
+- `GLTFScene` / `GLTFNode` / `GLTFAnimation` — parsed GLTF as pure Hydrogen types
+- `parseGLTF` / `parseGLB` — pure binary parsers (CRITICAL, large effort)
+- `LoadingState` / `LoadingManagerState` — pure loading coordination
+- `TextureDescriptor` / `CubeTextureDescriptor` — what to load
+- `AssetCache` — typed cache
+- `DRACOConfig` / `KTX2Config` — compression configuration
+
+---
+
+### GAP 14: SPECIAL OBJECTS — 14 types
+
+- `InstancedMeshParams` — instanced rendering (CRITICAL for performance)
+- `LOD` / `LODLevel` / `selectLODLevel` — level of detail
+- `SpriteParams` / `SpriteMaterial` — billboard sprites
+- `PointsParams` / `PointsMaterial` — point clouds
+- `LineParams` / `LineSegmentsParams` / `LineLoopParams` / `LineMaterial` — line rendering
+- Extend `SceneCommand` ADT with DrawSprite, DrawPoints, DrawLine, DrawInstancedMesh
+
+---
+
+### GAP 15: HELPERS — 15 types
+
+All pure data descriptions. Runtime generates line/mesh geometry.
+
+- `BoxHelper` / `Box3Helper` — wireframe AABB
+- `CameraHelper` / `cameraHelperLines` — frustum visualization
+- `DirectionalLightHelper` / `PointLightHelper` / `SpotLightHelper`
+- `SkeletonHelper` / `skeletonHelperLines`
+- `ArrowHelper` / `arrowHelperGeometry`
+- `PolarGridHelper` / `PlaneHelper`
+
+---
+
+### GAP 16: EXPORTERS — 10 functions
+
+- `exportGLTF` / `exportGLB` — scene to GLTF/GLB (MEDIUM)
+- `exportOBJ` — mesh to OBJ + MTL (LOW)
+- `exportSTLAscii` / `exportSTLBinary` — geometry to STL (LOW)
+- `exportPLY` — geometry to PLY (LOW)
+
+---
+
+### CRITICAL PATH — Implementation Order
+
+```
+PHASE 6: Math Completion (parallelizable)
+├─ decomposeMat4 / composeMat4                     ← blocks Object3D
+├─ setFromRotationMatrixQuaternion                  ← blocks decompose
+├─ setFromUnitVectorsQuaternion                     ← blocks orientation
+├─ setFromRotationMatrixEuler / setFromQuaternionEuler
+├─ getNormalMatrixMat3 / setFromMat4Mat3            ← blocks lighting
+├─ Spherical coordinates                            ← blocks OrbitControls
+└─ Vector apply* functions                          ← blocks transforms
+
+PHASE 7: Ray Intersection (parallelizable)
+├─ intersectSpherePar (quadratic solve)
+├─ intersectBoxPar (slab method)
+├─ intersectTrianglePar (Moller-Trumbore)           ← THE critical function
+├─ intersectPlanePar
+├─ normalizePlane / intersectLinePlane
+├─ applyMatrix4 for Box3, Sphere, Plane, Ray
+└─ barycoordTriangle / containsPointTriangle
+
+PHASE 8: Scene Graph (depends on Phase 6)
+├─ Object3D type + updateMatrix / updateMatrixWorld
+├─ Layers
+├─ Scene / Fog
+├─ flattenSceneGraph                                ← bridges to existing render
+└─ frustumFromProjectionMatrix
+
+PHASE 9: Raycasting Pipeline (depends on Phase 7 + 8)
+├─ rayFromCamera                                    ← REPLACES FFI PICKING
+├─ intersectMesh (iterate triangles)
+├─ intersectObject / intersectObjects
+└─ Controls as pure state machines
+
+PHASE 10: Materials & Textures (parallelizable)
+├─ Additional material types + WGSL shaders
+├─ Texture system
+├─ Shadow configuration
+├─ Post-processing framework
+└─ Additional tonemap shaders
+
+PHASE 11: Animation (parallelizable with Phase 10)
+├─ Interpolants + KeyframeTrack
+├─ AnimationClip + AnimationAction
+├─ AnimationMixer
+├─ PropertyBinding
+├─ Skeleton / Skinning
+└─ Skinning vertex shader
+
+PHASE 12: Curves & Advanced Geometry (depends on Phase 11 partially)
+├─ Curve2D / Curve3D types + operations
+├─ Path2D + Shape + triangulateShape
+├─ ShapeGeometry / ExtrudeGeometry / TubeGeometry
+├─ Frenet frames
+└─ Remaining geometries
+
+PHASE 13: Extras (parallelizable)
+├─ Helpers
+├─ Special objects (instanced, LOD, sprites, lines, points)
+├─ Loaders (GLTF/GLB parser)
+├─ Exporters
+└─ Resource management
+```
+
+**Phases 6, 7, 10, 11, 13 are parallelizable.**
+**Phases 8 depends on 6. Phase 9 depends on 7+8. Phase 12 depends on 11.**
+
+### Lean4 Proof Requirements — New
+
+**~96 new proof obligations.** Key theorems:
+
+| Theorem | Module | Why Critical |
+|---------|--------|-------------|
+| `decompose_roundtrip` | Mat4 | compose(decompose(M)) = M for TRS matrices |
+| `intersectTriangle_pointAt_onTriangle` | Ray | Moller-Trumbore correctness |
+| `intersectSphere_pointAt_onSphere` | Ray | Quadratic solution on sphere surface |
+| `intersectBox_pointAt_inside` | Ray | Slab method correctness |
+| `fromProjectionMatrix_containsPoint_iff_inClipSpace` | Frustum | Frustum extraction correctness |
+| `rayFromCamera_origin_on_nearPlane` | Raycaster | Camera unprojection correctness |
+| `updateMatrixWorld_deterministic` | Object3D | Same input = same output |
+| `localToWorld_worldToLocal_roundtrip` | Object3D | Invertibility of coordinate transform |
+| `closestPoint_distance_minimal` | Triangle | Voronoi region optimality |
+| `barycoord_roundtrip` | Triangle | Barycentric coordinate invertibility |
+| `normalize_idempotent` | Plane | Normalizing twice = once |
+| `applyMatrix4_identity` | Box3/Sphere/Plane/Ray | Identity matrix preserves shape |
+| `computeSkinning_weights_sum_1` | Skeleton | Affine combination correctness |
+| `computeFrenetFrames_orthonormal` | Curves | T x N = B, all unit length |
+| `triangulateShape_valid_indices` | ShapeUtils | Output indices in bounds |
+
+---
+
+### FFI Replacement Readiness
+
+After the complete parity analysis, here is the assessment of when the
+ThreeD/ FFI can be fully replaced:
+
+| FFI Feature | Pure Replacement Status | Blocking Gaps |
+|-------------|----------------------|---------------|
+| Scene management | GPU/Scene3D exists | Object3D, SceneEnvironment |
+| Camera creation | Camera3D exists | updateProjectionMatrix (expose publicly) |
+| Lighting (5 types) | Light3D exists | ShadowConfig |
+| Primitives (9 types) | Mesh3D exists (17 types) | None — READY |
+| Materials (Basic/Standard/Physical) | Material3D exists | PhongMaterial3D (FFI uses it) |
+| Materials (Phong/Toon/Matcap) | Missing | WGSL shaders needed |
+| Model loading (GLTF) | Missing | parseGLTF/parseGLB |
+| OrbitControls | Missing | OrbitControlState + Spherical |
+| Raycasting | Missing | Ray intersections + rayFromCamera |
+| Post-processing | Missing (ACES tonemap only) | PostProcessEffect framework |
+| WebXR | Not implemented in FFI either | N/A |
+| Screenshot | Missing | RenderTarget |
+| Grid/Axes helpers | Grid3D/Axes3D exist | None — READY |
+| Animation | Missing | Full animation system |
+| Stats (FPS) | Missing | RenderInfo |
+
+**Minimum for FFI removal:** Phases 6, 7, 8, 9 (math, intersections, scene graph,
+raycasting). This gives us everything the FFI currently does except model loading
+and animation — which can be handled by a minimal FFI shim for GLTF parsing
+while the pure parser is being built.
 
 ---
 
@@ -1898,12 +2571,13 @@ For each type to be considered complete:
 
 | Date | Status | Notes |
 |------|--------|-------|
+| 2026-02-24 | **TOTAL PARITY ANALYSIS** | Council audit: ~747 functions, ~58 types, ~96 proofs cataloged for complete Three.js replacement |
 | 2026-02-24 | **AUDIT COMPLETE** | Added comprehensive implementation audit, updated all status markers |
 | 2026-02-24 | PROOFS COMPLETE | All Lean4 proofs finished (0 sorry, 3173 jobs) |
 | 2026-02-21 | DRAFT | Initial roadmap |
 
 ---
 
-Document Status: **AUDIT COMPLETE — PROOFS DONE, PURESCRIPT GENERATION NEXT**
+Document Status: **TOTAL PARITY ANALYSIS COMPLETE — EVERY GAP CATALOGED**
 Last Updated: 2026-02-24
 
