@@ -42,7 +42,7 @@
 -- | defaultZ = ZIndex.auto
 -- |
 -- | -- Convert to CSS
--- | css = ZIndex.toLegacyCss dropdownZ  -- "100"
+-- | css = ZIndex.toCss dropdownZ  -- "100"
 -- | ```
 
 module Hydrogen.Schema.Elevation.ZIndex
@@ -60,7 +60,7 @@ module Hydrogen.Schema.Elevation.ZIndex
   , increment
   , decrement
   
-  -- * Conversion
+  -- * Conversion (Legacy string generation, NOT FFI)
   , toLegacyCss
   , toInt
   
@@ -160,10 +160,9 @@ decrement delta = increment (negate delta)
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS string for legacy system interop.
+-- | Convert to legacy CSS string.
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | NOT an FFI boundary - pure string generation.
 toLegacyCss :: ZIndex -> String
 toLegacyCss ZIndexAuto = "auto"
 toLegacyCss (ZIndexValue n) = show n

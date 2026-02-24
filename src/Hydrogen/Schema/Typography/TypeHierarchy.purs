@@ -37,24 +37,18 @@ module Hydrogen.Schema.Typography.TypeHierarchy
   -- Generation
   , generate
   , GenerateConfig
-  -- Legacy CSS Output (for interop with legacy systems)
+  -- CSS
   , toLegacyCss
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , negate
-  , (<>)
-  )
 
 import Hydrogen.Schema.Typography.FontWeight (FontWeight)
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.LetterSpacing (LetterSpacing)
 import Hydrogen.Schema.Typography.LetterSpacing as LetterSpacing
 import Hydrogen.Schema.Typography.LineHeight (LineHeight)
-import Hydrogen.Schema.Typography.TextTransform (TextTransform(None, Uppercase))
+import Hydrogen.Schema.Typography.TextTransform (TextTransform(..))
 import Hydrogen.Schema.Typography.TypeScale (TypeScale)
 import Hydrogen.Schema.Typography.TypeScale as TypeScale
 import Hydrogen.Schema.Typography.TypeStyle (TypeStyle, FontStack)
@@ -309,13 +303,11 @@ generate cfg = TypeHierarchy
     Uppercase
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // legacy css output
+--                                                                 // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Generate CSS stylesheet for the hierarchy for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Generate CSS custom properties for the hierarchy
 toLegacyCss :: TypeHierarchy -> String
 toLegacyCss th = 
   ".hero {\n" <> TypeStyle.toLegacyCss (hero th) <> "\n}\n\n" <>

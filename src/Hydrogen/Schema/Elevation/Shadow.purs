@@ -54,7 +54,7 @@
 -- |   }
 -- |
 -- | -- Convert to CSS
--- | css = Shadow.toLegacyCss cardShadow
+-- | css = Shadow.toCss cardShadow
 -- | -- "0px 4px 6px -1px rgba(0, 0, 0, 0.1)"
 -- |
 -- | -- Layered shadows for depth
@@ -100,7 +100,7 @@ module Hydrogen.Schema.Elevation.Shadow
   , scaleBlur
   , scaleShadow
   
-  -- * Legacy CSS Conversion (for interop with legacy systems)
+  -- * Conversion (Legacy string generation, NOT FFI)
   , toLegacyCss
   , dropShadowToLegacyCss
   , layeredToLegacyCss
@@ -326,12 +326,10 @@ scaleShadow factor s = s
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert box shadow to CSS string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | Convert box shadow to legacy CSS string.
 -- |
 -- | Format: "[inset] <offset-x> <offset-y> <blur> <spread> <color>"
+-- | NOT an FFI boundary - pure string generation.
 toLegacyCss :: BoxShadow -> String
 toLegacyCss s =
   let
@@ -344,24 +342,20 @@ toLegacyCss s =
   in
     insetStr <> offsetXStr <> " " <> offsetYStr <> " " <> blurStr <> " " <> spreadStr <> " " <> colorStr
 
--- | Convert drop shadow to CSS filter string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | Convert drop shadow to legacy CSS filter string.
 -- |
 -- | Format: "drop-shadow(<offset-x> <offset-y> <blur> <color>)"
+-- | NOT an FFI boundary - pure string generation.
 dropShadowToLegacyCss :: DropShadow -> String
 dropShadowToLegacyCss s =
   "drop-shadow(" <> showPx s.offsetX <> " " <> showPx s.offsetY <> " " 
     <> showPx s.blur <> " " <> RGB.toLegacyCssA s.color <> ")"
 
--- | Convert layered shadow to CSS string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | Convert layered shadow to legacy CSS string.
 -- |
 -- | Multiple shadows are comma-separated.
 -- | Returns "none" if no layers.
+-- | NOT an FFI boundary - pure string generation.
 layeredToLegacyCss :: LayeredShadow -> String
 layeredToLegacyCss (LayeredShadow ls) =
   if null ls

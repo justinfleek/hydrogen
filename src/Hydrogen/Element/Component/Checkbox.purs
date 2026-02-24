@@ -85,9 +85,6 @@ module Hydrogen.Element.Component.Checkbox
   
   -- * Behavior Props
   , onToggle
-  
-  -- * Escape Hatch
-  , extraAttributes
   ) where
 
 import Prelude
@@ -140,9 +137,6 @@ type CheckboxProps msg =
   
   -- Behavior
   , onToggle :: Maybe msg
-  
-  -- Escape hatch
-  , extraAttributes :: Array (E.Attribute msg)
   }
 
 -- | Property modifier
@@ -165,7 +159,6 @@ defaultProps =
   , labelFontWeight: Nothing
   , transitionDuration: Nothing
   , onToggle: Nothing
-  , extraAttributes: []
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -253,14 +246,6 @@ onToggle :: forall msg. msg -> CheckboxProp msg
 onToggle handler props = props { onToggle = Just handler }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Add extra attributes (escape hatch)
-extraAttributes :: forall msg. Array (E.Attribute msg) -> CheckboxProp msg
-extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
-
--- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // main component
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -343,7 +328,7 @@ buildCheckboxAttrs props =
       Just handler -> if not props.disabled then [ E.onClick handler ] else []
       Nothing -> []
   in
-    coreStyles <> radiusStyle <> idAttr <> disabledStyle <> clickHandler <> props.extraAttributes
+    coreStyles <> radiusStyle <> idAttr <> disabledStyle <> clickHandler
 
 -- | Checkmark SVG icon
 checkmark :: forall msg. CheckboxProps msg -> E.Element msg

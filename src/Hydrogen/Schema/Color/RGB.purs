@@ -52,7 +52,7 @@ module Hydrogen.Schema.Color.RGB
   , multiply
   , screen
   
-  -- * RGB Legacy CSS Output (for interop with legacy systems)
+  -- * RGB Output (Legacy string generation, NOT FFI)
   , rgbToLegacyCss
   , toLegacyCss
   , rgbToHex
@@ -67,7 +67,7 @@ module Hydrogen.Schema.Color.RGB
   , rgbaToRecord
   , toRecordA
   
-  -- * RGBA Legacy CSS Output (for interop with legacy systems)
+  -- * RGBA Output (Legacy string generation, NOT FFI)
   , rgbaToLegacyCss
   , toLegacyCssA
   
@@ -76,7 +76,7 @@ module Hydrogen.Schema.Color.RGB
   , fromRGBA
   ) where
 
-import Prelude (class Eq, class Ord, class Show, mod, show, (*), (-), (/), (<>))
+import Prelude
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
@@ -245,13 +245,13 @@ screen (RGB c1) (RGB c2) = RGB
     in Ch.channel (Int.round result)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // legacy css output
+--                                                                  // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS rgb() function string for legacy system interop.
+-- | Convert to legacy CSS rgb() function string.
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 -- |
 -- | ```purescript
 -- | rgbToLegacyCss (rgb 255 128 0)  -- "rgb(255, 128, 0)"
@@ -375,12 +375,10 @@ rgbaToRecord (RGBA c) =
 toRecordA :: RGBA -> { r :: Int, g :: Int, b :: Int, a :: Int }
 toRecordA = rgbaToRecord
 
--- | Convert to CSS rgba() function string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | Convert to legacy CSS rgba() function string.
 -- |
 -- | CSS expects alpha as 0.0-1.0, so we use Opacity.toUnitInterval.
+-- | NOT an FFI boundary - pure string generation.
 -- |
 -- | ```purescript
 -- | rgbaToLegacyCss (rgba 255 128 0 100)  -- "rgba(255, 128, 0, 1.0)"

@@ -37,15 +37,6 @@ module Hydrogen.Schema.Typography.LetterSpacing
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , negate
-  , show
-  , (*)
-  , (/)
-  , (<>)
-  )
 
 import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
@@ -140,10 +131,8 @@ unwrap (LetterSpacing s) = s
 toEm :: LetterSpacing -> Number
 toEm (LetterSpacing s) = Int.toNumber s / 1000.0
 
--- | Convert to CSS letter-spacing value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS letter-spacing value
 -- |
 -- | Outputs in em units for proper scaling with font size.
 toLegacyCss :: LetterSpacing -> String

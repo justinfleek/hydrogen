@@ -33,7 +33,7 @@ module Hydrogen.Schema.Typography.TextIndent
   -- * Accessors
   , unwrap
   , toEm
-  , toLegacyCssValue
+  , toLegacyCSSValue
   
   -- * Operations
   , scale
@@ -110,13 +110,11 @@ unwrap (TextIndent n) = n
 toEm :: TextIndent -> Number
 toEm (TextIndent n) = Int.toNumber n / 100.0
 
--- | Convert to CSS value string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCssValue :: TextIndent -> String
-toLegacyCssValue (TextIndent 0) = "0"
-toLegacyCssValue ti = show (toEm ti) <> "em"
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS value string
+toLegacyCSSValue :: TextIndent -> String
+toLegacyCSSValue (TextIndent 0) = "0"
+toLegacyCSSValue ti = show (toEm ti) <> "em"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // operations

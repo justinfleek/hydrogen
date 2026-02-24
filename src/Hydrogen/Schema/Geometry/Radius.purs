@@ -51,7 +51,7 @@ module Hydrogen.Schema.Geometry.Radius
   , double
   , half
   
-  -- * Legacy CSS Conversion (for interop with legacy systems)
+  -- * Conversion
   , toLegacyCss
   , cornersToLegacyCss
   ) where
@@ -207,10 +207,10 @@ half = scale 0.5
 --                                                                  // conversion
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert radius to CSS string for legacy system interop.
+-- | Convert radius to legacy CSS string
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 toLegacyCss :: Radius -> String
 toLegacyCss = case _ of
   RadiusPx n -> showNum n <> "px"
@@ -219,10 +219,10 @@ toLegacyCss = case _ of
   RadiusFull -> "9999px"
   RadiusNone -> "0"
 
--- | Convert corners to CSS border-radius string for legacy system interop.
+-- | Convert corners to legacy CSS border-radius string
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 cornersToLegacyCss :: Corners -> String
 cornersToLegacyCss { topLeft, topRight, bottomRight, bottomLeft } =
   if allSame then toLegacyCss topLeft

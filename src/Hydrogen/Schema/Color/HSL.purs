@@ -55,7 +55,7 @@ module Hydrogen.Schema.Color.HSL
   , decreaseSaturation
   , grayscale
   
-  -- * Legacy CSS Output (for interop with legacy systems)
+  -- * CSS Output (Legacy string generation, NOT FFI)
   , toLegacyCss
   
   -- * Interop
@@ -63,7 +63,7 @@ module Hydrogen.Schema.Color.HSL
   , toLegacy
   ) where
 
-import Prelude (class Eq, class Ord, class Show, show, (<>))
+import Prelude
 
 import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat
@@ -263,13 +263,13 @@ grayscale (HSL c) = HSL
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // legacy css output
+--                                                                  // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS hsl() function string for legacy system interop.
+-- | Convert to legacy CSS hsl() function string.
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 -- |
 -- | ```purescript
 -- | toLegacyCss (hsl 210 80 50)  -- "hsl(210, 80%, 50%)"

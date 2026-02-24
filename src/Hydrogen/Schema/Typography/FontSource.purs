@@ -29,7 +29,7 @@ module Hydrogen.Schema.Typography.FontSource
   , customFontImport
   , toFontFamily
   , requiresImport
-  , toCssImport
+  , toLegacyCssImport
   -- Common system fonts
   , arial
   , helvetica
@@ -239,12 +239,13 @@ requiresImport :: FontSource -> Boolean
 requiresImport (System _) = false
 requiresImport (Custom _) = true
 
+-- NOT an FFI boundary - pure string generation.
 -- | Generate CSS import for a font source
 -- |
 -- | Returns Nothing for system fonts, Just the import statement for custom fonts.
-toCssImport :: FontSource -> String
-toCssImport (System _) = ""
-toCssImport (Custom (CustomFont { family, import' })) = case import' of
+toLegacyCssImport :: FontSource -> String
+toLegacyCssImport (System _) = ""
+toLegacyCssImport (Custom (CustomFont { family, import' })) = case import' of
   GoogleFonts spec ->
     "@import url('https://fonts.googleapis.com/css2?family=" <> spec <> "&display=swap');"
   AdobeFonts projectId ->

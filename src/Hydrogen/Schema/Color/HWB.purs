@@ -49,18 +49,11 @@ module Hydrogen.Schema.Color.HWB
   , increaseWhiteness
   , increaseBlackness
   
-  -- * Legacy CSS Output (for interop with legacy systems)
+  -- * CSS Output (Legacy string generation, NOT FFI)
   , toLegacyCss
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , show
-  , (+)
-  , (<>)
-  )
 
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Hue (Hue)
@@ -180,13 +173,13 @@ increaseBlackness :: Int -> HWB -> HWB
 increaseBlackness amount (HWB c) = HWB c { b = blackness (unwrapBlackness c.b + amount) }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // legacy css output
+--                                                                   // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS hwb() function for legacy system interop.
+-- | Convert to legacy CSS hwb() function string.
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 toLegacyCss :: HWB -> String
 toLegacyCss (HWB c) = 
   "hwb(" <> show (Hue.unwrap c.h) <> "deg " 

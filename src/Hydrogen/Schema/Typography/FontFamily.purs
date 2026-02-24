@@ -38,15 +38,6 @@ module Hydrogen.Schema.Typography.FontFamily
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , otherwise
-  , show
-  , (==)
-  , (||)
-  , (<>)
-  )
 
 import Data.String (contains, Pattern(..))
 
@@ -147,10 +138,8 @@ fangsong = FontFamily "fangsong"
 unwrap :: FontFamily -> String
 unwrap (FontFamily f) = f
 
--- | Convert to CSS font-family value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS font-family value
 -- |
 -- | Adds quotes if the family name contains spaces or special characters.
 -- | Generic family names (serif, sans-serif, etc.) are not quoted.

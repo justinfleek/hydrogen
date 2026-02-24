@@ -14,16 +14,12 @@
 -- | readability. See LetterSpacing.uppercase for the standard adjustment.
 
 module Hydrogen.Schema.Typography.TextTransform
-  ( TextTransform(None, Uppercase, Lowercase, Capitalize)
+  ( TextTransform(..)
   , toLegacyCss
   , requiresTracking
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // text transform
@@ -52,10 +48,8 @@ instance showTextTransform :: Show TextTransform where
 --                                                                   // accessors
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS text-transform value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS text-transform value
 toLegacyCss :: TextTransform -> String
 toLegacyCss None = "none"
 toLegacyCss Uppercase = "uppercase"

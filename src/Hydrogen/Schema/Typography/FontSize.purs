@@ -30,13 +30,6 @@ module Hydrogen.Schema.Typography.FontSize
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , show
-  , (*)
-  , (<>)
-  )
 
 import Hydrogen.Schema.Bounded as Bounded
 
@@ -115,10 +108,8 @@ scale factor (FontSize s) = fontSize (s * factor)
 unwrap :: FontSize -> Number
 unwrap (FontSize s) = s
 
--- | Convert to CSS font-size value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS font-size value
 toLegacyCss :: FontSize -> String
 toLegacyCss (FontSize s) = show s <> "px"
 
