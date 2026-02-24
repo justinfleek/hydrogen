@@ -37,7 +37,7 @@ import Data.Array as Array
 import Data.Array.NonEmpty as NEA
 import Data.Foldable (all)
 import Data.Int (floor, toNumber)
-import Data.List (List(Nil, Cons))
+import Data.Maybe (Maybe(Just))
 import Data.Tuple (Tuple(Tuple))
 
 import Test.QuickCheck ((<?>), (===))
@@ -88,12 +88,23 @@ geometryTests = describe "WebGPU Geometry Generators" do
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Generate a Number in the given range using integer subdivision.
+-- | Uses ceiling for lower bound to ensure we never go below requested minimum.
 genNumber :: Number -> Number -> Gen Number
 genNumber lo hi = do
-  let loI = floor (lo * 100.0)
-  let hiI = floor (hi * 100.0)
-  n <- chooseInt loI hiI
-  pure (toNumber n / 100.0)
+  -- Use ceiling for lower bound, floor for upper bound
+  -- This ensures generated values are always within [lo, hi]
+  let loI = ceilInt (lo * 1000.0)
+  let hiI = floor (hi * 1000.0)
+  -- Ensure loI <= hiI (in case of very small ranges)
+  let actualLo = if loI > hiI then hiI else loI
+  n <- chooseInt actualLo hiI
+  pure (toNumber n / 1000.0)
+
+-- | Ceiling for Int (rounds up)
+ceilInt :: Number -> Int
+ceilInt x = 
+  let floored = floor x
+  in if toNumber floored < x then floored + 1 else floored
 
 -- | Generate positive Meter values with realistic distribution.
 -- |
@@ -1059,16 +1070,21 @@ allUVsInRange uvs =
     in u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0) uvs
 
 -- | Check if all triangles have non-degenerate indices (no duplicates per triangle).
+-- | Uses iterative chunking to avoid stack overflow on large meshes.
 allTrianglesNonDegenerate :: Array Int -> Boolean
 allTrianglesNonDegenerate indices =
-  checkTriangles (Array.toUnfoldable indices :: List Int)
-  where
-    checkTriangles :: List Int -> Boolean
-    checkTriangles lst = case lst of
-      Nil -> true
-      Cons a rest1 -> case rest1 of
-        Nil -> false  -- Not divisible by 3
-        Cons b rest2 -> case rest2 of
-          Nil -> false  -- Not divisible by 3
-          Cons c rest3 ->
-            a /= b && b /= c && a /= c && checkTriangles rest3
+  let
+    len = Array.length indices
+    -- Must be divisible by 3
+    validLength = len `mod` 3 == 0
+    -- Check each triangle by index, avoiding recursion
+    checkTriangle :: Int -> Boolean
+    checkTriangle i =
+      case Array.index indices i, Array.index indices (i + 1), Array.index indices (i + 2) of
+        Just a, Just b, Just c -> a /= b && b /= c && a /= c
+        _, _, _ -> false
+    -- Generate triangle start indices: 0, 3, 6, 9, ...
+    triangleCount = len / 3
+    triangleIndices = Array.range 0 (triangleCount - 1) <#> (_ * 3)
+  in
+    validLength && all checkTriangle triangleIndices
