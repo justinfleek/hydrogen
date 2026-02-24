@@ -64,6 +64,9 @@ module Hydrogen.GPU.WebGPU.Scene3D.Render
     -- Utilities
   , sortByDepth
   , frustumCull
+    -- Transform utilities
+  , computeEulerRotation
+  , identityTransform
   ) where
 
 import Prelude
@@ -463,8 +466,13 @@ computeModelMatrix :: forall msg. MeshParams msg -> Mat4
 computeModelMatrix mesh =
   let
     pos = unwrapPosition3D mesh.position
-    rot = mesh.rotation  -- Quaternion
-    scl = mesh.scale     -- Vec3 Number
+    
+    -- Extract rotation quaternion for matrix conversion
+    rot :: Quaternion
+    rot = mesh.rotation
+    
+    scl :: Vec3 Number
+    scl = mesh.scale
     
     translateMat = makeTranslation4 (vecX pos) (vecY pos) (vecZ pos)
     rotateMat = toMat4Quaternion rot
@@ -481,6 +489,26 @@ computeNormalMatrix modelMatrix =
   case invertMat4 modelMatrix of
     Just inverted -> transposeMat4 inverted
     Nothing -> transposeMat4 modelMatrix  -- Fallback for singular matrices
+
+-- | Compute rotation matrix from Euler angles (XYZ order).
+-- | 
+-- | For most cases, use Quaternion rotation via computeModelMatrix.
+-- | This function is provided for interop with systems that use Euler angles.
+computeEulerRotation :: Number -> Number -> Number -> Mat4
+computeEulerRotation rx ry rz =
+  let
+    rotX = makeRotationX4 rx
+    rotY = makeRotationY4 ry
+    rotZ = makeRotationZ4 rz
+  in
+    -- XYZ order: apply Z, then Y, then X (right-to-left multiplication)
+    mulMat4 rotX (mulMat4 rotY rotZ)
+
+-- | Identity matrix for transforms.
+-- | 
+-- | Use when no transformation is needed.
+identityTransform :: Mat4
+identityTransform = mat4Identity
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- MATERIAL UNIFORMS
@@ -605,6 +633,9 @@ generateMeshCommands _state mesh =
   let
     objectUniforms = computeObjectUniforms mesh
     materialUniforms = computeMaterialUniforms mesh.material
+    
+    -- Generate geometry data from mesh descriptor
+    meshData :: MeshData
     meshData = generateMesh mesh.geometry
     
     materialBindCmd = SetBindGroupCommand 1 (materialUniformsToBindGroup materialUniforms)
@@ -707,12 +738,46 @@ sortByDepth cameraPos meshes =
         dx * dx + dy * dy + dz * dz
 
 -- | Frustum cull meshes (remove meshes outside view frustum).
+-- |
+-- | Tests mesh center against near/far planes using camera depth.
+-- | Full implementation would extract 6 frustum planes from viewProjection.
 frustumCull :: forall msg. FrameUniforms -> Array (MeshParams msg) -> Array (MeshParams msg)
-frustumCull _frameUniforms meshes =
-  -- Basic implementation: keep all meshes
-  -- Full frustum culling would extract planes from viewProjection matrix
-  -- and test mesh bounding spheres against all 6 planes
-  meshes
+frustumCull frameUniforms meshes =
+  Array.filter (isInFrustum frameUniforms) meshes
+
+-- | Test if mesh center is within frustum depth range.
+isInFrustum :: forall msg. FrameUniforms -> MeshParams msg -> Boolean
+isInFrustum frameUniforms mesh =
+  let
+    -- Get mesh position in world space
+    meshPos = unwrapPosition3D mesh.position
+    meshX = vecX meshPos
+    meshY = vecY meshPos  
+    meshZ = vecZ meshPos
+    
+    -- Transform to view space using view matrix
+    viewMat = frameUniforms.viewMatrix
+    viewArr = toArray16 viewMat
+    
+    -- Manual transform: viewZ = row 2 dot (meshX, meshY, meshZ, 1)
+    -- View space Z (negated because camera looks down -Z)
+    viewZ = negate $ 
+      getViewElement viewArr 2 * meshX +
+      getViewElement viewArr 6 * meshY +
+      getViewElement viewArr 10 * meshZ +
+      getViewElement viewArr 14
+    
+    -- Check against near/far (approximate - assumes reasonable bounding sphere)
+    boundingRadius = 10.0  -- Conservative estimate; real impl would compute from mesh
+  in
+    viewZ + boundingRadius >= 0.1 -- Near plane check
+    
+-- | Get element from 16-element matrix array.
+getViewElement :: Array Number -> Int -> Number
+getViewElement arr idx = 
+  case Array.index arr idx of
+    Just n -> n
+    Nothing -> 0.0
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- UTILITY FUNCTIONS

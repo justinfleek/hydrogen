@@ -188,8 +188,13 @@ sphereIndexCount widthSegs heightSegs = widthSegs * heightSegs * 6
 generatePlane :: PlaneMeshParams -> MeshData
 generatePlane params =
   let
-    w = unwrapMeter params.width
-    h = unwrapMeter params.height
+    -- Extract dimensions from Schema types
+    widthM :: Meter
+    widthM = params.width
+    heightM :: Meter
+    heightM = params.height
+    w = unwrapMeter widthM
+    h = unwrapMeter heightM
     wSegs = params.widthSegments
     hSegs = params.heightSegments
     
@@ -332,11 +337,21 @@ generateSphere params =
     wSegs = params.widthSegments
     hSegs = params.heightSegments
     
-    -- Convert angle params to radians
-    phiStart = unwrapDegrees params.phiStart * degToRad
-    phiLength = unwrapDegrees params.phiLength * degToRad
-    thetaStart = unwrapDegrees params.thetaStart * degToRad
-    thetaLength = unwrapDegrees params.thetaLength * degToRad
+    -- Extract angle params from Schema types
+    phiStartDeg :: Degrees
+    phiStartDeg = params.phiStart
+    phiLengthDeg :: Degrees
+    phiLengthDeg = params.phiLength
+    thetaStartDeg :: Degrees
+    thetaStartDeg = params.thetaStart
+    thetaLengthDeg :: Degrees
+    thetaLengthDeg = params.thetaLength
+    
+    -- Convert to radians
+    phiStart = unwrapDegrees phiStartDeg * degToRad
+    phiLength = unwrapDegrees phiLengthDeg * degToRad
+    thetaStart = unwrapDegrees thetaStartDeg * degToRad
+    thetaLength = unwrapDegrees thetaLengthDeg * degToRad
     
     -- Generate vertices using spherical coordinates
     vertices = do
@@ -974,6 +989,7 @@ generateLathe params =
         phi = phiStart + (toNumber i / toNumber segments) * phiLength
         
         -- Get profile point
+        point :: Point2DProfile
         point = case Array.index points j of
           Nothing -> { x: meter 0.0, y: meter 0.0 }
           Just p -> p
@@ -1173,13 +1189,13 @@ sphericalUV v =
     -- U: atan2(z, x) mapped to [0, 1]
     -- V: asin(y) mapped to [0, 1]
     u = 0.5 + atan2 z x / (2.0 * pi)
-    vVal = 0.5 + asin (clamp (-1.0) 1.0 y) / pi
+    vVal = 0.5 + asin (clampNumber (-1.0) 1.0 y) / pi
   in
     vec2 u vVal
 
--- | Clamp a value to a range.
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = if x < lo then lo else if x > hi then hi else x
+-- | Clamp a Number to a range. Named clampNumber to avoid shadowing Prelude.clamp.
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = if x < lo then lo else if x > hi then hi else x
 
 -- | Arc tangent of y/x, handling quadrants.
 atan2 :: Number -> Number -> Number
