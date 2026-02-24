@@ -62,6 +62,7 @@ module Hydrogen.Schema.Typography.Word
   
   -- * Bounds
   , wordBoundsFromGlyphs
+  , letterSpacingPxBounds
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -74,6 +75,7 @@ import Prelude
   , class Show
   , show
   , map
+  , negate
   , (+)
   , (-)
   , (<>)
@@ -334,3 +336,14 @@ baselineY w = w.baseline
 -- | Adjust the baseline position.
 adjustBaseline :: Pixel -> Word -> Word
 adjustBaseline y w = w { baseline = y }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds documentation for LetterSpacingPx
+-- |
+-- | Min: -100.0 (tight kerning)
+-- | Max: 500.0 (extreme spacing)
+letterSpacingPxBounds :: Bounded.NumberBounds
+letterSpacingPxBounds = Bounded.numberBounds (-100.0) 500.0 "letterSpacingPx" "Letter spacing in pixels"

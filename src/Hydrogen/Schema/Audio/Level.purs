@@ -52,11 +52,18 @@ module Hydrogen.Schema.Audio.Level
   -- * Operations
   , addDb
   , multiplyGain
+  
+  -- * Bounds
+  , decibelBounds
+  , decibelFSBounds
+  , linearGainBounds
+  , percentBounds
   ) where
 
 import Prelude
 
 import Hydrogen.Math.Core as Math
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // decibel
@@ -221,3 +228,35 @@ addDb (Decibel a) (Decibel b) = decibel (a + b)
 -- | Multiply two linear gains
 multiplyGain :: LinearGain -> LinearGain -> LinearGain
 multiplyGain (LinearGain a) (LinearGain b) = linearGain (a * b)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Decibel
+-- |
+-- | Min: -120.0 (effective silence)
+-- | Max: 0.0 (unity)
+decibelBounds :: Bounded.NumberBounds
+decibelBounds = Bounded.numberBounds (-120.0) 0.0 "decibel" "Relative amplitude in dB (-120 to 0)"
+
+-- | Bounds for DecibelFS
+-- |
+-- | Min: -60.0
+-- | Max: 0.0 (digital full scale)
+decibelFSBounds :: Bounded.NumberBounds
+decibelFSBounds = Bounded.numberBounds (-60.0) 0.0 "decibelFS" "Amplitude relative to full scale (-60 to 0)"
+
+-- | Bounds for LinearGain
+-- |
+-- | Min: 0.0 (silence)
+-- | Max: 1.0 (unity)
+linearGainBounds :: Bounded.NumberBounds
+linearGainBounds = Bounded.numberBounds 0.0 1.0 "linearGain" "Linear amplitude multiplier (0-1)"
+
+-- | Bounds for Percent
+-- |
+-- | Min: 0.0
+-- | Max: 100.0
+percentBounds :: Bounded.NumberBounds
+percentBounds = Bounded.numberBounds 0.0 100.0 "percent" "Percentage value (0-100)"

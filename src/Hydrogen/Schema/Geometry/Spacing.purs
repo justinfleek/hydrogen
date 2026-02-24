@@ -54,9 +54,14 @@ module Hydrogen.Schema.Geometry.Spacing
   , marginLeft
   , marginNone
   , marginToLegacyCss
+  
+  -- * Bounds
+  , spacingValueBounds
   ) where
 
 import Data.Ord (max)
+
+import Hydrogen.Schema.Bounded as Bounded
 
 import Prelude
   ( class Eq
@@ -268,3 +273,14 @@ marginToLegacyCss m =
       t <> " " <> r
     else
       t <> " " <> r <> " " <> b <> " " <> l
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for SpacingValue
+-- |
+-- | Min: 0.0 (no spacing)
+-- | Max: 1000.0 (practical limit for UI spacing)
+spacingValueBounds :: Bounded.NumberBounds
+spacingValueBounds = Bounded.numberBounds 0.0 1000.0 "spacingValue" "Spacing in pixels (0-1000)"

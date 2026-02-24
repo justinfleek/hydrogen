@@ -28,6 +28,9 @@ import Test.Property as Property
 import Test.ColorConversion as ColorConversion
 import Test.ColorEdgeCases as ColorEdgeCases
 import Test.Element as Element
+import Test.QRCode as QRCode
+import Test.Widget as Widget
+import Test.Scene3D as Scene3D
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -48,6 +51,12 @@ main = launchAff_ $ runSpec [consoleReporter] do
   describe "Color System Tests" do
     ColorConversion.colorConversionTests
     ColorEdgeCases.colorEdgeCaseTests
+  describe "QR Code Tests" do
+    QRCode.qrCodeTests
+  describe "Widget Tests" do
+    Widget.widgetPropertyTests
+  describe "Scene3D Tests" do
+    Scene3D.scene3DTests
 
 -- =============================================================================
 --                                                              // format tests

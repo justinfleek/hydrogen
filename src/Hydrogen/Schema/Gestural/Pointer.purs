@@ -68,9 +68,17 @@ module Hydrogen.Schema.Gestural.Pointer
   , mousePointerState
   , touchPointerState
   , penPointerState
+  
+  -- * Bounds
+  , pressureBounds
+  , tiltXBounds
+  , tiltYBounds
+  , twistBounds
   ) where
 
 import Data.Maybe (Maybe(Just, Nothing))
+
+import Hydrogen.Schema.Bounded as Bounded
 
 import Prelude
 
@@ -433,3 +441,35 @@ penPointerState id pos pres tx ty tw =
     , tiltY = ty
     , twist = tw
     }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Pressure
+-- |
+-- | Min: 0.0 (no pressure/hovering)
+-- | Max: 1.0 (maximum pressure)
+pressureBounds :: Bounded.NumberBounds
+pressureBounds = Bounded.numberBounds 0.0 1.0 "pressure" "Pointer pressure (0-1)"
+
+-- | Bounds for TiltX
+-- |
+-- | Min: -90.0 (tilted fully left)
+-- | Max: 90.0 (tilted fully right)
+tiltXBounds :: Bounded.NumberBounds
+tiltXBounds = Bounded.numberBounds (-90.0) 90.0 "tiltX" "Pen tilt X in degrees (-90 to 90)"
+
+-- | Bounds for TiltY
+-- |
+-- | Min: -90.0 (tilted fully away)
+-- | Max: 90.0 (tilted fully toward)
+tiltYBounds :: Bounded.NumberBounds
+tiltYBounds = Bounded.numberBounds (-90.0) 90.0 "tiltY" "Pen tilt Y in degrees (-90 to 90)"
+
+-- | Bounds for Twist
+-- |
+-- | Min: 0.0
+-- | Max: 359.0 (cyclic rotation)
+twistBounds :: Bounded.NumberBounds
+twistBounds = Bounded.numberBounds 0.0 359.0 "twist" "Pen twist in degrees (0-359)"

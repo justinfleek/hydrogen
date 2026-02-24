@@ -40,6 +40,8 @@ module Hydrogen.Schema.Attestation.Timestamp
   , addHours
   , addDays
   , diff
+  -- * Bounds
+  , timestampBounds
   ) where
 
 import Prelude
@@ -54,6 +56,7 @@ import Prelude
   , (*)
   , (/)
   , (<)
+  , (>)
   , (>=)
   , (==)
   , (/=)
@@ -64,6 +67,7 @@ import Prelude
 
 import Data.Int (floor, toNumber) as Int
 import Data.Number (floor) as Number
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // timestamp
@@ -84,10 +88,13 @@ instance showTimestamp :: Show Timestamp where
 --                                                                // constructors
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Create a Timestamp, clamping negative values to 0
+-- | Create a Timestamp, clamping to [0, 253402300800000] ms
+-- |
+-- | Maximum is year 10000 — far enough in the future for any practical use.
 timestamp :: Number -> Timestamp
 timestamp ms
   | ms < 0.0 = Timestamp 0.0
+  | ms > 253402300800000.0 = Timestamp 253402300800000.0
   | otherwise = Timestamp (Number.floor ms)
 
 -- | Create a Timestamp without bounds checking
@@ -274,3 +281,15 @@ padZero4 n
   | n < 100 = "00" <> show n
   | n < 1000 = "0" <> show n
   | otherwise = show n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Timestamp [0, 253402300800000] ms
+-- |
+-- | - 0: Unix epoch (1970-01-01T00:00:00Z)
+-- | - 253402300800000: Year 10000 — far future ceiling
+timestampBounds :: Bounded.NumberBounds
+timestampBounds = Bounded.numberBounds 0.0 253402300800000.0 "Timestamp"
+  "UTC timestamp in milliseconds since Unix epoch (1970 to year 10000)"

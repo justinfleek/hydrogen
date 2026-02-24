@@ -70,10 +70,14 @@ module Hydrogen.Schema.Motion.ZoomLevel
   , minZoom
   , maxZoom
   , clamp
+  
+  -- * Bounds
+  , bounds
   ) where
 
 import Prelude hiding (clamp)
 
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Dimension.Temporal (Frames(Frames))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -235,3 +239,14 @@ zoom200 = ZoomLevel 2.0
 -- | 400% zoom
 zoom400 :: ZoomLevel
 zoom400 = ZoomLevel 4.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for ZoomLevel
+-- |
+-- | Min: 0.01 (1%)
+-- | Max: 100.0 (10000%)
+bounds :: Bounded.NumberBounds
+bounds = Bounded.numberBounds 0.01 100.0 "zoomLevel" "Timeline zoom scale (0.01-100.0)"

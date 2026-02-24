@@ -34,10 +34,13 @@ module Hydrogen.Schema.Gestural.Gesture.Swipe
   , noSwipe
   , swipeVelocity
   , isSwipeRecognized
+    -- * Bounds
+  , swipeVelocityThresholdBounds
   ) where
 
 import Prelude
 
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Math.Core (abs, sqrt)
 import Hydrogen.Schema.Gestural.Gesture.Phase 
   ( GesturePhase(Possible)
@@ -120,6 +123,18 @@ defaultSwipeThreshold = SwipeVelocityThreshold 0.5
 -- | Extract threshold value
 unwrapSwipeThreshold :: SwipeVelocityThreshold -> Number
 unwrapSwipeThreshold (SwipeVelocityThreshold v) = v
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for SwipeVelocityThreshold [0.1, 5.0] px/ms
+-- |
+-- | Default: 0.5 px/ms (500 px/s)
+-- | Range allows for both slow deliberate swipes and fast flicks.
+swipeVelocityThresholdBounds :: Bounded.NumberBounds
+swipeVelocityThresholdBounds = Bounded.numberBounds 0.1 5.0 "SwipeVelocityThreshold"
+  "Minimum velocity threshold for swipe recognition in pixels per millisecond"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // swipe // state

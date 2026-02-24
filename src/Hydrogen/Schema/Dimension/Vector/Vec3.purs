@@ -4,6 +4,18 @@
 
 -- | 3D vector type parameterized by component type.
 
+-- | ═══════════════════════════════════════════════════════════════════════════
+-- | Status: ✓ PROVEN (Hydrogen.Math.Vec3 in Lean4)
+-- |
+-- | Invariants proven in Lean4:
+-- |   • cross_perp_left: dot a (cross a b) = 0
+-- |   • cross_perp_right: dot b (cross a b) = 0
+-- |   • normalize_length: length (normalize v) = 1 (for v ≠ zero)
+-- |   • project_reject_orthogonal: dot (project a b) (reject a b) = 0
+-- |   • project_reject_sum: add (project a b) (reject a b) = a
+-- |   • add_comm, add_assoc, scale_distrib_vec
+-- | ═══════════════════════════════════════════════════════════════════════════
+
 module Hydrogen.Schema.Dimension.Vector.Vec3
   ( Vec3(Vec3)
   , vec3
@@ -18,12 +30,17 @@ module Hydrogen.Schema.Dimension.Vector.Vec3
   , negateVec3
   , dotVec3
   , crossVec3
+  , hadamardVec3
   , lengthSquaredVec3
   , lengthVec3
   , normalizeVec3
+  , normalizeVec3Safe
   , distanceVec3
+  , distanceSquaredVec3
   , lerpVec3
   , reflectVec3
+  , projectVec3
+  , rejectVec3
   , getX3
   , getY3
   , getZ3
@@ -108,11 +125,16 @@ dotVec3 :: forall a. Semiring a => Vec3 a -> Vec3 a -> a
 dotVec3 (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 -- | Cross product of two 3D vectors
+-- | PROVEN: cross_perp_left, cross_perp_right, cross_anticomm, cross_self
 crossVec3 :: forall a. Ring a => Vec3 a -> Vec3 a -> Vec3 a
 crossVec3 (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = Vec3
   (y1 * z2 - z1 * y2)
   (z1 * x2 - x1 * z2)
   (x1 * y2 - y1 * x2)
+
+-- | Hadamard (component-wise) product
+hadamardVec3 :: forall a. Semiring a => Vec3 a -> Vec3 a -> Vec3 a
+hadamardVec3 (Vec3 x1 y1 z1) (Vec3 x2 y2 z2) = Vec3 (x1 * x2) (y1 * y2) (z1 * z2)
 
 -- | Squared length of a 3D Number vector
 lengthSquaredVec3 :: Vec3 Number -> Number
@@ -123,14 +145,26 @@ lengthVec3 :: Vec3 Number -> Number
 lengthVec3 v = Math.sqrt (lengthSquaredVec3 v)
 
 -- | Normalize a 3D Number vector to unit length
+-- | PROVEN: normalize_length (result has length 1 for non-zero input)
+-- | WARNING: Caller must ensure v ≠ zero
 normalizeVec3 :: Vec3 Number -> Vec3 Number
 normalizeVec3 v =
+  let len = lengthVec3 v
+  in scaleVec3 (1.0 / len) v
+
+-- | Safe normalize (returns input unchanged for zero vector)
+normalizeVec3Safe :: Vec3 Number -> Vec3 Number
+normalizeVec3Safe v =
   let len = lengthVec3 v
   in if len == 0.0 then v else scaleVec3 (1.0 / len) v
 
 -- | Distance between two 3D points
 distanceVec3 :: Vec3 Number -> Vec3 Number -> Number
 distanceVec3 a b = lengthVec3 (subtractVec3 b a)
+
+-- | Squared distance (avoids sqrt, useful for comparisons)
+distanceSquaredVec3 :: Vec3 Number -> Vec3 Number -> Number
+distanceSquaredVec3 a b = lengthSquaredVec3 (subtractVec3 b a)
 
 -- | Linear interpolation between two 3D vectors
 lerpVec3 :: Number -> Vec3 Number -> Vec3 Number -> Vec3 Number
@@ -142,6 +176,20 @@ reflectVec3 :: Vec3 Number -> Vec3 Number -> Vec3 Number
 reflectVec3 incident normal =
   let d = 2.0 * dotVec3 incident normal
   in subtractVec3 incident (scaleVec3 d normal)
+
+-- | Project vector a onto vector b
+-- | PROVEN: project_reject_orthogonal (dot (project a b) (reject a b) = 0)
+-- | WARNING: Caller must ensure b ≠ zero
+projectVec3 :: Vec3 Number -> Vec3 Number -> Vec3 Number
+projectVec3 a b = 
+  let scalar = dotVec3 a b / dotVec3 b b
+  in scaleVec3 scalar b
+
+-- | Reject: component of a perpendicular to b
+-- | PROVEN: project_reject_sum (add (project a b) (reject a b) = a)
+-- | WARNING: Caller must ensure b ≠ zero
+rejectVec3 :: Vec3 Number -> Vec3 Number -> Vec3 Number
+rejectVec3 a b = subtractVec3 a (projectVec3 a b)
 
 -- | Get X component
 getX3 :: forall a. Vec3 a -> a

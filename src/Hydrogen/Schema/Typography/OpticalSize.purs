@@ -44,11 +44,15 @@ module Hydrogen.Schema.Typography.OpticalSize
   -- * Operations
   , clamp
   , matchFontSize
+  
+  -- * Bounds
+  , bounds
   ) where
 
 import Prelude
 
 import Data.Int (round, toNumber) as Int
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // type
@@ -150,3 +154,16 @@ matchFontSize :: Number -> OpticalSize
 matchFontSize pixels =
   let points = pixels * 72.0 / 96.0
   in opticalSize points
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds documentation for OpticalSize
+-- |
+-- | Stored as tenths of a point internally.
+-- | Min: 60 (6pt)
+-- | Max: 1440 (144pt)
+-- | Special: 0 represents "auto"
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 0 1440 "opticalSize" "Optical size axis (0=auto, or 60-1440 tenths of pt)"

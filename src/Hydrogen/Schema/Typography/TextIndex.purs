@@ -84,6 +84,14 @@ module Hydrogen.Schema.Typography.TextIndex
   , prevWord
   , nextLine
   , prevLine
+  
+  -- * Bounds Documentation
+  , characterIndexBounds
+  , wordIndexBounds
+  , lineIndexBounds
+  , blockIndexBounds
+  , contourIndexBounds
+  , pointIndexBounds
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -371,3 +379,31 @@ controlPointAddress text contourIdx pointIdx =
   , contour: contourIdx
   , point: pointIdx
   }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                         // bounds documentation
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for CharacterIndex
+characterIndexBounds :: Bounded.IntBounds
+characterIndexBounds = Bounded.intBounds 0 (maxCharactersPerWord - 1) "characterIndex" "Character position within word (0-255)"
+
+-- | Bounds for WordIndex
+wordIndexBounds :: Bounded.IntBounds
+wordIndexBounds = Bounded.intBounds 0 (maxWordsPerLine - 1) "wordIndex" "Word position within line (0-127)"
+
+-- | Bounds for LineIndex
+lineIndexBounds :: Bounded.IntBounds
+lineIndexBounds = Bounded.intBounds 0 (maxLinesPerBlock - 1) "lineIndex" "Line position within block (0-4095)"
+
+-- | Bounds for BlockIndex
+blockIndexBounds :: Bounded.IntBounds
+blockIndexBounds = Bounded.intBounds 0 (maxBlocks - 1) "blockIndex" "Block position in hierarchy (0-65535)"
+
+-- | Bounds for ContourIndex
+contourIndexBounds :: Bounded.IntBounds
+contourIndexBounds = Bounded.intBounds 0 (maxContoursPerGlyph - 1) "contourIndex" "Contour index within glyph (0-31)"
+
+-- | Bounds for PointIndex
+pointIndexBounds :: Bounded.IntBounds
+pointIndexBounds = Bounded.intBounds 0 (maxPointsPerContour - 1) "pointIndex" "Control point within contour (0-1023)"

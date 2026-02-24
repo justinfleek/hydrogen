@@ -14,6 +14,7 @@ module Hydrogen.Schema.Temporal.Millisecond
   , unwrap
   , toInt
   , toLegacyCss
+  , bounds
   ) where
 
 import Prelude
@@ -26,6 +27,8 @@ import Prelude
   , (<)
   , (>)
   )
+
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // millisecond
@@ -94,3 +97,14 @@ padZero3 n
   | n < 10 = "00" <> show n
   | n < 100 = "0" <> show n
   | otherwise = show n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Millisecond
+-- |
+-- | Min: 0
+-- | Max: 999
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 0 999 "millisecond" "Millisecond within second (0-999)"

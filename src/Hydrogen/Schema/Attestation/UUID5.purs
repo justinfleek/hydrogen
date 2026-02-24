@@ -51,6 +51,12 @@ module Hydrogen.Schema.Attestation.UUID5
   , nsAccordionContent
   , nsOTPInput
   , nsOTPDigit
+  , nsMesh
+  , nsScene
+  , nsPosition
+  , nsMaterial
+  , nsLight
+  , nsCamera
   ) where
 
 import Prelude
@@ -219,6 +225,70 @@ nsOTPDigit :: UUID5
 nsOTPDigit = UUID5
   [ 0x6f, 0x74, 0x70, 0x64, 0x69, 0x67, 0x69, 0x74
   , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Mesh UUIDs
+-- |
+-- | Meshes with identical geometry parameters get identical UUIDs.
+-- | Two agents creating the same box (same width, height, depth, segments)
+-- | will always get the same UUID — deterministic at billion-agent scale.
+-- | Derived from: uuid5(nil, "hydrogen.mesh")
+nsMesh :: UUID5
+nsMesh = UUID5
+  [ 0x6d, 0x65, 0x73, 0x68, 0x5f, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Scene UUIDs
+-- |
+-- | Complete scenes with identical configuration get identical UUIDs.
+-- | Enables deterministic scene caching and diffing.
+-- | Derived from: uuid5(nil, "hydrogen.scene")
+nsScene :: UUID5
+nsScene = UUID5
+  [ 0x73, 0x63, 0x65, 0x6e, 0x65, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Position UUIDs
+-- |
+-- | Positions with identical picometer values get identical UUIDs.
+-- | Position3D(x, y, z) → uuid5(nsPosition, "x:y:z")
+-- | Derived from: uuid5(nil, "hydrogen.position")
+nsPosition :: UUID5
+nsPosition = UUID5
+  [ 0x70, 0x6f, 0x73, 0x69, 0x74, 0x69, 0x6f, 0x6e
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Material UUIDs
+-- |
+-- | Materials with identical PBR parameters get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.material")
+nsMaterial :: UUID5
+nsMaterial = UUID5
+  [ 0x6d, 0x61, 0x74, 0x65, 0x72, 0x69, 0x61, 0x6c
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Light UUIDs
+-- |
+-- | Lights with identical parameters get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.light")
+nsLight :: UUID5
+nsLight = UUID5
+  [ 0x6c, 0x69, 0x67, 0x68, 0x74, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Camera UUIDs
+-- |
+-- | Cameras with identical parameters get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.camera")
+nsCamera :: UUID5
+nsCamera = UUID5
+  [ 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
   ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════

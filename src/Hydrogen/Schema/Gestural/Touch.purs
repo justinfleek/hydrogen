@@ -63,6 +63,9 @@ module Hydrogen.Schema.Gestural.Touch
   , touchPointCount
   , primaryTouch
   , allTouches
+  
+  -- * Bounds
+  , touchCountBounds
   ) where
 
 import Prelude
@@ -70,6 +73,7 @@ import Prelude
 import Data.Array (filter, head, length, snoc)
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core (sqrt, atan2)
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Gestural.Pointer 
   ( PointerPosition
   , Pressure
@@ -387,3 +391,14 @@ computeRotation tps
               cx = (x1 + x2) / 2.0
               cy = (y1 + y2) / 2.0
           in rotateState angle angle 0.0 cx cy
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for TouchCount
+-- |
+-- | Min: 0 (no touches)
+-- | Max: 10 (practical multi-touch limit)
+touchCountBounds :: Bounded.IntBounds
+touchCountBounds = Bounded.intBounds 0 10 "touchCount" "Number of active touches (0-10)"

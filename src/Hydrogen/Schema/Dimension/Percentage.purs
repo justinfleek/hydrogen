@@ -49,6 +49,10 @@ module Hydrogen.Schema.Dimension.Percentage
   , aspect1x1
   , aspect9x16
   , aspect3x4
+  
+  -- * Bounds
+  , percentBounds
+  , ratioBounds
   ) where
 
 import Prelude
@@ -63,6 +67,7 @@ import Prelude
   )
 
 import Hydrogen.Math.Core as Math
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // percent // 0 100
@@ -197,3 +202,21 @@ aspect9x16 = Proportion (9.0 / 16.0)
 -- | 3:4 portrait aspect ratio (~0.75)
 aspect3x4 :: Proportion
 aspect3x4 = Proportion (3.0 / 4.0)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Percent
+-- |
+-- | Min: 0.0
+-- | Max: 100.0
+percentBounds :: Bounded.NumberBounds
+percentBounds = Bounded.numberBounds 0.0 100.0 "percent" "Percentage value (0-100)"
+
+-- | Bounds for Ratio
+-- |
+-- | Min: 0.0
+-- | Max: 1.0
+ratioBounds :: Bounded.NumberBounds
+ratioBounds = Bounded.numberBounds 0.0 1.0 "ratio" "Normalized ratio (0-1)"

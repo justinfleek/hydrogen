@@ -16,6 +16,7 @@ module Hydrogen.Schema.Temporal.Second
   , unwrap
   , toInt
   , toLegacyCss
+  , bounds
   ) where
 
 import Prelude
@@ -28,6 +29,8 @@ import Prelude
   , (<)
   , (>)
   )
+
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // second
@@ -94,3 +97,14 @@ padZero :: Int -> String
 padZero n
   | n < 10 = "0" <> show n
   | otherwise = show n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Second
+-- |
+-- | Min: 0
+-- | Max: 59
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 0 59 "second" "Second within minute (0-59)"

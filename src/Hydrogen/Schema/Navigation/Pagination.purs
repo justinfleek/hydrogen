@@ -74,17 +74,20 @@ module Hydrogen.Schema.Navigation.Pagination
   , pageSize25
   , pageSize50
   , pageSize100
+  , pageSizeBounds
   
   -- * Page Number
   , PageNumber(PageNumber)
   , pageNumber
   , unwrapPageNumber
   , firstPage
+  , pageNumberBounds
   
   -- * Total Items
   , TotalItems(TotalItems)
   , totalItems
   , unwrapTotalItems
+  , totalItemsBounds
   
   -- * Page State (Molecule)
   , PageState
@@ -326,6 +329,10 @@ pageSize50 = PageSize 50
 pageSize100 :: PageSize
 pageSize100 = PageSize 100
 
+-- | Bounds for PageSize
+pageSizeBounds :: IntBounds
+pageSizeBounds = intBounds 1 500 "pageSize" "Items per page (1-500)"
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // page number
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -353,6 +360,10 @@ unwrapPageNumber (PageNumber n) = n
 firstPage :: PageNumber
 firstPage = PageNumber 1
 
+-- | Bounds for PageNumber
+pageNumberBounds :: IntBounds
+pageNumberBounds = intBounds 1 100000 "pageNumber" "Page number (1-100000)"
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // total items
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -375,6 +386,10 @@ totalItems n = TotalItems (if n < 0 then 0 else n)
 -- | Extract raw value
 unwrapTotalItems :: TotalItems -> Int
 unwrapTotalItems (TotalItems n) = n
+
+-- | Bounds for TotalItems (practical upper limit)
+totalItemsBounds :: IntBounds
+totalItemsBounds = intBounds 0 2147483647 "totalItems" "Total items in dataset (0-MAX_INT)"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // page state

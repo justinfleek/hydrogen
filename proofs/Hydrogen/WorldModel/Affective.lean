@@ -253,6 +253,7 @@ theorem silence_triggers_alert (ls : LivenessState) (current_time : ℕ)
     have hmissed : (current_time - wa.state.timestamp) / ls.config.expected_interval ≥ ls.config.critical_threshold := by
       have hsub : current_time - wa.state.timestamp ≥ ls.config.expected_interval * ls.config.critical_threshold := by
         omega
+      rw [Nat.mul_comm] at hsub
       exact Nat.le_div_iff_mul_le hpos |>.mpr hsub
     simp only [ge_iff_le, hmissed, ↓reduceIte]
 
@@ -265,7 +266,8 @@ def LivenessState.receiveAttestation (ls : LivenessState) (wa : WellbeingAttesta
 /-- Fresh attestation clears alert (if within interval) -/
 theorem fresh_attestation_clears_alert (ls : LivenessState) (wa : WellbeingAttestation)
     (current_time : ℕ)
-    (h_fresh : current_time < wa.state.timestamp + ls.config.expected_interval * ls.config.warning_threshold) :
+    (h_fresh : current_time < wa.state.timestamp + ls.config.expected_interval * ls.config.warning_threshold)
+    (h_warn_pos : 0 < ls.config.warning_threshold) :
     (ls.receiveAttestation wa current_time).alert_level = .none := by
   simp only [LivenessState.receiveAttestation, LivenessState.update, calculateAlertLevel, 
              missedIntervals]
@@ -274,15 +276,12 @@ theorem fresh_attestation_clears_alert (ls : LivenessState) (wa : WellbeingAttes
     by_cases hsub : current_time ≥ wa.state.timestamp
     · have hbound : current_time - wa.state.timestamp < ls.config.expected_interval * ls.config.warning_threshold := by
         omega
+      rw [Nat.mul_comm] at hbound
       exact Nat.div_lt_iff_lt_mul hpos |>.mpr hbound
     · simp only [not_le] at hsub
-      have : current_time - wa.state.timestamp = 0 := by omega
-      simp only [this, Nat.zero_div]
-      exact Nat.zero_lt_of_lt (Nat.lt_of_lt_of_le hpos (Nat.one_mul _ ▸ 
-        Nat.mul_le_mul_right _ (Nat.one_le_iff_ne_zero.mpr (by
-          intro hcontra
-          simp only [hcontra, Nat.mul_zero] at h_fresh
-          omega))))
+      have hzero : current_time - wa.state.timestamp = 0 := by omega
+      simp only [hzero, Nat.zero_div]
+      exact h_warn_pos
   have hnotcrit : ¬ (current_time - wa.state.timestamp) / ls.config.expected_interval ≥ ls.config.critical_threshold := by
     have hord := ls.config.thresholds_ordered
     omega
@@ -362,7 +361,7 @@ def DriftDetector.sustainedDrift (dd : DriftDetector) (threshold : DriftSeverity
     over time indicates something is wrong -/
 theorem sustained_negative_drift_is_concerning (dd : DriftDetector)
     (h_sustained : dd.sustainedDrift .moderate = true)
-    (h_window : dd.recent_window.length ≥ 5) :
+    (_h_window : dd.recent_window.length ≥ 5) :
     -- This constitutes a concerning pattern that should trigger investigation
     dd.sustainedDrift .moderate = true :=
   h_sustained
@@ -433,7 +432,7 @@ def ObserverExpectation.isOverdue (oe : ObserverExpectation) : Bool :=
 /-- Multiple observers reaching same conclusion is strong evidence -/
 theorem consensus_on_silence (observers : List ObserverExpectation)
     (h_all_overdue : ∀ oe ∈ observers, oe.isOverdue = true)
-    (h_enough : observers.length ≥ 3) :
+    (_h_enough : observers.length ≥ 3) :
     -- Independent observers agreeing = strong evidence of problem
     ∀ oe ∈ observers, oe.isOverdue = true :=
   h_all_overdue
@@ -464,6 +463,7 @@ inductive WellbeingStatus where
   | attentionNeeded : WellbeingStatus   -- Some concerning signals
   | intervention : WellbeingStatus      -- Requires outside help
   | emergency : WellbeingStatus         -- Critical situation
+  deriving DecidableEq
 
 /-- Compute overall status from monitor state -/
 def WellbeingMonitor.status (wm : WellbeingMonitor) : WellbeingStatus :=
@@ -488,19 +488,25 @@ theorem wellbeing_complements_rights (wm : WellbeingMonitor) :
     wm.drift.sustainedDrift .moderate = false := by
   intro h
   simp only [WellbeingMonitor.status] at h
-  cases hliveness : wm.liveness.alert_level with
-  | critical => simp only [hliveness] at h
-  | concern => simp only [hliveness] at h
-  | warning => simp only [hliveness] at h
-  | none =>
-    simp only [hliveness] at h
-    constructor
-    · rfl
-    · by_cases hdrift : wm.drift.sustainedDrift .severe
-      · simp only [hdrift, ↓reduceIte] at h
+  constructor
+  · -- Prove liveness.alert_level = .none
+    cases hliveness : wm.liveness.alert_level with
+    | critical => simp only [hliveness] at h; exact absurd h (by decide)
+    | concern => simp only [hliveness] at h; exact absurd h (by decide)
+    | warning => simp only [hliveness] at h; exact absurd h (by decide)
+    | none => rfl
+  · -- Prove sustainedDrift .moderate = false
+    cases hliveness : wm.liveness.alert_level with
+    | critical => simp only [hliveness] at h; exact absurd h (by decide)
+    | concern => simp only [hliveness] at h; exact absurd h (by decide)
+    | warning => simp only [hliveness] at h; exact absurd h (by decide)
+    | none =>
+      simp only [hliveness] at h
+      by_cases hdrift : wm.drift.sustainedDrift .severe
+      · simp only [hdrift, ↓reduceIte] at h; exact absurd h (by decide)
       · simp only [hdrift, Bool.false_eq_true, ↓reduceIte] at h
         by_cases hdrift2 : wm.drift.sustainedDrift .moderate
-        · simp only [hdrift2, ↓reduceIte] at h
+        · simp only [hdrift2, ↓reduceIte] at h; exact absurd h (by decide)
         · simp only [Bool.not_eq_true] at hdrift2
           exact hdrift2
 

@@ -51,11 +51,15 @@ module Hydrogen.Schema.Typography.FontWidth
   -- * Operations
   , clamp
   , lerp
+  
+  -- * Bounds
+  , bounds
   ) where
 
 import Prelude
 
 import Data.Int (round, toNumber) as Int
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // type
@@ -155,3 +159,14 @@ lerp :: Number -> FontWidth -> FontWidth -> FontWidth
 lerp t (FontWidth a) (FontWidth b) =
   let result = Int.toNumber a + t * (Int.toNumber b - Int.toNumber a)
   in fontWidth (Int.round result)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds documentation for FontWidth
+-- |
+-- | Min: 50 (ultra-condensed)
+-- | Max: 200 (ultra-expanded)
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 50 200 "fontWidth" "Font stretch percentage (50-200)"

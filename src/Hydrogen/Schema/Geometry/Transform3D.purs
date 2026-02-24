@@ -67,6 +67,7 @@ module Hydrogen.Schema.Geometry.Transform3D
   , getScale3DY
   , getScale3DZ
   , scale3DToLegacyCss
+  , scale3DBounds
   
   -- * Perspective
   , Perspective(Perspective)
@@ -74,6 +75,7 @@ module Hydrogen.Schema.Geometry.Transform3D
   , perspectiveNone
   , getPerspective
   , perspectiveToLegacyCss
+  , perspectiveBounds
   
   -- * Perspective Origin
   , PerspectiveOrigin(PerspectiveOrigin)
@@ -121,10 +123,12 @@ import Prelude
 
 import Data.Array (uncons)
 import Data.Maybe (Maybe(Nothing, Just))
-import Data.Ord (min, max)
+
 import Data.Foldable (foldl)
+import Data.Ord (min, max)
 import Data.Number (sqrt, sin, cos, atan2, pi)
 
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Geometry.Angle (Degrees, degrees, unwrapDegrees, addAngle)
 import Hydrogen.Schema.Geometry.Point (Point3D(Point3D), point3D)
 
@@ -270,9 +274,9 @@ instance showScale3D :: Show Scale3D where
   show (Scale3D s) =
     "scale3d(" <> show s.x <> ", " <> show s.y <> ", " <> show s.z <> ")"
 
--- | Clamp scale to valid range
+-- | Clamp scale to valid range (-10.0 to 10.0)
 clampScale :: Number -> Number
-clampScale n = max (-10.0) (min 10.0 n)
+clampScale = Bounded.clampNumber (-10.0) 10.0
 
 -- | Create 3D scale
 scale3D :: Number -> Number -> Number -> Scale3D
@@ -323,6 +327,16 @@ scale3DToLegacyCss (Scale3D s) =
     then "scale3d(" <> show s.x <> ", " <> show s.x <> ", " <> show s.x <> ")"
     else "scale3d(" <> show s.x <> ", " <> show s.y <> ", " <> show s.z <> ")"
 
+-- | Bounds for Scale3D components.
+-- |
+-- | Scale values are bounded -10.0 to 10.0 to prevent:
+-- | - Extreme distortion that breaks layouts
+-- | - Negative scales beyond mirroring (meaningful up to -1.0)
+-- | - Values that cause GPU precision issues
+scale3DBounds :: Bounded.NumberBounds
+scale3DBounds = Bounded.numberBounds (-10.0) 10.0 "Scale3D"
+  "3D scale factor per axis, allowing inversion via negative values"
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // perspective
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -341,9 +355,10 @@ instance showPerspective :: Show Perspective where
   show (Perspective p) = "perspective(" <> show p <> "px)"
 
 -- | Create perspective.
--- | Values are clamped to minimum of 1.0 to avoid division issues.
+-- | Values are clamped to 1.0-10000.0 to avoid division issues and
+-- | ensure meaningful perspective effects.
 perspective :: Number -> Perspective
-perspective n = Perspective (max 1.0 n)
+perspective n = Perspective (Bounded.clampNumber 1.0 10000.0 n)
 
 -- | No perspective (flat)
 perspectiveNone :: Perspective
@@ -359,6 +374,18 @@ perspectiveToLegacyCss (Perspective p) =
   if p == 0.0
     then "none"
     else "perspective(" <> show p <> "px)"
+
+-- | Bounds for Perspective depth.
+-- |
+-- | Perspective values are bounded 1.0 to 10000.0 pixels:
+-- | - Minimum 1.0 avoids division by zero and extreme fisheye
+-- | - Maximum 10000.0 is effectively flat (no visible perspective)
+-- | - Common UI values: 500-1500px
+-- | - Dramatic effects: 200-500px
+-- | - Note: perspectiveNone (0.0) is a special case meaning "no perspective"
+perspectiveBounds :: Bounded.NumberBounds
+perspectiveBounds = Bounded.numberBounds 1.0 10000.0 "Perspective"
+  "Perspective depth in pixels controlling 3D foreshortening"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // perspective origin

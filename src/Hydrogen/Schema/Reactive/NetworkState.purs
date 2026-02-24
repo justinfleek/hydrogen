@@ -52,11 +52,15 @@ module Hydrogen.Schema.Reactive.NetworkState
   , canFetch
   , shouldDeferLargeRequests
   , adaptiveImageQuality
+  -- * Bounds
+  , rttBounds
+  , downlinkBounds
   ) where
 
 import Prelude
 
 import Data.Maybe (Maybe(Nothing))
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // connection status
@@ -180,9 +184,11 @@ derive instance ordRoundTripTime :: Ord RoundTripTime
 instance showRoundTripTime :: Show RoundTripTime where
   show (RoundTripTime ms) = show ms <> "ms"
 
--- | Create RTT value (clamps to non-negative)
+-- | Create RTT value (clamps to [0, 30000] ms)
+-- |
+-- | Maximum is 30 seconds — beyond this, connection is effectively dead.
 rttMs :: Number -> RoundTripTime
-rttMs ms = RoundTripTime (max 0.0 ms)
+rttMs ms = RoundTripTime (Bounded.clampNumber 0.0 30000.0 ms)
 
 -- | Extract RTT value
 unwrapRtt :: RoundTripTime -> Number
@@ -209,9 +215,11 @@ derive instance ordDownlink :: Ord Downlink
 instance showDownlink :: Show Downlink where
   show (Downlink mbps) = show mbps <> " Mbps"
 
--- | Create downlink value (clamps to non-negative)
+-- | Create downlink value (clamps to [0, 10000] Mbps)
+-- |
+-- | Maximum is 10 Gbps — beyond current consumer technology.
 downlinkMbps :: Number -> Downlink
-downlinkMbps mbps = Downlink (max 0.0 mbps)
+downlinkMbps mbps = Downlink (Bounded.clampNumber 0.0 10000.0 mbps)
 
 -- | Extract downlink value
 unwrapDownlink :: Downlink -> Number
@@ -329,3 +337,23 @@ adaptiveImageQuality ns
   | is3g ns.quality.effectiveType = 0.75
   | shouldReduceData ns.quality = 0.5
   | otherwise = 1.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for RoundTripTime [0, 30000] ms
+-- |
+-- | - 0ms: Theoretical perfect latency (impossible, but valid floor)
+-- | - 30000ms: 30 seconds — connection is effectively dead beyond this
+rttBounds :: Bounded.NumberBounds
+rttBounds = Bounded.numberBounds 0.0 30000.0 "RoundTripTime"
+  "Network round-trip latency in milliseconds (0-30s)"
+
+-- | Bounds for Downlink [0, 10000] Mbps
+-- |
+-- | - 0 Mbps: No bandwidth (offline)
+-- | - 10000 Mbps: 10 Gbps — beyond current consumer technology
+downlinkBounds :: Bounded.NumberBounds
+downlinkBounds = Bounded.numberBounds 0.0 10000.0 "Downlink"
+  "Download bandwidth in megabits per second (0-10 Gbps)"

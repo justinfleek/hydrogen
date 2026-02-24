@@ -17,6 +17,7 @@ module Hydrogen.Schema.Temporal.Hour
   , isAM
   , isPM
   , toLegacyCss
+  , bounds
   ) where
 
 import Prelude
@@ -32,6 +33,8 @@ import Prelude
   , (>=)
   , (==)
   )
+
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                        // hour
@@ -112,3 +115,14 @@ padZero :: Int -> String
 padZero n
   | n < 10 = "0" <> show n
   | otherwise = show n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Hour
+-- |
+-- | Min: 0 (midnight)
+-- | Max: 23 (11 PM)
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 0 23 "hour" "Hour of day (0-23)"

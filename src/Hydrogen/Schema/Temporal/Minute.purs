@@ -13,6 +13,7 @@ module Hydrogen.Schema.Temporal.Minute
   , unwrap
   , toInt
   , toLegacyCss
+  , bounds
   ) where
 
 import Prelude
@@ -25,6 +26,8 @@ import Prelude
   , (<)
   , (>)
   )
+
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // minute
@@ -90,3 +93,14 @@ padZero :: Int -> String
 padZero n
   | n < 10 = "0" <> show n
   | otherwise = show n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Minute
+-- |
+-- | Min: 0
+-- | Max: 59
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds 0 59 "minute" "Minute within hour (0-59)"

@@ -44,9 +44,9 @@
 -- |
 -- | ## Implementation Note
 -- |
--- | Until a proper UUID5 library is added, we use a SHA256-based approximation
--- | that provides the same deterministic properties. The output format matches
--- | UUID string format for compatibility.
+-- | Uses proper SHA-256 based UUID5 from Hydrogen.Schema.Attestation.UUID5.
+-- | This provides cryptographically strong, deterministic identifiers that
+-- | work correctly with Unicode strings and won't cause collisions.
 
 module Hydrogen.Schema.Identity
   ( -- * Swatch Identity
@@ -96,19 +96,11 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
-  , otherwise
-  , negate
-  , mod
   , (<>)
   , (==)
-  , (<)
-  , (>=)
-  , (+)
-  , (*)
-  , (/)
   )
 
-import Data.String (length, take, drop)
+import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // namespaces
@@ -160,13 +152,17 @@ instance showEntityId :: Show EntityId where
 -- | Create entity ID from namespace and name
 -- |
 -- | The ID is deterministic: same namespace + name always produces same ID.
+-- | Uses proper SHA-256 based UUID5 from Hydrogen.Schema.Attestation.UUID5.
 entityIdFromNamespace :: Namespace -> String -> EntityId
 entityIdFromNamespace (Namespace ns) name = 
-  EntityId (deterministicUuid (ns <> ":" <> name))
+  let uuid = UUID5.uuid5 UUID5.nsElement (ns <> ":" <> name)
+  in EntityId (UUID5.toString uuid)
 
--- | Create entity ID from just a name (uses default namespace)
+-- | Create entity ID from just a name (uses Element namespace)
 entityId :: String -> EntityId
-entityId name = EntityId (deterministicUuid name)
+entityId name = 
+  let uuid = UUID5.uuid5 UUID5.nsElement name
+  in EntityId (UUID5.toString uuid)
 
 -- | Unwrap entity ID to String
 unwrapEntityId :: EntityId -> String
@@ -317,186 +313,5 @@ unwrapBrandId (BrandId id) = id
 -- | Convert to string
 brandIdToString :: BrandId -> String
 brandIdToString = unwrapBrandId
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // deterministic hash
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Generate a deterministic UUID-formatted string from input
--- |
--- | This is a simplified implementation that produces consistent output
--- | for the same input. In production, this should use proper UUID5.
--- |
--- | Output format: xxxxxxxx-xxxx-5xxx-yxxx-xxxxxxxxxxxx
--- | Where 5 indicates UUID version 5 (name-based SHA-1)
-deterministicUuid :: String -> String
-deterministicUuid input =
-  let
-    -- Simple deterministic hash (djb2 algorithm basis)
-    -- In production, replace with actual SHA-1 based UUID5
-    hash = simpleHash input
-    hex = toHex32 hash
-    
-    -- Format as UUID: 8-4-4-4-12
-    -- Version nibble (5) and variant bits are set
-    p1 = take 8 hex
-    p2 = take 4 (drop 8 hex)
-    p3 = "5" <> take 3 (drop 12 hex)  -- Version 5
-    p4 = "a" <> take 3 (drop 15 hex)  -- Variant (10xx)
-    p5 = take 12 (drop 18 hex) <> padRight 12 (drop 30 hex)
-  in
-    p1 <> "-" <> p2 <> "-" <> p3 <> "-" <> p4 <> "-" <> p5
-
--- | Simple hash function (djb2-inspired)
--- |
--- | Produces a deterministic integer from a string.
--- | NOT cryptographically secure — just for ID generation.
-simpleHash :: String -> Int
-simpleHash str = hashChars 5381 0
-  where
-    len = length str
-    hashChars acc idx
-      | idx == len = acc
-      | otherwise = 
-          let c = charCodeAt idx str
-              -- djb2: hash * 33 + c, but we use bitwise for speed
-              newAcc = ((acc * 33) + c) `mod` 2147483647
-          in hashChars newAcc (idx + 1)
-
--- | Get char code at index (ASCII approximation)
--- |
--- | Returns the character code, defaulting to 0 for out of bounds.
-charCodeAt :: Int -> String -> Int
-charCodeAt idx str =
-  let char = take 1 (drop idx str)
-  in if length char == 0
-       then 0
-       else charToCode char
-
--- | Convert single character to code
--- |
--- | Simple ASCII mapping for common characters.
-charToCode :: String -> Int
-charToCode c = case c of
-  "a" -> 97
-  "b" -> 98
-  "c" -> 99
-  "d" -> 100
-  "e" -> 101
-  "f" -> 102
-  "g" -> 103
-  "h" -> 104
-  "i" -> 105
-  "j" -> 106
-  "k" -> 107
-  "l" -> 108
-  "m" -> 109
-  "n" -> 110
-  "o" -> 111
-  "p" -> 112
-  "q" -> 113
-  "r" -> 114
-  "s" -> 115
-  "t" -> 116
-  "u" -> 117
-  "v" -> 118
-  "w" -> 119
-  "x" -> 120
-  "y" -> 121
-  "z" -> 122
-  "A" -> 65
-  "B" -> 66
-  "C" -> 67
-  "D" -> 68
-  "E" -> 69
-  "F" -> 70
-  "G" -> 71
-  "H" -> 72
-  "I" -> 73
-  "J" -> 74
-  "K" -> 75
-  "L" -> 76
-  "M" -> 77
-  "N" -> 78
-  "O" -> 79
-  "P" -> 80
-  "Q" -> 81
-  "R" -> 82
-  "S" -> 83
-  "T" -> 84
-  "U" -> 85
-  "V" -> 86
-  "W" -> 87
-  "X" -> 88
-  "Y" -> 89
-  "Z" -> 90
-  "0" -> 48
-  "1" -> 49
-  "2" -> 50
-  "3" -> 51
-  "4" -> 52
-  "5" -> 53
-  "6" -> 54
-  "7" -> 55
-  "8" -> 56
-  "9" -> 57
-  "-" -> 45
-  "_" -> 95
-  "." -> 46
-  "/" -> 47
-  ":" -> 58
-  " " -> 32
-  _ -> 63  -- '?' for unknown
-
--- | Convert integer to 32-character hex string
-toHex32 :: Int -> String
-toHex32 n =
-  let 
-    hex = intToHex (if n < 0 then negate n else n)
-  in 
-    padLeft 32 hex
-
--- | Convert integer to hex string
-intToHex :: Int -> String
-intToHex n
-  | n < 16 = hexDigit n
-  | otherwise = intToHex (n / 16) <> hexDigit (n `mod` 16)
-
--- | Single hex digit
-hexDigit :: Int -> String
-hexDigit d = case d of
-  0 -> "0"
-  1 -> "1"
-  2 -> "2"
-  3 -> "3"
-  4 -> "4"
-  5 -> "5"
-  6 -> "6"
-  7 -> "7"
-  8 -> "8"
-  9 -> "9"
-  10 -> "a"
-  11 -> "b"
-  12 -> "c"
-  13 -> "d"
-  14 -> "e"
-  15 -> "f"
-  _ -> "0"
-
--- | Pad string on left to target length
-padLeft :: Int -> String -> String
-padLeft target str =
-  let len = length str
-  in if len >= target
-       then str
-       else padLeft target ("0" <> str)
-
--- | Pad string on right to target length  
-padRight :: Int -> String -> String
-padRight target str =
-  let len = length str
-  in if len >= target
-       then take target str
-       else padRight target (str <> "0")
 
 

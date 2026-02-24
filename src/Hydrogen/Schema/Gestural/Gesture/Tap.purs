@@ -32,10 +32,13 @@ module Hydrogen.Schema.Gestural.Gesture.Tap
   , noTap
   , tapPosition
   , isTapRecognized
+    -- * Bounds
+  , tapCountBounds
   ) where
 
 import Prelude
 
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Gestural.Gesture.Phase 
   ( GesturePhase(Possible)
   , isEnded
@@ -89,6 +92,19 @@ isDoubleTap (TapCount n) = n == 2
 -- | Is this a triple tap?
 isTripleTap :: TapCount -> Boolean
 isTripleTap (TapCount n) = n == 3
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for TapCount [1, 3]
+-- |
+-- | - 1: Single tap
+-- | - 2: Double tap
+-- | - 3: Triple tap (select paragraph in text)
+tapCountBounds :: Bounded.IntBounds
+tapCountBounds = Bounded.intBounds 1 3 "TapCount"
+  "Number of taps in a multi-tap gesture (1=single, 2=double, 3=triple)"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // tap // state

@@ -530,6 +530,35 @@ When you see an error or warning:
 - There is a 0.00001% chance code doesn't belong — ask before deletion
 - Far more likely: a session ended prematurely, work remains
 
+## Import Philosophy
+
+**Imports are a contract, not a shopping list.**
+
+When an agent enters a module, the explicit import list tells them: "These are
+the tools available in this module's vocabulary." If an import exists, it means
+**this module's domain reasonably requires this functionality**.
+
+When you see an "unused import" warning, there are two valid responses:
+
+1. **The import belongs to this domain** → Add the missing functionality that
+   uses it. A Shape module doing tensor arithmetic SHOULD have `(+)`, `bind`,
+   `pure`, and `(&&)` available — even if the current implementation happens
+   not to use all of them yet.
+
+2. **The import truly doesn't belong** → This is rare (<0.01% of cases). Ask
+   before removing. The import was likely added intentionally for functionality
+   that wasn't completed.
+
+**Why this matters at billion-agent scale:**
+
+If an agent wants to add a function that needs `(+)` and sees it's not imported,
+they might think: "This module deliberately excludes arithmetic" — and they'll
+either work around it (creating inconsistency) or ask for clarification (wasting
+coordination overhead). The import list should give them a clear path forward.
+
+The explicit import list defines the module's **semantic scope**. It answers:
+"What operations are natural and expected in this domain?"
+
 ## Lean4 Proofs
 
 - Define invariants FIRST

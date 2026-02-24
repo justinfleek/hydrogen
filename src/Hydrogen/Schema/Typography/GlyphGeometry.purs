@@ -77,8 +77,10 @@ import Prelude
   , class Show
   , show
   , map
+  , negate
   , (+)
   , (-)
+  , (*)
   , (<>)
   , (==)
   , (>)

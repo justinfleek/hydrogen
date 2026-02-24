@@ -107,6 +107,11 @@ module Hydrogen.Schema.Geometry.Angle
   -- * Conversion
   , toLegacyCss
   , toRotateCss
+  
+  -- * Bounds
+  , degreesBounds
+  , radiansBounds
+  , turnsBounds
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -134,6 +139,8 @@ import Prelude
   )
 
 import Data.Number (pi, sin, cos, tan, asin, acos, atan, atan2, floor)
+
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // core types
@@ -485,3 +492,28 @@ toLegacyCss (Degrees d) = show d <> "deg"
 -- | ```
 toRotateCss :: Degrees -> String
 toRotateCss d = "rotate(" <> toLegacyCss d <> ")"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Degrees (cyclic: values normalize to this range)
+-- |
+-- | Min: 0.0
+-- | Max: 360.0 (exclusive, wraps to 0)
+degreesBounds :: Bounded.NumberBounds
+degreesBounds = Bounded.numberBounds 0.0 360.0 "degrees" "Angle in degrees (0-360, cyclic)"
+
+-- | Bounds for Radians (cyclic: values normalize to this range)
+-- |
+-- | Min: 0.0
+-- | Max: 2π (exclusive, wraps to 0)
+radiansBounds :: Bounded.NumberBounds
+radiansBounds = Bounded.numberBounds 0.0 (2.0 * pi) "radians" "Angle in radians (0-2π, cyclic)"
+
+-- | Bounds for Turns (cyclic: values normalize to this range)
+-- |
+-- | Min: 0.0
+-- | Max: 1.0 (exclusive, wraps to 0)
+turnsBounds :: Bounded.NumberBounds
+turnsBounds = Bounded.numberBounds 0.0 1.0 "turns" "Angle in turns (0-1, cyclic)"
