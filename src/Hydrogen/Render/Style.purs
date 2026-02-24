@@ -258,6 +258,7 @@ import Prelude
   )
 
 import Data.Array (intercalate)
+import Data.Foldable (foldl) as Foldable
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -905,7 +906,6 @@ composeFlipped :: forall a b c. (a -> b) -> (b -> c) -> (a -> c)
 composeFlipped f g x = g (f x)
 
 -- | foldl for Array
+-- | Pure implementation using Data.Foldable.foldl
 foldlArray :: forall a b. (b -> a -> b) -> b -> Array a -> b
-foldlArray = foldlArrayImpl
-
-foreign import foldlArrayImpl :: forall a b. (b -> a -> b) -> b -> Array a -> b
+foldlArray = Foldable.foldl

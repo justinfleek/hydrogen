@@ -109,6 +109,7 @@ import Prelude
   , (<>)
   )
 
+import Data.Array (length) as Array
 import Data.Maybe (Maybe)
 import Data.Tuple (Tuple)
 import Foreign (Foreign)
@@ -490,4 +491,6 @@ compose :: forall a b c. (b -> c) -> (a -> b) -> (a -> c)
 compose f g x = f (g x)
 
 -- Array length (needed for Show instance)
-foreign import length :: forall a. Array a -> Int
+-- Pure implementation using Data.Array.length
+length :: forall a. Array a -> Int
+length = Array.length
