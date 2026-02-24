@@ -31,12 +31,46 @@ module Hydrogen.GPU.Scene3D.Position
   , Direction3D(Direction3D)
   , direction3D
   , normalizeToDirection
+  
+  -- * Cardinal Directions (6 face centers)
   , directionX
   , directionY
   , directionZ
   , negativeX
   , negativeY
   , negativeZ
+  
+  -- * Semantic Aliases for Cardinals
+  , right
+  , left
+  , up
+  , down
+  , forward
+  , backward
+  
+  -- * Edge Directions (12 edge centers, normalized)
+  , rightUp
+  , rightDown
+  , rightForward
+  , rightBackward
+  , leftUp
+  , leftDown
+  , leftForward
+  , leftBackward
+  , upForward
+  , upBackward
+  , downForward
+  , downBackward
+  
+  -- * Corner Directions (8 cube corners, normalized)
+  , rightUpForward
+  , rightUpBackward
+  , rightDownForward
+  , rightDownBackward
+  , leftUpForward
+  , leftUpBackward
+  , leftDownForward
+  , leftDownBackward
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -187,3 +221,120 @@ negativeY = Direction3D (vec3 0.0 (-1.0) 0.0)
 -- | Negative Z axis direction (0, 0, -1).
 negativeZ :: Direction3D
 negativeZ = Direction3D (vec3 0.0 0.0 (-1.0))
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // semantic direction aliases
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Right direction (+X). Standard screen-space convention.
+right :: Direction3D
+right = directionX
+
+-- | Left direction (-X).
+left :: Direction3D
+left = negativeX
+
+-- | Up direction (+Y). Standard Y-up convention.
+up :: Direction3D
+up = directionY
+
+-- | Down direction (-Y).
+down :: Direction3D
+down = negativeY
+
+-- | Forward direction (+Z). Camera looks toward -Z, so +Z is "forward" into scene.
+-- | Note: This follows the right-handed coordinate system where +Z points toward viewer.
+forward :: Direction3D
+forward = directionZ
+
+-- | Backward direction (-Z). Toward the camera.
+backward :: Direction3D
+backward = negativeZ
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // edge directions
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Right + Up edge direction, normalized to unit length.
+rightUp :: Direction3D
+rightUp = Direction3D (normalizeVec3Safe (vec3 1.0 1.0 0.0))
+
+-- | Right + Down edge direction.
+rightDown :: Direction3D
+rightDown = Direction3D (normalizeVec3Safe (vec3 1.0 (-1.0) 0.0))
+
+-- | Right + Forward edge direction.
+rightForward :: Direction3D
+rightForward = Direction3D (normalizeVec3Safe (vec3 1.0 0.0 1.0))
+
+-- | Right + Backward edge direction.
+rightBackward :: Direction3D
+rightBackward = Direction3D (normalizeVec3Safe (vec3 1.0 0.0 (-1.0)))
+
+-- | Left + Up edge direction.
+leftUp :: Direction3D
+leftUp = Direction3D (normalizeVec3Safe (vec3 (-1.0) 1.0 0.0))
+
+-- | Left + Down edge direction.
+leftDown :: Direction3D
+leftDown = Direction3D (normalizeVec3Safe (vec3 (-1.0) (-1.0) 0.0))
+
+-- | Left + Forward edge direction.
+leftForward :: Direction3D
+leftForward = Direction3D (normalizeVec3Safe (vec3 (-1.0) 0.0 1.0))
+
+-- | Left + Backward edge direction.
+leftBackward :: Direction3D
+leftBackward = Direction3D (normalizeVec3Safe (vec3 (-1.0) 0.0 (-1.0)))
+
+-- | Up + Forward edge direction.
+upForward :: Direction3D
+upForward = Direction3D (normalizeVec3Safe (vec3 0.0 1.0 1.0))
+
+-- | Up + Backward edge direction.
+upBackward :: Direction3D
+upBackward = Direction3D (normalizeVec3Safe (vec3 0.0 1.0 (-1.0)))
+
+-- | Down + Forward edge direction.
+downForward :: Direction3D
+downForward = Direction3D (normalizeVec3Safe (vec3 0.0 (-1.0) 1.0))
+
+-- | Down + Backward edge direction.
+downBackward :: Direction3D
+downBackward = Direction3D (normalizeVec3Safe (vec3 0.0 (-1.0) (-1.0)))
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // corner directions
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Right + Up + Forward corner direction, normalized to unit length.
+rightUpForward :: Direction3D
+rightUpForward = Direction3D (normalizeVec3Safe (vec3 1.0 1.0 1.0))
+
+-- | Right + Up + Backward corner direction.
+rightUpBackward :: Direction3D
+rightUpBackward = Direction3D (normalizeVec3Safe (vec3 1.0 1.0 (-1.0)))
+
+-- | Right + Down + Forward corner direction.
+rightDownForward :: Direction3D
+rightDownForward = Direction3D (normalizeVec3Safe (vec3 1.0 (-1.0) 1.0))
+
+-- | Right + Down + Backward corner direction.
+rightDownBackward :: Direction3D
+rightDownBackward = Direction3D (normalizeVec3Safe (vec3 1.0 (-1.0) (-1.0)))
+
+-- | Left + Up + Forward corner direction.
+leftUpForward :: Direction3D
+leftUpForward = Direction3D (normalizeVec3Safe (vec3 (-1.0) 1.0 1.0))
+
+-- | Left + Up + Backward corner direction.
+leftUpBackward :: Direction3D
+leftUpBackward = Direction3D (normalizeVec3Safe (vec3 (-1.0) 1.0 (-1.0)))
+
+-- | Left + Down + Forward corner direction.
+leftDownForward :: Direction3D
+leftDownForward = Direction3D (normalizeVec3Safe (vec3 (-1.0) (-1.0) 1.0))
+
+-- | Left + Down + Backward corner direction.
+leftDownBackward :: Direction3D
+leftDownBackward = Direction3D (normalizeVec3Safe (vec3 (-1.0) (-1.0) (-1.0)))

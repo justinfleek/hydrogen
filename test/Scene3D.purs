@@ -32,14 +32,26 @@ import Data.Tuple (Tuple(Tuple))
 import Test.QuickCheck ((<?>), (===))
 import Test.QuickCheck.Gen (Gen, chooseInt, elements, frequency, oneOf, vectorOf)
 import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (fail, shouldEqual)
+import Test.Spec.Assertions (fail, shouldEqual, shouldSatisfy)
 import Test.Spec.QuickCheck (quickCheck) as Spec
 
 import Hydrogen.GPU.Scene3D.Identity as Identity
 import Hydrogen.GPU.Scene3D.Core
   ( Scene3D
   , SceneBuffer
-  , SceneCommand(SetCamera, SetBackground, AddLight, DrawMesh)
+  , SceneCommand
+      ( SetCamera
+      , SetBackground
+      , AddLight
+      , DrawMesh
+      , DrawGrid
+      , DrawAxes
+      , PushTransform
+      , PopTransform
+      , SetClipPlane
+      , ClearClipPlane
+      , Noop3D
+      )
   , emptyScene
   , withCamera
   , withBackground
@@ -58,6 +70,8 @@ import Hydrogen.GPU.Scene3D.Mesh
   , BoxMeshParams
   , SphereMeshParams
   , CylinderMeshParams
+  , PickId3D
+  , pickId3D
   )
 import Hydrogen.GPU.Scene3D.Material
   ( Material3D(BasicMaterial3D, StandardMaterial3D)
@@ -79,7 +93,27 @@ import Hydrogen.Schema.Dimension.Physical.SI (Meter, meter)
 import Hydrogen.Schema.Geometry.Angle (Degrees, degrees)
 import Hydrogen.Schema.Color.RGB (RGBA, rgba)
 import Hydrogen.Schema.Dimension.Rotation.Quaternion (Quaternion, quaternionIdentity)
-import Hydrogen.Schema.Dimension.Vector.Vec3 (vec3)
+import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3, vec3)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // helpers
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Create a basic MeshParams for testing.
+-- | Uses sensible defaults for shadow/pick/event fields.
+testMeshParams :: Mesh3D -> Material3D -> Position3D -> MeshParams Unit
+testMeshParams geom mat pos =
+  { geometry: geom
+  , material: mat
+  , position: pos
+  , rotation: quaternionIdentity
+  , scale: vec3 1.0 1.0 1.0
+  , castShadow: false
+  , receiveShadow: false
+  , pickId: Nothing
+  , onClick: Nothing
+  , onHover: Nothing
+  }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // generators
@@ -798,12 +832,16 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
             , far: meter 1000.0
             , position: zeroPosition3D
             , target: zeroPosition3D
+            , up: directionY
             }
       let scene = emptyScene # withCamera camera
       let buffer = flattenScene scene
       let cameraCmd = Array.head buffer
       case cameraCmd of
-        Just (SetCamera c) -> c `shouldEqual` camera
+        Just (SetCamera c) -> 
+          if c == camera 
+            then pure unit 
+            else fail "Camera in buffer doesn't match input camera"
         _ -> fail "First command should be SetCamera"
     
     it "replaces existing camera" do
@@ -814,6 +852,7 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
             , far: meter 100.0
             , position: zeroPosition3D
             , target: zeroPosition3D
+            , up: directionY
             }
       let camera2 = PerspectiveCamera3D
             { fov: degrees 90.0
@@ -822,6 +861,7 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
             , far: meter 500.0
             , position: zeroPosition3D
             , target: zeroPosition3D
+            , up: directionY
             }
       let scene = emptyScene # withCamera camera1 # withCamera camera2
       let buffer = flattenScene scene
@@ -835,7 +875,10 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
       let buffer = flattenScene scene
       let bgCmd = Array.index buffer 1
       case bgCmd of
-        Just (SetBackground b) -> b `shouldEqual` bg
+        Just (SetBackground b) -> 
+          if b == bg 
+            then pure unit 
+            else fail "Background in buffer doesn't match input background"
         _ -> fail "Second command should be SetBackground"
     
     it "replaces existing background" do
@@ -877,82 +920,63 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
   
   describe "withMesh" do
     it "adds a mesh to an empty scene" do
-      let meshParams = 
-            { mesh: BoxMesh3D 
-                { width: meter 1.0
-                , height: meter 1.0
-                , depth: meter 1.0
-                , widthSegments: 1
-                , heightSegments: 1
-                , depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 255 0 0 100
-                , opacity: 1.0
-                , transparent: false
-                , wireframe: false
-                }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0
+            , height: meter 1.0
+            , depth: meter 1.0
+            , widthSegments: 1
+            , heightSegments: 1
+            , depthSegments: 1
             }
+      let redMat = BasicMaterial3D 
+            { color: rgba 255 0 0 100
+            , opacity: 1.0
+            , transparent: false
+            , wireframe: false
+            }
+      let meshParams = testMeshParams boxGeom redMat zeroPosition3D
       let scene = emptyScene # withMesh meshParams
       Array.length scene.meshes `shouldEqual` 1
     
     it "accumulates multiple meshes" do
-      let boxMesh = 
-            { mesh: BoxMesh3D 
-                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
-                , widthSegments: 1, heightSegments: 1, depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
             }
-      let sphereMesh = 
-            { mesh: SphereMesh3D 
-                { radius: meter 0.5
-                , widthSegments: 16
-                , heightSegments: 8
-                , phiStart: degrees 0.0
-                , phiLength: degrees 360.0
-                , thetaStart: degrees 0.0
-                , thetaLength: degrees 180.0
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 0 255 0 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: Position3D { x: picometer 2000000000000, y: picometer 0, z: picometer 0 }
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let sphereGeom = SphereMesh3D 
+            { radius: meter 0.5
+            , widthSegments: 16
+            , heightSegments: 8
+            , phiStart: degrees 0.0
+            , phiLength: degrees 360.0
+            , thetaStart: degrees 0.0
+            , thetaLength: degrees 180.0
             }
+      let redMat = BasicMaterial3D 
+            { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
+      let greenMat = BasicMaterial3D 
+            { color: rgba 0 255 0 100, opacity: 1.0, transparent: false, wireframe: false }
+      let boxMesh = testMeshParams boxGeom redMat zeroPosition3D
+      let sphereMesh = testMeshParams sphereGeom greenMat 
+            (Position3D { x: picometer 2000000000000.0, y: picometer 0.0, z: picometer 0.0 })
       let scene = emptyScene # withMesh boxMesh # withMesh sphereMesh
       Array.length scene.meshes `shouldEqual` 2
     
     it "meshes appear in buffer in order added" do
-      let mesh1 = 
-            { mesh: BoxMesh3D 
-                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
-                , widthSegments: 1, heightSegments: 1, depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let box1 = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
             }
-      let mesh2 = 
-            { mesh: BoxMesh3D 
-                { width: meter 2.0, height: meter 2.0, depth: meter 2.0
-                , widthSegments: 1, heightSegments: 1, depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 0 0 255 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let box2 = BoxMesh3D 
+            { width: meter 2.0, height: meter 2.0, depth: meter 2.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
             }
+      let redMat = BasicMaterial3D 
+            { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
+      let blueMat = BasicMaterial3D 
+            { color: rgba 0 0 255 100, opacity: 1.0, transparent: false, wireframe: false }
+      let mesh1 = testMeshParams box1 redMat zeroPosition3D
+      let mesh2 = testMeshParams box2 blueMat zeroPosition3D
       let scene = emptyScene # withMesh mesh1 # withMesh mesh2
       let buffer = flattenScene scene
       let meshes = Array.mapMaybe (\cmd -> case cmd of
@@ -967,22 +991,19 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
             , aspect: 1.777
             , near: meter 0.1
             , far: meter 1000.0
-            , position: Position3D { x: picometer 0, y: picometer 5000000000000, z: picometer 10000000000000 }
+            , position: Position3D { x: picometer 0.0, y: picometer 5000000000000.0, z: picometer 10000000000000.0 }
             , target: zeroPosition3D
+            , up: directionY
             }
       let bg = solidBackground (rgba 30 30 30 100)
       let light = AmbientLight3D { color: rgba 255 255 255 100, intensity: 0.8 }
-      let mesh = 
-            { mesh: BoxMesh3D 
-                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
-                , widthSegments: 1, heightSegments: 1, depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 200 100 50 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
             }
+      let orangeMat = BasicMaterial3D 
+            { color: rgba 200 100 50 100, opacity: 1.0, transparent: false, wireframe: false }
+      let mesh = testMeshParams boxGeom orangeMat zeroPosition3D
       let scene = emptyScene 
             # withCamera camera
             # withBackground bg
@@ -996,21 +1017,17 @@ builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" d
       -- Build scene in different orders, verify same structure
       let camera = PerspectiveCamera3D
             { fov: degrees 75.0, aspect: 1.0, near: meter 0.1, far: meter 100.0
-            , position: zeroPosition3D, target: zeroPosition3D
+            , position: zeroPosition3D, target: zeroPosition3D, up: directionY
             }
       let bg = solidBackground (rgba 0 0 0 100)
       let light = AmbientLight3D { color: rgba 255 255 255 100, intensity: 1.0 }
-      let mesh = 
-            { mesh: BoxMesh3D 
-                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
-                , widthSegments: 1, heightSegments: 1, depthSegments: 1
-                }
-            , material: BasicMaterial3D 
-                { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
-            , position: zeroPosition3D
-            , rotation: quaternionIdentity
-            , scale: vec3 1.0 1.0 1.0
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
             }
+      let whiteMat = BasicMaterial3D 
+            { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
+      let mesh = testMeshParams boxGeom whiteMat zeroPosition3D
       -- Order 1: camera, bg, light, mesh
       let scene1 = emptyScene # withCamera camera # withBackground bg # withLight light # withMesh mesh
       -- Order 2: mesh, light, bg, camera
@@ -1035,9 +1052,9 @@ positionUtilityTests = describe "Scene3D Tests" $ describe "Position Utilities" 
     it "has all zero coordinates" do
       case zeroPosition3D of
         Position3D p -> do
-          p.x `shouldEqual` picometer 0
-          p.y `shouldEqual` picometer 0
-          p.z `shouldEqual` picometer 0
+          p.x `shouldEqual` picometer 0.0
+          p.y `shouldEqual` picometer 0.0
+          p.z `shouldEqual` picometer 0.0
     
     it "produces consistent UUID" do
       let uuid1 = Identity.positionId zeroPosition3D
@@ -1053,6 +1070,7 @@ positionUtilityTests = describe "Scene3D Tests" $ describe "Position Utilities" 
             , far: meter 100.0
             , position: zeroPosition3D
             , target: zeroPosition3D
+            , up: directionY
             }
       let scene = emptyScene # withCamera camera
       let buffer = flattenScene scene
@@ -1077,12 +1095,19 @@ sceneBufferTests = describe "Scene3D Tests" $ describe "SceneBuffer Type" do
     -- Can filter
     let lights = Array.filter isAddLight buffer
     Array.length lights `shouldEqual` 1
-    -- Can map
+    -- Can map - handle all SceneCommand constructors explicitly
     let commandTypes = map (\cmd -> case cmd of
           SetCamera _ -> "camera"
           SetBackground _ -> "background"
           AddLight _ -> "light"
-          DrawMesh _ -> "mesh") buffer
+          DrawMesh _ -> "mesh"
+          DrawGrid _ -> "grid"
+          DrawAxes _ -> "axes"
+          PushTransform _ -> "pushTransform"
+          PopTransform -> "popTransform"
+          SetClipPlane _ -> "setClipPlane"
+          ClearClipPlane -> "clearClipPlane"
+          Noop3D -> "noop") buffer
     Array.length commandTypes `shouldEqual` 3
 
 -- | Tests for Quaternion type usage in mesh parameters.
@@ -1090,21 +1115,120 @@ quaternionUsageTests :: Spec Unit
 quaternionUsageTests = describe "Scene3D Tests" $ describe "Quaternion Usage" do
   
   it "MeshParams uses Quaternion for rotation" do
+    -- Explicitly create MeshParams with a typed Quaternion rotation
+    -- This verifies the Quaternion type is accepted in the rotation field
     let rotation :: Quaternion
         rotation = quaternionIdentity
-    let meshParams = 
-          { mesh: BoxMesh3D 
-              { width: meter 1.0, height: meter 1.0, depth: meter 1.0
-              , widthSegments: 1, heightSegments: 1, depthSegments: 1
-              }
-          , material: BasicMaterial3D 
-              { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
+    let boxGeom = BoxMesh3D 
+          { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+          , widthSegments: 1, heightSegments: 1, depthSegments: 1
+          }
+    let whiteMat = BasicMaterial3D 
+          { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
+    -- Create full MeshParams with explicit rotation field to verify Quaternion type
+    let meshParams :: MeshParams Unit
+        meshParams = 
+          { geometry: boxGeom
+          , material: whiteMat
           , position: zeroPosition3D
-          , rotation: rotation  -- Quaternion type
+          , rotation: rotation  -- Quaternion type explicitly used
           , scale: vec3 1.0 1.0 1.0
+          , castShadow: false
+          , receiveShadow: false
+          , pickId: Nothing
+          , onClick: Nothing
+          , onHover: Nothing
           }
     let scene = emptyScene # withMesh meshParams
     Array.length scene.meshes `shouldEqual` 1
+
+-- | Tests for MeshParams advanced features: PickId3D and Vec3 scale.
+meshParamsAdvancedTests :: Spec Unit
+meshParamsAdvancedTests = describe "Scene3D Tests" $ describe "MeshParams Advanced" do
+  
+  describe "PickId3D for raycasting" do
+    it "mesh can have a PickId3D for raycast identification" do
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
+            }
+      let mat = BasicMaterial3D 
+            { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
+      -- Create mesh with a PickId3D for raycast hit detection
+      let pickableId :: PickId3D
+          pickableId = pickId3D 42
+      let meshParams :: MeshParams Unit
+          meshParams = 
+            { geometry: boxGeom
+            , material: mat
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            , castShadow: false
+            , receiveShadow: false
+            , pickId: Just pickableId
+            , onClick: Nothing
+            , onHover: Nothing
+            }
+      let scene = emptyScene # withMesh meshParams
+      -- Verify mesh was added
+      Array.length scene.meshes `shouldEqual` 1
+      -- Verify pickId is set correctly
+      case Array.head scene.meshes of
+        Just m -> m.pickId `shouldSatisfy` (_ == Just pickableId)
+        Nothing -> fail "Scene should have one mesh"
+    
+    it "mesh without PickId3D has Nothing" do
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
+            }
+      let mat = BasicMaterial3D 
+            { color: rgba 0 255 0 100, opacity: 1.0, transparent: false, wireframe: false }
+      let meshParams = testMeshParams boxGeom mat zeroPosition3D
+      case meshParams.pickId of
+        Nothing -> pure unit
+        Just _ -> fail "testMeshParams should create mesh with no pickId"
+  
+  describe "Vec3 scale" do
+    it "scale uses Vec3 Number type" do
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
+            }
+      let mat = BasicMaterial3D 
+            { color: rgba 0 0 255 100, opacity: 1.0, transparent: false, wireframe: false }
+      -- Create non-uniform scale
+      let nonUniformScale :: Vec3 Number
+          nonUniformScale = vec3 2.0 0.5 1.5
+      let meshParams :: MeshParams Unit
+          meshParams = 
+            { geometry: boxGeom
+            , material: mat
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: nonUniformScale
+            , castShadow: false
+            , receiveShadow: false
+            , pickId: Nothing
+            , onClick: Nothing
+            , onHover: Nothing
+            }
+      let scene = emptyScene # withMesh meshParams
+      Array.length scene.meshes `shouldEqual` 1
+    
+    it "uniform scale 1.0 is identity" do
+      let boxGeom = BoxMesh3D 
+            { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+            , widthSegments: 1, heightSegments: 1, depthSegments: 1
+            }
+      let mat = BasicMaterial3D 
+            { color: rgba 128 128 128 100, opacity: 1.0, transparent: false, wireframe: false }
+      let identityScale :: Vec3 Number
+          identityScale = vec3 1.0 1.0 1.0
+      let meshParams = testMeshParams boxGeom mat zeroPosition3D
+      -- testMeshParams uses vec3 1.0 1.0 1.0 as default scale
+      meshParams.scale `shouldSatisfy` (_ == identityScale)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // exports
@@ -1121,3 +1245,4 @@ scene3DTests = do
   positionUtilityTests
   sceneBufferTests
   quaternionUsageTests
+  meshParamsAdvancedTests
