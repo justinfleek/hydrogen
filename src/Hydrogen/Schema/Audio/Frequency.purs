@@ -104,6 +104,17 @@ module Hydrogen.Schema.Audio.Frequency
   , midiToNoteName
   , midiToOctaveNumber
   , noteNameToString
+  
+  -- * Bounds
+  , hertzBounds
+  , kilohertzBounds
+  , midiNoteBounds
+  , midiPitchBounds
+  , centBounds
+  , semitoneBounds
+  , octaveBounds
+  , sampleRateBounds
+  , bitDepthBounds
   ) where
 
 import Prelude
@@ -111,6 +122,7 @@ import Prelude
 import Data.Int as Int
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // hertz
@@ -605,3 +617,70 @@ midiToNoteName (MidiNote n) =
 -- | MIDI 0-11 = octave -1, 12-23 = octave 0, 60-71 = octave 4
 midiToOctaveNumber :: MidiNote -> Int
 midiToOctaveNumber (MidiNote n) = (n / 12) - 1
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Hertz (practical audio range)
+-- |
+-- | Min: 0.0
+-- | Max: 20000.0 (human hearing upper limit)
+hertzBounds :: Bounded.NumberBounds
+hertzBounds = Bounded.numberBounds 0.0 20000.0 "hertz" "Frequency in Hz (0-20000)"
+
+-- | Bounds for Kilohertz
+-- |
+-- | Min: 0.0
+-- | Max: 200.0 (20kHz = 0.2kHz for audio, higher for RF)
+kilohertzBounds :: Bounded.NumberBounds
+kilohertzBounds = Bounded.numberBounds 0.0 200.0 "kilohertz" "Frequency in kHz (0-200)"
+
+-- | Bounds for MidiNote
+-- |
+-- | Min: 0
+-- | Max: 127
+midiNoteBounds :: Bounded.IntBounds
+midiNoteBounds = Bounded.intBounds 0 127 "midiNote" "MIDI note number (0-127)"
+
+-- | Bounds for MidiPitch
+-- |
+-- | Min: 0.0
+-- | Max: 127.99
+midiPitchBounds :: Bounded.NumberBounds
+midiPitchBounds = Bounded.numberBounds 0.0 127.99 "midiPitch" "MIDI pitch with microtonal (0-127.99)"
+
+-- | Bounds for Cent
+-- |
+-- | Min: -100.0 (one semitone down)
+-- | Max: 100.0 (one semitone up)
+centBounds :: Bounded.NumberBounds
+centBounds = Bounded.numberBounds (-100.0) 100.0 "cent" "Pitch offset in cents (-100 to 100)"
+
+-- | Bounds for Semitone
+-- |
+-- | Min: -12.0 (one octave down)
+-- | Max: 12.0 (one octave up)
+semitoneBounds :: Bounded.NumberBounds
+semitoneBounds = Bounded.numberBounds (-12.0) 12.0 "semitone" "Pitch offset in semitones (-12 to 12)"
+
+-- | Bounds for Octave
+-- |
+-- | Min: -10.0
+-- | Max: 10.0
+octaveBounds :: Bounded.NumberBounds
+octaveBounds = Bounded.numberBounds (-10.0) 10.0 "octave" "Pitch offset in octaves (-10 to 10)"
+
+-- | Bounds for SampleRate
+-- |
+-- | Min: 8000 (telephony)
+-- | Max: 192000 (high-resolution audio)
+sampleRateBounds :: Bounded.IntBounds
+sampleRateBounds = Bounded.intBounds 8000 192000 "sampleRate" "Audio sample rate in Hz (8000-192000)"
+
+-- | Bounds for BitDepth
+-- |
+-- | Min: 8 (lo-fi)
+-- | Max: 32 (float)
+bitDepthBounds :: Bounded.IntBounds
+bitDepthBounds = Bounded.intBounds 8 32 "bitDepth" "Bits per sample (8-32)"

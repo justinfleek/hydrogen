@@ -77,6 +77,9 @@ module Hydrogen.Schema.Tensor.Dimension
   , simplifyDimExpr
   , mapDimExpr
   , dimExprToString
+  
+  -- * Bounds
+  , dimBounds
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -91,6 +94,7 @@ import Prelude
   , bind
   , pure
   , map
+  , min
   , show
   , (+)
   , (-)
@@ -107,6 +111,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Nothing, Just))
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // core types
@@ -161,15 +166,19 @@ instance showDimExpr :: Show DimExpr where
 --                                                                // constructors
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Create a dimension, clamping to minimum 1.
+-- | Create a dimension, clamping to [1, 1073741824].
+-- |
+-- | Maximum is 2^30 — practical limit for tensor dimensions
+-- | (larger would exceed reasonable memory for any single dimension).
 -- |
 -- | ```purescript
 -- | dim 64 == Dim 64
--- | dim 0 == Dim 1   -- clamped
--- | dim (-5) == Dim 1  -- clamped
+-- | dim 0 == Dim 1   -- clamped to min
+-- | dim (-5) == Dim 1  -- clamped to min
+-- | dim 2000000000 == Dim 1073741824  -- clamped to max
 -- | ```
 dim :: Int -> Dim
-dim n = Dim (if n < 1 then 1 else n)
+dim n = Dim (Bounded.clampInt 1 1073741824 n)
 
 -- | Create a dimension without bounds checking.
 -- |
@@ -434,3 +443,16 @@ dimExprToString (DimSym v) = show v
 dimExprToString (DimMul a b) = "(" <> dimExprToString a <> " * " <> dimExprToString b <> ")"
 dimExprToString (DimDiv a b) = "(" <> dimExprToString a <> " / " <> dimExprToString b <> ")"
 dimExprToString (DimAdd a b) = "(" <> dimExprToString a <> " + " <> dimExprToString b <> ")"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for Dim [1, 1073741824]
+-- |
+-- | - Minimum 1: Tensor dimensions must be positive
+-- | - Maximum 2^30: Practical memory limit for a single dimension
+-- |   (A 1B element dimension × 4 bytes = 4GB for one axis alone)
+dimBounds :: Bounded.IntBounds
+dimBounds = Bounded.intBounds 1 1073741824 "Dim"
+  "Tensor dimension size, strictly positive with practical memory ceiling"

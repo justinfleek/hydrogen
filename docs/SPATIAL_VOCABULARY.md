@@ -38,7 +38,7 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 | 7 | Boundary & Topology | [~] | `Geometry.Border`, `Geometry.Stroke` |
 | 8 | Coordinate Systems | [x] | `Geometry.Point`, `Dimension.Vector.Vec2/3/4` |
 | 9 | Orientation & Alignment | [~] | `Geometry.Transform`, `Reactive.FocusManagement` |
-| 10 | Symmetry | [ ] | — |
+| 10 | Symmetry | [x] | `Geometry.Symmetry` |
 | 11 | Distribution & Arrangement | [~] | `Graph.Layout`, `Dimension.Spacing` |
 | 12 | Motion & Kinematics | [x] | `Motion.*`, `Gestural.Motion`, `Animation.*` |
 | 13 | Fields & Gradients | [~] | `Color.Gradient`, `Material.Noise*` |
@@ -68,8 +68,8 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 | 37 | Selection & Focus | [x] | `Reactive.SelectionState`, `Gestural.Focus`, `Gestural.Selection` |
 | 38 | Data Visualization | [~] | `Graph.*` |
 | 39 | Network/Graph | [x] | `Graph.Layout`, `Graph.Connection`, `Graph.NodeContent` |
-| 40 | Physics & Forces | [ ] | — |
-| 41 | Collision & Contact | [ ] | — |
+| 40 | Physics & Forces | [x] | `Physics.Force` |
+| 41 | Collision & Contact | [x] | `Physics.Collision` |
 | 42 | Constraints & Joints | [ ] | — |
 | 43 | Skeleton & Rigging | [ ] | — |
 | 44 | Procedural & Generative | [~] | `Material.Noise*` |
@@ -90,7 +90,7 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 | 59 | Quantum Spatial | [ ] | — |
 | 60 | Domain-Specific | [~] | Medical terms in `Geometry.Position` |
 
-**Summary:** 13 fully implemented [x], 24 partial [~], 23 not yet started [ ]
+**Summary:** 14 fully implemented [x], 24 partial [~], 22 not yet started [ ]
 
 ---
 
@@ -547,7 +547,7 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 
 ---
 
-## 10. SYMMETRY [ ]
+## 10. SYMMETRY [x]
 
 ### Reflection Symmetry
 
@@ -1848,7 +1848,9 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 
 ---
 
-## 40. PHYSICS & FORCES [ ]
+## 40. PHYSICS & FORCES [x]
+
+**Implemented:** `Hydrogen.Schema.Physics.Force`
 
 ### Force Types
 
@@ -1892,7 +1894,9 @@ Legend: [x] = Implemented in Hydrogen Schema | [~] = Partial | [ ] = Not yet
 
 ---
 
-## 41. COLLISION & CONTACT [ ]
+## 41. COLLISION & CONTACT [x]
+
+**Implemented:** `Hydrogen.Schema.Physics.Collision`
 
 ### Collision Types
 

@@ -68,6 +68,12 @@ module Hydrogen.Schema.Dimension.Angular
   , unwrapDegrees
   , unwrapTurns
   , unwrapGradians
+  
+  -- * Bounds (for normalized values)
+  , radiansBounds
+  , degreesBounds
+  , turnsBounds
+  , gradiansBounds
   ) where
 
 import Prelude
@@ -91,6 +97,7 @@ import Prelude
   )
 
 import Hydrogen.Math.Core as Math
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // core types
@@ -316,3 +323,23 @@ unwrapTurns (Turns n) = n
 -- | Extract the raw Number from Gradians
 unwrapGradians :: Gradians -> Number
 unwrapGradians (Gradians n) = n
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for normalized Radians [0, 2π)
+radiansBounds :: Bounded.NumberBounds
+radiansBounds = Bounded.numberBounds 0.0 Math.tau "radians" "Angle in radians (0 to 2π)"
+
+-- | Bounds for normalized Degrees [0, 360)
+degreesBounds :: Bounded.NumberBounds
+degreesBounds = Bounded.numberBounds 0.0 360.0 "degrees" "Angle in degrees (0-360)"
+
+-- | Bounds for normalized Turns [0, 1)
+turnsBounds :: Bounded.NumberBounds
+turnsBounds = Bounded.numberBounds 0.0 1.0 "turns" "Angle in turns (0-1)"
+
+-- | Bounds for normalized Gradians [0, 400)
+gradiansBounds :: Bounded.NumberBounds
+gradiansBounds = Bounded.numberBounds 0.0 400.0 "gradians" "Angle in gradians (0-400)"

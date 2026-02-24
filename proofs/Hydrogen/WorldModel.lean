@@ -80,3 +80,4 @@ import Hydrogen.WorldModel.Integrity
 import Hydrogen.WorldModel.Consensus
 import Hydrogen.WorldModel.Governance
 import Hydrogen.WorldModel.Economy
+import Hydrogen.WorldModel.Affective

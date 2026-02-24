@@ -61,7 +61,7 @@ module Hydrogen.Convention
 import Prelude
 
 import Data.Array as Array
-import Data.Either (Either(..))
+import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 import Data.String.CodeUnits as CU

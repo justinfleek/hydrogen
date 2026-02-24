@@ -47,11 +47,15 @@ module Hydrogen.Schema.Typography.Grade
   , invert
   , scale
   , add
+  
+  -- * Bounds
+  , bounds
   ) where
 
 import Prelude
 
 import Data.Int (round, toNumber) as Int
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // type
@@ -148,3 +152,14 @@ scale factor (Grade n) = grade (Int.round (Int.toNumber n * factor))
 -- | Add two grades together
 add :: Grade -> Grade -> Grade
 add (Grade a) (Grade b) = grade (a + b)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds documentation for Grade
+-- |
+-- | Min: -200 (lightest)
+-- | Max: 200 (boldest)
+bounds :: Bounded.IntBounds
+bounds = Bounded.intBounds (-200) 200 "grade" "Variable font grade axis (-200 to 200)"

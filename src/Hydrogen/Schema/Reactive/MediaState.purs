@@ -96,6 +96,10 @@ module Hydrogen.Schema.Reactive.MediaState
   , canSeek
   , formattedCurrentTime
   , formattedDuration
+  -- * Bounds
+  , playbackRateBounds
+  , volumeLevelBounds
+  , timePositionBounds
   ) where
 
 import Prelude
@@ -103,6 +107,7 @@ import Prelude
 import Data.Array (last, length)
 import Data.Int (floor)
 import Data.Maybe (Maybe(Just, Nothing), isJust)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // playback status
@@ -343,9 +348,11 @@ derive instance ordTimePosition :: Ord TimePosition
 instance showTimePosition :: Show TimePosition where
   show (TimePosition t) = formatTime t
 
--- | Create time position (clamps to non-negative)
+-- | Create time position (clamps to [0, 604800] seconds)
+-- |
+-- | Maximum is 7 days (604800 seconds) — practical upper limit for any media.
 timePosition :: Number -> TimePosition
-timePosition t = TimePosition (max 0.0 t)
+timePosition t = TimePosition (Bounded.clampNumber 0.0 604800.0 t)
 
 -- | Start of media
 startPosition :: TimePosition
@@ -590,3 +597,31 @@ formattedCurrentTime ms = show ms.progress.currentTime
 -- | Get formatted duration string
 formattedDuration :: MediaState -> String
 formattedDuration ms = show ms.progress.duration
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for PlaybackRate [0.25, 4.0]
+-- |
+-- | - 0.25x: Quarter speed (slowest practical slow-motion)
+-- | - 4.0x: Quadruple speed (fastest practical fast-forward)
+playbackRateBounds :: Bounded.NumberBounds
+playbackRateBounds = Bounded.numberBounds 0.25 4.0 "PlaybackRate"
+  "Playback speed multiplier (0.25x slow-motion to 4.0x fast-forward)"
+
+-- | Bounds for VolumeLevel [0.0, 1.0]
+-- |
+-- | - 0.0: Muted (silent)
+-- | - 1.0: Full volume
+volumeLevelBounds :: Bounded.NumberBounds
+volumeLevelBounds = Bounded.numberBounds 0.0 1.0 "VolumeLevel"
+  "Audio volume level as unit interval (0=muted, 1=full)"
+
+-- | Bounds for TimePosition [0.0, 604800.0] seconds
+-- |
+-- | - 0.0: Start of media
+-- | - 604800.0: 7 days (maximum practical media duration)
+timePositionBounds :: Bounded.NumberBounds
+timePositionBounds = Bounded.numberBounds 0.0 604800.0 "TimePosition"
+  "Playback position in seconds (0 to 7 days maximum)"

@@ -1,6 +1,7 @@
 # Spago
 .spago/
 output/
+output-*/
 spago.lock
 
 # Node

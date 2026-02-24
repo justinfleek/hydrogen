@@ -90,6 +90,12 @@ module Hydrogen.Schema.Reactive.ContainerQuery
   , containerStatic
   , resolveAtWidth
   
+  -- * Breakpoint Utilities
+  , breakpointFromContainerWidth
+  , isWithinBreakpoint
+  , isAtLeastBreakpoint
+  , isBelowBreakpoint
+  
   -- * CSS Generation
   , containerStylesCss
   , containerTypeCss
@@ -115,6 +121,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Schema.Reactive.Viewport 
   ( Breakpoint(Xs, Sm, Md, Lg, Xl, Xxl)
+  , Orientation(Portrait, Landscape, Square)
   , breakpointMin
   , breakpointMax
   )
@@ -209,7 +216,7 @@ data QueryCondition
   | MaxHeight Int
   | WidthRange Int Int
   | HeightRange Int Int
-  | Orientation String  -- "portrait" | "landscape"
+  | OrientationQuery Orientation  -- Uses Schema Orientation ADT
   | AspectRatio Number
   | AspectRatioMin Number
   | AspectRatioMax Number
@@ -223,7 +230,7 @@ instance showQueryCondition :: Show QueryCondition where
   show (MaxHeight h) = "(max-height: " <> show h <> "px)"
   show (WidthRange minW maxW) = "(min-width: " <> show minW <> "px) and (max-width: " <> show maxW <> "px)"
   show (HeightRange minH maxH) = "(min-height: " <> show minH <> "px) and (max-height: " <> show maxH <> "px)"
-  show (Orientation o) = "(orientation: " <> o <> ")"
+  show (OrientationQuery o) = "(orientation: " <> orientationToCss o <> ")"
   show (AspectRatio r) = "(aspect-ratio: " <> show r <> ")"
   show (AspectRatioMin r) = "(min-aspect-ratio: " <> show r <> ")"
   show (AspectRatioMax r) = "(max-aspect-ratio: " <> show r <> ")"
@@ -252,9 +259,17 @@ widthRange = WidthRange
 heightRange :: Int -> Int -> QueryCondition
 heightRange = HeightRange
 
+-- | Convert Orientation to CSS value.
+orientationToCss :: Orientation -> String
+orientationToCss Portrait = "portrait"
+orientationToCss Landscape = "landscape"
+orientationToCss Square = "square"
+
 -- | Orientation condition.
-orientation :: String -> QueryCondition
-orientation = Orientation
+-- |
+-- | Uses Schema `Orientation` ADT for type safety.
+orientation :: Orientation -> QueryCondition
+orientation = OrientationQuery
 
 -- | Exact aspect ratio condition.
 aspectRatio :: Number -> QueryCondition
@@ -359,14 +374,48 @@ containerStatic :: forall a. a -> ContainerResponsive a
 containerStatic a = { xs: a, sm: a, md: a, lg: a, xl: a, xxl: a }
 
 -- | Resolve a container-responsive value at a specific container width.
+-- |
+-- | Uses Schema breakpoint thresholds for consistency.
 resolveAtWidth :: forall a. ContainerResponsive a -> Int -> a
 resolveAtWidth cr width
-  | width >= 1536 = cr.xxl
-  | width >= 1280 = cr.xl
-  | width >= 1024 = cr.lg
-  | width >= 768 = cr.md
-  | width >= 640 = cr.sm
+  | width >= breakpointMin Xxl = cr.xxl
+  | width >= breakpointMin Xl = cr.xl
+  | width >= breakpointMin Lg = cr.lg
+  | width >= breakpointMin Md = cr.md
+  | width >= breakpointMin Sm = cr.sm
   | otherwise = cr.xs
+
+-- | Get the breakpoint that a container width falls into.
+-- |
+-- | Uses Schema breakpoint thresholds for consistency.
+breakpointFromContainerWidth :: Int -> Breakpoint
+breakpointFromContainerWidth width
+  | width >= breakpointMin Xxl = Xxl
+  | width >= breakpointMin Xl = Xl
+  | width >= breakpointMin Lg = Lg
+  | width >= breakpointMin Md = Md
+  | width >= breakpointMin Sm = Sm
+  | otherwise = Xs
+
+-- | Check if a container width is within a specific breakpoint range.
+-- |
+-- | Returns true if width >= breakpoint min AND width <= breakpoint max.
+isWithinBreakpoint :: Int -> Breakpoint -> Boolean
+isWithinBreakpoint width bp =
+  width >= breakpointMin bp && withinMax width bp
+  where
+    withinMax :: Int -> Breakpoint -> Boolean
+    withinMax w b = case breakpointMax b of
+      Nothing -> true  -- Xxl has no upper bound
+      Just maxW -> w <= maxW
+
+-- | Check if container width is at least a given breakpoint.
+isAtLeastBreakpoint :: Int -> Breakpoint -> Boolean
+isAtLeastBreakpoint width bp = width >= breakpointMin bp
+
+-- | Check if container width is below a given breakpoint.
+isBelowBreakpoint :: Int -> Breakpoint -> Boolean
+isBelowBreakpoint width bp = width < breakpointMin bp
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // css generation

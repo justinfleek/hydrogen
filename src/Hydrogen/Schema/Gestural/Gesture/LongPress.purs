@@ -29,10 +29,13 @@ module Hydrogen.Schema.Gestural.Gesture.LongPress
   , longPressPosition
   , isLongPressTriggered
   , isLongPressActive
+    -- * Bounds
+  , longPressThresholdBounds
   ) where
 
 import Prelude
 
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Gestural.Gesture.Phase 
   ( GesturePhase(Possible)
   , isActive
@@ -67,6 +70,20 @@ defaultLongPressThreshold = LongPressThreshold 500.0
 -- | Extract threshold value
 unwrapLongPressThreshold :: LongPressThreshold -> Number
 unwrapLongPressThreshold (LongPressThreshold ms) = ms
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                      // bounds
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Bounds for LongPressThreshold [100, 2000] ms
+-- |
+-- | Standard thresholds:
+-- | - iOS: 500ms
+-- | - Android: 400ms
+-- | - Web: configurable, typically 500ms
+longPressThresholdBounds :: Bounded.NumberBounds
+longPressThresholdBounds = Bounded.numberBounds 100.0 2000.0 "LongPressThreshold"
+  "Minimum duration threshold for long press in milliseconds"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // long // press state
