@@ -2,33 +2,34 @@
 //                                                      // hydrogen // eventbus
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export const traverseImpl = (f) => (arr) => () => {
-  const results = [];
-  for (let i = 0; i < arr.length; i++) {
-    results.push(f(arr[i])());
-  }
-  return results;
-};
-
+// | Log an event to console for debugging
+// | This is FFI because event type may not have Show instance
+// | JavaScript console.log can display any value natively
 export const logEvent = (maybeName) => (event) => () => {
-  const busName = maybeName ? `[${maybeName.value0}]` : "[EventBus]";
+  // maybeName is a PureScript Maybe - check for Just constructor
+  const busName = maybeName && maybeName.value0 
+    ? `[${maybeName.value0}]` 
+    : "[EventBus]";
   console.log(`${busName} Event:`, event);
 };
 
-export const nowImpl = () => Date.now();
-
-export const mapImpl = (f) => (arr) => arr.map(f);
-
 // Typed channel support for heterogeneous events
+// This uses JavaScript Symbols which have no PureScript equivalent
+// Symbols provide runtime type safety for heterogeneous event buses
+
 const eventTypeKey = Symbol("hydrogen.event.type");
 
+// | Wrap an event with its type identifier
+// | Used to create heterogeneous events that can be distinguished at runtime
 export const wrapEvent = (typeName) => (event) => {
   return { [eventTypeKey]: typeName, payload: event };
 };
 
-export const unwrapEvent = (typeName) => (anyEvent) => {
+// | Unwrap an event if it matches the expected type
+// | Takes Just and Nothing constructors for proper Maybe encoding
+export const unwrapEventImpl = (just) => (nothing) => (typeName) => (anyEvent) => {
   if (anyEvent && anyEvent[eventTypeKey] === typeName) {
-    return anyEvent.payload; // Just
+    return just(anyEvent.payload);
   }
-  return null; // Nothing
+  return nothing;
 };
