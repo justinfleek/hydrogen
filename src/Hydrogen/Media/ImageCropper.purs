@@ -128,7 +128,9 @@ module Hydrogen.Media.ImageCropper
 
 import Prelude
 
-import Data.Array (foldl)
+import Data.Array as Array
+import Data.Functor (map)
+import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3)
@@ -544,7 +546,7 @@ controlsClassName c props = props { className = props.className <> " " <> c }
 imageCropper :: forall w i. Array (CropperProp i) -> HH.HTML w i
 imageCropper propMods =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
+    props = Array.foldl (\p f -> f p) defaultProps propMods
     
     containerClasses = 
       "image-cropper relative select-none"
@@ -628,11 +630,6 @@ imageCropper propMods =
               ]
           else HH.text ""
       ]
-  where
-    toNumber :: Int -> Number
-    toNumber = toNumberImpl
-
-foreign import toNumberImpl :: Int -> Number
 
 -- | Render grid overlay
 renderGrid :: forall w i. Int -> HH.HTML w i
@@ -640,16 +637,13 @@ renderGrid lines =
   let
     spacing = 100.0 / (toNumber (lines + 1))
     
-    horizontalLines = map (renderGridLine true spacing) (range 1 lines)
-    verticalLines = map (renderGridLine false spacing) (range 1 lines)
+    horizontalLines = map (renderGridLine true spacing) (Array.range 1 lines)
+    verticalLines = map (renderGridLine false spacing) (Array.range 1 lines)
   in
     HH.div
       [ cls [ "cropper-grid absolute inset-0 pointer-events-none" ] ]
       (horizontalLines <> verticalLines)
   where
-    toNumber :: Int -> Number
-    toNumber = toNumberImpl
-    
     renderGridLine :: Boolean -> Number -> Int -> HH.HTML w i
     renderGridLine horizontal spacing' idx =
       let
@@ -711,7 +705,7 @@ cropperControls :: forall w i. Array (ControlsProp i) ->
   HH.HTML w i
 cropperControls propMods handlers =
   let
-    props = foldl (\p f -> f p) defaultControlsProps propMods
+    props = Array.foldl (\p f -> f p) defaultControlsProps propMods
     
     controlsClasses = "cropper-controls flex flex-wrap items-center gap-2 p-3 bg-card border rounded-lg"
   in
@@ -909,9 +903,3 @@ toInt :: Number -> Int
 toInt = toIntImpl
 
 foreign import toIntImpl :: Number -> Int
-
--- | Generate range of integers
-range :: Int -> Int -> Array Int
-range = rangeImpl
-
-foreign import rangeImpl :: Int -> Int -> Array Int

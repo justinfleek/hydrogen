@@ -70,9 +70,10 @@ module Hydrogen.Component.Rating
   , RatingSize(..)
   ) where
 
-import Prelude hiding (map)
+import Prelude
 
 import Data.Array (foldl, range)
+import Data.Functor (map)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Halogen.HTML as HH
@@ -399,12 +400,4 @@ emojiIcon fillLevel =
       [ cls [ "text-2xl select-none leading-none" ] ] 
       [ HH.text emoji ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Map function for arrays
-map :: forall a b. (a -> b) -> Array a -> Array b
-map f xs = mapImpl f xs
-
-foreign import mapImpl :: forall a b. (a -> b) -> Array a -> Array b

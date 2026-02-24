@@ -89,6 +89,7 @@ import Prelude hiding (when)
 
 import Control.Monad (when)
 import Data.Array as Array
+import Data.Int (toNumber) as Int
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -589,7 +590,10 @@ getFlagState provider f = do
 -- ═══════════════════════════════════════════════════════════════════════════
 
 foreign import hashString :: String -> Int
-foreign import toNumber :: Int -> Number
+
+-- | Int to Number (pure)
+toNumber :: Int -> Number
+toNumber = Int.toNumber
 
 -- Note: Using Control.Monad.when
 

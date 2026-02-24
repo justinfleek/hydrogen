@@ -62,7 +62,7 @@ module Hydrogen.Component.Motion.Timeline.PropertyTrack
 import Prelude
 
 import Data.Array (length, mapWithIndex)
-import Data.Int (round)
+import Data.Int (round, toNumber)
 import Data.Maybe (Maybe(Just))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -213,7 +213,7 @@ labelColumnWidth = 150.0
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
   let
-    indent = intToNumber state.depth * indentPerLevel
+    indent = toNumber state.depth * indentPerLevel
     
     containerClasses =
       "flex items-center h-full border-b border-border/50 " <>
@@ -237,8 +237,7 @@ render state =
 unwrapPropertyId :: PropertyId -> String
 unwrapPropertyId (PropertyId id) = id
 
--- | Convert Int to Number
-foreign import intToNumber :: Int -> Number
+
 
 -- | Render the label column
 renderLabelColumn :: forall m. State -> Number -> H.ComponentHTML Action () m

@@ -7,6 +7,7 @@ module Showcase.Main where
 import Prelude
 
 import Data.Array (foldl, index)
+import Data.Int (toNumber, floor) as Int
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.String.CodeUnits (toCharArray, fromCharArray)
 import Effect (Effect)
@@ -1173,15 +1174,14 @@ toUpperChar c = case c of
 -- FFI imports for proper WCAG calculation using JavaScript's Math.pow
 foreign import calculateContrastRatioFFI :: String -> String -> Number
 foreign import formatContrastRatioFFI :: Number -> String
-foreign import truncateFFI :: Number -> Int
-foreign import intToNumberFFI :: Int -> Number
 
--- Aliases for convenience
+-- | Truncate Number to Int (pure)
 truncate :: Number -> Int
-truncate = truncateFFI
+truncate = Int.floor
 
+-- | Convert Int to Number (pure)
 toNumber :: Int -> Number
-toNumber = intToNumberFFI
+toNumber = Int.toNumber
 
 -- Get contrast ratio between text and background (via FFI)
 getContrastRatio :: String -> String -> Number

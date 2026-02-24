@@ -111,6 +111,7 @@ module Hydrogen.Schema.Motion.Easing
 
 import Prelude
 
+import Data.Int (toNumber) as Int
 import Hydrogen.Math.Core as Math
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -386,20 +387,17 @@ findTForX x1 x2 x = iterate 0.5 8
           then t
           else iterate (t - (currentX - x) / derivative) (n - 1)
 
--- | Int to Number conversion
-foreign import intToNumber :: Int -> Number
-
 -- | Evaluate step easing
 evaluateSteps :: Int -> Boolean -> Number -> Number
 evaluateSteps n jumpStart t
-  | t <= 0.0 = if jumpStart then 1.0 / intToNumber n else 0.0
+  | t <= 0.0 = if jumpStart then 1.0 / Int.toNumber n else 0.0
   | t >= 1.0 = 1.0
   | otherwise =
       let
-        step = Math.floor (t * intToNumber n)
+        step = Math.floor (t * Int.toNumber n)
         adjustedStep = if jumpStart then step + 1.0 else step
       in
-        adjustedStep / intToNumber n
+        adjustedStep / Int.toNumber n
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

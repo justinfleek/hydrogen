@@ -58,7 +58,7 @@ module Hydrogen.Component.Motion.Timeline.Playhead
 
 import Prelude
 
-import Data.Int (round)
+import Data.Int (round, toNumber)
 import Data.Maybe (Maybe(Just))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -245,11 +245,6 @@ formatSeconds n =
     frac = round ((n - toNumber whole) * 100.0)
   in
     show whole <> "." <> (if frac < 10 then "0" else "") <> show frac <> "s"
-  where
-    toNumber :: Int -> Number
-    toNumber i = toNumberImpl i
-
-foreign import toNumberImpl :: Int -> Number
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // handle action
@@ -308,6 +303,3 @@ handleQuery = case _ of
       newFrame = max 0.0 (f + toNumber n)
     H.modify_ _ { currentFrame = Frames newFrame }
     pure (Just reply)
-    where
-      toNumber :: Int -> Number
-      toNumber = toNumberImpl

@@ -12,8 +12,10 @@
     │  Vec2.lean      │ 2D vectors (TODO)                                     │
     │  Vec4.lean      │ 4D/homogeneous vectors (TODO)                         │
     │  Mat3.lean      │ 3x3 matrices, rotations (TODO)                        │
-    │  Mat4.lean      │ 4x4 matrices, transforms (TODO)                       │
-    │  Quaternion.lean│ Unit quaternions, slerp (TODO)                        │
+    │  Mat4.lean      │ 4x4 matrices, transforms, determinant                 │
+    │  Mat4Inverse    │ Matrix inversion, adjugate, cofactors                 │
+    │  Mat4Projection │ Perspective, orthographic, look-at matrices           │
+    │  Quaternion.lean│ Unit quaternions, SLERP, rotation matrices            │
     │  Transform.lean │ Position + Rotation + Scale (TODO)                    │
     │  AABB.lean      │ Axis-aligned bounding boxes (TODO)                    │
     │  Frustum.lean   │ View frustum, culling (TODO)                          │
@@ -27,11 +29,15 @@
   
   These proofs enable billion-agent operation without runtime validation.
   
-  Status: FOUNDATIONAL - Bounded and Vec3 complete, others TODO
+  Status: FOUNDATIONAL - Bounded, Vec3, Mat4, Quaternion complete; others TODO
 -/
 
 import Hydrogen.Math.Bounded
 import Hydrogen.Math.Vec3
+import Hydrogen.Math.Mat4
+import Hydrogen.Math.Mat4Inverse
+import Hydrogen.Math.Mat4Projection
+import Hydrogen.Math.Quaternion
 
 namespace Hydrogen.Math
 
@@ -98,6 +104,124 @@ namespace Hydrogen.Math
 - `project_reject_orthogonal` - projection ⊥ rejection
 - `project_reject_sum` - projection + rejection = original
 - `lerp_zero_t`, `lerp_one_t` - lerp endpoints
+
+## Mat4.lean
+
+### Algebraic
+- `add_comm`, `add_assoc`, `add_zero`, `zero_add`, `add_neg` - addition group
+- `mul_identity_left`, `mul_identity_right` - identity laws
+- `mul_zero_left`, `mul_zero_right` - zero annihilation
+- `mul_assoc` - THE CRITICAL THEOREM: matrix multiplication is associative
+- `mul_add_left`, `mul_add_right` - distributivity
+- `scale_mul_left`, `scale_mul_right` - scalar multiplication
+
+### Transpose
+- `transpose_involutive` - (Aᵀ)ᵀ = A
+- `transpose_identity`, `transpose_zero` - special matrices
+- `transpose_add`, `transpose_scale` - linearity
+- `transpose_mul` - (AB)ᵀ = BᵀAᵀ (reverses order)
+
+### Determinant
+- `det_identity` - det(I) = 1
+- `det_zero` - det(0) = 0
+- `det_transpose` - det(Aᵀ) = det(A)
+- `det_scale` - det(sA) = s⁴·det(A)
+- `det_mul` - det(AB) = det(A)·det(B) (multiplicative)
+
+### Transformations
+- `makeTranslation_zero`, `makeScale_one` - identity cases
+- `makeTranslation_mul` - T(a)·T(b) = T(a+b) (translations compose by adding)
+- `makeScale_mul` - S(a)·S(b) = S(a*b) (scales compose by multiplying)
+- `makeRotationX/Y/Z_zero` - R(0) = I (zero rotation is identity)
+- `det_makeTranslation` - det = 1 (volume-preserving)
+- `det_makeScale` - det = sx·sy·sz (volume scaling)
+- `det_makeRotationX/Y/Z` - det = 1 (volume-preserving)
+
+### Invertibility
+- `identity_invertible`, `makeTranslation_invertible` - basic invertibility
+- `makeScale_invertible`, `makeRotationX/Y/Z_invertible` - transform invertibility
+- `mul_invertible` - product of invertibles is invertible
+
+## Mat4Inverse.lean
+
+### Cofactors and Adjugate
+- `c00`..`c33` - all 16 cofactor functions
+- `adjugate` - transpose of cofactor matrix
+- `adjugate_identity` - adj(I) = I
+
+### Adjugate Laws
+- `mul_adjugate` - A × adj(A) = det(A) × I (KEY IDENTITY)
+- `adjugate_mul` - adj(A) × A = det(A) × I
+
+### Inverse
+- `inverse` - A⁻¹ = adj(A) / det(A) for invertible A
+- `mul_inverse` - A × A⁻¹ = I (right inverse)
+- `inverse_mul` - A⁻¹ × A = I (left inverse)
+- `inverse_identity` - I⁻¹ = I
+- `inverse_mul_rev` - (A × B)⁻¹ = B⁻¹ × A⁻¹ (reverses order)
+
+## Mat4Projection.lean
+
+### Perspective Projection
+- `makePerspective` - symmetric frustum from fov, aspect, near, far
+- `makeFrustum` - asymmetric frustum from bounds
+
+### Orthographic Projection
+- `makeOrthographic` - orthographic from bounds
+- `makeOrthographicSymmetric` - centered orthographic
+- `makeOrthographic_invertible` - non-degenerate ortho is invertible
+- `det_makeOrthographicSymmetric` - determinant is nonzero
+
+### View Matrix
+- `makeLookAt` - view matrix from eye, center, up vectors
+
+## Quaternion.lean
+
+### Algebraic
+- `add_comm`, `add_assoc`, `add_zero`, `zero_add`, `add_neg` - addition group
+- `mul_identity_left`, `mul_identity_right` - identity laws
+- `mul_zero_left`, `mul_zero_right` - zero annihilation
+- `mul_assoc` - THE KEY THEOREM: quaternion multiplication is associative
+- `mul_not_comm` - multiplication is NOT commutative (unlike matrices)
+- `scale_mul_left`, `scale_mul_right` - scalar multiplication
+
+### Conjugate
+- `conjugate_involutive` - (q*)* = q
+- `conjugate_identity`, `conjugate_zero` - special cases
+- `conjugate_mul` - (ab)* = b*a* (reverses order)
+- `conjugate_add` - distributes over addition
+- `mul_conjugate`, `conjugate_mul_self` - q × q* = ‖q‖² × I
+
+### Length
+- `lengthSq_nonneg`, `length_nonneg` - non-negativity
+- `lengthSq_identity`, `length_identity` - identity has length 1
+- `lengthSq_zero`, `length_zero` - zero has length 0
+- `lengthSq_eq_zero` - ‖q‖² = 0 ↔ q = 0
+- `length_conjugate` - ‖q*‖ = ‖q‖
+- `lengthSq_mul`, `length_mul` - ‖ab‖ = ‖a‖ × ‖b‖ (multiplicative)
+
+### Unit Quaternions
+- `IsUnit` - predicate for unit length
+- `identity_isUnit` - I is unit
+- `mul_isUnit` - unit × unit = unit (closed under multiplication)
+- `conjugate_isUnit` - unit* is unit
+- `fromRotationX/Y/Z_isUnit` - axis rotations are unit
+- `normalize_isUnit` - normalization produces unit quaternion
+
+### Inverse
+- `inverse` - q⁻¹ = q* / ‖q‖²
+- `inverse_unit` - for unit q: q⁻¹ = q*
+- `mul_inverse_unit`, `inverse_mul_unit` - q × q⁻¹ = I for unit q
+
+### SLERP
+- `lerp` - linear interpolation (for small angles)
+- `lerp_zero`, `lerp_one` - lerp endpoints
+- `slerp` - spherical linear interpolation (THE KEY FEATURE)
+
+### Rotation Matrix Conversion
+- `toMat4` - convert quaternion to 4×4 rotation matrix
+- `toMat4_identity` - identity quaternion → identity matrix
+- `det_toMat4_unit` - det = 1 for unit quaternions (rotation matrices)
 -/
 
 -- ═══════════════════════════════════════════════════════════════════════════════

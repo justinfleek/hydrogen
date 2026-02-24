@@ -12,7 +12,7 @@ module Hydrogen.UI.Progress
   , className
   ) where
 
-import Prelude (class Eq, (<>))
+import Prelude (class Eq, max, min, show, (<>))
 
 import Data.Array (foldl)
 import Hydrogen.Render.Element as E
@@ -49,12 +49,13 @@ progress mods value =
     config = foldl (\c f -> f c) defaultConfig mods
     barClasses = "h-full transition-all " <> variantClasses config.variant
     containerClasses = "relative h-4 w-full overflow-hidden rounded-full bg-secondary " <> config.className
-    widthStyle = "width: " <> intToPercent value <> "%"
+    clampedValue = min 100 (max 0 value)
+    widthStyle = "width: " <> show clampedValue <> "%"
   in
     E.div_
       [ E.class_ containerClasses
       , E.role "progressbar"
-      , E.attr "aria-valuenow" (intToString value)
+      , E.attr "aria-valuenow" (show value)
       , E.attr "aria-valuemin" "0"
       , E.attr "aria-valuemax" "100"
       ]
@@ -64,6 +65,3 @@ progress mods value =
           ] 
           []
       ]
-
-foreign import intToString :: Int -> String
-foreign import intToPercent :: Int -> String

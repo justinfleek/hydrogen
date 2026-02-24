@@ -91,10 +91,11 @@ module Hydrogen.Schema.Motion.Timecode
 import Prelude
 
 import Data.Int (floor, round)
-import Data.Int (toNumber) as Int
+import Data.Int (toNumber, fromString) as Int
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String (Pattern(Pattern), Replacement(Replacement), length, replaceAll, split)
-import Data.String (contains, trim, toCodePointArray) as String
+import Data.String (contains, trim) as String
+import Data.Traversable (traverse) as Traversable
 import Hydrogen.Schema.Dimension.Temporal (FrameRate, Frames(Frames), Seconds(Seconds))
 import Hydrogen.Schema.Dimension.Temporal (unwrapFps) as Temporal
 
@@ -287,36 +288,14 @@ parseComponents str =
 
 -- | Helper to parse array of strings to ints
 parseIntArray :: Array String -> Maybe (Array Int)
-parseIntArray strs = traverse parseIntSafe strs
+parseIntArray strs = Traversable.traverse parseIntSafe strs
   where
     parseIntSafe :: String -> Maybe Int
     parseIntSafe s = 
-      case String.toCodePointArray s of
-        [] -> Nothing
-        _ -> 
-          let trimmed = String.trim s
-          in if length trimmed == 0
-               then Nothing
-               else parseInt trimmed
-
--- | Safe integer parsing
-parseInt :: String -> Maybe Int
-parseInt s = 
-  let n = unsafeParseInt s
-  in if isNaN_ (Int.toNumber n) then Nothing else Just n
-
--- | Foreign parseInt (returns NaN for invalid)
-foreign import unsafeParseInt :: String -> Int
-
--- | Check if number is NaN
-foreign import isNaN_ :: Number -> Boolean
-
--- | Traverse for arrays
-traverse :: forall a b. (a -> Maybe b) -> Array a -> Maybe (Array b)
-traverse f arr = traverseImpl f arr
-
--- | Foreign traverse implementation
-foreign import traverseImpl :: forall a b. (a -> Maybe b) -> Array a -> Maybe (Array b)
+      let trimmed = String.trim s
+      in if length trimmed == 0
+           then Nothing
+           else Int.fromString trimmed
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // conversion
