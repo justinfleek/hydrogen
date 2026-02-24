@@ -257,6 +257,62 @@ theorem perp_perp_perp_perp (v : Vec2) : perp (perp (perp (perp v))) = v := by
   simp only [perp]
   ext <;> ring
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Length Laws
+-- ─────────────────────────────────────────────────────────────────────────────
+
+theorem lengthSq_nonneg (v : Vec2) : 0 ≤ lengthSq v := by
+  simp only [lengthSq]
+  have h1 : 0 ≤ v.x * v.x := mul_self_nonneg v.x
+  have h2 : 0 ≤ v.y * v.y := mul_self_nonneg v.y
+  linarith
+
+theorem length_nonneg (v : Vec2) : 0 ≤ length v := by
+  simp only [length]
+  exact Real.sqrt_nonneg _
+
+theorem lengthSq_zero : lengthSq zero = 0 := by
+  simp only [lengthSq, zero]
+  ring
+
+theorem length_zero : length zero = 0 := by
+  simp only [length, lengthSq_zero, Real.sqrt_zero]
+
+theorem lengthSq_eq_zero {v : Vec2} : lengthSq v = 0 ↔ v = zero := by
+  constructor
+  · intro h
+    simp only [lengthSq] at h
+    have h1 : v.x * v.x ≥ 0 := mul_self_nonneg v.x
+    have h2 : v.y * v.y ≥ 0 := mul_self_nonneg v.y
+    have hx : v.x * v.x = 0 := by linarith
+    have hy : v.y * v.y = 0 := by linarith
+    have ex : v.x = 0 := mul_self_eq_zero.mp hx
+    have ey : v.y = 0 := mul_self_eq_zero.mp hy
+    ext <;> simp only [zero] <;> assumption
+  · intro h
+    rw [h]
+    exact lengthSq_zero
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- LERP (Linear Interpolation)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-- Linear interpolation between two vectors -/
+def lerp (a b : Vec2) (t : ℝ) : Vec2 :=
+  add (scale (1 - t) a) (scale t b)
+
+theorem lerp_zero (a b : Vec2) : lerp a b 0 = a := by
+  simp only [lerp, scale, add]
+  ext <;> ring
+
+theorem lerp_one (a b : Vec2) : lerp a b 1 = b := by
+  simp only [lerp, scale, add]
+  ext <;> ring
+
+theorem lerp_self (v : Vec2) (t : ℝ) : lerp v v t = v := by
+  simp only [lerp, scale, add]
+  ext <;> ring
+
 end Vec2
 
 end Hydrogen.Math

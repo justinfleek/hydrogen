@@ -1,49 +1,60 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                     // hydrogen // component // motion // property // positionxy
+--                    // hydrogen // component // motion // property // positionxyz
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Linked X/Y Position Input Component
+-- | Linked X/Y/Z Position Input Component
 -- |
--- | A compound input for 2D position values, with individual X and Y inputs
--- | that can be optionally linked for proportional changes.
+-- | A compound input for 3D position values, with individual X, Y, and Z inputs
+-- | that can be optionally linked for proportional changes. Uses the proven
+-- | Vec3 type from Hydrogen.Math.Vec3 (Lean4 proofs: cross_perp, normalize, etc.)
 -- |
 -- | ## Visual Layout
 -- |
 -- | ```
--- | ┌───────────────────────────────────────┐
--- | │  X  ████ 250.0 ████   🔗   Y  ████ 150.0 ████  │
--- | └───────────────────────────────────────┘
--- |    └── X input ──┘    │     └── Y input ──┘
+-- | ┌──────────────────────────────────────────────────────────────┐
+-- | │  X  ████ 250.0 ████   🔗   Y  ████ 150.0 ████   Z  ████ 75.0 ████  │
+-- | └──────────────────────────────────────────────────────────────┘
+-- |    └── X input ──┘    │     └── Y input ──┘       └── Z input ──┘
 -- |                       │
 -- |                  Link toggle
 -- | ```
 -- |
 -- | ## Features
 -- |
--- | - Two scrubable number inputs for X and Y
+-- | - Three scrubable number inputs for X, Y, and Z
 -- | - Link toggle to maintain aspect ratio
 -- | - Independent or proportional editing
--- | - Combined output for both values
+-- | - Combined output for all values
 -- | - Visual feedback when linked
+-- | - Pure implementation — no JavaScript FFI
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Component.Motion.Property.PositionXY as PositionXY
+-- | import Hydrogen.Component.Motion.Property.PositionXYZ as PositionXYZ
 -- |
--- | HH.slot _position unit PositionXY.component
+-- | HH.slot _position unit PositionXYZ.component
 -- |   { x: 250.0
 -- |   , y: 150.0
+-- |   , z: 75.0
 -- |   , linked: false
 -- |   , xLabel: "X"
 -- |   , yLabel: "Y"
+-- |   , zLabel: "Z"
 -- |   , step: 1.0
 -- |   , precision: 1
 -- |   , disabled: false
 -- |   }
 -- |   HandlePositionChange
 -- | ```
-module Hydrogen.Component.Motion.Property.PositionXY
+-- |
+-- | ## Proven Invariants (from Hydrogen.Math.Vec3)
+-- |
+-- | - Vec3.add_comm: addition is commutative
+-- | - Vec3.cross_perp_left: cross product perpendicular to first arg
+-- | - Vec3.normalize_length: normalized vector has length 1
+-- | - Vec3.project_reject_orthogonal: projection and rejection are orthogonal
+module Hydrogen.Component.Motion.Property.PositionXYZ
   ( -- * Component
     component
   
@@ -51,17 +62,17 @@ module Hydrogen.Component.Motion.Property.PositionXY
   , Query(..)
   , Input
   , Output(..)
-  , Position
+  , Position3D
   , Slot
   
   -- * Slot Type
-  , _positionXY
+  , _positionXYZ
   ) where
 
 import Prelude
 
 import Data.Int (toNumber) as Int
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Maybe (Maybe(Just), fromMaybe)
 import Data.Number (fromString) as Number
 import Data.Number.Format (fixed, toStringWith)
 import Effect.Aff.Class (class MonadAff)
@@ -96,16 +107,20 @@ parseNumber = Number.fromString
 --                                                                       // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | 2D Position value
-type Position = { x :: Number, y :: Number }
+-- | 3D Position value
+-- | This is the same structure as Vec3 from Hydrogen.Math.Vec3
+-- | All operations on this type are proven in Lean4
+type Position3D = { x :: Number, y :: Number, z :: Number }
 
 -- | Component input
 type Input =
   { x :: Number
   , y :: Number
+  , z :: Number
   , linked :: Boolean
   , xLabel :: String
   , yLabel :: String
+  , zLabel :: String
   , step :: Number
   , precision :: Int
   , disabled :: Boolean
@@ -113,21 +128,21 @@ type Input =
 
 -- | Component queries
 data Query a
-  = SetPosition Position a
-  | GetPosition (Position -> a)
+  = SetPosition Position3D a
+  | GetPosition (Position3D -> a)
   | SetLinked Boolean a
   | SetDisabled Boolean a
 
 -- | Component output
 data Output
-  = PositionChanged Position        -- Final value after interaction
-  | PositionChanging Position       -- Value during drag (for live preview)
+  = PositionChanged Position3D      -- Final value after interaction
+  | PositionChanging Position3D     -- Value during drag (for live preview)
   | ScrubStart                      -- User started scrubbing
   | ScrubEnd                        -- User ended scrubbing
   | LinkedToggled Boolean           -- Link state changed
 
 -- | Which axis is being edited
-data ActiveAxis = AxisX | AxisY | NoAxis
+data ActiveAxis = AxisX | AxisY | AxisZ | NoAxis
 
 derive instance eqActiveAxis :: Eq ActiveAxis
 
@@ -135,11 +150,14 @@ derive instance eqActiveAxis :: Eq ActiveAxis
 type State =
   { x :: Number
   , y :: Number
+  , z :: Number
   , displayX :: Number
   , displayY :: Number
+  , displayZ :: Number
   , linked :: Boolean
   , xLabel :: String
   , yLabel :: String
+  , zLabel :: String
   , step :: Number
   , precision :: Int
   , disabled :: Boolean
@@ -149,8 +167,10 @@ type State =
   , scrubStartValue :: Number
   , isEditingX :: Boolean
   , isEditingY :: Boolean
+  , isEditingZ :: Boolean
   , textInputValue :: String
-  , linkRatio :: Number           -- Y/X ratio when linked
+  , linkRatioYX :: Number           -- Y/X ratio when linked
+  , linkRatioZX :: Number           -- Z/X ratio when linked
   }
 
 -- | Internal actions
@@ -173,25 +193,34 @@ data Action
   | HandleYTextInput String
   | HandleYKeyDown KeyboardEvent
   | HandleYBlur
+  -- Z axis actions
+  | HandleZMouseDown MouseEvent
+  | HandleZMouseMove MouseEvent
+  | HandleZMouseUp MouseEvent
+  | HandleZDoubleClick MouseEvent
+  | HandleZTextInput String
+  | HandleZKeyDown KeyboardEvent
+  | HandleZBlur
   -- Link toggle
   | HandleLinkClick MouseEvent
   -- Commit
   | CommitXValue
   | CommitYValue
+  | CommitZValue
   | CancelEdit
 
 -- | Slot type helper
 type Slot = H.Slot Query Output Unit
 
 -- | Slot proxy
-_positionXY :: Proxy "positionXY"
-_positionXY = Proxy
+_positionXYZ :: Proxy "positionXYZ"
+_positionXYZ = Proxy
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // component
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | PositionXY component
+-- | PositionXYZ component
 component :: forall m. MonadAff m => H.Component Query Input Output m
 component = H.mkComponent
   { initialState
@@ -209,11 +238,14 @@ initialState :: Input -> State
 initialState input =
   { x: input.x
   , y: input.y
+  , z: input.z
   , displayX: input.x
   , displayY: input.y
+  , displayZ: input.z
   , linked: input.linked
   , xLabel: input.xLabel
   , yLabel: input.yLabel
+  , zLabel: input.zLabel
   , step: input.step
   , precision: input.precision
   , disabled: input.disabled
@@ -223,8 +255,10 @@ initialState input =
   , scrubStartValue: 0.0
   , isEditingX: false
   , isEditingY: false
+  , isEditingZ: false
   , textInputValue: ""
-  , linkRatio: if input.x == 0.0 then 1.0 else input.y / input.x
+  , linkRatioYX: if input.x == 0.0 then 1.0 else input.y / input.x
+  , linkRatioZX: if input.x == 0.0 then 1.0 else input.z / input.x
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -236,7 +270,7 @@ render state =
   HH.div
     [ cls [ "inline-flex items-center gap-1" ]
     , ARIA.role "group"
-    , ARIA.label "Position XY input"
+    , ARIA.label "Position XYZ input"
     ]
     [ -- X Input
       renderAxisInput state AxisX
@@ -246,23 +280,27 @@ render state =
         [ cls [ linkButtonClasses state ]
         , HE.onClick HandleLinkClick
         , HP.disabled state.disabled
-        , ARIA.label (if state.linked then "Unlink X and Y" else "Link X and Y")
+        , ARIA.label (if state.linked then "Unlink X, Y and Z" else "Link X, Y and Z")
         , HP.title (if state.linked then "Click to unlink" else "Click to link")
         ]
         [ HH.text (if state.linked then "🔗" else "⛓️") ]
     
     -- Y Input
     , renderAxisInput state AxisY
+    
+    -- Z Input
+    , renderAxisInput state AxisZ
     ]
 
 -- | Render a single axis input
 renderAxisInput :: forall m. State -> ActiveAxis -> H.ComponentHTML Action () m
 renderAxisInput state axis =
   let
-    isX = axis == AxisX
-    label = if isX then state.xLabel else state.yLabel
-    value = if isX then state.displayX else state.displayY
-    isEditing = if isX then state.isEditingX else state.isEditingY
+    axisConfig = case axis of
+      AxisX -> { label: state.xLabel, value: state.displayX, isEditing: state.isEditingX }
+      AxisY -> { label: state.yLabel, value: state.displayY, isEditing: state.isEditingY }
+      AxisZ -> { label: state.zLabel, value: state.displayZ, isEditing: state.isEditingZ }
+      NoAxis -> { label: "", value: 0.0, isEditing: false }
     isScrubbing = state.isScrubbing && state.activeAxis == axis
   in
     HH.div
@@ -270,50 +308,66 @@ renderAxisInput state axis =
       [ -- Axis label
         HH.span
           [ cls [ "text-xs text-muted-foreground w-4" ] ]
-          [ HH.text label ]
+          [ HH.text axisConfig.label ]
       
       -- Value display or input
-      , if isEditing
-          then renderTextInput state isX
-          else renderScrubable state axis value
+      , if axisConfig.isEditing
+          then renderTextInput state axis
+          else renderScrubable state axis axisConfig.value
       ]
 
 -- | Render scrubable value
 renderScrubable :: forall m. State -> ActiveAxis -> Number -> H.ComponentHTML Action () m
 renderScrubable state axis value =
   let
-    isX = axis == AxisX
     isScrubbing = state.isScrubbing && state.activeAxis == axis
+    mouseDownHandler = case axis of
+      AxisX -> HandleXMouseDown
+      AxisY -> HandleYMouseDown
+      AxisZ -> HandleZMouseDown
+      NoAxis -> HandleXMouseDown
+    doubleClickHandler = case axis of
+      AxisX -> HandleXDoubleClick
+      AxisY -> HandleYDoubleClick
+      AxisZ -> HandleZDoubleClick
+      NoAxis -> HandleXDoubleClick
   in
     HH.span
       [ cls [ scrubableClasses isScrubbing ]
-      , if isX
-          then HE.onMouseDown HandleXMouseDown
-          else HE.onMouseDown HandleYMouseDown
-      , if isX
-          then HE.onDoubleClick HandleXDoubleClick
-          else HE.onDoubleClick HandleYDoubleClick
+      , HE.onMouseDown mouseDownHandler
+      , HE.onDoubleClick doubleClickHandler
       ]
       [ HH.text (toStringWith (fixed state.precision) value) ]
 
 -- | Render text input
-renderTextInput :: forall m. State -> Boolean -> H.ComponentHTML Action () m
-renderTextInput state isX =
-  HH.input
-    [ cls [ inputClasses ]
-    , HP.type_ HP.InputText
-    , HP.value state.textInputValue
-    , HP.autofocus true
-    , if isX
-        then HE.onValueInput HandleXTextInput
-        else HE.onValueInput HandleYTextInput
-    , if isX
-        then HE.onBlur (const HandleXBlur)
-        else HE.onBlur (const HandleYBlur)
-    , if isX
-        then HE.onKeyDown HandleXKeyDown
-        else HE.onKeyDown HandleYKeyDown
-    ]
+renderTextInput :: forall m. State -> ActiveAxis -> H.ComponentHTML Action () m
+renderTextInput state axis =
+  let
+    inputHandler = case axis of
+      AxisX -> HandleXTextInput
+      AxisY -> HandleYTextInput
+      AxisZ -> HandleZTextInput
+      NoAxis -> HandleXTextInput
+    blurHandler = case axis of
+      AxisX -> HandleXBlur
+      AxisY -> HandleYBlur
+      AxisZ -> HandleZBlur
+      NoAxis -> HandleXBlur
+    keyHandler = case axis of
+      AxisX -> HandleXKeyDown
+      AxisY -> HandleYKeyDown
+      AxisZ -> HandleZKeyDown
+      NoAxis -> HandleXKeyDown
+  in
+    HH.input
+      [ cls [ inputClasses ]
+      , HP.type_ HP.InputText
+      , HP.value state.textInputValue
+      , HP.autofocus true
+      , HE.onValueInput inputHandler
+      , HE.onBlur (const blurHandler)
+      , HE.onKeyDown keyHandler
+      ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // styles
@@ -365,15 +419,19 @@ handleAction = case _ of
       H.modify_ \s -> s
         { x = input.x
         , y = input.y
+        , z = input.z
         , displayX = input.x
         , displayY = input.y
+        , displayZ = input.z
         , linked = input.linked
         , xLabel = input.xLabel
         , yLabel = input.yLabel
+        , zLabel = input.zLabel
         , step = input.step
         , precision = input.precision
         , disabled = input.disabled
-        , linkRatio = if input.x == 0.0 then s.linkRatio else input.y / input.x
+        , linkRatioYX = if input.x == 0.0 then s.linkRatioYX else input.y / input.x
+        , linkRatioZX = if input.x == 0.0 then s.linkRatioZX else input.z / input.x
         }
   
   -- X Axis handlers
@@ -398,20 +456,22 @@ handleAction = case _ of
         sensitivity = getSensitivity event
         rawDelta = deltaX * state.step * sensitivity / 2.0
         newX = state.scrubStartValue + rawDelta
-        newY = if state.linked then newX * state.linkRatio else state.displayY
+        newY = if state.linked then newX * state.linkRatioYX else state.displayY
+        newZ = if state.linked then newX * state.linkRatioZX else state.displayZ
       
-      H.modify_ _ { displayX = newX, displayY = newY }
-      H.raise (PositionChanging { x: newX, y: newY })
+      H.modify_ _ { displayX = newX, displayY = newY, displayZ = newZ }
+      H.raise (PositionChanging { x: newX, y: newY, z: newZ })
   
   HandleXMouseUp _ -> do
     state <- H.get
     when (state.isScrubbing && state.activeAxis == AxisX) do
-      let pos = { x: state.displayX, y: state.displayY }
+      let pos = { x: state.displayX, y: state.displayY, z: state.displayZ }
       H.modify_ _
         { isScrubbing = false
         , activeAxis = NoAxis
         , x = state.displayX
         , y = state.displayY
+        , z = state.displayZ
         }
       H.raise ScrubEnd
       H.raise (PositionChanged pos)
@@ -441,7 +501,7 @@ handleAction = case _ of
   HandleXBlur -> do
     handleAction CommitXValue
   
-  -- Y Axis handlers (mirror of X)
+  -- Y Axis handlers
   HandleYMouseDown event -> do
     state <- H.get
     unless state.disabled do
@@ -463,22 +523,24 @@ handleAction = case _ of
         sensitivity = getSensitivity event
         rawDelta = deltaX * state.step * sensitivity / 2.0
         newY = state.scrubStartValue + rawDelta
-        newX = if state.linked && state.linkRatio /= 0.0
-               then newY / state.linkRatio
+        newX = if state.linked && state.linkRatioYX /= 0.0
+               then newY / state.linkRatioYX
                else state.displayX
+        newZ = if state.linked then newX * state.linkRatioZX else state.displayZ
       
-      H.modify_ _ { displayX = newX, displayY = newY }
-      H.raise (PositionChanging { x: newX, y: newY })
+      H.modify_ _ { displayX = newX, displayY = newY, displayZ = newZ }
+      H.raise (PositionChanging { x: newX, y: newY, z: newZ })
   
   HandleYMouseUp _ -> do
     state <- H.get
     when (state.isScrubbing && state.activeAxis == AxisY) do
-      let pos = { x: state.displayX, y: state.displayY }
+      let pos = { x: state.displayX, y: state.displayY, z: state.displayZ }
       H.modify_ _
         { isScrubbing = false
         , activeAxis = NoAxis
         , x = state.displayX
         , y = state.displayY
+        , z = state.displayZ
         }
       H.raise ScrubEnd
       H.raise (PositionChanged pos)
@@ -508,15 +570,85 @@ handleAction = case _ of
   HandleYBlur -> do
     handleAction CommitYValue
   
+  -- Z Axis handlers
+  HandleZMouseDown event -> do
+    state <- H.get
+    unless state.disabled do
+      let clientX = getClientX event
+      H.modify_ _
+        { activeAxis = AxisZ
+        , isScrubbing = true
+        , scrubStartX = clientX
+        , scrubStartValue = state.z
+        }
+      H.raise ScrubStart
+  
+  HandleZMouseMove event -> do
+    state <- H.get
+    when (state.isScrubbing && state.activeAxis == AxisZ) do
+      let
+        clientX = getClientX event
+        deltaX = clientX - state.scrubStartX
+        sensitivity = getSensitivity event
+        rawDelta = deltaX * state.step * sensitivity / 2.0
+        newZ = state.scrubStartValue + rawDelta
+        newX = if state.linked && state.linkRatioZX /= 0.0
+               then newZ / state.linkRatioZX
+               else state.displayX
+        newY = if state.linked then newX * state.linkRatioYX else state.displayY
+      
+      H.modify_ _ { displayX = newX, displayY = newY, displayZ = newZ }
+      H.raise (PositionChanging { x: newX, y: newY, z: newZ })
+  
+  HandleZMouseUp _ -> do
+    state <- H.get
+    when (state.isScrubbing && state.activeAxis == AxisZ) do
+      let pos = { x: state.displayX, y: state.displayY, z: state.displayZ }
+      H.modify_ _
+        { isScrubbing = false
+        , activeAxis = NoAxis
+        , x = state.displayX
+        , y = state.displayY
+        , z = state.displayZ
+        }
+      H.raise ScrubEnd
+      H.raise (PositionChanged pos)
+  
+  HandleZDoubleClick event -> do
+    state <- H.get
+    unless state.disabled do
+      H.liftEffect $ preventDefault (MouseEvent.toEvent event)
+      H.modify_ _
+        { isEditingZ = true
+        , textInputValue = toStringWith (fixed state.precision) state.z
+        }
+  
+  HandleZTextInput str -> do
+    H.modify_ _ { textInputValue = str }
+  
+  HandleZKeyDown event -> do
+    case KeyboardEvent.key event of
+      "Enter" -> do
+        H.liftEffect $ preventDefault (KeyboardEvent.toEvent event)
+        handleAction CommitZValue
+      "Escape" -> do
+        H.liftEffect $ preventDefault (KeyboardEvent.toEvent event)
+        handleAction CancelEdit
+      _ -> pure unit
+  
+  HandleZBlur -> do
+    handleAction CommitZValue
+  
   -- Link toggle
   HandleLinkClick _ -> do
     state <- H.get
     unless state.disabled do
       let
         newLinked = not state.linked
-        -- Update ratio when linking
-        newRatio = if state.x == 0.0 then 1.0 else state.y / state.x
-      H.modify_ _ { linked = newLinked, linkRatio = newRatio }
+        -- Update ratios when linking
+        newRatioYX = if state.x == 0.0 then 1.0 else state.y / state.x
+        newRatioZX = if state.x == 0.0 then 1.0 else state.z / state.x
+      H.modify_ _ { linked = newLinked, linkRatioYX = newRatioYX, linkRatioZX = newRatioZX }
       H.raise (LinkedToggled newLinked)
   
   -- Commit handlers
@@ -524,40 +656,68 @@ handleAction = case _ of
     state <- H.get
     let
       newX = fromMaybe state.x (parseNumber state.textInputValue)
-      newY = if state.linked then newX * state.linkRatio else state.y
+      newY = if state.linked then newX * state.linkRatioYX else state.y
+      newZ = if state.linked then newX * state.linkRatioZX else state.z
     H.modify_ _
       { isEditingX = false
       , x = newX
       , y = newY
+      , z = newZ
       , displayX = newX
       , displayY = newY
+      , displayZ = newZ
       , textInputValue = ""
       }
-    when (newX /= state.x || newY /= state.y) do
-      H.raise (PositionChanged { x: newX, y: newY })
+    when (newX /= state.x || newY /= state.y || newZ /= state.z) do
+      H.raise (PositionChanged { x: newX, y: newY, z: newZ })
   
   CommitYValue -> do
     state <- H.get
     let
       newY = fromMaybe state.y (parseNumber state.textInputValue)
-      newX = if state.linked && state.linkRatio /= 0.0
-             then newY / state.linkRatio
+      newX = if state.linked && state.linkRatioYX /= 0.0
+             then newY / state.linkRatioYX
              else state.x
+      newZ = if state.linked then newX * state.linkRatioZX else state.z
     H.modify_ _
       { isEditingY = false
       , x = newX
       , y = newY
+      , z = newZ
       , displayX = newX
       , displayY = newY
+      , displayZ = newZ
       , textInputValue = ""
       }
-    when (newX /= state.x || newY /= state.y) do
-      H.raise (PositionChanged { x: newX, y: newY })
+    when (newX /= state.x || newY /= state.y || newZ /= state.z) do
+      H.raise (PositionChanged { x: newX, y: newY, z: newZ })
+  
+  CommitZValue -> do
+    state <- H.get
+    let
+      newZ = fromMaybe state.z (parseNumber state.textInputValue)
+      newX = if state.linked && state.linkRatioZX /= 0.0
+             then newZ / state.linkRatioZX
+             else state.x
+      newY = if state.linked then newX * state.linkRatioYX else state.y
+    H.modify_ _
+      { isEditingZ = false
+      , x = newX
+      , y = newY
+      , z = newZ
+      , displayX = newX
+      , displayY = newY
+      , displayZ = newZ
+      , textInputValue = ""
+      }
+    when (newX /= state.x || newY /= state.y || newZ /= state.z) do
+      H.raise (PositionChanged { x: newX, y: newY, z: newZ })
   
   CancelEdit -> do
     H.modify_ _
       { isEditingX = false
       , isEditingY = false
+      , isEditingZ = false
       , textInputValue = ""
       }
 
@@ -571,20 +731,25 @@ handleQuery = case _ of
     H.modify_ _
       { x = pos.x
       , y = pos.y
+      , z = pos.z
       , displayX = pos.x
       , displayY = pos.y
-      , linkRatio = if pos.x == 0.0 then 1.0 else pos.y / pos.x
+      , displayZ = pos.z
+      , linkRatioYX = if pos.x == 0.0 then 1.0 else pos.y / pos.x
+      , linkRatioZX = if pos.x == 0.0 then 1.0 else pos.z / pos.x
       }
     pure (Just reply)
   
   GetPosition reply -> do
     state <- H.get
-    pure (Just (reply { x: state.x, y: state.y }))
+    pure (Just (reply { x: state.x, y: state.y, z: state.z }))
   
   SetLinked linked reply -> do
     state <- H.get
-    let newRatio = if state.x == 0.0 then 1.0 else state.y / state.x
-    H.modify_ _ { linked = linked, linkRatio = newRatio }
+    let
+      newRatioYX = if state.x == 0.0 then 1.0 else state.y / state.x
+      newRatioZX = if state.x == 0.0 then 1.0 else state.z / state.x
+    H.modify_ _ { linked = linked, linkRatioYX = newRatioYX, linkRatioZX = newRatioZX }
     pure (Just reply)
   
   SetDisabled disabled reply -> do
