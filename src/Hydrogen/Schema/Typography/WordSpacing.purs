@@ -35,7 +35,7 @@ module Hydrogen.Schema.Typography.WordSpacing
   -- * Accessors
   , unwrap
   , toEm
-  , toLegacyCssValue
+  , toLegacyCSSValue
   
   -- * Operations
   , scale
@@ -118,12 +118,10 @@ unwrap (WordSpacing n) = n
 toEm :: WordSpacing -> Number
 toEm (WordSpacing n) = Int.toNumber n / 1000.0
 
--- | Convert to CSS value string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCssValue :: WordSpacing -> String
-toLegacyCssValue ws
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS value string
+toLegacyCSSValue :: WordSpacing -> String
+toLegacyCSSValue ws
   | unwrap ws == 0 = "normal"
   | otherwise = show (toEm ws) <> "em"
 

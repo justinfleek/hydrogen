@@ -46,15 +46,6 @@ module Hydrogen.Schema.Typography.FontWeight
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , show
-  , (<)
-  , (>=)
-  , (&&)
-  , (<>)
-  )
 
 import Data.Int (toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
@@ -170,10 +161,8 @@ unwrap (FontWeight w) = w
 toNumber :: FontWeight -> Number
 toNumber (FontWeight w) = Int.toNumber w
 
--- | Convert to CSS font-weight value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS font-weight value
 toLegacyCss :: FontWeight -> String
 toLegacyCss (FontWeight w) = show w
 

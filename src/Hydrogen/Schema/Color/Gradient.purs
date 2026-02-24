@@ -60,7 +60,7 @@ module Hydrogen.Schema.Color.Gradient
   , sampleConicAt
   , sampleMeshAt
   
-  -- * Legacy CSS Output (for interop with legacy systems)
+  -- * CSS Output (Legacy string generation, NOT FFI)
   , toLegacyCss
   , linearToLegacyCss
   , radialToLegacyCss
@@ -68,23 +68,6 @@ module Hydrogen.Schema.Color.Gradient
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , compare
-  , map
-  , show
-  , (+)
-  , (-)
-  , (*)
-  , (/)
-  , (==)
-  , (>=)
-  , (<=)
-  , (&&)
-  , (<>)
-  , ($)
-  )
 
 import Data.Array (drop, foldl, index, sortBy, take, uncons)
 import Data.Int (round)
@@ -172,9 +155,6 @@ newtype LinearGradient = LinearGradient
 
 derive instance eqLinearGradient :: Eq LinearGradient
 
-instance showLinearGradient :: Show LinearGradient where
-  show g = linearToLegacyCss g
-
 -- | Create a linear gradient with default angle (180 degrees = top to bottom)
 linearGradient :: Array ColorStop -> LinearGradient
 linearGradient stops = LinearGradient
@@ -211,9 +191,6 @@ newtype RadialGradient = RadialGradient
 
 derive instance eqRadialGradient :: Eq RadialGradient
 
-instance showRadialGradient :: Show RadialGradient where
-  show g = radialToLegacyCss g
-
 -- | Create a radial gradient centered at (0.5, 0.5)
 radialGradient :: Array ColorStop -> RadialGradient
 radialGradient stops = RadialGradient
@@ -237,9 +214,6 @@ newtype ConicGradient = ConicGradient
   }
 
 derive instance eqConicGradient :: Eq ConicGradient
-
-instance showConicGradient :: Show ConicGradient where
-  show g = conicToLegacyCss g
 
 -- | Create a conic gradient centered at (0.5, 0.5) starting from top
 conicGradient :: Array ColorStop -> ConicGradient
@@ -272,9 +246,6 @@ newtype MeshGradient = MeshGradient
 
 derive instance eqMeshGradient :: Eq MeshGradient
 
-instance showMeshGradient :: Show MeshGradient where
-  show (MeshGradient m) = "mesh(" <> rgbToLegacyCss m.topLeft <> ", " <> rgbToLegacyCss m.topRight <> ", " <> rgbToLegacyCss m.bottomLeft <> ", " <> rgbToLegacyCss m.bottomRight <> ")"
-
 -- | Create a mesh gradient with equal blend (0.5) for all corners
 meshGradient :: RGB -> RGB -> RGB -> RGB -> MeshGradient
 meshGradient tl tr bl br = MeshGradient
@@ -301,51 +272,54 @@ data Gradient
 
 derive instance eqGradient :: Eq Gradient
 
-instance showGradient :: Show Gradient where
-  show = toLegacyCss
-
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // legacy css output
+--                                                                   // css output
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Convert gradient to CSS for legacy system interop.
+-- | Convert gradient to legacy CSS string.
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | This generates a CSS-compatible string for use with legacy rendering.
+-- | NOT an FFI boundary - pure string generation.
 toLegacyCss :: Gradient -> String
 toLegacyCss (Linear g) = linearToLegacyCss g
 toLegacyCss (Radial g) = radialToLegacyCss g
 toLegacyCss (Conic g) = conicToLegacyCss g
 toLegacyCss (Mesh _) = "/* Mesh gradients require Canvas API or SVG - no CSS equivalent */"
 
--- | Convert linear gradient to CSS for legacy system interop.
+-- | Convert linear gradient to legacy CSS string.
+-- |
+-- | NOT an FFI boundary - pure string generation.
 linearToLegacyCss :: LinearGradient -> String
 linearToLegacyCss (LinearGradient g) =
-  "linear-gradient(" <> show g.angle <> "deg, " <> stopsToLegacyCss g.stops <> ")"
+  "linear-gradient(" <> show g.angle <> "deg, " <> stopsToLegacyCSS g.stops <> ")"
 
--- | Convert radial gradient to CSS for legacy system interop.
+-- | Convert radial gradient to legacy CSS string.
+-- |
+-- | NOT an FFI boundary - pure string generation.
 radialToLegacyCss :: RadialGradient -> String
 radialToLegacyCss (RadialGradient g) =
   "radial-gradient(circle at " 
     <> show (ratioToPercent g.centerX) <> "% " 
     <> show (ratioToPercent g.centerY) <> "%, " 
-    <> stopsToLegacyCss g.stops <> ")"
+    <> stopsToLegacyCSS g.stops <> ")"
 
--- | Convert conic gradient to CSS for legacy system interop.
+-- | Convert conic gradient to legacy CSS string.
+-- |
+-- | NOT an FFI boundary - pure string generation.
 conicToLegacyCss :: ConicGradient -> String
 conicToLegacyCss (ConicGradient g) =
   "conic-gradient(from " <> show g.startAngle <> "deg at "
     <> show (ratioToPercent g.centerX) <> "% "
     <> show (ratioToPercent g.centerY) <> "%, "
-    <> stopsToLegacyCss g.stops <> ")"
+    <> stopsToLegacyCSS g.stops <> ")"
 
--- | Convert array of color stops to CSS format for legacy system interop.
-stopsToLegacyCss :: Array ColorStop -> String
-stopsToLegacyCss stops = 
-  let stopStrings = map stopToLegacyCss stops
+-- | Convert array of color stops to legacy CSS format
+stopsToLegacyCSS :: Array ColorStop -> String
+stopsToLegacyCSS stops = 
+  let stopStrings = map stopToLegacyCSS stops
   in joinWith ", " stopStrings
   where
-  stopToLegacyCss (ColorStop cs) = 
+  stopToLegacyCSS (ColorStop cs) = 
     rgbToLegacyCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
   
   joinWith :: String -> Array String -> String

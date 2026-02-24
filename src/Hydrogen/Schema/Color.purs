@@ -81,9 +81,9 @@ module Hydrogen.Schema.Color
   , add
   , multiply
   , screen
-  , toLegacyCss
+  , toCss
   , toHex
-  , toLegacyCssA
+  , toCssA
   , toRGBA
   , fromRGBA
   
@@ -270,19 +270,7 @@ module Hydrogen.Schema.Color
   ) where
 
 import Hydrogen.Schema.Color.RGB as RGB
-import Hydrogen.Schema.Color.Channel as Ch
-import Hydrogen.Schema.Color.Opacity as Op
 import Hydrogen.Schema.Color.HSL as HSL
-import Hydrogen.Schema.Color.Hue as Hue
-import Hydrogen.Schema.Color.Saturation as Sat
-import Hydrogen.Schema.Color.Lightness as Light
-import Hydrogen.Schema.Color.Cyan as Cy
-import Hydrogen.Schema.Color.Magenta as Mg
-import Hydrogen.Schema.Color.Yellow as Yw
-import Hydrogen.Schema.Color.Key as Key
-import Hydrogen.Schema.Color.Kelvin as Kelvin
-import Hydrogen.Schema.Color.Luminance as Luminance
-import Data.Maybe (Maybe)
 import Hydrogen.Schema.Color.CMYK as CMYK
 import Hydrogen.Schema.Color.LAB as LAB
 import Hydrogen.Schema.Color.LCH as LCH
@@ -302,98 +290,40 @@ import Hydrogen.Schema.Color.ColorWheels as ColorWheels
 -- RGB
 type RGB = RGB.RGB
 type RGBA = RGB.RGBA
-
-rgb :: Int -> Int -> Int -> RGB
 rgb = RGB.rgb
-
-rgba :: Int -> Int -> Int -> Int -> RGBA
 rgba = RGB.rgba
-
-fromChannels :: Ch.Channel -> Ch.Channel -> Ch.Channel -> RGB
 fromChannels = RGB.fromChannels
-
-red :: RGB -> Ch.Channel
 red = RGB.red
-
-green :: RGB -> Ch.Channel
 green = RGB.green
-
-blue :: RGB -> Ch.Channel
 blue = RGB.blue
-
-alpha :: RGBA -> Op.Opacity
 alpha = RGB.alpha
-
-invert :: RGB -> RGB
 invert = RGB.invert
-
-blend :: Number -> RGB -> RGB -> RGB
 blend = RGB.blend
-
-add :: RGB -> RGB -> RGB
 add = RGB.add
-
-multiply :: RGB -> RGB -> RGB
 multiply = RGB.multiply
-
-screen :: RGB -> RGB -> RGB
 screen = RGB.screen
-
-toLegacyCss :: RGB -> String
-toLegacyCss = RGB.toLegacyCss
-
-toHex :: RGB -> String
+toCss = RGB.toLegacyCss
 toHex = RGB.toHex
-
-toLegacyCssA :: RGBA -> String
-toLegacyCssA = RGB.toLegacyCssA
-
-toRGBA :: RGB -> RGBA
+toCssA = RGB.toLegacyCssA
 toRGBA = RGB.toRGBA
-
-fromRGBA :: RGBA -> RGB
 fromRGBA = RGB.fromRGBA
 
 -- HSL
 type HSL = HSL.HSL
-
-hsl :: Int -> Int -> Int -> HSL
 hsl = HSL.hsl
-
-fromComponents :: Hue.Hue -> Sat.Saturation -> Light.Lightness -> HSL
 fromComponents = HSL.fromComponents
-
-hue :: HSL -> Hue.Hue
 hue = HSL.hue
-
-saturation :: HSL -> Sat.Saturation
 saturation = HSL.saturation
-
-lightness :: HSL -> Light.Lightness
 lightness = HSL.lightness
 
 -- CMYK
 type CMYK = CMYK.CMYK
-
-cmyk :: Int -> Int -> Int -> Int -> CMYK
 cmyk = CMYK.cmyk
-
-cmykFromComponents :: Cy.Cyan -> Mg.Magenta -> Yw.Yellow -> Key.Key -> CMYK
 cmykFromComponents = CMYK.cmykFromComponents
-
-cyan :: CMYK -> Cy.Cyan
 cyan = CMYK.cyan
-
-magenta :: CMYK -> Mg.Magenta
 magenta = CMYK.magenta
-
-yellow :: CMYK -> Yw.Yellow
 yellow = CMYK.yellow
-
-key :: CMYK -> Key.Key
 key = CMYK.key
-
-cmykToCss :: CMYK -> String
 cmykToCss = CMYK.cmykToCss
 
 -- LAB
@@ -401,20 +331,10 @@ type LAB = LAB.LAB
 type LabL = LAB.LabL
 type LabA = LAB.LabA
 type LabB = LAB.LabB
-
-lab :: Number -> Number -> Number -> LAB
 lab = LAB.lab
-
-labL :: LAB -> LabL
 labL = LAB.labL
-
-labA :: LAB -> LabA
 labA = LAB.labA
-
-labB :: LAB -> LabB
 labB = LAB.labB
-
-deltaE :: LAB -> LAB -> Number
 deltaE = LAB.deltaE
 
 -- LCH
@@ -422,17 +342,9 @@ type LCH = LCH.LCH
 type LchL = LCH.LchL
 type LchC = LCH.LchC
 type LchH = LCH.LchH
-
-lch :: Number -> Number -> Number -> LCH
 lch = LCH.lch
-
-lchL :: LCH -> LchL
 lchL = LCH.lchL
-
-lchC :: LCH -> LchC
 lchC = LCH.lchC
-
-lchH :: LCH -> LchH
 lchH = LCH.lchH
 
 -- XYZ
@@ -440,327 +352,137 @@ type XYZ = XYZ.XYZ
 type XComponent = XYZ.XComponent
 type YComponent = XYZ.YComponent
 type ZComponent = XYZ.ZComponent
-
-xyz :: Number -> Number -> Number -> XYZ
 xyz = XYZ.xyz
-
-xComponent :: XYZ -> XComponent
 xComponent = XYZ.xComponent
-
-yComponent :: XYZ -> YComponent
 yComponent = XYZ.yComponent
-
-zComponent :: XYZ -> ZComponent
 zComponent = XYZ.zComponent
-
-d65White :: XYZ
 d65White = XYZ.d65White
 
 -- Conversions
-hslToRgb :: HSL -> RGB
 hslToRgb = Conversion.hslToRgb
-
-rgbToHsl :: RGB -> HSL
 rgbToHsl = Conversion.rgbToHsl
-
-rgbToCmyk :: RGB -> CMYK
 rgbToCmyk = Conversion.rgbToCmyk
-
-cmykToRgb :: CMYK -> RGB
 cmykToRgb = Conversion.cmykToRgb
-
-rgbToHex :: RGB -> String
 rgbToHex = Conversion.rgbToHex
-
-hexToRgb :: String -> RGB
 hexToRgb = Conversion.hexToRgb
-
-rgbToXyz :: RGB -> XYZ
 rgbToXyz = Conversion.rgbToXyz
-
-xyzToRgb :: XYZ -> RGB
 xyzToRgb = Conversion.xyzToRgb
-
-xyzToLab :: XYZ -> LAB
 xyzToLab = Conversion.xyzToLab
-
-labToXyz :: LAB -> XYZ
 labToXyz = Conversion.labToXyz
-
-rgbToLab :: RGB -> LAB
 rgbToLab = Conversion.rgbToLab
-
-labToRgb :: LAB -> RGB
 labToRgb = Conversion.labToRgb
-
-rgbToLch :: RGB -> LCH
 rgbToLch = Conversion.rgbToLch
-
-lchToRgb :: LCH -> RGB
 lchToRgb = Conversion.lchToRgb
-
-kelvinToRgb :: Kelvin.Kelvin -> RGB
 kelvinToRgb = Conversion.kelvinToRgb
-
-rgbToRecord :: RGB -> { r :: Int, g :: Int, b :: Int }
 rgbToRecord = Conversion.rgbToRecord
-
-rgbFromRecord :: { r :: Int, g :: Int, b :: Int } -> RGB
 rgbFromRecord = Conversion.rgbFromRecord
-
-hslToRecord :: HSL -> { h :: Int, s :: Int, l :: Int }
 hslToRecord = Conversion.hslToRecord
-
-hslFromRecord :: { h :: Int, s :: Int, l :: Int } -> HSL
 hslFromRecord = Conversion.hslFromRecord
-
-cmykToRecord :: CMYK -> { c :: Int, m :: Int, y :: Int, k :: Int }
 cmykToRecord = Conversion.cmykToRecord
-
-cmykFromRecord :: { c :: Int, m :: Int, y :: Int, k :: Int } -> CMYK
 cmykFromRecord = Conversion.cmykFromRecord
-
-labToRecord :: LAB -> { l :: Number, a :: Number, b :: Number }
 labToRecord = Conversion.labToRecord
-
-labFromRecord :: { l :: Number, a :: Number, b :: Number } -> LAB
 labFromRecord = Conversion.labFromRecord
-
-lchToRecord :: LCH -> { l :: Number, c :: Number, h :: Number }
 lchToRecord = Conversion.lchToRecord
-
-lchFromRecord :: { l :: Number, c :: Number, h :: Number } -> LCH
 lchFromRecord = Conversion.lchFromRecord
-
-xyzToRecord :: XYZ -> { x :: Number, y :: Number, z :: Number }
 xyzToRecord = Conversion.xyzToRecord
-
-xyzFromRecord :: { x :: Number, y :: Number, z :: Number } -> XYZ
 xyzFromRecord = Conversion.xyzFromRecord
 
 -- Blend
 type BlendMode = Blend.BlendMode
-type CompositeOp = Blend.CompositeOp
-
-blendRGBA :: BlendMode -> RGBA -> RGBA -> RGBA
 blendRGBA = Blend.blendRGBA
-
-blendChannel :: BlendMode -> Int -> Int -> Int
 blendChannel = Blend.blendChannel
-
-composite :: CompositeOp -> RGBA -> RGBA -> RGBA
+type CompositeOp = Blend.CompositeOp
 composite = Blend.composite
-
-mixRGB :: Number -> RGB -> RGB -> RGB
 mixRGB = Blend.mixRGB
-
-mixRGBA :: Number -> RGBA -> RGBA -> RGBA
 mixRGBA = Blend.mixRGBA
-
-lerpRGB :: Number -> RGB -> RGB -> RGB
 lerpRGB = Blend.lerpRGB
-
-blendModeToCss :: BlendMode -> String
 blendModeToCss = Blend.blendModeToCss
-
-compositeOpToCss :: CompositeOp -> String
 compositeOpToCss = Blend.compositeOpToCss
 
 -- Glow
 type Glow = Glow.Glow
-
-glow :: Int -> Number -> Number -> Glow
 glow = Glow.glow
-
-glowFromRecord :: { color :: Int, intensity :: Number, spread :: Number } -> Glow
 glowFromRecord = Glow.glowFromRecord
-
-glowColor :: Glow -> Kelvin.Kelvin
 glowColor = Glow.glowColor
-
-glowIntensity :: Glow -> Luminance.Luminance
 glowIntensity = Glow.glowIntensity
-
-glowSpread :: Glow -> Number
 glowSpread = Glow.glowSpread
-
-glowToRecord :: Glow -> { color :: Int, intensity :: Number, spread :: Number }
 glowToRecord = Glow.glowToRecord
-
-glowToRgb :: Glow -> RGB
 glowToRgb = Glow.glowToRgb
-
-glowToCss :: Glow -> String
 glowToCss = Glow.glowToCss
-
-withColor :: Kelvin.Kelvin -> Glow -> Glow
 withColor = Glow.withColor
-
-withIntensity :: Luminance.Luminance -> Glow -> Glow
 withIntensity = Glow.withIntensity
-
-withSpread :: Number -> Glow -> Glow
 withSpread = Glow.withSpread
-
-warmGlow :: Number -> Number -> Glow
 warmGlow = Glow.warmGlow
-
-coolGlow :: Number -> Number -> Glow
 coolGlow = Glow.coolGlow
-
-neutralGlow :: Number -> Number -> Glow
 neutralGlow = Glow.neutralGlow
 
 -- CVD
 type CVDType = CVD.CVDType
+cvdPrevalence = CVD.cvdPrevalence
 type AccessibilityIssue = CVD.AccessibilityIssue
 type AccessibilityReport = CVD.AccessibilityReport
-
-cvdPrevalence :: CVDType -> { males :: Number, females :: Number }
-cvdPrevalence = CVD.cvdPrevalence
-
-simulateCVD :: CVDType -> RGB -> RGB
 simulateCVD = CVD.simulateCVD
-
-isDistinguishable :: CVDType -> RGB -> RGB -> Boolean
 isDistinguishable = CVD.isDistinguishable
-
-checkAccessibility :: RGB -> RGB -> AccessibilityReport
 checkAccessibility = CVD.checkAccessibility
-
-suggestAccessibleAlternative :: RGB -> RGB -> Maybe RGB
 suggestAccessibleAlternative = CVD.suggestAccessibleAlternative
-
-ensureAccessible :: RGB -> RGB -> RGB
 ensureAccessible = CVD.ensureAccessible
-
-cvdSafeContrast :: RGB -> RGB -> Number
 cvdSafeContrast = CVD.cvdSafeContrast
 
 -- Contrast
 type WCAGLevel = Contrast.WCAGLevel
 type Contrast = Contrast.Contrast
-
-contrastRatio :: RGB -> RGB -> Number
 contrastRatio = Contrast.contrastRatio
-
-contrastBetween :: RGB -> RGB -> Contrast
 contrastBetween = Contrast.contrastBetween
-
-meetsWCAG :: WCAGLevel -> RGB -> RGB -> Boolean
 meetsWCAG = Contrast.meetsWCAG
-
-suggestForeground :: RGB -> RGB
 suggestForeground = Contrast.suggestForeground
-
-luminanceRGB :: RGB -> Number
 luminanceRGB = Contrast.luminanceRGB
-
-relativeLuminance :: RGB -> Number
 relativeLuminance = Contrast.relativeLuminance
 
 -- Harmony
 type Harmony = Harmony.Harmony
 type HarmonyConfig = Harmony.HarmonyConfig
-
-generateHarmony :: HarmonyConfig -> Array HSL
 generateHarmony = Harmony.generateHarmony
 
 -- Properties
-colorfulness :: HSL -> Number
 colorfulness = Properties.colorfulness
-
-chroma :: HSL -> Number
 chroma = Properties.chroma
-
-brightness :: RGB -> Number
 brightness = Properties.brightness
-
-value :: RGB -> Number
 value = Properties.value
-
-perceivedLightness :: RGB -> Number
 perceivedLightness = Properties.perceivedLightness
-
-labLightness :: RGB -> Number
 labLightness = Properties.labLightness
 
 -- Temperature
 type Temperature = Temperature.Temperature
-
-temperatureFromHSL :: HSL -> Temperature
 temperatureFromHSL = Temperature.temperatureFromHSL
-
-kelvin :: Int -> Temperature
 kelvin = Temperature.kelvin
 
 -- Mood
 type Mood = Mood.Mood
-
-moodFromHSL :: HSL -> Mood
 moodFromHSL = Mood.moodFromHSL
-
-moodDescription :: Mood -> String
 moodDescription = Mood.moodDescription
 
 -- WhiteBalance
 type WhiteBalance = WhiteBalance.WhiteBalance
 type Preset = WhiteBalance.Preset
-
-whiteBalance :: Int -> Int -> WhiteBalance
 whiteBalance = WhiteBalance.whiteBalance
-
-fromPreset :: Preset -> WhiteBalance
 fromPreset = WhiteBalance.fromPreset
-
-temperature :: WhiteBalance -> Int
 temperature = WhiteBalance.temperature
-
-tint :: WhiteBalance -> Int
 tint = WhiteBalance.tint
-
-whiteBalanceApplyToRgb :: WhiteBalance -> RGB -> RGB
-whiteBalanceApplyToRgb = WhiteBalance.applyToRgb
-
-withTemperature :: Int -> WhiteBalance -> WhiteBalance
+whiteBalanceApplyToRgb = WhiteBalance.applyToRgb  -- Renamed to avoid conflict
 withTemperature = WhiteBalance.withTemperature
-
-withTint :: Int -> WhiteBalance -> WhiteBalance
 withTint = WhiteBalance.withTint
 
 -- ColorWheels
 type ColorWheels = ColorWheels.ColorWheels
 type WheelAdjustment = ColorWheels.WheelAdjustment
-
-colorWheels :: WheelAdjustment -> WheelAdjustment -> WheelAdjustment -> ColorWheels
 colorWheels = ColorWheels.colorWheels
-
-neutralWheels :: ColorWheels
 neutralWheels = ColorWheels.neutralWheels
-
-wheelAdjustment :: Number -> Number -> Number -> WheelAdjustment
 wheelAdjustment = ColorWheels.wheelAdjustment
-
-neutralAdjustment :: WheelAdjustment
 neutralAdjustment = ColorWheels.neutralAdjustment
-
-lift :: ColorWheels -> WheelAdjustment
 lift = ColorWheels.lift
-
-gamma :: ColorWheels -> WheelAdjustment
 gamma = ColorWheels.gamma
-
-gain :: ColorWheels -> WheelAdjustment
 gain = ColorWheels.gain
-
-colorWheelsApplyToRgb :: ColorWheels -> RGB -> RGB
-colorWheelsApplyToRgb = ColorWheels.applyToRgb
-
-withLift :: WheelAdjustment -> ColorWheels -> ColorWheels
+colorWheelsApplyToRgb = ColorWheels.applyToRgb  -- Renamed to avoid conflict
 withLift = ColorWheels.withLift
-
-withGamma :: WheelAdjustment -> ColorWheels -> ColorWheels
 withGamma = ColorWheels.withGamma
-
-withGain :: WheelAdjustment -> ColorWheels -> ColorWheels
 withGain = ColorWheels.withGain

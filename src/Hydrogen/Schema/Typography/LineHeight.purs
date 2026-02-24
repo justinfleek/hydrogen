@@ -33,12 +33,6 @@ module Hydrogen.Schema.Typography.LineHeight
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , show
-  , (*)
-  )
 
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Typography.FontSize (FontSize)
@@ -128,10 +122,8 @@ unwrap (LineHeight h) = h
 toPixels :: FontSize -> LineHeight -> Number
 toPixels fs (LineHeight ratio) = FontSize.unwrap fs * ratio
 
--- | Convert to CSS line-height value (unitless) for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS line-height value (unitless)
 toLegacyCss :: LineHeight -> String
 toLegacyCss (LineHeight h) = show h
 

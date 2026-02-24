@@ -46,7 +46,7 @@ module Hydrogen.Schema.Typography.FontWidth
   -- * Accessors
   , unwrap
   , toPercentage
-  , toLegacyCssValue
+  , toLegacyCSSValue
   
   -- * Operations
   , clamp
@@ -54,19 +54,6 @@ module Hydrogen.Schema.Typography.FontWidth
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , class Show
-  , identity
-  , otherwise
-  , show
-  , (+)
-  , (-)
-  , (*)
-  , (<)
-  , (>)
-  , (<>)
-  )
 
 import Data.Int (round, toNumber) as Int
 
@@ -149,12 +136,10 @@ unwrap (FontWidth n) = n
 toPercentage :: FontWidth -> Number
 toPercentage (FontWidth n) = Int.toNumber n
 
--- | Convert to CSS value string for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCssValue :: FontWidth -> String
-toLegacyCssValue (FontWidth n) = show n <> "%"
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS value string
+toLegacyCSSValue :: FontWidth -> String
+toLegacyCSSValue (FontWidth n) = show n <> "%"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // operations

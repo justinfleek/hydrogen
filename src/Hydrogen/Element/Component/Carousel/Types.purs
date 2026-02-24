@@ -1,357 +1,507 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                          // hydrogen // element // component // carousel // types
+--                                    // hydrogen // element // carousel // types
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Carousel Types — Configuration atoms for sequential content navigation.
+-- | Carousel Types — Core type definitions for the carousel compound.
 -- |
--- | A Carousel is a navigation container for ANY content. It handles:
--- | - Sequential navigation (next/prev)
--- | - Viewport pagination (multiple items visible)
--- | - Transition animations between slides
--- | - Swipe gesture recognition
--- | - Auto-play timing
--- | - Indicator placement (dots, thumbnails)
+-- | ## Architecture
 -- |
--- | The content is opaque — the Carousel doesn't care what's inside.
--- | Images, videos, cards, 3D objects, data visualizations — all work.
+-- | This module defines the atomic and molecular types that compose into
+-- | carousel state and configuration. No rendering logic — pure types.
+-- |
+-- | ## Type Hierarchy
+-- |
+-- | **Atoms** (bounded primitives):
+-- | - SlideIndex, TransitionKind, LayoutPath, ContentKind
+-- |
+-- | **Molecules** (composed atoms):
+-- | - SlideConfig, TransitionConfig, LayoutConfig
+-- |
+-- | **Compounds** (full configurations):
+-- | - CarouselConfig (assembled from molecules)
 -- |
 -- | ## Dependencies
--- | - Prelude (Eq, Show)
--- | - Hydrogen.Schema.Navigation.Index (IndexedPosition, BoundaryBehavior)
--- | - Hydrogen.Schema.Navigation.Pagination (ItemsVisible, ItemsToScroll, ItemGap)
--- | - Hydrogen.Schema.Motion.Transition (TransitionConfig)
--- | - Hydrogen.Schema.Dimension.Temporal (Milliseconds)
--- | - Hydrogen.Schema.Geometry.Position (Edge)
--- | - Hydrogen.Schema.Gestural.Gesture.Swipe (SwipeDirection)
 -- |
--- | ## Dependents
--- | - Element.Component.Carousel (main component)
--- | - Element.Component.Carousel.Render (rendering helpers)
+-- | - Prelude (Eq, Ord, Show, Bounded)
+-- | - Schema atoms (referenced, not imported here)
 
 module Hydrogen.Element.Component.Carousel.Types
-  ( -- * Carousel State
-    CarouselState
-  , carouselState
-  , initialCarouselState
-  , currentIndex
-  , slideCount
-  , isPlaying
-  , isHovered
+  ( -- * Slide Index
+    SlideIndex
+  , slideIndex
+  , unwrapSlideIndex
+  , firstSlide
+  , nextIndex
+  , prevIndex
   
-  -- * Carousel Config
-  , CarouselConfig
-  , carouselConfig
-  , defaultConfig
+  -- * Transition Kinds
+  , TransitionKind
+      ( TransitionNone
+      , TransitionSlide
+      , TransitionSlideVertical
+      , TransitionFade
+      , TransitionZoom
+      , TransitionFlip
+      , TransitionFlipVertical
+      , TransitionCube
+      , TransitionCoverflow
+      , TransitionCards
+      , TransitionWheel
+      , TransitionSpiral
+      , TransitionParallax
+      , TransitionMorph
+      , TransitionDissolve
+      , TransitionBlur
+      , TransitionWipe
+      , TransitionReveal
+      )
   
-  -- * Config Accessors
-  , configItemsVisible
-  , configItemsToScroll
-  , configGap
-  , configTransition
-  , configAutoPlayInterval
-  , configPauseOnHover
-  , configBehavior
-  , configShowArrows
-  , configShowDots
-  , configShowThumbnails
-  , configThumbnailPosition
+  -- * Layout Paths
+  , LayoutPath
+      ( PathLinear
+      , PathLinearVertical
+      , PathGrid
+      , PathMasonry
+      , PathStack
+      , PathCircular
+      , PathArc
+      , PathHelix
+      , PathSphere
+      , PathCylinder
+      , PathMobius
+      , PathCustom
+      )
+  
+  -- * Content Kinds
+  , ContentKind
+      ( ContentImage
+      , ContentVideo
+      , ContentAudio
+      , ContentEmbed
+      , ContentText
+      , ContentCard
+      , ContentHTML
+      , ContentCanvas
+      , ContentWebGL
+      , ContentGame
+      , ContentLiveData
+      , ContentInteractive
+      )
+  
+  -- * Slide Position
+  , SlidePosition
+      ( PositionActive
+      , PositionPrev
+      , PositionNext
+      , PositionNearby
+      , PositionOffscreen
+      )
+  
+  -- * Navigation Mode
+  , NavigationMode
+      ( NavArrows
+      , NavDots
+      , NavThumbnails
+      , NavProgress
+      , NavKeyboard
+      , NavSwipe
+      , NavDrag
+      , NavScroll
+      , NavPinch
+      , NavVoice
+      , NavRetinal
+      , NavBrainwave
+      )
+  
+  -- * Autoplay Mode
+  , AutoplayMode
+      ( AutoplayOff
+      , AutoplayTimed
+      , AutoplayContentAware
+      , AutoplayAdaptive
+      , AutoplayOnVisible
+      , AutoplayOnFocus
+      , AutoplayOnRetinalFocus
+      )
+  
+  -- * Focus Mode (for accessibility/retinal)
+  , FocusMode
+      ( FocusKeyboard
+      , FocusMouse
+      , FocusTouch
+      , FocusProximity
+      , FocusRetinal
+      , FocusRetinalDwell
+      , FocusRetinalSaccade
+      , FocusAttention
+      )
   
   -- * Carousel Messages
-  , CarouselMsg(GoTo, GoNext, GoPrev, SetPlaying, SetHovered, SwipeDetected)
-  
-  -- * State Updates
-  , updateCarousel
+  , CarouselMsg
+      ( GoToSlide
+      , NextSlide
+      , PrevSlide
+      , StartAutoplay
+      , StopAutoplay
+      , ToggleAutoplay
+      )
   ) where
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                     // imports
+-- ═══════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
+  , class Ord
   , class Show
+  , class Bounded
   , show
-  , otherwise
-  , not
-  , (&&)
-  , (||)
-  , (==)
-  , (<=)
+  , top
+  , bottom
+  , (+)
   , (-)
+  , (>=)
+  , (<=)
+  , (==)
   , (<>)
+  , max
+  , min
   )
-
-import Data.Maybe (Maybe(Nothing, Just))
-
-import Hydrogen.Schema.Navigation.Index
-  ( IndexedPosition
-  , BoundaryBehavior(Clamp, Wrap)
-  , indexedPosition
-  , position
-  , total
-  , next
-  , prev
-  , goTo
-  )
-import Hydrogen.Schema.Navigation.Pagination
-  ( ItemsVisible
-  , ItemsToScroll
-  , ItemGap
-  , singleItem
-  , scrollOne
-  , noGap
-  , unwrapItemsVisible
-  , unwrapItemsToScroll
-  )
-import Hydrogen.Schema.Motion.Transition
-  ( TransitionConfig
-  , smoothSlide
-  )
-import Hydrogen.Schema.Dimension.Temporal
-  ( Milliseconds
-  , ms
-  )
-import Hydrogen.Schema.Geometry.Position (Edge(Bottom))
-import Hydrogen.Schema.Gestural.Gesture.Swipe (SwipeDirection(SwipeLeft, SwipeRight))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // carousel state
+--                                                                 // slide index
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Runtime state of a carousel
+-- | Bounded slide index (0 to maxSlides-1)
 -- |
--- | This is the live, mutable state that changes as users interact.
--- | Separate from config (which is static after initialization).
-type CarouselState =
-  { position :: IndexedPosition    -- ^ Current slide position
-  , playing :: Boolean             -- ^ Is auto-play active
-  , hovered :: Boolean             -- ^ Is pointer over carousel
-  }
+-- | Always valid — construction clamps to bounds.
+-- | Navigation functions handle wrapping based on carousel config.
+newtype SlideIndex = SlideIndex Int
 
--- | Create carousel state
-carouselState :: Int -> Int -> BoundaryBehavior -> Boolean -> CarouselState
-carouselState idx count bhv autoPlay =
-  { position: indexedPosition idx count bhv
-  , playing: autoPlay
-  , hovered: false
-  }
+derive instance eqSlideIndex :: Eq SlideIndex
+derive instance ordSlideIndex :: Ord SlideIndex
 
--- | Initial carousel state (first slide, not playing, not hovered)
-initialCarouselState :: Int -> BoundaryBehavior -> CarouselState
-initialCarouselState count bhv = carouselState 0 count bhv false
+instance showSlideIndex :: Show SlideIndex where
+  show (SlideIndex i) = "Slide[" <> show i <> "]"
 
--- | Get current slide index
-currentIndex :: CarouselState -> Int
-currentIndex cs = position cs.position
+-- | Create slide index, clamped to non-negative
+slideIndex :: Int -> SlideIndex
+slideIndex i = SlideIndex (max 0 i)
 
--- | Get total slide count
-slideCount :: CarouselState -> Int
-slideCount cs = total cs.position
+-- | Extract index value
+unwrapSlideIndex :: SlideIndex -> Int
+unwrapSlideIndex (SlideIndex i) = i
 
--- | Is auto-play currently active?
-isPlaying :: CarouselState -> Boolean
-isPlaying cs = cs.playing
+-- | First slide (index 0)
+firstSlide :: SlideIndex
+firstSlide = SlideIndex 0
 
--- | Is carousel currently hovered?
-isHovered :: CarouselState -> Boolean
-isHovered cs = cs.hovered
+-- | Next index (caller must handle bounds/wrapping)
+nextIndex :: SlideIndex -> SlideIndex
+nextIndex (SlideIndex i) = SlideIndex (i + 1)
+
+-- | Previous index (floors at 0)
+prevIndex :: SlideIndex -> SlideIndex
+prevIndex (SlideIndex i) = SlideIndex (max 0 (i - 1))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // carousel config
+--                                                              // transition kind
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Static configuration for a carousel
+-- | Transition animation type between slides
 -- |
--- | Set once at creation, doesn't change during interaction.
--- | All visual/behavioral parameters come from Schema atoms.
-type CarouselConfig =
-  { itemsVisible :: ItemsVisible           -- ^ Items visible at once
-  , itemsToScroll :: ItemsToScroll         -- ^ Items to advance per action
-  , gap :: ItemGap                         -- ^ Gap between items
-  , transition :: TransitionConfig         -- ^ Slide transition animation
-  , autoPlayInterval :: Maybe Milliseconds -- ^ Auto-play interval (Nothing = disabled)
-  , pauseOnHover :: Boolean                -- ^ Pause auto-play on hover
-  , behavior :: BoundaryBehavior           -- ^ Clamp or Wrap at edges
-  , showArrows :: Boolean                  -- ^ Show prev/next arrows
-  , showDots :: Boolean                    -- ^ Show dot indicators
-  , showThumbnails :: Boolean              -- ^ Show thumbnail strip
-  , thumbnailPosition :: Edge              -- ^ Where to place thumbnails
-  }
+-- | Each transition can be configured with duration and easing separately.
+-- | 3D transitions require perspective to be set on container.
+data TransitionKind
+  = TransitionNone        -- ^ Instant switch, no animation
+  | TransitionSlide       -- ^ Horizontal slide (default)
+  | TransitionSlideVertical -- ^ Vertical slide
+  | TransitionFade        -- ^ Crossfade opacity
+  | TransitionZoom        -- ^ Scale in/out
+  | TransitionFlip        -- ^ 3D flip on Y axis
+  | TransitionFlipVertical -- ^ 3D flip on X axis
+  | TransitionCube        -- ^ 3D cube rotation
+  | TransitionCoverflow   -- ^ 3D coverflow (iTunes style)
+  | TransitionCards       -- ^ Stacked cards effect
+  | TransitionWheel       -- ^ Ferris wheel rotation
+  | TransitionSpiral      -- ^ 3D spiral path
+  | TransitionParallax    -- ^ Multi-layer parallax
+  | TransitionMorph       -- ^ Shape morphing between slides
+  | TransitionDissolve    -- ^ Pixel dissolve effect
+  | TransitionBlur        -- ^ Blur transition
+  | TransitionWipe        -- ^ Directional wipe
+  | TransitionReveal      -- ^ Reveal underneath
 
--- | Create carousel config
-carouselConfig 
-  :: ItemsVisible 
-  -> ItemsToScroll 
-  -> ItemGap 
-  -> TransitionConfig 
-  -> Maybe Milliseconds
-  -> Boolean
-  -> BoundaryBehavior
-  -> Boolean
-  -> Boolean
-  -> Boolean
-  -> Edge
-  -> CarouselConfig
-carouselConfig vis scrl gp trans interval pauseHover bhv arrows dots thumbs thumbPos =
-  { itemsVisible: vis
-  , itemsToScroll: scrl
-  , gap: gp
-  , transition: trans
-  , autoPlayInterval: interval
-  , pauseOnHover: pauseHover
-  , behavior: bhv
-  , showArrows: arrows
-  , showDots: dots
-  , showThumbnails: thumbs
-  , thumbnailPosition: thumbPos
-  }
+derive instance eqTransitionKind :: Eq TransitionKind
+derive instance ordTransitionKind :: Ord TransitionKind
 
--- | Default carousel configuration
+instance showTransitionKind :: Show TransitionKind where
+  show TransitionNone = "none"
+  show TransitionSlide = "slide"
+  show TransitionSlideVertical = "slide-vertical"
+  show TransitionFade = "fade"
+  show TransitionZoom = "zoom"
+  show TransitionFlip = "flip"
+  show TransitionFlipVertical = "flip-vertical"
+  show TransitionCube = "cube"
+  show TransitionCoverflow = "coverflow"
+  show TransitionCards = "cards"
+  show TransitionWheel = "wheel"
+  show TransitionSpiral = "spiral"
+  show TransitionParallax = "parallax"
+  show TransitionMorph = "morph"
+  show TransitionDissolve = "dissolve"
+  show TransitionBlur = "blur"
+  show TransitionWipe = "wipe"
+  show TransitionReveal = "reveal"
+
+instance boundedTransitionKind :: Bounded TransitionKind where
+  top = TransitionReveal
+  bottom = TransitionNone
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                 // layout path
+-- ═══════════════════════════════════════���═══════════════════════════════════════
+
+-- | Geometric path slides follow
 -- |
--- | Single item visible, slide transition, arrows and dots, no auto-play.
-defaultConfig :: CarouselConfig
-defaultConfig =
-  { itemsVisible: singleItem
-  , itemsToScroll: scrollOne
-  , gap: noGap
-  , transition: smoothSlide
-  , autoPlayInterval: Nothing
-  , pauseOnHover: true
-  , behavior: Clamp
-  , showArrows: true
-  , showDots: true
-  , showThumbnails: false
-  , thumbnailPosition: Bottom
-  }
+-- | Defines the spatial arrangement of slides in 2D or 3D space.
+-- | Linear is the traditional carousel; others create immersive experiences.
+data LayoutPath
+  = PathLinear          -- ^ Horizontal line (traditional)
+  | PathLinearVertical  -- ^ Vertical line
+  | PathGrid            -- ^ 2D grid arrangement
+  | PathMasonry         -- ^ Pinterest-style masonry
+  | PathStack           -- ^ Stacked cards (Tinder style)
+  | PathCircular        -- ^ Circle in XY plane
+  | PathArc             -- ^ Partial arc
+  | PathHelix           -- ^ 3D helix/spiral
+  | PathSphere          -- ^ Points on sphere surface
+  | PathCylinder        -- ^ Wrapped around cylinder
+  | PathMobius          -- ^ Möbius strip (continuous loop)
+  | PathCustom          -- ^ Custom path (defined by points)
+
+derive instance eqLayoutPath :: Eq LayoutPath
+derive instance ordLayoutPath :: Ord LayoutPath
+
+instance showLayoutPath :: Show LayoutPath where
+  show PathLinear = "linear"
+  show PathLinearVertical = "linear-vertical"
+  show PathGrid = "grid"
+  show PathMasonry = "masonry"
+  show PathStack = "stack"
+  show PathCircular = "circular"
+  show PathArc = "arc"
+  show PathHelix = "helix"
+  show PathSphere = "sphere"
+  show PathCylinder = "cylinder"
+  show PathMobius = "mobius"
+  show PathCustom = "custom"
+
+instance boundedLayoutPath :: Bounded LayoutPath where
+  top = PathCustom
+  bottom = PathLinear
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // config accessors
+--                                                                // content kind
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Get items visible setting
-configItemsVisible :: CarouselConfig -> Int
-configItemsVisible cfg = unwrapItemsVisible cfg.itemsVisible
-
--- | Get items to scroll setting
-configItemsToScroll :: CarouselConfig -> Int
-configItemsToScroll cfg = unwrapItemsToScroll cfg.itemsToScroll
-
--- | Get gap setting
-configGap :: CarouselConfig -> ItemGap
-configGap cfg = cfg.gap
-
--- | Get transition config
-configTransition :: CarouselConfig -> TransitionConfig
-configTransition cfg = cfg.transition
-
--- | Get auto-play interval
-configAutoPlayInterval :: CarouselConfig -> Maybe Milliseconds
-configAutoPlayInterval cfg = cfg.autoPlayInterval
-
--- | Get pause on hover setting
-configPauseOnHover :: CarouselConfig -> Boolean
-configPauseOnHover cfg = cfg.pauseOnHover
-
--- | Get boundary behavior
-configBehavior :: CarouselConfig -> BoundaryBehavior
-configBehavior cfg = cfg.behavior
-
--- | Show arrows?
-configShowArrows :: CarouselConfig -> Boolean
-configShowArrows cfg = cfg.showArrows
-
--- | Show dots?
-configShowDots :: CarouselConfig -> Boolean
-configShowDots cfg = cfg.showDots
-
--- | Show thumbnails?
-configShowThumbnails :: CarouselConfig -> Boolean
-configShowThumbnails cfg = cfg.showThumbnails
-
--- | Get thumbnail position
-configThumbnailPosition :: CarouselConfig -> Edge
-configThumbnailPosition cfg = cfg.thumbnailPosition
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // carousel messages
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Messages the carousel can receive
+-- | Type of content a slide contains
 -- |
--- | Pure data describing user intent. The update function interprets these.
+-- | Content-aware rendering enables:
+-- | - Appropriate loading states per type
+-- | - Media controls for video/audio
+-- | - Lazy loading strategies
+-- | - Accessibility announcements
+data ContentKind
+  = ContentImage        -- ^ Static image (jpg, png, webp, svg)
+  | ContentVideo        -- ^ Video content (mp4, webm)
+  | ContentAudio        -- ^ Audio with visualization
+  | ContentEmbed        -- ^ External embed (YouTube, Vimeo, etc.)
+  | ContentText         -- ^ Rich text block
+  | ContentCard         -- ^ Structured card component
+  | ContentHTML         -- ^ Arbitrary HTML/Element
+  | ContentCanvas       -- ^ Canvas 2D rendering
+  | ContentWebGL        -- ^ WebGL 3D scene
+  | ContentGame         -- ^ Interactive game/simulation
+  | ContentLiveData     -- ^ Live updating data feed
+  | ContentInteractive  -- ^ Full interactive component
+
+derive instance eqContentKind :: Eq ContentKind
+derive instance ordContentKind :: Ord ContentKind
+
+instance showContentKind :: Show ContentKind where
+  show ContentImage = "image"
+  show ContentVideo = "video"
+  show ContentAudio = "audio"
+  show ContentEmbed = "embed"
+  show ContentText = "text"
+  show ContentCard = "card"
+  show ContentHTML = "html"
+  show ContentCanvas = "canvas"
+  show ContentWebGL = "webgl"
+  show ContentGame = "game"
+  show ContentLiveData = "live-data"
+  show ContentInteractive = "interactive"
+
+instance boundedContentKind :: Bounded ContentKind where
+  top = ContentInteractive
+  bottom = ContentImage
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // slide position
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Relative position of a slide to the active slide
+-- |
+-- | Used for applying position-aware effects (blur inactive, scale active, etc.)
+data SlidePosition
+  = PositionActive      -- ^ Currently focused/active slide
+  | PositionPrev        -- ^ Immediately before active
+  | PositionNext        -- ^ Immediately after active
+  | PositionNearby Int  -- ^ N positions from active (signed)
+  | PositionOffscreen   -- ^ Not visible, can be virtualized
+
+derive instance eqSlidePosition :: Eq SlidePosition
+
+instance showSlidePosition :: Show SlidePosition where
+  show PositionActive = "active"
+  show PositionPrev = "prev"
+  show PositionNext = "next"
+  show (PositionNearby n) = "nearby[" <> show n <> "]"
+  show PositionOffscreen = "offscreen"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // navigation mode
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | How users can navigate the carousel
+-- |
+-- | Multiple modes can be enabled simultaneously.
+data NavigationMode
+  = NavArrows           -- ^ Prev/Next arrow buttons
+  | NavDots             -- ^ Dot indicators (click to jump)
+  | NavThumbnails       -- ^ Thumbnail strip
+  | NavProgress         -- ^ Progress bar (click to seek)
+  | NavKeyboard         -- ^ Arrow keys, Home/End
+  | NavSwipe            -- ^ Touch swipe gestures
+  | NavDrag             -- ^ Mouse drag
+  | NavScroll           -- ^ Scroll wheel
+  | NavPinch            -- ^ Pinch to zoom/navigate
+  | NavVoice            -- ^ Voice commands
+  | NavRetinal          -- ^ Eye/gaze tracking
+  | NavBrainwave        -- ^ BCI input (future)
+
+derive instance eqNavigationMode :: Eq NavigationMode
+derive instance ordNavigationMode :: Ord NavigationMode
+
+instance showNavigationMode :: Show NavigationMode where
+  show NavArrows = "arrows"
+  show NavDots = "dots"
+  show NavThumbnails = "thumbnails"
+  show NavProgress = "progress"
+  show NavKeyboard = "keyboard"
+  show NavSwipe = "swipe"
+  show NavDrag = "drag"
+  show NavScroll = "scroll"
+  show NavPinch = "pinch"
+  show NavVoice = "voice"
+  show NavRetinal = "retinal"
+  show NavBrainwave = "brainwave"
+
+instance boundedNavigationMode :: Bounded NavigationMode where
+  top = NavBrainwave
+  bottom = NavArrows
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                               // autoplay mode
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Autoplay behavior configuration
+-- |
+-- | Defines how automatic slide advancement works.
+data AutoplayMode
+  = AutoplayOff              -- ^ No autoplay
+  | AutoplayTimed            -- ^ Fixed interval per slide
+  | AutoplayContentAware     -- ^ Duration based on content (video length, reading time)
+  | AutoplayAdaptive         -- ^ Learns from user engagement
+  | AutoplayOnVisible        -- ^ Only when carousel is in viewport
+  | AutoplayOnFocus          -- ^ Only when carousel has focus
+  | AutoplayOnRetinalFocus   -- ^ Only when user is looking at carousel
+
+derive instance eqAutoplayMode :: Eq AutoplayMode
+derive instance ordAutoplayMode :: Ord AutoplayMode
+
+instance showAutoplayMode :: Show AutoplayMode where
+  show AutoplayOff = "off"
+  show AutoplayTimed = "timed"
+  show AutoplayContentAware = "content-aware"
+  show AutoplayAdaptive = "adaptive"
+  show AutoplayOnVisible = "on-visible"
+  show AutoplayOnFocus = "on-focus"
+  show AutoplayOnRetinalFocus = "on-retinal-focus"
+
+instance boundedAutoplayMode :: Bounded AutoplayMode where
+  top = AutoplayOnRetinalFocus
+  bottom = AutoplayOff
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // focus mode
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Focus detection mode for accessibility and advanced input
+-- |
+-- | Determines how the carousel detects user attention.
+data FocusMode
+  = FocusKeyboard          -- ^ Standard keyboard focus (tab navigation)
+  | FocusMouse             -- ^ Mouse hover
+  | FocusTouch             -- ^ Touch/tap
+  | FocusProximity         -- ^ Device proximity sensors
+  | FocusRetinal           -- ^ Eye tracking (WebGazer, Tobii, etc.)
+  | FocusRetinalDwell      -- ^ Eye tracking with dwell time
+  | FocusRetinalSaccade    -- ^ Eye tracking detecting saccades
+  | FocusAttention         -- ^ Combined signals (ML model)
+
+derive instance eqFocusMode :: Eq FocusMode
+derive instance ordFocusMode :: Ord FocusMode
+
+instance showFocusMode :: Show FocusMode where
+  show FocusKeyboard = "keyboard"
+  show FocusMouse = "mouse"
+  show FocusTouch = "touch"
+  show FocusProximity = "proximity"
+  show FocusRetinal = "retinal"
+  show FocusRetinalDwell = "retinal-dwell"
+  show FocusRetinalSaccade = "retinal-saccade"
+  show FocusAttention = "attention"
+
+instance boundedFocusMode :: Bounded FocusMode where
+  top = FocusAttention
+  bottom = FocusKeyboard
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // carousel messages
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Messages the carousel can produce
+-- |
+-- | These are the only ways to interact with carousel state.
+-- | The update function in the application handles these messages.
 data CarouselMsg
-  = GoTo Int                   -- ^ Go to specific slide index
-  | GoNext                     -- ^ Go to next slide
-  | GoPrev                     -- ^ Go to previous slide
-  | SetPlaying Boolean         -- ^ Set auto-play state
-  | SetHovered Boolean         -- ^ Set hover state
-  | SwipeDetected SwipeDirection -- ^ Swipe gesture detected
+  = GoToSlide SlideIndex     -- ^ Navigate to specific slide
+  | NextSlide                -- ^ Go to next slide
+  | PrevSlide                -- ^ Go to previous slide
+  | StartAutoplay            -- ^ Start autoplay
+  | StopAutoplay             -- ^ Stop autoplay
+  | ToggleAutoplay           -- ^ Toggle autoplay state
 
 derive instance eqCarouselMsg :: Eq CarouselMsg
 
 instance showCarouselMsg :: Show CarouselMsg where
-  show (GoTo idx) = "GoTo " <> show idx
-  show GoNext = "GoNext"
-  show GoPrev = "GoPrev"
-  show (SetPlaying p) = "SetPlaying " <> show p
-  show (SetHovered h) = "SetHovered " <> show h
-  show (SwipeDetected dir) = "SwipeDetected " <> show dir
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // state updates
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Update carousel state in response to a message
--- |
--- | Pure function: State × Msg → State
--- | No effects, no side effects, deterministic.
-updateCarousel :: CarouselConfig -> CarouselMsg -> CarouselState -> CarouselState
-updateCarousel cfg msg state = case msg of
-  GoTo idx -> 
-    state { position = goTo idx state.position }
-  
-  GoNext -> 
-    advanceByScroll cfg state
-  
-  GoPrev -> 
-    retreatByScroll cfg state
-  
-  SetPlaying p -> 
-    state { playing = p }
-  
-  SetHovered h -> 
-    let 
-      newPlaying = 
-        if h && cfg.pauseOnHover 
-          then false 
-          else state.playing
-    in 
-      state { hovered = h, playing = newPlaying }
-  
-  SwipeDetected dir -> 
-    case dir of
-      SwipeLeft -> advanceByScroll cfg state
-      SwipeRight -> retreatByScroll cfg state
-      _ -> state  -- Ignore vertical swipes
-
--- | Advance by configured scroll amount
-advanceByScroll :: CarouselConfig -> CarouselState -> CarouselState
-advanceByScroll cfg state =
-  let scrollAmt = unwrapItemsToScroll cfg.itemsToScroll
-  in state { position = advanceBy scrollAmt state.position }
-
--- | Retreat by configured scroll amount
-retreatByScroll :: CarouselConfig -> CarouselState -> CarouselState
-retreatByScroll cfg state =
-  let scrollAmt = unwrapItemsToScroll cfg.itemsToScroll
-  in state { position = retreatBy scrollAmt state.position }
-
--- | Advance position by n slides
-advanceBy :: Int -> IndexedPosition -> IndexedPosition
-advanceBy n pos = applyN n next pos
-
--- | Retreat position by n slides
-retreatBy :: Int -> IndexedPosition -> IndexedPosition
-retreatBy n pos = applyN n prev pos
-
--- | Apply function n times
-applyN :: forall a. Int -> (a -> a) -> a -> a
-applyN n f x
-  | n <= 0 = x
-  | otherwise = applyN (n - 1) f (f x)
+  show (GoToSlide idx) = "GoToSlide(" <> show idx <> ")"
+  show NextSlide = "NextSlide"
+  show PrevSlide = "PrevSlide"
+  show StartAutoplay = "StartAutoplay"
+  show StopAutoplay = "StopAutoplay"
+  show ToggleAutoplay = "ToggleAutoplay"
