@@ -189,16 +189,25 @@ boxMesh3D :: BoxMeshParams -> Mesh3D
 boxMesh3D = BoxMesh3D
 
 -- | Sphere mesh parameters.
+-- |
+-- | Phi: horizontal angle (longitude), 0 to 2π for full sphere
+-- | Theta: vertical angle (latitude), 0 to π for full sphere
 type SphereMeshParams =
   { radius :: Meter
   , widthSegments :: Int      -- Longitude divisions (min 3)
   , heightSegments :: Int     -- Latitude divisions (min 2)
+  , phiStart :: Degrees       -- Horizontal start angle (default 0)
+  , phiLength :: Degrees      -- Horizontal sweep (default 360)
+  , thetaStart :: Degrees     -- Vertical start angle (default 0)
+  , thetaLength :: Degrees    -- Vertical sweep (default 180)
   }
 
 sphereMesh3D :: SphereMeshParams -> Mesh3D
 sphereMesh3D = SphereMesh3D
 
 -- | Cylinder mesh parameters.
+-- |
+-- | Theta controls the arc of the cylinder (360 for full cylinder).
 type CylinderMeshParams =
   { radiusTop :: Meter
   , radiusBottom :: Meter
@@ -206,18 +215,25 @@ type CylinderMeshParams =
   , radialSegments :: Int
   , heightSegments :: Int
   , openEnded :: Boolean
+  , thetaStart :: Degrees     -- Start angle (default 0)
+  , thetaLength :: Degrees    -- Arc sweep (default 360)
   }
 
 cylinderMesh3D :: CylinderMeshParams -> Mesh3D
 cylinderMesh3D = CylinderMesh3D
 
 -- | Cone mesh parameters.
+-- |
+-- | A cone is a cylinder with zero top radius.
+-- | Theta controls the arc of the base (360 for full cone).
 type ConeMeshParams =
   { radius :: Meter
   , height :: Meter
   , radialSegments :: Int
   , heightSegments :: Int
   , openEnded :: Boolean
+  , thetaStart :: Degrees     -- Start angle (default 0)
+  , thetaLength :: Degrees    -- Arc sweep (default 360)
   }
 
 coneMesh3D :: ConeMeshParams -> Mesh3D

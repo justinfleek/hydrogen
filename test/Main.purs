@@ -31,6 +31,7 @@ import Test.Element as Element
 import Test.QRCode as QRCode
 import Test.Widget as Widget
 import Test.Scene3D as Scene3D
+import Test.WebGPU.Geometry as WebGPUGeometry
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -57,6 +58,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     Widget.widgetPropertyTests
   describe "Scene3D Tests" do
     Scene3D.scene3DTests
+  describe "WebGPU Tests" do
+    WebGPUGeometry.geometryTests
 
 -- =============================================================================
 --                                                              // format tests

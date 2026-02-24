@@ -199,20 +199,24 @@ boxMeshId p =
 
 -- | Sphere mesh identity.
 -- |
--- | Format: "sphere:r:ws:hs"
+-- | Format: "sphere:r:ws:hs:phiS:phiL:thetaS:thetaL"
 sphereMeshId :: SphereMeshParams -> UUID5
 sphereMeshId p =
   let
     canonical = "sphere:"
       <> show (unwrapMeter p.radius) <> ":"
       <> show p.widthSegments <> ":"
-      <> show p.heightSegments
+      <> show p.heightSegments <> ":"
+      <> show (unwrapDegrees p.phiStart) <> ":"
+      <> show (unwrapDegrees p.phiLength) <> ":"
+      <> show (unwrapDegrees p.thetaStart) <> ":"
+      <> show (unwrapDegrees p.thetaLength)
   in
     UUID5.uuid5 UUID5.nsMesh canonical
 
 -- | Cylinder mesh identity.
 -- |
--- | Format: "cylinder:rt:rb:h:rs:hs:open"
+-- | Format: "cylinder:rt:rb:h:rs:hs:open:thetaS:thetaL"
 cylinderMeshId :: CylinderMeshParams -> UUID5
 cylinderMeshId p =
   let
@@ -222,13 +226,15 @@ cylinderMeshId p =
       <> show (unwrapMeter p.height) <> ":"
       <> show p.radialSegments <> ":"
       <> show p.heightSegments <> ":"
-      <> show p.openEnded
+      <> show p.openEnded <> ":"
+      <> show (unwrapDegrees p.thetaStart) <> ":"
+      <> show (unwrapDegrees p.thetaLength)
   in
     UUID5.uuid5 UUID5.nsMesh canonical
 
 -- | Cone mesh identity.
 -- |
--- | Format: "cone:r:h:rs:hs:open"
+-- | Format: "cone:r:h:rs:hs:open:thetaS:thetaL"
 coneMeshId :: ConeMeshParams -> UUID5
 coneMeshId p =
   let
@@ -237,7 +243,9 @@ coneMeshId p =
       <> show (unwrapMeter p.height) <> ":"
       <> show p.radialSegments <> ":"
       <> show p.heightSegments <> ":"
-      <> show p.openEnded
+      <> show p.openEnded <> ":"
+      <> show (unwrapDegrees p.thetaStart) <> ":"
+      <> show (unwrapDegrees p.thetaLength)
   in
     UUID5.uuid5 UUID5.nsMesh canonical
 

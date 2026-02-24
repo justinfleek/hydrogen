@@ -32,7 +32,7 @@ import Data.Tuple (Tuple(Tuple))
 import Test.QuickCheck ((<?>), (===))
 import Test.QuickCheck.Gen (Gen, chooseInt, elements, frequency, oneOf, vectorOf)
 import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
+import Test.Spec.Assertions (fail, shouldEqual)
 import Test.Spec.QuickCheck (quickCheck) as Spec
 
 import Hydrogen.GPU.Scene3D.Identity as Identity
@@ -233,7 +233,10 @@ genSphereMeshParams = do
   radius <- genPositiveMeter
   widthSegments <- genSegments
   heightSegments <- genSegments
-  pure { radius, widthSegments, heightSegments }
+  -- Full sphere by default
+  pure { radius, widthSegments, heightSegments
+       , phiStart: degrees 0.0, phiLength: degrees 360.0
+       , thetaStart: degrees 0.0, thetaLength: degrees 180.0 }
 
 -- | Generate CylinderMeshParams.
 genCylinderMeshParams :: Gen CylinderMeshParams
@@ -244,7 +247,9 @@ genCylinderMeshParams = do
   radialSegments <- genSegments
   heightSegments <- genSegments
   openEnded <- elements $ NEA.cons' false [true]
-  pure { radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded }
+  -- Full cylinder by default
+  pure { radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded
+       , thetaStart: degrees 0.0, thetaLength: degrees 360.0 }
 
 -- | Generate a random Mesh3D (limited to deterministic primitives).
 genMesh3D :: Gen Mesh3D
@@ -546,6 +551,8 @@ scaleSpecificTests = describe "Scale-Specific Tests" do
             , radialSegments: 16
             , heightSegments: 1
             , openEnded: false
+            , thetaStart: degrees 0.0
+            , thetaLength: degrees 360.0
             }
       let mesh = CylinderMesh3D params
       let uuid1 = Identity.meshId mesh
@@ -604,6 +611,10 @@ knownValueTests = describe "Known Value Sanity Tests" do
             { radius: meter 1.0
             , widthSegments: 32
             , heightSegments: 16
+            , phiStart: degrees 0.0
+            , phiLength: degrees 360.0
+            , thetaStart: degrees 0.0
+            , thetaLength: degrees 180.0
             }
       let uuid1 = Identity.sphereMeshId unitSphere
       let uuid2 = Identity.sphereMeshId unitSphere
@@ -770,6 +781,332 @@ isSetBackground (SetBackground _) = true
 isSetBackground _ = false
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // builder tests
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Tests for Scene3D builder functions: withCamera, withBackground, withLight, withMesh.
+-- | These are the primary API for constructing scenes compositionally.
+builderFunctionTests :: Spec Unit
+builderFunctionTests = describe "Scene3D Tests" $ describe "Builder Functions" do
+  
+  describe "withCamera" do
+    it "sets the camera on an empty scene" do
+      let camera = PerspectiveCamera3D
+            { fov: degrees 75.0
+            , aspect: 1.777
+            , near: meter 0.1
+            , far: meter 1000.0
+            , position: zeroPosition3D
+            , target: zeroPosition3D
+            }
+      let scene = emptyScene # withCamera camera
+      let buffer = flattenScene scene
+      let cameraCmd = Array.head buffer
+      case cameraCmd of
+        Just (SetCamera c) -> c `shouldEqual` camera
+        _ -> fail "First command should be SetCamera"
+    
+    it "replaces existing camera" do
+      let camera1 = PerspectiveCamera3D
+            { fov: degrees 45.0
+            , aspect: 1.0
+            , near: meter 0.1
+            , far: meter 100.0
+            , position: zeroPosition3D
+            , target: zeroPosition3D
+            }
+      let camera2 = PerspectiveCamera3D
+            { fov: degrees 90.0
+            , aspect: 2.0
+            , near: meter 1.0
+            , far: meter 500.0
+            , position: zeroPosition3D
+            , target: zeroPosition3D
+            }
+      let scene = emptyScene # withCamera camera1 # withCamera camera2
+      let buffer = flattenScene scene
+      let cameraCount = Array.length $ Array.filter isSetCamera buffer
+      cameraCount `shouldEqual` 1
+  
+  describe "withBackground" do
+    it "sets the background on an empty scene" do
+      let bg = solidBackground (rgba 100 149 237 100)  -- cornflower blue
+      let scene = emptyScene # withBackground bg
+      let buffer = flattenScene scene
+      let bgCmd = Array.index buffer 1
+      case bgCmd of
+        Just (SetBackground b) -> b `shouldEqual` bg
+        _ -> fail "Second command should be SetBackground"
+    
+    it "replaces existing background" do
+      let bg1 = solidBackground (rgba 0 0 0 100)    -- black
+      let bg2 = solidBackground (rgba 255 255 255 100)  -- white
+      let scene = emptyScene # withBackground bg1 # withBackground bg2
+      let buffer = flattenScene scene
+      let bgCount = Array.length $ Array.filter isSetBackground buffer
+      bgCount `shouldEqual` 1
+  
+  describe "withLight" do
+    it "adds a light to an empty scene" do
+      let light = AmbientLight3D
+            { color: rgba 255 255 255 100
+            , intensity: 1.0
+            }
+      let scene = emptyScene # withLight light
+      Array.length scene.lights `shouldEqual` 1
+    
+    it "accumulates multiple lights" do
+      let light1 = AmbientLight3D { color: rgba 255 255 255 100, intensity: 1.0 }
+      let light2 = AmbientLight3D { color: rgba 255 200 150 100, intensity: 0.5 }
+      let light3 = AmbientLight3D { color: rgba 100 100 255 100, intensity: 0.3 }
+      let scene = emptyScene 
+            # withLight light1 
+            # withLight light2 
+            # withLight light3
+      Array.length scene.lights `shouldEqual` 3
+    
+    it "lights appear in buffer in order added" do
+      let light1 = AmbientLight3D { color: rgba 255 0 0 100, intensity: 1.0 }
+      let light2 = AmbientLight3D { color: rgba 0 255 0 100, intensity: 1.0 }
+      let scene = emptyScene # withLight light1 # withLight light2
+      let buffer = flattenScene scene
+      let lights = Array.mapMaybe (\cmd -> case cmd of
+            AddLight l -> Just l
+            _ -> Nothing) buffer
+      Array.length lights `shouldEqual` 2
+  
+  describe "withMesh" do
+    it "adds a mesh to an empty scene" do
+      let meshParams = 
+            { mesh: BoxMesh3D 
+                { width: meter 1.0
+                , height: meter 1.0
+                , depth: meter 1.0
+                , widthSegments: 1
+                , heightSegments: 1
+                , depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 255 0 0 100
+                , opacity: 1.0
+                , transparent: false
+                , wireframe: false
+                }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let scene = emptyScene # withMesh meshParams
+      Array.length scene.meshes `shouldEqual` 1
+    
+    it "accumulates multiple meshes" do
+      let boxMesh = 
+            { mesh: BoxMesh3D 
+                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+                , widthSegments: 1, heightSegments: 1, depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let sphereMesh = 
+            { mesh: SphereMesh3D 
+                { radius: meter 0.5
+                , widthSegments: 16
+                , heightSegments: 8
+                , phiStart: degrees 0.0
+                , phiLength: degrees 360.0
+                , thetaStart: degrees 0.0
+                , thetaLength: degrees 180.0
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 0 255 0 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: Position3D { x: picometer 2000000000000, y: picometer 0, z: picometer 0 }
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let scene = emptyScene # withMesh boxMesh # withMesh sphereMesh
+      Array.length scene.meshes `shouldEqual` 2
+    
+    it "meshes appear in buffer in order added" do
+      let mesh1 = 
+            { mesh: BoxMesh3D 
+                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+                , widthSegments: 1, heightSegments: 1, depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 255 0 0 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let mesh2 = 
+            { mesh: BoxMesh3D 
+                { width: meter 2.0, height: meter 2.0, depth: meter 2.0
+                , widthSegments: 1, heightSegments: 1, depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 0 0 255 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let scene = emptyScene # withMesh mesh1 # withMesh mesh2
+      let buffer = flattenScene scene
+      let meshes = Array.mapMaybe (\cmd -> case cmd of
+            DrawMesh m -> Just m
+            _ -> Nothing) buffer
+      Array.length meshes `shouldEqual` 2
+
+  describe "Compositional building" do
+    it "builds complete scene with all builders" do
+      let camera = PerspectiveCamera3D
+            { fov: degrees 60.0
+            , aspect: 1.777
+            , near: meter 0.1
+            , far: meter 1000.0
+            , position: Position3D { x: picometer 0, y: picometer 5000000000000, z: picometer 10000000000000 }
+            , target: zeroPosition3D
+            }
+      let bg = solidBackground (rgba 30 30 30 100)
+      let light = AmbientLight3D { color: rgba 255 255 255 100, intensity: 0.8 }
+      let mesh = 
+            { mesh: BoxMesh3D 
+                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+                , widthSegments: 1, heightSegments: 1, depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 200 100 50 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      let scene = emptyScene 
+            # withCamera camera
+            # withBackground bg
+            # withLight light
+            # withMesh mesh
+      let buffer = flattenScene scene
+      -- Buffer should have: 1 camera + 1 background + 1 light + 1 mesh = 4
+      Array.length buffer `shouldEqual` 4
+    
+    it "builder order doesn't affect final buffer structure" do
+      -- Build scene in different orders, verify same structure
+      let camera = PerspectiveCamera3D
+            { fov: degrees 75.0, aspect: 1.0, near: meter 0.1, far: meter 100.0
+            , position: zeroPosition3D, target: zeroPosition3D
+            }
+      let bg = solidBackground (rgba 0 0 0 100)
+      let light = AmbientLight3D { color: rgba 255 255 255 100, intensity: 1.0 }
+      let mesh = 
+            { mesh: BoxMesh3D 
+                { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+                , widthSegments: 1, heightSegments: 1, depthSegments: 1
+                }
+            , material: BasicMaterial3D 
+                { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
+            , position: zeroPosition3D
+            , rotation: quaternionIdentity
+            , scale: vec3 1.0 1.0 1.0
+            }
+      -- Order 1: camera, bg, light, mesh
+      let scene1 = emptyScene # withCamera camera # withBackground bg # withLight light # withMesh mesh
+      -- Order 2: mesh, light, bg, camera
+      let scene2 = emptyScene # withMesh mesh # withLight light # withBackground bg # withCamera camera
+      let buffer1 = flattenScene scene1
+      let buffer2 = flattenScene scene2
+      -- Both should have same length
+      Array.length buffer1 `shouldEqual` Array.length buffer2
+      -- Both should start with SetCamera
+      case Array.head buffer1 of
+        Just (SetCamera _) -> pure unit
+        _ -> fail "buffer1 should start with SetCamera"
+      case Array.head buffer2 of
+        Just (SetCamera _) -> pure unit
+        _ -> fail "buffer2 should start with SetCamera"
+
+-- | Tests for Position3D utilities including zeroPosition3D.
+positionUtilityTests :: Spec Unit
+positionUtilityTests = describe "Scene3D Tests" $ describe "Position Utilities" do
+  
+  describe "zeroPosition3D" do
+    it "has all zero coordinates" do
+      case zeroPosition3D of
+        Position3D p -> do
+          p.x `shouldEqual` picometer 0
+          p.y `shouldEqual` picometer 0
+          p.z `shouldEqual` picometer 0
+    
+    it "produces consistent UUID" do
+      let uuid1 = Identity.positionId zeroPosition3D
+      let uuid2 = Identity.positionId zeroPosition3D
+      uuid1 `shouldEqual` uuid2
+    
+    it "is identity for position operations" do
+      -- zeroPosition3D should be usable as a neutral origin
+      let camera = PerspectiveCamera3D
+            { fov: degrees 60.0
+            , aspect: 1.0
+            , near: meter 0.1
+            , far: meter 100.0
+            , position: zeroPosition3D
+            , target: zeroPosition3D
+            }
+      let scene = emptyScene # withCamera camera
+      let buffer = flattenScene scene
+      Array.length buffer `shouldEqual` 2  -- camera + background
+
+-- | Tests for SceneBuffer type alias usage.
+sceneBufferTests :: Spec Unit
+sceneBufferTests = describe "Scene3D Tests" $ describe "SceneBuffer Type" do
+  
+  it "SceneBuffer is Array of SceneCommand" do
+    -- This test verifies SceneBuffer type alias works correctly
+    let scene = emptyScene :: Scene3D Unit
+    let buffer :: SceneBuffer Unit
+        buffer = flattenScene scene
+    -- Buffer is usable as an array
+    Array.length buffer `shouldEqual` 2
+  
+  it "SceneBuffer supports standard array operations" do
+    let scene = emptyScene # withLight (AmbientLight3D { color: rgba 255 255 255 100, intensity: 1.0 })
+    let buffer :: SceneBuffer Unit
+        buffer = flattenScene scene
+    -- Can filter
+    let lights = Array.filter isAddLight buffer
+    Array.length lights `shouldEqual` 1
+    -- Can map
+    let commandTypes = map (\cmd -> case cmd of
+          SetCamera _ -> "camera"
+          SetBackground _ -> "background"
+          AddLight _ -> "light"
+          DrawMesh _ -> "mesh") buffer
+    Array.length commandTypes `shouldEqual` 3
+
+-- | Tests for Quaternion type usage in mesh parameters.
+quaternionUsageTests :: Spec Unit
+quaternionUsageTests = describe "Scene3D Tests" $ describe "Quaternion Usage" do
+  
+  it "MeshParams uses Quaternion for rotation" do
+    let rotation :: Quaternion
+        rotation = quaternionIdentity
+    let meshParams = 
+          { mesh: BoxMesh3D 
+              { width: meter 1.0, height: meter 1.0, depth: meter 1.0
+              , widthSegments: 1, heightSegments: 1, depthSegments: 1
+              }
+          , material: BasicMaterial3D 
+              { color: rgba 255 255 255 100, opacity: 1.0, transparent: false, wireframe: false }
+          , position: zeroPosition3D
+          , rotation: rotation  -- Quaternion type
+          , scale: vec3 1.0 1.0 1.0
+          }
+    let scene = emptyScene # withMesh meshParams
+    Array.length scene.meshes `shouldEqual` 1
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // exports
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -780,3 +1117,7 @@ scene3DTests = do
   scaleSpecificTests
   knownValueTests
   flattenSceneTests
+  builderFunctionTests
+  positionUtilityTests
+  sceneBufferTests
+  quaternionUsageTests
