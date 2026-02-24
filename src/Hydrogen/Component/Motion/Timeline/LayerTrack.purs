@@ -81,7 +81,7 @@ import Hydrogen.Schema.Motion.TimeRange as TR
 import Hydrogen.UI.Core (cls)
 import Type.Proxy (Proxy(Proxy))
 import Web.UIEvent.MouseEvent (MouseEvent)
-import Web.UIEvent.MouseEvent (shiftKey) as MouseEvent
+import Web.UIEvent.MouseEvent (button, shiftKey) as MouseEvent
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -443,7 +443,7 @@ handleAction = case _ of
           HoverNone -> NoDrag
       
       -- Check for right-click
-      if mouseButton event == 2
+      if MouseEvent.button event == 2
         then H.raise (ContextMenuRequested state.layerId)
         else when (dragMode' /= NoDrag) do
           H.modify_ _ { dragMode = dragMode' }
@@ -467,8 +467,7 @@ handleAction = case _ of
     H.modify_ _ { isExpanded = newExpanded }
     H.raise (ExpandToggled state.layerId newExpanded)
 
--- | Get mouse button (0=left, 1=middle, 2=right)
-foreign import mouseButton :: MouseEvent -> Int
+
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // handle query

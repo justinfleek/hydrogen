@@ -97,14 +97,15 @@ import Prelude
 
 import Data.Array (foldl)
 import Data.Array as Array
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Data.Either (Either(Left, Right))
+import Data.Int (fromString) as Int
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe, isJust)
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA as ARIA
-import Hydrogen.Component.Calendar (CalendarDate, WeekStart(..), isDateInRange)
+import Hydrogen.Component.Calendar (CalendarDate, WeekStart(Sunday), isDateInRange)
 import Hydrogen.Component.Calendar as Calendar
 import Hydrogen.UI.Core (cls)
 
@@ -660,8 +661,12 @@ monthNameLong m = case m of
   12 -> "December"
   _ -> "Unknown"
 
--- | Parse an integer from string (simplified)
+-- | Parse an integer from string
+-- | Pure implementation using Data.Int.fromString
+-- | Handles trimming whitespace before parsing
 parseInt :: String -> Maybe Int
-parseInt = parseIntImpl Just Nothing
-
-foreign import parseIntImpl :: (Int -> Maybe Int) -> Maybe Int -> String -> Maybe Int
+parseInt str = 
+  let trimmed = String.trim str
+  in if String.null trimmed
+     then Nothing
+     else Int.fromString trimmed

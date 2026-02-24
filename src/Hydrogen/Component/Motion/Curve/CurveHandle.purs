@@ -67,16 +67,6 @@ import Type.Proxy (Proxy(Proxy))
 import Web.UIEvent.MouseEvent (MouseEvent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Extract clientX from a mouse event
-foreign import getClientX :: MouseEvent -> Number
-
--- | Extract clientY from a mouse event
-foreign import getClientY :: MouseEvent -> Number
-
--- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 

@@ -101,7 +101,8 @@ import Prelude
 
 import Data.Array (foldl, range)
 import Data.Int (rem)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Int (fromString) as Int
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -553,7 +554,7 @@ renderTimeSegment :: forall w i. TimePickerProps i ->
   , readOnly :: Boolean
   , showButtons :: Boolean
   } -> HH.HTML w i
-renderTimeSegment props segment =
+renderTimeSegment _props segment =
   HH.div
     [ cls [ segmentContainerClasses ] ]
     [ -- Increment button
@@ -677,8 +678,12 @@ replicate n x = if n <= 0 then [] else map (const x) (range 1 n)
 
 -- Note: Using Prelude.clamp for bounds checking
 
--- | Parse integer
+-- | Parse integer from string
+-- | Pure implementation using Data.Int.fromString
+-- | Handles trimming whitespace before parsing
 parseInt :: String -> Maybe Int
-parseInt = parseIntImpl Just Nothing
-
-foreign import parseIntImpl :: (Int -> Maybe Int) -> Maybe Int -> String -> Maybe Int
+parseInt str = 
+  let trimmed = String.trim str
+  in if String.null trimmed
+     then Nothing
+     else Int.fromString trimmed
