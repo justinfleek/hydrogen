@@ -3,25 +3,28 @@
   
   Numerical integration methods for particle physics simulation.
   
-  ZERO-LATENCY INVARIANTS:
-    1. All integration steps preserve finite values
-    2. Verlet integration is time-reversible (proven)
-    3. Energy bounds are provable for conservative systems
-    4. Semi-implicit Euler is symplectic (preserves phase space volume)
+  PROVEN INVARIANTS:
+    1. verlet_time_reversible: Verlet integration reverses trajectory when
+       time-reversed (forward then backward returns to previous state)
+    2. euler_semiImplicit_same_velocity: Both Euler methods produce identical
+       velocity updates (differ only in position by a*dt²)
+    3. verlet_position_formula: Equivalent to classic Störmer-Verlet:
+       x(t+dt) = 2x(t) - x(t-dt) + a*dt²
+    4. verlet_damping_one: Damping factor 1 = undamped Verlet
+    5. Zero timestep is identity for Euler methods
+  
+  NOT YET PROVEN (future work):
+    - Energy conservation bounds for conservative systems
+    - Symplecticity of semi-implicit Euler (det Jacobian = 1)
+    - Stability bounds for different dt values
   
   METHODS IMPLEMENTED:
-    - Euler (explicit): Simple but unstable for stiff systems
-    - Semi-implicit Euler: Stable for oscillatory systems (LATTICE rigid bodies)
-    - Verlet: Time-reversible, energy-conserving (LATTICE soft bodies)
-    - Velocity Verlet: Explicit velocity tracking variant
+    - Euler (explicit): x += v*dt, v += a*dt
+    - Semi-implicit Euler: v += a*dt, x += v*dt (velocity first)
+    - Verlet: x' = 2x - x_prev + a*dt² (position-based)
+    - Velocity Verlet: x += v*dt + 0.5*a*dt², v += a*dt
   
-  PARTICLE PHYSICS APPLICATIONS:
-    - Rigid body dynamics
-    - Soft body simulation
-    - Cloth and rope physics
-    - Constraint satisfaction
-  
-  Status: FOUNDATIONAL - Required for deterministic physics simulation.
+  Status: FOUNDATIONAL - All theorems fully proven, no sorry, no custom axioms.
 -/
 
 import Hydrogen.Math.Vec2

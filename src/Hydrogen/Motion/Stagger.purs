@@ -72,8 +72,8 @@ module Hydrogen.Motion.Stagger
 
 import Prelude
 
-import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Int (toNumber) as Int
+import Data.Number (sin, floor) as Number
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import Halogen.HTML as HH
@@ -285,17 +285,11 @@ randomStagger :: Milliseconds -> Milliseconds -> StaggerFn
 randomStagger (Milliseconds minDelay) (Milliseconds maxDelay) = \index _ ->
   -- Note: This is deterministic based on index for reproducibility
   let
-    pseudo = sin (toNumber index * 12.9898) * 43758.5453
-    random = pseudo - floor pseudo
+    pseudo = Number.sin (toNumber index * 12.9898) * 43758.5453
+    random = pseudo - Number.floor pseudo
   in
     Milliseconds (minDelay + random * (maxDelay - minDelay))
 
 -- Helper functions
 toNumber :: Int -> Number
-toNumber n = if n <= 0 then 0.0 else toNumber (n - 1) + 1.0
-
--- Note: Using Prelude.max
-
--- Foreign imports for math (not in PureScript Prelude)
-foreign import sin :: Number -> Number
-foreign import floor :: Number -> Number
+toNumber = Int.toNumber

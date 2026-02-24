@@ -117,8 +117,9 @@ module Hydrogen.Component.Carousel
 
 import Prelude
 
-import Data.Array (foldl, length, mapWithIndex, (!!))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Array (foldl, length, mapWithIndex, range)
+import Data.Int (toNumber)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn3)
 import Halogen.HTML as HH
@@ -194,7 +195,7 @@ initCarousel :: Element ->
   , preventScroll :: Boolean
   } ->
   Effect CarouselElement
-initCarousel el callbacks opts = do
+initCarousel _el _callbacks _opts = do
   pure unsafeCarouselElement
 
 -- | Destroy carousel
@@ -458,13 +459,7 @@ carousel propMods slides =
         in Just (handler newIndex)
       Nothing -> Nothing
     
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
-    
-    toNumberImpl :: Int -> Number
-    toNumberImpl = unsafeToNumber
 
-foreign import unsafeToNumber :: Int -> Number
 
 -- | Wrap a slide with proper styling
 wrapSlide :: forall w i. CarouselProps i -> Number -> Int -> HH.HTML w i -> HH.HTML w i
@@ -582,11 +577,6 @@ carouselDots props count =
       , ARIA.label "Slide navigation"
       ]
       (map renderDot (range 0 (dotCount - 1)))
-  where
-    range :: Int -> Int -> Array Int
-    range start end = rangeImpl start end
-
-foreign import rangeImpl :: Int -> Int -> Array Int
 
 -- | Thumbnail navigation
 carouselThumbnails :: forall w i. CarouselProps i -> Array (HH.HTML w i) -> HH.HTML w i

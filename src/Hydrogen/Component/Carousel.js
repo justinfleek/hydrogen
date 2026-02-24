@@ -197,25 +197,3 @@ export const unsafeCarouselElement = {
   autoPlayTimer: null,
   destroy: () => {},
 };
-
-/**
- * Convert Int to Number
- * @param {number} n - Integer value
- * @returns {number} Number value
- */
-export const unsafeToNumber = (n) => n;
-
-/**
- * Generate array range [start, end]
- * @param {number} start - Start index
- * @param {number} end - End index (inclusive)
- * @returns {number[]} Array of integers
- */
-export const rangeImpl = (start) => (end) => {
-  if (end < start) return [];
-  const result = [];
-  for (let i = start; i <= end; i++) {
-    result.push(i);
-  }
-  return result;
-};

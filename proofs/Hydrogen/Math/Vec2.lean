@@ -3,19 +3,29 @@
   
   2D Vector type for particle physics and UI layout.
   
-  ZERO-LATENCY INVARIANTS:
-    1. All components are finite (no NaN, no Infinity)
-    2. Perpendicular operation proven: perp(v) · v = 0
-    3. Length is non-negative
-    4. Normalization produces unit vectors
+  PROVEN INVARIANTS:
+    1. perp_orthogonal: perp(v) · v = 0 (perpendicular is orthogonal)
+       → Vortex forces do no work (tangent to radius)
+    2. perpCW_orthogonal: perpCW(v) · v = 0 (clockwise perpendicular)
+    3. lengthSq_perp: |perp(v)|² = |v|² (rotation preserves length)
+    4. perp_perp: perp(perp(v)) = -v (180° rotation)
+    5. lengthSq_nonneg, length_nonneg: length ≥ 0
+    6. lengthSq_eq_zero: |v|² = 0 ↔ v = zero
+    7. dot_comm, dot_self_nonneg: dot product laws
+    8. add forms abelian group: add_comm, add_assoc, add_zero, add_neg
+    9. lerp_zero, lerp_one, lerp_self: interpolation endpoints
+  
+  NOT YET PROVEN (future work):
+    - normalize_length: |normalize(v)| = 1 (requires nonzero proof)
+    - Cauchy-Schwarz: |a·b| ≤ |a||b|
   
   PARTICLE PHYSICS APPLICATIONS:
-    - Position, velocity, acceleration
-    - Force vectors (gravity wells, vortices)
+    - Position, velocity, acceleration vectors
+    - Force vectors (vortex forces use perp)
     - Collision normals and tangents
     - 2D constraint solving
   
-  Status: FOUNDATIONAL - Required for all 2D particle simulations.
+  Status: FOUNDATIONAL - All theorems fully proven, no sorry, no custom axioms.
 -/
 
 import Hydrogen.Math.Bounded

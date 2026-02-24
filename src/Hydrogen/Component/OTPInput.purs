@@ -70,7 +70,7 @@ module Hydrogen.Component.OTPInput
   , OTPInputElement
   ) where
 
-import Prelude hiding (map)
+import Prelude
 
 import Data.Array (foldl, range, (!!))
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -315,11 +315,4 @@ otpDigit props idx =
       , ARIA.label ("Digit " <> show (idx + 1) <> " of " <> show props.length)
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
 
--- | Map function for arrays (FFI for performance in DOM operations)
-map :: forall a b. (a -> b) -> Array a -> Array b
-map f xs = mapImpl f xs
-
-foreign import mapImpl :: forall a b. (a -> b) -> Array a -> Array b

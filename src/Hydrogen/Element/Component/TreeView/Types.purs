@@ -115,6 +115,14 @@ module Hydrogen.Element.Component.TreeView.Types
       , NavigateHome
       , NavigateEnd
       , ActivateNode
+      -- Edit messages
+      , BeginEdit
+      , UpdateEditBuffer
+      , ConfirmEdit
+      , CancelEdit
+      -- Hover messages
+      , SetHover
+      , ClearHover
       )
   ) where
 
@@ -448,6 +456,14 @@ data TreeViewMsg
   | NavigateHome                                       -- ^ Home key (first node)
   | NavigateEnd                                        -- ^ End key (last node)
   | ActivateNode NodeId                                -- ^ Enter/Space on node
+  -- Inline edit messages
+  | BeginEdit NodeId                                   -- ^ Start editing a node label
+  | UpdateEditBuffer String                            -- ^ Update the edit text buffer
+  | ConfirmEdit                                        -- ^ Confirm edit (Enter key)
+  | CancelEdit                                         -- ^ Cancel edit (Escape key)
+  -- Hover messages
+  | SetHover NodeId                                    -- ^ Mouse entered a node
+  | ClearHover                                         -- ^ Mouse left the tree
 
 derive instance eqTreeViewMsg :: Eq TreeViewMsg
 
@@ -471,3 +487,9 @@ instance showTreeViewMsg :: Show TreeViewMsg where
   show NavigateHome = "NavigateHome"
   show NavigateEnd = "NavigateEnd"
   show (ActivateNode nid) = "ActivateNode(" <> show nid <> ")"
+  show (BeginEdit nid) = "BeginEdit(" <> show nid <> ")"
+  show (UpdateEditBuffer text) = "UpdateEditBuffer(\"" <> text <> "\")"
+  show ConfirmEdit = "ConfirmEdit"
+  show CancelEdit = "CancelEdit"
+  show (SetHover nid) = "SetHover(" <> show nid <> ")"
+  show ClearHover = "ClearHover"

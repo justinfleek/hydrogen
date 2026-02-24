@@ -12,20 +12,27 @@
 -- | - Geometry: selection corners/radius
 -- | - Reactive: SelectionState, FocusManagement for selection/focus
 -- | - Gestural: keyboard navigation, drag-drop
+-- | - Graph: layout algorithms, connections, viewport
 -- |
 -- | ## Architecture
 -- |
 -- | TreeView is organized into submodules following the Carousel pattern:
 -- |
--- | | Module      | Purpose                                    |
--- | |-------------|--------------------------------------------|
--- | | Types       | NodeId, SelectionMode, CheckState, etc.    |
--- | | State       | Runtime state (expanded, selected, etc.)   |
--- | | Node        | Tree data structure and queries            |
--- | | Navigation  | Keyboard navigation logic                  |
--- | | Selection   | Selection and checkbox logic               |
--- | | DragDrop    | Drag and drop reordering                   |
--- | | Render      | Pure Element rendering                     |
+-- | | Module        | Purpose                                    |
+-- | |---------------|--------------------------------------------|
+-- | | Types         | NodeId, SelectionMode, CheckState, etc.    |
+-- | | State         | Runtime state (expanded, selected, etc.)   |
+-- | | Node          | Tree data structure and queries            |
+-- | | Navigation    | Keyboard navigation logic                  |
+-- | | Selection     | Selection and checkbox logic               |
+-- | | DragDrop      | Drag and drop reordering                   |
+-- | | Layout        | Position computation for all layout types  |
+-- | | Connection    | Visual connections between nodes           |
+-- | | Content       | Slot-based content rendering               |
+-- | | Viewport      | Virtualization for 100k+ nodes             |
+-- | | Animation     | Motion and transitions                     |
+-- | | Accessibility | ARIA, announcements, RTL support           |
+-- | | Render        | Pure Element rendering                     |
 -- |
 -- | ## Usage
 -- |
@@ -69,8 +76,29 @@ module Hydrogen.Element.Component.TreeView
   -- * Re-exports: DragDrop
   , module DragDrop
   
+  -- * Re-exports: Layout
+  , module Layout
+  
+  -- * Re-exports: Connection
+  , module Connection
+  
+  -- * Re-exports: Content
+  , module Content
+  
+  -- * Re-exports: Viewport
+  , module Viewport
+  
+  -- * Re-exports: Animation
+  , module Animation
+  
+  -- * Re-exports: Accessibility
+  , module Accessibility
+  
   -- * Re-exports: Render
   , module Render
+  
+  -- * Re-exports: InlineEdit
+  , module InlineEdit
   ) where
 
 import Hydrogen.Element.Component.TreeView.Types
@@ -134,6 +162,12 @@ import Hydrogen.Element.Component.TreeView.Types
       , NavigateHome
       , NavigateEnd
       , ActivateNode
+      , BeginEdit
+      , UpdateEditBuffer
+      , ConfirmEdit
+      , CancelEdit
+      , SetHover
+      , ClearHover
       )
   ) as Types
 
@@ -190,12 +224,29 @@ import Hydrogen.Element.Component.TreeView.State
   , setLoading
   , clearLoading
   , loadingNodes
+  , EditState
+  , noEdit
+  , beginEditState
+  , updateEditBuffer
+  , getEditingNode
+  , getEditBuffer
+  , isEditing
+  , isEditingNode
+  , clearEditState
+  , HoverState
+  , noHover
+  , setHover
+  , getHoveredNode
+  , isHovering
+  , isHoveringNode
+  , clearHover
   , TreeViewState
   , initialState
   , withSelectionMode
   , withCheckable
   , withDraggable
   , withSearchable
+  , withEditable
   ) as State
 
 import Hydrogen.Element.Component.TreeView.Node
@@ -262,10 +313,12 @@ import Hydrogen.Element.Component.TreeView.Selection
   , handleToggleSelect
   , handleSelectRange
   , handleSelectAll
+  , handleSelectSubtree
   , handleClearSelection
   , handleCheck
   , handleUncheck
   , handleToggleCheck
+  , handleCheckSubtree
   , handleClearChecked
   , propagateCheckToChildren
   , propagateCheckToParent
@@ -278,6 +331,7 @@ import Hydrogen.Element.Component.TreeView.Selection
   , getSelectedNodes
   , getCheckedNodes
   , getPartiallyCheckedNodes
+  , subtreeNodes
   ) as Selection
 
 import Hydrogen.Element.Component.TreeView.DragDrop
@@ -304,9 +358,226 @@ import Hydrogen.Element.Component.TreeView.DragDrop
   , getCurrentDropPosition
   ) as DragDrop
 
+import Hydrogen.Element.Component.TreeView.Layout
+  ( LayoutResult
+  , layoutResult
+  , emptyLayout
+  , nodePosition
+  , nodePositions
+  , contentBounds
+  , layoutNodeCount
+  , computeLayout
+  , recomputeLayout
+  , layoutIndentedList
+  , layoutRadial
+  , layoutTreemap
+  , layoutTidy
+  , layoutOrgChart
+  , layoutMindMap
+  , layoutDendrogram
+  , layoutSunburst
+  , layoutCirclePack
+  , layoutIcicle
+  , positionOf
+  , childPositions
+  , boundingBox
+  , centerOf
+  , translateLayout
+  , scaleLayout
+  , rotateLayout
+  ) as Layout
+
+import Hydrogen.Element.Component.TreeView.Connection
+  ( renderConnections
+  , renderConnection
+  , connectionPath
+  , straightPath
+  , curvedPath
+  , orthogonalPath
+  , stepPath
+  , ConnectionPoint
+  , connectionPoint
+  , nodeConnectionPoints
+  , anchorPoint
+  , renderTerminal
+  , arrowMarker
+  , dotMarker
+  , ConnectionProps
+  , defaultConnectionProps
+  , withConnectionStyle
+  , withShowConnections
+  ) as Connection
+
+import Hydrogen.Element.Component.TreeView.Content
+  ( renderNodeContent
+  , renderSlot
+  , renderLeadingSlot
+  , renderIconSlot
+  , renderMainSlot
+  , renderSubtitleSlot
+  , renderTrailingSlot
+  , renderActionsSlot
+  , renderBelowSlot
+  , ContentProps
+  , defaultContentProps
+  , withTemplate
+  , withSlotRenderer
+  , withExpandIcon
+  , withCheckbox
+  , SlotRenderer
+  , emptySlot
+  , textSlot
+  , iconSlot
+  , badgeSlot
+  , buttonSlot
+  , customSlot
+  , applyTemplate
+  , textOnlyTemplate
+  , iconTextTemplate
+  , cardTemplate
+  , avatarTemplate
+  ) as Content
+
+import Hydrogen.Element.Component.TreeView.Viewport
+  ( TreeViewport
+  , treeViewport
+  , initialViewport
+  , viewportZoom
+  , viewportPan
+  , viewportScreenSize
+  , setViewportZoom
+  , setViewportPan
+  , panViewport
+  , zoomViewport
+  , zoomToPoint
+  , fitToContent
+  -- visibleNodes and visibleNodeIds are exported from Navigation
+  , isNodeVisible
+  , nodeVisibility
+  , VirtualizedTree
+  , virtualizedTree
+  , virtualNodeCount
+  , renderWindow
+  , shouldRenderNode
+  , RenderChunk
+  , renderChunks
+  , chunkNodes
+  , nextChunk
+  , isRenderComplete
+  , LoadRequest
+  , loadRequest
+  , pendingLoads
+  , acknowledgeLoad
+  , nodeLOD
+  , shouldShowLabel
+  , shouldShowIcon
+  , simplifiedNode
+  , ViewportEvent(..)
+  , handleViewportEvent
+  ) as Viewport
+
+import Hydrogen.Element.Component.TreeView.Animation
+  ( AnimationState
+  , animationState
+  , initialAnimation
+  , isAnimating
+  , animationProgress
+  , ExpandAnimation
+  , expandAnimation
+  , collapseAnimation
+  , toggleAnimation
+  , expandProgress
+  , isExpandComplete
+  , PositionAnimation
+  , positionAnimation
+  , animatePosition
+  , currentPosition
+  , targetPosition
+  , positionProgress
+  , SelectionAnimation
+  , selectAnimation
+  , deselectAnimation
+  , selectionOpacity
+  , FocusAnimation
+  , focusAnimation
+  , focusProgress
+  , focusRingScale
+  , LayoutTransition
+  , layoutTransition
+  , transitionProgress
+  , interpolatePosition
+  , AnimationConfig
+  , animationConfig
+  , defaultAnimationConfig
+  , fastAnimations
+  , slowAnimations
+  , noAnimations
+  , withDuration
+  , withEasing
+  , Easing(..)
+  , easeLinear
+  , easeInOut
+  , easeOut
+  , easeSpring
+  , applyEasing
+  , updateAnimations
+  , stepAnimation
+  , cancelAnimation
+  , completeAnimation
+  ) as Animation
+
+import Hydrogen.Element.Component.TreeView.Accessibility
+  ( AriaAttrs
+  , ariaAttrs
+  , containerAriaAttrs
+  , nodeAriaAttrs
+  , ariaExpanded
+  , ariaSelected
+  , ariaLevel
+  , ariaSetSize
+  , ariaPosInSet
+  , ariaLabel
+  , ariaDescribedBy
+  , ariaActiveDescendant
+  , Announcement
+  , announcement
+  , expandAnnouncement
+  , collapseAnnouncement
+  , selectAnnouncement
+  , loadingAnnouncement
+  , errorAnnouncement
+  , LiveRegion
+  , liveRegion
+  , politeRegion
+  , assertiveRegion
+  , liveRegionAttrs
+  , Direction(..)
+  , isRTL
+  , flipNavigationKey
+  , directionAttr
+  , focusableAttrs
+  , rovingTabIndex
+  , focusFirst
+  , focusLast
+  , A11yConfig
+  , a11yConfig
+  , defaultA11yConfig
+  , withReducedMotion
+  , withHighContrast
+  , withDirection
+  ) as Accessibility
+
 import Hydrogen.Element.Component.TreeView.Render
   ( renderTreeView
+  , renderTreeViewAdvanced
   , renderNode
+  , renderExpandedNodes
+  , renderSelectedNodes
+  , renderCheckedNodes
+  , renderFocusedNode
+  , renderSubtree
+  , renderRootNodes
+  , renderChildNodes
   , TreeViewProps
   , TreeViewProp
   , defaultProps
@@ -316,16 +587,78 @@ import Hydrogen.Element.Component.TreeView.Render
   , iconColor
   , textColor
   , hoverBackground
+  , expandIconColor
   , indentSize
   , nodeHeight
   , iconSize
+  , expandIconSize
   , borderRadius
   , onNodeClick
   , onNodeExpand
   , onNodeSelect
   , onNodeCheck
+  , onNodeDoubleClick
+  , onNodeDragStart
+  , onNodeDragEnd
+  , onNodeDragOver
+  , onNodeDrop
+  , onKeyDown
+  , onNodeHover
+  , onNodeHoverEnd
+  , withPropsCheckable
+  , withLayoutConfig
+  , withConnectionProps
+  , withPropsConnectionStyle
+  , withContentProps
+  , withAccessibilityConfig
+  , withPropsShowConnections
   , renderExpandIcon
   , renderNodeIcon
   , renderNodeLabel
+  , renderCheckbox
   , renderDropIndicator
+  , renderNodeWithLayout
+  , renderNodeAtPosition
+  , withDefaultExpandHandler
+  , withDefaultSelectHandler
+  , withDefaultCheckHandler
+  , withDefaultFocusHandler
+  , withDefaultActivateHandler
+  , withDefaultDragStartHandler
+  , withDefaultDragEndHandler
+  , withDefaultDragOverHandler
+  , withDefaultDropHandler
+  , withDefaultHoverHandlers
+  , withDefaultKeyboardHandler
+  , withAllDefaultHandlers
+  , keyToNavigationMsg
+  , isNodeDisabled
+  , computeIndentPixels
   ) as Render
+
+import Hydrogen.Element.Component.TreeView.InlineEdit
+  ( renderEditInput
+  , renderEditableLabel
+  , EditProps
+  , defaultEditProps
+  , withInputClass
+  , withPlaceholder
+  , withMaxLength
+  , withAutoFocus
+  , withSelectOnFocus
+  , handleEditKeyDown
+  , handleEditInput
+  , handleEditBlur
+  , beginEdit
+  , updateEdit
+  , confirmEdit
+  , cancelEdit
+  , EditValidation
+  , validateNotEmpty
+  , validateMaxLength
+  , validatePattern
+  , runValidation
+  , isValidEdit
+  , getEditResult
+  , hasEditChanged
+  ) as InlineEdit

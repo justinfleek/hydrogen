@@ -176,7 +176,4 @@ export const startResendTimerImpl = (seconds, onTick) => {
   setTimeout(tick, 1000);
 };
 
-/**
- * Map implementation for arrays
- */
-export const mapImpl = (f) => (arr) => arr.map(f);
+
