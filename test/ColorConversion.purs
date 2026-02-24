@@ -112,8 +112,9 @@ genRGBEdgeCase = elements $ NEA.cons'
 --                                                                      // helpers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Check if two RGB colors are approximately equal (within tolerance)
--- | Tolerance accounts for floating point precision loss in conversions
+-- | Check if two RGB colors are approximately equal (within per-channel tolerance)
+-- | Tolerance is applied to EACH channel independently to prevent masking
+-- | single-channel errors (e.g., 15 off on red but 0 on green/blue)
 rgbApproxEqual :: Int -> RGB.RGB -> RGB.RGB -> Boolean
 rgbApproxEqual tolerance c1 c2 =
   let
@@ -124,13 +125,13 @@ rgbApproxEqual tolerance c1 c2 =
     g2 = Channel.unwrap (RGB.green c2)
     b2 = Channel.unwrap (RGB.blue c2)
     
-    -- Calculate diff using Ints
+    -- Calculate diff per channel
     diffR = if r1 > r2 then r1 - r2 else r2 - r1
     diffG = if g1 > g2 then g1 - g2 else g2 - g1
     diffB = if b1 > b2 then b1 - b2 else b2 - b1
-    diff = diffR + diffG + diffB
   in
-    diff <= tolerance
+    -- Each channel must be within tolerance independently
+    diffR <= tolerance && diffG <= tolerance && diffB <= tolerance
 
 -- | Format RGB for error messages
 showRGB :: RGB.RGB -> String
@@ -211,6 +212,10 @@ propRGBOKLCHRoundTrip = do
   rgb <- genRGB
   let oklch = Conv.rgbToOklch rgb
   let rgb' = Conv.oklchToRgb oklch
+  -- Tolerance of 12 per-channel accounts for integer hue quantization in OKLCH.
+  -- The OKLCH type uses Int hue (0-359°) for determinism, which introduces
+  -- up to ±0.5° angular error. For high-chroma colors, this translates to
+  -- ~10-12 units RGB error in the worst case.
   pure $ rgbApproxEqual 12 rgb rgb'
     <?> ("RGB→OKLCH→RGB failed: " <> showRGB rgb <> " → " <> showRGB rgb')
 
