@@ -81,6 +81,25 @@ import Hydrogen.Element.Component.QRCode.Types
   , getModule
   )
 
+-- Schema atoms for type-safe colors and dimensions
+import Hydrogen.Schema.Color.SRGB
+  ( SRGB
+  , srgb
+  , srgbToHex
+  )
+
+import Hydrogen.Schema.Dimension.Device
+  ( Pixel
+  , px
+  , unwrapPixel
+  )
+
+import Hydrogen.Schema.Dimension.Percentage
+  ( Ratio
+  , ratio
+  , unwrapRatio
+  )
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // module styles
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -104,26 +123,29 @@ instance showModuleStyle :: Show ModuleStyle where
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Color configuration for QR code rendering.
+-- |
+-- | Uses Schema SRGB atoms for type-safe color handling.
+-- | Invalid color values are impossible by construction.
 type QRColors =
-  { dark :: String       -- ^ Color for dark modules (usually black)
-  , light :: String      -- ^ Color for light modules (usually white)
-  , background :: String -- ^ Background color (quiet zone)
+  { dark :: SRGB       -- ^ Color for dark modules (usually black)
+  , light :: SRGB      -- ^ Color for light modules (usually white)
+  , background :: SRGB -- ^ Background color (quiet zone)
   }
 
 -- | Default black-on-white colors.
 defaultColors :: QRColors
 defaultColors =
-  { dark: "#000000"
-  , light: "#ffffff"
-  , background: "#ffffff"
+  { dark: srgb 0 0 0         -- Black
+  , light: srgb 255 255 255  -- White
+  , background: srgb 255 255 255
   }
 
 -- | Inverted white-on-black colors.
 invertedColors :: QRColors
 invertedColors =
-  { dark: "#ffffff"
-  , light: "#000000"
-  , background: "#000000"
+  { dark: srgb 255 255 255   -- White
+  , light: srgb 0 0 0        -- Black
+  , background: srgb 0 0 0
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -131,12 +153,16 @@ invertedColors =
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for QR code rendering.
+-- |
+-- | Uses Schema atoms for type-safe dimensions:
+-- | - moduleSize: Pixel (not raw Number)
+-- | - cornerRadius: Ratio (bounded 0.0-1.0, clamped)
 type RenderConfig =
-  { moduleSize :: Number    -- ^ Size of each module in pixels
+  { moduleSize :: Pixel     -- ^ Size of each module in pixels
   , quietZone :: Int        -- ^ Quiet zone width in modules (spec: 4)
   , style :: ModuleStyle    -- ^ Visual style
   , colors :: QRColors      -- ^ Color scheme
-  , cornerRadius :: Number  -- ^ Corner radius for Rounded style (0-0.5)
+  , cornerRadius :: Ratio   -- ^ Corner radius for Rounded style (0.0-1.0)
   }
 
 -- | Default render configuration.
@@ -145,13 +171,14 @@ type RenderConfig =
 -- | - 4-module quiet zone (QR spec minimum)
 -- | - Classic square style
 -- | - Black on white
+-- | - 0.3 corner radius ratio
 defaultRenderConfig :: RenderConfig
 defaultRenderConfig =
-  { moduleSize: 10.0
+  { moduleSize: px 10.0
   , quietZone: 4
   , style: Classic
   , colors: defaultColors
-  , cornerRadius: 0.3
+  , cornerRadius: ratio 0.3
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -167,7 +194,8 @@ renderQRCode cfg matrix =
   let
     size = matrixSize matrix
     totalSize = size + cfg.quietZone * 2
-    viewBoxSize = toNumber totalSize * cfg.moduleSize
+    modSize = unwrapPixel cfg.moduleSize
+    viewBoxSize = toNumber totalSize * modSize
     viewBox = "0 0 " <> show viewBoxSize <> " " <> show viewBoxSize
   in
     E.svg_
@@ -188,7 +216,8 @@ renderMatrix :: forall msg. RenderConfig -> QRMatrix -> E.Element msg
 renderMatrix cfg matrix =
   let
     size = matrixSize matrix
-    offset = toNumber cfg.quietZone * cfg.moduleSize
+    modSize = unwrapPixel cfg.moduleSize
+    offset = toNumber cfg.quietZone * modSize
   in
     E.g_
       [ E.attr "transform" ("translate(" <> show offset <> "," <> show offset <> ")") ]
@@ -198,14 +227,15 @@ renderMatrix cfg matrix =
 renderBackground :: forall msg. RenderConfig -> Int -> E.Element msg
 renderBackground cfg totalSize =
   let
-    pixelSize = toNumber totalSize * cfg.moduleSize
+    modSize = unwrapPixel cfg.moduleSize
+    pixelSize = toNumber totalSize * modSize
   in
     E.rect_
       [ E.attr "x" "0"
       , E.attr "y" "0"
       , E.attr "width" (show pixelSize)
       , E.attr "height" (show pixelSize)
-      , E.attr "fill" cfg.colors.background
+      , E.attr "fill" (srgbToHex cfg.colors.background)
       ]
 
 -- | Render all modules in the matrix.
@@ -241,48 +271,52 @@ renderDarkModule cfg row col =
 renderSquare :: forall msg. RenderConfig -> Int -> Int -> E.Element msg
 renderSquare cfg row col =
   let
-    x = toNumber col * cfg.moduleSize
-    y = toNumber row * cfg.moduleSize
+    modSize = unwrapPixel cfg.moduleSize
+    x = toNumber col * modSize
+    y = toNumber row * modSize
   in
     E.rect_
       [ E.attr "x" (show x)
       , E.attr "y" (show y)
-      , E.attr "width" (show cfg.moduleSize)
-      , E.attr "height" (show cfg.moduleSize)
-      , E.attr "fill" cfg.colors.dark
+      , E.attr "width" (show modSize)
+      , E.attr "height" (show modSize)
+      , E.attr "fill" (srgbToHex cfg.colors.dark)
       ]
 
 -- | Render a rounded corner module.
 renderRounded :: forall msg. RenderConfig -> Int -> Int -> E.Element msg
 renderRounded cfg row col =
   let
-    x = toNumber col * cfg.moduleSize
-    y = toNumber row * cfg.moduleSize
-    r = cfg.moduleSize * cfg.cornerRadius
+    modSize = unwrapPixel cfg.moduleSize
+    cornerRatio = unwrapRatio cfg.cornerRadius
+    x = toNumber col * modSize
+    y = toNumber row * modSize
+    r = modSize * cornerRatio
   in
     E.rect_
       [ E.attr "x" (show x)
       , E.attr "y" (show y)
-      , E.attr "width" (show cfg.moduleSize)
-      , E.attr "height" (show cfg.moduleSize)
+      , E.attr "width" (show modSize)
+      , E.attr "height" (show modSize)
       , E.attr "rx" (show r)
       , E.attr "ry" (show r)
-      , E.attr "fill" cfg.colors.dark
+      , E.attr "fill" (srgbToHex cfg.colors.dark)
       ]
 
 -- | Render a circular dot module.
 renderDot :: forall msg. RenderConfig -> Int -> Int -> E.Element msg
 renderDot cfg row col =
   let
-    cx = toNumber col * cfg.moduleSize + cfg.moduleSize / 2.0
-    cy = toNumber row * cfg.moduleSize + cfg.moduleSize / 2.0
-    r = cfg.moduleSize / 2.0 * 0.85  -- Slightly smaller for spacing
+    modSize = unwrapPixel cfg.moduleSize
+    cx = toNumber col * modSize + modSize / 2.0
+    cy = toNumber row * modSize + modSize / 2.0
+    r = modSize / 2.0 * 0.85  -- Slightly smaller for spacing
   in
     E.circle_
       [ E.attr "cx" (show cx)
       , E.attr "cy" (show cy)
       , E.attr "r" (show r)
-      , E.attr "fill" cfg.colors.dark
+      , E.attr "fill" (srgbToHex cfg.colors.dark)
       ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -322,6 +356,7 @@ getDarkModulePositions cfg matrix =
     makePosition :: RenderConfig -> QRMatrix -> Int -> Int -> ModulePosition
     makePosition config m row col =
       let
+        modSize = unwrapPixel config.moduleSize
         mod = getModule row col m
         dark = case mod of
           Dark _ -> true
@@ -329,8 +364,8 @@ getDarkModulePositions cfg matrix =
       in
         { row
         , col
-        , x: toNumber col * config.moduleSize
-        , y: toNumber row * config.moduleSize
+        , x: toNumber col * modSize
+        , y: toNumber row * modSize
         , isDark: dark
         }
 

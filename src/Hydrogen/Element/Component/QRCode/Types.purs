@@ -79,7 +79,10 @@ module Hydrogen.Element.Component.QRCode.Types
   
   -- * Codeword
   , Codeword(Codeword)
+  , mkCodeword
   , codewordValue
+  , minCodeword
+  , maxCodeword
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -524,6 +527,9 @@ getCapacity (QRVersion v) ec = case v of
 -- | Codewords are the fundamental unit of data in QR codes.
 -- | The data is encoded into codewords, then error correction
 -- | codewords are added, and finally they're placed in the matrix.
+-- |
+-- | Values are bounded to 0-255 (8 bits). Use `mkCodeword` for
+-- | safe construction with automatic clamping.
 newtype Codeword = Codeword Int
 
 derive instance eqCodeword :: Eq Codeword
@@ -548,6 +554,31 @@ instance showCodeword :: Show Codeword where
         in
           hexDigit high <> hexDigit low
 
+instance boundedCodeword :: Bounded Codeword where
+  top = Codeword 255
+  bottom = Codeword 0
+
+-- | Create a codeword, clamping to valid range [0, 255].
+-- |
+-- | ```purescript
+-- | mkCodeword 128   -- Codeword 128
+-- | mkCodeword (-5)  -- Codeword 0 (clamped)
+-- | mkCodeword 300   -- Codeword 255 (clamped)
+-- | ```
+mkCodeword :: Int -> Codeword
+mkCodeword n
+  | n < 0 = Codeword 0
+  | n > 255 = Codeword 255
+  | otherwise = Codeword n
+
 -- | Extract codeword value as Int (0-255)
 codewordValue :: Codeword -> Int
 codewordValue (Codeword c) = c
+
+-- | Minimum codeword value (0x00)
+minCodeword :: Codeword
+minCodeword = bottom
+
+-- | Maximum codeword value (0xFF)
+maxCodeword :: Codeword
+maxCodeword = top
