@@ -78,6 +78,12 @@ module Hydrogen.GPU.Binary
   , quadPayloadSize
   , glyphPayloadSize
   , particlePayloadSize
+  -- v2 payload sizes
+  , glyphPathHeaderSize
+  , glyphInstancePayloadSize
+  , wordHeaderSize
+  , pathDataHeaderSize
+  , animationStateHeaderSize
   
   -- * Serialization
   , serialize
@@ -86,7 +92,15 @@ module Hydrogen.GPU.Binary
   , serializeRect
   , serializeQuad
   , serializeGlyph
+  , serializePath
+  , serializeClipRegion
   , serializeParticle
+  -- v2 serializers
+  , serializeGlyphPath
+  , serializeGlyphInstance
+  , serializeWord
+  , serializePathData
+  , serializeAnimationState
   
   -- * Deserialization
   , deserialize
@@ -98,7 +112,9 @@ module Hydrogen.GPU.Binary
   , fromByteArray
   , writeF32
   , writeU32
+  , writeU16
   , writeU8
+  , writeI8
   , readF32
   , readU32
   , readU8
@@ -110,13 +126,10 @@ import Prelude
   , class Show
   , Unit
   , bind
-  , map
   , mod
-  , negate
   , otherwise
   , pure
   , show
-  , ($)
   , (&&)
   , (+)
   , (-)
@@ -172,6 +185,12 @@ data CommandType
   | CmdDrawParticle
   | CmdPushClip
   | CmdPopClip
+  -- v2 Typography as Geometry
+  | CmdDrawGlyphPath
+  | CmdDrawGlyphInstance
+  | CmdDrawWord
+  | CmdDefinePathData
+  | CmdUpdateAnimationState
 
 derive instance eqCommandType :: Eq CommandType
 derive instance ordCommandType :: Ord CommandType
@@ -185,6 +204,11 @@ instance showCommandType :: Show CommandType where
   show CmdDrawParticle = "DrawParticle"
   show CmdPushClip = "PushClip"
   show CmdPopClip = "PopClip"
+  show CmdDrawGlyphPath = "DrawGlyphPath"
+  show CmdDrawGlyphInstance = "DrawGlyphInstance"
+  show CmdDrawWord = "DrawWord"
+  show CmdDefinePathData = "DefinePathData"
+  show CmdUpdateAnimationState = "UpdateAnimationState"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // constants
@@ -202,15 +226,15 @@ version = 1
 headerSize :: Int
 headerSize = 16
 
--- | DrawRect payload size (excluding command type byte)
+-- | DrawRect payload size (excluding 4-byte command header)
 -- | x, y, width, height: 4 × f32 = 16
 -- | r, g, b, a: 4 × f32 = 16 (unpacked for GPU)
 -- | cornerRadius (4 corners): 4 × f32 = 16
 -- | depth: f32 = 4
 -- | pickId: u32 = 4
--- | Total: 56 bytes + 4 alignment = 60 bytes
+-- | Total: 56 bytes payload (60 bytes with header)
 rectPayloadSize :: Int
-rectPayloadSize = 60
+rectPayloadSize = 56
 
 -- | DrawQuad payload size
 -- | 4 vertices × 2 coords × f32 = 32
@@ -241,6 +265,70 @@ glyphPayloadSize = 44
 -- | Total: 36 bytes
 particlePayloadSize :: Int
 particlePayloadSize = 36
+
+-- ─────────────────────────────────────────────────────────────────────────────────
+--                                                      // v2 payload size constants
+-- ─────────────────────────────────────────────────────────────────────────────────
+
+-- | DrawGlyphPath payload size (VARIABLE - this is the header portion)
+-- | glyphId: u32 = 4
+-- | fontId: u32 = 4 (upgraded for billion-agent scale)
+-- | contourCount: u16 = 2
+-- | padding: u16 = 2
+-- | bounds: 6 × f32 = 24 (minX, minY, minZ, maxX, maxY, maxZ)
+-- | advanceWidth: f32 = 4
+-- | depth: f32 = 4
+-- | pickId: u32 = 4
+-- | Header: 48 bytes + variable contour data
+glyphPathHeaderSize :: Int
+glyphPathHeaderSize = 48
+
+-- | DrawGlyphInstance payload size (FIXED: 52 bytes)
+-- | pathDataId: u32 = 4
+-- | position: 3 × f32 = 12 (x, y, z)
+-- | rotation: 3 × f32 = 12 (x, y, z euler)
+-- | scale: 3 × f32 = 12 (x, y, z)
+-- | color: 4 × u8 = 4 (RGBA packed)
+-- | animationPhase: f32 = 4
+-- | springState: 5 × f32 = 20 (velocity, displacement, tension, damping, mass)
+-- | depth: f32 = 4
+-- | pickId: u32 = 4
+-- | Total: 76 bytes (68 + 8 for damping/mass)
+glyphInstancePayloadSize :: Int
+glyphInstancePayloadSize = 76
+
+-- | DrawWord payload size (VARIABLE - this is the header portion)
+-- | wordId: u32 = 4
+-- | glyphCount: u16 = 2
+-- | staggerDirection: u8 = 1
+-- | easing: u8 = 1
+-- | origin: 3 × f32 = 12 (x, y, z)
+-- | staggerDelayMs: f32 = 4
+-- | staggerSeed: u32 = 4 (for StaggerRandom, 0 otherwise)
+-- | color: 4 × u8 = 4
+-- | depth: f32 = 4
+-- | pickId: u32 = 4
+-- | Header: 40 bytes + variable glyph references
+wordHeaderSize :: Int
+wordHeaderSize = 40
+
+-- | PathData payload size (VARIABLE - this is the header portion)
+-- | pathDataId: u32 = 4
+-- | commandCount: u32 = 4
+-- | bounds: 6 × f32 = 24
+-- | Header: 32 bytes + variable command data
+pathDataHeaderSize :: Int
+pathDataHeaderSize = 32
+
+-- | AnimationState payload size (VARIABLE - this is the header portion)
+-- | targetCount: u16 = 2
+-- | mode: u8 = 1
+-- | padding: u8 = 1
+-- | frameTime: f32 = 4
+-- | blendFactor: f32 = 4 (for AnimationBlend, 0.0 otherwise)
+-- | Header: 12 bytes + variable target data
+animationStateHeaderSize :: Int
+animationStateHeaderSize = 12
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // low level ops
@@ -280,6 +368,20 @@ writeU32 n =
 -- | Write an 8-bit unsigned integer.
 writeU8 :: Int -> Array Int
 writeU8 n = [n .&. 0xFF]
+
+-- | Write a 16-bit unsigned integer as 2 bytes (little-endian).
+writeU16 :: Int -> Array Int
+writeU16 n =
+  [ n .&. 0xFF
+  , (shr n 8) .&. 0xFF
+  ]
+
+-- | Write a signed 8-bit integer (stored as unsigned).
+-- | Values -128 to 127 are stored as 0-255.
+writeI8 :: Int -> Array Int
+writeI8 n = 
+  let unsigned = if n < 0 then 256 + n else n
+  in [unsigned .&. 0xFF]
 
 -- | Read a 32-bit float from bytes at offset.
 readF32 :: Array Int -> Int -> Maybe Number
@@ -421,13 +523,24 @@ serializeCommand = case _ of
   
   DC.DrawGlyph params -> writeU8 0x03 <> pad 3 <> serializeGlyph params
   
-  DC.DrawPath _ -> writeU8 0x04 <> pad 3  -- Path needs variable-size handling
+  DC.DrawPath params -> writeU8 0x04 <> pad 3 <> serializePath params
   
   DC.DrawParticle params -> writeU8 0x05 <> pad 3 <> serializeParticle params
   
-  DC.PushClip _ -> writeU8 0x10 <> pad 3  -- Clip needs expansion
+  DC.PushClip region -> writeU8 0x10 <> pad 3 <> serializeClipRegion region
   
   DC.PopClip -> writeU8 0x11 <> pad 3
+  
+  -- v2 Typography as Geometry (opcodes 0x20-0x24)
+  DC.DrawGlyphPath params -> writeU8 0x20 <> pad 3 <> serializeGlyphPath params
+  
+  DC.DrawGlyphInstance params -> writeU8 0x21 <> pad 3 <> serializeGlyphInstance params
+  
+  DC.DrawWord params -> writeU8 0x22 <> pad 3 <> serializeWord params
+  
+  DC.DefinePathData params -> writeU8 0x23 <> pad 3 <> serializePathData params
+  
+  DC.UpdateAnimationState params -> writeU8 0x24 <> pad 3 <> serializeAnimationState params
 
 -- | Padding bytes for alignment.
 pad :: Int -> Array Int
@@ -518,6 +631,371 @@ serializeParticle p =
     <> writeF32 (Opacity.toUnitInterval (RGB.alpha p.color))
     -- Pick ID
     <> writeU32 (pickIdToInt p.pickId)
+
+-- | Serialize DrawPath payload (variable length).
+-- |
+-- | Wire format:
+-- | - segmentCount: u32 (number of path segments)
+-- | - fillPresent: u8 (1 = has fill, 0 = no fill)
+-- | - strokePresent: u8 (1 = has stroke, 0 = no stroke)
+-- | - padding: u16 (alignment)
+-- | - [fill color if present]: 4 × f32
+-- | - [stroke color if present]: 4 × f32
+-- | - strokeWidth: f32
+-- | - depth: f32
+-- | - pickId: u32
+-- | - [segments]: variable path segment data
+serializePath :: forall msg. DC.PathParams msg -> Array Int
+serializePath p =
+  let
+    segmentCount = Array.length p.segments
+    fillPresent = case p.fill of
+      Just _ -> 1
+      Nothing -> 0
+    strokePresent = case p.stroke of
+      Just _ -> 1
+      Nothing -> 0
+  in
+    -- Header
+    writeU32 segmentCount
+    <> writeU8 fillPresent
+    <> writeU8 strokePresent
+    <> writeU16 0  -- padding for alignment
+    -- Fill color (if present)
+    <> serializeMaybeColor p.fill
+    -- Stroke color (if present)
+    <> serializeMaybeColor p.stroke
+    -- Stroke width
+    <> writeF32 (unwrapPixel p.strokeWidth)
+    -- Depth
+    <> writeF32 p.depth
+    -- Pick ID
+    <> writeU32 (pickIdToInt p.pickId)
+    -- Path segments
+    <> Array.concatMap serializePathSegment p.segments
+
+-- | Serialize an optional color (RGBA as 4 × f32, or nothing).
+serializeMaybeColor :: Maybe RGB.RGBA -> Array Int
+serializeMaybeColor = case _ of
+  Nothing -> []
+  Just rgba ->
+    let rgb = RGB.fromRGBA rgba
+    in writeF32 (Channel.toUnitInterval (RGB.red rgb))
+       <> writeF32 (Channel.toUnitInterval (RGB.green rgb))
+       <> writeF32 (Channel.toUnitInterval (RGB.blue rgb))
+       <> writeF32 (Opacity.toUnitInterval (RGB.alpha rgba))
+
+-- | Serialize ClipRegion payload.
+-- |
+-- | Wire format for ClipRect:
+-- | - subtype: u8 = 0x00 (rectangle)
+-- | - padding: u8[3]
+-- | - x, y, width, height: 4 × f32
+-- | - cornerRadii: 4 × f32 (topLeft, topRight, bottomRight, bottomLeft)
+-- |
+-- | Wire format for ClipPath:
+-- | - subtype: u8 = 0x01 (path)
+-- | - padding: u8[3]
+-- | - segmentCount: u32
+-- | - [segments]: variable path segment data
+serializeClipRegion :: DC.ClipRegion -> Array Int
+serializeClipRegion = case _ of
+  DC.ClipRect rect ->
+    writeU8 0x00  -- subtype: rectangle
+    <> pad 3      -- alignment padding
+    -- Position and size
+    <> writeF32 (unwrapPixel rect.x)
+    <> writeF32 (unwrapPixel rect.y)
+    <> writeF32 (unwrapPixel rect.width)
+    <> writeF32 (unwrapPixel rect.height)
+    -- Corner radii
+    <> writeF32 (radiusToNumber rect.cornerRadius.topLeft)
+    <> writeF32 (radiusToNumber rect.cornerRadius.topRight)
+    <> writeF32 (radiusToNumber rect.cornerRadius.bottomRight)
+    <> writeF32 (radiusToNumber rect.cornerRadius.bottomLeft)
+  
+  DC.ClipPath segments ->
+    let segmentCount = Array.length segments
+    in writeU8 0x01  -- subtype: path
+       <> pad 3       -- alignment padding
+       <> writeU32 segmentCount
+       <> Array.concatMap serializePathSegment segments
+
+-- ─────────────────────────────────────────────────────────────────────────────────
+--                                                  // v2 typography serialization
+-- ─────────────────────────────────────────────────────────────────────────────────
+
+-- | Serialize DrawGlyphPath payload (variable length).
+-- |
+-- | Wire format:
+-- | - glyphId: u32
+-- | - fontId: u16
+-- | - contourCount: u16
+-- | - bounds: 6 × f32
+-- | - advanceWidth: f32
+-- | - depth: f32
+-- | - pickId: u32
+-- | - [contours]: variable, per-contour command arrays
+serializeGlyphPath :: forall msg. DC.GlyphPathParams msg -> Array Int
+serializeGlyphPath p =
+  let
+    contourCount = Array.length p.contours
+  in
+    -- Header
+    writeU32 p.glyphId
+    <> writeU32 p.fontId         -- u32 for billion-agent scale (was u16)
+    <> writeU16 contourCount
+    <> writeU16 0                -- padding for alignment
+    -- Bounds
+    <> writeF32 (unwrapPixel p.bounds.minX)
+    <> writeF32 (unwrapPixel p.bounds.minY)
+    <> writeF32 (unwrapPixel p.bounds.minZ)
+    <> writeF32 (unwrapPixel p.bounds.maxX)
+    <> writeF32 (unwrapPixel p.bounds.maxY)
+    <> writeF32 (unwrapPixel p.bounds.maxZ)
+    -- Advance and depth
+    <> writeF32 (unwrapPixel p.advanceWidth)
+    <> writeF32 p.depth
+    -- Pick ID
+    <> writeU32 (pickIdToInt p.pickId)
+    -- Contours (variable)
+    <> Array.concatMap serializeContour p.contours
+
+-- | Serialize a single contour.
+serializeContour :: DC.ContourData -> Array Int
+serializeContour c =
+  let
+    cmdCount = Array.length c.commands
+    outerFlag = if c.isOuter then 1 else 0
+  in
+    writeU16 cmdCount
+    <> writeU8 outerFlag
+    <> writeU8 0  -- padding for alignment
+    <> Array.concatMap serializePathSegment c.commands
+
+-- | Serialize a path segment.
+serializePathSegment :: DC.PathSegment -> Array Int
+serializePathSegment = case _ of
+  DC.MoveTo pt -> 
+    writeU8 0x01 <> pad 3
+    <> writeF32 (unwrapPixel pt.x)
+    <> writeF32 (unwrapPixel pt.y)
+  
+  DC.LineTo pt ->
+    writeU8 0x02 <> pad 3
+    <> writeF32 (unwrapPixel pt.x)
+    <> writeF32 (unwrapPixel pt.y)
+  
+  DC.QuadraticTo ctrl end ->
+    writeU8 0x03 <> pad 3
+    <> writeF32 (unwrapPixel ctrl.x)
+    <> writeF32 (unwrapPixel ctrl.y)
+    <> writeF32 (unwrapPixel end.x)
+    <> writeF32 (unwrapPixel end.y)
+  
+  DC.CubicTo c1 c2 end ->
+    writeU8 0x04 <> pad 3
+    <> writeF32 (unwrapPixel c1.x)
+    <> writeF32 (unwrapPixel c1.y)
+    <> writeF32 (unwrapPixel c2.x)
+    <> writeF32 (unwrapPixel c2.y)
+    <> writeF32 (unwrapPixel end.x)
+    <> writeF32 (unwrapPixel end.y)
+  
+  DC.ClosePath ->
+    writeU8 0x05 <> pad 3
+
+-- | Serialize DrawGlyphInstance payload (fixed 68 bytes).
+serializeGlyphInstance :: forall msg. DC.GlyphInstanceParams msg -> Array Int
+serializeGlyphInstance p =
+  let
+    rgb = RGB.fromRGBA p.color
+  in
+    -- Path reference
+    writeU32 p.pathDataId
+    -- Position (3D)
+    <> writeF32 (unwrapPixel p.position.x)
+    <> writeF32 (unwrapPixel p.position.y)
+    <> writeF32 (unwrapPixel p.position.z)
+    -- Rotation (euler)
+    <> writeF32 p.rotation.x
+    <> writeF32 p.rotation.y
+    <> writeF32 p.rotation.z
+    -- Scale
+    <> writeF32 p.scale.x
+    <> writeF32 p.scale.y
+    <> writeF32 p.scale.z
+    -- Color (packed RGBA)
+    <> writeU8 (Channel.unwrap (RGB.red rgb))
+    <> writeU8 (Channel.unwrap (RGB.green rgb))
+    <> writeU8 (Channel.unwrap (RGB.blue rgb))
+    <> writeU8 (Opacity.unwrap (RGB.alpha p.color))
+    -- Animation state
+    <> writeF32 p.animationPhase
+    <> writeF32 p.spring.velocity
+    <> writeF32 p.spring.displacement
+    <> writeF32 p.spring.tension
+    <> writeF32 p.spring.damping
+    <> writeF32 p.spring.mass
+    -- Depth and pick
+    <> writeF32 p.depth
+    <> writeU32 (pickIdToInt p.pickId)
+
+-- | Serialize DrawWord payload (variable length).
+serializeWord :: forall msg. DC.WordParams msg -> Array Int
+serializeWord p =
+  let
+    glyphCount = Array.length p.glyphInstances
+    rgb = RGB.fromRGBA p.color
+    staggerSeed = getStaggerSeed p.stagger.direction
+  in
+    -- Header
+    writeU32 p.wordId
+    <> writeU16 glyphCount
+    <> writeU8 (staggerDirToInt p.stagger.direction)
+    <> writeU8 (easingToInt p.stagger.easing)
+    -- Origin
+    <> writeF32 (unwrapPixel p.origin.x)
+    <> writeF32 (unwrapPixel p.origin.y)
+    <> writeF32 (unwrapPixel p.origin.z)
+    -- Stagger delay and seed
+    <> writeF32 p.stagger.delayMs
+    <> writeU32 staggerSeed  -- Seed for StaggerRandom, 0 otherwise
+    -- Color (packed)
+    <> writeU8 (Channel.unwrap (RGB.red rgb))
+    <> writeU8 (Channel.unwrap (RGB.green rgb))
+    <> writeU8 (Channel.unwrap (RGB.blue rgb))
+    <> writeU8 (Opacity.unwrap (RGB.alpha p.color))
+    -- Depth and pick
+    <> writeF32 p.depth
+    <> writeU32 (pickIdToInt p.pickId)
+    -- Glyph references (variable)
+    <> Array.concatMap writeU32 p.glyphInstances
+    -- Positions (variable)
+    <> Array.concatMap serializePoint3D p.positions
+
+-- | Extract seed from StaggerDirection (0 for non-random).
+getStaggerSeed :: DC.StaggerDirection -> Int
+getStaggerSeed = case _ of
+  DC.StaggerRandom seed -> seed
+  _ -> 0
+
+-- | Serialize a 3D point.
+serializePoint3D :: DC.Point3D -> Array Int
+serializePoint3D p =
+  writeF32 (unwrapPixel p.x)
+  <> writeF32 (unwrapPixel p.y)
+  <> writeF32 (unwrapPixel p.z)
+
+-- | Serialize PathData payload (variable length).
+serializePathData :: DC.PathDataParams -> Array Int
+serializePathData p =
+  let
+    cmdCount = Array.length p.commands
+  in
+    writeU32 p.pathDataId
+    <> writeU32 cmdCount
+    -- Bounds
+    <> writeF32 (unwrapPixel p.bounds.minX)
+    <> writeF32 (unwrapPixel p.bounds.minY)
+    <> writeF32 (unwrapPixel p.bounds.minZ)
+    <> writeF32 (unwrapPixel p.bounds.maxX)
+    <> writeF32 (unwrapPixel p.bounds.maxY)
+    <> writeF32 (unwrapPixel p.bounds.maxZ)
+    -- Commands (variable)
+    <> Array.concatMap serializePathSegment p.commands
+
+-- | Serialize AnimationState payload (variable length).
+serializeAnimationState :: DC.AnimationStateParams -> Array Int
+serializeAnimationState p =
+  let
+    targetCount = Array.length p.targets
+    blendFactor = getBlendFactor p.mode
+  in
+    writeU16 targetCount
+    <> writeU8 (animModeToInt p.mode)
+    <> writeU8 0  -- padding
+    <> writeF32 p.frameTime
+    <> writeF32 blendFactor  -- Blend factor (0.0 if not AnimationBlend)
+    -- Targets (variable)
+    <> Array.concatMap serializeAnimTarget p.targets
+
+-- | Extract blend factor from AnimationUpdateMode (0.0 for non-blend).
+getBlendFactor :: DC.AnimationUpdateMode -> Number
+getBlendFactor = case _ of
+  DC.AnimationBlend factor -> factor
+  _ -> 0.0
+
+-- | Serialize a single animation target.
+serializeAnimTarget :: DC.AnimationTarget -> Array Int
+serializeAnimTarget t =
+  writeU32 t.targetId
+  <> writeU8 (targetTypeToInt t.targetType)
+  <> pad 3  -- alignment
+  -- Delta position
+  <> writeF32 (unwrapPixel t.deltaPosition.x)
+  <> writeF32 (unwrapPixel t.deltaPosition.y)
+  <> writeF32 (unwrapPixel t.deltaPosition.z)
+  -- Delta rotation
+  <> writeF32 t.deltaRotation.x
+  <> writeF32 t.deltaRotation.y
+  <> writeF32 t.deltaRotation.z
+  -- Delta scale
+  <> writeF32 t.deltaScale.x
+  <> writeF32 t.deltaScale.y
+  <> writeF32 t.deltaScale.z
+  -- Delta color (signed, but stored as unsigned)
+  <> writeI8 t.deltaColor.r
+  <> writeI8 t.deltaColor.g
+  <> writeI8 t.deltaColor.b
+  <> writeI8 t.deltaColor.a
+  -- Phase advance
+  <> writeF32 t.phaseAdvance
+
+-- ─────────────────────────────────────────────────────────────────────────────────
+--                                                             // v2 enum encoders
+-- ─────────────────────────────────────────────────────────────────────────────────
+
+-- | Encode StaggerDirection to u8.
+staggerDirToInt :: DC.StaggerDirection -> Int
+staggerDirToInt = case _ of
+  DC.StaggerLeftToRight -> 0
+  DC.StaggerRightToLeft -> 1
+  DC.StaggerCenterOut -> 2
+  DC.StaggerEdgesIn -> 3
+  DC.StaggerRandom _ -> 4  -- Seed stored separately if needed
+
+-- | Encode EasingFunction to u8.
+easingToInt :: DC.EasingFunction -> Int
+easingToInt = case _ of
+  DC.EaseLinear -> 0
+  DC.EaseInQuad -> 1
+  DC.EaseOutQuad -> 2
+  DC.EaseInOutQuad -> 3
+  DC.EaseInCubic -> 4
+  DC.EaseOutCubic -> 5
+  DC.EaseInOutCubic -> 6
+  DC.EaseInElastic -> 7
+  DC.EaseOutElastic -> 8
+  DC.EaseInOutElastic -> 9
+  DC.EaseInBounce -> 10
+  DC.EaseOutBounce -> 11
+  DC.EaseSpring -> 12
+
+-- | Encode AnimationUpdateMode to u8.
+animModeToInt :: DC.AnimationUpdateMode -> Int
+animModeToInt = case _ of
+  DC.AnimationReplace -> 0
+  DC.AnimationAdditive -> 1
+  DC.AnimationBlend _ -> 2  -- Factor stored separately if needed
+
+-- | Encode TargetType to u8.
+targetTypeToInt :: DC.TargetType -> Int
+targetTypeToInt = case _ of
+  DC.TargetGlyphInstance -> 0
+  DC.TargetWord -> 1
+  DC.TargetPathData -> 2
+  DC.TargetControlPoint -> 3
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // deserialization

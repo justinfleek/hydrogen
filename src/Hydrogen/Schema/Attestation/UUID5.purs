@@ -44,6 +44,13 @@ module Hydrogen.Schema.Attestation.UUID5
   , nsAttestation
   , nsContact
   , nsButton
+  , nsToggle
+  , nsTab
+  , nsTabPanel
+  , nsAccordionTrigger
+  , nsAccordionContent
+  , nsOTPInput
+  , nsOTPDigit
   ) where
 
 import Prelude
@@ -136,6 +143,60 @@ nsButton :: UUID5
 nsButton = UUID5
   [ 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x5f, 0x68
   , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Toggle UUIDs
+-- |
+-- | Toggle buttons with identical value get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.toggle")
+nsToggle :: UUID5
+nsToggle = UUID5
+  [ 0x74, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Tab UUIDs
+-- |
+-- | Tabs with identical value get identical UUIDs.
+-- | Used for aria-controls linkage to TabPanel.
+-- | Derived from: uuid5(nil, "hydrogen.tab")
+nsTab :: UUID5
+nsTab = UUID5
+  [ 0x74, 0x61, 0x62, 0x5f, 0x5f, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen TabPanel UUIDs
+-- |
+-- | TabPanels with identical value get identical UUIDs.
+-- | Used for aria-labelledby linkage to Tab.
+-- | Derived from: uuid5(nil, "hydrogen.tabpanel")
+nsTabPanel :: UUID5
+nsTabPanel = UUID5
+  [ 0x74, 0x61, 0x62, 0x70, 0x61, 0x6e, 0x65, 0x6c
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Accordion Trigger UUIDs
+-- |
+-- | Accordion triggers with identical value get identical UUIDs.
+-- | Used for aria-controls linkage to content.
+-- | Derived from: uuid5(nil, "hydrogen.accordion.trigger")
+nsAccordionTrigger :: UUID5
+nsAccordionTrigger = UUID5
+  [ 0x61, 0x63, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6f
+  , 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x67, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Accordion Content UUIDs
+-- |
+-- | Accordion content with identical value get identical UUIDs.
+-- | Used for aria-labelledby linkage to trigger.
+-- | Derived from: uuid5(nil, "hydrogen.accordion.content")
+nsAccordionContent :: UUID5
+nsAccordionContent = UUID5
+  [ 0x61, 0x63, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6f
+  , 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e
   ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════

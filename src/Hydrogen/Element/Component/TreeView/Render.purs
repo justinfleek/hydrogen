@@ -112,6 +112,7 @@ module Hydrogen.Element.Component.TreeView.Render
   , renderNodeIcon
   , renderNodeLabel
   , renderCheckbox
+  , renderCheckboxReadOnly
   , renderDropIndicator
   
   -- * Advanced Rendering
@@ -625,14 +626,47 @@ renderTreeViewAdvanced propMods tree state =
       (connectionLayer <> nodeLayer)
 
 -- | Build container styles from props
+-- |
+-- | Includes accessibility configuration for direction, motion, and contrast.
 buildContainerStyles :: forall msg. TreeViewProps msg -> Array (E.Attribute msg)
 buildContainerStyles props =
   let
     bgStyle = case props.backgroundColor of
       Nothing -> []
       Just c -> [ E.style "background-color" (Color.toHex c) ]
+    
+    -- Apply a11yConfig settings when provided
+    a11yStyles = case props.a11yConfig of
+      Nothing -> []
+      Just config ->
+        let
+          -- Text direction (LTR/RTL/Auto)
+          directionStyle = case config.direction of
+            A11y.LTR -> [ E.style "direction" "ltr" ]
+            A11y.RTL -> [ E.style "direction" "rtl" ]
+            A11y.Auto -> [ E.attr "dir" "auto" ]
+          
+          -- Reduced motion preference (CSS respects prefers-reduced-motion,
+          -- but we can also disable transitions explicitly)
+          motionStyle = if config.reducedMotion
+            then [ E.attr "data-reduced-motion" "true"
+                 , E.style "transition" "none"
+                 ]
+            else []
+          
+          -- High contrast mode indicator
+          contrastAttr = if config.highContrast
+            then [ E.attr "data-high-contrast" "true" ]
+            else []
+          
+          -- Labelled-by for accessibility
+          labelledByAttr = case config.labelledBy of
+            Nothing -> []
+            Just labelId -> [ E.attr "aria-labelledby" labelId ]
+        in
+          directionStyle <> motionStyle <> contrastAttr <> labelledByAttr
   in
-    bgStyle
+    bgStyle <> a11yStyles
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                       // state-specific renders
@@ -728,6 +762,8 @@ renderCheckedNodes props tree checkedState =
       (map (renderCheckedNodeSummary props) checkedNodeList)
 
 -- | Render a summary of a checked node
+-- |
+-- | Uses renderCheckboxReadOnly since this is a display-only summary.
 renderCheckedNodeSummary :: forall msg. TreeViewProps msg -> TreeNode -> E.Element msg
 renderCheckedNodeSummary props node =
   E.div_
@@ -737,7 +773,7 @@ renderCheckedNodeSummary props node =
     , E.style "gap" "4px"
     , E.style "padding" "4px 8px"
     ]
-    [ renderCheckbox Checked
+    [ renderCheckboxReadOnly Checked
     , renderNodeIcon props node false
     , renderNodeLabel props node
     ]
@@ -935,7 +971,7 @@ renderNodeRow props tree state node =
       Just contentConfig ->
         Content.renderNodeContent contentConfig node expanded selected focused checkState false
       Nothing ->
-        renderNodeContentFallback props node expanded checkState hasChildren
+        renderNodeContentFallback props node nid expanded checkState hasChildren
     
     -- Build the node element
     nodeElement = E.element "div"
@@ -1053,7 +1089,7 @@ renderNodeAtPosition props tree state node position =
       Just contentConfig ->
         Content.renderNodeContent contentConfig node expanded selected focused checkState false
       Nothing ->
-        renderNodeContentFallback props node expanded checkState hasChildren
+        renderNodeContentFallback props node nid expanded checkState hasChildren
   in
     E.element "div"
       ([ E.class_ "tree-node tree-node-positioned"
@@ -1082,17 +1118,18 @@ renderNode ::
   E.Element msg
 renderNode props node depth expanded selected focused checkState checkable =
   let
+    nid = nodeId node
     hasChildren = nodeHasChildren node
     -- Render checkbox if checkable is true
     checkboxElement = if checkable
-      then [ renderCheckbox checkState ]
+      then [ renderCheckbox props nid checkState ]
       else []
     -- Legacy API: no hover state available, pass false
     hovered = false
   in
     E.div_
       (buildNodeStyles props depth selected focused hovered)
-      (checkboxElement <> [ renderNodeContentWithCheckState props node expanded checkState hasChildren ])
+      (checkboxElement <> [ renderNodeContentWithCheckState props node nid expanded checkState hasChildren ])
 
 -- | Build node row styles (for indented list)
 buildNodeStyles :: 
@@ -1241,15 +1278,16 @@ renderNodeContentFallback ::
   forall msg.
   TreeViewProps msg ->
   TreeNode ->
+  NodeId ->      -- node identifier for handlers
   Boolean ->     -- expanded
   CheckState ->
   Boolean ->     -- hasChildren
   E.Element msg
-renderNodeContentFallback props node expanded checkState hasChildren =
+renderNodeContentFallback props node nid expanded checkState hasChildren =
   let
     -- Render checkbox if checkable is enabled
     checkboxElement = if props.checkable
-      then [ renderCheckbox checkState ]
+      then [ renderCheckbox props nid checkState ]
       else []
   in
     E.div_
@@ -1258,7 +1296,7 @@ renderNodeContentFallback props node expanded checkState hasChildren =
       , E.style "gap" "4px"
       , E.style "flex" "1"
       ]
-      ([ renderExpandIcon props hasChildren expanded ] <>
+      ([ renderExpandIcon props nid hasChildren expanded ] <>
        checkboxElement <>
        [ renderNodeIcon props node expanded
        , renderNodeLabel props node
@@ -1272,28 +1310,30 @@ renderNodeContentWithCheckState ::
   forall msg.
   TreeViewProps msg ->
   TreeNode ->
+  NodeId ->      -- node identifier for handlers
   Boolean ->     -- expanded
   CheckState ->
   Boolean ->     -- hasChildren
   E.Element msg
-renderNodeContentWithCheckState props node expanded checkState hasChildren =
+renderNodeContentWithCheckState props node nid expanded checkState hasChildren =
   E.div_
     [ E.style "display" "flex"
     , E.style "align-items" "center"
     , E.style "gap" "4px"
     , E.style "flex" "1"
     ]
-    [ renderExpandIcon props hasChildren expanded
-    , renderCheckbox checkState  -- Always render checkbox with the provided state
+    [ renderExpandIcon props nid hasChildren expanded
+    , renderCheckbox props nid checkState  -- Always render checkbox with the provided state
     , renderNodeIcon props node expanded
     , renderNodeLabel props node
     ]
 
--- | Render expand/collapse icon
+-- | Render expand/collapse icon with click handler
 -- |
 -- | Uses expandIconColor and expandIconSize from props for customization.
-renderExpandIcon :: forall msg. TreeViewProps msg -> Boolean -> Boolean -> E.Element msg
-renderExpandIcon props hasChildren expanded =
+-- | Wires the onNodeExpand handler when provided.
+renderExpandIcon :: forall msg. TreeViewProps msg -> NodeId -> Boolean -> Boolean -> E.Element msg
+renderExpandIcon props nid hasChildren expanded =
   if hasChildren
     then
       let
@@ -1311,6 +1351,11 @@ renderExpandIcon props hasChildren expanded =
             in [ E.style "width" px, E.style "height" px, E.style "font-size" px ]
           Nothing -> 
             [ E.style "width" "16px", E.style "height" "16px" ]
+        
+        -- Wire onNodeExpand handler if provided
+        expandHandler = case props.onNodeExpand of
+          Just handler -> [ E.onClick (handler nid) ]
+          Nothing -> []
       in
         E.span_
           ([ E.class_ "tree-expand-icon"
@@ -1320,7 +1365,10 @@ renderExpandIcon props hasChildren expanded =
            , E.style "transition" "transform 150ms"
            , E.style "transform" (if expanded then "rotate(90deg)" else "rotate(0deg)")
            , E.style "cursor" "pointer"
-           ] <> colorStyle <> sizeStyle)
+           , E.role "button"
+           , E.attr "aria-expanded" (if expanded then "true" else "false")
+           , E.attr "aria-label" (if expanded then "Collapse" else "Expand")
+           ] <> colorStyle <> sizeStyle <> expandHandler)
           [ E.text "▶" ]
     else
       -- Spacer for leaf nodes to maintain alignment
@@ -1376,9 +1424,47 @@ renderNodeLabel props node =
        ] <> colorStyle)
       [ E.text (nodeLabel node) ]
 
--- | Render a checkbox with the given state
-renderCheckbox :: forall msg. CheckState -> E.Element msg
-renderCheckbox checkState =
+-- | Render a checkbox with the given state and click handler
+-- |
+-- | Wires the onNodeCheck handler when provided in props.
+renderCheckbox :: forall msg. TreeViewProps msg -> NodeId -> CheckState -> E.Element msg
+renderCheckbox props nid checkState =
+  let
+    icon = case checkState of
+      Checked -> "☑"
+      Unchecked -> "☐"
+      Indeterminate -> "▣"
+    
+    ariaChecked = case checkState of
+      Checked -> "true"
+      Unchecked -> "false"
+      Indeterminate -> "mixed"
+    
+    -- Wire onNodeCheck handler if provided
+    checkHandler = case props.onNodeCheck of
+      Just handler -> [ E.onClick (handler nid) ]
+      Nothing -> []
+  in
+    E.span_
+      ([ E.class_ "tree-checkbox"
+       , E.role "checkbox"
+       , E.attr "aria-checked" ariaChecked
+       , E.attr "aria-label" "Toggle selection"
+       , E.style "width" "16px"
+       , E.style "height" "16px"
+       , E.style "display" "inline-flex"
+       , E.style "align-items" "center"
+       , E.style "justify-content" "center"
+       , E.style "cursor" "pointer"
+       , E.style "flex-shrink" "0"
+       ] <> checkHandler)
+      [ E.text icon ]
+
+-- | Render a read-only checkbox for display-only contexts (summaries, previews)
+-- |
+-- | Unlike renderCheckbox, this doesn't wire any click handlers.
+renderCheckboxReadOnly :: forall msg. CheckState -> E.Element msg
+renderCheckboxReadOnly checkState =
   let
     icon = case checkState of
       Checked -> "☑"
@@ -1391,15 +1477,15 @@ renderCheckbox checkState =
       Indeterminate -> "mixed"
   in
     E.span_
-      [ E.class_ "tree-checkbox"
+      [ E.class_ "tree-checkbox tree-checkbox-readonly"
       , E.role "checkbox"
       , E.attr "aria-checked" ariaChecked
+      , E.attr "aria-readonly" "true"
       , E.style "width" "16px"
       , E.style "height" "16px"
       , E.style "display" "inline-flex"
       , E.style "align-items" "center"
       , E.style "justify-content" "center"
-      , E.style "cursor" "pointer"
       , E.style "flex-shrink" "0"
       ]
       [ E.text icon ]

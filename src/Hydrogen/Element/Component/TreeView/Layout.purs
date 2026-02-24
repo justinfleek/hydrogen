@@ -96,24 +96,16 @@ module Hydrogen.Element.Component.TreeView.Layout
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Prelude
-  ( class Eq
-  , class Show
-  , show
-  , (<>)
-  , (-)
+  ( (-)
   , (+)
   , (/)
   , (*)
-  , (<)
-  , (<=)
-  , (>=)
-  , (>)
   , (==)
+  , (>)
   , (&&)
   , max
   , min
   , map
-  , ($)
   )
 
 import Data.Array as Array
@@ -126,7 +118,6 @@ import Data.Int (toNumber, floor) as Int
 
 import Hydrogen.Element.Component.TreeView.Types
   ( NodeId
-  , unwrapNodeId
   , Depth
   , unwrapDepth
   )
@@ -138,8 +129,6 @@ import Hydrogen.Element.Component.TreeView.Node
   , nodeChildren
   , rootNodes
   , getNode
-  , treeSize
-  , flattenTree
   , nodeDepth
   )
 
@@ -151,8 +140,6 @@ import Hydrogen.Element.Component.TreeView.State
 import Hydrogen.Schema.Graph.Layout
   ( LayoutConfig
   , LayoutAlgorithm(..)
-  , LayoutOrientation(..)
-  , LayoutSpacing
   , NodeSizing(..)
   , NodePosition
   , siblingGap
@@ -274,10 +261,6 @@ layoutIndentedList ::
   LayoutResult
 layoutIndentedList config tree expanded =
   let
-    spacing = config.spacing
-    nodeHeight = nodeSizeHeight config.sizing
-    nodeWidth = nodeSizeWidth config.sizing
-    
     -- Get visible nodes (flattened, respecting expansion)
     roots = rootNodes tree
     
@@ -390,7 +373,6 @@ layoutRadial config tree expanded =
           layoutRadialLevel config tree expanded stateWithRoot childNodes inner angleStep start 1
     
     -- Calculate bounds (circular, so use outer radius)
-    diameter = outer * 2.0
     bounds = Viewport.viewportBounds (negateNum outer) (negateNum outer) outer outer
   in
     layoutResult finalState.positions bounds (Map.size finalState.positions)
@@ -516,7 +498,7 @@ layoutTreemap ::
   LayoutResult
 layoutTreemap config tree expanded =
   let
-    treemapParams = fromMaybe defaultTreemapParams config.treemapParams
+    _treemapParams = fromMaybe defaultTreemapParams config.treemapParams
     bounds = fromMaybe (Viewport.viewportBounds 0.0 0.0 800.0 600.0) 
              (boundsFromConstraints config)
     
@@ -638,9 +620,6 @@ layoutTidy ::
   LayoutResult
 layoutTidy config tree expanded =
   let
-    spacing = config.spacing
-    nodeSize = nodeSizeWidth config.sizing
-    
     roots = rootNodes tree
     
     initialState = { positions: Map.empty, maxX: 0.0, maxY: 0.0 }
@@ -801,7 +780,6 @@ layoutMindMap ::
   LayoutResult
 layoutMindMap config tree expanded =
   let
-    spacing = config.spacing
     nodeSize = nodeSizeWidth config.sizing
     
     roots = rootNodes tree

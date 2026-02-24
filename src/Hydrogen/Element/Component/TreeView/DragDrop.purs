@@ -71,21 +71,15 @@ module Hydrogen.Element.Component.TreeView.DragDrop
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Prelude
-  ( class Eq
-  , class Show
-  , show
-  , (==)
+  ( (==)
   , (/=)
-  , (<>)
   , (<)
   , (>)
   , (&&)
-  , (||)
   , not
   , otherwise
   )
 
-import Data.Array as Array
 import Data.Maybe (Maybe(Just, Nothing), isJust)
 
 import Hydrogen.Element.Component.TreeView.Types
@@ -97,7 +91,6 @@ import Hydrogen.Element.Component.TreeView.Types
 
 import Hydrogen.Element.Component.TreeView.State
   ( DragState
-  , noDrag
   , beginDrag
   , updateDragOver
   , endDrag
@@ -112,10 +105,7 @@ import Hydrogen.Element.Component.TreeView.Node
   , TreeNode
   , nodeId
   , nodeDisabled
-  , nodeHasChildren
-  , isAncestorOf
   , isDescendantOf
-  , nodeDepth
   , parentNode
   , moveNode
   , getNode

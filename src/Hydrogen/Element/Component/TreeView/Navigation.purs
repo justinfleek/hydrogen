@@ -68,9 +68,8 @@ import Prelude
   , (-)
   , (>=)
   , (<)
-  , (&&)
-  , not
   , map
+  , not
   )
 
 import Data.Array as Array
@@ -86,9 +85,9 @@ import Hydrogen.Element.Component.TreeView.State
   ( ExpandedState
   , FocusState
   , isExpanded
+  , setExpanded
   , getFocusedNode
   , focusOn
-  , setExpanded
   )
 
 import Hydrogen.Element.Component.TreeView.Node
@@ -99,7 +98,6 @@ import Hydrogen.Element.Component.TreeView.Node
   , parentNode
   , nodeId
   , nodeLabel
-  , nodeHasChildren
   )
 
 -- ═══════════════════════════════════════════════════════════════════════════════

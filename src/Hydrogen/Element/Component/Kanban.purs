@@ -194,6 +194,8 @@ import Hydrogen.Element.Component.Kanban.State
   , removeCard
   , updateCard
   , moveCard
+  , moveCardRelative
+  , moveCardToColumn
   , cardCount
   , cardCountInColumn
   , Swimlane

@@ -46,6 +46,8 @@ module Hydrogen.Element.Component.Kanban.State
   , removeCard
   , updateCard
   , moveCard
+  , moveCardRelative
+  , moveCardToColumn
   , cardCount
   , cardCountInColumn
   
@@ -79,25 +81,19 @@ module Hydrogen.Element.Component.Kanban.State
   ) where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , map
+  ( map
   , not
-  , otherwise
   , (#)
   , (+)
-  , (-)
   , (<>)
   , (==)
-  , (&&)
   , (/=)
   , (>=)
-  , (>)
   )
 
-import Data.Array (filter, findIndex, length, snoc, sortBy, updateAt)
+import Data.Array (filter, findIndex, length, snoc, sortBy)
 import Data.Array as Array
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Ord (comparing)
 import Data.Set (Set)
 import Data.Set as Set
@@ -121,10 +117,9 @@ import Hydrogen.Element.Component.Kanban.Types
       , SelectCard
       , DeselectCard
       )
+  , DropPosition(DropBefore, DropAfter, DropInto)
   , cardId
   , unwrapCardId
-  , unwrapColumnId
-  , unwrapSwimlaneId
   )
 import Hydrogen.Element.Component.Kanban.Card
   ( KanbanCard
@@ -310,6 +305,44 @@ moveCard cId colId newIndex state =
     reindexCardsAfter :: Int -> Array KanbanCard -> Array KanbanCard
     reindexCardsAfter idx cards =
       map (\c -> if cardIndex c >= idx then setCardIndex (cardIndex c + 1) c else c) cards
+
+-- | Move card relative to a target card using DropPosition
+-- |
+-- | This enables fine-grained drop positioning:
+-- | - DropBefore: Insert before the target card
+-- | - DropAfter: Insert after the target card
+-- | - DropInto: Insert at the end of the target's column (target is the column itself)
+-- |
+-- | Uses `findIndex` to locate the target card in its column's card array.
+moveCardRelative :: CardId -> CardId -> DropPosition -> KanbanState -> KanbanState
+moveCardRelative draggedId targetId position state =
+  case getCard targetId state of
+    Nothing -> state  -- Target card not found
+    Just targetCard ->
+      let
+        targetColId = cardColumnId targetCard
+        cardsInCol = getCardsInColumn targetColId state
+        -- Find target's position in the sorted column cards
+        mTargetIdx = findIndex (\c -> cardIdOf c == targetId) cardsInCol
+      in case mTargetIdx of
+        Nothing -> state  -- Target not in column (shouldn't happen)
+        Just targetIdx ->
+          let
+            -- Compute insertion index based on drop position
+            insertIdx = case position of
+              DropBefore -> targetIdx
+              DropAfter -> targetIdx + 1
+              DropInto -> length cardsInCol  -- End of column
+          in
+            moveCard draggedId targetColId insertIdx state
+
+-- | Move card to end of column (convenience for DropInto with column target)
+moveCardToColumn :: CardId -> ColumnId -> KanbanState -> KanbanState
+moveCardToColumn cId colId state =
+  let
+    insertIdx = cardCountInColumn colId state
+  in
+    moveCard cId colId insertIdx state
 
 -- | Get total card count
 cardCount :: KanbanState -> Int

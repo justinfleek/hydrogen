@@ -85,32 +85,26 @@ import Prelude
   )
 
 import Data.Array as Array
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-import Data.Foldable (foldl)
+import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Render.Element as E
 
 import Hydrogen.Element.Component.TreeView.Types
-  ( NodeId
-  , CheckState(Checked, Unchecked, Indeterminate)
-  , NodeIcon
+  ( CheckState(Checked, Unchecked, Indeterminate)
   , iconToEmoji
   , iconToAria
   )
 
 import Hydrogen.Element.Component.TreeView.Node
   ( TreeNode
-  , nodeId
   , nodeLabel
   , nodeIcon
   , nodeHasChildren
-  , nodeDisabled
   )
 
 import Hydrogen.Schema.Graph.NodeContent
   ( ContentSlot(..)
   , ContentTemplate(..)
-  , slotPriority
   ) as Schema
 
 -- ═══════════════════════════════════════════════════════════════════════════════

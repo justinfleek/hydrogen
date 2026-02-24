@@ -93,8 +93,7 @@ import Hydrogen.Render.Element as E
 import Hydrogen.Element.Component.TreeView.Types
   ( NodeId
   , TreeViewMsg
-      ( BeginEdit
-      , UpdateEditBuffer
+      ( UpdateEditBuffer
       , ConfirmEdit
       , CancelEdit
       )

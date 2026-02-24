@@ -40,10 +40,12 @@ module Hydrogen.Element.Component.TreeView.Accessibility
   , ariaAttrs
   , containerAriaAttrs
   , nodeAriaAttrs
+  , computeNodeAriaAttrs
   
   -- * Aria Builders
   , ariaExpanded
   , ariaSelected
+  , ariaChecked
   , ariaLevel
   , ariaSetSize
   , ariaPosInSet
@@ -99,6 +101,8 @@ import Prelude
   , (<>)
   , (==)
   , (<<<)
+  , (+)
+  , (||)
   , not
   , negate
   )
@@ -196,6 +200,71 @@ nodeAriaAttrs config =
   in
     base <> expandedAttr <> disabledAttr
 
+-- | Compute ARIA attributes for a node from tree structure
+-- |
+-- | This computes aria-level, aria-setsize, and aria-posinset from the
+-- | actual tree structure rather than requiring pre-computed values.
+-- |
+-- | Uses:
+-- | - `unwrapDepth` to convert Depth to aria-level Int
+-- | - `siblingNodes` to compute aria-setsize
+-- | - `nodeId` to find position in sibling list
+-- | - `nodeHasChildren` / `nodeChildren` to determine expandability
+computeNodeAriaAttrs ::
+  forall msg.
+  { node :: TreeNode
+  , tree :: Tree
+  , depth :: Depth
+  , expanded :: Boolean
+  , selected :: Boolean
+  , checkState :: Maybe CheckState
+  , disabled :: Boolean
+  } ->
+  AriaAttrs msg
+computeNodeAriaAttrs config =
+  let
+    nid = nodeId config.node
+    siblings = siblingNodes nid config.tree
+    -- setSize includes self, so add 1 to sibling count
+    setSize = Array.length siblings + 1
+    -- Find position among siblings (1-indexed)
+    posInSet = findPosInSet nid siblings + 1
+    -- Level is depth + 1 (aria-level is 1-indexed)
+    level = unwrapDepth config.depth + 1
+    -- Node is expandable if it has children
+    hasChildren = nodeHasChildren config.node || not (Array.null (nodeChildren config.node))
+    
+    base =
+      [ E.role "treeitem"
+      , E.attr "aria-level" (show level)
+      , E.attr "aria-setsize" (show setSize)
+      , E.attr "aria-posinset" (show posInSet)
+      , E.attr "aria-selected" (if config.selected then "true" else "false")
+      ]
+    
+    -- Only include aria-expanded if node is expandable
+    expandedAttr = if hasChildren
+      then [ E.attr "aria-expanded" (if config.expanded then "true" else "false") ]
+      else []
+    
+    -- Include aria-checked if checkbox state is provided
+    checkedAttr = case config.checkState of
+      Nothing -> []
+      Just cs -> [ ariaChecked cs ]
+    
+    disabledAttr = if config.disabled
+      then [ E.attr "aria-disabled" "true" ]
+      else []
+  in
+    base <> expandedAttr <> checkedAttr <> disabledAttr
+  where
+    -- Find position of node among siblings (0-indexed)
+    findPosInSet :: NodeId -> Array TreeNode -> Int
+    findPosInSet targetId sibs =
+      case Array.findIndex (\n -> nodeId n == targetId) sibs of
+        Just idx -> idx
+        Nothing -> 0  -- Self is not in siblings, so position 0
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // aria builders
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -207,6 +276,17 @@ ariaExpanded exp = E.attr "aria-expanded" (if exp then "true" else "false")
 -- | aria-selected attribute
 ariaSelected :: forall msg. Boolean -> E.Attribute msg
 ariaSelected sel = E.attr "aria-selected" (if sel then "true" else "false")
+
+-- | aria-checked attribute for checkbox trees
+-- |
+-- | Maps CheckState to ARIA tri-state:
+-- | - Checked → "true"
+-- | - Unchecked → "false"
+-- | - Indeterminate → "mixed"
+ariaChecked :: forall msg. CheckState -> E.Attribute msg
+ariaChecked Checked = E.attr "aria-checked" "true"
+ariaChecked Unchecked = E.attr "aria-checked" "false"
+ariaChecked Indeterminate = E.attr "aria-checked" "mixed"
 
 -- | aria-level attribute
 ariaLevel :: forall msg. Int -> E.Attribute msg
