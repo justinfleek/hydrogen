@@ -100,7 +100,8 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
-import Data.Number (abs, acos, asin, atan2, cos, pi, sin, sqrt)
+import Data.Int (toNumber)
+import Data.Number (abs, acos, asin, atan2, cos, pi, pow, sin, sqrt)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -470,13 +471,3 @@ round' :: Number -> Number
 round' = roundImpl
 
 foreign import roundImpl :: Number -> Number
-
-pow :: Number -> Number -> Number
-pow = powImpl
-
-foreign import powImpl :: Number -> Number -> Number
-
-toNumber :: Int -> Number
-toNumber = toNumberImpl
-
-foreign import toNumberImpl :: Int -> Number

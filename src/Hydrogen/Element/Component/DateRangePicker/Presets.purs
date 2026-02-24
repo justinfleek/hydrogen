@@ -63,7 +63,7 @@ import Hydrogen.Element.Component.Calendar
   , WeekStart(Sunday, Monday)
   , addDays
   , addMonths
-  , daysInMonth
+  , getDaysInMonth
   , dayOfWeek
   )
 
@@ -263,7 +263,7 @@ lastMonthRange today =
   let
     lastMonth = addMonths today (-1)
     start = { year: lastMonth.year, month: lastMonth.month, day: 1 }
-    lastDay = daysInMonth lastMonth.year lastMonth.month
+    lastDay = getDaysInMonth lastMonth.year lastMonth.month
     end = { year: lastMonth.year, month: lastMonth.month, day: lastDay }
   in
     { start: start, end: end }

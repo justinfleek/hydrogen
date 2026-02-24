@@ -48,7 +48,7 @@ import Data.Int (fromString) as Int
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 
-import Hydrogen.Element.Component.Calendar (CalendarDate, daysInMonth)
+import Hydrogen.Element.Component.Calendar (CalendarDate, getDaysInMonth)
 import Hydrogen.Element.Component.DatePicker.Types (DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -181,7 +181,7 @@ isValidDate :: Int -> Int -> Int -> Boolean
 isValidDate year month day =
   year >= 1 && year <= 9999 &&
   month >= 1 && month <= 12 &&
-  day >= 1 && day <= daysInMonth year month
+  day >= 1 && day <= getDaysInMonth year month
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

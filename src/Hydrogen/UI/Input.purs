@@ -67,7 +67,8 @@ module Hydrogen.UI.Input
   ) where
 
 import Prelude
-  ( (<>)
+  ( show
+  , (<>)
   , (||)
   )
 
@@ -279,10 +280,10 @@ textarea mods =
     config = foldl (\c f -> f c) defaultConfig mods
     baseAttrs = buildAttrs config
     rowsAttr = case config.rows of
-      Just r -> [ E.attr "rows" (intToString r) ]
+      Just r -> [ E.attr "rows" (show r) ]
       Nothing -> []
     colsAttr = case config.cols of
-      Just c -> [ E.attr "cols" (intToString c) ]
+      Just c -> [ E.attr "cols" (show c) ]
       Nothing -> []
     -- Textarea has different height class
     textareaClass = "min-h-20 h-auto"
@@ -345,5 +346,4 @@ maybeMsg f = case _ of
 conditionalAttr :: forall msg. Boolean -> E.Attribute msg -> Array (E.Attribute msg)
 conditionalAttr enabled attr = if enabled then [ attr ] else []
 
--- | Int to String (avoiding Prelude.show import)
-foreign import intToString :: Int -> String
+

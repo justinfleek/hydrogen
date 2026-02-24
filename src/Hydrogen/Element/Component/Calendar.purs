@@ -77,6 +77,10 @@ module Hydrogen.Element.Component.Calendar
   , MonthDay(..)
   , MonthWeek
   , MonthGrid
+  , Locale(..)
+  
+  -- * Locale Helpers
+  , monthName
   
   -- * Props
   , CalendarProps
@@ -145,15 +149,16 @@ module Hydrogen.Element.Component.Calendar
   , onPrevMonth
   , onNextMonth
   
-  -- * Date Operations (re-exported from FFI)
+  -- * Date Operations (pure Gregorian arithmetic)
+  , isLeapYear
   , getDaysInMonth
+  , dayOfWeek
   , getFirstDayOfMonth
   , compareDates
   , sameDate
   , addDays
   , addMonths
   , getWeekNumber
-  , isLeapYear
   
   -- * Grid Building
   , buildMonthGrid
@@ -164,6 +169,7 @@ import Prelude
   , class Show
   , const
   , map
+  , negate
   , not
   , otherwise
   , show
@@ -173,9 +179,12 @@ import Prelude
   , (<)
   , (<>)
   , (==)
+  , (/=)
   , (>)
   , (>=)
   , (||)
+  , (/)
+  , (*)
   )
 
 import Data.Array (foldl, snoc)
@@ -235,6 +244,27 @@ instance showWeekStart :: Show WeekStart where
 weekStartIndex :: WeekStart -> Int
 weekStartIndex Sunday = 0
 weekStartIndex Monday = 1
+
+-- | Locale for date formatting
+data Locale
+  = EnUS   -- English (United States)
+  | EnGB   -- English (United Kingdom)
+  | De     -- German
+  | Fr     -- French
+  | Es     -- Spanish
+  | Ja     -- Japanese
+  | Zh     -- Chinese
+
+derive instance eqLocale :: Eq Locale
+
+instance showLocale :: Show Locale where
+  show EnUS = "en-US"
+  show EnGB = "en-GB"
+  show De = "de"
+  show Fr = "fr"
+  show Es = "es"
+  show Ja = "ja"
+  show Zh = "zh"
 
 -- | A day cell in the month grid
 data MonthDay
@@ -537,47 +567,175 @@ onNextMonth m props = props { onNextMonth = Just m }
 --                                                             // date operations
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Get number of days in a month
-getDaysInMonth :: Int -> Int -> Int
-getDaysInMonth = getDaysInMonthImpl
-
--- | Get day of week for first day of month (0 = Sunday)
-getFirstDayOfMonth :: Int -> Int -> Int
-getFirstDayOfMonth = getFirstDayOfMonthImpl
-
--- | Compare two dates: -1 (a < b), 0 (equal), 1 (a > b)
-compareDates :: CalendarDate -> CalendarDate -> Int
-compareDates = compareDatesImpl
-
--- | Check if two dates are the same
-sameDate :: CalendarDate -> CalendarDate -> Boolean
-sameDate = sameDateImpl
-
--- | Add days to a date
-addDays :: CalendarDate -> Int -> CalendarDate
-addDays = addDaysImpl
-
--- | Add months to a date
-addMonths :: CalendarDate -> Int -> CalendarDate
-addMonths = addMonthsImpl
-
--- | Get ISO week number
-getWeekNumber :: CalendarDate -> Int
-getWeekNumber = getWeekNumberImpl
+-- Pure Gregorian calendar arithmetic. No FFI. No JavaScript.
 
 -- | Check if a year is a leap year
 isLeapYear :: Int -> Boolean
-isLeapYear = isLeapYearImpl
+isLeapYear year =
+  (year `rem` 4 == 0 && year `rem` 100 /= 0) || year `rem` 400 == 0
 
--- FFI imports
-foreign import getDaysInMonthImpl :: Int -> Int -> Int
-foreign import getFirstDayOfMonthImpl :: Int -> Int -> Int
-foreign import compareDatesImpl :: CalendarDate -> CalendarDate -> Int
-foreign import sameDateImpl :: CalendarDate -> CalendarDate -> Boolean
-foreign import addDaysImpl :: CalendarDate -> Int -> CalendarDate
-foreign import addMonthsImpl :: CalendarDate -> Int -> CalendarDate
-foreign import getWeekNumberImpl :: CalendarDate -> Int
-foreign import isLeapYearImpl :: Int -> Boolean
+-- | Get number of days in a month (1-indexed)
+getDaysInMonth :: Int -> Int -> Int
+getDaysInMonth year month = case month of
+  1 -> 31
+  2 -> if isLeapYear year then 29 else 28
+  3 -> 31
+  4 -> 30
+  5 -> 31
+  6 -> 30
+  7 -> 31
+  8 -> 31
+  9 -> 30
+  10 -> 31
+  11 -> 30
+  12 -> 31
+  _ -> 0
+
+-- | Day of week using Zeller's congruence (0 = Sunday, 6 = Saturday)
+-- |
+-- | Zeller's formula for Gregorian calendar:
+-- |   h = (q + floor(13(m+1)/5) + K + floor(K/4) + floor(J/4) - 2J) mod 7
+-- |
+-- | January/February treated as months 13/14 of previous year.
+dayOfWeek :: CalendarDate -> Int
+dayOfWeek date =
+  let
+    adjustedYear = if date.month < 3 then date.year - 1 else date.year
+    adjustedMonth = if date.month < 3 then date.month + 12 else date.month
+    
+    q = date.day
+    m = adjustedMonth
+    k = adjustedYear `rem` 100
+    j = adjustedYear / 100
+    
+    h = (q + (13 * (m + 1)) / 5 + k + k / 4 + j / 4 - 2 * j) `rem` 7
+    
+    -- Zeller: 0=Saturday, 1=Sunday. Convert to 0=Sunday.
+    dow = (h + 6) `rem` 7
+  in
+    if dow < 0 then dow + 7 else dow
+
+-- | Get day of week for first day of month (0 = Sunday)
+getFirstDayOfMonth :: Int -> Int -> Int
+getFirstDayOfMonth year month = dayOfWeek { year, month, day: 1 }
+
+-- | Compare two dates: -1 (a < b), 0 (equal), 1 (a > b)
+compareDates :: CalendarDate -> CalendarDate -> Int
+compareDates a b
+  | a.year < b.year = -1
+  | a.year > b.year = 1
+  | a.month < b.month = -1
+  | a.month > b.month = 1
+  | a.day < b.day = -1
+  | a.day > b.day = 1
+  | otherwise = 0
+
+-- | Check if two dates are the same
+sameDate :: CalendarDate -> CalendarDate -> Boolean
+sameDate a b = a.year == b.year && a.month == b.month && a.day == b.day
+
+-- | Add days to a date (handles month/year overflow)
+addDays :: CalendarDate -> Int -> CalendarDate
+addDays date n
+  | n == 0 = date
+  | n > 0 = addDaysPositive date n
+  | otherwise = addDaysNegative date (negate n)
+
+-- | Add positive number of days
+addDaysPositive :: CalendarDate -> Int -> CalendarDate
+addDaysPositive date n =
+  let
+    daysInCurrentMonth = getDaysInMonth date.year date.month
+    daysRemaining = daysInCurrentMonth - date.day
+  in
+    if n < daysRemaining + 1
+      then date { day = date.day + n }
+      else
+        let
+          nextMonth = if date.month == 12 then 1 else date.month + 1
+          nextYear = if date.month == 12 then date.year + 1 else date.year
+          nextDate = { year: nextYear, month: nextMonth, day: 1 }
+          remaining = n - daysRemaining - 1
+        in
+          addDaysPositive nextDate remaining
+
+-- | Subtract positive number of days
+addDaysNegative :: CalendarDate -> Int -> CalendarDate
+addDaysNegative date n =
+  if n < date.day
+    then date { day = date.day - n }
+    else
+      let
+        prevMonth = if date.month == 1 then 12 else date.month - 1
+        prevYear = if date.month == 1 then date.year - 1 else date.year
+        daysInPrevMonth = getDaysInMonth prevYear prevMonth
+        prevDate = { year: prevYear, month: prevMonth, day: daysInPrevMonth }
+        remaining = n - date.day
+      in
+        addDaysNegative prevDate remaining
+
+-- | Add months to a date (clamps day to valid range)
+addMonths :: CalendarDate -> Int -> CalendarDate
+addMonths date n =
+  let
+    totalMonths = date.year * 12 + (date.month - 1) + n
+    newYear = totalMonths / 12
+    newMonth = (totalMonths `rem` 12) + 1
+    adjustedMonth = if newMonth < 1 then newMonth + 12 else newMonth
+    adjustedYear = if newMonth < 1 then newYear - 1 else newYear
+    maxDay = getDaysInMonth adjustedYear adjustedMonth
+    newDay = if date.day > maxDay then maxDay else date.day
+  in
+    { year: adjustedYear, month: adjustedMonth, day: newDay }
+
+-- | Get ISO 8601 week number (1-53)
+-- |
+-- | Week 1 contains the first Thursday of the year. Weeks start Monday.
+getWeekNumber :: CalendarDate -> Int
+getWeekNumber date =
+  let
+    dow = dayOfWeek date
+    daysToThursday = (4 - dow + 7) `rem` 7
+    thursday = addDays date daysToThursday
+    jan1 = { year: thursday.year, month: 1, day: 1 }
+    daysSinceJan1 = daysBetween jan1 thursday
+  in
+    daysSinceJan1 / 7 + 1
+
+-- | Days between two dates (assumes b >= a)
+daysBetween :: CalendarDate -> CalendarDate -> Int
+daysBetween a b =
+  let
+    doyA = dayOfYear a
+    doyB = dayOfYear b
+  in
+    if a.year == b.year
+      then doyB - doyA
+      else
+        let
+          daysRemainingInYearA = daysInYear a.year - doyA
+          fullYears = countDaysInYears (a.year + 1) (b.year - 1)
+        in
+          daysRemainingInYearA + fullYears + doyB
+
+-- | Day of year (1-365 or 1-366)
+dayOfYear :: CalendarDate -> Int
+dayOfYear date = go 1 0
+  where
+  go :: Int -> Int -> Int
+  go m acc
+    | m == date.month = acc + date.day
+    | otherwise = go (m + 1) (acc + getDaysInMonth date.year m)
+
+-- | Total days in a year
+daysInYear :: Int -> Int
+daysInYear year = if isLeapYear year then 366 else 365
+
+-- | Sum days in range of years (inclusive)
+countDaysInYears :: Int -> Int -> Int
+countDaysInYears startYear endYear
+  | startYear > endYear = 0
+  | otherwise = daysInYear startYear + countDaysInYears (startYear + 1) endYear
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // month grid
@@ -729,7 +887,7 @@ renderHeader props =
           [ E.style "font-size" "14px"
           , E.style "font-weight" "500"
           ]
-          [ E.text (monthName props.viewMonth <> " " <> show props.viewYear) ]
+          [ E.text (monthName EnUS props.viewMonth <> " " <> show props.viewYear) ]
       ]
 
 -- | Render navigation header with prev/next buttons
@@ -755,7 +913,7 @@ renderNavHeader props =
           [ E.style "font-size" "14px"
           , E.style "font-weight" "500"
           ]
-          [ E.text (monthName props.viewMonth <> " " <> show props.viewYear) ]
+          [ E.text (monthName EnUS props.viewMonth <> " " <> show props.viewYear) ]
       , -- Next month button
         renderNavButton props.onNextMonth navColor navRadius cSize (E.text "\x203a")
       ]
@@ -1012,9 +1170,20 @@ isDateRangeEnd props date = case props.rangeEnd of
   Just end -> sameDate date end
   Nothing -> false
 
--- | Month name lookup
-monthName :: Int -> String
-monthName = case _ of
+-- | Month name lookup by locale
+monthName :: Locale -> Int -> String
+monthName locale month = case locale of
+  EnUS -> monthNameEnUS month
+  EnGB -> monthNameEnUS month  -- Same as US English
+  De -> monthNameDe month
+  Fr -> monthNameFr month
+  Es -> monthNameEs month
+  Ja -> monthNameJa month
+  Zh -> monthNameZh month
+
+-- | English month names
+monthNameEnUS :: Int -> String
+monthNameEnUS = case _ of
   1 -> "January"
   2 -> "February"
   3 -> "March"
@@ -1028,6 +1197,91 @@ monthName = case _ of
   11 -> "November"
   12 -> "December"
   _ -> "Unknown"
+
+-- | German month names
+monthNameDe :: Int -> String
+monthNameDe = case _ of
+  1 -> "Januar"
+  2 -> "Februar"
+  3 -> "März"
+  4 -> "April"
+  5 -> "Mai"
+  6 -> "Juni"
+  7 -> "Juli"
+  8 -> "August"
+  9 -> "September"
+  10 -> "Oktober"
+  11 -> "November"
+  12 -> "Dezember"
+  _ -> "Unbekannt"
+
+-- | French month names
+monthNameFr :: Int -> String
+monthNameFr = case _ of
+  1 -> "janvier"
+  2 -> "février"
+  3 -> "mars"
+  4 -> "avril"
+  5 -> "mai"
+  6 -> "juin"
+  7 -> "juillet"
+  8 -> "août"
+  9 -> "septembre"
+  10 -> "octobre"
+  11 -> "novembre"
+  12 -> "décembre"
+  _ -> "inconnu"
+
+-- | Spanish month names
+monthNameEs :: Int -> String
+monthNameEs = case _ of
+  1 -> "enero"
+  2 -> "febrero"
+  3 -> "marzo"
+  4 -> "abril"
+  5 -> "mayo"
+  6 -> "junio"
+  7 -> "julio"
+  8 -> "agosto"
+  9 -> "septiembre"
+  10 -> "octubre"
+  11 -> "noviembre"
+  12 -> "diciembre"
+  _ -> "desconocido"
+
+-- | Japanese month names
+monthNameJa :: Int -> String
+monthNameJa = case _ of
+  1 -> "1月"
+  2 -> "2月"
+  3 -> "3月"
+  4 -> "4月"
+  5 -> "5月"
+  6 -> "6月"
+  7 -> "7月"
+  8 -> "8月"
+  9 -> "9月"
+  10 -> "10月"
+  11 -> "11月"
+  12 -> "12月"
+  _ -> "不明"
+
+-- | Chinese month names
+monthNameZh :: Int -> String
+monthNameZh = case _ of
+  1 -> "一月"
+  2 -> "二月"
+  3 -> "三月"
+  4 -> "四月"
+  5 -> "五月"
+  6 -> "六月"
+  7 -> "七月"
+  8 -> "八月"
+  9 -> "九月"
+  10 -> "十月"
+  11 -> "十一月"
+  12 -> "十二月"
+  _ -> "未知"
 
 -- | Rotate an array by n positions
 rotateArray :: forall a. Int -> Array a -> Array a

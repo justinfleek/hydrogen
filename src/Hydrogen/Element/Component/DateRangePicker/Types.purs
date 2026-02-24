@@ -37,7 +37,8 @@ import Prelude
   , (+)
   , (-)
   , (*)
-  , Ordering(GT)
+  , (>)
+  , not
   )
 
 import Hydrogen.Element.Component.Calendar 
@@ -55,9 +56,10 @@ import Hydrogen.Element.Component.Calendar (CalendarDate, DateRange, compareDate
 -- | Create a DateRange, swapping dates if start > end
 mkDateRange :: CalendarDate -> CalendarDate -> DateRange
 mkDateRange d1 d2 =
-  case compareDates d1 d2 of
-    GT -> { start: d2, end: d1 }  -- d1 > d2, so swap
-    _  -> { start: d1, end: d2 }
+  -- compareDates returns Int: positive if d1 > d2, negative if d1 < d2, 0 if equal
+  if compareDates d1 d2 > 0
+    then { start: d2, end: d1 }  -- d1 > d2, so swap
+    else { start: d1, end: d2 }
 
 -- | Get range start date
 rangeStart :: DateRange -> CalendarDate
@@ -83,9 +85,9 @@ rangeDays r =
 -- | Check if range is valid (start <= end)
 isValidRange :: DateRange -> Boolean
 isValidRange r = 
-  case compareDates r.start r.end of
-    GT -> false
-    _  -> true
+  -- compareDates returns positive if first > second
+  -- Valid range: start <= end means compareDates returns 0 or negative
+  not (compareDates r.start r.end > 0)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // comparison mode
