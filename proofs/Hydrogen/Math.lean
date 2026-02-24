@@ -9,7 +9,7 @@
     ├─────────────────────────────────────────────────────────────────────────┤
     │  Bounded.lean   │ Finite, Bounded, UnitInterval, Positive, NonNegative │
     │  Vec3.lean      │ 3D vectors, dot, cross, normalize, project/reject    │
-    │  Vec2.lean      │ 2D vectors (TODO)                                     │
+    │  Vec2.lean      │ 2D vectors, dot, perp, lerp (particle physics)        │
     │  Vec4.lean      │ 4D/homogeneous vectors (TODO)                         │
     │  Mat3.lean      │ 3x3 matrices, rotations (TODO)                        │
     │  Mat4.lean      │ 4x4 matrices, transforms, determinant                 │
@@ -29,10 +29,11 @@
   
   These proofs enable billion-agent operation without runtime validation.
   
-  Status: FOUNDATIONAL - Bounded, Vec3, Mat4, Quaternion complete; others TODO
+  Status: FOUNDATIONAL - Bounded, Vec2, Vec3, Mat4, Quaternion complete; others TODO
 -/
 
 import Hydrogen.Math.Bounded
+import Hydrogen.Math.Vec2
 import Hydrogen.Math.Vec3
 import Hydrogen.Math.Mat4
 import Hydrogen.Math.Mat4Inverse
@@ -71,6 +72,40 @@ namespace Hydrogen.Math
 
 ### Positive, NonNegative
 - `sqrt_sq` - sqrt (x²) = x for non-negative x
+
+## Vec2.lean (Particle Physics Foundation)
+
+### Algebraic
+- `add_comm`, `add_assoc`, `add_zero`, `zero_add`, `add_neg` - addition group
+- `sub_def` - a - b = a + (-b)
+- `scale_one`, `scale_zero`, `zero_scale` - scalar multiplication
+- `scale_neg_one`, `neg_scale`, `scale_neg` - negation laws
+- `scale_assoc`, `scale_add_left`, `scale_add_right` - scalar linearity
+
+### Dot Product
+- `dot_comm` - commutativity
+- `dot_self_nonneg` - v·v ≥ 0
+- `dot_self_eq_zero` - v·v = 0 ↔ v = 0
+- `dot_scale_left`, `dot_scale_right` - scalar linearity
+- `dot_add_left`, `dot_add_right` - additive linearity
+
+### Perpendicular Operations (THE KEY GEOMETRIC PROOFS)
+- `perp_orthogonal` - perp(v)·v = 0 (THE CRITICAL THEOREM for vortex forces)
+- `perpCW_orthogonal` - perpCW(v)·v = 0
+- `perp_neg_perpCW` - perp(v) = -perpCW(v)
+- `lengthSq_perp` - |perp(v)|² = |v|² (rotation preserves length)
+- `perp_perp` - perp(perp(v)) = -v (90° + 90° = 180°)
+- `perp_perp_perp_perp` - four perp's = identity
+
+### Length and Normalization
+- `lengthSq_nonneg`, `length_nonneg` - non-negativity
+- `lengthSq_eq_zero` - |v|² = 0 ↔ v = 0
+- `lengthSq_zero_vec`, `length_zero_vec` - |0| = 0
+
+### Linear Interpolation
+- `lerp_zero` - lerp(0, a, b) = a
+- `lerp_one` - lerp(1, a, b) = b
+- `lerp_self` - lerp(t, a, a) = a
 
 ## Vec3.lean
 

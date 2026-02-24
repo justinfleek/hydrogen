@@ -51,8 +51,9 @@ module Hydrogen.Component.Motion.Property.ScrubableNumber
 
 import Prelude
 
-import Data.Int (round)
+import Data.Int (round, toNumber) as Int
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Number (fromString) as Number
 import Data.Number.Format (fixed, toStringWith)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -66,21 +67,21 @@ import Web.Event.Event (preventDefault)
 import Web.UIEvent.KeyboardEvent (KeyboardEvent)
 import Web.UIEvent.KeyboardEvent (key, toEvent) as KeyboardEvent
 import Web.UIEvent.MouseEvent (MouseEvent)
-import Web.UIEvent.MouseEvent (toEvent, shiftKey, ctrlKey, metaKey) as MouseEvent
+import Web.UIEvent.MouseEvent (clientX, toEvent, shiftKey, ctrlKey, metaKey) as MouseEvent
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
+--                                                                     // helpers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Extract clientX from a mouse event
-foreign import getClientX :: MouseEvent -> Number
-
--- | Parse a string to a Number, returning Nothing on failure
-foreign import parseNumberImpl :: (forall a. a -> Maybe a) -> (forall a. Maybe a) -> String -> Maybe Number
+-- | Extract clientX from a mouse event (pure implementation)
+-- | Uses Web.UIEvent.MouseEvent.clientX which returns Int, converted to Number
+getClientX :: MouseEvent -> Number
+getClientX = Int.toNumber <<< MouseEvent.clientX
 
 -- | Parse a string to a Number safely
+-- | Pure implementation using Data.Number.fromString
 parseNumber :: String -> Maybe Number
-parseNumber = parseNumberImpl Just Nothing
+parseNumber = Number.fromString
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types
@@ -186,7 +187,7 @@ initialState input =
   , scrubStartX: 0.0
   , scrubStartValue: 0.0
   , textInputValue: ""
-  , inputId: "scrubable-input-" <> show (round (input.value * 1000.0))
+  , inputId: "scrubable-input-" <> show (Int.round (input.value * 1000.0))
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
