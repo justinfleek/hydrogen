@@ -8,14 +8,15 @@
     │                           Hydrogen.Math                                 │
     ├─────────────────────────────────────────────────────────────────────────┤
     │  Bounded.lean   │ Finite, Bounded, UnitInterval, Positive, NonNegative │
-    │  Vec3.lean      │ 3D vectors, dot, cross, normalize, project/reject    │
     │  Vec2.lean      │ 2D vectors, dot, perp, lerp (particle physics)        │
+    │  Vec3.lean      │ 3D vectors, dot, cross, normalize, project/reject    │
     │  Vec4.lean      │ 4D/homogeneous vectors (TODO)                         │
     │  Mat3.lean      │ 3x3 matrices, rotations (TODO)                        │
     │  Mat4.lean      │ 4x4 matrices, transforms, determinant                 │
     │  Mat4Inverse    │ Matrix inversion, adjugate, cofactors                 │
     │  Mat4Projection │ Perspective, orthographic, look-at matrices           │
     │  Quaternion.lean│ Unit quaternions, SLERP, rotation matrices            │
+    │  Integration    │ Euler, Verlet, velocity Verlet (particle physics)     │
     │  Transform.lean │ Position + Rotation + Scale (TODO)                    │
     │  AABB.lean      │ Axis-aligned bounding boxes (TODO)                    │
     │  Frustum.lean   │ View frustum, culling (TODO)                          │
@@ -29,7 +30,7 @@
   
   These proofs enable billion-agent operation without runtime validation.
   
-  Status: FOUNDATIONAL - Bounded, Vec2, Vec3, Mat4, Quaternion complete; others TODO
+  Status: FOUNDATIONAL - Bounded, Vec2, Vec3, Mat4, Quaternion, Integration complete; others TODO
 -/
 
 import Hydrogen.Math.Bounded
@@ -39,6 +40,7 @@ import Hydrogen.Math.Mat4
 import Hydrogen.Math.Mat4Inverse
 import Hydrogen.Math.Mat4Projection
 import Hydrogen.Math.Quaternion
+import Hydrogen.Math.Integration
 
 namespace Hydrogen.Math
 
@@ -257,6 +259,48 @@ namespace Hydrogen.Math
 - `toMat4` - convert quaternion to 4×4 rotation matrix
 - `toMat4_identity` - identity quaternion → identity matrix
 - `det_toMat4_unit` - det = 1 for unit quaternions (rotation matrices)
+
+## Integration.lean (Particle Physics Simulation)
+
+### Integration Methods
+- `eulerStep` - explicit Euler (simple but unstable)
+- `semiImplicitEulerStep` - symplectic Euler (LATTICE rigid bodies)
+- `verletStep` - Störmer-Verlet (LATTICE soft bodies)
+- `verletStepDamped` - Verlet with damping factor
+- `velocityVerletStep` - velocity Verlet (explicit velocity tracking)
+
+### State Conversion
+- `toVerletState` - convert particle state to Verlet state
+- `fromVerletState` - extract ParticleState from VerletState
+- `verletVelocity` - extract implicit velocity from Verlet state
+
+### Zero Acceleration
+- `euler_zero_accel` - zero acceleration preserves velocity
+- `semiImplicit_zero_accel` - zero acceleration preserves velocity
+
+### Zero Timestep
+- `euler_zero_dt` - zero timestep is identity
+- `semiImplicit_zero_dt` - zero timestep is identity
+- `verlet_zero_dt` - zero timestep advances by implicit velocity
+
+### Time-Reversibility (THE KEY THEOREM)
+- `verlet_time_reversible` - Verlet is time-reversible (energy conservation)
+
+### Euler Comparison
+- `euler_semiImplicit_same_velocity` - both produce same velocity
+- `euler_semiImplicit_position_diff` - position differs by a*dt²
+
+### Verlet Equivalence
+- `verlet_position_formula` - classic x(t+dt) = 2x(t) - x(t-dt) + a*dt²
+- `verlet_conversion_velocity` - velocity preserved through conversion
+
+### Damping Properties
+- `verlet_damping_one` - damping=1 is undamped Verlet
+- `verlet_damping_zero` - damping=0 eliminates velocity
+
+### Velocity Verlet Properties
+- `velocityVerlet_same_velocity` - same velocity as explicit Euler
+- `velocityVerlet_position` - includes second-order correction
 -/
 
 -- ═══════════════════════════════════════════════════════════════════════════════

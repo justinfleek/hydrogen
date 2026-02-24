@@ -71,17 +71,21 @@ module Hydrogen.Event.Bus
   , emitTyped
   ) where
 
-import Prelude hiding (when)
+import Prelude hiding (map, when)
 
-import Control.Monad (when, unless)
+import Control.Monad (unless, when)
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.DateTime.Instant (unInstant) as Instant
+import Data.Functor (map) as Functor
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Time.Duration (Milliseconds(Milliseconds)) as Duration
+import Data.Traversable (traverse) as Traversable
 import Effect (Effect)
+import Effect.Aff (Aff, Milliseconds(..), delay)
+import Effect.Class (liftEffect)
+import Effect.Now (now) as Now
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Effect.Aff (Aff, Milliseconds(..), delay)
-import Effect.Aff as Aff
-import Effect.Class (liftEffect)
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Event Bus Core
@@ -219,9 +223,11 @@ emit bus event = do
   for_ arr f = void $ traverse f arr
   
   traverse :: forall b c. (b -> Effect c) -> Array b -> Effect (Array c)
-  traverse = traverseImpl
+  traverse = Traversable.traverse
 
-foreign import traverseImpl :: forall a b. (a -> Effect b) -> Array a -> Effect (Array b)
+-- | Log an event to the console (for debugging)
+-- | Uses FFI because event type may not have Show instance
+-- | JavaScript console.log can display any value
 foreign import logEvent :: forall a. Maybe String -> a -> Effect Unit
 
 -- | Emit an event asynchronously (non-blocking)
@@ -306,7 +312,12 @@ recordEvent history event = do
        else newArr
   ) history.events
 
-foreign import nowImpl :: Effect Number
+-- | Get current timestamp in milliseconds (pure implementation)
+nowImpl :: Effect Number
+nowImpl = do
+  instant <- Now.now
+  let Duration.Milliseconds ms = Instant.unInstant instant
+  pure ms
 
 -- | Get the event history
 getHistory :: forall a. EventBus a -> Effect (Array { event :: a, timestamp :: Number })
@@ -327,7 +338,7 @@ replay bus handler = do
   for_ events \{ event } -> handler event
   where
   for_ :: forall b. Array b -> (b -> Effect Unit) -> Effect Unit
-  for_ arr f = void $ traverseImpl f arr
+  for_ arr f = void $ Traversable.traverse f arr
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Debugging
@@ -347,6 +358,7 @@ getSubscriberCount bus = Array.length <$> Ref.read bus.subscribers
 
 -- | A typed channel that carries a specific event type
 -- | Used for heterogeneous event buses
+newtype TypedChannel :: Type -> Type
 newtype TypedChannel a = TypedChannel String
 
 derive instance eqTypedChannel :: Eq (TypedChannel a)
@@ -360,7 +372,11 @@ typedChannel = TypedChannel
 foreign import data AnyEvent :: Type
 
 foreign import wrapEvent :: forall a. String -> a -> AnyEvent
-foreign import unwrapEvent :: forall a. String -> AnyEvent -> Maybe a
+foreign import unwrapEventImpl :: forall a. (a -> Maybe a) -> Maybe a -> String -> AnyEvent -> Maybe a
+
+-- | Unwrap an event if it matches the expected type
+unwrapEvent :: forall a. String -> AnyEvent -> Maybe a
+unwrapEvent = unwrapEventImpl Just Nothing
 
 -- | Subscribe to a typed channel on a heterogeneous bus
 subscribeTyped
@@ -387,8 +403,6 @@ emitTyped bus (TypedChannel name) event =
 
 -- Note: Using Control.Monad.when and Control.Monad.unless from standard library
 
--- | Map function for arrays (FFI for performance in Effect contexts)
+-- | Map function for arrays (pure implementation)
 map :: forall a b. (a -> b) -> Array a -> Array b
-map = mapImpl
-
-foreign import mapImpl :: forall a b. (a -> b) -> Array a -> Array b
+map = Functor.map

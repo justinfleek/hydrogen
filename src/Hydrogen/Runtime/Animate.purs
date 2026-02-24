@@ -139,7 +139,8 @@ import Prelude
   , (>=)
   )
 
-import Data.Array (filter, snoc)
+import Data.Array (filter, index, length, snoc) as Array
+import Data.Foldable (foldl) as Foldable
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Motion.Spring (SpringConfig)
 import Hydrogen.Motion.Spring as Spring
@@ -563,22 +564,22 @@ animator = AnimatorState []
 -- | Add a spring animation.
 withSpring :: String -> SpringConfig -> Number -> AnimatorState -> AnimatorState
 withSpring name config initial (AnimatorState entries) =
-  AnimatorState $ snoc entries (SpringEntry name (springState config initial))
+  AnimatorState $ Array.snoc entries (SpringEntry name (springState config initial))
 
 -- | Add a tween animation.
 withTween :: String -> Number -> AnimatorState -> AnimatorState
 withTween name initial (AnimatorState entries) =
-  AnimatorState $ snoc entries (TweenEntry name (tweenState initial))
+  AnimatorState $ Array.snoc entries (TweenEntry name (tweenState initial))
 
 -- | Add a Vec2 animation.
 withVec2 :: String -> Vec2 -> AnimatorState -> AnimatorState
 withVec2 name initial (AnimatorState entries) =
-  AnimatorState $ snoc entries (Vec2Entry name (vec2State initial))
+  AnimatorState $ Array.snoc entries (Vec2Entry name (vec2State initial))
 
 -- | Add a color animation.
 withColor :: String -> RGB -> AnimatorState -> AnimatorState
 withColor name initial (AnimatorState entries) =
-  AnimatorState $ snoc entries (ColorEntry name (colorState initial))
+  AnimatorState $ Array.snoc entries (ColorEntry name (colorState initial))
 
 -- | Start an animation by name (for tweens).
 -- | Timestamp is no longer needed - uses pending start pattern.
@@ -670,7 +671,7 @@ getColor name (AnimatorState entries) =
 -- | Find first entry matching name.
 findFirst :: String -> Array AnimationEntry -> Maybe AnimationEntry
 findFirst name entries =
-  case filter (matchesName name) entries of
+  case Array.filter (matchesName name) entries of
     [] -> Nothing
     arr -> headMay arr
   where
@@ -719,12 +720,12 @@ sequence initial =
 -- | Add a tween step to the sequence.
 andThen :: Number -> Number -> Easing -> Sequence -> Sequence
 andThen target duration easing seq =
-  seq { steps = snoc seq.steps (TweenStep target duration easing) }
+  seq { steps = Array.snoc seq.steps (TweenStep target duration easing) }
 
 -- | Add a delay step to the sequence.
 withDelay :: Number -> Sequence -> Sequence
 withDelay duration seq =
-  seq { steps = snoc seq.steps (DelayStep duration) }
+  seq { steps = Array.snoc seq.steps (DelayStep duration) }
 
 -- | Start and tick the sequence.
 -- | On first call, marks the sequence as started. Subsequent calls advance it.
@@ -794,15 +795,14 @@ sequenceValue seq = seq.tween.currentValue
 headMay :: forall a. Array a -> Maybe a
 headMay arr = arrayIndex 0 arr
 
--- | Array length
-foreign import arrayLength :: forall a. Array a -> Int
+-- | Array length (pure implementation)
+arrayLength :: forall a. Array a -> Int
+arrayLength = Array.length
 
--- | Array index implementation (takes constructors)
-foreign import arrayIndexImpl :: forall a. (a -> Maybe a) -> Maybe a -> Int -> Array a -> Maybe a
-
--- | Array index - safe indexing with Maybe
+-- | Array index - safe indexing with Maybe (pure implementation)
 arrayIndex :: forall a. Int -> Array a -> Maybe a
-arrayIndex = arrayIndexImpl Just Nothing
+arrayIndex idx arr = Array.index arr idx
 
--- | foldl for arrays
-foreign import foldlArray :: forall a b. (b -> a -> b) -> b -> Array a -> b
+-- | foldl for arrays (pure implementation)
+foldlArray :: forall a b. (b -> a -> b) -> b -> Array a -> b
+foldlArray = Foldable.foldl

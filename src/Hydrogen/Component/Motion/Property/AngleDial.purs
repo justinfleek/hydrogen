@@ -55,8 +55,10 @@ module Hydrogen.Component.Motion.Property.AngleDial
 
 import Prelude
 
+import Data.Int (toNumber) as Int
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Number (pi)
+import Data.Number (fromString) as Number
 import Data.Number.Format (fixed, toStringWith)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -71,29 +73,30 @@ import Web.Event.Event (preventDefault)
 import Web.UIEvent.KeyboardEvent (KeyboardEvent)
 import Web.UIEvent.KeyboardEvent (key, toEvent) as KeyboardEvent
 import Web.UIEvent.MouseEvent (MouseEvent)
-import Web.UIEvent.MouseEvent (toEvent, shiftKey) as MouseEvent
+import Web.UIEvent.MouseEvent (clientX, clientY, toEvent, shiftKey) as MouseEvent
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
+--                                                                     // helpers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Extract clientX from a mouse event
-foreign import getClientX :: MouseEvent -> Number
+-- | Extract clientX from a mouse event (pure implementation)
+getClientX :: MouseEvent -> Number
+getClientX = Int.toNumber <<< MouseEvent.clientX
 
--- | Extract clientY from a mouse event  
-foreign import getClientY :: MouseEvent -> Number
+-- | Extract clientY from a mouse event (pure implementation)
+getClientY :: MouseEvent -> Number
+getClientY = Int.toNumber <<< MouseEvent.clientY
 
--- | Parse a string to a Number, returning Nothing on failure
-foreign import parseNumberImpl :: (forall a. a -> Maybe a) -> (forall a. Maybe a) -> String -> Maybe Number
-
--- | Parse a string to a Number safely
+-- | Parse a string to a Number safely (pure implementation)
 parseNumber :: String -> Maybe Number
-parseNumber = parseNumberImpl Just Nothing
+parseNumber = Number.fromString
 
 -- | Get element center X position
+-- | Uses getBoundingClientRect which requires FFI
 foreign import getElementCenterX :: MouseEvent -> Number
 
 -- | Get element center Y position
+-- | Uses getBoundingClientRect which requires FFI
 foreign import getElementCenterY :: MouseEvent -> Number
 
 -- ═══════════════════════════════════════════════════════════════════════════════
