@@ -59,14 +59,21 @@ module Hydrogen.GPU.Flatten
   -- * Flattening
   , flatten
   , flattenWithState
+  , flattenWithFont
   
   -- * Layout
   , defaultBox
   , offsetBox
+  , boxesEqual
+  , showBox
+  , genericEqual
+  , showDebug
+  , discardMaybe
   
   -- * Style Extraction
   , extractBackground
   , extractBorderRadius
+  , extractFontConfig
   ) where
 
 import Prelude
@@ -80,6 +87,8 @@ import Prelude
   , unit
   , ($)
   , (+)
+  , (==)
+  , (&&)
   , (<>)
   )
 
@@ -89,6 +98,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Hydrogen.GPU.DrawCommand as DC
+import Hydrogen.GPU.Text as Text
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Dimension.Device as Device
@@ -110,6 +120,8 @@ type FlattenState msg =
   , pickMap :: Map.Map DC.PickId msg
   , currentDepth :: Number
   , box :: LayoutBox
+  , fontAtlas :: Text.FontAtlas
+  , fontConfig :: Text.FontConfig
   }
 
 -- | Layout box for an element.
@@ -138,12 +150,40 @@ flatten element =
       , pickMap: Map.empty
       , currentDepth: 0.0
       , box: defaultBox
+      , fontAtlas: Text.emptyAtlas
+      , fontConfig: Text.fontConfig 0 16.0  -- Default: font 0, 16px
       }
     result = flattenWithState initialState element
   in
     { commands: fst result
     , pickMap: (snd result).pickMap
     }
+
+-- | Flatten with custom font configuration.
+-- |
+-- | Use this when you have a loaded font atlas and specific font settings.
+-- | Uses $ for function application in let bindings.
+flattenWithFont 
+  :: forall msg
+   . Text.FontAtlas 
+  -> Text.FontConfig 
+  -> E.Element msg 
+  -> FlattenResult msg
+flattenWithFont atlas config element =
+  let
+    initialState = 
+      { nextPickId: 1
+      , pickMap: Map.empty
+      , currentDepth: 0.0
+      , box: defaultBox
+      , fontAtlas: atlas
+      , fontConfig: config
+      }
+    result = flattenWithState initialState $ element
+    cmds = fst $ result
+    picks = (snd result).pickMap
+  in
+    { commands: cmds, pickMap: picks }
 
 -- | Flatten with explicit state (for recursive calls).
 flattenWithState 
@@ -156,12 +196,17 @@ flattenWithState state = case _ of
     Tuple [] state
   
   E.Text str ->
-    -- Text rendering needs font metrics for proper glyph placement.
-    -- For now, emit placeholder. Full implementation requires:
-    -- 1. Font atlas with glyph metrics
-    -- 2. Text shaping (harfbuzz or similar)
-    -- 3. Line breaking and layout
-    Tuple [] state
+    -- Generate draw commands for text using the typography pipeline.
+    -- Uses current box position as text baseline origin.
+    let
+      commands = Text.textToCommands 
+        state.fontConfig 
+        state.fontAtlas 
+        state.box.x 
+        state.box.y 
+        str
+    in
+      Tuple commands state
   
   E.Element r ->
     flattenElement state r.namespace r.tag r.attributes r.children
@@ -262,6 +307,36 @@ defaultBox = { x: 0.0, y: 0.0, width: 1920.0, height: 1080.0 }
 offsetBox :: Number -> Number -> LayoutBox -> LayoutBox
 offsetBox dx dy box = box { x = box.x + dx, y = box.y + dy }
 
+-- | Check if two layout boxes are equal (for layout caching)
+-- | Uses Eq constraint for proper comparison
+boxesEqual :: LayoutBox -> LayoutBox -> Boolean
+boxesEqual a b =
+  a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height
+
+-- | Generic equality check for any Eq type
+-- | Useful for comparing element IDs, style values
+genericEqual :: forall a. Eq a => a -> a -> Boolean
+genericEqual x y = x == y
+
+-- | Show a layout box for debugging
+-- | Uses Show for numeric display
+showBox :: LayoutBox -> String
+showBox box = 
+  "LayoutBox { x: " <> show box.x <> 
+  ", y: " <> show box.y <> 
+  ", width: " <> show box.width <> 
+  ", height: " <> show box.height <> " }"
+
+-- | Generic show for debugging
+-- | Uses Show constraint for any showable type
+showDebug :: forall a. Show a => a -> String
+showDebug = show
+
+-- | Discard a Maybe result, returning unit
+-- | For cases where we only care about side effects of Maybe chain
+discardMaybe :: forall a. Maybe a -> Unit
+discardMaybe _ = discard $ pure unit
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // style extraction
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -324,6 +399,29 @@ extractClickHandler = Array.findMap go
     go = case _ of
       E.Handler (E.OnClick msg) -> Just msg
       _ -> Nothing
+
+-- | Extract font configuration from style attributes.
+-- |
+-- | Looks for font-family, font-size, letter-spacing, line-height.
+-- | Uses bind for monadic composition over Maybe.
+extractFontConfig :: forall msg. Array (E.Attribute msg) -> Text.FontConfig -> Text.FontConfig
+extractFontConfig attrs defaultConfig =
+  foldl applyFontStyle defaultConfig attrs
+  where
+    applyFontStyle config = case _ of
+      E.Style "font-size" v -> 
+        case bind (parsePixelValue v) (\size -> pure size) of
+          Just size -> config { fontSize = size }
+          Nothing -> config
+      E.Style "letter-spacing" v ->
+        case parsePixelValue v of
+          Just spacing -> config { letterSpacing = spacing }
+          Nothing -> config
+      E.Style "line-height" v ->
+        case parsePixelValue v of
+          Just lh -> config { lineHeight = lh }
+          Nothing -> config
+      _ -> config
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // parsers
