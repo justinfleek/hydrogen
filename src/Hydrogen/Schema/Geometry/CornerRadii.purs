@@ -215,6 +215,38 @@ isNone :: CornerRadii -> Boolean
 isNone (CornerRadii r) = 
   r.topLeft == 0.0 && r.topRight == 0.0 && r.bottomRight == 0.0 && r.bottomLeft == 0.0
 
+-- | Spread between max and min radius.
+-- |
+-- | Uses (-) to calculate difference between largest and smallest corner.
+-- | Useful for detecting asymmetric corners.
+radiusSpread :: CornerRadii -> Number
+radiusSpread cr = maxRadius cr - minRadius cr
+
+-- | Check if any corner exceeds a threshold.
+-- |
+-- | Uses (||) for compound boolean logic.
+hasAnyLargeCorner :: Number -> CornerRadii -> Boolean
+hasAnyLargeCorner threshold (CornerRadii r) =
+  r.topLeft > threshold || r.topRight > threshold || 
+  r.bottomRight > threshold || r.bottomLeft > threshold
+
+-- | Check if any corner is below a threshold.
+-- |
+-- | Uses (<=) for inclusive comparison.
+hasAnySmallCorner :: Number -> CornerRadii -> Boolean
+hasAnySmallCorner threshold (CornerRadii r) =
+  r.topLeft <= threshold || r.topRight <= threshold || 
+  r.bottomRight <= threshold || r.bottomLeft <= threshold
+
+-- | Check if all radii fit within container bounds.
+-- |
+-- | For a rectangle of given width and height, radii should not exceed
+-- | half of the smaller dimension.
+fitsWithinBounds :: Number -> Number -> CornerRadii -> Boolean
+fitsWithinBounds width height cr =
+  let maxAllowed = if width <= height then width / 2.0 else height / 2.0
+  in maxRadius cr <= maxAllowed
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // transformations
 -- ═══════════════════════════════════════════════════════════════════════════════

@@ -73,6 +73,7 @@ import Prelude
   , class Ord
   , class Show
   , show
+  , negate
   , (<>)
   )
 
