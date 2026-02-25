@@ -41,11 +41,15 @@ module Hydrogen.Runtime.Trigger
   , mkElementBounds
   , boundsContainsPoint
   , distanceToCenter
+  , boundsOverlap
+  , compareBoundsByArea
   
   -- * Condition Evaluation
   , evaluateCondition
   , evaluateAllConditions
   , getMetConditionIndices
+  , anyConditionMet
+  , allConditionsMet
   
   -- * Sequence Tracking
   , SequenceState
@@ -58,6 +62,12 @@ module Hydrogen.Runtime.Trigger
   , initialHoverState
   , updateHoverState
   , getHoverDuration
+  , isCurrentlyHovering
+  
+  -- * Generic Utilities
+  , elementsEqual
+  , findFirstMatching
+  , sortByOrd
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -67,6 +77,8 @@ module Hydrogen.Runtime.Trigger
 import Prelude
   ( class Eq
   , class Ord
+  , Ordering(LT, GT, EQ)
+  , compare
   , not
   , otherwise
   , ($)
@@ -178,6 +190,23 @@ distanceToCenter bounds point =
   in
     sqrt (dx * dx + dy * dy)
 
+-- | Check if two bounds rectangles overlap
+-- | Used for hit testing, collision detection between UI elements
+boundsOverlap :: ElementBounds -> ElementBounds -> Boolean
+boundsOverlap a b =
+  not (a.x + a.width < b.x || b.x + b.width < a.x ||
+       a.y + a.height < b.y || b.y + b.height < a.y)
+
+-- | Compare two bounds by area (for z-ordering, priority)
+-- | Smaller elements typically have higher interaction priority
+compareBoundsByArea :: ElementBounds -> ElementBounds -> Ordering
+compareBoundsByArea a b =
+  let
+    areaA = a.width * a.height
+    areaB = b.width * b.height
+  in
+    compare areaA areaB
+
 -- | Square root via Newton's method
 sqrt :: Number -> Number
 sqrt n
@@ -185,7 +214,7 @@ sqrt n
   | otherwise = sqrtIter n (n / 2.0) 20
 
 sqrtIter :: Number -> Number -> Int -> Number
-sqrtIter n guess 0 = guess
+sqrtIter _ guess 0 = guess
 sqrtIter n guess i =
   let newGuess = (guess + n / guess) / 2.0
   in sqrtIter n newGuess (i - 1)
@@ -198,7 +227,7 @@ sqrtIter n guess i =
 evaluateCondition :: RuntimeContext -> TriggerCondition -> Boolean
 evaluateCondition ctx condition = case condition of
   HoverFor duration elementId ->
-    case getHoverDuration ctx.hoverState elementId of
+    case getHoverDuration ctx.timestamp ctx.hoverState elementId of
       Nothing -> false
       Just d -> d >= duration
   
@@ -225,7 +254,7 @@ evaluateCondition ctx condition = case condition of
       Just bounds -> distanceToCenter bounds ctx.mousePos > radius
   
   HoldFor duration elementId ->
-    case getHoverDuration ctx.hoverState elementId of
+    case getHoverDuration ctx.timestamp ctx.hoverState elementId of
       Nothing -> false
       Just d -> d >= duration
   
@@ -252,7 +281,21 @@ evaluateAllConditions ctx conditions =
 -- | Get indices of met conditions
 getMetConditionIndices :: RuntimeContext -> Array TriggerCondition -> Array Int
 getMetConditionIndices ctx conditions =
-  indexedFilter (\i c -> evaluateCondition ctx c) conditions
+  indexedFilter (\_ c -> evaluateCondition ctx c) conditions
+
+-- | Check if ANY condition is met (OR semantics)
+-- | Useful for triggers that should fire when any of multiple conditions occur
+anyConditionMet :: RuntimeContext -> Array TriggerCondition -> Boolean
+anyConditionMet ctx conditions =
+  Array.length (Array.filter (\c -> evaluateCondition ctx c) conditions) > 0
+
+-- | Check if ALL conditions are met (AND semantics)
+-- | Standard trigger behavior - all conditions must be satisfied
+allConditionsMet :: RuntimeContext -> Array TriggerCondition -> Boolean
+allConditionsMet ctx conditions =
+  case conditions of
+    [] -> true  -- Empty conditions = always met
+    _  -> Array.length (getMetConditionIndices ctx conditions) == Array.length conditions
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // sequence tracking
@@ -333,11 +376,18 @@ updateHoverState timestamp mousePos elements state =
     state { hoveredElements = stillHovered <> newHovers }
 
 -- | Get hover duration for an element
-getHoverDuration :: HoverState -> String -> Maybe Number
-getHoverDuration state elementId =
+-- | Returns the duration in milliseconds since hover started
+getHoverDuration :: Number -> HoverState -> String -> Maybe Number
+getHoverDuration currentTimestamp state elementId =
   case Array.filter (\h -> h.elementId == elementId) state.hoveredElements of
-    [h] -> Just h.startTime
+    [h] -> Just (currentTimestamp - h.startTime)
     _ -> Nothing
+
+-- | Check if an element is currently being hovered
+-- | Simpler check than duration - just presence in hover list
+isCurrentlyHovering :: HoverState -> String -> Boolean
+isCurrentlyHovering state elementId =
+  Array.length (Array.filter (\h -> h.elementId == elementId) state.hoveredElements) > 0
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // helpers
@@ -399,4 +449,46 @@ infixl 1 applyFlipped as #
 applyFlipped :: forall a b. a -> (a -> b) -> b
 applyFlipped x f = f x
 
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // generic utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if two arrays contain the same elements (order-sensitive)
+-- | Generic over any Eq type
+elementsEqual :: forall a. Eq a => Array a -> Array a -> Boolean
+elementsEqual xs ys =
+  Array.length xs == Array.length ys && go xs ys
+  where
+    go :: Array a -> Array a -> Boolean
+    go [] [] = true
+    go as bs = case Array.take 1 as of
+      [] -> Array.length bs == 0
+      [a] -> case Array.take 1 bs of
+        [] -> false
+        [b] -> a == b && go (Array.drop 1 as) (Array.drop 1 bs)
+        _ -> false
+      _ -> false
+
+-- | Find first element matching predicate
+-- | Uses $ for standard function application pattern
+findFirstMatching :: forall a. (a -> Boolean) -> Array a -> Maybe a
+findFirstMatching pred arr =
+  let filtered = Array.filter pred $ arr
+  in case Array.take 1 filtered of
+    [x] -> Just x
+    _ -> Nothing
+
+-- | Simple insertion sort for small arrays using Ord
+-- | For trigger priority ordering, element z-ordering
+sortByOrd :: forall a. Ord a => (a -> a -> Ordering) -> Array a -> Array a
+sortByOrd cmp arr = foldlArray insert [] arr
+  where
+    insert :: Array a -> a -> Array a
+    insert [] x = [x]
+    insert sorted x = 
+      let 
+        smaller = Array.filter (\y -> cmp y x == LT || cmp y x == EQ) sorted
+        larger = Array.filter (\y -> cmp y x == GT) sorted
+      in 
+        smaller <> [x] <> larger
 
