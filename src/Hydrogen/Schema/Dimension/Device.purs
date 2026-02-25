@@ -33,6 +33,7 @@ module Hydrogen.Schema.Dimension.Device
   
   -- * Display Properties
   , PixelsPerInch(PixelsPerInch)
+  , PixelsPerCentimeter(PixelsPerCentimeter)
   , DevicePixelRatio(DevicePixelRatio)
   
   -- * Constructors
@@ -42,6 +43,7 @@ module Hydrogen.Schema.Dimension.Device
   , dp
   , sp
   , ppi
+  , ppcm
   , dpr
   
   -- * Operations
@@ -66,7 +68,12 @@ module Hydrogen.Schema.Dimension.Device
   , unwrapDp
   , unwrapSp
   , unwrapPpi
+  , unwrapPpcm
   , unwrapDpr
+  
+  -- * PPI/PPCM Conversion
+  , ppiToPpcm
+  , ppcmToPpi
   
   -- * Device Profiles
   , DeviceProfile
@@ -111,6 +118,7 @@ import Prelude
   , (+)
   , (-)
   , (*)
+  , (/)
   , (<>)
   )
 
@@ -197,6 +205,18 @@ derive instance ordPixelsPerInch :: Ord PixelsPerInch
 instance showPixelsPerInch :: Show PixelsPerInch where
   show (PixelsPerInch n) = show n <> " PPI"
 
+-- | Pixels per centimeter - metric equivalent of PPI.
+-- |
+-- | 1 inch = 2.54 cm, so PPCM = PPI / 2.54
+-- | Useful for metric regions and scientific applications.
+newtype PixelsPerCentimeter = PixelsPerCentimeter Number
+
+derive instance eqPixelsPerCentimeter :: Eq PixelsPerCentimeter
+derive instance ordPixelsPerCentimeter :: Ord PixelsPerCentimeter
+
+instance showPixelsPerCentimeter :: Show PixelsPerCentimeter where
+  show (PixelsPerCentimeter n) = show n <> " PPCM"
+
 -- | Device pixel ratio - ratio of device pixels to CSS pixels
 -- | Standard displays: 1.0
 -- | Retina displays: 2.0
@@ -237,6 +257,10 @@ sp = ScaledPixel
 -- | Create a PixelsPerInch value
 ppi :: Number -> PixelsPerInch
 ppi = PixelsPerInch
+
+-- | Create a PixelsPerCentimeter value
+ppcm :: Number -> PixelsPerCentimeter
+ppcm = PixelsPerCentimeter
 
 -- | Create a DevicePixelRatio value
 dpr :: Number -> DevicePixelRatio
@@ -324,6 +348,10 @@ unwrapSp (ScaledPixel n) = n
 -- | Extract the raw Number from a PixelsPerInch
 unwrapPpi :: PixelsPerInch -> Number
 unwrapPpi (PixelsPerInch n) = n
+
+-- | Extract the raw Number from a PixelsPerCentimeter
+unwrapPpcm :: PixelsPerCentimeter -> Number
+unwrapPpcm (PixelsPerCentimeter n) = n
 
 -- | Extract the raw Number from a DevicePixelRatio
 unwrapDpr :: DevicePixelRatio -> Number
@@ -679,3 +707,31 @@ supportsFaceID p = p.capabilities.faceID
 -- | Check if device supports force/3D touch.
 supportsForceTouch :: DeviceProfile -> Boolean
 supportsForceTouch p = p.capabilities.forceTouch
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // ppi/ppcm conversion
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Conversion factor: 1 inch = 2.54 centimeters
+inchesPerCm :: Number
+inchesPerCm = 2.54
+
+-- | Convert PPI to PPCM.
+-- |
+-- | PPCM = PPI / 2.54
+-- |
+-- | ```purescript
+-- | ppiToPpcm (ppi 96.0)  -- ~37.8 PPCM
+-- | ```
+ppiToPpcm :: PixelsPerInch -> PixelsPerCentimeter
+ppiToPpcm (PixelsPerInch n) = PixelsPerCentimeter (n / inchesPerCm)
+
+-- | Convert PPCM to PPI.
+-- |
+-- | PPI = PPCM × 2.54
+-- |
+-- | ```purescript
+-- | ppcmToPpi (ppcm 37.8)  -- ~96 PPI
+-- | ```
+ppcmToPpi :: PixelsPerCentimeter -> PixelsPerInch
+ppcmToPpi (PixelsPerCentimeter n) = PixelsPerInch (n * inchesPerCm)
