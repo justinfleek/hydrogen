@@ -15,19 +15,32 @@
 -- | - Planck length: quantum minimum (theoretical)
 
 module Hydrogen.Schema.Dimension.Physical.Atomic
-  ( -- * Types
+  ( -- * SI Prefix Units (small)
     Picometer(Picometer)
   , Femtometer(Femtometer)
+  , Attometer(Attometer)
+  , Zeptometer(Zeptometer)
+  , Yoctometer(Yoctometer)
+  
+  -- * Special Units
   , Angstrom(Angstrom)
   , BohrRadius(BohrRadius)
   , Fermi(Fermi)
   , PlanckLength(PlanckLength)
   
-  -- * Constructors
+  -- * Constructors (SI)
   , picometer
   , picometers
   , femtometer
   , femtometers
+  , attometer
+  , attometers
+  , zeptometer
+  , zeptometers
+  , yoctometer
+  , yoctometers
+  
+  -- * Constructors (Special)
   , angstrom
   , angstroms
   , bohrRadius
@@ -38,6 +51,9 @@ module Hydrogen.Schema.Dimension.Physical.Atomic
   -- * Accessors
   , unwrapPicometer
   , unwrapFemtometer
+  , unwrapAttometer
+  , unwrapZeptometer
+  , unwrapYoctometer
   , unwrapAngstrom
   , unwrapBohrRadius
   , unwrapFermi
@@ -46,6 +62,9 @@ module Hydrogen.Schema.Dimension.Physical.Atomic
   -- * Conversions to Meter
   , picometersToMeters
   , femtometersToMeters
+  , attometersToMeters
+  , zeptometersToMeters
+  , yoctometersToMeters
   , angstromsToMeters
   , bohrRadiusToMeters
   , fermiToMeters
@@ -110,6 +129,90 @@ unwrapFemtometer (Femtometer n) = n
 
 femtometersToMeters :: Femtometer -> Number
 femtometersToMeters (Femtometer n) = n * 1.0e-15
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // attometer
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Attometer - 10^-18 meter (subatomic scale)
+-- |
+-- | Used for measuring quarks and extremely short distances.
+-- | 1 attometer = 0.001 femtometers
+newtype Attometer = Attometer Number
+
+derive instance eqAttometer :: Eq Attometer
+derive instance ordAttometer :: Ord Attometer
+
+instance showAttometer :: Show Attometer where
+  show (Attometer n) = show n <> " am"
+
+attometer :: Number -> Attometer
+attometer = Attometer
+
+attometers :: Number -> Attometer
+attometers = Attometer
+
+unwrapAttometer :: Attometer -> Number
+unwrapAttometer (Attometer n) = n
+
+attometersToMeters :: Attometer -> Number
+attometersToMeters (Attometer n) = n * 1.0e-18
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // zeptometer
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Zeptometer - 10^-21 meter
+-- |
+-- | Theoretical scale below current experimental limits.
+-- | Used in high-energy physics calculations.
+newtype Zeptometer = Zeptometer Number
+
+derive instance eqZeptometer :: Eq Zeptometer
+derive instance ordZeptometer :: Ord Zeptometer
+
+instance showZeptometer :: Show Zeptometer where
+  show (Zeptometer n) = show n <> " zm"
+
+zeptometer :: Number -> Zeptometer
+zeptometer = Zeptometer
+
+zeptometers :: Number -> Zeptometer
+zeptometers = Zeptometer
+
+unwrapZeptometer :: Zeptometer -> Number
+unwrapZeptometer (Zeptometer n) = n
+
+zeptometersToMeters :: Zeptometer -> Number
+zeptometersToMeters (Zeptometer n) = n * 1.0e-21
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // yoctometer
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Yoctometer - 10^-24 meter (smallest SI prefix)
+-- |
+-- | Theoretical scale approaching Planck length (10^-35 m).
+-- | Used in theoretical physics and cosmology.
+newtype Yoctometer = Yoctometer Number
+
+derive instance eqYoctometer :: Eq Yoctometer
+derive instance ordYoctometer :: Ord Yoctometer
+
+instance showYoctometer :: Show Yoctometer where
+  show (Yoctometer n) = show n <> " ym"
+
+yoctometer :: Number -> Yoctometer
+yoctometer = Yoctometer
+
+yoctometers :: Number -> Yoctometer
+yoctometers = Yoctometer
+
+unwrapYoctometer :: Yoctometer -> Number
+unwrapYoctometer (Yoctometer n) = n
+
+yoctometersToMeters :: Yoctometer -> Number
+yoctometersToMeters (Yoctometer n) = n * 1.0e-24
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // angstrom

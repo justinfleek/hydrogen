@@ -48,11 +48,16 @@
 module Hydrogen.Schema.Elevation.ZIndex
   ( -- * Core Types
     ZIndex(..)
+  , IsolationMode(..)
   
-  -- * Constructors
+  -- * ZIndex Constructors
   , z
   , auto
   , negative
+  
+  -- * IsolationMode Constructors
+  , isolate
+  , autoIsolation
   
   -- * Operations
   , above
@@ -62,12 +67,14 @@ module Hydrogen.Schema.Elevation.ZIndex
   
   -- * Conversion (Legacy string generation, NOT FFI)
   , toLegacyCss
+  , isolationToLegacyCss
   , toInt
   
   -- * Predicates
   , isAuto
   , isNegative
   , isPositive
+  , isIsolated
   ) where
 
 import Prelude
@@ -97,6 +104,21 @@ data ZIndex
   | ZIndexValue Int
 
 derive instance eqZIndex :: Eq ZIndex
+
+-- | Isolation mode for stacking context creation.
+-- |
+-- | CSS `isolation` property controls whether an element creates a new
+-- | stacking context. This is useful for containing z-index values
+-- | within a subtree.
+-- |
+-- | - `isolate`: Creates a new stacking context (like z-index: 0 but
+-- |   without requiring position: relative)
+-- | - `auto`: Inherits stacking context from parent (default)
+data IsolationMode
+  = Isolate
+  | IsolationAuto
+
+derive instance eqIsolationMode :: Eq IsolationMode
 
 instance ordZIndex :: Ord ZIndex where
   compare ZIndexAuto ZIndexAuto = EQ
@@ -128,6 +150,14 @@ negative :: Int -> ZIndex
 negative n = ZIndexValue (negate (abs n))
   where
     abs x = if x < 0 then negate x else x
+
+-- | Create isolation mode that forces a new stacking context
+isolate :: IsolationMode
+isolate = Isolate
+
+-- | Auto isolation (inherit from parent, default)
+autoIsolation :: IsolationMode
+autoIsolation = IsolationAuto
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // operations
@@ -167,6 +197,13 @@ toLegacyCss :: ZIndex -> String
 toLegacyCss ZIndexAuto = "auto"
 toLegacyCss (ZIndexValue n) = show n
 
+-- | Convert isolation mode to CSS string.
+-- |
+-- | NOT an FFI boundary - pure string generation.
+isolationToLegacyCss :: IsolationMode -> String
+isolationToLegacyCss Isolate = "isolate"
+isolationToLegacyCss IsolationAuto = "auto"
+
 -- | Extract integer value (Nothing for auto)
 toInt :: ZIndex -> Int
 toInt ZIndexAuto = 0
@@ -190,3 +227,8 @@ isNegative (ZIndexValue n) = n < 0
 isPositive :: ZIndex -> Boolean
 isPositive ZIndexAuto = false
 isPositive (ZIndexValue n) = n > 0
+
+-- | Check if isolation mode creates a stacking context
+isIsolated :: IsolationMode -> Boolean
+isIsolated Isolate = true
+isIsolated IsolationAuto = false

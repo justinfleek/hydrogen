@@ -22,6 +22,9 @@ module Hydrogen.Schema.Dimension.Physical.Astronomical
   , Megaparsec(Megaparsec)
   , LightSecond(LightSecond)
   , LightMinute(LightMinute)
+  , SolarRadius(SolarRadius)
+  , EarthRadius(EarthRadius)
+  , LunarDistance(LunarDistance)
   
   -- * Constructors
   , lightYear
@@ -38,6 +41,12 @@ module Hydrogen.Schema.Dimension.Physical.Astronomical
   , lightSeconds
   , lightMinute
   , lightMinutes
+  , solarRadius
+  , solarRadii
+  , earthRadius
+  , earthRadii
+  , lunarDistance
+  , lunarDistances
   
   -- * Accessors
   , unwrapLightYear
@@ -47,6 +56,9 @@ module Hydrogen.Schema.Dimension.Physical.Astronomical
   , unwrapMegaparsec
   , unwrapLightSecond
   , unwrapLightMinute
+  , unwrapSolarRadius
+  , unwrapEarthRadius
+  , unwrapLunarDistance
   
   -- * Conversions to Meter
   , lightYearsToMeters
@@ -56,12 +68,18 @@ module Hydrogen.Schema.Dimension.Physical.Astronomical
   , megaparsecsToMeters
   , lightSecondsToMeters
   , lightMinutesToMeters
+  , solarRadiusToMeters
+  , earthRadiusToMeters
+  , lunarDistanceToMeters
   
   -- * Physical Constants
   , speedOfLight
   , metersPerLightYear
   , metersPerParsec
   , metersPerAU
+  , metersPerSolarRadius
+  , metersPerEarthRadius
+  , metersPerLunarDistance
   ) where
 
 import Prelude
@@ -92,6 +110,18 @@ metersPerParsec = 3.0856775814913673e16
 -- | Meters per AU (exact by definition)
 metersPerAU :: Number
 metersPerAU = 1.495978707e11
+
+-- | Meters per solar radius (IAU nominal)
+metersPerSolarRadius :: Number
+metersPerSolarRadius = 6.96e8
+
+-- | Meters per Earth radius (IAU nominal equatorial)
+metersPerEarthRadius :: Number
+metersPerEarthRadius = 6.3781e6
+
+-- | Meters per lunar distance (mean Earth-Moon distance)
+metersPerLunarDistance :: Number
+metersPerLunarDistance = 3.844e8
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // light year
@@ -267,3 +297,87 @@ unwrapLightMinute (LightMinute n) = n
 
 lightMinutesToMeters :: LightMinute -> Number
 lightMinutesToMeters (LightMinute n) = n * speedOfLight * 60.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // solar radius
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Solar radius - radius of the Sun (IAU nominal)
+-- |
+-- | ~696,000 km. Used for expressing stellar sizes.
+-- | The Sun has a radius of 1 R☉ by definition.
+newtype SolarRadius = SolarRadius Number
+
+derive instance eqSolarRadius :: Eq SolarRadius
+derive instance ordSolarRadius :: Ord SolarRadius
+
+instance showSolarRadius :: Show SolarRadius where
+  show (SolarRadius n) = show n <> " R☉"
+
+solarRadius :: Number -> SolarRadius
+solarRadius = SolarRadius
+
+solarRadii :: Number -> SolarRadius
+solarRadii = SolarRadius
+
+unwrapSolarRadius :: SolarRadius -> Number
+unwrapSolarRadius (SolarRadius n) = n
+
+solarRadiusToMeters :: SolarRadius -> Number
+solarRadiusToMeters (SolarRadius n) = n * metersPerSolarRadius
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // earth radius
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Earth radius - equatorial radius of Earth (IAU nominal)
+-- |
+-- | ~6,378 km. Used for expressing planetary sizes and distances.
+-- | Earth's equatorial radius is 1 R⊕ by definition.
+newtype EarthRadius = EarthRadius Number
+
+derive instance eqEarthRadius :: Eq EarthRadius
+derive instance ordEarthRadius :: Ord EarthRadius
+
+instance showEarthRadius :: Show EarthRadius where
+  show (EarthRadius n) = show n <> " R⊕"
+
+earthRadius :: Number -> EarthRadius
+earthRadius = EarthRadius
+
+earthRadii :: Number -> EarthRadius
+earthRadii = EarthRadius
+
+unwrapEarthRadius :: EarthRadius -> Number
+unwrapEarthRadius (EarthRadius n) = n
+
+earthRadiusToMeters :: EarthRadius -> Number
+earthRadiusToMeters (EarthRadius n) = n * metersPerEarthRadius
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // lunar distance
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Lunar distance - mean distance from Earth to Moon
+-- |
+-- | ~384,400 km. Used for expressing distances in the Earth-Moon system.
+-- | Also called "Moon distance" (LD).
+newtype LunarDistance = LunarDistance Number
+
+derive instance eqLunarDistance :: Eq LunarDistance
+derive instance ordLunarDistance :: Ord LunarDistance
+
+instance showLunarDistance :: Show LunarDistance where
+  show (LunarDistance n) = show n <> " LD"
+
+lunarDistance :: Number -> LunarDistance
+lunarDistance = LunarDistance
+
+lunarDistances :: Number -> LunarDistance
+lunarDistances = LunarDistance
+
+unwrapLunarDistance :: LunarDistance -> Number
+unwrapLunarDistance (LunarDistance n) = n
+
+lunarDistanceToMeters :: LunarDistance -> Number
+lunarDistanceToMeters (LunarDistance n) = n * metersPerLunarDistance

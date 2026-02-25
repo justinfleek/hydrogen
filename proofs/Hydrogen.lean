@@ -15,6 +15,7 @@
   │ Light           │ Types, Attenuation, Directional, Point, Spot, Shadow    │
   │ Material        │ Types, Layer, BRDF, Sparkle, ISP (NVIDIA PPISP-based)   │
   │ WorldModel      │ Pose, Attention (AnchorWeave-based spatial memory)      │
+  │ Optimize        │ Submodular maximization, matroids, FAA algorithm        │
   └─────────────────────────────────────────────────────────────────────────────┘
   
   Status: 
@@ -26,6 +27,7 @@
     - Light: 6 modules complete (light system with attenuation proofs)
     - Material: 5 modules complete (PBR + sparkle + ISP)
     - WorldModel: 2 modules (spatial memory security proofs)
+    - Optimize: 4 modules (submodular, matroid, continuous greedy, FAA)
 -/
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -76,3 +78,9 @@ import Hydrogen.Material
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.WorldModel
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- OPTIMIZE (Submodular Maximization for GPU Resource Allocation)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+import Hydrogen.Optimize
