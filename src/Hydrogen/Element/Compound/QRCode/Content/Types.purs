@@ -35,7 +35,7 @@
 -- | - Prelude (Eq, Show)
 -- | - Data.Maybe (optional fields)
 
-module Hydrogen.Element.Component.QRCode.Content.Types
+module Hydrogen.Element.Compound.QRCode.Content.Types
   ( -- * Main Content ADT
     QRContent(..)
   , contentToString
@@ -109,7 +109,7 @@ import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
 
 -- Re-exported modules
-import Hydrogen.Element.Component.QRCode.Content.Types.WiFi
+import Hydrogen.Element.Compound.QRCode.Content.Types.WiFi
   ( WiFiSecurity(WEP, WPA, WPA2, WPA3, NoPassword)
   , WiFiContent
   , wifiContent
@@ -117,20 +117,20 @@ import Hydrogen.Element.Component.QRCode.Content.Types.WiFi
   , encodeWiFi
   ) as WiFi
 
-import Hydrogen.Element.Component.QRCode.Content.Types.VCard
+import Hydrogen.Element.Compound.QRCode.Content.Types.VCard
   ( VCardContent
   , vCardContent
   , vCardFull
   , encodeVCard
   ) as VCard
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Calendar
+import Hydrogen.Element.Compound.QRCode.Content.Types.Calendar
   ( CalendarContent
   , calendarContent
   , encodeCalendar
   ) as Calendar
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Geo
+import Hydrogen.Element.Compound.QRCode.Content.Types.Geo
   ( GeoContent
   , geoContent
   , geoWithAltitude
@@ -138,7 +138,7 @@ import Hydrogen.Element.Component.QRCode.Content.Types.Geo
   , encodeGeo
   ) as Geo
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Bitcoin
+import Hydrogen.Element.Compound.QRCode.Content.Types.Bitcoin
   ( BitcoinContent
   , bitcoinContent
   , bitcoinWithAmount
@@ -146,7 +146,7 @@ import Hydrogen.Element.Component.QRCode.Content.Types.Bitcoin
   , encodeBitcoin
   ) as Bitcoin
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Slack
+import Hydrogen.Element.Compound.QRCode.Content.Types.Slack
   ( SlackAction(SlackOpenChannel, SlackComposeMessage, SlackTriggerWorkflow)
   , SlackContent
   , slackChannel
@@ -155,7 +155,7 @@ import Hydrogen.Element.Component.QRCode.Content.Types.Slack
   , encodeSlack
   ) as Slack
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Webhook
+import Hydrogen.Element.Compound.QRCode.Content.Types.Webhook
   ( HTTPMethod(GET, POST, PUT, DELETE, PATCH)
   , WebhookContent
   , webhookGet
@@ -163,14 +163,14 @@ import Hydrogen.Element.Component.QRCode.Content.Types.Webhook
   , encodeWebhook
   ) as Webhook
 
-import Hydrogen.Element.Component.QRCode.Content.Types.DeepLink
+import Hydrogen.Element.Compound.QRCode.Content.Types.DeepLink
   ( DeepLinkContent
   , deepLink
   , deepLinkWithFallback
   , encodeDeepLink
   ) as DeepLink
 
-import Hydrogen.Element.Component.QRCode.Content.Types.Helpers (encodeURIComponent)
+import Hydrogen.Element.Compound.QRCode.Content.Types.Helpers (encodeURIComponent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // main content

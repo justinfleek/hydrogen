@@ -19,8 +19,8 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Widget.Metric as Metric
--- | import Hydrogen.Element.Component.Widget.Types as Widget
+-- | import Hydrogen.Element.Compound.Widget.Metric as Metric
+-- | import Hydrogen.Element.Compound.Widget.Types as Widget
 -- |
 -- | -- Basic metric
 -- | Metric.metricWidget []
@@ -51,7 +51,7 @@
 -- |   }
 -- | ```
 
-module Hydrogen.Element.Component.Widget.Metric
+module Hydrogen.Element.Compound.Widget.Metric
   ( -- * Widget Component
     metricWidget
   , metricWidgetCompact
@@ -118,7 +118,7 @@ import Prelude
 import Data.Array (foldl, index, length, mapWithIndex)
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.Widget.Types
+import Hydrogen.Element.Compound.Widget.Types
   ( ChangeDirection(ChangeUp, ChangeDown, ChangeFlat)
   , ValueFormat(FormatNumber, FormatCurrency, FormatPercent, FormatDate, FormatDatetime, FormatDuration, FormatCustom)
   , Percentage

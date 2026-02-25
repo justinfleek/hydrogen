@@ -24,7 +24,7 @@
 -- |
 -- | - TreeView.Types (NodeId, CheckState, DropPosition, SelectionMode)
 
-module Hydrogen.Element.Component.TreeView.State
+module Hydrogen.Element.Compound.TreeView.State
   ( -- * Expanded State
     ExpandedState
   , emptyExpanded
@@ -145,7 +145,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Tuple (Tuple, fst, snd)
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , unwrapNodeId
   , CheckState(Unchecked, Checked, Indeterminate)

@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.CodeBlock as CodeBlock
+-- | import Hydrogen.Element.Compound.CodeBlock as CodeBlock
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic code block
@@ -38,7 +38,7 @@
 -- | -- Inline code
 -- | CodeBlock.inlineCode "npm install"
 -- | ```
-module Hydrogen.Element.Component.CodeBlock
+module Hydrogen.Element.Compound.CodeBlock
   ( -- * CodeBlock Components
     codeBlock
   , inlineCode

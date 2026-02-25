@@ -23,7 +23,7 @@
 -- | - Carousel.Types (SlidePosition)
 -- | - Schema atoms (Color, Dimension, etc.)
 
-module Hydrogen.Element.Component.Carousel.Effects
+module Hydrogen.Element.Compound.Carousel.Effects
   ( -- * Effect Kind
     EffectKind
       ( EffectOpacity

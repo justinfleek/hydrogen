@@ -18,7 +18,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Tour.Msg (TourMsg(..))
+-- | import Hydrogen.Element.Compound.Tour.Msg (TourMsg(..))
 -- |
 -- | handleTour :: TourMsg -> State -> State
 -- | handleTour msg state = case msg of
@@ -28,7 +28,7 @@
 -- |   ...
 -- | ```
 
-module Hydrogen.Element.Component.Tour.Msg
+module Hydrogen.Element.Compound.Tour.Msg
   ( -- * Tour Messages
     TourMsg
       ( -- Navigation
@@ -102,7 +102,7 @@ import Prelude
   , (<>)
   )
 
-import Hydrogen.Element.Component.Tour.Types (StepId, StepIndex)
+import Hydrogen.Element.Compound.Tour.Types (StepId, StepIndex)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // tour msg

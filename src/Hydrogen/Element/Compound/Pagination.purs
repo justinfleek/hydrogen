@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Pagination as Pagination
+-- | import Hydrogen.Element.Compound.Pagination as Pagination
 -- |
 -- | -- Basic pagination
 -- | Pagination.pagination
@@ -33,7 +33,7 @@
 -- |   , Pagination.compact true
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.Pagination
+module Hydrogen.Element.Compound.Pagination
   ( -- * Pagination Components
     pagination
   , paginationWithInfo

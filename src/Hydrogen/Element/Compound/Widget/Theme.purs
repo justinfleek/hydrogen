@@ -20,7 +20,7 @@
 -- | The color palette draws from NVIDIA's visual identity:
 -- | purples, blues, cyans, greens, yellows, oranges, reds, pinks.
 
-module Hydrogen.Element.Component.Widget.Theme
+module Hydrogen.Element.Compound.Widget.Theme
   ( -- * Color Palettes
     NeonPalette
   , defaultNeonPalette

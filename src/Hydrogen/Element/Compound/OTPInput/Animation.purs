@@ -33,7 +33,7 @@
 -- | - Schema.Dimension.Temporal for durations
 -- | - Types module for DigitAnimationState, OTPState
 
-module Hydrogen.Element.Component.OTPInput.Animation
+module Hydrogen.Element.Compound.OTPInput.Animation
   ( -- * Animation Types
     OTPAnimation(OTPAnimation)
   , OTPAnimationProperty(TranslateX, TranslateY, Scale, ScaleX, ScaleY, Opacity, Rotate)
@@ -83,13 +83,13 @@ import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Motion.Easing as Easing
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( DigitAnimationState(DigitIdle, DigitEntering, DigitFilled, DigitError, DigitSuccess)
   , OTPState(Idle, Entering, Verifying, Success, Error)
   , OTPDigit(OTPDigit)
   )
 
-import Hydrogen.Element.Component.OTPInput.Props
+import Hydrogen.Element.Compound.OTPInput.Props
   ( OTPInputProps
   )
 

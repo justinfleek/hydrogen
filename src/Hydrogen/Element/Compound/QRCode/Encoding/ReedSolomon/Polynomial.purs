@@ -8,7 +8,7 @@
 -- | - Index 0 is the constant term (x^0)
 -- | - Index n is the coefficient of x^n
 
-module Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.Polynomial
+module Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.Polynomial
   ( Polynomial
   , polyAdd
   , polyMulScalar
@@ -36,7 +36,7 @@ import Data.Array (length, index, replicate, reverse, drop, foldl)
 import Data.Array (zipWith, filter, mapWithIndex) as Array
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.GF
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.GF
   ( gfAdd
   , gfSub
   , gfMul

@@ -35,7 +35,7 @@
 -- | - TreeView.Node (Tree, TreeNode, traversal)
 -- | - Schema.Graph.Layout (LayoutConfig, LayoutAlgorithm, NodePosition)
 
-module Hydrogen.Element.Component.TreeView.Layout
+module Hydrogen.Element.Compound.TreeView.Layout
   ( -- * Layout Result
     LayoutResult
   , layoutResult
@@ -116,13 +116,13 @@ import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldl)
 import Data.Int (toNumber, floor) as Int
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , Depth
   , unwrapDepth
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId
@@ -132,7 +132,7 @@ import Hydrogen.Element.Component.TreeView.Node
   , nodeDepth
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( ExpandedState
   , isExpanded
   )

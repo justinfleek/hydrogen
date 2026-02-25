@@ -43,7 +43,27 @@ module Hydrogen.GPU.WebGPU.Scene3D.Geometry
   , generateMesh
   ) where
 
-import Hydrogen.GPU.Scene3D.Mesh (Mesh3D(..))
+import Hydrogen.GPU.Scene3D.Mesh
+  ( Mesh3D
+      ( BoxMesh3D
+      , SphereMesh3D
+      , CylinderMesh3D
+      , ConeMesh3D
+      , PlaneMesh3D
+      , TorusMesh3D
+      , TorusKnotMesh3D
+      , RingMesh3D
+      , CircleMesh3D
+      , CapsuleMesh3D
+      , IcosahedronMesh3D
+      , OctahedronMesh3D
+      , TetrahedronMesh3D
+      , DodecahedronMesh3D
+      , LatheMesh3D
+      , ExtrudeMesh3D
+      , BufferGeometry3D
+      )
+  )
 
 import Hydrogen.GPU.WebGPU.Scene3D.Geometry.Core
   ( MeshData

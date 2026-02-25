@@ -22,7 +22,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Progress as Progress
+-- | import Hydrogen.Element.Compound.Progress as Progress
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- |
@@ -42,7 +42,7 @@
 -- |   [ Progress.indicatorColor brand.primaryColor ]
 -- | ```
 
-module Hydrogen.Element.Component.Progress
+module Hydrogen.Element.Compound.Progress
   ( -- * Main Components
     progress
   , progressIndeterminate

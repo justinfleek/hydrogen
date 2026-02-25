@@ -19,7 +19,7 @@
 -- | - Priority level
 -- | - Expanded state
 
-module Hydrogen.Element.Component.Kanban.Card
+module Hydrogen.Element.Compound.Kanban.Card
   ( -- * Card Data
     KanbanCard
   , kanbanCard
@@ -101,7 +101,7 @@ import Data.Array (filter, snoc)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
 
-import Hydrogen.Element.Component.Kanban.Types
+import Hydrogen.Element.Compound.Kanban.Types
   ( CardId
   , ColumnId
   , Priority(PriorityLow)

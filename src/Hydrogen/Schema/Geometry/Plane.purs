@@ -40,6 +40,7 @@ module Hydrogen.Schema.Geometry.Plane
   -- * Basic Operations
   , distanceToPointPlane
   , negatePlane
+  , normalizePlane
   , coplanarPointPlane
   , projectPointPlane
   , reflectPointPlane
@@ -58,17 +59,19 @@ import Prelude
   , (+)
   , (-)
   , (*)
+  , (/)
+  , (<)
   , (<>)
   )
 
 import Hydrogen.Schema.Dimension.Vector.Vec3 
-  ( Vec3(Vec3)
-  , vec3
+  ( Vec3
   , subtractVec3
   , scaleVec3
   , negateVec3
   , dotVec3
   , crossVec3
+  , lengthVec3
   , vec3UnitX
   , vec3UnitY
   , vec3UnitZ
@@ -165,6 +168,29 @@ distanceToPointPlane (Plane normal constant) point = dotVec3 normal point + cons
 -- | Proof reference: Plane.lean negate, negate_negate, distanceToPoint_negate
 negatePlane :: Plane -> Plane
 negatePlane (Plane normal constant) = Plane (negateVec3 normal) (negate constant)
+
+-- | Normalize the plane so the normal vector has unit length.
+-- |
+-- | After normalization:
+-- | - The normal has length 1
+-- | - The constant equals the signed distance from origin to the plane
+-- | - distanceToPointPlane returns the actual Euclidean distance
+-- |
+-- | If the normal has near-zero length (degenerate plane), returns the
+-- | plane unchanged to avoid division by zero.
+-- |
+-- | Proof reference: Plane.lean normalize, normalize_idempotent (pending)
+-- | Three.js parity: Plane.normalize
+normalizePlane :: Plane -> Plane
+normalizePlane (Plane normal constant) =
+  let
+    len = lengthVec3 normal
+  in
+    if len < 1.0e-10
+      then Plane normal constant  -- Degenerate plane, return unchanged
+      else
+        let invLen = 1.0 / len
+        in Plane (scaleVec3 invLen normal) (constant * invLen)
 
 -- | Get a point on the plane (closest point to origin for unit normal)
 -- | Proof reference: Plane.lean coplanarPoint

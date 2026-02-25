@@ -24,7 +24,7 @@
 -- | | columnWidth      | Dimension | Device.Pixel        | Column width       |
 -- | | elevation        | Elevation | BoxShadow           | Card shadows       |
 
-module Hydrogen.Element.Component.Kanban.Render
+module Hydrogen.Element.Compound.Kanban.Render
   ( -- * Render Functions
     renderBoard
   , renderColumn
@@ -85,7 +85,7 @@ import Hydrogen.Schema.Color.RGB as Color
 import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 
-import Hydrogen.Element.Component.Kanban.Types
+import Hydrogen.Element.Compound.Kanban.Types
   ( CardId
   , ColumnId
   , KanbanMsg
@@ -105,7 +105,7 @@ import Hydrogen.Element.Component.Kanban.Types
   , unwrapCardId
   , unwrapColumnId
   )
-import Hydrogen.Element.Component.Kanban.Card
+import Hydrogen.Element.Compound.Kanban.Card
   ( KanbanCard
   , CardLabel
   , Assignee
@@ -124,7 +124,7 @@ import Hydrogen.Element.Component.Kanban.Card
   , assigneeInitials
   , formatDueDate
   )
-import Hydrogen.Element.Component.Kanban.Column
+import Hydrogen.Element.Compound.Kanban.Column
   ( KanbanColumn
   , columnIdOf
   , columnTitle
@@ -134,7 +134,7 @@ import Hydrogen.Element.Component.Kanban.Column
   , columnCardCountLabel
   , isColumnOverWIP
   )
-import Hydrogen.Element.Component.Kanban.State
+import Hydrogen.Element.Compound.Kanban.State
   ( KanbanState
   , Swimlane
   , swimlaneName

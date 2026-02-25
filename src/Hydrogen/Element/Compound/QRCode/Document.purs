@@ -26,7 +26,7 @@
 -- | - QRCode.Types (QRVersion, ErrorCorrection)
 -- | - QRCode.Content.Types (QRContent)
 
-module Hydrogen.Element.Component.QRCode.Document
+module Hydrogen.Element.Compound.QRCode.Document
   ( -- * Document Type
     QRCodeDocument
   , mkDocument
@@ -82,18 +82,18 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing), maybe, fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Types 
+import Hydrogen.Element.Compound.QRCode.Types 
   ( QRVersion
   , ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
   , mkVersion
   )
-import Hydrogen.Element.Component.QRCode.Content.Types 
+import Hydrogen.Element.Compound.QRCode.Content.Types 
   ( QRContent
   , contentToString
   )
 
 -- Re-exported modules
-import Hydrogen.Element.Component.QRCode.Document.Identity
+import Hydrogen.Element.Compound.QRCode.Document.Identity
   ( UUID5
   , SHA256
   , generateUUID5
@@ -101,7 +101,7 @@ import Hydrogen.Element.Component.QRCode.Document.Identity
   , toHexString
   ) as Identity
 
-import Hydrogen.Element.Component.QRCode.Document.Styles
+import Hydrogen.Element.Compound.QRCode.Document.Styles
   ( QRStyle(StyleClassic, StyleRounded, StyleDots, StyleOrganic, StyleGradient, StyleArtistic)
   , QRColors
   , defaultColors
@@ -111,7 +111,7 @@ import Hydrogen.Element.Component.QRCode.Document.Styles
   , defaultModuleStyles
   ) as Styles
 
-import Hydrogen.Element.Component.QRCode.Document.Logo
+import Hydrogen.Element.Compound.QRCode.Document.Logo
   ( LogoConfig(LogoImage, LogoText, LogoShape, LogoIcon)
   , imageLogo
   , textLogo
@@ -119,14 +119,14 @@ import Hydrogen.Element.Component.QRCode.Document.Logo
   , iconLogo
   ) as Logo
 
-import Hydrogen.Element.Component.QRCode.Document.Label
+import Hydrogen.Element.Compound.QRCode.Document.Label
   ( LabelPosition(LabelBelow, LabelAbove, LabelRight, LabelLeft)
   , LabelConfig
   , defaultLabel
   , labelWithTitle
   ) as Label
 
-import Hydrogen.Element.Component.QRCode.Document.Metadata
+import Hydrogen.Element.Compound.QRCode.Document.Metadata
   ( DocumentMetadata
   , defaultMetadata
   , metadataWithTitle

@@ -7,7 +7,7 @@
 -- | This module contains type definitions shared across the DatePicker
 -- | component family. Pure data types with no rendering logic.
 
-module Hydrogen.Element.Component.DatePicker.Types
+module Hydrogen.Element.Compound.DatePicker.Types
   ( -- * Date Format
     DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom)
   

@@ -33,7 +33,7 @@
 -- | - Accessibility for ARIA attributes
 -- | - Validation for input patterns
 
-module Hydrogen.Element.Component.OTPInput.Render
+module Hydrogen.Element.Compound.OTPInput.Render
   ( -- * Main Components
     otpInput
   , otpInputWithResend
@@ -69,22 +69,22 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as Color
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPState(Idle, Entering, Verifying, Success, Error)
   , unwrapDigitCount
   )
 
-import Hydrogen.Element.Component.OTPInput.Props
+import Hydrogen.Element.Compound.OTPInput.Props
   ( OTPInputProps
   , OTPInputProp
   , defaultProps
   )
 
-import Hydrogen.Element.Component.OTPInput.Digit
+import Hydrogen.Element.Compound.OTPInput.Digit
   ( renderDigit
   )
 
-import Hydrogen.Element.Component.OTPInput.Accessibility
+import Hydrogen.Element.Compound.OTPInput.Accessibility
   ( getContainerA11yAttrs
   , getLiveRegionAttrs
   , getAnnouncementText

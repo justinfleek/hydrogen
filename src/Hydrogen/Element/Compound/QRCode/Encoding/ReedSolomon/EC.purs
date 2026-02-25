@@ -7,7 +7,7 @@
 -- | The generator polynomial for n error correction codewords is:
 -- |   G(x) = (x - α^0)(x - α^1)(x - α^2)...(x - α^(n-1))
 
-module Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.EC
+module Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.EC
   ( generatorPoly
   , generatorPolyCoeffs
   , computeECCodewords
@@ -27,8 +27,8 @@ import Prelude
 
 import Data.Array (length, replicate, reverse, take)
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.GF (gfExp)
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.Polynomial
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.GF (gfExp)
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.Polynomial
   ( Polynomial
   , polyMul
   , polyDivide

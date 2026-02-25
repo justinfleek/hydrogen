@@ -29,7 +29,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.DatePicker as DatePicker
+-- | import Hydrogen.Element.Compound.DatePicker as DatePicker
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic date picker
@@ -47,15 +47,15 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.DatePicker
+module Hydrogen.Element.Compound.DatePicker
   ( -- * Component
     datePicker
   
   -- * Re-exports from Types
-  , module Hydrogen.Element.Component.DatePicker.Types
+  , module Hydrogen.Element.Compound.DatePicker.Types
   
   -- * Re-exports from Format
-  , module Hydrogen.Element.Component.DatePicker.Format
+  , module Hydrogen.Element.Compound.DatePicker.Format
   
   -- * Props
   , DatePickerProps
@@ -127,13 +127,13 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.Calendar as Calendar
-import Hydrogen.Element.Component.DatePicker.Types
+import Hydrogen.Element.Compound.Calendar as Calendar
+import Hydrogen.Element.Compound.DatePicker.Types
   ( DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom)
   , ValidationError(InvalidFormat, DateOutOfRange, DateDisabled, EmptyValue)
   , validationErrorMessage
   )
-import Hydrogen.Element.Component.DatePicker.Format
+import Hydrogen.Element.Compound.DatePicker.Format
   ( formatDate
   , formatDateISO
   , formatDateUSShort
@@ -147,7 +147,7 @@ import Hydrogen.Element.Component.DatePicker.Format
   , monthNameLong
   , padZero
   )
-import Hydrogen.Element.Component.DatePicker.Render as Render
+import Hydrogen.Element.Compound.DatePicker.Render as Render
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

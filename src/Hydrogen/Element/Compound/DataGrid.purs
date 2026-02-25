@@ -49,9 +49,9 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.DataGrid as Grid
--- | import Hydrogen.Element.Component.DataGrid.Column as Col
--- | import Hydrogen.Element.Component.DataGrid.Types (CellType(..))
+-- | import Hydrogen.Element.Compound.DataGrid as Grid
+-- | import Hydrogen.Element.Compound.DataGrid.Column as Col
+-- | import Hydrogen.Element.Compound.DataGrid.Types (CellType(..))
 -- |
 -- | -- Define columns
 -- | columns =
@@ -73,15 +73,15 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.DataGrid
+module Hydrogen.Element.Compound.DataGrid
   ( -- * Grid Component
     dataGrid
   
     -- * Re-exports from Types
-  , module Hydrogen.Element.Component.DataGrid.Types
+  , module Hydrogen.Element.Compound.DataGrid.Types
   
     -- * Re-exports from Column
-  , module Hydrogen.Element.Component.DataGrid.Column
+  , module Hydrogen.Element.Compound.DataGrid.Column
   
     -- * Grid Prop Builders
   
@@ -188,7 +188,7 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.DataGrid.Types
+import Hydrogen.Element.Compound.DataGrid.Types
   ( CellContext
   , CellType(CellText, CellNumber, CellDate, CellBoolean, CellLink, CellBadge, CellActions, CellCustom)
   , ColumnDef
@@ -207,7 +207,7 @@ import Hydrogen.Element.Component.DataGrid.Types
   , defaultColumnDef
   , defaultGridProps
   )
-import Hydrogen.Element.Component.DataGrid.Column
+import Hydrogen.Element.Compound.DataGrid.Column
   ( cellRenderer
   , cellType
   , colMaxWidth
@@ -224,8 +224,8 @@ import Hydrogen.Element.Component.DataGrid.Column
   , resizable
   , sortable
   )
-import Hydrogen.Element.Component.DataGrid.Cell as Cell
-import Hydrogen.Element.Component.DataGrid.Processing as Processing
+import Hydrogen.Element.Compound.DataGrid.Cell as Cell
+import Hydrogen.Element.Compound.DataGrid.Processing as Processing
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // grid component

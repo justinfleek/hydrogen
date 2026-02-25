@@ -37,7 +37,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.TagInput as TagInput
+-- | import Hydrogen.Element.Compound.TagInput as TagInput
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic tag input (inherits all visual properties from context)
@@ -65,7 +65,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.TagInput
+module Hydrogen.Element.Compound.TagInput
   ( -- * TagInput Components
     tagInput
   , tagBadge

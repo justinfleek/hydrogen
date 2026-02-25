@@ -26,7 +26,7 @@
 -- | | harmonyType   | -         | HarmonyType       | Relationship type      |
 -- | | swatchSize    | Dimension | SwatchSize        | Display size           |
 
-module Hydrogen.Element.Component.ColorPicker.Harmony
+module Hydrogen.Element.Compound.ColorPicker.Harmony
   ( -- * Component
     harmonyPalette
   

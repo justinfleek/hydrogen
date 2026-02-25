@@ -20,7 +20,7 @@
 -- | - Data.Maybe (optional password)
 -- | - Data.String (escaping)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.WiFi
+module Hydrogen.Element.Compound.QRCode.Content.Types.WiFi
   ( -- * WiFi Security Type
     WiFiSecurity(WEP, WPA, WPA2, WPA3, NoPassword)
   

@@ -18,7 +18,7 @@
 -- | - CardLabel: Tag with color
 -- | - Swimlane: Horizontal grouping
 
-module Hydrogen.Element.Component.Kanban.Types
+module Hydrogen.Element.Compound.Kanban.Types
   ( -- * Identifiers
     BoardId
   , boardId

@@ -21,7 +21,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Radio as Radio
+-- | import Hydrogen.Element.Compound.Radio as Radio
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Single radio
@@ -43,7 +43,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Radio
+module Hydrogen.Element.Compound.Radio
   ( -- * Main Components
     radio
   , radioWithLabel

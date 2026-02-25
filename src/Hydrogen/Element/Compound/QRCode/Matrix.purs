@@ -26,7 +26,7 @@
 -- | 8. Apply mask to data modules
 -- | 9. Place format and version information
 
-module Hydrogen.Element.Component.QRCode.Matrix
+module Hydrogen.Element.Compound.QRCode.Matrix
   ( -- * Matrix Construction (from Patterns)
     module Patterns
   
@@ -65,7 +65,7 @@ import Prelude
 import Data.Array as Array
 import Data.Array (foldl, (..))
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion
   , QRMatrix
   , ErrorCorrection
@@ -84,14 +84,14 @@ import Hydrogen.Element.Component.QRCode.Types
   )
 
 -- Re-export from sub-modules (aliased for module re-export)
-import Hydrogen.Element.Component.QRCode.Matrix.Patterns as Patterns
-import Hydrogen.Element.Component.QRCode.Matrix.Data as MatrixData
-import Hydrogen.Element.Component.QRCode.Matrix.Mask as Mask
-import Hydrogen.Element.Component.QRCode.Matrix.Penalty as Penalty
-import Hydrogen.Element.Component.QRCode.Matrix.FormatVersion as FormatVersion
+import Hydrogen.Element.Compound.QRCode.Matrix.Patterns as Patterns
+import Hydrogen.Element.Compound.QRCode.Matrix.Data as MatrixData
+import Hydrogen.Element.Compound.QRCode.Matrix.Mask as Mask
+import Hydrogen.Element.Compound.QRCode.Matrix.Penalty as Penalty
+import Hydrogen.Element.Compound.QRCode.Matrix.FormatVersion as FormatVersion
 
 -- Direct imports for use in this module's functions
-import Hydrogen.Element.Component.QRCode.Matrix.Patterns
+import Hydrogen.Element.Compound.QRCode.Matrix.Patterns
   ( initializeMatrix
   , placeFinderPatterns
   , placeSeparators
@@ -101,17 +101,17 @@ import Hydrogen.Element.Component.QRCode.Matrix.Patterns
   , reserveVersionAreas
   )
 
-import Hydrogen.Element.Component.QRCode.Matrix.Data
+import Hydrogen.Element.Compound.QRCode.Matrix.Data
   ( placeDataBits
   )
 
-import Hydrogen.Element.Component.QRCode.Matrix.Mask
+import Hydrogen.Element.Compound.QRCode.Matrix.Mask
   ( MaskPattern(Mask0, Mask1, Mask2, Mask3, Mask4, Mask5, Mask6, Mask7)
   , applyMask
   , selectBestMask
   )
 
-import Hydrogen.Element.Component.QRCode.Matrix.FormatVersion
+import Hydrogen.Element.Compound.QRCode.Matrix.FormatVersion
   ( placeFormatInfo
   , placeVersionInfo
   )

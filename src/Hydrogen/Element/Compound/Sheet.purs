@@ -11,7 +11,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Sheet as Sheet
+-- | import Hydrogen.Element.Compound.Sheet as Sheet
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic sheet from right
@@ -36,7 +36,7 @@
 -- |   ]
 -- |   [ -- Content ]
 -- | ```
-module Hydrogen.Element.Component.Sheet
+module Hydrogen.Element.Compound.Sheet
   ( -- * Sheet Components
     sheet
   , sheetTrigger

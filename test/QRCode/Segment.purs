@@ -14,8 +14,8 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((===))
 import Test.QuickCheck.Gen (suchThat)
 
-import Hydrogen.Element.Component.QRCode.Types as Types
-import Hydrogen.Element.Component.QRCode.Encoding.Segment as Seg
+import Hydrogen.Element.Compound.QRCode.Types as Types
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment as Seg
 import Test.QRCode.Generators (genNumericString)
 
 segmentEncodingTests :: Spec Unit

@@ -33,7 +33,7 @@
 -- | - TreeView.Node (Tree, ancestry queries)
 -- | - Schema.Gestural.DragDrop (DragPhase, DropEffect)
 
-module Hydrogen.Element.Component.TreeView.DragDrop
+module Hydrogen.Element.Compound.TreeView.DragDrop
   ( -- * Drag Operations
     canStartDrag
   , startNodeDrag
@@ -82,14 +82,14 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing), isJust)
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , DropPosition(DropBefore, DropAfter, DropInside)
   , Depth
   , rootDepth
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( DragState
   , beginDrag
   , updateDragOver
@@ -100,7 +100,7 @@ import Hydrogen.Element.Component.TreeView.State
   , getDragPosition
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId

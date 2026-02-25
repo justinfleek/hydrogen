@@ -20,44 +20,44 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Carousel as Carousel
+-- | import Hydrogen.Element.Compound.Carousel as Carousel
 -- |
 -- | view :: Carousel.CarouselState -> Element Carousel.CarouselMsg
 -- | view state = 
 -- |   Carousel.carousel Carousel.defaultConfig state mySlides
 -- | ```
 
-module Hydrogen.Element.Component.Carousel
+module Hydrogen.Element.Compound.Carousel
   ( -- * Re-exports from Types
-    module Hydrogen.Element.Component.Carousel.Types
+    module Hydrogen.Element.Compound.Carousel.Types
   
   -- * Re-exports from Effects
-  , module Hydrogen.Element.Component.Carousel.Effects
+  , module Hydrogen.Element.Compound.Carousel.Effects
   
   -- * Re-exports from Gestures
-  , module Hydrogen.Element.Component.Carousel.Gestures
+  , module Hydrogen.Element.Compound.Carousel.Gestures
   
   -- * Re-exports from Transitions
-  , module Hydrogen.Element.Component.Carousel.Transitions
+  , module Hydrogen.Element.Compound.Carousel.Transitions
   
   -- * Re-exports from State
-  , module Hydrogen.Element.Component.Carousel.State
+  , module Hydrogen.Element.Compound.Carousel.State
   
   -- * Re-exports from Slide
-  , module Hydrogen.Element.Component.Carousel.Slide
+  , module Hydrogen.Element.Compound.Carousel.Slide
   
   -- * Re-exports from Navigation
-  , module Hydrogen.Element.Component.Carousel.Navigation
+  , module Hydrogen.Element.Compound.Carousel.Navigation
   
   -- * Re-exports from Render
-  , module Hydrogen.Element.Component.Carousel.Render
+  , module Hydrogen.Element.Compound.Carousel.Render
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // imports
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( AutoplayMode
       ( AutoplayOff
       , AutoplayTimed
@@ -153,7 +153,7 @@ import Hydrogen.Element.Component.Carousel.Types
   , slideIndex
   , unwrapSlideIndex
   )
-import Hydrogen.Element.Component.Carousel.Effects 
+import Hydrogen.Element.Compound.Carousel.Effects 
   ( BlurEffect
   , EffectKind
       ( EffectOpacity
@@ -212,7 +212,7 @@ import Hydrogen.Element.Component.Carousel.Effects
   , rotationEffect
   , scaleEffect
   )
-import Hydrogen.Element.Component.Carousel.Gestures 
+import Hydrogen.Element.Compound.Carousel.Gestures 
   ( DragGesture
   , GestureState
   , PinchGesture
@@ -257,7 +257,7 @@ import Hydrogen.Element.Component.Carousel.Gestures
   , swipeProgress
   , voiceState
   )
-import Hydrogen.Element.Component.Carousel.Transitions 
+import Hydrogen.Element.Compound.Carousel.Transitions 
   ( EasingFunction
       ( EaseLinear
       , EaseIn
@@ -295,7 +295,7 @@ import Hydrogen.Element.Component.Carousel.Transitions
   , transitionConfig
   , zoomTransition
   )
-import Hydrogen.Element.Component.Carousel.State 
+import Hydrogen.Element.Compound.Carousel.State 
   ( AutoplayState
   , CarouselState
   , TransitionState
@@ -313,7 +313,7 @@ import Hydrogen.Element.Component.Carousel.State
   , transitionProgress
   , transitionState
   )
-import Hydrogen.Element.Component.Carousel.Slide 
+import Hydrogen.Element.Compound.Carousel.Slide 
   ( ContentSource
       ( SourceUrl
       , SourceInline
@@ -332,7 +332,7 @@ import Hydrogen.Element.Component.Carousel.Slide
   , textSlide
   , videoSlide
   )
-import Hydrogen.Element.Component.Carousel.Navigation 
+import Hydrogen.Element.Compound.Carousel.Navigation 
   ( ArrowConfig
   , ArrowPosition
       ( ArrowsInside
@@ -359,7 +359,7 @@ import Hydrogen.Element.Component.Carousel.Navigation
   , minimalNavigation
   , progressConfig
   )
-import Hydrogen.Element.Component.Carousel.Render 
+import Hydrogen.Element.Compound.Carousel.Render 
   ( CarouselConfig
   , CarouselMsg
       ( GoToSlide

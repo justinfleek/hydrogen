@@ -7,7 +7,7 @@
 -- | Icons for signature pad toolbar: eraser, undo, clear (trash), pen.
 -- | All icons are 18x18 with stroke-based rendering for consistent styling.
 
-module Hydrogen.Element.Component.Signature.Icons
+module Hydrogen.Element.Compound.Signature.Icons
   ( -- * Toolbar Icons
     eraserIcon
   , undoIcon

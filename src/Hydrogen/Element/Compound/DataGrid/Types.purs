@@ -19,7 +19,7 @@
 -- | - **Column**: ColumnDef, ColumnProp
 -- | - **Grid**: GridProps, GridProp, GridState
 
-module Hydrogen.Element.Component.DataGrid.Types
+module Hydrogen.Element.Compound.DataGrid.Types
   ( -- * Cell Type Enum
     CellType(CellText, CellNumber, CellDate, CellBoolean, CellLink, CellBadge, CellActions, CellCustom)
   

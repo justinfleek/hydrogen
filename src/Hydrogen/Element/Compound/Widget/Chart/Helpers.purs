@@ -10,7 +10,7 @@
 -- | Array utilities from Data.Array.
 -- | All helpers use bounded fallbacks — no Infinity or NaN escapes.
 
-module Hydrogen.Element.Component.Widget.Chart.Helpers
+module Hydrogen.Element.Compound.Widget.Chart.Helpers
   ( -- * Array Operations
     mapPoints
   , arrayMin
@@ -31,7 +31,7 @@ import Data.Array (foldl, index, mapWithIndex, replicate, take) as ReExports
 import Data.Array (foldl, index, mapWithIndex)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int (toNumber) as ReExports
-import Hydrogen.Element.Component.Widget.Chart.Types (DataPoint)
+import Hydrogen.Element.Compound.Widget.Chart.Types (DataPoint)
 import Hydrogen.Math.Core (cos, sin) as ReExports
 
 -- ═══════════════════════════════════════════════════════════════════════════════

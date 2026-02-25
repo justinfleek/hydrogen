@@ -10,7 +10,7 @@
 -- | Each widget occupies a cell (or spans multiple cells) in the grid.
 -- | The layout responds to container size using Schema breakpoints.
 
-module Hydrogen.Element.Component.Dashboard.Layout
+module Hydrogen.Element.Compound.Dashboard.Layout
   ( -- * Component
     dashboard
     

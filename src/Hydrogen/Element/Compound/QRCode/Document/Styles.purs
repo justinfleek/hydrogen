@@ -17,7 +17,7 @@
 -- | - Prelude (Eq, Show)
 -- | - Data.Maybe (optional colors)
 
-module Hydrogen.Element.Component.QRCode.Document.Styles
+module Hydrogen.Element.Compound.QRCode.Document.Styles
   ( -- * QR Style Preset
     QRStyle(..)
   

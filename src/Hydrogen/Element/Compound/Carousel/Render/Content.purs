@@ -27,7 +27,7 @@
 -- | - Carousel.Slide (SlideData, ContentSource)
 -- | - Hydrogen.Render.Element
 
-module Hydrogen.Element.Component.Carousel.Render.Content
+module Hydrogen.Element.Compound.Carousel.Render.Content
   ( -- * Main Content Renderer
     renderSlideContent
   , renderCaption
@@ -74,7 +74,7 @@ import Data.String (drop, length, take) as String
 import Data.String.Pattern (Pattern(Pattern))
 
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.Carousel.Slide 
+import Hydrogen.Element.Compound.Carousel.Slide 
   ( SlideData
   , ContentSource
       ( SourceUrl
@@ -82,7 +82,7 @@ import Hydrogen.Element.Component.Carousel.Slide
       , SourceData
       )
   )
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( ContentKind
       ( ContentImage
       , ContentVideo

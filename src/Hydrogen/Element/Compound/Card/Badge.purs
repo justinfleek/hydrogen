@@ -29,7 +29,7 @@
 -- | - Schema.Color.RGB (badge colors)
 -- | - Schema.Typography (text styling)
 
-module Hydrogen.Element.Component.Card.Badge
+module Hydrogen.Element.Compound.Card.Badge
   ( -- * Badge Position
     BadgePosition
       ( BadgeTopLeft

@@ -40,7 +40,7 @@
 -- |   }
 -- |
 -- | -- Generate CSS
--- | CQ.toCss container cardStyles
+-- | CQ.toLegacyCss container cardStyles
 -- | -- container-type: inline-size;
 -- | -- @container (min-width: 640px) { ... }
 -- | ```
@@ -53,7 +53,7 @@
 module Hydrogen.Schema.Reactive.ContainerQuery
   ( -- * Container Type
     ContainerType(InlineSize, BlockSize, Size, Normal)
-  , containerTypeToCSS
+  , containerTypeToLegacyCss
   
   -- * Container Definition
   , Container
@@ -81,7 +81,7 @@ module Hydrogen.Schema.Reactive.ContainerQuery
   , containerQuery
   , containerQueryNamed
   , queryCondition
-  , queryToCss
+  , queryToLegacyCss
   
   -- * Container-Responsive Values
   , ContainerResponsiveSpec
@@ -97,9 +97,9 @@ module Hydrogen.Schema.Reactive.ContainerQuery
   , isBelowBreakpoint
   
   -- * CSS Generation
-  , containerStylesCss
-  , containerTypeCss
-  , containerNameCss
+  , containerStylesLegacyCss
+  , containerTypeLegacyCss
+  , containerNameLegacyCss
   ) where
 
 import Prelude
@@ -151,11 +151,11 @@ instance showContainerType :: Show ContainerType where
   show Normal = "normal"
 
 -- | Convert container type to CSS value.
-containerTypeToCSS :: ContainerType -> String
-containerTypeToCSS InlineSize = "inline-size"
-containerTypeToCSS BlockSize = "block-size"
-containerTypeToCSS Size = "size"
-containerTypeToCSS Normal = "normal"
+containerTypeToLegacyCss :: ContainerType -> String
+containerTypeToLegacyCss InlineSize = "inline-size"
+containerTypeToLegacyCss BlockSize = "block-size"
+containerTypeToLegacyCss Size = "size"
+containerTypeToLegacyCss Normal = "normal"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // container definition
@@ -314,8 +314,8 @@ queryCondition :: ContainerQuery -> QueryCondition
 queryCondition cq = cq.condition
 
 -- | Convert container query to CSS @container rule.
-queryToCss :: ContainerQuery -> String
-queryToCss cq = case cq.containerName of
+queryToLegacyCss :: ContainerQuery -> String
+queryToLegacyCss cq = case cq.containerName of
   Nothing -> "@container " <> show cq.condition
   Just name -> "@container " <> name <> " " <> show cq.condition
 
@@ -422,14 +422,14 @@ isBelowBreakpoint width bp = width < breakpointMin bp
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Generate CSS for container-type property.
-containerTypeCss :: QueryContainer -> String
-containerTypeCss qc = "container-type: " <> containerTypeToCSS qc.containerType <> ";"
+containerTypeLegacyCss :: QueryContainer -> String
+containerTypeLegacyCss qc = "container-type: " <> containerTypeToLegacyCss qc.containerType <> ";"
 
 -- | Generate CSS for container-name property.
-containerNameCss :: QueryContainer -> String
-containerNameCss qc = "container-name: " <> qc.name <> ";"
+containerNameLegacyCss :: QueryContainer -> String
+containerNameLegacyCss qc = "container-name: " <> qc.name <> ";"
 
 -- | Generate complete container CSS (type + name).
-containerStylesCss :: QueryContainer -> String
-containerStylesCss qc =
-  containerTypeCss qc <> " " <> containerNameCss qc
+containerStylesLegacyCss :: QueryContainer -> String
+containerStylesLegacyCss qc =
+  containerTypeLegacyCss qc <> " " <> containerNameLegacyCss qc

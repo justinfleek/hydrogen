@@ -24,7 +24,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.PhoneInput as PhoneInput
+-- | import Hydrogen.Element.Compound.PhoneInput as PhoneInput
 -- |
 -- | -- Basic phone input
 -- | PhoneInput.phoneInput
@@ -45,7 +45,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.PhoneInput
+module Hydrogen.Element.Compound.PhoneInput
   ( -- * Main Component
     phoneInput
   , phoneInputWithLabel

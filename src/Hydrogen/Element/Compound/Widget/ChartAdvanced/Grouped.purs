@@ -17,7 +17,7 @@
 -- |
 -- | Pure Element output — no framework dependencies.
 
-module Hydrogen.Element.Component.Widget.ChartAdvanced.Grouped
+module Hydrogen.Element.Compound.Widget.ChartAdvanced.Grouped
   ( -- * Types
     GroupedBarData
   , GroupedBarConfig
@@ -48,7 +48,7 @@ import Prelude
 import Data.Array (foldl, index, length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMin, arrayMax)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMin, arrayMax)
 import Hydrogen.Math.Core as Math
 import Hydrogen.Render.Element as E
 

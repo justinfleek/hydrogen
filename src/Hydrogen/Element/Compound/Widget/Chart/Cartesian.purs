@@ -7,7 +7,7 @@
 -- | Charts using X/Y coordinate systems with axes.
 -- | Pure Element output — no framework dependencies.
 
-module Hydrogen.Element.Component.Widget.Chart.Cartesian
+module Hydrogen.Element.Compound.Widget.Chart.Cartesian
   ( -- * Chart Renderers
     renderLineChart
   , renderAreaChart
@@ -33,9 +33,9 @@ import Prelude
 import Data.Array (foldl, index, length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMax, arrayMin, mapPoints)
-import Hydrogen.Element.Component.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
-import Hydrogen.Element.Component.Widget.Chart.Types (ChartData, ChartProps, DataPoint, SeriesData)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMax, arrayMin, mapPoints)
+import Hydrogen.Element.Compound.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
+import Hydrogen.Element.Compound.Widget.Chart.Types (ChartData, ChartProps, DataPoint, SeriesData)
 import Hydrogen.Render.Element as E
 
 -- ═══════════════════════════════════════════════════════════════════════════════

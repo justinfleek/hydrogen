@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.NumberInput as NumberInput
+-- | import Hydrogen.Element.Compound.NumberInput as NumberInput
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic number input
@@ -43,7 +43,7 @@
 -- |   , NumberInput.inputSuffix ".00"
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.NumberInput
+module Hydrogen.Element.Compound.NumberInput
   ( -- * NumberInput Component
     numberInput
   , numberInputWithButtons

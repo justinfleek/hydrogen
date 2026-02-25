@@ -48,11 +48,17 @@ module Hydrogen.Schema.Geometry.Ray
   , distanceToPoint
   , distanceSqToPoint
   
-  -- * Intersection Tests
-  , intersectSphereParameter
+  -- * Intersection Tests (Parameter)
   , intersectPlaneParameter
+  , intersectSphereParameter
   , intersectBoxParameter
   , intersectTriangleParameter
+  
+  -- * Intersection Tests (Point)
+  , intersectPlanePoint
+  , intersectSpherePoint
+  , intersectBoxPoint
+  , intersectTrianglePoint
   
   -- * Accessors
   , getOrigin
@@ -64,8 +70,8 @@ import Prelude
   , class Show
   , max
   , min
-  , negate
   , show
+  , negate
   , not
   , (||)
   , (&&)
@@ -83,7 +89,7 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Dimension.Vector.Vec3 
-  ( Vec3
+  ( Vec3(Vec3)
   , addVec3
   , subtractVec3
   , scaleVec3
@@ -234,195 +240,275 @@ getDirection :: Ray -> Vec3 Number
 getDirection (Ray _ direction) = direction
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // intersection tests
+--                                                         // intersection tests
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Intersect ray with a sphere, returning the parameter t at intersection.
+-- | Small epsilon for numerical comparisons
+epsilon :: Number
+epsilon = 1.0e-10
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                                              // ray vs plane
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- | Intersect ray with a plane defined by normal and constant.
 -- |
--- | Returns Nothing if ray misses the sphere.
--- | Returns the nearest positive t (front-facing intersection).
+-- | Plane equation: normal · P + constant = 0
+-- | Ray equation: P(t) = origin + t * direction
 -- |
--- | Algorithm: Solve quadratic |origin + t*dir - center|² = radius²
--- |   a = dir·dir, b = 2*(origin-center)·dir, c = |origin-center|² - r²
--- |   discriminant = b² - 4ac
+-- | Substituting: normal · (origin + t * direction) + constant = 0
+-- | Solving: t = -(normal · origin + constant) / (normal · direction)
 -- |
--- | Three.js parity: Ray.intersectSphere
--- | Proof reference: Ray.lean intersectSphereParameter (pending)
-intersectSphereParameter
-  :: Ray
-  -> Vec3 Number  -- center
-  -> Number       -- radius
-  -> Maybe Number
-intersectSphereParameter (Ray origin direction) center radius =
+-- | Returns Nothing if:
+-- | - Ray is parallel to plane (denominator ≈ 0)
+-- | - Intersection is behind ray origin (t < 0)
+-- |
+-- | Proof reference: Ray.lean intersectPlane (theorem pending)
+intersectPlaneParameter :: Ray -> Vec3 Number -> Number -> Maybe Number
+intersectPlaneParameter (Ray origin direction) planeNormal planeConstant =
   let
-    oc = subtractVec3 origin center
+    denominator = dotVec3 planeNormal direction
+  in
+    if Math.abs denominator < epsilon then
+      -- Ray is parallel to plane
+      Nothing
+    else
+      let t = negate (dotVec3 planeNormal origin + planeConstant) / denominator
+      in if t >= 0.0 then Just t else Nothing
+
+-- | Intersect ray with plane, returning the intersection point.
+intersectPlanePoint :: Ray -> Vec3 Number -> Number -> Maybe (Vec3 Number)
+intersectPlanePoint r planeNormal planeConstant =
+  case intersectPlaneParameter r planeNormal planeConstant of
+    Just t -> Just (pointAt r t)
+    Nothing -> Nothing
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                                             // ray vs sphere
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- | Intersect ray with a sphere defined by center and radius.
+-- |
+-- | Sphere equation: |P - center|² = radius²
+-- | Ray equation: P(t) = origin + t * direction
+-- |
+-- | Let oc = origin - center
+-- | Substituting: |oc + t * direction|² = radius²
+-- | Expanding: t²(d·d) + 2t(oc·d) + (oc·oc) - r² = 0
+-- |
+-- | This is quadratic: at² + bt + c = 0 where:
+-- |   a = direction · direction
+-- |   b = 2 * (oc · direction)  
+-- |   c = (oc · oc) - radius²
+-- |
+-- | Discriminant: b² - 4ac
+-- | - < 0: no intersection
+-- | - = 0: ray is tangent (one intersection)
+-- | - > 0: ray passes through (two intersections, return nearest with t ≥ 0)
+-- |
+-- | Proof reference: Ray.lean intersectSphere (theorem: intersectSphere_pointAt_onSphere)
+intersectSphereParameter :: Ray -> Vec3 Number -> Number -> Maybe Number
+intersectSphereParameter (Ray origin direction) sphereCenter sphereRadius =
+  let
+    oc = subtractVec3 origin sphereCenter
     a = dotVec3 direction direction
-    halfB = dotVec3 oc direction
-    c = dotVec3 oc oc - radius * radius
+    halfB = dotVec3 oc direction  -- using half-b optimization
+    c = dotVec3 oc oc - sphereRadius * sphereRadius
     discriminant = halfB * halfB - a * c
   in
-    if discriminant < 0.0 then Nothing
-    else if a == 0.0 then Nothing  -- Degenerate ray (zero direction)
+    if discriminant < 0.0 then
+      -- No intersection
+      Nothing
+    else if a < epsilon then
+      -- Degenerate ray (zero direction)
+      Nothing
     else
       let
         sqrtD = Math.sqrt discriminant
-        t1 = (negate halfB - sqrtD) / a
-        t2 = (negate halfB + sqrtD) / a
+        -- Two solutions: t = (-halfB ± sqrtD) / a
+        t1 = (negate halfB - sqrtD) / a  -- near intersection
+        t2 = (negate halfB + sqrtD) / a  -- far intersection
       in
-        -- Return nearest positive t
+        -- Return nearest non-negative t
         if t1 >= 0.0 then Just t1
         else if t2 >= 0.0 then Just t2
         else Nothing
 
--- | Intersect ray with an infinite plane, returning the parameter t at intersection.
--- |
--- | Plane is defined by: normal · P = constant
--- | (i.e., all points P where dot(normal, P) = constant)
--- |
--- | Returns Nothing if ray is parallel to plane or intersection is behind origin.
--- |
--- | Algorithm: t = (constant - normal·origin) / (normal·direction)
--- |
--- | Three.js parity: Ray.intersectPlane
--- | Proof reference: Ray.lean intersectPlaneParameter (pending)
-intersectPlaneParameter
-  :: Ray
-  -> Vec3 Number  -- planeNormal (should be normalized)
-  -> Number       -- planeConstant
-  -> Maybe Number
-intersectPlaneParameter (Ray origin direction) planeNormal planeConstant =
-  let
-    denom = dotVec3 planeNormal direction
-  in
-    if Math.abs denom < epsilon then Nothing  -- Ray parallel to plane
-    else
-      let
-        t = (planeConstant - dotVec3 planeNormal origin) / denom
-      in
-        if t < 0.0 then Nothing  -- Intersection behind ray origin
-        else Just t
-  where
-    epsilon = 1.0e-10
+-- | Intersect ray with sphere, returning the intersection point.
+intersectSpherePoint :: Ray -> Vec3 Number -> Number -> Maybe (Vec3 Number)
+intersectSpherePoint r sphereCenter sphereRadius =
+  case intersectSphereParameter r sphereCenter sphereRadius of
+    Just t -> Just (pointAt r t)
+    Nothing -> Nothing
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                                               // ray vs box
+-- ─────────────────────────────────────────────────────────────────────────────
 
 -- | Intersect ray with an axis-aligned bounding box (AABB).
 -- |
--- | Returns Nothing if ray misses the box.
--- | Returns the parameter t at the nearest intersection point.
+-- | Uses the slab method: for each axis, compute the parameter range [tMin, tMax]
+-- | where the ray is inside that axis's slabs. The ray intersects the box if
+-- | all three ranges overlap and the final tMax > 0.
 -- |
--- | Algorithm: Slab method - compute entry/exit for each axis and find overlap.
+-- | For each axis i:
+-- |   t1 = (boxMin[i] - origin[i]) / direction[i]
+-- |   t2 = (boxMax[i] - origin[i]) / direction[i]
+-- |   tMin = max(tMin, min(t1, t2))
+-- |   tMax = min(tMax, max(t1, t2))
 -- |
--- | Three.js parity: Ray.intersectBox
--- | Proof reference: Ray.lean intersectBoxParameter (pending)
-intersectBoxParameter
-  :: Ray
-  -> Vec3 Number  -- boxMin
-  -> Vec3 Number  -- boxMax
-  -> Maybe Number
-intersectBoxParameter (Ray origin direction) boxMin boxMax =
+-- | Returns Nothing if:
+-- | - Ray misses the box (tMin > tMax)
+-- | - Box is entirely behind ray origin (tMax < 0)
+-- |
+-- | Proof reference: Ray.lean intersectBox (theorem: intersectBox_pointAt_inside)
+intersectBoxParameter :: Ray -> Vec3 Number -> Vec3 Number -> Maybe Number
+intersectBoxParameter (Ray (Vec3 ox oy oz) (Vec3 dx dy dz)) (Vec3 minX minY minZ) (Vec3 maxX maxY maxZ) =
   let
-    -- Decompose into components
-    ox = getX3 origin
-    oy = getY3 origin
-    oz = getZ3 origin
-    dx = getX3 direction
-    dy = getY3 direction
-    dz = getZ3 direction
-    minX = getX3 boxMin
-    minY = getY3 boxMin
-    minZ = getZ3 boxMin
-    maxX = getX3 boxMax
-    maxY = getY3 boxMax
-    maxZ = getZ3 boxMax
+    -- Compute inverse direction (handle zero components)
+    invDx = if Math.abs dx < epsilon then 1.0e30 else 1.0 / dx
+    invDy = if Math.abs dy < epsilon then 1.0e30 else 1.0 / dy
+    invDz = if Math.abs dz < epsilon then 1.0e30 else 1.0 / dz
     
-    -- Compute t values for each slab
-    -- Handle division by zero: if direction component is 0, check if origin is inside slab
-    computeSlab :: Number -> Number -> Number -> Number -> { tMin :: Number, tMax :: Number }
-    computeSlab o d lo hi =
-      if Math.abs d < epsilon then
-        -- Ray parallel to slab - check if origin is inside
-        if o < lo || o > hi then
-          { tMin: infinity, tMax: negInfinity }  -- No intersection possible
-        else
-          { tMin: negInfinity, tMax: infinity }  -- Always inside this slab
-      else
-        let
-          invD = 1.0 / d
-          t1 = (lo - o) * invD
-          t2 = (hi - o) * invD
-        in
-          if invD < 0.0 then { tMin: t2, tMax: t1 }
-          else { tMin: t1, tMax: t2 }
+    -- X slab
+    tx1 = (minX - ox) * invDx
+    tx2 = (maxX - ox) * invDx
+    txMin = min tx1 tx2
+    txMax = max tx1 tx2
     
-    slabX = computeSlab ox dx minX maxX
-    slabY = computeSlab oy dy minY maxY
-    slabZ = computeSlab oz dz minZ maxZ
+    -- Y slab
+    ty1 = (minY - oy) * invDy
+    ty2 = (maxY - oy) * invDy
+    tyMin = min ty1 ty2
+    tyMax = max ty1 ty2
     
-    -- Intersection is the overlap of all three slabs
-    tNear = max slabX.tMin (max slabY.tMin slabZ.tMin)
-    tFar = min slabX.tMax (min slabY.tMax slabZ.tMax)
+    -- Z slab
+    tz1 = (minZ - oz) * invDz
+    tz2 = (maxZ - oz) * invDz
+    tzMin = min tz1 tz2
+    tzMax = max tz1 tz2
+    
+    -- Combine: overall entry and exit
+    tEnter = max txMin (max tyMin tzMin)
+    tExit = min txMax (min tyMax tzMax)
   in
-    -- No intersection if tNear > tFar or tFar < 0
-    if tNear > tFar || tFar < 0.0 then Nothing
-    -- If tNear < 0, we're inside the box; return tFar (exit point) or 0
-    else if tNear < 0.0 then Just 0.0
-    else Just tNear
-  where
-    epsilon = 1.0e-10
-    infinity = 1.0e30
-    negInfinity = negate 1.0e30
+    if tEnter > tExit || tExit < 0.0 then
+      -- Miss or behind
+      Nothing
+    else if tEnter >= 0.0 then
+      -- Ray starts outside box, enters at tEnter
+      Just tEnter
+    else
+      -- Ray starts inside box, exits at tExit
+      Just tExit
 
--- | Intersect ray with a triangle using Möller–Trumbore algorithm.
+-- | Intersect ray with AABB, returning the intersection point.
+intersectBoxPoint :: Ray -> Vec3 Number -> Vec3 Number -> Maybe (Vec3 Number)
+intersectBoxPoint r boxMin boxMax =
+  case intersectBoxParameter r boxMin boxMax of
+    Just t -> Just (pointAt r t)
+    Nothing -> Nothing
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                                           // ray vs triangle
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- | Intersect ray with a triangle using the Möller–Trumbore algorithm.
 -- |
--- | Returns Nothing if ray misses the triangle or (optionally) if backface.
--- | Returns the parameter t at the intersection point.
+-- | This is THE critical function for raycasting. Called once per triangle
+-- | in the raycasting pipeline.
 -- |
--- | Algorithm: Möller–Trumbore intersection
--- |   edge1 = v1 - v0, edge2 = v2 - v0
--- |   h = direction × edge2, a = edge1 · h
--- |   if |a| < ε, ray is parallel to triangle
--- |   f = 1/a, s = origin - v0, u = f * (s · h)
--- |   if u < 0 or u > 1, miss
--- |   q = s × edge1, v = f * (direction · q)
--- |   if v < 0 or u + v > 1, miss
+-- | Given triangle vertices (v0, v1, v2) and ray (origin, direction):
+-- |   edge1 = v1 - v0
+-- |   edge2 = v2 - v0
+-- |   h = direction × edge2
+-- |   a = edge1 · h
+-- |
+-- | If a ≈ 0, ray is parallel to triangle plane.
+-- |
+-- | Otherwise:
+-- |   f = 1/a
+-- |   s = origin - v0
+-- |   u = f * (s · h)
+-- |   
+-- | If u < 0 or u > 1, intersection is outside triangle.
+-- |
+-- |   q = s × edge1
+-- |   v = f * (direction · q)
+-- |
+-- | If v < 0 or u + v > 1, intersection is outside triangle.
+-- |
 -- |   t = f * (edge2 · q)
 -- |
--- | Three.js parity: Ray.intersectTriangle
--- | Proof reference: Ray.lean intersectTriangleParameter (pending)
-intersectTriangleParameter
-  :: Ray
-  -> Vec3 Number  -- v0 (vertex A)
-  -> Vec3 Number  -- v1 (vertex B)
-  -> Vec3 Number  -- v2 (vertex C)
-  -> Boolean      -- backfaceCulling: if true, ignore back-facing triangles
+-- | If t < 0, intersection is behind ray origin.
+-- |
+-- | The parameter `cullBackFace` determines whether to reject back-facing triangles:
+-- | - True: only front faces (a > 0) are hit
+-- | - False: both front and back faces are hit
+-- |
+-- | Proof reference: Ray.lean intersectTriangle (theorem: intersectTriangle_pointAt_onTriangle)
+intersectTriangleParameter 
+  :: Ray 
+  -> Vec3 Number  -- v0
+  -> Vec3 Number  -- v1
+  -> Vec3 Number  -- v2
+  -> Boolean      -- cullBackFace
   -> Maybe Number
-intersectTriangleParameter (Ray origin direction) v0 v1 v2 backfaceCulling =
+intersectTriangleParameter (Ray origin direction) v0 v1 v2 cullBackFace =
   let
     edge1 = subtractVec3 v1 v0
     edge2 = subtractVec3 v2 v0
     h = crossVec3 direction edge2
     a = dotVec3 edge1 h
   in
-    -- Check if ray is parallel to triangle (or backface culling)
-    if backfaceCulling && a < epsilon then Nothing  -- Backface (or parallel)
-    else if not backfaceCulling && Math.abs a < epsilon then Nothing  -- Parallel
+    -- Check if ray is parallel to triangle
+    if cullBackFace then
+      -- Culling: reject if a < epsilon (back-facing or parallel)
+      if a < epsilon then Nothing
+      else intersectTriangleCore origin direction v0 edge1 edge2 h a
+    else
+      -- No culling: reject only if |a| < epsilon (parallel)
+      if Math.abs a < epsilon then Nothing
+      else intersectTriangleCore origin direction v0 edge1 edge2 h a
+
+-- | Core Möller–Trumbore computation (after parallel check)
+intersectTriangleCore 
+  :: Vec3 Number  -- origin
+  -> Vec3 Number  -- direction
+  -> Vec3 Number  -- v0
+  -> Vec3 Number  -- edge1
+  -> Vec3 Number  -- edge2
+  -> Vec3 Number  -- h = direction × edge2
+  -> Number       -- a = edge1 · h
+  -> Maybe Number
+intersectTriangleCore origin direction v0 edge1 edge2 h a =
+  let
+    f = 1.0 / a
+    s = subtractVec3 origin v0
+    u = f * dotVec3 s h
+  in
+    if u < 0.0 || u > 1.0 then
+      Nothing
     else
       let
-        f = 1.0 / a
-        s = subtractVec3 origin v0
-        u = f * dotVec3 s h
+        q = crossVec3 s edge1
+        v = f * dotVec3 direction q
       in
-        if u < 0.0 || u > 1.0 then Nothing
+        if v < 0.0 || u + v > 1.0 then
+          Nothing
         else
-          let
-            q = crossVec3 s edge1
-            v = f * dotVec3 direction q
-          in
-            if v < 0.0 || u + v > 1.0 then Nothing
-            else
-              let
-                t = f * dotVec3 edge2 q
-              in
-                if t < epsilon then Nothing  -- Intersection behind ray
-                else Just t
-  where
-    epsilon = 1.0e-10
+          let t = f * dotVec3 edge2 q
+          in if t >= 0.0 then Just t else Nothing
+
+-- | Intersect ray with triangle, returning the intersection point.
+intersectTrianglePoint 
+  :: Ray 
+  -> Vec3 Number  -- v0
+  -> Vec3 Number  -- v1
+  -> Vec3 Number  -- v2
+  -> Boolean      -- cullBackFace
+  -> Maybe (Vec3 Number)
+intersectTrianglePoint r v0 v1 v2 cullBackFace =
+  case intersectTriangleParameter r v0 v1 v2 cullBackFace of
+    Just t -> Just (pointAt r t)
+    Nothing -> Nothing

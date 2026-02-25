@@ -38,7 +38,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.SearchInput as SearchInput
+-- | import Hydrogen.Element.Compound.SearchInput as SearchInput
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic search input (inherits all visual properties from context)
@@ -65,7 +65,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.SearchInput
+module Hydrogen.Element.Compound.SearchInput
   ( -- * SearchInput Component
     searchInput
   

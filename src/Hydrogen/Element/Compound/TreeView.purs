@@ -37,7 +37,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.TreeView as TreeView
+-- | import Hydrogen.Element.Compound.TreeView as TreeView
 -- |
 -- | -- Build tree data
 -- | let tree = TreeView.emptyTree
@@ -57,7 +57,7 @@
 -- |   state
 -- | ```
 
-module Hydrogen.Element.Component.TreeView
+module Hydrogen.Element.Compound.TreeView
   ( -- * Re-exports: Types
     module Types
   
@@ -101,7 +101,7 @@ module Hydrogen.Element.Component.TreeView
   , module InlineEdit
   ) where
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , nodeId
   , unwrapNodeId
@@ -171,7 +171,7 @@ import Hydrogen.Element.Component.TreeView.Types
       )
   ) as Types
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( ExpandedState
   , emptyExpanded
   , isExpanded
@@ -249,7 +249,7 @@ import Hydrogen.Element.Component.TreeView.State
   , withEditable
   ) as State
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( TreeNode
   , treeNode
   -- nodeId is re-exported from Types
@@ -292,7 +292,7 @@ import Hydrogen.Element.Component.TreeView.Node
   , filterTree
   ) as Node
 
-import Hydrogen.Element.Component.TreeView.Navigation
+import Hydrogen.Element.Compound.TreeView.Navigation
   ( visibleNodes
   , visibleNodeIds
   , navigateUp
@@ -307,7 +307,7 @@ import Hydrogen.Element.Component.TreeView.Navigation
   , findNextByPrefix
   ) as Navigation
 
-import Hydrogen.Element.Component.TreeView.Selection
+import Hydrogen.Element.Compound.TreeView.Selection
   ( handleSelect
   , handleDeselect
   , handleToggleSelect
@@ -334,7 +334,7 @@ import Hydrogen.Element.Component.TreeView.Selection
   , subtreeNodes
   ) as Selection
 
-import Hydrogen.Element.Component.TreeView.DragDrop
+import Hydrogen.Element.Compound.TreeView.DragDrop
   ( canStartDrag
   , startNodeDrag
   , updateNodeDrag
@@ -358,7 +358,7 @@ import Hydrogen.Element.Component.TreeView.DragDrop
   , getCurrentDropPosition
   ) as DragDrop
 
-import Hydrogen.Element.Component.TreeView.Layout
+import Hydrogen.Element.Compound.TreeView.Layout
   ( LayoutResult
   , layoutResult
   , emptyLayout
@@ -387,7 +387,7 @@ import Hydrogen.Element.Component.TreeView.Layout
   , rotateLayout
   ) as Layout
 
-import Hydrogen.Element.Component.TreeView.Connection
+import Hydrogen.Element.Compound.TreeView.Connection
   ( renderConnections
   , renderConnection
   , connectionPath
@@ -408,7 +408,7 @@ import Hydrogen.Element.Component.TreeView.Connection
   , withShowConnections
   ) as Connection
 
-import Hydrogen.Element.Component.TreeView.Content
+import Hydrogen.Element.Compound.TreeView.Content
   ( renderNodeContent
   , renderSlot
   , renderLeadingSlot
@@ -438,7 +438,7 @@ import Hydrogen.Element.Component.TreeView.Content
   , avatarTemplate
   ) as Content
 
-import Hydrogen.Element.Component.TreeView.Viewport
+import Hydrogen.Element.Compound.TreeView.Viewport
   ( TreeViewport
   , treeViewport
   , initialViewport
@@ -476,7 +476,7 @@ import Hydrogen.Element.Component.TreeView.Viewport
   , handleViewportEvent
   ) as Viewport
 
-import Hydrogen.Element.Component.TreeView.Animation
+import Hydrogen.Element.Compound.TreeView.Animation
   ( AnimationState
   , animationState
   , initialAnimation
@@ -526,7 +526,7 @@ import Hydrogen.Element.Component.TreeView.Animation
   , completeAnimation
   ) as Animation
 
-import Hydrogen.Element.Component.TreeView.Accessibility
+import Hydrogen.Element.Compound.TreeView.Accessibility
   ( AriaAttrs
   , ariaAttrs
   , containerAriaAttrs
@@ -567,7 +567,7 @@ import Hydrogen.Element.Component.TreeView.Accessibility
   , withDirection
   ) as Accessibility
 
-import Hydrogen.Element.Component.TreeView.Render
+import Hydrogen.Element.Compound.TreeView.Render
   ( renderTreeView
   , renderTreeViewAdvanced
   , renderNode
@@ -636,7 +636,7 @@ import Hydrogen.Element.Component.TreeView.Render
   , computeIndentPixels
   ) as Render
 
-import Hydrogen.Element.Component.TreeView.InlineEdit
+import Hydrogen.Element.Compound.TreeView.InlineEdit
   ( renderEditInput
   , renderEditableLabel
   , EditProps

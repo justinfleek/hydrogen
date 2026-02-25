@@ -48,77 +48,83 @@ CIC (Inductive Constructions)         ← Coq/Rocq, Lean 4, Agda, Idris 2
 proofs/
 ├── Hydrogen.lean                    # Root module
 └── Hydrogen/
-    ├── Math/                        # 17 modules
-    │   ├── Bounded.lean             # Bounded numeric types (30+ theorems, 0 axioms)
-    │   ├── Vec2.lean                # 2D vectors
-    │   ├── Vec3.lean                # 3D vectors (93 theorems, 0 axioms)
-    │   ├── Vec4.lean                # 4D vectors
-    │   ├── Mat3.lean                # 3x3 matrices
-    │   ├── Mat4.lean                # 4x4 matrices
-    │   ├── Mat4Inverse.lean         # Matrix inversion
-    │   ├── Mat4Projection.lean      # Projection matrices
-    │   ├── Quaternion.lean          # Rotation quaternions
-    │   ├── Euler.lean               # Euler angles
-    │   ├── Ray.lean                 # Ray casting
-    │   ├── Plane.lean               # Plane geometry
-    │   ├── Sphere.lean              # Sphere geometry
-    │   ├── Triangle.lean            # Triangle geometry
-    │   ├── Frustum.lean             # View frustum
-    │   ├── Box3.lean                # Bounding boxes
-    │   ├── Constraint.lean          # Physics constraints
-    │   ├── Force.lean               # Physics forces
-    │   └── Integration.lean         # Physics integration
+    ├── Math/                        # 17 modules, 549 theorems
+    │   ├── Bounded.lean             # Bounded numeric types (56 theorems)
+    │   ├── Vec2.lean                # 2D vectors (33 theorems)
+    │   ├── Vec3.lean                # 3D vectors (38 theorems)
+    │   ├── Vec4.lean                # 4D vectors (38 theorems)
+    │   ├── Mat3.lean                # 3x3 matrices (42 theorems)
+    │   ├── Mat4.lean                # 4x4 matrices (45 theorems)
+    │   ├── Mat4Inverse.lean         # Matrix inversion (7 theorems)
+    │   ├── Mat4Projection.lean      # Projection matrices (2 theorems)
+    │   ├── Quaternion.lean          # Rotation quaternions (47 theorems)
+    │   ├── Euler.lean               # Euler angles (42 theorems)
+    │   ├── Ray.lean                 # Ray casting (22 theorems)
+    │   ├── Plane.lean               # Plane geometry (17 theorems)
+    │   ├── Sphere.lean              # Sphere geometry (27 theorems)
+    │   ├── Triangle.lean            # Triangle geometry (28 theorems)
+    │   ├── Frustum.lean             # View frustum (24 theorems)
+    │   ├── Box3.lean                # Bounding boxes (31 theorems)
+    │   ├── Constraint.lean          # Physics constraints (17 theorems)
+    │   ├── Force.lean               # Physics forces (17 theorems)
+    │   └── Integration.lean         # Physics integration (16 theorems)
     │
     ├── Schema/
-    │   └── Color/
+    │   └── Color/                   # 3 modules, 23 theorems, 16 axioms
     │       ├── Hue.lean             # Hue rotation (8 theorems, 0 axioms) ✓
-    │       ├── Conversions.lean     # Color conversions (10 proven, 16 axioms)
-    │       └── Real.lean            # Real number helpers
+    │       ├── Conversions.lean     # Color conversions (10 theorems, 16 axioms)
+    │       └── Real.lean            # Real number helpers (5 theorems)
     │
-    ├── Geometry/                    # 5 modules
-    │   ├── Bounds.lean
-    │   ├── Mesh.lean
-    │   ├── Primitives.lean
-    │   ├── Texture.lean
-    │   └── Vertex.lean
+    ├── Geometry/                    # 5 modules, 69 theorems
+    │   ├── Bounds.lean              # Bounding computation (8 theorems)
+    │   ├── Mesh.lean                # Mesh validation (10 theorems)
+    │   ├── Primitives.lean          # Primitive shapes (14 theorems)
+    │   ├── Texture.lean             # Texture coordinates (19 theorems)
+    │   └── Vertex.lean              # Vertex formats (18 theorems)
     │
-    ├── Material/                    # 5 modules
-    │   ├── BRDF.lean
-    │   ├── ISP.lean
-    │   ├── Layer.lean
-    │   ├── Sparkle.lean
-    │   └── Types.lean
+    ├── Material/                    # 5 modules, 107 theorems
+    │   ├── BRDF.lean                # Bidirectional reflectance (23 theorems)
+    │   ├── ISP.lean                 # Image signal processing (66 theorems)
+    │   ├── Layer.lean               # Material layers (0 theorems)
+    │   ├── Sparkle.lean             # Sparkle/glitter effects (18 theorems)
+    │   └── Types.lean               # Material type definitions (0 theorems)
     │
-    ├── Light/                       # 6 modules
-    │   ├── Attenuation.lean
-    │   ├── Directional.lean
-    │   ├── Point.lean
-    │   ├── Shadow.lean
-    │   ├── Spot.lean
-    │   └── Types.lean
+    ├── Light/                       # 6 modules, 58 theorems
+    │   ├── Attenuation.lean         # Light falloff (16 theorems)
+    │   ├── Directional.lean         # Directional lights (7 theorems)
+    │   ├── Point.lean               # Point lights (8 theorems)
+    │   ├── Shadow.lean              # Shadow mapping (12 theorems)
+    │   ├── Spot.lean                # Spot lights (6 theorems)
+    │   └── Types.lean               # Light type definitions (9 theorems)
     │
-    ├── Camera/                      # 3 modules
-    │   ├── Lens.lean
-    │   ├── Projection.lean
-    │   └── Types.lean
+    ├── Camera/                      # 3 modules, 25 theorems
+    │   ├── Lens.lean                # Focal length/FOV (14 theorems)
+    │   ├── Projection.lean          # Projection matrices (2 theorems)
+    │   └── Types.lean               # Camera type definitions (9 theorems)
     │
-    ├── Scene/                       # 4 modules
-    │   ├── Diff.lean
-    │   ├── Graph.lean
-    │   ├── Node.lean
-    │   └── Resource.lean
+    ├── Scene/                       # 4 modules, 42 theorems
+    │   ├── Diff.lean                # Scene diffing (6 theorems)
+    │   ├── Graph.lean               # Scene graph (8 theorems)
+    │   ├── Node.lean                # Scene nodes (18 theorems)
+    │   └── Resource.lean            # Resource management (10 theorems)
     │
-    └── WorldModel/                  # 5 modules
-        ├── Attention.lean
-        ├── Consensus.lean
-        ├── Integrity.lean
-        ├── Pose.lean
-        └── Rights.lean
+    └── WorldModel/                  # 8 modules, 119 theorems
+        ├── Affective.lean           # Emotional states (7 theorems)
+        ├── Attention.lean           # Attention allocation (10 theorems)
+        ├── Consensus.lean           # Multi-agent consensus (12 theorems)
+        ├── Economy.lean             # Resource economics (20 theorems)
+        ├── Governance.lean          # Governance rules (14 theorems)
+        ├── Integrity.lean           # World integrity (19 theorems)
+        ├── Pose.lean                # Agent pose (7 theorems)
+        └── Rights.lean              # Digital rights (30 theorems)
 ```
 
-**Total:** 59 Lean proof files
+**Total:** 61 Lean proof files, 992 theorems/lemmas, 16 axioms, 0 sorry
 
 ## CURRENT PROOF STATUS
+
+**Build Status:** ✓ `lake build` succeeds (3173 jobs, 0 errors)
+**Completeness:** 0 `sorry` — all proofs are complete
 
 ### Hue.lean (0 Axioms — FULLY VERIFIED)
 
@@ -136,17 +142,19 @@ proofs/
 
 **Status:** ✓ FULLY VERIFIED - ALL THEOREMS PROVEN (NO AXIOMS)
 
-### Conversions.lean (8 Proven Theorems, 0 `sorry`)
+### Conversions.lean (10 Proven Theorems, 16 Axioms, 0 `sorry`)
 
 **Proven (NO AXIOMS NEEDED):**
 1. ✓ `rgb_bounded_roundtrip` - RGB stays in 0-255 after LAB roundtrip
 2. ✓ `lab_l_bounded_roundtrip` - LAB L stays in 0-100 after RGB roundtrip
-3. ✓ `rgbToXyz_total` - RGB→XYZ always succeeds (totality)
-4. ✓ `xyzToRgb_total` - XYZ→RGB always succeeds (totality)
-5. ✓ `xyzToLab_total` - XYZ→LAB always succeeds (totality)
-6. ✓ `labToXyz_total` - LAB→XYZ always succeeds (totality)
-7. ✓ `rgbToLab_via_xyz` - RGB→LAB must go through XYZ (commutativity)
-8. ✓ `labToRgb_via_xyz` - LAB→RGB must go through XYZ (commutativity)
+3. ✓ `nat_trichotomy` - Natural numbers are 0, between, or max
+4. ✓ `rgb_clamps_deterministic` - Gamut clamping produces valid RGB
+5. ✓ `rgbToXyz_total` - RGB→XYZ always succeeds (totality)
+6. ✓ `xyzToRgb_total` - XYZ→RGB always succeeds (totality)
+7. ✓ `xyzToLab_total` - XYZ→LAB always succeeds (totality)
+8. ✓ `labToXyz_total` - LAB→XYZ always succeeds (totality)
+9. ✓ `rgbToLab_via_xyz` - RGB→LAB must go through XYZ (commutativity)
+10. ✓ `labToRgb_via_xyz` - LAB→RGB must go through XYZ (commutativity)
 
 **Axiomatized (require interval arithmetic / real analysis):**
 - Floating-point finiteness preservation

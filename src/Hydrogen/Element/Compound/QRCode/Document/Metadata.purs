@@ -18,7 +18,7 @@
 -- | - Data.Maybe (optional fields)
 -- | - Data.Tuple (custom fields)
 
-module Hydrogen.Element.Component.QRCode.Document.Metadata
+module Hydrogen.Element.Compound.QRCode.Document.Metadata
   ( -- * Document Metadata
     DocumentMetadata
   , defaultMetadata

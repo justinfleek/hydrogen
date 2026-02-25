@@ -31,7 +31,7 @@ import Data.String.CodeUnits (fromCharArray)
 import Data.Tuple (Tuple(Tuple))
 import Test.QuickCheck.Gen (Gen, chooseInt, elements, frequency, oneOf, vectorOf)
 
-import Hydrogen.Element.Component.QRCode.Types as Types
+import Hydrogen.Element.Compound.QRCode.Types as Types
 
 genGFElement :: Gen Int
 genGFElement = chooseInt 0 255

@@ -31,7 +31,7 @@
 -- | - TreeView.Node (TreeNode, nodeLabel)
 -- | - Hydrogen.Render.Element (Element)
 
-module Hydrogen.Element.Component.TreeView.InlineEdit
+module Hydrogen.Element.Compound.TreeView.InlineEdit
   ( -- * Edit Input Rendering
     renderEditInput
   , renderEditableLabel
@@ -90,7 +90,7 @@ import Data.String.Regex (Regex, test) as Regex
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , TreeViewMsg
       ( UpdateEditBuffer
@@ -99,7 +99,7 @@ import Hydrogen.Element.Component.TreeView.Types
       )
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( EditState
   , noEdit
   , beginEditState
@@ -110,7 +110,7 @@ import Hydrogen.Element.Component.TreeView.State
   , isEditingNode
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( TreeNode
   , nodeId
   , nodeLabel

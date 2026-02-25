@@ -4,7 +4,7 @@
 
 -- | Segment accumulator for building segments incrementally.
 
-module Hydrogen.Element.Component.QRCode.Encoding.Segment.Accumulator
+module Hydrogen.Element.Compound.QRCode.Encoding.Segment.Accumulator
   ( SegmentAccumulator
   , Segment
   , emptyAccumulator
@@ -22,8 +22,8 @@ import Prelude
 import Data.Array (length, snoc)
 import Data.String.CodeUnits (toCharArray)
 
-import Hydrogen.Element.Component.QRCode.Types (EncodingMode)
-import Hydrogen.Element.Component.QRCode.Encoding.Segment.CharTable (charToString)
+import Hydrogen.Element.Compound.QRCode.Types (EncodingMode)
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment.CharTable (charToString)
 
 type Segment =
   { mode :: EncodingMode

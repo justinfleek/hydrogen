@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Breadcrumb as Breadcrumb
+-- | import Hydrogen.Element.Compound.Breadcrumb as Breadcrumb
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic breadcrumb
@@ -28,7 +28,7 @@
 -- | Breadcrumb.breadcrumb [ Breadcrumb.collapsed 2 ]
 -- |   [ ... ]
 -- | ```
-module Hydrogen.Element.Component.Breadcrumb
+module Hydrogen.Element.Compound.Breadcrumb
   ( -- * Breadcrumb Components
     breadcrumb
   , breadcrumbItem

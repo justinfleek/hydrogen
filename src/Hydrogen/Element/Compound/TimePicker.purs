@@ -29,7 +29,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.TimePicker as TimePicker
+-- | import Hydrogen.Element.Compound.TimePicker as TimePicker
 -- | import Hydrogen.Schema.Temporal.TimeOfDay as TimeOfDay
 -- |
 -- | -- Basic time picker (24h format)
@@ -46,16 +46,16 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.TimePicker
+module Hydrogen.Element.Compound.TimePicker
   ( -- * Component
     timePicker
   , timePickerInline
   
   -- * Re-exports from Types
-  , module Hydrogen.Element.Component.TimePicker.Types
+  , module Hydrogen.Element.Compound.TimePicker.Types
   
   -- * Re-exports from Format
-  , module Hydrogen.Element.Component.TimePicker.Format
+  , module Hydrogen.Element.Compound.TimePicker.Format
   
   -- * Props
   , TimePickerProps
@@ -119,7 +119,7 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Temporal.TimeOfDay as TimeOfDay
 
-import Hydrogen.Element.Component.TimePicker.Types
+import Hydrogen.Element.Compound.TimePicker.Types
   ( HourFormat(Hour12, Hour24)
   , Period(AM, PM)
   , ValidationError(InvalidFormat, TimeOutOfRange, EmptyValue)
@@ -127,7 +127,7 @@ import Hydrogen.Element.Component.TimePicker.Types
   , togglePeriod
   , validationErrorMessage
   )
-import Hydrogen.Element.Component.TimePicker.Format
+import Hydrogen.Element.Compound.TimePicker.Format
   ( formatTime
   , format24H
   , format12H
@@ -136,7 +136,7 @@ import Hydrogen.Element.Component.TimePicker.Format
   , periodFromHour
   , padZero
   )
-import Hydrogen.Element.Component.TimePicker.Render as Render
+import Hydrogen.Element.Compound.TimePicker.Render as Render
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

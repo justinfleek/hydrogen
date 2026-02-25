@@ -22,7 +22,7 @@
 -- | - Types.Module (Module type)
 -- | - Data.Array (array operations)
 
-module Hydrogen.Element.Component.QRCode.Types.Matrix
+module Hydrogen.Element.Compound.QRCode.Types.Matrix
   ( -- * QR Matrix
     QRMatrix
   , mkMatrix
@@ -51,7 +51,7 @@ import Data.Array (replicate, index, updateAt, (..))
 import Data.Array (mapMaybe) as Array
 import Data.Maybe (Maybe(Just), fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Types.Module (Module(Reserved))
+import Hydrogen.Element.Compound.QRCode.Types.Module (Module(Reserved))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // qr matrix

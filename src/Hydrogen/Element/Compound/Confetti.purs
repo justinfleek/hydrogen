@@ -42,7 +42,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Confetti as Confetti
+-- | import Hydrogen.Element.Compound.Confetti as Confetti
 -- |
 -- | -- Simple burst
 -- | celebration = Confetti.confetti Confetti.defaultConfig
@@ -63,7 +63,7 @@
 -- |   ["🎉", "🎊", "✨", "🥳"]
 -- | ```
 
-module Hydrogen.Element.Component.Confetti
+module Hydrogen.Element.Compound.Confetti
   ( -- * Component
     confetti
   , confettiEmoji

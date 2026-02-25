@@ -18,7 +18,7 @@
 -- | - Data.Array (filtering)
 -- | - Content.Types.Helpers (URI encoding)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Bitcoin
+module Hydrogen.Element.Compound.QRCode.Content.Types.Bitcoin
   ( -- * Bitcoin Content
     BitcoinContent
   , bitcoinContent
@@ -46,7 +46,7 @@ import Data.Array (filter, length)
 import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
-import Hydrogen.Element.Component.QRCode.Content.Types.Helpers (encodeURIComponent)
+import Hydrogen.Element.Compound.QRCode.Content.Types.Helpers (encodeURIComponent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // bitcoin content

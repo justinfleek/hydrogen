@@ -25,7 +25,7 @@
 -- |
 -- | - Prelude (Eq, Ord, Show)
 
-module Hydrogen.Element.Component.OTPInput.Types
+module Hydrogen.Element.Compound.OTPInput.Types
   ( -- * Core Types
     OTPInputType(Numeric, Alphanumeric)
   , OTPDigitCount(OTPDigitCount)

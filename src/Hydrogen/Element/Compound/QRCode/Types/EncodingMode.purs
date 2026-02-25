@@ -19,7 +19,7 @@
 -- | - Data.Char (character codes)
 -- | - Data.Array (all)
 
-module Hydrogen.Element.Component.QRCode.Types.EncodingMode
+module Hydrogen.Element.Compound.QRCode.Types.EncodingMode
   ( -- * Encoding Mode
     EncodingMode(ModeNumeric, ModeAlphanumeric, ModeByte, ModeKanji, ModeECI)
   , modeIndicator

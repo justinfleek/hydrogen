@@ -23,7 +23,7 @@
 -- | | pickedColor   | Color     | Maybe RGB         | Last picked color      |
 -- | | buttonSize    | Dimension | Pixel             | Button dimensions      |
 
-module Hydrogen.Element.Component.ColorPicker.Eyedropper
+module Hydrogen.Element.Compound.ColorPicker.Eyedropper
   ( -- * Component
     eyedropperButton
     

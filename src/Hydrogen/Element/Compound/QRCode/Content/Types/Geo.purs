@@ -17,7 +17,7 @@
 -- | - Data.Maybe (optional fields)
 -- | - Content.Types.Helpers (URI encoding)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Geo
+module Hydrogen.Element.Compound.QRCode.Content.Types.Geo
   ( -- * Geo Content
     GeoContent
   , geoContent
@@ -39,7 +39,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing), maybe)
-import Hydrogen.Element.Component.QRCode.Content.Types.Helpers (encodeURIComponent)
+import Hydrogen.Element.Compound.QRCode.Content.Types.Helpers (encodeURIComponent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // geo content

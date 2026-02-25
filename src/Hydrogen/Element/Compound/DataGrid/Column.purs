@@ -11,8 +11,8 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.DataGrid.Column as Col
--- | import Hydrogen.Element.Component.DataGrid.Types (CellType(..))
+-- | import Hydrogen.Element.Compound.DataGrid.Column as Col
+-- | import Hydrogen.Element.Compound.DataGrid.Types (CellType(..))
 -- |
 -- | -- Define columns
 -- | columns =
@@ -23,7 +23,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.DataGrid.Column
+module Hydrogen.Element.Compound.DataGrid.Column
   ( -- * Column Constructor
     column
   
@@ -54,7 +54,7 @@ import Data.Array (foldl)
 import Data.Maybe (Maybe(Just))
 
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.DataGrid.Types
+import Hydrogen.Element.Compound.DataGrid.Types
   ( CellType
   , CellContext
   , ColumnDef

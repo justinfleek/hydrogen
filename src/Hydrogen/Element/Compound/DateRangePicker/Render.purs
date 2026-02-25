@@ -7,7 +7,7 @@
 -- | Internal module containing render functions. Pure PureScript, no FFI.
 -- | Uses Schema atoms for all visual properties.
 
-module Hydrogen.Element.Component.DateRangePicker.Render
+module Hydrogen.Element.Compound.DateRangePicker.Render
   ( -- * Render Functions
     renderTrigger
   , renderPopup
@@ -40,17 +40,17 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.Calendar as Calendar
-import Hydrogen.Element.Component.DateRangePicker.Types 
+import Hydrogen.Element.Compound.Calendar as Calendar
+import Hydrogen.Element.Compound.DateRangePicker.Types 
   ( CalendarDate
   , ComparisonMode
   , comparisonModeLabel
   )
 import Hydrogen.Schema.Attestation.Timestamp (Timestamp)
 import Hydrogen.Schema.Attestation.Timestamp as Timestamp
-import Hydrogen.Element.Component.DateRangePicker.Presets (PresetDef, presetId, presetLabel)
-import Hydrogen.Element.Component.DatePicker.Format (formatDate)
-import Hydrogen.Element.Component.DatePicker.Types (DateFormat(ISO))
+import Hydrogen.Element.Compound.DateRangePicker.Presets (PresetDef, presetId, presetLabel)
+import Hydrogen.Element.Compound.DatePicker.Format (formatDate)
+import Hydrogen.Element.Compound.DatePicker.Types (DateFormat(ISO))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

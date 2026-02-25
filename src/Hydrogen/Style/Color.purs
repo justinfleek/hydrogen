@@ -48,7 +48,7 @@ module Hydrogen.Style.Color
   , HSL(..)
   , hsl
   , toHslString
-  , toCssVar
+  , toLegacyCssVar
     -- * Color Manipulation
   , lighten
   , darken
@@ -280,10 +280,10 @@ toHslString c
   | c.a < 100.0 = "hsla(" <> show c.h <> ", " <> show c.s <> "%, " <> show c.l <> "%, " <> show (c.a / 100.0) <> ")"
   | otherwise = "hsl(" <> show c.h <> ", " <> show c.s <> "%, " <> show c.l <> "%)"
 
--- | Convert to CSS variable format (shadcn style)
+-- | Convert to Legacy CSS variable format (shadcn style)
 -- | Returns "H S% L%" for use with CSS custom properties
-toCssVar :: HSL -> String
-toCssVar c = show c.h <> " " <> show c.s <> "% " <> show c.l <> "%"
+toLegacyCssVar :: HSL -> String
+toLegacyCssVar c = show c.h <> " " <> show c.s <> "% " <> show c.l <> "%"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // color manipulation

@@ -13,7 +13,7 @@
 -- | Parsing is done with string splitting and integer validation.
 -- | No Intl API, no locale dependencies beyond what we embed.
 
-module Hydrogen.Element.Component.DatePicker.Format
+module Hydrogen.Element.Compound.DatePicker.Format
   ( -- * Formatting
     formatDate
   , formatDateISO
@@ -48,8 +48,8 @@ import Data.Int (fromString) as Int
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String as String
 
-import Hydrogen.Element.Component.Calendar (CalendarDate, getDaysInMonth)
-import Hydrogen.Element.Component.DatePicker.Types (DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom))
+import Hydrogen.Element.Compound.Calendar (CalendarDate, getDaysInMonth)
+import Hydrogen.Element.Compound.DatePicker.Types (DateFormat(ISO, USShort, USLong, EUShort, EULong, Custom))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // formatting

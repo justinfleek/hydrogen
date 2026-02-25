@@ -19,7 +19,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Widget.Sparkline as Sparkline
+-- | import Hydrogen.Element.Compound.Widget.Sparkline as Sparkline
 -- |
 -- | -- Basic sparkline
 -- | Sparkline.sparklineWidget []
@@ -40,7 +40,7 @@
 -- |   }
 -- | ```
 
-module Hydrogen.Element.Component.Widget.Sparkline
+module Hydrogen.Element.Compound.Widget.Sparkline
   ( -- * Widget Component
     sparklineWidget
   , sparklineWidgetSimple
@@ -90,7 +90,7 @@ import Prelude
 import Data.Array (foldl, length, mapWithIndex, index, last)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.Widget.Types
+import Hydrogen.Element.Compound.Widget.Types
   ( ChangeDirection(ChangeUp, ChangeDown, ChangeFlat)
   )
 

@@ -25,7 +25,7 @@ import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.HTMLElement (fromElement)
 import Web.HTML.Window (document)
 
-import Hydrogen.Component.Button as Button
+import Hydrogen.Element.Compound.Button as Button
 import Hydrogen.Icon.Icons as Icon
 import Hydrogen.Icon.Icon as I
 

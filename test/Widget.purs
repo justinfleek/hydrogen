@@ -28,10 +28,10 @@ import Data.String as String
 import Data.Tuple (Tuple(Tuple))
 import Effect.Aff (Aff, throwError)
 import Effect.Exception (error, Error)
-import Hydrogen.Element.Component.Widget.Card as Card
-import Hydrogen.Element.Component.Widget.Chart3D as Chart3D
-import Hydrogen.Element.Component.Widget.ChartAdvanced as ChartAdv
-import Hydrogen.Element.Component.Widget.Theme as Theme
+import Hydrogen.Element.Compound.Widget.Card as Card
+import Hydrogen.Element.Compound.Widget.Chart3D as Chart3D
+import Hydrogen.Element.Compound.Widget.ChartAdvanced as ChartAdv
+import Hydrogen.Element.Compound.Widget.Theme as Theme
 import Hydrogen.Math.Core as Math
 import Hydrogen.Render.Element as E
 import Test.QuickCheck (Result, (===), (<?>))

@@ -11,7 +11,7 @@
 -- |
 -- | This module adds validation and verification utilities.
 
-module Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon
+module Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon
   ( module GF
   , module Polynomial
   , module EC
@@ -36,7 +36,7 @@ import Prelude
 import Data.Array (length, index, (..))
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.GF
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.GF
   ( GFElement(GFElement)
   , mkGFElement
   , gfElementValue
@@ -58,7 +58,7 @@ import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.GF
   , highBit
   ) as GF
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.Polynomial
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.Polynomial
   ( Polynomial
   , polyMul
   , polyMulScalar
@@ -69,7 +69,7 @@ import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.Polynomial
   , showPolynomial
   ) as Polynomial
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.EC
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.EC
   ( generatorPoly
   , generatorPolyCoeffs
   , computeECCodewords

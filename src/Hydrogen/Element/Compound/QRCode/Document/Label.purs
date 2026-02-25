@@ -14,7 +14,7 @@
 -- |
 -- | - Prelude (Eq, Show)
 
-module Hydrogen.Element.Component.QRCode.Document.Label
+module Hydrogen.Element.Compound.QRCode.Document.Label
   ( -- * Label Position
     LabelPosition(..)
   

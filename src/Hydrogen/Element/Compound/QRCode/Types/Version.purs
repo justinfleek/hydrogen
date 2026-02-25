@@ -15,7 +15,7 @@
 -- |
 -- | - Prelude (Eq, Ord, Show, Bounded)
 
-module Hydrogen.Element.Component.QRCode.Types.Version
+module Hydrogen.Element.Compound.QRCode.Types.Version
   ( -- * QR Version
     QRVersion(QRVersion)
   , mkVersion

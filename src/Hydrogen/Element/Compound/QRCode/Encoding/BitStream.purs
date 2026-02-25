@@ -32,7 +32,7 @@
 -- | - Data.Array (bit storage)
 -- | - Data.EuclideanRing (div, mod for bit math)
 
-module Hydrogen.Element.Component.QRCode.Encoding.BitStream
+module Hydrogen.Element.Compound.QRCode.Encoding.BitStream
   ( -- * BitStream Type
     BitStream
   , empty

@@ -4,8 +4,20 @@
 
 -- | Hydrogen Web Framework
 -- |
--- | A PureScript/Halogen web framework for building robust web applications
--- | with type-safe routing, API clients, SSG support, and accessible UI components.
+-- | The purest web design language ever created.
+-- |
+-- | Hydrogen is a pure rendering abstraction — UI as data, not framework-specific
+-- | code. Built on lawful abstractions with Schema atoms composing into Elements.
+-- |
+-- | ## Architecture
+-- |
+-- | ```
+-- | Haskell (Business Logic)
+-- |     ↓ generates
+-- | PureScript Element (Pure Data)
+-- |     ↓ interprets
+-- | WebGPU Runtime (Rendering)
+-- | ```
 -- |
 -- | ## Quick Start
 -- |
@@ -19,14 +31,10 @@
 -- | import Hydrogen.UI.Tabs as Tabs
 -- | import Hydrogen.Data.Format (formatBytes, formatDuration)
 -- | import Hydrogen.Data.RemoteData (RemoteData(..))
--- | import Hydrogen.Query as Q
--- | import Hydrogen.State.Atom as Atom
--- | import Hydrogen.State.Store as Store
--- | import Hydrogen.Realtime.WebSocket as WS
--- | import Hydrogen.Auth.Session as Session
--- | import Hydrogen.I18n.Locale as I18n
--- | import Hydrogen.Feature.Flags as Flags
--- | import Hydrogen.Analytics.Tracker as Analytics
+-- | import Hydrogen.Element.Compound.Skeleton as Skeleton
+-- | import Hydrogen.Element.Compound.Alert as Alert
+-- | import Hydrogen.Schema.Color.RGB as Color
+-- | import Hydrogen.Schema.Dimension.Device as Device
 -- | ```
 -- |
 -- | ## Modules
@@ -34,17 +42,20 @@
 -- | ### Core
 -- | - **Hydrogen.Router** - Type-safe client-side routing
 -- | - **Hydrogen.API.Client** - HTTP client with JSON encoding
--- | - **Hydrogen.Query** - Data fetching with caching, deduplication, and QueryState
 -- | - **Hydrogen.SSG** - Static site generation
--- | - **Hydrogen.HTML.Renderer** - Render Halogen HTML to strings
+-- | - **Hydrogen.HTML.Renderer** - Render Element to HTML strings
 -- |
--- | ### State Management
--- | - **Hydrogen.State.Atom** - Jotai/Recoil-style atomic state
--- | - **Hydrogen.State.Store** - Redux-style store with middleware
+-- | ### Schema (Atomic Design Primitives)
+-- | - **Hydrogen.Schema.Color** - Color spaces, atoms, conversions
+-- | - **Hydrogen.Schema.Dimension** - Pixel, spacing, viewport atoms
+-- | - **Hydrogen.Schema.Geometry** - Radius, corners, transforms
+-- | - **Hydrogen.Schema.Typography** - Font size, weight, line height
+-- | - **Hydrogen.Schema.Motion** - Easing, duration, spring physics
+-- | - **Hydrogen.Schema.Elevation** - Shadow, z-index
 -- |
--- | ### Realtime
--- | - **Hydrogen.Realtime.WebSocket** - WebSocket client with reconnection
--- | - **Hydrogen.Realtime.SSE** - Server-Sent Events client
+-- | ### Element (Pure UI as Data)
+-- | - **Hydrogen.Element.Compound** - Schema-native components
+-- | - **Hydrogen.Element.Layout** - Container, Grid, Stack, etc.
 -- |
 -- | ### Auth
 -- | - **Hydrogen.Auth.Session** - Session/token management
@@ -76,6 +87,8 @@
 -- | - **Hydrogen.UI.FocusTrap** - Focus management utilities
 -- | - **Hydrogen.UI.AriaHider** - Screen reader isolation utilities
 -- | - **Hydrogen.UI.Id** - Unique ID generation for accessibility
+-- |
+-- | ### Data
 -- | - **Hydrogen.Data.Format** - Number/byte/duration formatting
 -- | - **Hydrogen.Data.RemoteData** - RemoteData type for async state
 module Hydrogen
@@ -91,6 +104,7 @@ module Hydrogen
   , module Hydrogen.UI.FocusTrap
   , module Hydrogen.UI.AriaHider
   , module Hydrogen.UI.Id
+    -- * Data
   , module Hydrogen.Data.Format
   , module Hydrogen.Data.RemoteData
   ) where

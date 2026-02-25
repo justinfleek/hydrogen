@@ -27,7 +27,7 @@
 -- | - TreeView.Node (Tree, node queries)
 -- | - Schema.Reactive.SelectionState (HierarchicalStatus)
 
-module Hydrogen.Element.Component.TreeView.Selection
+module Hydrogen.Element.Compound.TreeView.Selection
   ( -- * Selection Operations
     handleSelect
   , handleDeselect
@@ -80,13 +80,13 @@ import Data.Array as Array
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Foldable (foldl)
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , SelectionMode(SingleSelect, MultiSelect, NoSelect)
   , CheckState(Unchecked, Checked, Indeterminate)
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( SelectedState
   , CheckedState
   , emptySelected
@@ -100,7 +100,7 @@ import Hydrogen.Element.Component.TreeView.State
   , emptyChecked
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , childNodes

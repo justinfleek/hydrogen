@@ -73,6 +73,9 @@ module Hydrogen.Schema.Geometry.Box3
   -- * Translation
   , translateBox3
   
+  -- * Transform
+  , applyMatrix4Box3
+  
   -- * Accessors
   , getMinBox3
   , getMaxBox3
@@ -86,9 +89,7 @@ import Prelude
   , show
   , negate
   , (+)
-  , (-)
   , (*)
-  , (/)
   , (<=)
   , (>=)
   , (>)
@@ -108,6 +109,7 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   , vec3Zero
   , distanceSquaredVec3
   )
+import Hydrogen.Schema.Dimension.Matrix.Mat4 (Mat4, mulPointMat4)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                        // type
@@ -329,6 +331,51 @@ distanceToPointBox3 b p = Math.sqrt (distanceSqToPointBox3 b p)
 translateBox3 :: Box3 -> Vec3 Number -> Box3
 translateBox3 (Box3 minV maxV) offset =
   Box3 (addVec3 minV offset) (addVec3 maxV offset)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                   // transform
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Transform an AABB by a 4x4 matrix.
+-- |
+-- | Transforms all 8 corners of the box and computes a new AABB that
+-- | contains all transformed corners. This means the result may be larger
+-- | than the original box if the transform includes rotation.
+-- |
+-- | For rotation-only or scale-only transforms, there are more efficient
+-- | algorithms, but this general approach works for any affine transform.
+-- |
+-- | Proof reference: Box3.lean applyMatrix4, applyMatrix4_identity (pending)
+-- | Three.js parity: Box3.applyMatrix4
+applyMatrix4Box3 :: Box3 -> Mat4 -> Box3
+applyMatrix4Box3 (Box3 (Vec3 minX minY minZ) (Vec3 maxX maxY maxZ)) matrix =
+  let
+    -- Transform all 8 corners
+    c0 = mulPointMat4 matrix (vec3 minX minY minZ)  -- min, min, min
+    c1 = mulPointMat4 matrix (vec3 minX minY maxZ)  -- min, min, max
+    c2 = mulPointMat4 matrix (vec3 minX maxY minZ)  -- min, max, min
+    c3 = mulPointMat4 matrix (vec3 minX maxY maxZ)  -- min, max, max
+    c4 = mulPointMat4 matrix (vec3 maxX minY minZ)  -- max, min, min
+    c5 = mulPointMat4 matrix (vec3 maxX minY maxZ)  -- max, min, max
+    c6 = mulPointMat4 matrix (vec3 maxX maxY minZ)  -- max, max, min
+    c7 = mulPointMat4 matrix (vec3 maxX maxY maxZ)  -- max, max, max
+    
+    -- Find the new AABB containing all transformed corners
+    -- Start with first corner and expand
+    result = expandByPointBox3
+              (expandByPointBox3
+                (expandByPointBox3
+                  (expandByPointBox3
+                    (expandByPointBox3
+                      (expandByPointBox3
+                        (expandByPointBox3 (box3FromPoint c0) c1)
+                        c2)
+                      c3)
+                    c4)
+                  c5)
+                c6)
+              c7
+  in result
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

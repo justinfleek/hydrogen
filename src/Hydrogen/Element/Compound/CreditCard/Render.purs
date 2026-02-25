@@ -4,7 +4,7 @@
 
 -- | CreditCard Render — Element rendering helpers for credit card UI.
 
-module Hydrogen.Element.Component.CreditCard.Render
+module Hydrogen.Element.Compound.CreditCard.Render
   ( renderCardNumberInput
   , renderExpiryInput
   , renderCvvInput
@@ -23,13 +23,13 @@ module Hydrogen.Element.Component.CreditCard.Render
 import Prelude (show, (<>), (==))
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.CreditCard.Types
+import Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   , CardField(CvvField)
   , cardTypeName
   , cvvLength
   )
-import Hydrogen.Element.Component.CreditCard.Format
+import Hydrogen.Element.Compound.CreditCard.Format
   ( formatCardNumber
   , displayCardNumber
   , displayExpiry

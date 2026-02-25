@@ -29,7 +29,7 @@
 -- | - Carousel.Effects (SlideEffects)
 -- | - Hydrogen.Render.Element (Element constructors)
 
-module Hydrogen.Element.Component.Carousel.Render
+module Hydrogen.Element.Compound.Carousel.Render
   ( -- * Render Function
     carousel
   
@@ -81,7 +81,7 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Color.RGB as Color
 import Data.String.Common (joinWith) as String
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( slideIndex
   , unwrapSlideIndex
   , SlidePosition
@@ -127,7 +127,7 @@ import Hydrogen.Element.Component.Carousel.Types
       )
   , CarouselMsg
   )
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( CarouselMsg
       ( GoToSlide
       , NextSlide
@@ -137,26 +137,26 @@ import Hydrogen.Element.Component.Carousel.Types
       , ToggleAutoplay
       )
   ) as CarouselMsgExport
-import Hydrogen.Element.Component.Carousel.State 
+import Hydrogen.Element.Compound.Carousel.State 
   ( CarouselState
   , TransitionState
   , isTransitioning
   , transitionProgress
   )
-import Hydrogen.Element.Component.Carousel.Slide 
+import Hydrogen.Element.Compound.Carousel.Slide 
   ( SlideCollection
   , SlideData
   , slideAt
   , slideCount
   )
-import Hydrogen.Element.Component.Carousel.Navigation 
+import Hydrogen.Element.Compound.Carousel.Navigation 
   ( NavigationConfig
   , defaultNavigation
   )
-import Hydrogen.Element.Component.Carousel.Render.Navigation 
+import Hydrogen.Element.Compound.Carousel.Render.Navigation 
   ( renderNavigation
   )
-import Hydrogen.Element.Component.Carousel.Render.Layout
+import Hydrogen.Element.Compound.Carousel.Render.Layout
   ( computeLayoutTransform
   , sin
   , cos
@@ -164,17 +164,17 @@ import Hydrogen.Element.Component.Carousel.Render.Layout
   , absInt
   , toInt
   )
-import Hydrogen.Element.Component.Carousel.Render.Content
+import Hydrogen.Element.Compound.Carousel.Render.Content
   ( renderSlideContent
   , renderCaption
   )
-import Hydrogen.Element.Component.Carousel.Render.Effects
+import Hydrogen.Element.Compound.Carousel.Render.Effects
   ( computeSlidePosition
   , positionToClass
   , computeEffectStyles
   , pow
   )
-import Hydrogen.Element.Component.Carousel.Effects 
+import Hydrogen.Element.Compound.Carousel.Effects 
   ( SlideEffects
   , defaultEffects
   , isEffectEnabled
@@ -184,12 +184,12 @@ import Hydrogen.Element.Component.Carousel.Effects
       , ParallaxBoth
       )
   )
-import Hydrogen.Element.Component.Carousel.Transitions 
+import Hydrogen.Element.Compound.Carousel.Transitions 
   ( TransitionConfig
   , defaultTransition
   , easingToCss
   )
-import Hydrogen.Element.Component.Carousel.Gestures (GestureState, isDragActive, dragOffset)
+import Hydrogen.Element.Compound.Carousel.Gestures (GestureState, isDragActive, dragOffset)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // carousel config

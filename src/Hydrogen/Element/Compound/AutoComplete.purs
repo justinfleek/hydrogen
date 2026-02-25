@@ -38,7 +38,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.AutoComplete as AC
+-- | import Hydrogen.Element.Compound.AutoComplete as AC
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic autocomplete (inherits all visual properties from context)
@@ -66,7 +66,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.AutoComplete
+module Hydrogen.Element.Compound.AutoComplete
   ( -- * AutoComplete Component
     autoComplete
   

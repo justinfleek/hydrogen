@@ -18,8 +18,8 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Widget.Gauge as Gauge
--- | import Hydrogen.Element.Component.Widget.Types as Widget
+-- | import Hydrogen.Element.Compound.Widget.Gauge as Gauge
+-- | import Hydrogen.Element.Compound.Widget.Types as Widget
 -- |
 -- | -- CPU usage gauge with thresholds
 -- | Gauge.gaugeWidget []
@@ -39,7 +39,7 @@
 -- |   }
 -- | ```
 
-module Hydrogen.Element.Component.Widget.Gauge
+module Hydrogen.Element.Compound.Widget.Gauge
   ( -- * Widget Component
     gaugeWidget
   , gaugeWidgetSimple

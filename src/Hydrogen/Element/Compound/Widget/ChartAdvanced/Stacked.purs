@@ -20,7 +20,7 @@
 -- |
 -- | Pure Element output — no framework dependencies.
 
-module Hydrogen.Element.Component.Widget.ChartAdvanced.Stacked
+module Hydrogen.Element.Compound.Widget.ChartAdvanced.Stacked
   ( -- * Types
     StackedData
   , StackedConfig
@@ -51,7 +51,7 @@ import Prelude
 import Data.Array (foldl, index, length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Nothing), fromMaybe)
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMax)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMax)
 import Hydrogen.Render.Element as E
 
 -- ═══════════════════════════════════════════════════════════════════════════════

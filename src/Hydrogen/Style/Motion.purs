@@ -30,7 +30,7 @@
 -- |
 -- | ```purescript
 -- | import Hydrogen.Style.Motion as Motion
--- | import Hydrogen.Style.Css (cx)
+-- | import Hydrogen.Style.LegacyCss (cx)
 -- |
 -- | -- Basic transition
 -- | cx [ Motion.transition Motion.All

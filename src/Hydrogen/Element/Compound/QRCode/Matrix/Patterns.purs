@@ -17,7 +17,7 @@
 -- | Each QR version (2-40) has specific alignment pattern center positions
 -- | defined in ISO 18004. Version 1 has no alignment patterns.
 
-module Hydrogen.Element.Component.QRCode.Matrix.Patterns
+module Hydrogen.Element.Compound.QRCode.Matrix.Patterns
   ( initializeMatrix
   , placeFinderPatterns
   , placeSeparators
@@ -53,7 +53,7 @@ import Data.Array (foldl, filter, (..))
 import Data.EuclideanRing (mod)
 import Data.Ord (abs)
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion
   , QRMatrix
   , Module(Dark, Light, Reserved)

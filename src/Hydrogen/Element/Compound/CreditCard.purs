@@ -27,7 +27,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.CreditCard as CreditCard
+-- | import Hydrogen.Element.Compound.CreditCard as CreditCard
 -- |
 -- | -- Basic credit card input
 -- | CreditCard.creditCard
@@ -53,7 +53,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.CreditCard
+module Hydrogen.Element.Compound.CreditCard
   ( -- * Main Components
     creditCard
   , creditCardWithPreview
@@ -87,13 +87,13 @@ module Hydrogen.Element.Component.CreditCard
   , onFocusChange
   
   -- * Re-exports from Types
-  , module Hydrogen.Element.Component.CreditCard.Types
+  , module Hydrogen.Element.Compound.CreditCard.Types
   
   -- * Re-exports from Validation
-  , module Hydrogen.Element.Component.CreditCard.Validation
+  , module Hydrogen.Element.Compound.CreditCard.Validation
   
   -- * Re-exports from Format
-  , module Hydrogen.Element.Component.CreditCard.Format
+  , module Hydrogen.Element.Compound.CreditCard.Format
   ) where
 
 import Prelude
@@ -106,7 +106,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.CreditCard.Types
+import Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   , CardField(CardNumberField, ExpiryField, CvvField, CardholderField, NoField)
   , CreditCardValue
@@ -119,7 +119,7 @@ import Hydrogen.Element.Component.CreditCard.Types
   , cardTypeGradient
   )
 
-import Hydrogen.Element.Component.CreditCard.Validation
+import Hydrogen.Element.Compound.CreditCard.Validation
   ( luhnCheck
   , validateCardNumber
   , isAllDigits
@@ -131,7 +131,7 @@ import Hydrogen.Element.Component.CreditCard.Validation
   , validateCardValue
   )
 
-import Hydrogen.Element.Component.CreditCard.Format
+import Hydrogen.Element.Compound.CreditCard.Format
   ( formatCardNumber
   , formatStandard
   , formatAmex
@@ -148,7 +148,7 @@ import Hydrogen.Element.Component.CreditCard.Format
   , digitsOnly
   )
 
-import Hydrogen.Element.Component.CreditCard.Render as Render
+import Hydrogen.Element.Compound.CreditCard.Render as Render
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

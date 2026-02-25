@@ -20,7 +20,7 @@
 -- | | width         | Dimension | Pixel             | Slider width           |
 -- | | height        | Dimension | Pixel             | Slider height          |
 
-module Hydrogen.Element.Component.ColorPicker.Alpha
+module Hydrogen.Element.Compound.ColorPicker.Alpha
   ( -- * Component
     alphaSlider
   

@@ -7,7 +7,7 @@
 -- | Internal module containing render functions. Pure PureScript, no FFI.
 -- | Uses Schema atoms for all visual properties.
 
-module Hydrogen.Element.Component.TimePicker.Render
+module Hydrogen.Element.Compound.TimePicker.Render
   ( -- * Render Functions
     renderTimeSegment
   , renderSeparator
@@ -44,8 +44,8 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.TimePicker.Types (Period(AM, PM))
-import Hydrogen.Element.Component.TimePicker.Format (padZero)
+import Hydrogen.Element.Compound.TimePicker.Types (Period(AM, PM))
+import Hydrogen.Element.Compound.TimePicker.Format (padZero)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

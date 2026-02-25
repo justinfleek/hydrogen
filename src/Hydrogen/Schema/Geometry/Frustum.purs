@@ -60,10 +60,6 @@ import Prelude
   , class Show
   , negate
   , show
-  , (+)
-  , (-)
-  , (*)
-  , (/)
   , (<)
   , (>=)
   , (<>)

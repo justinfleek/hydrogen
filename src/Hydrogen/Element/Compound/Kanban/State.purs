@@ -20,7 +20,7 @@
 -- | - Selected card
 -- | - Collapsed columns
 
-module Hydrogen.Element.Component.Kanban.State
+module Hydrogen.Element.Compound.Kanban.State
   ( -- * Board State
     KanbanState
   , initialState
@@ -98,7 +98,7 @@ import Data.Ord (comparing)
 import Data.Set (Set)
 import Data.Set as Set
 
-import Hydrogen.Element.Component.Kanban.Types
+import Hydrogen.Element.Compound.Kanban.Types
   ( CardId
   , ColumnId
   , SwimlaneId
@@ -121,7 +121,7 @@ import Hydrogen.Element.Component.Kanban.Types
   , cardId
   , unwrapCardId
   )
-import Hydrogen.Element.Component.Kanban.Card
+import Hydrogen.Element.Compound.Kanban.Card
   ( KanbanCard
   , cardIdOf
   , cardColumnId
@@ -131,7 +131,7 @@ import Hydrogen.Element.Component.Kanban.Card
   , setCardIndex
   , setCardExpanded
   )
-import Hydrogen.Element.Component.Kanban.Column
+import Hydrogen.Element.Compound.Kanban.Column
   ( KanbanColumn
   , columnIdOf
   , columnIndex

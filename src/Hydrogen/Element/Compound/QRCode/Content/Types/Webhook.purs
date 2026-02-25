@@ -14,7 +14,7 @@
 -- |
 -- | - Prelude (Eq, Show)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Webhook
+module Hydrogen.Element.Compound.QRCode.Content.Types.Webhook
   ( -- * HTTP Method
     HTTPMethod(GET, POST, PUT, DELETE, PATCH)
   

@@ -6,7 +6,7 @@
 -- |
 -- | Internal module containing render functions. Pure PureScript, no FFI.
 
-module Hydrogen.Element.Component.DatePicker.Render
+module Hydrogen.Element.Compound.DatePicker.Render
   ( -- * Render Functions
     renderInput
   , renderCalendarIcon
@@ -38,8 +38,8 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.Calendar as Calendar
-import Hydrogen.Element.Component.DatePicker.Types (DateFormat)
+import Hydrogen.Element.Compound.Calendar as Calendar
+import Hydrogen.Element.Compound.DatePicker.Types (DateFormat)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

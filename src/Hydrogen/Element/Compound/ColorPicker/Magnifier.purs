@@ -21,7 +21,7 @@
 -- | view of the underlying content. It's typically positioned near
 -- | the cursor but offset to avoid obscuring the selection point.
 
-module Hydrogen.Element.Component.ColorPicker.Magnifier
+module Hydrogen.Element.Compound.ColorPicker.Magnifier
   ( -- * Component
     magnifier
   

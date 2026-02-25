@@ -24,7 +24,7 @@
 -- | | TargetAnchor    | Spatial   | Anchor point within target           |
 -- | | WaitStrategy    | Temporal  | How to wait for target availability  |
 
-module Hydrogen.Element.Component.Tour.Target
+module Hydrogen.Element.Compound.Tour.Target
   ( -- * Target Kind
     TargetKind
       ( TargetSelector

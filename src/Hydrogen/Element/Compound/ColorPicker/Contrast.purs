@@ -19,7 +19,7 @@
 -- | L = 0.2126 * R + 0.7152 * G + 0.0722 * B
 -- | where R, G, B are linearized (gamma-corrected) values.
 
-module Hydrogen.Element.Component.ColorPicker.Contrast
+module Hydrogen.Element.Compound.ColorPicker.Contrast
   ( -- * Component
     contrastChecker
   

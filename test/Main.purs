@@ -17,9 +17,6 @@ import Hydrogen.Data.RemoteData as RD
 import Hydrogen.Query as Q
 import Hydrogen.Router (normalizeTrailingSlash)
 import Hydrogen.SSG as SSG
-import Hydrogen.UI.Core as UI
-import Hydrogen.UI.Error as Error
-import Hydrogen.UI.Loading as Loading
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual, shouldSatisfy)
 import Test.Spec.Reporter.Console (consoleReporter)
@@ -38,9 +35,6 @@ main = launchAff_ $ runSpec [consoleReporter] do
   describe "Hydrogen Framework" do
     formatTests
     routerTests
-    uiCoreTests
-    uiLoadingTests
-    uiErrorTests
     ssgTests
     rendererTests
     remoteDataTests
@@ -165,109 +159,6 @@ routerTests = describe "Router" do
     
     it "handles nested paths" do
       normalizeTrailingSlash "/docs/api/" `shouldEqual` "/docs/api"
-
--- =============================================================================
---                                                             // ui core tests
--- =============================================================================
-
-uiCoreTests :: Spec Unit
-uiCoreTests = describe "UI.Core" do
-  describe "classes" do
-    it "combines class names" do
-      UI.classes ["foo", "bar", "baz"] `shouldEqual` "foo bar baz"
-    
-    it "filters empty strings" do
-      UI.classes ["foo", "", "bar"] `shouldEqual` "foo bar"
-    
-    it "handles empty array" do
-      UI.classes [] `shouldEqual` ""
-
-  describe "box" do
-    it "renders div with class" do
-      let html = UI.box "my-class" [ HH.text "content" ]
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "my-class")
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "content")
-
-  describe "row" do
-    it "renders flex row" do
-      let html = UI.row "gap-4" [ HH.text "item" ]
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "flex")
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "flex-row")
-
-  describe "column" do
-    it "renders flex column" do
-      let html = UI.column "gap-2" [ HH.text "item" ]
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "flex")
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "flex-col")
-
--- =============================================================================
---                                                          // ui loading tests
--- =============================================================================
-
-uiLoadingTests :: Spec Unit
-uiLoadingTests = describe "UI.Loading" do
-  describe "spinner" do
-    it "renders with animate-spin" do
-      let html = Loading.spinner "w-8 h-8"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "animate-spin")
-    
-    it "applies size class" do
-      let html = Loading.spinner "w-8 h-8"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "w-8 h-8")
-
-  describe "loadingState" do
-    it "includes message" do
-      let html = Loading.loadingState "Loading data..."
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Loading data...")
-    
-    it "includes spinner" do
-      let html = Loading.loadingState "test"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "animate-spin")
-
-  describe "loadingCard" do
-    it "renders with animate-pulse" do
-      Renderer.render Loading.loadingCard `shouldSatisfy` String.contains (String.Pattern "animate-pulse")
-
-  describe "skeletonText" do
-    it "applies width class" do
-      let html = Loading.skeletonText "w-32"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "w-32")
-
--- =============================================================================
---                                                            // ui error tests
--- =============================================================================
-
-uiErrorTests :: Spec Unit
-uiErrorTests = describe "UI.Error" do
-  describe "errorState" do
-    it "shows message" do
-      let html = Error.errorState "Something went wrong"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Something went wrong")
-    
-    it "shows failed to load text" do
-      let html = Error.errorState "test"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Failed to load")
-
-  describe "errorCard" do
-    it "shows message" do
-      let html = Error.errorCard "Network error"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Network error")
-    
-    it "has error styling" do
-      let html = Error.errorCard "test"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "destructive")
-
-  describe "errorBadge" do
-    it "shows error label" do
-      let html = Error.errorBadge "Invalid input"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Error:")
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Invalid input")
-
-  describe "emptyState" do
-    it "shows title and description" do
-      let html = Error.emptyState "No items" "Add your first item"
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "No items")
-      Renderer.render html `shouldSatisfy` String.contains (String.Pattern "Add your first item")
 
 -- =============================================================================
 --                                                                 // ssg tests

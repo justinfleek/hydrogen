@@ -55,7 +55,27 @@ import Prelude
 
 import Data.Array (findIndex, length, snoc)
 import Data.Maybe (Maybe(Just), fromMaybe)
-import Hydrogen.Tour.State (DismissReason, TourMsg(..), TourState)
+import Hydrogen.Tour.State
+  ( DismissReason
+  , TourMsg
+      ( StartTour
+      , PauseTour
+      , ResumeTour
+      , SkipTour
+      , CompleteTour
+      , DismissTour
+      , NextStep
+      , PrevStep
+      , GoToStep
+      , GoToStepById
+      , Restart
+      , SnoozeTour
+      , TargetResolved
+      , TargetNotFound
+      , CustomAction
+      )
+  , TourState
+  )
 import Hydrogen.Tour.Step (Step, stepId)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), StepId, TourPhase(TourActive, TourCompleted, TourDismissed, TourInactive, TourPaused, TourSkipped))
 

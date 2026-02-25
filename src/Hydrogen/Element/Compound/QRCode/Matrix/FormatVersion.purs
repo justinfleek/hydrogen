@@ -23,7 +23,7 @@
 -- | - Format: BCH(15,5) with generator x^10 + x^8 + x^5 + x^4 + x^2 + x + 1
 -- | - Version: BCH(18,6) with generator 1111100100101
 
-module Hydrogen.Element.Component.QRCode.Matrix.FormatVersion
+module Hydrogen.Element.Compound.QRCode.Matrix.FormatVersion
   ( encodeFormatInfo
   , placeFormatInfo
   , encodeVersionInfo
@@ -48,7 +48,7 @@ import Data.EuclideanRing (div, mod)
 import Data.Int.Bits (xor, shr, and)
 import Data.Maybe (fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion
   , QRMatrix
   , ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
@@ -59,7 +59,7 @@ import Hydrogen.Element.Component.QRCode.Types
   , versionToInt
   )
 
-import Hydrogen.Element.Component.QRCode.Matrix.Mask (MaskPattern, maskPatternIndex)
+import Hydrogen.Element.Compound.QRCode.Matrix.Mask (MaskPattern, maskPatternIndex)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // format information

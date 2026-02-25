@@ -21,7 +21,7 @@
 -- |
 -- | - Carousel.Types (NavigationMode)
 
-module Hydrogen.Element.Component.Carousel.Navigation
+module Hydrogen.Element.Compound.Carousel.Navigation
   ( -- * Arrow Config
     ArrowConfig
   , arrowConfig

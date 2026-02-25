@@ -28,7 +28,7 @@
 -- | The best mask is selected by evaluating penalty scores for all 8
 -- | patterns and choosing the one with minimum penalty.
 
-module Hydrogen.Element.Component.QRCode.Matrix.Mask
+module Hydrogen.Element.Compound.QRCode.Matrix.Mask
   ( MaskPattern(Mask0, Mask1, Mask2, Mask3, Mask4, Mask5, Mask6, Mask7)
   , maskPatternIndex
   , allMaskPatterns
@@ -59,7 +59,7 @@ import Data.Array (foldl, head, (..))
 import Data.EuclideanRing (div, mod)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRMatrix
   , Module(Dark, Light)
   , ModuleType(DataModule)
@@ -68,7 +68,7 @@ import Hydrogen.Element.Component.QRCode.Types
   , setModule
   )
 
-import Hydrogen.Element.Component.QRCode.Matrix.Penalty (calculatePenalty)
+import Hydrogen.Element.Compound.QRCode.Matrix.Penalty (calculatePenalty)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // mask pattern type

@@ -25,7 +25,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Accordion as Accordion
+-- | import Hydrogen.Element.Compound.Accordion as Accordion
 -- |
 -- | Accordion.accordion []
 -- |   [ Accordion.item [ Accordion.itemValue "section-1" ]
@@ -49,7 +49,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Accordion
+module Hydrogen.Element.Compound.Accordion
   ( -- * Main Components
     accordion
   , item

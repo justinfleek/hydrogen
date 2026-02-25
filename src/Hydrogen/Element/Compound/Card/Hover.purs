@@ -33,7 +33,7 @@
 -- | - Schema.Audio.Trigger (audio triggers)
 -- | - Schema.Motion.Lottie (animation triggers)
 
-module Hydrogen.Element.Component.Card.Hover
+module Hydrogen.Element.Compound.Card.Hover
   ( -- * Card Hover Config
     CardHoverConfig
   , cardHoverConfig

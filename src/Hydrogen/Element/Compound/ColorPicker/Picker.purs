@@ -30,7 +30,7 @@
 -- | - Cursor position (for magnifier)
 -- | - Recent colors history
 
-module Hydrogen.Element.Component.ColorPicker.Picker
+module Hydrogen.Element.Compound.ColorPicker.Picker
   ( -- * Component
     colorPicker
   
@@ -110,16 +110,16 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Data.Array (snoc) as Array
 
 -- Sub-components
-import Hydrogen.Element.Component.ColorPicker.Wheel as Wheel
-import Hydrogen.Element.Component.ColorPicker.Panel as Panel
-import Hydrogen.Element.Component.ColorPicker.Input as Input
-import Hydrogen.Element.Component.ColorPicker.Preview as Preview
-import Hydrogen.Element.Component.ColorPicker.Swatches as Swatches
-import Hydrogen.Element.Component.ColorPicker.Harmony as Harmony
-import Hydrogen.Element.Component.ColorPicker.Contrast as Contrast
-import Hydrogen.Element.Component.ColorPicker.Alpha as Alpha
-import Hydrogen.Element.Component.ColorPicker.Magnifier as Magnifier
-import Hydrogen.Element.Component.ColorPicker.Eyedropper as Eyedropper
+import Hydrogen.Element.Compound.ColorPicker.Wheel as Wheel
+import Hydrogen.Element.Compound.ColorPicker.Panel as Panel
+import Hydrogen.Element.Compound.ColorPicker.Input as Input
+import Hydrogen.Element.Compound.ColorPicker.Preview as Preview
+import Hydrogen.Element.Compound.ColorPicker.Swatches as Swatches
+import Hydrogen.Element.Compound.ColorPicker.Harmony as Harmony
+import Hydrogen.Element.Compound.ColorPicker.Contrast as Contrast
+import Hydrogen.Element.Compound.ColorPicker.Alpha as Alpha
+import Hydrogen.Element.Compound.ColorPicker.Magnifier as Magnifier
+import Hydrogen.Element.Compound.ColorPicker.Eyedropper as Eyedropper
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // tabs

@@ -22,7 +22,7 @@
 -- | | CloseButton     | Reactive  | Close/dismiss button configuration   |
 -- | | KeyboardConfig  | Gestural  | Keyboard navigation settings         |
 
-module Hydrogen.Element.Component.Tour.Navigation
+module Hydrogen.Element.Compound.Tour.Navigation
   ( -- * Navigation Style
     NavigationStyle
       ( NavMinimal

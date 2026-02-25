@@ -16,7 +16,7 @@
 -- | - Prelude (basic operations)
 -- | - Data.EuclideanRing (division)
 
-module Hydrogen.Element.Component.QRCode.Types.Capacity
+module Hydrogen.Element.Compound.QRCode.Types.Capacity
   ( -- * Capacity Type
     Capacity
   , getCapacity
@@ -34,8 +34,8 @@ import Prelude
 
 import Data.EuclideanRing (div)
 
-import Hydrogen.Element.Component.QRCode.Types.Version (QRVersion(QRVersion))
-import Hydrogen.Element.Component.QRCode.Types.ErrorCorrection (ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh))
+import Hydrogen.Element.Compound.QRCode.Types.Version (QRVersion(QRVersion))
+import Hydrogen.Element.Compound.QRCode.Types.ErrorCorrection (ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // capacity

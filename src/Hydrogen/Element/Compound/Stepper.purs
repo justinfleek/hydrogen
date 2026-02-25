@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Stepper as Stepper
+-- | import Hydrogen.Element.Compound.Stepper as Stepper
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic stepper
@@ -40,7 +40,7 @@
 -- |   ]
 -- |   stepContent
 -- | ```
-module Hydrogen.Element.Component.Stepper
+module Hydrogen.Element.Compound.Stepper
   ( -- * Stepper Components
     stepper
   , stepperWithNav

@@ -19,7 +19,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Collapsible as Collapsible
+-- | import Hydrogen.Element.Compound.Collapsible as Collapsible
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic collapsible
@@ -44,7 +44,7 @@
 -- |   trigger
 -- |   content
 -- | ```
-module Hydrogen.Element.Component.Collapsible
+module Hydrogen.Element.Compound.Collapsible
   ( -- * Components
     collapsible
   , trigger

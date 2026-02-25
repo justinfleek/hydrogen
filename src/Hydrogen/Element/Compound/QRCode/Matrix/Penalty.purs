@@ -22,7 +22,7 @@
 -- |
 -- | The mask with minimum total penalty is selected.
 
-module Hydrogen.Element.Component.QRCode.Matrix.Penalty
+module Hydrogen.Element.Compound.QRCode.Matrix.Penalty
   ( calculatePenalty
   , penaltyRule1
   , penaltyRule2
@@ -52,7 +52,7 @@ import Data.EuclideanRing (div, mod)
 import Data.Maybe (fromMaybe)
 import Data.Ord (abs)
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRMatrix
   , Module(Dark, Light)
   , matrixSize

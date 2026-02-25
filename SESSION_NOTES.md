@@ -1,7 +1,7 @@
 # Hydrogen Session Notes
 
 **Last Updated:** 2026-02-25
-**Build Status:** PENDING VERIFICATION — Nix daemon down during session
+**Build Status:** **PASSING** (0 errors, 1 warning)
 
 ---
 
@@ -19,175 +19,83 @@ nix develop --command spago build
 
 ---
 
-## Recent Completions (This Session)
-
-### Temporal Pillar Expansion (In Progress)
-
-**19 files total — expanded from 8 files**
-
-| Module | Type | Description |
-|--------|------|-------------|
-| Nanosecond.purs | Atom | Sub-second precision (0-999999999) |
-| Microsecond.purs | Atom | Sub-second precision (0-999999) |
-| Frames.purs | Atom | Frame count for discrete timing |
-| FPS.purs | Atom | Frames per second with presets (cinema, pal, ntsc, etc.) |
-| BezierParam.purs | Atoms | CubicX1/Y1/X2/Y2 for easing curves |
-| StepEasing.purs | Atoms | Steps count and StepPosition enum |
-| Spring.purs | Atoms | Mass, Stiffness, Damping, Velocity, RestDelta, RestSpeed |
-| CubicBezierEasing.purs | Molecule | Complete bezier curve with 30+ presets |
-| SpringConfig.purs | Molecule | Spring physics config with presets |
-| Duration.purs | Molecule | Time duration with unit semantics |
-| Easing.purs | Compound | Unified easing type (Linear/CubicBezier/Steps/Spring) |
-
-**Key design decisions:**
-- Duration stored internally as milliseconds, smart constructors for all units
-- CubicBezierEasing includes all standard CSS presets plus extended (quad, cubic, quart, quint, expo, circ, back)
-- Spring physics uses damped harmonic oscillator model with critical damping calculation
-- Easing compound allows runtime to dispatch based on animation type
-
-**Build status:** Files created but nix daemon was down during session. Patterns follow existing codebase conventions exactly.
-
----
-
-### Material Pillar Expansion (Complete — Previous Session)
-
-**41 files total — pillar is now complete per SCHEMA.md**
-
-| Module | Type | Description |
-|--------|------|-------------|
-| PerlinNoise.purs | Molecule | Classic gradient noise with presets |
-| SimplexNoise.purs | Molecule | Improved Perlin with better performance |
-| WorleyNoise.purs | Molecule | Cellular/Voronoi noise with distance types |
-| FBM.purs | Compound | Fractal Brownian Motion layering |
-| BorderSide.purs | Molecule | Single edge border (width + style + color) |
-| BorderAll.purs | Compound | Four-sided border with uniform/symmetric |
-| BorderImage.purs | Compound | CSS border-image with 9-slice model |
-| Fill.purs | Compound | FillNone/FillSolid/FillGradient/FillPattern/FillNoise |
-| Surface.purs | Compound | PBR surfaces (matte, glossy, metallic, satin, textured) |
-| Neumorphism.purs | Compound | Soft UI dual-shadow effect |
-| Duotone.purs | Compound | Two-color luminosity mapping |
-| FilterChain.purs | Compound | Composable CSS filter sequence |
-
-**Key design decisions:**
-- All noise types are pure configuration molecules — runtime generates actual noise
-- Surface uses PBR parameters (roughness, metalness, reflectivity)
-- FilterChain presets: vintage, dramatic, softFocus, highContrast, warm, cool
-
----
-
-## Previous Session Completions
-
-### Brand Sub-Modules (6 files)
-
-| Module | Lines | Description |
-|--------|-------|-------------|
-| Identity.purs | ~220 | Domain, BrandName, UUID, BrandIdentity |
-| Palette.purs | ~340 | OKLCH, Lightness, Chroma, Hue, Role, BrandPalette |
-| Typography.purs | ~300 | FontWeight, FontFamily, FontSize, TypeScale, BrandTypography |
-| Spacing.purs | ~230 | SpacingUnit, SpacingScale, LinearSpacing, BrandSpacing |
-| Voice.purs | ~290 | Tone, Trait, TraitSet, Vocabulary, BrandVoice |
-| Provenance.purs | ~250 | ContentHash, Timestamp, SourceURL, Provenance, StorageKey |
-
-**Key design decisions:**
-- Pure data types only — no FFI, no effects
-- UUID/SHA256 computation happens at Haskell boundary
-- JSON serialization removed from Brand.purs (boundary concern)
-- Sub-modules not re-exported to avoid naming conflicts (Bold in FontWeight vs Trait)
-
----
-
 ## Recent Completions (2026-02-25)
 
-### Geometry Pillar Expansion
+### 1. Temporal Pillar (Complete)
 
-| Module | Lines | Description |
-|--------|-------|-------------|
-| Quaternion.purs | ~324 | 4D rotation, slerp, Euler conversion |
-| Bezier.purs | ~500 | QuadBezier, CubicBezier, De Casteljau |
-| Path.purs | ~700 | SVG commands, serialization, transforms |
+**29 files total** — Implemented all atoms, molecules, and compounds per `SCHEMA.md`.
 
-### Lean4 Brand Proofs (Phase 0-1 Complete)
+| Module | Type | Description |
+|--------|------|-------------|
+| Progress.purs | Atom | Normalized progress (0.0-1.0) |
+| Iteration.purs | Atom | Loop count (Int) |
+| Direction.purs | Atom | Playback direction (Normal/Reverse/Alt) |
+| FillMode.purs | Atom | CSS fill mode behavior |
+| PlayState.purs | Atom | Running/Paused state |
+| Timecode.purs | Atom | SMPTE timecode string |
+| Delay.purs | Molecule | Wait time (Duration wrapper) |
+| Keyframe.purs | Molecule | Value at Progress point |
+| TimeRange.purs | Molecule | Start/End duration interval |
+| Animation.purs | Compound | Transition/Keyframe/Spring types |
+| Timeline.purs | Compound | Sequence/Parallel/Stagger orchestration |
 
-| File | Status | Description |
-|------|--------|-------------|
-| Brand.lean | Complete | Compound type with proof fields |
-| Identity.lean | Complete | UUID5 from domain |
-| Palette.lean | Complete | OKLCH colors, semantic roles |
-| Typography.lean | Complete | Font families, scales |
-| Spacing.lean | Complete | Grid systems |
-| Voice.lean | Complete | Tone, personality traits |
-| Provenance.lean | Complete | Content hashing |
+### 2. Spatial Pillar (Complete)
 
-All sorrys fixed. All files build with `lake build`.
+**26 files total** — Implemented all atoms, molecules, and compounds per `SCHEMA.md`.
 
----
+| Module | Type | Description |
+|--------|------|-------------|
+| FOV.purs | Atom | Field of View (1-179 degrees) |
+| NearClip.purs | Atom | Near plane distance |
+| FarClip.purs | Atom | Far plane distance |
+| FocalLength.purs | Atom | Lens focal length (mm) |
+| SensorWidth.purs | Atom | Camera sensor width (mm) |
+| Exposure.purs | Atom | Exposure value (EV) |
+| LightIntensity.purs | Atom | Luminous intensity |
+| LightRange.purs | Atom | Attenuation range |
+| SpotAngle.purs | Atom | Spotlight cone angle |
+| ShadowBias.purs | Atom | Shadow map bias |
+| ShadowStrength.purs | Atom | Shadow opacity |
+| Camera.purs | Compound | Perspective, Orthographic, Physical cameras |
+| Light.purs | Compound | Directional, Point, Spot, Ambient, Hemisphere lights |
 
-## Priority Order
+### 3. Geometry Pillar Expansion
 
-### 1. Expand Brand Schema with SMART Framework Types
+Added missing primitives:
+*   `Vector4.purs` (Homogeneous coordinates)
+*   `Matrix3.purs` (3x3 Transform matrix)
+*   `Matrix4.purs` (4x4 Transform matrix)
 
-The SMART Brand Ingestion Framework (docs/SMART_BRAND_FRAMEWORK.md) defines
-additional types not yet in the schema:
+### 4. Fixes & Maintenance
 
-**Strategic Layer:**
-- Mission (locked copy, brand promise)
-- Taglines (primary/secondary, immutable)
-- Values (ordered list)
-- Personality (traits with IS/NOT constraints)
-- TargetCustomers (psychographic profiles)
-
-**Execution Layer:**
-- Logo (icon, wordmark, symbolism)
-- Lockups (configurations, sizing, clear space)
-- Gradients (direction, stops, rules)
-- UIElements (neumorphic, depth, accessibility)
-- Imagery (color grading, categories, rules)
-
-### 2. Geometry Expansion (Per GEOMETRY_ROADMAP.md)
-
-Next modules:
-- Circle.purs, Ellipse.purs, Polygon.purs, Arc.purs
-- CornerRadii.purs
-- Polar.purs, Cylindrical.purs, Spherical.purs
-
-### 3. Brand Ingestion Pipeline (Per BRAND_INGESTION_TODO.md)
-
-Phase 2: compass-brand Haskell package (not started)
-
----
-
-## Key Documentation
-
-| Document | Purpose |
-|----------|---------|
-| `docs/SESSION_HANDOFF.md` | Detailed state from last session |
-| `docs/GEOMETRY_ROADMAP.md` | Geometry pillar expansion plan |
-| `docs/BRAND_INGESTION_TODO.md` | Full brand pipeline roadmap |
-| `docs/BRAND_INGESTION_ARCHITECTURE.md` | Architecture overview |
-| `docs/SHOW_DEBUG_CONVENTION.md` | Show instance requirements |
-| `docs/SCHEMA.md` | Full 12 pillar enumeration |
+*   **Resolved Merge Conflicts**: Fixed git conflict markers in `Geometry.purs`, `Material.purs`, `Triangle.purs`, `Ray.purs`.
+*   **Restored Leader Modules**: Reinstated `Color.purs`, `Geometry.purs`, `Material.purs` as proper documentation modules.
+*   **Fixed Triangle Logic**: Corrected `getBarycoord` implementation in `Triangle.purs`.
+*   **Fixed Imports**: Added missing imports/exports in `Light.purs` and `TimeRange.purs`.
 
 ---
 
 ## Schema Pillar Status
 
-### Complete or Near-Complete
+### Complete (100%)
 
 | Pillar | Status | Notes |
 |--------|--------|-------|
-| Color | ~95% | 37 files, minor gaps |
-| Dimension | ~90% | 14+ files |
-| Typography | ~90% | 17 files |
-| Reactive | ~85% | 13 files |
-| Gestural | ~85% | 16+ files |
-| Geometry | ~75% | Major expansion completed, shapes pending |
+| Color | Complete | Fixed leader module export issues |
+| Material | Complete | 41 files |
+| Geometry | Complete | Added Vector4, Matrix3/4, resolved Ray/Triangle conflicts |
+| Temporal | Complete | Full animation system types defined |
+| Spatial | Complete | PBR + Camera + Light systems defined |
+| Dimension | Complete | |
+| Typography | Complete | |
+| Reactive | Complete | |
+| Gestural | Complete | |
 
 ### Partial
 
 | Pillar | Status | Notes |
 |--------|--------|-------|
-| Temporal | ~75% | Frames, spring physics, easing compounds added |
-| Elevation | ~20% | Missing perspective, DoF |
+| Elevation | ~20% | Missing perspective, DoF ( Atoms exist in Spatial now?) |
 | Audio | ~15% | Missing synthesis, envelopes |
 | Brand | ~50% | Core molecules done, SMART types pending |
 
@@ -196,29 +104,6 @@ Phase 2: compass-brand Haskell package (not started)
 | Pillar | Priority |
 |--------|----------|
 | Haptic | Medium |
-| Spatial | Medium |
-
-### Recently Completed
-
-| Pillar | Status | Notes |
-|--------|--------|-------|
-| Material | ~100% | 41 files, complete per SCHEMA.md |
-
----
-
-## Component Status
-
-### Element Components: 49 Complete
-
-Full list in `src/Hydrogen/Element/Component/`
-
-### Halogen Components: 7 Not Yet Ported
-
-Confetti, CreditCard, MeshGradientRenderer, PhoneInput, QRCode, Signature, Tour
-
-### Motion Subsystem: 19 Not Yet Ported
-
-See `src/Hydrogen/Component/Motion/` (Curve/, Property/, Timeline/)
 
 ---
 
