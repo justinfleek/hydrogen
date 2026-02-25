@@ -36,12 +36,26 @@ module Hydrogen.Schema.Reactive.DataState
   , noRetries
   , shouldRetry
   , nextRetryDelay
+  -- * Loading State (Molecule)
+  , LoadingState
+  , loadingState
+  , notLoading
+  , loadingIndeterminate
+  , loadingProgress
+  , loadingWithMessage
+  , loadingComplete
+  , loadingFailed
+  , isLoading
+  , isLoadingComplete
+  , hasLoadingError
+  , loadingPercent
+  , updateProgress
   ) where
 
 import Prelude
 
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(Nothing))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core (pow)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -237,3 +251,94 @@ shouldRetry r = r.attempt < r.maxAttempts
 nextRetryDelay :: RetryState -> Number
 nextRetryDelay r = 
   min r.maxDelayMs (r.baseDelayMs * pow 2.0 (toNumber r.attempt))
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // loading state
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Combined loading state (Loading + Progress + Error)
+-- |
+-- | Per SCHEMA.md: FocusRing, SelectionState, LoadingState are the three
+-- | Reactive molecules that compose multiple atoms.
+-- |
+-- | LoadingState combines:
+-- | - Loading flag: is currently loading
+-- | - Progress: 0.0 to 1.0 normalized progress
+-- | - Error: optional error that occurred
+type LoadingState e =
+  { loading :: Boolean         -- ^ Currently loading
+  , progress :: Number         -- ^ Progress 0.0 to 1.0
+  , error :: Maybe e           -- ^ Error if loading failed
+  , indeterminate :: Boolean   -- ^ Progress is unknown
+  , message :: Maybe String    -- ^ Loading message/status
+  }
+
+-- | Create loading state
+loadingState :: forall e. Boolean -> Number -> Maybe e -> LoadingState e
+loadingState loading progress error =
+  { loading
+  , progress: clampProgress progress
+  , error
+  , indeterminate: false
+  , message: Nothing
+  }
+  where
+  clampProgress :: Number -> Number
+  clampProgress p = max 0.0 (min 1.0 p)
+
+-- | Not loading (initial state)
+notLoading :: forall e. LoadingState e
+notLoading = loadingState false 0.0 Nothing
+
+-- | Loading with indeterminate progress (spinner)
+loadingIndeterminate :: forall e. LoadingState e
+loadingIndeterminate = (loadingState true 0.0 Nothing)
+  { indeterminate = true }
+
+-- | Loading with determinate progress (progress bar)
+loadingProgress :: forall e. Number -> LoadingState e
+loadingProgress progress = loadingState true (max 0.0 (min 1.0 progress)) Nothing
+
+-- | Loading with message
+loadingWithMessage :: forall e. String -> LoadingState e
+loadingWithMessage msg = (loadingState true 0.0 Nothing)
+  { indeterminate = true
+  , message = Just msg
+  }
+
+-- | Loading complete
+loadingComplete :: forall e. LoadingState e
+loadingComplete = loadingState false 1.0 Nothing
+
+-- | Loading failed with error
+loadingFailed :: forall e. e -> LoadingState e
+loadingFailed err = (loadingState false 0.0 (Just err))
+
+-- | Is currently loading?
+isLoading :: forall e. LoadingState e -> Boolean
+isLoading ls = ls.loading
+
+-- | Is loading complete?
+isLoadingComplete :: forall e. LoadingState e -> Boolean
+isLoadingComplete ls = not ls.loading && ls.progress >= 1.0 && isNothing ls.error
+  where
+  isNothing :: forall a. Maybe a -> Boolean
+  isNothing Nothing = true
+  isNothing _ = false
+
+-- | Has loading error?
+hasLoadingError :: forall e. LoadingState e -> Boolean
+hasLoadingError ls = case ls.error of
+  Just _ -> true
+  Nothing -> false
+
+-- | Get loading progress percentage (0-100)
+loadingPercent :: forall e. LoadingState e -> Number
+loadingPercent ls = ls.progress * 100.0
+
+-- | Update progress
+updateProgress :: forall e. Number -> LoadingState e -> LoadingState e
+updateProgress progress ls = ls
+  { progress = max 0.0 (min 1.0 progress)
+  , indeterminate = false
+  }

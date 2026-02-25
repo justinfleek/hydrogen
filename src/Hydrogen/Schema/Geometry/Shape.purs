@@ -39,6 +39,9 @@ module Hydrogen.Schema.Geometry.Shape
   , PixelPoint2D
   , pixelPoint2D
   , pixelOrigin
+  , PixelPoint3D
+  , pixelPoint3D
+  , pixelOrigin3D
   
   -- * Anchor Points (for Bezier)
   , AnchorPoint
@@ -168,6 +171,36 @@ pixelPoint2D x y = { x, y }
 -- | The pixel origin point (0, 0)
 pixelOrigin :: PixelPoint2D
 pixelOrigin = { x: Pixel 0.0, y: Pixel 0.0 }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // pixel point 3d
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | A 3D point in pixel space with explicit Pixel units.
+-- |
+-- | Extends PixelPoint2D with a Z coordinate for:
+-- | - 3D viewport positioning (widgets floating in space)
+-- | - Depth sorting for overlapping elements
+-- | - WebGL/WebGPU vertex data with type-safe units
+-- | - Gimbal and gizmo positioning for interactive 3D controls
+-- |
+-- | The Z axis follows WebGL convention: positive Z comes toward the viewer.
+-- |
+-- | ## Example: Bento box widget at depth
+-- |
+-- | ```purescript
+-- | widgetPosition = pixelPoint3D (Pixel 100.0) (Pixel 50.0) (Pixel 10.0)
+-- | -- Widget is 100px right, 50px down, 10px toward viewer
+-- | ```
+type PixelPoint3D = { x :: Pixel, y :: Pixel, z :: Pixel }
+
+-- | Smart constructor for PixelPoint3D
+pixelPoint3D :: Pixel -> Pixel -> Pixel -> PixelPoint3D
+pixelPoint3D x y z = { x, y, z }
+
+-- | The 3D pixel origin point (0, 0, 0)
+pixelOrigin3D :: PixelPoint3D
+pixelOrigin3D = { x: Pixel 0.0, y: Pixel 0.0, z: Pixel 0.0 }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // anchor point

@@ -76,6 +76,27 @@ module Hydrogen.Schema.Gestural.Scroll
   , applyScrollDelta
   , isScrolling
   , scrollVelocity
+    -- * Infinite Scroll
+  , InfiniteScrollState
+  , infiniteScroll
+  , defaultInfiniteScroll
+  , shouldLoadMore
+  , startLoadingMore
+  , finishLoadingMore
+  , loadingError
+  , resetInfiniteScroll
+    -- * Pull to Refresh
+  , PullToRefreshPhase(PullIdle, PullActive, PullThreshold, PullRefreshing, PullComplete)
+  , PullToRefreshState
+  , pullToRefresh
+  , defaultPullToRefresh
+  , canPullToRefresh
+  , updatePullDistance
+  , releasePull
+  , completeRefresh
+  , resetPullToRefresh
+  , isRefreshing
+  , isPastThreshold
   ) where
 
 import Prelude hiding (clamp)
@@ -434,3 +455,170 @@ isScrolling ss = abs ss.velocity.x > 0.1 || abs ss.velocity.y > 0.1
 -- | Get current scroll velocity
 scrollVelocity :: ScrollState -> ScrollPosition
 scrollVelocity ss = ss.velocity
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // infinite scroll
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Infinite scroll state for loading more content
+type InfiniteScrollState =
+  { enabled :: Boolean          -- ^ Is infinite scroll enabled
+  , loading :: Boolean          -- ^ Currently loading more
+  , hasMore :: Boolean          -- ^ More content available
+  , threshold :: Number         -- ^ Distance from bottom to trigger (px)
+  , loadCount :: Int            -- ^ Number of loads performed
+  , error :: Boolean            -- ^ Last load failed
+  }
+
+-- | Create infinite scroll state
+infiniteScroll :: Number -> InfiniteScrollState
+infiniteScroll threshold =
+  { enabled: true
+  , loading: false
+  , hasMore: true
+  , threshold
+  , loadCount: 0
+  , error: false
+  }
+
+-- | Default infinite scroll (100px threshold)
+defaultInfiniteScroll :: InfiniteScrollState
+defaultInfiniteScroll = infiniteScroll 100.0
+
+-- | Should trigger load based on scroll state?
+shouldLoadMore :: ScrollState -> InfiniteScrollState -> Boolean
+shouldLoadMore ss is =
+  is.enabled
+  && is.hasMore
+  && not is.loading
+  && not is.error
+  && distanceToBottom ss <= is.threshold
+  where
+  distanceToBottom :: ScrollState -> Number
+  distanceToBottom scrollState =
+    scrollableHeight scrollState.bounds - scrollState.position.y
+
+-- | Start loading more
+startLoadingMore :: InfiniteScrollState -> InfiniteScrollState
+startLoadingMore is = is { loading = true, error = false }
+
+-- | Finish loading (success)
+finishLoadingMore :: Boolean -> InfiniteScrollState -> InfiniteScrollState
+finishLoadingMore hasMore is = is
+  { loading = false
+  , hasMore = hasMore
+  , loadCount = is.loadCount + 1
+  }
+
+-- | Finish loading (error)
+loadingError :: InfiniteScrollState -> InfiniteScrollState
+loadingError is = is { loading = false, error = true }
+
+-- | Reset infinite scroll state
+resetInfiniteScroll :: InfiniteScrollState -> InfiniteScrollState
+resetInfiniteScroll is = is
+  { loading = false
+  , hasMore = true
+  , loadCount = 0
+  , error = false
+  }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // pull to refresh
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Pull to refresh phase
+data PullToRefreshPhase
+  = PullIdle         -- ^ Not pulling
+  | PullActive       -- ^ Actively pulling down
+  | PullThreshold    -- ^ Past threshold, will refresh on release
+  | PullRefreshing   -- ^ Refreshing in progress
+  | PullComplete     -- ^ Refresh complete, animating back
+
+derive instance eqPullToRefreshPhase :: Eq PullToRefreshPhase
+derive instance ordPullToRefreshPhase :: Ord PullToRefreshPhase
+
+instance showPullToRefreshPhase :: Show PullToRefreshPhase where
+  show PullIdle = "idle"
+  show PullActive = "active"
+  show PullThreshold = "threshold"
+  show PullRefreshing = "refreshing"
+  show PullComplete = "complete"
+
+-- | Pull to refresh state
+type PullToRefreshState =
+  { phase :: PullToRefreshPhase  -- ^ Current phase
+  , pullDistance :: Number       -- ^ Current pull distance (px)
+  , threshold :: Number          -- ^ Distance to trigger refresh (px)
+  , maxPull :: Number            -- ^ Maximum pull distance (px)
+  , progress :: Number           -- ^ Progress 0-1 toward threshold
+  , enabled :: Boolean           -- ^ Is pull to refresh enabled
+  }
+
+-- | Create pull to refresh state
+pullToRefresh :: Number -> Number -> PullToRefreshState
+pullToRefresh threshold maxPull =
+  { phase: PullIdle
+  , pullDistance: 0.0
+  , threshold
+  , maxPull
+  , progress: 0.0
+  , enabled: true
+  }
+
+-- | Default pull to refresh (64px threshold, 128px max)
+defaultPullToRefresh :: PullToRefreshState
+defaultPullToRefresh = pullToRefresh 64.0 128.0
+
+-- | Can pull to refresh from current scroll position?
+canPullToRefresh :: ScrollState -> Boolean
+canPullToRefresh ss = ss.position.y <= 0.0
+
+-- | Update pull distance (during drag)
+updatePullDistance :: Number -> PullToRefreshState -> PullToRefreshState
+updatePullDistance distance ptr
+  | not ptr.enabled = ptr
+  | otherwise =
+    let
+      clamped = max 0.0 (min ptr.maxPull distance)
+      prog = if ptr.threshold > 0.0 then min 1.0 (clamped / ptr.threshold) else 0.0
+      newPhase = 
+        if clamped >= ptr.threshold 
+          then PullThreshold
+          else if clamped > 0.0 then PullActive else PullIdle
+    in ptr
+      { pullDistance = clamped
+      , progress = prog
+      , phase = if ptr.phase == PullRefreshing then PullRefreshing else newPhase
+      }
+
+-- | Release pull (triggers refresh if past threshold)
+releasePull :: PullToRefreshState -> PullToRefreshState
+releasePull ptr = case ptr.phase of
+  PullThreshold -> ptr { phase = PullRefreshing }
+  PullRefreshing -> ptr  -- Already refreshing
+  _ -> ptr { phase = PullIdle, pullDistance = 0.0, progress = 0.0 }
+
+-- | Complete refresh
+completeRefresh :: PullToRefreshState -> PullToRefreshState
+completeRefresh ptr = ptr
+  { phase = PullComplete
+  , pullDistance = 0.0
+  , progress = 0.0
+  }
+
+-- | Reset to idle
+resetPullToRefresh :: PullToRefreshState -> PullToRefreshState
+resetPullToRefresh ptr = ptr
+  { phase = PullIdle
+  , pullDistance = 0.0
+  , progress = 0.0
+  }
+
+-- | Is currently refreshing?
+isRefreshing :: PullToRefreshState -> Boolean
+isRefreshing ptr = ptr.phase == PullRefreshing
+
+-- | Is pull past threshold?
+isPastThreshold :: PullToRefreshState -> Boolean
+isPastThreshold ptr = ptr.phase == PullThreshold

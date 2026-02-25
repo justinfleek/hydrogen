@@ -94,6 +94,40 @@ module Hydrogen.Schema.Reactive.Feedback
   , shouldAutoDismiss
   , hasAction
   , isBlocking
+  -- * Tooltip (Molecule)
+  , TooltipPlacement(..)
+  , Tooltip
+  , tooltip
+  , simpleTooltip
+  , interactiveTooltip
+  -- * Popover (Molecule)
+  , PopoverTrigger(..)
+  , Popover
+  , popover
+  , popoverWithTitle
+  , isPopoverOpen
+  , openPopover
+  , closePopover
+  -- * Drawer (Molecule)
+  , DrawerPosition(..)
+  , Drawer
+  , drawer
+  , navigationDrawer
+  , sidePanelDrawer
+  , isDrawerOpen
+  , openDrawer
+  , closeDrawer
+  , toggleDrawer
+  -- * Sheet (Molecule)
+  , SheetSnapPoint(..)
+  , Sheet
+  , sheet
+  , standardSheet
+  , multiDetentSheet
+  , isSheetOpen
+  , openSheet
+  , closeSheet
+  , snapSheet
   ) where
 
 import Prelude
@@ -620,3 +654,277 @@ hasAction sb = isJust sb.action
 -- | Is feedback blocking (modal)?
 isBlocking :: Dialog -> Boolean
 isBlocking _ = true  -- Dialogs are always blocking
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // tooltip molecule
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Tooltip placement relative to trigger
+data TooltipPlacement
+  = TooltipTop
+  | TooltipTopStart
+  | TooltipTopEnd
+  | TooltipBottom
+  | TooltipBottomStart
+  | TooltipBottomEnd
+  | TooltipLeft
+  | TooltipLeftStart
+  | TooltipLeftEnd
+  | TooltipRight
+  | TooltipRightStart
+  | TooltipRightEnd
+
+derive instance eqTooltipPlacement :: Eq TooltipPlacement
+derive instance ordTooltipPlacement :: Ord TooltipPlacement
+
+instance showTooltipPlacement :: Show TooltipPlacement where
+  show TooltipTop = "top"
+  show TooltipTopStart = "top-start"
+  show TooltipTopEnd = "top-end"
+  show TooltipBottom = "bottom"
+  show TooltipBottomStart = "bottom-start"
+  show TooltipBottomEnd = "bottom-end"
+  show TooltipLeft = "left"
+  show TooltipLeftStart = "left-start"
+  show TooltipLeftEnd = "left-end"
+  show TooltipRight = "right"
+  show TooltipRightStart = "right-start"
+  show TooltipRightEnd = "right-end"
+
+-- | Tooltip configuration
+type Tooltip =
+  { content :: String             -- ^ Tooltip text
+  , placement :: TooltipPlacement -- ^ Where to show relative to trigger
+  , delay :: Number               -- ^ Delay before showing (ms)
+  , hideDelay :: Number           -- ^ Delay before hiding (ms)
+  , maxWidth :: Number            -- ^ Maximum width (px)
+  , arrow :: Boolean              -- ^ Show arrow pointing to trigger
+  , interactive :: Boolean        -- ^ Can tooltip be interacted with
+  }
+
+-- | Create tooltip
+tooltip :: String -> TooltipPlacement -> Tooltip
+tooltip content placement =
+  { content
+  , placement
+  , delay: 200.0
+  , hideDelay: 100.0
+  , maxWidth: 300.0
+  , arrow: true
+  , interactive: false
+  }
+
+-- | Simple tooltip (top placement)
+simpleTooltip :: String -> Tooltip
+simpleTooltip content = tooltip content TooltipTop
+
+-- | Interactive tooltip (can be hovered)
+interactiveTooltip :: String -> TooltipPlacement -> Tooltip
+interactiveTooltip content placement = (tooltip content placement)
+  { interactive = true
+  , hideDelay = 300.0
+  }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // popover molecule
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Popover trigger mode
+data PopoverTrigger
+  = PopoverClick      -- ^ Open on click
+  | PopoverHover      -- ^ Open on hover
+  | PopoverFocus      -- ^ Open on focus
+  | PopoverManual     -- ^ Controlled externally
+
+derive instance eqPopoverTrigger :: Eq PopoverTrigger
+derive instance ordPopoverTrigger :: Ord PopoverTrigger
+
+instance showPopoverTrigger :: Show PopoverTrigger where
+  show PopoverClick = "click"
+  show PopoverHover = "hover"
+  show PopoverFocus = "focus"
+  show PopoverManual = "manual"
+
+-- | Popover configuration (richer than tooltip)
+type Popover =
+  { id :: String                  -- ^ Unique identifier
+  , placement :: TooltipPlacement -- ^ Reuse tooltip placement
+  , trigger :: PopoverTrigger     -- ^ How to trigger
+  , title :: Maybe String         -- ^ Optional title
+  , closeButton :: Boolean        -- ^ Show close button
+  , closeOnClickOutside :: Boolean -- ^ Close when clicking outside
+  , closeOnEscape :: Boolean      -- ^ Close on Escape key
+  , offset :: Number              -- ^ Distance from trigger (px)
+  , isOpen :: Boolean             -- ^ Current open state
+  }
+
+-- | Create popover
+popover :: String -> TooltipPlacement -> PopoverTrigger -> Popover
+popover id placement trigger =
+  { id
+  , placement
+  , trigger
+  , title: Nothing
+  , closeButton: true
+  , closeOnClickOutside: true
+  , closeOnEscape: true
+  , offset: 8.0
+  , isOpen: false
+  }
+
+-- | Popover with title
+popoverWithTitle :: String -> String -> TooltipPlacement -> Popover
+popoverWithTitle id title placement =
+  (popover id placement PopoverClick)
+    { title = Just title }
+
+-- | Is popover open?
+isPopoverOpen :: Popover -> Boolean
+isPopoverOpen p = p.isOpen
+
+-- | Open popover
+openPopover :: Popover -> Popover
+openPopover p = p { isOpen = true }
+
+-- | Close popover
+closePopover :: Popover -> Popover
+closePopover p = p { isOpen = false }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // drawer molecule
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Drawer position (which edge it slides from)
+data DrawerPosition
+  = DrawerLeft
+  | DrawerRight
+  | DrawerTop
+  | DrawerBottom
+
+derive instance eqDrawerPosition :: Eq DrawerPosition
+derive instance ordDrawerPosition :: Ord DrawerPosition
+
+instance showDrawerPosition :: Show DrawerPosition where
+  show DrawerLeft = "left"
+  show DrawerRight = "right"
+  show DrawerTop = "top"
+  show DrawerBottom = "bottom"
+
+-- | Drawer configuration
+type Drawer =
+  { id :: String                  -- ^ Unique identifier
+  , position :: DrawerPosition    -- ^ Which edge
+  , size :: Number                -- ^ Width (left/right) or height (top/bottom) in px
+  , title :: Maybe String         -- ^ Optional title
+  , hasOverlay :: Boolean         -- ^ Show backdrop overlay
+  , closeOnOverlayClick :: Boolean -- ^ Close when clicking overlay
+  , closeOnEscape :: Boolean      -- ^ Close on Escape key
+  , isOpen :: Boolean             -- ^ Current open state
+  , isPush :: Boolean             -- ^ Push content vs overlay
+  }
+
+-- | Create drawer
+drawer :: String -> DrawerPosition -> Number -> Drawer
+drawer id position size =
+  { id
+  , position
+  , size
+  , title: Nothing
+  , hasOverlay: true
+  , closeOnOverlayClick: true
+  , closeOnEscape: true
+  , isOpen: false
+  , isPush: false
+  }
+
+-- | Navigation drawer (left, 280px)
+navigationDrawer :: String -> Drawer
+navigationDrawer id = drawer id DrawerLeft 280.0
+
+-- | Side panel drawer (right, 400px)
+sidePanelDrawer :: String -> Drawer
+sidePanelDrawer id = drawer id DrawerRight 400.0
+
+-- | Is drawer open?
+isDrawerOpen :: Drawer -> Boolean
+isDrawerOpen d = d.isOpen
+
+-- | Open drawer
+openDrawer :: Drawer -> Drawer
+openDrawer d = d { isOpen = true }
+
+-- | Close drawer
+closeDrawer :: Drawer -> Drawer
+closeDrawer d = d { isOpen = false }
+
+-- | Toggle drawer
+toggleDrawer :: Drawer -> Drawer
+toggleDrawer d = d { isOpen = not d.isOpen }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                               // sheet molecule
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Sheet snap point (height detents)
+data SheetSnapPoint
+  = SheetMinimized    -- ^ Just peek (e.g., 100px)
+  | SheetPartial      -- ^ Half height
+  | SheetExpanded     -- ^ Full height (minus safe area)
+  | SheetCustom Number -- ^ Custom height in pixels
+
+derive instance eqSheetSnapPoint :: Eq SheetSnapPoint
+
+instance showSheetSnapPoint :: Show SheetSnapPoint where
+  show SheetMinimized = "minimized"
+  show SheetPartial = "partial"
+  show SheetExpanded = "expanded"
+  show (SheetCustom h) = "custom(" <> show h <> "px)"
+
+-- | Bottom sheet configuration (mobile pattern)
+type Sheet =
+  { id :: String                      -- ^ Unique identifier
+  , title :: Maybe String             -- ^ Optional title
+  , snapPoints :: Array SheetSnapPoint -- ^ Available snap heights
+  , currentSnap :: SheetSnapPoint     -- ^ Current snap position
+  , hasOverlay :: Boolean             -- ^ Show backdrop
+  , dismissible :: Boolean            -- ^ Can swipe down to dismiss
+  , hasHandle :: Boolean              -- ^ Show drag handle
+  , isOpen :: Boolean                 -- ^ Current open state
+  }
+
+-- | Create sheet
+sheet :: String -> Array SheetSnapPoint -> Sheet
+sheet id snapPoints =
+  { id
+  , title: Nothing
+  , snapPoints
+  , currentSnap: SheetPartial
+  , hasOverlay: true
+  , dismissible: true
+  , hasHandle: true
+  , isOpen: false
+  }
+
+-- | Standard bottom sheet (partial/expanded)
+standardSheet :: String -> Sheet
+standardSheet id = sheet id [SheetPartial, SheetExpanded]
+
+-- | Multi-detent sheet (minimized/partial/expanded)
+multiDetentSheet :: String -> Sheet
+multiDetentSheet id = sheet id [SheetMinimized, SheetPartial, SheetExpanded]
+
+-- | Is sheet open?
+isSheetOpen :: Sheet -> Boolean
+isSheetOpen s = s.isOpen
+
+-- | Open sheet to snap point
+openSheet :: SheetSnapPoint -> Sheet -> Sheet
+openSheet snap s = s { isOpen = true, currentSnap = snap }
+
+-- | Close sheet
+closeSheet :: Sheet -> Sheet
+closeSheet s = s { isOpen = false }
+
+-- | Snap sheet to point
+snapSheet :: SheetSnapPoint -> Sheet -> Sheet
+snapSheet snap s = s { currentSnap = snap }
