@@ -29,6 +29,7 @@ module Hydrogen.Schema.Temporal.Easing
   , springEasing
   
   -- * Standard Presets
+  , linear
   , ease
   , easeIn
   , easeOut
@@ -122,6 +123,13 @@ springEasing = Spring
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // standard presets
 -- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | CSS linear as cubic bezier: constant velocity via (0, 0, 1, 1)
+-- |
+-- | Unlike `linearEasing` (which uses the Linear constructor),
+-- | this uses CubicBezier for full CSS interop.
+linear :: Easing
+linear = CubicBezier Bezier.linear
 
 -- | CSS ease: gentle acceleration and deceleration
 ease :: Easing
