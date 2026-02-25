@@ -1,7 +1,7 @@
 # Hydrogen Session Notes
 
 **Last Updated:** 2026-02-25
-**Build Status:** **PASSING** (0 errors, 1 warning)
+**Build Status:** **PASSING** (0 errors, 0 warnings)
 
 ---
 
@@ -20,6 +20,29 @@ nix develop --command spago build
 ---
 
 ## Recent Completions (2026-02-25)
+
+### 0. Gestural & Reactive Pillar Completion
+
+Locked in the remaining atoms/molecules/compounds per SCHEMA.md:
+
+**Gestural Pillar Additions:**
+
+| Module | Type | Description |
+|--------|------|-------------|
+| Timing.purs (NEW) | Atoms | ClickCount, HoldDuration, TapInterval |
+| Scroll.purs | Compounds | InfiniteScrollState, PullToRefreshState |
+| Touch.purs | Compounds | EdgeSwipeState, ThreeFingerSwipeState, TwoFingerTapState |
+| Gesture/Pinch.purs (NEW) | Compound | PinchGesture with scale tracking |
+| Gesture/Rotate.purs (NEW) | Compound | RotateGesture with angle/snap |
+| Gesture.purs | Updated | Re-exports Pinch/Rotate, updated GestureState |
+
+**Reactive Pillar Additions:**
+
+| Module | Type | Description |
+|--------|------|-------------|
+| DataState.purs | Molecule | LoadingState (Loading + Progress + Error) |
+| Feedback.purs | Molecules | Tooltip, Popover, Drawer, Sheet |
+| FocusManagement.purs | Already complete | FocusRing molecule was present |
 
 ### 1. Temporal Pillar (Complete)
 

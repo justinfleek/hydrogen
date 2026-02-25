@@ -32,6 +32,10 @@ module Hydrogen.Schema.Gestural.Gesture
   , module Hydrogen.Schema.Gestural.Gesture.Swipe
     -- * Re-exports from Pan
   , module Hydrogen.Schema.Gestural.Gesture.Pan
+    -- * Re-exports from Pinch
+  , module Hydrogen.Schema.Gestural.Gesture.Pinch
+    -- * Re-exports from Rotate
+  , module Hydrogen.Schema.Gestural.Gesture.Rotate
     -- * Combined Gesture State
   , GestureState
   , initialGestureState
@@ -42,6 +46,8 @@ module Hydrogen.Schema.Gestural.Gesture
   , updateLongPressState
   , updateSwipeState
   , updatePanState
+  , updatePinchState
+  , updateRotateState
   ) where
 
 import Prelude
@@ -112,6 +118,51 @@ import Hydrogen.Schema.Gestural.Gesture.Pan
   , isPanning
   , panDistance
   )
+import Hydrogen.Schema.Gestural.Gesture.Pinch
+  ( PinchConfig
+  , pinchConfig
+  , defaultPinchConfig
+  , pinchMinScale
+  , pinchMaxScale
+  , PinchGesture
+  , pinchGesture
+  , noPinchGesture
+  , beginPinch
+  , updatePinch
+  , endPinch
+  , cancelPinch
+  , pinchGestureScale
+  , pinchGestureCenter
+  , pinchGestureVelocity
+  , isPinchActive
+  , isPinchEnded
+  , clampScale
+  , scaleProgress
+  )
+import Hydrogen.Schema.Gestural.Gesture.Rotate
+  ( RotateConfig
+  , rotateConfig
+  , defaultRotateConfig
+  , rotateSnapAngles
+  , RotateGesture
+  , rotateGesture
+  , noRotateGesture
+  , beginRotate
+  , updateRotate
+  , endRotate
+  , cancelRotate
+  , rotateGestureAngle
+  , rotateGestureAngleDegrees
+  , rotateGestureDelta
+  , rotateGestureCenter
+  , rotateGestureVelocity
+  , isRotateActive
+  , isRotateEnded
+  , normalizeAngle
+  , radiansToDegrees
+  , degreesToRadians
+  , snapToAngle
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                     // combined // gesture state
@@ -126,6 +177,8 @@ type GestureState =
   , longPress :: LongPressState   -- ^ Long press gesture state
   , swipe :: SwipeState           -- ^ Swipe gesture state
   , pan :: PanState               -- ^ Pan gesture state
+  , pinch :: PinchGesture         -- ^ Pinch gesture state
+  , rotate :: RotateGesture       -- ^ Rotate gesture state
   , timestamp :: Number           -- ^ Last update timestamp
   }
 
@@ -136,6 +189,8 @@ initialGestureState =
   , longPress: noLongPress
   , swipe: noSwipe
   , pan: noPan
+  , pinch: noPinchGesture
+  , rotate: noRotateGesture
   , timestamp: 0.0
   }
 
@@ -150,6 +205,8 @@ hasActiveGesture gs =
   || isActive gs.longPress.phase 
   || isActive gs.swipe.phase 
   || isActive gs.pan.phase
+  || isPinchActive gs.pinch
+  || isRotateActive gs.rotate
 
 -- | Is any gesture in a terminal state?
 hasCompletedGesture :: GestureState -> Boolean
@@ -158,6 +215,8 @@ hasCompletedGesture gs =
   || isTerminal gs.longPress.phase
   || isTerminal gs.swipe.phase
   || isTerminal gs.pan.phase
+  || isPinchEnded gs.pinch
+  || isRotateEnded gs.rotate
 
 -- | Update tap state in combined gesture
 updateTapState :: TapState -> GestureState -> GestureState
@@ -174,3 +233,11 @@ updateSwipeState sw gs = gs { swipe = sw }
 -- | Update pan state in combined gesture
 updatePanState :: PanState -> GestureState -> GestureState
 updatePanState pn gs = gs { pan = pn }
+
+-- | Update pinch state in combined gesture
+updatePinchState :: PinchGesture -> GestureState -> GestureState
+updatePinchState pc gs = gs { pinch = pc }
+
+-- | Update rotate state in combined gesture
+updateRotateState :: RotateGesture -> GestureState -> GestureState
+updateRotateState rt gs = gs { rotate = rt }
