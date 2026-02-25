@@ -126,7 +126,7 @@ derive instance eqBox3 :: Eq Box3
 
 instance showBox3 :: Show Box3 where
   show (Box3 minV maxV) =
-    "Box3(min: " <> show minV <> ", max: " <> show maxV <> ")"
+    "(Box3 min:" <> show minV <> " max:" <> show maxV <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // constructors

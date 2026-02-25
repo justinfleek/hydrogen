@@ -115,7 +115,7 @@ derive instance eqSphere :: Eq Sphere
 
 instance showSphere :: Show Sphere where
   show (Sphere center radius) =
-    "Sphere(center: " <> show center <> ", radius: " <> show radius <> ")"
+    "(Sphere center:" <> show center <> " radius:" <> show radius <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // constructors

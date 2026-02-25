@@ -82,7 +82,7 @@ derive instance eqVertexIndex :: Eq VertexIndex
 derive instance ordVertexIndex :: Ord VertexIndex
 
 instance showVertexIndex :: Show VertexIndex where
-  show (VertexIndex i) = show i
+  show (VertexIndex i) = "(VertexIndex " <> show i <> ")"
 
 -- | Create a vertex index (clamps negative values to 0).
 vertexIndex :: Int -> VertexIndex
@@ -108,7 +108,7 @@ derive instance eqUV :: Eq UV
 derive instance ordUV :: Ord UV
 
 instance showUV :: Show UV where
-  show (UV c) = "UV(" <> show c.u <> ", " <> show c.v <> ")"
+  show (UV c) = "(UV " <> show c.u <> " " <> show c.v <> ")"
 
 -- | Create UV coordinates.
 uv :: Number -> Number -> UV
@@ -166,9 +166,9 @@ newtype MeshVertex2D = MeshVertex2D
 derive instance eqMeshVertex2D :: Eq MeshVertex2D
 
 instance showMeshVertex2D :: Show MeshVertex2D where
-  show (MeshVertex2D v) = "MeshVertex2D { position: " <> show v.position 
-    <> ", color: " <> show v.color
-    <> ", uv: " <> show v.texCoord <> " }"
+  show (MeshVertex2D v) = "(MeshVertex2D position:" <> show v.position 
+    <> " color:" <> show v.color
+    <> " uv:" <> show v.texCoord <> ")"
 
 -- | Create a mesh vertex with all attributes.
 meshVertex2D :: Point2D -> RGB -> UV -> MeshVertex2D

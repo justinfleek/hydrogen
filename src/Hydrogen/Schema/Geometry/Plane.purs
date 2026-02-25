@@ -96,7 +96,7 @@ derive instance eqPlane :: Eq Plane
 
 instance showPlane :: Show Plane where
   show (Plane normal constant) =
-    "Plane(normal: " <> show normal <> ", constant: " <> show constant <> ")"
+    "(Plane normal:" <> show normal <> " constant:" <> show constant <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // constructors

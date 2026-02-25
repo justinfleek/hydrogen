@@ -203,7 +203,7 @@ derive instance eqReflectionAxis :: Eq ReflectionAxis
 derive instance ordReflectionAxis :: Ord ReflectionAxis
 
 instance showReflectionAxis :: Show ReflectionAxis where
-  show (ReflectionAxis r) = "ReflectionAxis(" <> show (unwrapDegrees r.angle) <> "°)"
+  show (ReflectionAxis r) = "(ReflectionAxis angle:" <> show r.angle <> ")"
 
 -- | Create a reflection axis at the given angle
 reflectionAxis :: Degrees -> ReflectionAxis
@@ -273,11 +273,7 @@ derive instance eqRotationalSymmetry :: Eq RotationalSymmetry
 derive instance ordRotationalSymmetry :: Ord RotationalSymmetry
 
 instance showRotationalSymmetry :: Show RotationalSymmetry where
-  show (RotationalSymmetry r) 
-    | r.folds < 0 = "RotationalSymmetry(∞)"
-    | r.folds == 0 = "RotationalSymmetry(none)"
-    | r.folds == 1 = "RotationalSymmetry(identity)"
-    | otherwise = "RotationalSymmetry(" <> show r.folds <> "-fold)"
+  show (RotationalSymmetry r) = "(RotationalSymmetry folds:" <> show r.folds <> ")"
 
 -- | Create rotational symmetry with N folds.
 -- | Values < 1 are treated as no symmetry, except -1 means circular.
@@ -358,7 +354,7 @@ derive instance eqDihedralSymmetry :: Eq DihedralSymmetry
 derive instance ordDihedralSymmetry :: Ord DihedralSymmetry
 
 instance showDihedralSymmetry :: Show DihedralSymmetry where
-  show (DihedralSymmetry d) = "D_" <> show d.n
+  show (DihedralSymmetry d) = "(DihedralSymmetry n:" <> show d.n <> ")"
 
 -- | Create dihedral symmetry D_n
 dihedralSymmetry :: Int -> DihedralSymmetry
@@ -419,7 +415,7 @@ derive instance ordTranslationalSymmetry :: Ord TranslationalSymmetry
 
 instance showTranslationalSymmetry :: Show TranslationalSymmetry where
   show (TranslationalSymmetry t) = 
-    "TranslationalSymmetry(" <> show t.periodX <> ", " <> show t.periodY <> ")"
+    "(TranslationalSymmetry periodX:" <> show t.periodX <> " periodY:" <> show t.periodY <> ")"
 
 -- | Create translational symmetry with given periods
 translationalSymmetry :: Number -> Number -> TranslationalSymmetry
@@ -478,7 +474,7 @@ derive instance ordGlideReflection :: Ord GlideReflection
 
 instance showGlideReflection :: Show GlideReflection where
   show (GlideReflection g) = 
-    "GlideReflection(" <> show (unwrapDegrees (axisAngle g.axis)) <> "°, " <> show g.distance <> ")"
+    "(GlideReflection axis:" <> show g.axis <> " distance:" <> show g.distance <> ")"
 
 -- | Create a glide reflection
 glideReflection :: ReflectionAxis -> Number -> GlideReflection
@@ -526,11 +522,11 @@ derive instance eqSymmetryGroup :: Eq SymmetryGroup
 
 instance showSymmetryGroup :: Show SymmetryGroup where
   show (SymmetryGroup s) = 
-    "SymmetryGroup { " 
-      <> "reflection: " <> showMaybe s.reflection
-      <> ", rotation: " <> show s.rotation
-      <> ", dihedral: " <> showMaybe s.dihedral
-      <> " }"
+    "(SymmetryGroup " 
+      <> "reflection:" <> showMaybe s.reflection
+      <> " rotation:" <> show s.rotation
+      <> " dihedral:" <> showMaybe s.dihedral
+      <> ")"
 
 -- | No symmetry at all
 noSymmetry :: SymmetryGroup
@@ -686,11 +682,11 @@ derive instance eqSymmetryOp :: Eq SymmetryOp
 
 instance showSymmetryOp :: Show SymmetryOp where
   show Identity = "Identity"
-  show (Reflect axis) = "Reflect(" <> show (unwrapDegrees (axisAngle axis)) <> "°)"
-  show (Rotate angle) = "Rotate(" <> show (unwrapDegrees angle) <> "°)"
-  show (Translate dx dy) = "Translate(" <> show dx <> ", " <> show dy <> ")"
-  show (Glide axis dist) = "Glide(" <> show (unwrapDegrees (axisAngle axis)) <> "°, " <> show dist <> ")"
-  show (Compose a b) = show a <> " ∘ " <> show b
+  show (Reflect axis) = "(Reflect " <> show axis <> ")"
+  show (Rotate angle) = "(Rotate " <> show angle <> ")"
+  show (Translate dx dy) = "(Translate dx:" <> show dx <> " dy:" <> show dy <> ")"
+  show (Glide axis dist) = "(Glide axis:" <> show axis <> " distance:" <> show dist <> ")"
+  show (Compose a b) = "(Compose " <> show a <> " " <> show b <> ")"
 
 -- | Identity operation (do nothing)
 identityOp :: SymmetryOp
@@ -748,8 +744,8 @@ derive instance eqPointGroup :: Eq PointGroup
 derive instance ordPointGroup :: Ord PointGroup
 
 instance showPointGroup :: Show PointGroup where
-  show (CyclicGroup n) = "C_" <> show n
-  show (DihedralGroup n) = "D_" <> show n
+  show (CyclicGroup n) = "(CyclicGroup n:" <> show n <> ")"
+  show (DihedralGroup n) = "(DihedralGroup n:" <> show n <> ")"
 
 -- | Get the name of a point group
 pointGroupName :: PointGroup -> String
@@ -802,7 +798,23 @@ derive instance eqWallpaperGroup :: Eq WallpaperGroup
 derive instance ordWallpaperGroup :: Ord WallpaperGroup
 
 instance showWallpaperGroup :: Show WallpaperGroup where
-  show group = wallpaperGroupName group
+  show P1 = "P1"
+  show P2 = "P2"
+  show PM = "PM"
+  show PG = "PG"
+  show CM = "CM"
+  show PMM = "PMM"
+  show PMG = "PMG"
+  show PGG = "PGG"
+  show CMM = "CMM"
+  show P4 = "P4"
+  show P4M = "P4M"
+  show P4G = "P4G"
+  show P3 = "P3"
+  show P3M1 = "P3M1"
+  show P31M = "P31M"
+  show P6 = "P6"
+  show P6M = "P6M"
 
 -- | Get the standard crystallographic name
 wallpaperGroupName :: WallpaperGroup -> String

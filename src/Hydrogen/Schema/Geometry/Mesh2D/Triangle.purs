@@ -75,9 +75,9 @@ newtype TriangleIndices = TriangleIndices
 derive instance eqTriangleIndices :: Eq TriangleIndices
 
 instance showTriangleIndices :: Show TriangleIndices where
-  show (TriangleIndices t) = "Triangle(" 
-    <> show t.a <> ", " 
-    <> show t.b <> ", " 
+  show (TriangleIndices t) = "(TriangleIndices a:" 
+    <> show t.a <> " b:" 
+    <> show t.b <> " c:" 
     <> show t.c <> ")"
 
 -- | Create triangle indices.

@@ -79,8 +79,8 @@ module Hydrogen.GPU.Flatten
 import Prelude
   ( class Eq
   , class Show
+  , Unit
   , bind
-  , discard
   , map
   , pure
   , show
@@ -332,10 +332,13 @@ showBox box =
 showDebug :: forall a. Show a => a -> String
 showDebug = show
 
--- | Discard a Maybe result, returning unit
--- | For cases where we only care about side effects of Maybe chain
+-- | Discard a Maybe result, returning unit.
+-- |
+-- | Used when a computation produces a Maybe but we only care that it ran,
+-- | not about the result. Commonly needed when chaining operations where
+-- | intermediate steps may fail but we want to continue regardless.
 discardMaybe :: forall a. Maybe a -> Unit
-discardMaybe _ = discard $ pure unit
+discardMaybe _ = unit
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // style extraction

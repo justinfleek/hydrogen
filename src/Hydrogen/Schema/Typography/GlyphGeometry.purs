@@ -93,7 +93,10 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Schema.Dimension.Device (Pixel(Pixel))
 import Hydrogen.Schema.Bounded as Bounded
-import Hydrogen.Schema.Geometry.Shape (PathCommand(MoveTo, LineTo, CubicTo, QuadraticTo, ClosePath), Point2D)
+import Hydrogen.Schema.Geometry.Shape
+  ( PathCommand(MoveTo, LineTo, CubicTo, QuadraticTo, ClosePath)
+  , PixelPoint2D
+  )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // 3d control points
@@ -465,5 +468,5 @@ glyphToPath2D gp = Array.concatMap contourToPath2D gp.contours
     command3DTo2D (CubicTo3D c1 c2 end) = CubicTo (to2D c1) (to2D c2) (to2D end)
     command3DTo2D ClosePath3D = ClosePath
     
-    to2D :: ControlPoint3D -> Point2D
+    to2D :: ControlPoint3D -> PixelPoint2D
     to2D { x, y } = { x, y }

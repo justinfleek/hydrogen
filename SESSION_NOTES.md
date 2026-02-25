@@ -1,331 +1,236 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-24
-**Build Status:** Zero warnings, zero errors
+**Last Updated:** 2026-02-25
+**Build Status:** PENDING VERIFICATION — Nix daemon down during session
 
 ---
 
-## Current Goal
+## Quick Start for New Sessions
 
-Port remaining Halogen-based components (`Hydrogen.Component.*`) to Schema-native Element-based components (`Hydrogen.Element.Component.*`). All components must use Schema atoms exclusively — no hardcoded CSS strings, no Tailwind classes, no JavaScript FFI except at true system boundaries.
+**Read these first:**
+1. `CLAUDE.md` — Project rules, attestation, conventions
+2. `docs/SESSION_HANDOFF.md` — Detailed handoff from last session
+3. `docs/CONTINUITY_VISION.md` — Why correctness matters
 
----
-
-## Key Constraints
-
-- **Pure Schema, no Tailwind**: Components use Schema atoms for all visual properties
-- **extraAttributes for edge cases**: Escape hatch exists but should be used sparingly (testing, a11y)
-- **No JS FFI in components**: FFI only at true system boundaries (Target.DOM runtime)
-- **Pure PureScript locale data**: Use lookup tables for locale strings, not JavaScript's Intl API
-- **500 line max per file**: Files must be split when exceeding this limit
-- **Explicit imports only**: Never use `(..)` imports — they are canaries for incomplete work
-- **Fix all warnings**: Zero warnings required — NEVER DELETE CODE TO FIX WARNINGS
-- **UUID5 for identifiers**: Deterministic ID generation for contacts, events, etc.
-
----
-
-## Build Command
-
+**Build command:**
 ```bash
 nix develop --command spago build
 ```
 
 ---
 
-## Component Porting Status
+## Recent Completions (This Session)
 
-### Ported to Element (49 components)
+### Temporal Pillar Expansion (In Progress)
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Accordion | Complete | Element-only (new) |
-| Alert | Complete | |
-| AlertDialog | Complete | |
-| AutoComplete | Complete | |
-| Avatar | Complete | |
-| Badge | Complete | |
-| Breadcrumb | Complete | |
-| Button | Complete | |
-| Calendar | Complete | |
-| Card | Complete | + submodules (Shape, Media, Hover, Badge) |
-| Carousel | Complete | + submodules (Gestures, Transitions, Effects) |
-| ChatBubble | Complete | |
-| Checkbox | Complete | |
-| CodeBlock | Complete | |
-| Collapsible | Complete | |
-| ColorPicker | Complete | |
-| DataGrid | Complete | + submodules (Types, Cell, Column, Processing) |
-| DatePicker | Complete | + submodules (Types, Format, Render) |
-| DateRangePicker | Complete | + submodules (Types, Presets, Render) |
-| GradientEditor | Complete | |
-| Input | Complete | |
-| Kanban | Complete | + submodules (Types, State, Render, Card, Column) |
-| LoadingBar | Complete | |
-| NumberInput | Complete | |
-| OTPInput | Complete | + submodules (Types, Props, Render, Digit, Animation, Validation, Accessibility) |
-| Pagination | Complete | |
-| PasswordInput | Complete | |
-| Progress | Complete | |
-| Radio | Complete | |
-| Rating | Complete | |
-| SearchInput | Complete | |
-| Select | Complete | |
-| Separator | Complete | |
-| Sheet | Complete | |
-| Skeleton | Complete | |
-| Slider | Complete | |
-| StatCard | Complete | |
-| Stepper | Complete | |
-| Swatch | Complete | Element-only (new) |
-| Switch | Complete | |
-| Table | Complete | |
-| Tabs | Complete | Element-only (new) |
-| TagInput | Complete | |
-| Textarea | Complete | |
-| Timeline | Complete | |
-| TimePicker | Complete | + submodules (Types, Format, Render) |
-| Toast | Complete | |
-| Toggle | Complete | |
-| TreeView | Complete | + submodules (Types, State, Node, Render, Selection, Navigation, Layout, DragDrop, Animation, InlineEdit, Content, Accessibility, Connection, Viewport) |
+**19 files total — expanded from 8 files**
 
-### Not Yet Ported (7 components)
+| Module | Type | Description |
+|--------|------|-------------|
+| Nanosecond.purs | Atom | Sub-second precision (0-999999999) |
+| Microsecond.purs | Atom | Sub-second precision (0-999999) |
+| Frames.purs | Atom | Frame count for discrete timing |
+| FPS.purs | Atom | Frames per second with presets (cinema, pal, ntsc, etc.) |
+| BezierParam.purs | Atoms | CubicX1/Y1/X2/Y2 for easing curves |
+| StepEasing.purs | Atoms | Steps count and StepPosition enum |
+| Spring.purs | Atoms | Mass, Stiffness, Damping, Velocity, RestDelta, RestSpeed |
+| CubicBezierEasing.purs | Molecule | Complete bezier curve with 30+ presets |
+| SpringConfig.purs | Molecule | Spring physics config with presets |
+| Duration.purs | Molecule | Time duration with unit semantics |
+| Easing.purs | Compound | Unified easing type (Linear/CubicBezier/Steps/Spring) |
 
-| Component | Halogen Lines | Notes |
-|-----------|---------------|-------|
-| Confetti | 398 | Particle system |
-| CreditCard | 802 | Card detection/formatting |
-| MeshGradientRenderer | 155 | Complex gradient |
-| PhoneInput | 547 | International format |
-| QRCode | 638 | Image generation |
-| Signature | 701 | Canvas drawing |
-| Tour | 666 | Onboarding overlay |
+**Key design decisions:**
+- Duration stored internally as milliseconds, smart constructors for all units
+- CubicBezierEasing includes all standard CSS presets plus extended (quad, cubic, quart, quint, expo, circ, back)
+- Spring physics uses damped harmonic oscillator model with critical damping calculation
+- Easing compound allows runtime to dispatch based on animation type
 
-### Motion Subsystem — Not Yet Ported (19 Halogen components)
-
-**Curve/** (6 components)
-- BezierCurve, CurveEditor, CurveHandle, CurveKeyframe, EasingPicker, EasingPreview
-
-**Property/** (7 components)
-- AngleDial, KeyframeToggle, PositionXY, PositionXYZ, PropertyGroup, PropertyRow, ScrubableNumber
-
-**Timeline/** (6 components)
-- AnimationTimeline, KeyframeMarker, LayerTrack, Playhead, PropertyTrack, TimeRuler
+**Build status:** Files created but nix daemon was down during session. Patterns follow existing codebase conventions exactly.
 
 ---
 
-## Schema Pillar Completeness
+### Material Pillar Expansion (Complete — Previous Session)
 
-### Complete (~80%+)
+**41 files total — pillar is now complete per SCHEMA.md**
 
-| Pillar | Files | Notes |
-|--------|-------|-------|
-| Color | 37 | Missing: Value, camera log curves, LUT modules |
-| Dimension | 14+ | Missing: SI prefixes, explicit pixel types |
-| Typography | 17 | Missing: TabSize, TextDecoration, OpenType features |
-| Reactive | 13 | Mostly complete |
-| Gestural | 16+ | Missing: Pinch, Rotate multi-touch |
+| Module | Type | Description |
+|--------|------|-------------|
+| PerlinNoise.purs | Molecule | Classic gradient noise with presets |
+| SimplexNoise.purs | Molecule | Improved Perlin with better performance |
+| WorleyNoise.purs | Molecule | Cellular/Voronoi noise with distance types |
+| FBM.purs | Compound | Fractal Brownian Motion layering |
+| BorderSide.purs | Molecule | Single edge border (width + style + color) |
+| BorderAll.purs | Compound | Four-sided border with uniform/symmetric |
+| BorderImage.purs | Compound | CSS border-image with 9-slice model |
+| Fill.purs | Compound | FillNone/FillSolid/FillGradient/FillPattern/FillNoise |
+| Surface.purs | Compound | PBR surfaces (matte, glossy, metallic, satin, textured) |
+| Neumorphism.purs | Compound | Soft UI dual-shadow effect |
+| Duotone.purs | Compound | Two-color luminosity mapping |
+| FilterChain.purs | Compound | Composable CSS filter sequence |
 
-### Partial (15-50%)
-
-| Pillar | Files | Major Gaps |
-|--------|-------|------------|
-| Temporal | 6 | Missing: Frames, FPS, Spring physics, Progress atoms |
-| Elevation | 2 | Missing: Perspective, DoF, semantic elevation compounds |
-| Geometry | 1 | Only Radius.purs exists — missing angles, shapes, paths, transforms, beziers |
-| Audio | 2 | Only Frequency/Level — missing synthesis, envelopes, filters |
-
-### Missing (0%)
-
-| Pillar | Priority | Description |
-|--------|----------|-------------|
-| Material | High | Blur, filters, noise, borders, gradients, surfaces |
-| Haptic | Medium | Vibration, impact feedback, audio cues |
-| Spatial | Medium | 3D transforms, cameras, lights, PBR materials |
-| Brand | High | Design tokens, themes, semantic colors, component tokens |
+**Key design decisions:**
+- All noise types are pure configuration molecules — runtime generates actual noise
+- Surface uses PBR parameters (roughness, metalness, reflectivity)
+- FilterChain presets: vintage, dramatic, softFocus, highContrast, warm, cool
 
 ---
 
-## (..) Import Canaries
+## Previous Session Completions
 
-**111 files with 188 (..) imports need fixing.**
-
-### Highest Priority (5 occurrences)
-
-- `src/Hydrogen/Query.purs`
-- `src/Hydrogen/API/Client.purs`
-
-### High Priority (3-4 occurrences)
-
-- `src/Hydrogen/HTML/Renderer.purs` (4)
-- `src/Hydrogen/Schema/Dimension/Camera.purs` (3)
-- `src/Hydrogen/Realtime/WebSocket.purs` (3)
-- `src/Hydrogen/Motion/LayoutAnimation.purs` (3)
-- `src/Hydrogen/Error/Boundary.purs` (3)
-- `src/Hydrogen/Component/DatePicker.purs` (3)
-- `src/Hydrogen/Component/DataGrid.purs` (3)
-
-### Common Patterns to Fix
-
-```purescript
--- BAD (canary)
-import Data.Maybe (..)
-
--- GOOD (explicit)
-import Data.Maybe (Maybe(Nothing, Just), isJust, isNothing, fromMaybe)
-```
-
----
-
-## Scheduling System (Completed This Session)
-
-New modules in `src/Hydrogen/Schema/Scheduling/`:
+### Brand Sub-Modules (6 files)
 
 | Module | Lines | Description |
 |--------|-------|-------------|
-| RSVP.purs | ~100 | Pending, Accepted, Declined, Tentative, Delegated |
-| Recurrence.purs | ~400 | RFC 5545 rules (daily, weekly, monthly, yearly) |
-| Contact.purs | ~250 | Person, Room, Resource, Group with ContactId |
-| Invite.purs | ~280 | AttendeeRole, RSVP tracking, ContactId reference |
-| Event.purs | 405 | Core types, constructors, accessors |
-| EventQuery.purs | 150 | Boolean predicates, computed properties |
-| EventMod.purs | 203 | Modifiers, offset ops, iCal export |
+| Identity.purs | ~220 | Domain, BrandName, UUID, BrandIdentity |
+| Palette.purs | ~340 | OKLCH, Lightness, Chroma, Hue, Role, BrandPalette |
+| Typography.purs | ~300 | FontWeight, FontFamily, FontSize, TypeScale, BrandTypography |
+| Spacing.purs | ~230 | SpacingUnit, SpacingScale, LinearSpacing, BrandSpacing |
+| Voice.purs | ~290 | Tone, Trait, TraitSet, Vocabulary, BrandVoice |
+| Provenance.purs | ~250 | ContentHash, Timestamp, SourceURL, Provenance, StorageKey |
 
-New modules in `src/Hydrogen/Schema/Temporal/`:
+**Key design decisions:**
+- Pure data types only — no FFI, no effects
+- UUID/SHA256 computation happens at Haskell boundary
+- JSON serialization removed from Brand.purs (boundary concern)
+- Sub-modules not re-exported to avoid naming conflicts (Bold in FontWeight vs Trait)
+
+---
+
+## Recent Completions (2026-02-25)
+
+### Geometry Pillar Expansion
 
 | Module | Lines | Description |
 |--------|-------|-------------|
-| Millisecond.purs | ~90 | Bounded 0-999 |
-| TimeOfDay.purs | 300 | Hour + Minute + Second + Millisecond molecule |
-| Timezone.purs | ~310 | UtcOffset, TimezoneId, 13 common zones |
+| Quaternion.purs | ~324 | 4D rotation, slerp, Euler conversion |
+| Bezier.purs | ~500 | QuadBezier, CubicBezier, De Casteljau |
+| Path.purs | ~700 | SVG commands, serialization, transforms |
+
+### Lean4 Brand Proofs (Phase 0-1 Complete)
+
+| File | Status | Description |
+|------|--------|-------------|
+| Brand.lean | Complete | Compound type with proof fields |
+| Identity.lean | Complete | UUID5 from domain |
+| Palette.lean | Complete | OKLCH colors, semantic roles |
+| Typography.lean | Complete | Font families, scales |
+| Spacing.lean | Complete | Grid systems |
+| Voice.lean | Complete | Tone, personality traits |
+| Provenance.lean | Complete | Content hashing |
+
+All sorrys fixed. All files build with `lake build`.
 
 ---
 
-## Recommended Next Steps (Priority Order)
+## Priority Order
 
-### 1. Port Remaining 7 Components
+### 1. Expand Brand Schema with SMART Framework Types
 
-```
-Confetti.purs → Element/Component/Confetti.purs
-CreditCard.purs → Element/Component/CreditCard.purs
-MeshGradientRenderer.purs → Element/Component/MeshGradientRenderer.purs
-PhoneInput.purs → Element/Component/PhoneInput.purs
-QRCode.purs → Element/Component/QRCode.purs
-Signature.purs → Element/Component/Signature.purs
-Tour.purs → Element/Component/Tour.purs
-```
+The SMART Brand Ingestion Framework (docs/SMART_BRAND_FRAMEWORK.md) defines
+additional types not yet in the schema:
 
-### 2. Create Missing Schema Pillars
+**Strategic Layer:**
+- Mission (locked copy, brand promise)
+- Taglines (primary/secondary, immutable)
+- Values (ordered list)
+- Personality (traits with IS/NOT constraints)
+- TargetCustomers (psychographic profiles)
 
-**Material Pillar** (highest impact):
-- BlurRadius, BlurSigma atoms
-- Filter atoms (Brightness, Contrast, Saturation, etc.)
-- BorderWidth, BorderStyle atoms
-- GradientFill, SolidFill compounds
-- BackdropBlur, Frosted effects
+**Execution Layer:**
+- Logo (icon, wordmark, symbolism)
+- Lockups (configurations, sizing, clear space)
+- Gradients (direction, stops, rules)
+- UIElements (neumorphic, depth, accessibility)
+- Imagery (color grading, categories, rules)
 
-**Brand Pillar** (required for theming):
-- ColorToken, SpacingToken, SizeToken molecules
-- SemanticColors compound
-- ThemeLight, ThemeDark compounds
+### 2. Geometry Expansion (Per GEOMETRY_ROADMAP.md)
 
-**Geometry Pillar** (required for many components):
-- Angle atoms (Degrees, Radians, Turns)
-- Point2D, Point3D molecules
-- Circle, Rectangle, Path compounds
-- Transform molecules (Translate, Rotate, Scale)
+Next modules:
+- Circle.purs, Ellipse.purs, Polygon.purs, Arc.purs
+- CornerRadii.purs
+- Polar.purs, Cylindrical.purs, Spherical.purs
 
-### 3. Fix (..) Imports in Core Modules
+### 3. Brand Ingestion Pipeline (Per BRAND_INGESTION_TODO.md)
 
-Start with highest-impact:
-- `Hydrogen/Query.purs`
-- `Hydrogen/API/Client.purs`
-- `Hydrogen/HTML/Renderer.purs`
-
-### 4. Port Motion Subsystem
-
-This is the largest remaining undertaking (19 Halogen components). Consider:
-- Start with core timeline components
-- Bezier/easing can reuse Schema/Motion/Easing
-- Property/ components are good candidates for early porting
+Phase 2: compass-brand Haskell package (not started)
 
 ---
 
-## File Locations
+## Key Documentation
 
-### Documentation
-- `docs/SCHEMA.md` — Full 12 pillar enumeration
-- `docs/design-ontology.md` — Implementation details
-- `docs/COMPONENT_ARCHITECTURE.md` — Component porting spec
-- `CLAUDE.md` — Project rules and attestation
-
-### Halogen Components (to port FROM)
-- `src/Hydrogen/Component/*.purs`
-- `src/Hydrogen/Component/Motion/**/*.purs`
-
-### Element Components (to port TO)
-- `src/Hydrogen/Element/Component/*.purs`
-
-### Schema Atoms
-- `src/Hydrogen/Schema/Color/`
-- `src/Hydrogen/Schema/Dimension/`
-- `src/Hydrogen/Schema/Geometry/`
-- `src/Hydrogen/Schema/Typography/`
-- `src/Hydrogen/Schema/Elevation/`
-- `src/Hydrogen/Schema/Temporal/`
-- `src/Hydrogen/Schema/Reactive/`
-- `src/Hydrogen/Schema/Gestural/`
-- `src/Hydrogen/Schema/Audio/`
-- `src/Hydrogen/Schema/Motion/`
-- `src/Hydrogen/Schema/Scheduling/` (NEW)
-
-### Missing Schema Directories (to create)
-- `src/Hydrogen/Schema/Material/`
-- `src/Hydrogen/Schema/Haptic/`
-- `src/Hydrogen/Schema/Spatial/`
-- `src/Hydrogen/Schema/Brand/`
+| Document | Purpose |
+|----------|---------|
+| `docs/SESSION_HANDOFF.md` | Detailed state from last session |
+| `docs/GEOMETRY_ROADMAP.md` | Geometry pillar expansion plan |
+| `docs/BRAND_INGESTION_TODO.md` | Full brand pipeline roadmap |
+| `docs/BRAND_INGESTION_ARCHITECTURE.md` | Architecture overview |
+| `docs/SHOW_DEBUG_CONVENTION.md` | Show instance requirements |
+| `docs/SCHEMA.md` | Full 12 pillar enumeration |
 
 ---
 
-## Session Summary (2026-02-23)
+## Schema Pillar Status
 
-### Created (Scheduling Schema)
+### Complete or Near-Complete
 
-- `Millisecond.purs` — Bounded millisecond atom
-- `TimeOfDay.purs` — Time molecule
-- `Timezone.purs` — UTC offset and IANA zones
-- `RSVP.purs` — Attendee response status
-- `Recurrence.purs` — RFC 5545 recurrence rules
-- `Contact.purs` — Person/Room/Resource/Group
-- `Invite.purs` — Event invitation with roles
-- `Event.purs` — Core event types (split into 3 modules)
-- `EventQuery.purs` — Query functions
-- `EventMod.purs` — Modifiers and display
+| Pillar | Status | Notes |
+|--------|--------|-------|
+| Color | ~95% | 37 files, minor gaps |
+| Dimension | ~90% | 14+ files |
+| Typography | ~90% | 17 files |
+| Reactive | ~85% | 13 files |
+| Gestural | ~85% | 16+ files |
+| Geometry | ~75% | Major expansion completed, shapes pending |
 
-### Created (DatePicker Element Port)
+### Partial
 
-- `Element/Component/DatePicker.purs` — Main component (464 lines)
-- `Element/Component/DatePicker/Types.purs` — DateFormat, ValidationError (80 lines)
-- `Element/Component/DatePicker/Format.purs` — Pure PureScript formatting (228 lines)
-- `Element/Component/DatePicker/Render.purs` — Render helpers (297 lines)
+| Pillar | Status | Notes |
+|--------|--------|-------|
+| Temporal | ~75% | Frames, spring physics, easing compounds added |
+| Elevation | ~20% | Missing perspective, DoF |
+| Audio | ~15% | Missing synthesis, envelopes |
+| Brand | ~50% | Core molecules done, SMART types pending |
 
-### Created (TimePicker Element Port)
+### Not Started
 
-- `Element/Component/TimePicker.purs` — Main component (496 lines)
-- `Element/Component/TimePicker/Types.purs` — HourFormat, Period, ValidationError (121 lines)
-- `Element/Component/TimePicker/Format.purs` — Pure PureScript formatting/parsing (268 lines)
-- `Element/Component/TimePicker/Render.purs` — Render helpers (346 lines)
+| Pillar | Priority |
+|--------|----------|
+| Haptic | Medium |
+| Spatial | Medium |
 
-### Fixed
+### Recently Completed
 
-- `Hour.purs` — Added missing Show class import
-- `Minute.purs` — Added missing Show class import
-- `Second.purs` — Added missing Show class import
-- `DatePicker.purs` — Fixed unused imports ((<>), formatDate)
-- Removed monolithic `Time.purs` (replaced by individual modules)
+| Pillar | Status | Notes |
+|--------|--------|-------|
+| Material | ~100% | 41 files, complete per SCHEMA.md |
 
-### Verified
+---
 
-- Full build: 0 warnings, 0 errors
-- All new modules under 500 line limit
-- All imports explicit (no `(..)`)
-- No JavaScript FFI in any component (caught and fixed FFI attempt in TimePicker/Format.purs)
+## Component Status
+
+### Element Components: 49 Complete
+
+Full list in `src/Hydrogen/Element/Component/`
+
+### Halogen Components: 7 Not Yet Ported
+
+Confetti, CreditCard, MeshGradientRenderer, PhoneInput, QRCode, Signature, Tour
+
+### Motion Subsystem: 19 Not Yet Ported
+
+See `src/Hydrogen/Component/Motion/` (Curve/, Property/, Timeline/)
+
+---
+
+## Development Rules (from CLAUDE.md)
+
+1. **Never delete code to fix warnings** — "Unused" means incomplete
+2. **Never use (..) imports** — They're canaries for incomplete work
+3. **No stubs, no TODOs** — Complete implementations only
+4. **500 line max per file** — Split into submodules
+5. **Show instances** — Follow SHOW_DEBUG_CONVENTION.md
+6. **Verify build after each change**
+
+────────────────────────────────────────────────────────────────────────────────
+
+                                                        — Updated 2026-02-25

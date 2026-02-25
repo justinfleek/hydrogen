@@ -110,11 +110,11 @@ data GradientType
 derive instance eqGradientType :: Eq GradientType
 
 instance showGradientType :: Show GradientType where
-  show (GradientLinear angle) = "linear(" <> show angle <> "deg)"
-  show GradientRadial = "radial"
-  show (GradientConic angle) = "conic(" <> show angle <> "deg)"
+  show (GradientLinear angle) = "(GradientLinear " <> show angle <> ")"
+  show GradientRadial = "GradientRadial"
+  show (GradientConic angle) = "(GradientConic " <> show angle <> ")"
   show (GradientConicAnimated start speed) = 
-    "conic-animated(" <> show start <> "deg, " <> show speed <> "deg/s)"
+    "(GradientConicAnimated " <> show start <> " " <> show speed <> ")"
 
 -- | Color stop for gradient stroke (position 0.0-1.0, color as hex string)
 -- | Note: Using string for color here to avoid circular dependency with Color module
@@ -135,7 +135,7 @@ derive instance eqGradientStroke :: Eq GradientStroke
 
 instance showGradientStroke :: Show GradientStroke where
   show (GradientStroke gs) = 
-    "GradientStroke(" <> show gs.gradientType <> ", width:" <> show gs.strokeWidth <> ")"
+    "(GradientStroke type:" <> show gs.gradientType <> " width:" <> show gs.strokeWidth <> ")"
 
 -- | Create gradient stroke with specified type and stops
 gradientStroke :: GradientType -> Array GradientColorStop -> Number -> GradientStroke
@@ -184,9 +184,9 @@ derive instance eqConicBorderConfig :: Eq ConicBorderConfig
 
 instance showConicBorderConfig :: Show ConicBorderConfig where
   show (ConicBorderConfig c) = 
-    "ConicBorder(width:" <> show c.borderWidth <> 
-    ", blur:" <> show c.blurRadius <> 
-    ", speed:" <> show c.rotationSpeed <> "deg/s)"
+    "(ConicBorderConfig width:" <> show c.borderWidth <> 
+    " blur:" <> show c.blurRadius <> 
+    " speed:" <> show c.rotationSpeed <> ")"
 
 -- | Create conic border with custom configuration
 conicBorder 
@@ -252,7 +252,7 @@ derive instance eqDashPattern :: Eq DashPattern
 
 instance showDashPattern :: Show DashPattern where
   show (DashPattern d) = 
-    "DashPattern(" <> show d.dashLength <> "/" <> show d.gapLength <> ")"
+    "(DashPattern dash:" <> show d.dashLength <> " gap:" <> show d.gapLength <> ")"
 
 -- | Create dash pattern
 dashPattern :: Number -> Number -> DashPattern
@@ -271,9 +271,9 @@ data DashDirection
 derive instance eqDashDirection :: Eq DashDirection
 
 instance showDashDirection :: Show DashDirection where
-  show DashForward = "forward"
-  show DashBackward = "backward"
-  show DashAlternate = "alternate"
+  show DashForward = "DashForward"
+  show DashBackward = "DashBackward"
+  show DashAlternate = "DashAlternate"
 
 -- | Animation configuration for dashes
 newtype DashAnimation = DashAnimation
@@ -286,7 +286,7 @@ derive instance eqDashAnimation :: Eq DashAnimation
 
 instance showDashAnimation :: Show DashAnimation where
   show (DashAnimation a) = 
-    "DashAnimation(" <> show a.speed <> "px/s, " <> show a.direction <> ")"
+    "(DashAnimation speed:" <> show a.speed <> " direction:" <> show a.direction <> ")"
 
 -- | Create dash animation
 dashAnimation :: Number -> DashDirection -> DashAnimation
@@ -308,7 +308,7 @@ derive instance eqAnimatedDash :: Eq AnimatedDash
 
 instance showAnimatedDash :: Show AnimatedDash where
   show (AnimatedDash ad) = 
-    "AnimatedDash(" <> show ad.pattern <> ", " <> show ad.animation <> ")"
+    "(AnimatedDash pattern:" <> show ad.pattern <> " animation:" <> show ad.animation <> ")"
 
 -- | Create animated dash
 animatedDash :: DashPattern -> DashAnimation -> Number -> String -> AnimatedDash
@@ -359,7 +359,7 @@ derive instance eqPulseConfig :: Eq PulseConfig
 
 instance showPulseConfig :: Show PulseConfig where
   show (PulseConfig p) = 
-    "PulseConfig(" <> show p.minWidth <> "-" <> show p.maxWidth <> ", " <> show p.period <> "ms)"
+    "(PulseConfig min:" <> show p.minWidth <> " max:" <> show p.maxWidth <> " period:" <> show p.period <> ")"
 
 -- | Create pulse config
 pulseConfig :: Number -> Number -> Number -> PulseConfig
@@ -380,7 +380,7 @@ newtype PulsingStroke = PulsingStroke
 derive instance eqPulsingStroke :: Eq PulsingStroke
 
 instance showPulsingStroke :: Show PulsingStroke where
-  show (PulsingStroke ps) = "PulsingStroke(" <> show ps.pulse <> ")"
+  show (PulsingStroke ps) = "(PulsingStroke pulse:" <> show ps.pulse <> ")"
 
 -- | Create pulsing stroke
 pulsingStroke :: PulseConfig -> String -> PulsingStroke
@@ -432,7 +432,7 @@ derive instance eqGlowConfig :: Eq GlowConfig
 
 instance showGlowConfig :: Show GlowConfig where
   show (GlowConfig g) = 
-    "GlowConfig(blur:" <> show g.blurRadius <> ", intensity:" <> show g.intensity <> ")"
+    "(GlowConfig blur:" <> show g.blurRadius <> " intensity:" <> show g.intensity <> ")"
 
 -- | Create glow config
 glowConfig :: Number -> Number -> String -> GlowConfig
@@ -455,7 +455,7 @@ newtype GlowingStroke = GlowingStroke
 derive instance eqGlowingStroke :: Eq GlowingStroke
 
 instance showGlowingStroke :: Show GlowingStroke where
-  show (GlowingStroke gs) = "GlowingStroke(" <> show gs.glow <> ")"
+  show (GlowingStroke gs) = "(GlowingStroke glow:" <> show gs.glow <> ")"
 
 -- | Create glowing stroke
 glowingStroke :: GlowConfig -> Number -> String -> GlowingStroke
@@ -511,12 +511,12 @@ data BorderEffect
 derive instance eqBorderEffect :: Eq BorderEffect
 
 instance showBorderEffect :: Show BorderEffect where
-  show (EffectGradient gs) = "Gradient(" <> show gs <> ")"
-  show (EffectConic cb) = "Conic(" <> show cb <> ")"
-  show (EffectDash ad) = "Dash(" <> show ad <> ")"
-  show (EffectPulse ps) = "Pulse(" <> show ps <> ")"
-  show (EffectGlow gs) = "Glow(" <> show gs <> ")"
-  show EffectNone = "None"
+  show (EffectGradient gs) = "(EffectGradient " <> show gs <> ")"
+  show (EffectConic cb) = "(EffectConic " <> show cb <> ")"
+  show (EffectDash ad) = "(EffectDash " <> show ad <> ")"
+  show (EffectPulse ps) = "(EffectPulse " <> show ps <> ")"
+  show (EffectGlow gs) = "(EffectGlow " <> show gs <> ")"
+  show EffectNone = "EffectNone"
 
 -- | Combined animated border configuration
 -- |
@@ -536,7 +536,7 @@ derive instance eqAnimatedBorder :: Eq AnimatedBorder
 
 instance showAnimatedBorder :: Show AnimatedBorder where
   show (AnimatedBorder ab) = 
-    "AnimatedBorder(" <> show ab.primary <> ")"
+    "(AnimatedBorder primary:" <> show ab.primary <> ")"
 
 -- | Create animated border with primary effect only
 animatedBorder :: BorderEffect -> AnimatedBorder

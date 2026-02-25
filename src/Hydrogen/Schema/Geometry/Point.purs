@@ -143,7 +143,7 @@ derive instance eqPoint2D :: Eq Point2D
 derive instance ordPoint2D :: Ord Point2D
 
 instance showPoint2D :: Show Point2D where
-  show (Point2D p) = "(" <> show p.x <> ", " <> show p.y <> ")"
+  show (Point2D p) = "(Point2D " <> show p.x <> " " <> show p.y <> ")"
 
 -- | Create a 2D point
 point2D :: Number -> Number -> Point2D
@@ -193,7 +193,7 @@ derive instance eqPoint3D :: Eq Point3D
 derive instance ordPoint3D :: Ord Point3D
 
 instance showPoint3D :: Show Point3D where
-  show (Point3D p) = "(" <> show p.x <> ", " <> show p.y <> ", " <> show p.z <> ")"
+  show (Point3D p) = "(Point3D " <> show p.x <> " " <> show p.y <> " " <> show p.z <> ")"
 
 -- | Create a 3D point
 point3D :: Number -> Number -> Number -> Point3D

@@ -166,7 +166,7 @@ derive instance eqVector2D :: Eq Vector2D
 derive instance ordVector2D :: Ord Vector2D
 
 instance showVector2D :: Show Vector2D where
-  show (Vector2D v) = "<" <> show v.x <> ", " <> show v.y <> ">"
+  show (Vector2D v) = "(Vector2D " <> show v.x <> " " <> show v.y <> ")"
 
 instance semiringVector2D :: Semiring Vector2D where
   add = addVec2
@@ -209,7 +209,7 @@ derive instance eqVector3D :: Eq Vector3D
 derive instance ordVector3D :: Ord Vector3D
 
 instance showVector3D :: Show Vector3D where
-  show (Vector3D v) = "<" <> show v.x <> ", " <> show v.y <> ", " <> show v.z <> ">"
+  show (Vector3D v) = "(Vector3D " <> show v.x <> " " <> show v.y <> " " <> show v.z <> ")"
 
 instance semiringVector3D :: Semiring Vector3D where
   add = addVec3

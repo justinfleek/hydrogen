@@ -9,6 +9,17 @@
 
 # THE UNIVERSAL DESIGN LANGUAGE
 
+## Key References
+
+Before diving in, familiarize yourself with these foundational documents:
+
+| Document | Purpose |
+|----------|---------|
+| **[SHOW_DEBUG_CONVENTION.md](./SHOW_DEBUG_CONVENTION.md)** | `Show` as structured debugging infrastructure, not pretty-printing |
+| **[SCHEMA.md](./SCHEMA.md)** | Complete 12-pillar Schema enumeration |
+| **[design-ontology.md](./design-ontology.md)** | Atom → Molecule → Compound architecture |
+| **[PROOFS.md](./PROOFS.md)** | Lean4 verification strategy |
+
 ## Purpose of This Document
 
 This document defines what it means for Hydrogen to be a **universal design

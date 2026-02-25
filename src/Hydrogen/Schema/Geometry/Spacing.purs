@@ -86,7 +86,7 @@ derive instance eqSpacingValue :: Eq SpacingValue
 derive instance ordSpacingValue :: Ord SpacingValue
 
 instance showSpacingValue :: Show SpacingValue where
-  show (SpacingValue n) = show n <> "px"
+  show (SpacingValue n) = "(SpacingValue " <> show n <> ")"
 
 -- | Create a spacing value, clamping to non-negative.
 spacingValue :: Number -> SpacingValue

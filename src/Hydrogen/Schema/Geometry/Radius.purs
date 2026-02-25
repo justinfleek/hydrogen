@@ -57,6 +57,14 @@ module Hydrogen.Schema.Geometry.Radius
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , show
+  , (==)
+  , (&&)
+  , (<>)
+  , (*)
+  )
 
 import Data.Int as Int
 
@@ -75,7 +83,12 @@ data Radius
 derive instance eqRadius :: Eq Radius
 
 instance showRadius :: Show Radius where
-  show = toLegacyCss
+  show = case _ of
+    RadiusPx n -> "(RadiusPx " <> show n <> ")"
+    RadiusPercent n -> "(RadiusPercent " <> show n <> ")"
+    RadiusRem n -> "(RadiusRem " <> show n <> ")"
+    RadiusFull -> "(RadiusFull)"
+    RadiusNone -> "(RadiusNone)"
 
 -- | Per-corner radius control
 type Corners =
