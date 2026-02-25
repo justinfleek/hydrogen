@@ -141,7 +141,16 @@ derive instance eqStrokeStyle :: Eq StrokeStyle
 derive instance ordStrokeStyle :: Ord StrokeStyle
 
 instance showStrokeStyle :: Show StrokeStyle where
-  show = strokeStyleToCss
+  show StyleNone = "(StrokeStyle None)"
+  show StyleHidden = "(StrokeStyle Hidden)"
+  show StyleDotted = "(StrokeStyle Dotted)"
+  show StyleDashed = "(StrokeStyle Dashed)"
+  show StyleSolid = "(StrokeStyle Solid)"
+  show StyleDouble = "(StrokeStyle Double)"
+  show StyleGroove = "(StrokeStyle Groove)"
+  show StyleRidge = "(StrokeStyle Ridge)"
+  show StyleInset = "(StrokeStyle Inset)"
+  show StyleOutset = "(StrokeStyle Outset)"
 
 -- | Convert stroke style to CSS string
 strokeStyleToCss :: StrokeStyle -> String
@@ -210,7 +219,9 @@ derive instance eqLineCap :: Eq LineCap
 derive instance ordLineCap :: Ord LineCap
 
 instance showLineCap :: Show LineCap where
-  show = lineCapToCss
+  show CapButt = "(LineCap Butt)"
+  show CapRound = "(LineCap Round)"
+  show CapSquare = "(LineCap Square)"
 
 -- | Convert line cap to CSS/SVG string
 lineCapToCss :: LineCap -> String
@@ -254,7 +265,9 @@ derive instance eqLineJoin :: Eq LineJoin
 derive instance ordLineJoin :: Ord LineJoin
 
 instance showLineJoin :: Show LineJoin where
-  show = lineJoinToCss
+  show JoinMiter = "(LineJoin Miter)"
+  show JoinRound = "(LineJoin Round)"
+  show JoinBevel = "(LineJoin Bevel)"
 
 -- | Convert line join to CSS/SVG string
 lineJoinToCss :: LineJoin -> String
@@ -301,7 +314,7 @@ derive instance eqMiterLimit :: Eq MiterLimit
 derive instance ordMiterLimit :: Ord MiterLimit
 
 instance showMiterLimit :: Show MiterLimit where
-  show (MiterLimit n) = "MiterLimit " <> show n
+  show (MiterLimit n) = "(MiterLimit " <> show n <> ")"
 
 -- | Miter limit bounds documentation
 miterLimitBounds :: NumberBounds

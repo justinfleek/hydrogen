@@ -116,12 +116,12 @@ derive instance eqFrustum :: Eq Frustum
 
 instance showFrustum :: Show Frustum where
   show (Frustum left right top bottom near far) =
-    "Frustum(left: " <> show left <> 
-    ", right: " <> show right <>
-    ", top: " <> show top <>
-    ", bottom: " <> show bottom <>
-    ", near: " <> show near <>
-    ", far: " <> show far <> ")"
+    "(Frustum left:" <> show left <> 
+    " right:" <> show right <>
+    " top:" <> show top <>
+    " bottom:" <> show bottom <>
+    " near:" <> show near <>
+    " far:" <> show far <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // constructors

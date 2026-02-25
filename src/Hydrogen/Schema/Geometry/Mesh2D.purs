@@ -208,9 +208,9 @@ newtype Mesh2D = Mesh2D
 derive instance eqMesh2D :: Eq Mesh2D
 
 instance showMesh2D :: Show Mesh2D where
-  show (Mesh2D m) = "Mesh2D { vertices: " <> show (length m.vertices)
-    <> ", triangles: " <> show (length m.triangles)
-    <> ", bounds: " <> show m.bounds <> " }"
+  show (Mesh2D m) = "(Mesh2D vertices:" <> show (length m.vertices)
+    <> " triangles:" <> show (length m.triangles)
+    <> " bounds:" <> show m.bounds <> ")"
 
 -- | Empty mesh with no vertices or triangles.
 emptyMesh2D :: Mesh2D

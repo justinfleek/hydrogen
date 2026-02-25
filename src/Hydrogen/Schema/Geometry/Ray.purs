@@ -120,7 +120,7 @@ derive instance eqRay :: Eq Ray
 
 instance showRay :: Show Ray where
   show (Ray origin direction) =
-    "Ray(origin: " <> show origin <> ", direction: " <> show direction <> ")"
+    "(Ray origin:" <> show origin <> " direction:" <> show direction <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // constructors

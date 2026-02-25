@@ -35,10 +35,10 @@ module Hydrogen.Schema.Geometry.Shape
   , WindingRule(..)
   , ArcParams
   
-  -- * Point Types
-  , Point2D
-  , point2D
-  , origin
+  -- * Pixel Point Types (distinct from Geometry.Point)
+  , PixelPoint2D
+  , pixelPoint2D
+  , pixelOrigin
   
   -- * Anchor Points (for Bezier)
   , AnchorPoint
@@ -148,20 +148,26 @@ import Hydrogen.Schema.Dimension.Device (Pixel(Pixel))
 import Hydrogen.Schema.Geometry.Radius (Corners) as Radius
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // point2d
+--                                                              // pixel point 2d
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | A 2D point in pixel space.
--- | Represents coordinates for shape vertices and control points.
-type Point2D = { x :: Pixel, y :: Pixel }
+-- | A 2D point in pixel space with explicit Pixel units.
+-- |
+-- | This is distinct from Geometry.Point.Point2D which uses unbounded Numbers.
+-- | PixelPoint2D is used for shape vertices and control points where we need
+-- | type-safe unit tracking.
+-- |
+-- | For generic coordinate operations, use Geometry.Point.Point2D.
+-- | For shape definitions with pixel measurements, use PixelPoint2D.
+type PixelPoint2D = { x :: Pixel, y :: Pixel }
 
--- | Smart constructor for Point2D
-point2D :: Pixel -> Pixel -> Point2D
-point2D x y = { x, y }
+-- | Smart constructor for PixelPoint2D
+pixelPoint2D :: Pixel -> Pixel -> PixelPoint2D
+pixelPoint2D x y = { x, y }
 
--- | The origin point (0, 0)
-origin :: Point2D
-origin = { x: Pixel 0.0, y: Pixel 0.0 }
+-- | The pixel origin point (0, 0)
+pixelOrigin :: PixelPoint2D
+pixelOrigin = { x: Pixel 0.0, y: Pixel 0.0 }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // anchor point
@@ -178,40 +184,40 @@ derive instance eqAnchorType :: Eq AnchorType
 derive instance ordAnchorType :: Ord AnchorType
 
 instance showAnchorType :: Show AnchorType where
-  show AnchorSmooth = "smooth"
-  show AnchorCorner = "corner"
-  show AnchorSymmetric = "symmetric"
+  show AnchorSmooth = "(AnchorType Smooth)"
+  show AnchorCorner = "(AnchorType Corner)"
+  show AnchorSymmetric = "(AnchorType Symmetric)"
 
 -- | A bezier anchor point with position and control handles.
 -- | Control handles are relative to the anchor position.
 type AnchorPoint =
-  { position :: Point2D
-  , handleIn :: Point2D    -- ^ Incoming control handle (relative)
-  , handleOut :: Point2D   -- ^ Outgoing control handle (relative)
+  { position :: PixelPoint2D
+  , handleIn :: PixelPoint2D    -- ^ Incoming control handle (relative)
+  , handleOut :: PixelPoint2D   -- ^ Outgoing control handle (relative)
   , anchorType :: AnchorType
   }
 
 -- | Create an anchor point with explicit handles
-anchorPoint :: Point2D -> Point2D -> Point2D -> AnchorType -> AnchorPoint
+anchorPoint :: PixelPoint2D -> PixelPoint2D -> PixelPoint2D -> AnchorType -> AnchorPoint
 anchorPoint position handleIn handleOut anchorType =
   { position, handleIn, handleOut, anchorType }
 
 -- | Create a smooth anchor with colinear handles
-smoothAnchor :: Point2D -> Point2D -> Point2D -> AnchorPoint
+smoothAnchor :: PixelPoint2D -> PixelPoint2D -> PixelPoint2D -> AnchorPoint
 smoothAnchor position handleIn handleOut =
   anchorPoint position handleIn handleOut AnchorSmooth
 
 -- | Create a corner anchor (sharp, independent handles)
-cornerAnchor :: Point2D -> AnchorPoint
+cornerAnchor :: PixelPoint2D -> AnchorPoint
 cornerAnchor position =
-  anchorPoint position origin origin AnchorCorner
+  anchorPoint position pixelOrigin pixelOrigin AnchorCorner
 
 -- | Create a symmetric anchor (handles mirror each other)
-symmetricAnchor :: Point2D -> Point2D -> AnchorPoint
+symmetricAnchor :: PixelPoint2D -> PixelPoint2D -> AnchorPoint
 symmetricAnchor position handle =
   anchorPoint position (negatePoint handle) handle AnchorSymmetric
   where
-    negatePoint :: Point2D -> Point2D
+    negatePoint :: PixelPoint2D -> PixelPoint2D
     negatePoint { x: Pixel px, y: Pixel py } = 
       { x: Pixel (negate px), y: Pixel (negate py) }
 
@@ -229,32 +235,32 @@ derive instance eqWindingRule :: Eq WindingRule
 derive instance ordWindingRule :: Ord WindingRule
 
 instance showWindingRule :: Show WindingRule where
-  show WindingNonZero = "nonzero"
-  show WindingEvenOdd = "evenodd"
+  show WindingNonZero = "(WindingRule NonZero)"
+  show WindingEvenOdd = "(WindingRule EvenOdd)"
 
 -- | Path commands following SVG path semantics.
 -- | These are the atomic operations for constructing paths.
 data PathCommand
-  = MoveTo Point2D              -- ^ Move to point (starts new subpath)
-  | LineTo Point2D              -- ^ Draw line to point
-  | HorizontalTo Pixel          -- ^ Draw horizontal line to X
-  | VerticalTo Pixel            -- ^ Draw vertical line to Y
-  | CubicTo Point2D Point2D Point2D  -- ^ Cubic bezier (c1, c2, end)
-  | QuadraticTo Point2D Point2D      -- ^ Quadratic bezier (control, end)
-  | ArcTo ArcParams Point2D          -- ^ Elliptical arc to point
-  | ClosePath                        -- ^ Close current subpath
+  = MoveTo PixelPoint2D              -- ^ Move to point (starts new subpath)
+  | LineTo PixelPoint2D              -- ^ Draw line to point
+  | HorizontalTo Pixel               -- ^ Draw horizontal line to X
+  | VerticalTo Pixel                 -- ^ Draw vertical line to Y
+  | CubicTo PixelPoint2D PixelPoint2D PixelPoint2D  -- ^ Cubic bezier (c1, c2, end)
+  | QuadraticTo PixelPoint2D PixelPoint2D           -- ^ Quadratic bezier (control, end)
+  | ArcTo ArcParams PixelPoint2D                    -- ^ Elliptical arc to point
+  | ClosePath                                       -- ^ Close current subpath
 
 derive instance eqPathCommand :: Eq PathCommand
 
 instance showPathCommand :: Show PathCommand where
-  show (MoveTo _) = "M"
-  show (LineTo _) = "L"
-  show (HorizontalTo _) = "H"
-  show (VerticalTo _) = "V"
-  show (CubicTo _ _ _) = "C"
-  show (QuadraticTo _ _) = "Q"
-  show (ArcTo _ _) = "A"
-  show ClosePath = "Z"
+  show (MoveTo p) = "(PathCommand MoveTo " <> show p <> ")"
+  show (LineTo p) = "(PathCommand LineTo " <> show p <> ")"
+  show (HorizontalTo x) = "(PathCommand HorizontalTo " <> show x <> ")"
+  show (VerticalTo y) = "(PathCommand VerticalTo " <> show y <> ")"
+  show (CubicTo c1 c2 end) = "(PathCommand CubicTo " <> show c1 <> " " <> show c2 <> " " <> show end <> ")"
+  show (QuadraticTo c end) = "(PathCommand QuadraticTo " <> show c <> " " <> show end <> ")"
+  show (ArcTo _ end) = "(PathCommand ArcTo " <> show end <> ")"
+  show ClosePath = "(PathCommand ClosePath)"
 
 -- | Parameters for elliptical arc commands
 type ArcParams =
@@ -288,17 +294,17 @@ derive instance eqShapePrimitive :: Eq ShapePrimitive
 derive instance ordShapePrimitive :: Ord ShapePrimitive
 
 instance showShapePrimitive :: Show ShapePrimitive where
-  show PrimitiveRectangle = "rectangle"
-  show PrimitiveEllipse = "ellipse"
-  show PrimitiveLine = "line"
-  show PrimitivePolygon = "polygon"
-  show PrimitiveStar = "star"
-  show PrimitiveRing = "ring"
-  show PrimitiveSpiral = "spiral"
-  show PrimitiveArrow = "arrow"
-  show PrimitiveCross = "cross"
-  show PrimitiveGear = "gear"
-  show PrimitivePath = "path"
+  show PrimitiveRectangle = "(ShapePrimitive Rectangle)"
+  show PrimitiveEllipse = "(ShapePrimitive Ellipse)"
+  show PrimitiveLine = "(ShapePrimitive Line)"
+  show PrimitivePolygon = "(ShapePrimitive Polygon)"
+  show PrimitiveStar = "(ShapePrimitive Star)"
+  show PrimitiveRing = "(ShapePrimitive Ring)"
+  show PrimitiveSpiral = "(ShapePrimitive Spiral)"
+  show PrimitiveArrow = "(ShapePrimitive Arrow)"
+  show PrimitiveCross = "(ShapePrimitive Cross)"
+  show PrimitiveGear = "(ShapePrimitive Gear)"
+  show PrimitivePath = "(ShapePrimitive Path)"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // rectangle
@@ -306,19 +312,19 @@ instance showShapePrimitive :: Show ShapePrimitive where
 
 -- | Rectangle shape with position, dimensions, and optional corner radii.
 type RectangleShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , width :: Pixel
   , height :: Pixel
   , corners :: Radius.Corners
   }
 
 -- | Create a rectangle shape
-rectangleShape :: Point2D -> Pixel -> Pixel -> Radius.Corners -> RectangleShape
+rectangleShape :: PixelPoint2D -> Pixel -> Pixel -> Radius.Corners -> RectangleShape
 rectangleShape center width height corners =
   { center, width, height, corners }
 
 -- | Create a square shape (equal width and height)
-squareShape :: Point2D -> Pixel -> Radius.Corners -> RectangleShape
+squareShape :: PixelPoint2D -> Pixel -> Radius.Corners -> RectangleShape
 squareShape center size corners =
   rectangleShape center size size corners
 
@@ -329,18 +335,18 @@ squareShape center size corners =
 -- | Ellipse shape with center and radii.
 -- | When radiusX == radiusY, this is a circle.
 type EllipseShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , radiusX :: Pixel
   , radiusY :: Pixel
   }
 
 -- | Create an ellipse shape
-ellipseShape :: Point2D -> Pixel -> Pixel -> EllipseShape
+ellipseShape :: PixelPoint2D -> Pixel -> Pixel -> EllipseShape
 ellipseShape center radiusX radiusY =
   { center, radiusX, radiusY }
 
 -- | Create a circle shape (equal radii)
-circleShape :: Point2D -> Pixel -> EllipseShape
+circleShape :: PixelPoint2D -> Pixel -> EllipseShape
 circleShape center radius =
   ellipseShape center radius radius
 
@@ -350,12 +356,12 @@ circleShape center radius =
 
 -- | Line segment from start to end point.
 type LineShape =
-  { start :: Point2D
-  , end :: Point2D
+  { start :: PixelPoint2D
+  , end :: PixelPoint2D
   }
 
 -- | Create a line shape
-lineShape :: Point2D -> Point2D -> LineShape
+lineShape :: PixelPoint2D -> PixelPoint2D -> LineShape
 lineShape start end = { start, end }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -364,29 +370,29 @@ lineShape start end = { start, end }
 
 -- | Regular polygon with N sides inscribed in a circle.
 type PolygonShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , radius :: Pixel        -- ^ Distance from center to vertices
   , sides :: Int           -- ^ Number of sides (minimum 3)
   , rotation :: Number     -- ^ Rotation in degrees
   }
 
 -- | Create a polygon shape
-polygonShape :: Point2D -> Pixel -> Int -> Number -> PolygonShape
+polygonShape :: PixelPoint2D -> Pixel -> Int -> Number -> PolygonShape
 polygonShape center radius sides rotation =
   { center, radius, sides: max 3 sides, rotation }
   where
     max a b = if a > b then a else b
 
 -- | Create an equilateral triangle
-triangleShape :: Point2D -> Pixel -> PolygonShape
+triangleShape :: PixelPoint2D -> Pixel -> PolygonShape
 triangleShape center radius = polygonShape center radius 3 0.0
 
 -- | Create a regular pentagon
-pentagonShape :: Point2D -> Pixel -> PolygonShape
+pentagonShape :: PixelPoint2D -> Pixel -> PolygonShape
 pentagonShape center radius = polygonShape center radius 5 0.0
 
 -- | Create a regular hexagon
-hexagonShape :: Point2D -> Pixel -> PolygonShape
+hexagonShape :: PixelPoint2D -> Pixel -> PolygonShape
 hexagonShape center radius = polygonShape center radius 6 0.0
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -395,7 +401,7 @@ hexagonShape center radius = polygonShape center radius 6 0.0
 
 -- | Star shape with configurable points and inner/outer radii.
 type StarShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , outerRadius :: Pixel    -- ^ Distance to star points
   , innerRadius :: Pixel    -- ^ Distance to inner vertices
   , points :: Int           -- ^ Number of points (minimum 3)
@@ -403,7 +409,7 @@ type StarShape =
   }
 
 -- | Create a star shape
-starShape :: Point2D -> Pixel -> Pixel -> Int -> Number -> StarShape
+starShape :: PixelPoint2D -> Pixel -> Pixel -> Int -> Number -> StarShape
 starShape center outerRadius innerRadius points rotation =
   { center
   , outerRadius
@@ -420,13 +426,13 @@ starShape center outerRadius innerRadius points rotation =
 
 -- | Ring (donut) shape with inner and outer radii.
 type RingShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , outerRadius :: Pixel    -- ^ Outer circle radius
   , innerRadius :: Pixel    -- ^ Inner hole radius
   }
 
 -- | Create a ring shape
-ringShape :: Point2D -> Pixel -> Pixel -> RingShape
+ringShape :: PixelPoint2D -> Pixel -> Pixel -> RingShape
 ringShape center outerRadius innerRadius =
   { center, outerRadius, innerRadius }
 
@@ -443,12 +449,12 @@ derive instance eqSpiralDirection :: Eq SpiralDirection
 derive instance ordSpiralDirection :: Ord SpiralDirection
 
 instance showSpiralDirection :: Show SpiralDirection where
-  show SpiralClockwise = "clockwise"
-  show SpiralCounterclockwise = "counterclockwise"
+  show SpiralClockwise = "(SpiralDirection Clockwise)"
+  show SpiralCounterclockwise = "(SpiralDirection Counterclockwise)"
 
 -- | Spiral shape (Archimedean spiral)
 type SpiralShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , startRadius :: Pixel    -- ^ Starting radius
   , endRadius :: Pixel      -- ^ Ending radius
   , turns :: Number         -- ^ Number of full rotations
@@ -456,7 +462,7 @@ type SpiralShape =
   }
 
 -- | Create a spiral shape
-spiralShape :: Point2D -> Pixel -> Pixel -> Number -> SpiralDirection -> SpiralShape
+spiralShape :: PixelPoint2D -> Pixel -> Pixel -> Number -> SpiralDirection -> SpiralShape
 spiralShape center startRadius endRadius turns direction =
   { center, startRadius, endRadius, turns, direction }
 
@@ -477,17 +483,17 @@ derive instance eqArrowHeadStyle :: Eq ArrowHeadStyle
 derive instance ordArrowHeadStyle :: Ord ArrowHeadStyle
 
 instance showArrowHeadStyle :: Show ArrowHeadStyle where
-  show ArrowTriangle = "triangle"
-  show ArrowStealth = "stealth"
-  show ArrowDiamond = "diamond"
-  show ArrowCircle = "circle"
-  show ArrowSquare = "square"
-  show ArrowNone = "none"
+  show ArrowTriangle = "(ArrowHeadStyle Triangle)"
+  show ArrowStealth = "(ArrowHeadStyle Stealth)"
+  show ArrowDiamond = "(ArrowHeadStyle Diamond)"
+  show ArrowCircle = "(ArrowHeadStyle Circle)"
+  show ArrowSquare = "(ArrowHeadStyle Square)"
+  show ArrowNone = "(ArrowHeadStyle None)"
 
 -- | Arrow shape with configurable head and tail styles
 type ArrowShape =
-  { start :: Point2D
-  , end :: Point2D
+  { start :: PixelPoint2D
+  , end :: PixelPoint2D
   , headStyle :: ArrowHeadStyle
   , tailStyle :: ArrowHeadStyle
   , headSize :: Pixel       -- ^ Size of arrow head
@@ -495,7 +501,7 @@ type ArrowShape =
   }
 
 -- | Create an arrow shape
-arrowShape :: Point2D -> Point2D -> ArrowHeadStyle -> Pixel -> Pixel -> ArrowShape
+arrowShape :: PixelPoint2D -> PixelPoint2D -> ArrowHeadStyle -> Pixel -> Pixel -> ArrowShape
 arrowShape start end headStyle headSize shaftWidth =
   { start
   , end
@@ -511,14 +517,14 @@ arrowShape start end headStyle headSize shaftWidth =
 
 -- | Cross/plus shape
 type CrossShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , armLength :: Pixel      -- ^ Length of each arm from center
   , armWidth :: Pixel       -- ^ Width/thickness of arms
   , rotation :: Number      -- ^ Rotation in degrees (0 = plus, 45 = X)
   }
 
 -- | Create a cross shape
-crossShape :: Point2D -> Pixel -> Pixel -> Number -> CrossShape
+crossShape :: PixelPoint2D -> Pixel -> Pixel -> Number -> CrossShape
 crossShape center armLength armWidth rotation =
   { center, armLength, armWidth, rotation }
 
@@ -528,7 +534,7 @@ crossShape center armLength armWidth rotation =
 
 -- | Gear/cog shape
 type GearShape =
-  { center :: Point2D
+  { center :: PixelPoint2D
   , outerRadius :: Pixel    -- ^ Radius to tooth tips
   , innerRadius :: Pixel    -- ^ Radius to tooth valleys
   , holeRadius :: Pixel     -- ^ Center hole radius
@@ -537,7 +543,7 @@ type GearShape =
   }
 
 -- | Create a gear shape
-gearShape :: Point2D -> Pixel -> Pixel -> Pixel -> Int -> Number -> GearShape
+gearShape :: PixelPoint2D -> Pixel -> Pixel -> Pixel -> Int -> Number -> GearShape
 gearShape center outerRadius innerRadius holeRadius teeth toothWidth =
   { center
   , outerRadius
@@ -601,11 +607,11 @@ derive instance eqBooleanOp :: Eq BooleanOp
 derive instance ordBooleanOp :: Ord BooleanOp
 
 instance showBooleanOp :: Show BooleanOp where
-  show BoolUnion = "union"
-  show BoolSubtract = "subtract"
-  show BoolIntersect = "intersect"
-  show BoolExclude = "exclude"
-  show BoolDivide = "divide"
+  show BoolUnion = "(BooleanOp Union)"
+  show BoolSubtract = "(BooleanOp Subtract)"
+  show BoolIntersect = "(BooleanOp Intersect)"
+  show BoolExclude = "(BooleanOp Exclude)"
+  show BoolDivide = "(BooleanOp Divide)"
 
 -- | Compound shape from boolean operations
 type CompoundShape =
@@ -695,15 +701,15 @@ data Shape
 derive instance eqShape :: Eq Shape
 
 instance showShape :: Show Shape where
-  show (ShapeRectangle _) = "Rectangle"
-  show (ShapeEllipse _) = "Ellipse"
-  show (ShapeLine _) = "Line"
-  show (ShapePolygon _) = "Polygon"
-  show (ShapeStar _) = "Star"
-  show (ShapeRing _) = "Ring"
-  show (ShapeSpiral _) = "Spiral"
-  show (ShapeArrow _) = "Arrow"
-  show (ShapeCross _) = "Cross"
-  show (ShapeGear _) = "Gear"
-  show (ShapePath _) = "Path"
-  show (ShapeCompound _) = "Compound"
+  show (ShapeRectangle _) = "(Shape Rectangle)"
+  show (ShapeEllipse _) = "(Shape Ellipse)"
+  show (ShapeLine _) = "(Shape Line)"
+  show (ShapePolygon _) = "(Shape Polygon)"
+  show (ShapeStar _) = "(Shape Star)"
+  show (ShapeRing _) = "(Shape Ring)"
+  show (ShapeSpiral _) = "(Shape Spiral)"
+  show (ShapeArrow _) = "(Shape Arrow)"
+  show (ShapeCross _) = "(Shape Cross)"
+  show (ShapeGear _) = "(Shape Gear)"
+  show (ShapePath _) = "(Shape Path)"
+  show (ShapeCompound _) = "(Shape Compound)"

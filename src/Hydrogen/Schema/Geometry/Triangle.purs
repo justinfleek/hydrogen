@@ -123,7 +123,7 @@ derive instance eqBarycentric :: Eq Barycentric
 
 instance showBarycentric :: Show Barycentric where
   show (Barycentric u v w) =
-    "Barycentric(" <> show u <> ", " <> show v <> ", " <> show w <> ")"
+    "(Barycentric " <> show u <> " " <> show v <> " " <> show w <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // triangle type
@@ -142,7 +142,7 @@ derive instance eqTriangle :: Eq Triangle
 
 instance showTriangle :: Show Triangle where
   show (Triangle a b c) =
-    "Triangle(a: " <> show a <> ", b: " <> show b <> ", c: " <> show c <> ")"
+    "(Triangle a:" <> show a <> " b:" <> show b <> " c:" <> show c <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // triangle constructors

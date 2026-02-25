@@ -150,10 +150,7 @@ derive instance eqScale :: Eq Scale
 derive instance ordScale :: Ord Scale
 
 instance showScale :: Show Scale where
-  show (Scale s) = 
-    if s.x == s.y 
-      then "scale(" <> show s.x <> ")"
-      else "scale(" <> show s.x <> ", " <> show s.y <> ")"
+  show (Scale s) = "(Scale " <> show s.x <> " " <> show s.y <> ")"
 
 -- | Clamp scale value to valid range (-10.0 to 10.0).
 clampScale :: Number -> Number
@@ -263,7 +260,7 @@ derive instance eqTranslate :: Eq Translate
 derive instance ordTranslate :: Ord Translate
 
 instance showTranslate :: Show Translate where
-  show (Translate t) = "translate(" <> show t.x <> "px, " <> show t.y <> "px)"
+  show (Translate t) = "(Translate " <> show t.x <> " " <> show t.y <> ")"
 
 -- | Create translation
 translate :: Number -> Number -> Translate
@@ -316,7 +313,7 @@ derive instance eqRotate :: Eq Rotate
 derive instance ordRotate :: Ord Rotate
 
 instance showRotate :: Show Rotate where
-  show (Rotate r) = "rotate(" <> show r.angle <> ")"
+  show (Rotate r) = "(Rotate " <> show r.angle <> ")"
 
 -- | Create rotation from degrees
 rotate :: Degrees -> Rotate
@@ -366,7 +363,7 @@ derive instance eqSkew :: Eq Skew
 derive instance ordSkew :: Ord Skew
 
 instance showSkew :: Show Skew where
-  show (Skew s) = "skew(" <> show s.x <> "deg, " <> show s.y <> "deg)"
+  show (Skew s) = "(Skew " <> show s.x <> " " <> show s.y <> ")"
 
 -- | Clamp skew to safe range
 clampSkew :: Number -> Number
@@ -420,7 +417,7 @@ derive instance eqOrigin :: Eq Origin
 derive instance ordOrigin :: Ord Origin
 
 instance showOrigin :: Show Origin where
-  show (Origin o) = show o.x <> "% " <> show o.y <> "%"
+  show (Origin o) = "(Origin " <> show o.x <> " " <> show o.y <> ")"
 
 -- | Create origin from percentages
 origin :: Number -> Number -> Origin
@@ -493,7 +490,13 @@ newtype Transform2D = Transform2D
 derive instance eqTransform2D :: Eq Transform2D
 
 instance showTransform2D :: Show Transform2D where
-  show t = transform2DToLegacyCss t
+  show (Transform2D t) = "(Transform2D"
+    <> " translate:" <> show t.translate
+    <> " rotate:" <> show t.rotate
+    <> " scale:" <> show t.scale
+    <> " skew:" <> show t.skew
+    <> " origin:" <> show t.origin
+    <> ")"
 
 -- | Create a transform with all components
 transform2D 

@@ -80,8 +80,8 @@ newtype Bounds2D = Bounds2D
 derive instance eqBounds2D :: Eq Bounds2D
 
 instance showBounds2D :: Show Bounds2D where
-  show (Bounds2D b) = "Bounds2D { min: (" <> show b.minX <> ", " <> show b.minY
-    <> "), max: (" <> show b.maxX <> ", " <> show b.maxY <> ") }"
+  show (Bounds2D b) = "(Bounds2D minX:" <> show b.minX <> " minY:" <> show b.minY
+    <> " maxX:" <> show b.maxX <> " maxY:" <> show b.maxY <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // construction

@@ -114,10 +114,10 @@ derive instance eqEdge :: Eq Edge
 derive instance ordEdge :: Ord Edge
 
 instance showEdge :: Show Edge where
-  show Top = "top"
-  show Bottom = "bottom"
-  show Left = "left"
-  show Right = "right"
+  show Top = "(Edge Top)"
+  show Bottom = "(Edge Bottom)"
+  show Left = "(Edge Left)"
+  show Right = "(Edge Right)"
 
 -- | Is this a vertical edge (top or bottom)?
 isVerticalEdge :: Edge -> Boolean
@@ -163,10 +163,10 @@ derive instance eqLogicalEdge :: Eq LogicalEdge
 derive instance ordLogicalEdge :: Ord LogicalEdge
 
 instance showLogicalEdge :: Show LogicalEdge where
-  show Start = "start"
-  show End = "end"
-  show BlockStart = "block-start"
-  show BlockEnd = "block-end"
+  show Start = "(LogicalEdge Start)"
+  show End = "(LogicalEdge End)"
+  show BlockStart = "(LogicalEdge BlockStart)"
+  show BlockEnd = "(LogicalEdge BlockEnd)"
 
 -- | Resolve logical edge to physical edge
 -- |
@@ -198,10 +198,10 @@ derive instance eqCorner :: Eq Corner
 derive instance ordCorner :: Ord Corner
 
 instance showCorner :: Show Corner where
-  show TopLeft = "top-left"
-  show TopRight = "top-right"
-  show BottomLeft = "bottom-left"
-  show BottomRight = "bottom-right"
+  show TopLeft = "(Corner TopLeft)"
+  show TopRight = "(Corner TopRight)"
+  show BottomLeft = "(Corner BottomLeft)"
+  show BottomRight = "(Corner BottomRight)"
 
 -- | Get the two edges that form this corner
 cornerEdges :: Corner -> { horizontal :: Edge, vertical :: Edge }
@@ -244,8 +244,8 @@ derive instance eqAxis :: Eq Axis
 derive instance ordAxis :: Ord Axis
 
 instance showAxis :: Show Axis where
-  show Horizontal = "horizontal"
-  show Vertical = "vertical"
+  show Horizontal = "(Axis Horizontal)"
+  show Vertical = "(Axis Vertical)"
 
 -- | Is horizontal axis?
 isHorizontal :: Axis -> Boolean
@@ -281,11 +281,11 @@ derive instance eqAlignment :: Eq Alignment
 derive instance ordAlignment :: Ord Alignment
 
 instance showAlignment :: Show Alignment where
-  show AlignStart = "start"
-  show AlignCenter = "center"
-  show AlignEnd = "end"
-  show AlignStretch = "stretch"
-  show AlignBaseline = "baseline"
+  show AlignStart = "(Alignment Start)"
+  show AlignCenter = "(Alignment Center)"
+  show AlignEnd = "(Alignment End)"
+  show AlignStretch = "(Alignment Stretch)"
+  show AlignBaseline = "(Alignment Baseline)"
 
 -- | Is stretch alignment?
 isStretch :: Alignment -> Boolean
@@ -401,6 +401,6 @@ derive instance eqAnchorReference :: Eq AnchorReference
 derive instance ordAnchorReference :: Ord AnchorReference
 
 instance showAnchorReference :: Show AnchorReference where
-  show AnchorViewport = "viewport"
-  show AnchorParent = "parent"
-  show AnchorElement = "element"
+  show AnchorViewport = "(AnchorReference Viewport)"
+  show AnchorParent = "(AnchorReference Parent)"
+  show AnchorElement = "(AnchorReference Element)"

@@ -143,8 +143,7 @@ derive instance eqTranslate3D :: Eq Translate3D
 derive instance ordTranslate3D :: Ord Translate3D
 
 instance showTranslate3D :: Show Translate3D where
-  show (Translate3D t) = 
-    "translate3d(" <> show t.x <> "px, " <> show t.y <> "px, " <> show t.z <> "px)"
+  show (Translate3D t) = "(Translate3D " <> show t.x <> " " <> show t.y <> " " <> show t.z <> ")"
 
 -- | Create 3D translation
 translate3D :: Number -> Number -> Number -> Translate3D
@@ -202,8 +201,7 @@ derive instance eqRotate3D :: Eq Rotate3D
 derive instance ordRotate3D :: Ord Rotate3D
 
 instance showRotate3D :: Show Rotate3D where
-  show (Rotate3D r) =
-    "rotateX(" <> show r.x <> ") rotateY(" <> show r.y <> ") rotateZ(" <> show r.z <> ")"
+  show (Rotate3D r) = "(Rotate3D x:" <> show r.x <> " y:" <> show r.y <> " z:" <> show r.z <> ")"
 
 -- | Rotate only around X axis
 rotateX3D :: Degrees -> Rotate3D
@@ -271,8 +269,7 @@ derive instance eqScale3D :: Eq Scale3D
 derive instance ordScale3D :: Ord Scale3D
 
 instance showScale3D :: Show Scale3D where
-  show (Scale3D s) =
-    "scale3d(" <> show s.x <> ", " <> show s.y <> ", " <> show s.z <> ")"
+  show (Scale3D s) = "(Scale3D " <> show s.x <> " " <> show s.y <> " " <> show s.z <> ")"
 
 -- | Clamp scale to valid range (-10.0 to 10.0)
 clampScale :: Number -> Number
@@ -352,7 +349,7 @@ derive instance eqPerspective :: Eq Perspective
 derive instance ordPerspective :: Ord Perspective
 
 instance showPerspective :: Show Perspective where
-  show (Perspective p) = "perspective(" <> show p <> "px)"
+  show (Perspective p) = "(Perspective " <> show p <> ")"
 
 -- | Create perspective.
 -- | Values are clamped to 1.0-10000.0 to avoid division issues and
@@ -398,7 +395,7 @@ derive instance eqPerspectiveOrigin :: Eq PerspectiveOrigin
 derive instance ordPerspectiveOrigin :: Ord PerspectiveOrigin
 
 instance showPerspectiveOrigin :: Show PerspectiveOrigin where
-  show (PerspectiveOrigin o) = show o.x <> "% " <> show o.y <> "%"
+  show (PerspectiveOrigin o) = "(PerspectiveOrigin " <> show o.x <> " " <> show o.y <> ")"
 
 -- | Create perspective origin from percentages
 perspectiveOrigin :: Number -> Number -> PerspectiveOrigin
@@ -437,7 +434,13 @@ newtype Transform3D = Transform3D
 derive instance eqTransform3D :: Eq Transform3D
 
 instance showTransform3D :: Show Transform3D where
-  show t = transform3DToLegacyCss t
+  show (Transform3D t) = "(Transform3D"
+    <> " translate:" <> show t.translate
+    <> " rotate:" <> show t.rotate
+    <> " scale:" <> show t.scale
+    <> " perspective:" <> show t.perspective
+    <> " perspectiveOrigin:" <> show t.perspectiveOrigin
+    <> ")"
 
 -- | Create a 3D transform with all components
 transform3D
