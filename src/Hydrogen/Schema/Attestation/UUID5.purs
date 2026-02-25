@@ -57,6 +57,16 @@ module Hydrogen.Schema.Attestation.UUID5
   , nsMaterial
   , nsLight
   , nsCamera
+  -- * GPU/Render Namespaces
+  , nsRenderEffect
+  , nsComputeKernel
+  , nsFrameState
+  , nsAnimationState
+  , nsSpringState
+  , nsEffectPass
+  , nsBlurKernel
+  , nsGlowKernel
+  , nsParticleKernel
   ) where
 
 import Prelude
@@ -289,6 +299,106 @@ nsCamera :: UUID5
 nsCamera = UUID5
   [ 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x68
   , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // gpu/render namespaces
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Namespace for Hydrogen RenderEffect UUIDs
+-- |
+-- | RenderEffects with identical parameters get identical UUIDs.
+-- | Same blur radius, glow color, etc. → same UUID at billion-agent scale.
+-- | Derived from: uuid5(nil, "hydrogen.rendereffect")
+nsRenderEffect :: UUID5
+nsRenderEffect = UUID5
+  [ 0x72, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x66
+  , 0x66, 0x65, 0x63, 0x74, 0x5f, 0x68, 0x79, 0x64
+  ]
+
+-- | Namespace for Hydrogen ComputeKernel UUIDs
+-- |
+-- | ComputeKernels with identical parameters get identical UUIDs.
+-- | Enables GPU kernel caching and deduplication across agents.
+-- | Derived from: uuid5(nil, "hydrogen.computekernel")
+nsComputeKernel :: UUID5
+nsComputeKernel = UUID5
+  [ 0x63, 0x6f, 0x6d, 0x70, 0x75, 0x74, 0x65, 0x6b
+  , 0x65, 0x72, 0x6e, 0x65, 0x6c, 0x5f, 0x68, 0x79
+  ]
+
+-- | Namespace for Hydrogen FrameState UUIDs
+-- |
+-- | FrameStates capture per-frame animation/interaction state.
+-- | Used for replay, debugging, and deterministic rendering.
+-- | Derived from: uuid5(nil, "hydrogen.framestate")
+nsFrameState :: UUID5
+nsFrameState = UUID5
+  [ 0x66, 0x72, 0x61, 0x6d, 0x65, 0x73, 0x74, 0x61
+  , 0x74, 0x65, 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f
+  ]
+
+-- | Namespace for Hydrogen AnimationState UUIDs
+-- |
+-- | AnimationStates track animation progress, phases, and timing.
+-- | Identical animation configurations → identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.animationstate")
+nsAnimationState :: UUID5
+nsAnimationState = UUID5
+  [ 0x61, 0x6e, 0x69, 0x6d, 0x61, 0x74, 0x69, 0x6f
+  , 0x6e, 0x73, 0x74, 0x61, 0x74, 0x65, 0x5f, 0x68
+  ]
+
+-- | Namespace for Hydrogen SpringState UUIDs
+-- |
+-- | SpringStates capture spring physics configuration.
+-- | Same stiffness, damping, mass → same UUID.
+-- | Derived from: uuid5(nil, "hydrogen.springstate")
+nsSpringState :: UUID5
+nsSpringState = UUID5
+  [ 0x73, 0x70, 0x72, 0x69, 0x6e, 0x67, 0x73, 0x74
+  , 0x61, 0x74, 0x65, 0x5f, 0x68, 0x79, 0x64, 0x72
+  ]
+
+-- | Namespace for Hydrogen EffectPass UUIDs
+-- |
+-- | EffectPasses describe GPU render pass configurations.
+-- | Deterministic identity enables pass caching and reuse.
+-- | Derived from: uuid5(nil, "hydrogen.effectpass")
+nsEffectPass :: UUID5
+nsEffectPass = UUID5
+  [ 0x65, 0x66, 0x66, 0x65, 0x63, 0x74, 0x70, 0x61
+  , 0x73, 0x73, 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f
+  ]
+
+-- | Namespace for Hydrogen BlurKernel UUIDs
+-- |
+-- | BlurKernels with identical radius, sigma, passes → identical UUID.
+-- | Derived from: uuid5(nil, "hydrogen.blurkernel")
+nsBlurKernel :: UUID5
+nsBlurKernel = UUID5
+  [ 0x62, 0x6c, 0x75, 0x72, 0x6b, 0x65, 0x72, 0x6e
+  , 0x65, 0x6c, 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f
+  ]
+
+-- | Namespace for Hydrogen GlowKernel UUIDs
+-- |
+-- | GlowKernels with identical intensity, color, radius → identical UUID.
+-- | Derived from: uuid5(nil, "hydrogen.glowkernel")
+nsGlowKernel :: UUID5
+nsGlowKernel = UUID5
+  [ 0x67, 0x6c, 0x6f, 0x77, 0x6b, 0x65, 0x72, 0x6e
+  , 0x65, 0x6c, 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f
+  ]
+
+-- | Namespace for Hydrogen ParticleKernel UUIDs
+-- |
+-- | ParticleKernels with identical physics → identical UUID.
+-- | Derived from: uuid5(nil, "hydrogen.particlekernel")
+nsParticleKernel :: UUID5
+nsParticleKernel = UUID5
+  [ 0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65
+  , 0x6b, 0x65, 0x72, 0x6e, 0x65, 0x6c, 0x5f, 0x68
   ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
