@@ -48,6 +48,12 @@ module Hydrogen.Schema.Geometry.Ray
   , distanceToPoint
   , distanceSqToPoint
   
+  -- * Intersection Tests
+  , intersectSphereParameter
+  , intersectPlaneParameter
+  , intersectBoxParameter
+  , intersectTriangleParameter
+  
   -- * Accessors
   , getOrigin
   , getDirection
@@ -57,26 +63,38 @@ import Prelude
   ( class Eq
   , class Show
   , max
+  , min
+  , negate
   , show
+  , not
+  , (||)
+  , (&&)
   , (+)
   , (-)
   , (*)
   , (/)
   , (==)
+  , (<)
+  , (>)
+  , (>=)
   , (<>)
   )
 
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Dimension.Vector.Vec3 
-  ( Vec3(Vec3)
-  , vec3
+  ( Vec3
   , addVec3
   , subtractVec3
   , scaleVec3
   , negateVec3
   , dotVec3
+  , crossVec3
   , distanceVec3
   , distanceSquaredVec3
+  , getX3
+  , getY3
+  , getZ3
   , vec3Zero
   , vec3UnitZ
   )
@@ -214,3 +232,197 @@ getOrigin (Ray origin _) = origin
 -- | Get the ray direction
 getDirection :: Ray -> Vec3 Number
 getDirection (Ray _ direction) = direction
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // intersection tests
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Intersect ray with a sphere, returning the parameter t at intersection.
+-- |
+-- | Returns Nothing if ray misses the sphere.
+-- | Returns the nearest positive t (front-facing intersection).
+-- |
+-- | Algorithm: Solve quadratic |origin + t*dir - center|² = radius²
+-- |   a = dir·dir, b = 2*(origin-center)·dir, c = |origin-center|² - r²
+-- |   discriminant = b² - 4ac
+-- |
+-- | Three.js parity: Ray.intersectSphere
+-- | Proof reference: Ray.lean intersectSphereParameter (pending)
+intersectSphereParameter
+  :: Ray
+  -> Vec3 Number  -- center
+  -> Number       -- radius
+  -> Maybe Number
+intersectSphereParameter (Ray origin direction) center radius =
+  let
+    oc = subtractVec3 origin center
+    a = dotVec3 direction direction
+    halfB = dotVec3 oc direction
+    c = dotVec3 oc oc - radius * radius
+    discriminant = halfB * halfB - a * c
+  in
+    if discriminant < 0.0 then Nothing
+    else if a == 0.0 then Nothing  -- Degenerate ray (zero direction)
+    else
+      let
+        sqrtD = Math.sqrt discriminant
+        t1 = (negate halfB - sqrtD) / a
+        t2 = (negate halfB + sqrtD) / a
+      in
+        -- Return nearest positive t
+        if t1 >= 0.0 then Just t1
+        else if t2 >= 0.0 then Just t2
+        else Nothing
+
+-- | Intersect ray with an infinite plane, returning the parameter t at intersection.
+-- |
+-- | Plane is defined by: normal · P = constant
+-- | (i.e., all points P where dot(normal, P) = constant)
+-- |
+-- | Returns Nothing if ray is parallel to plane or intersection is behind origin.
+-- |
+-- | Algorithm: t = (constant - normal·origin) / (normal·direction)
+-- |
+-- | Three.js parity: Ray.intersectPlane
+-- | Proof reference: Ray.lean intersectPlaneParameter (pending)
+intersectPlaneParameter
+  :: Ray
+  -> Vec3 Number  -- planeNormal (should be normalized)
+  -> Number       -- planeConstant
+  -> Maybe Number
+intersectPlaneParameter (Ray origin direction) planeNormal planeConstant =
+  let
+    denom = dotVec3 planeNormal direction
+  in
+    if Math.abs denom < epsilon then Nothing  -- Ray parallel to plane
+    else
+      let
+        t = (planeConstant - dotVec3 planeNormal origin) / denom
+      in
+        if t < 0.0 then Nothing  -- Intersection behind ray origin
+        else Just t
+  where
+    epsilon = 1.0e-10
+
+-- | Intersect ray with an axis-aligned bounding box (AABB).
+-- |
+-- | Returns Nothing if ray misses the box.
+-- | Returns the parameter t at the nearest intersection point.
+-- |
+-- | Algorithm: Slab method - compute entry/exit for each axis and find overlap.
+-- |
+-- | Three.js parity: Ray.intersectBox
+-- | Proof reference: Ray.lean intersectBoxParameter (pending)
+intersectBoxParameter
+  :: Ray
+  -> Vec3 Number  -- boxMin
+  -> Vec3 Number  -- boxMax
+  -> Maybe Number
+intersectBoxParameter (Ray origin direction) boxMin boxMax =
+  let
+    -- Decompose into components
+    ox = getX3 origin
+    oy = getY3 origin
+    oz = getZ3 origin
+    dx = getX3 direction
+    dy = getY3 direction
+    dz = getZ3 direction
+    minX = getX3 boxMin
+    minY = getY3 boxMin
+    minZ = getZ3 boxMin
+    maxX = getX3 boxMax
+    maxY = getY3 boxMax
+    maxZ = getZ3 boxMax
+    
+    -- Compute t values for each slab
+    -- Handle division by zero: if direction component is 0, check if origin is inside slab
+    computeSlab :: Number -> Number -> Number -> Number -> { tMin :: Number, tMax :: Number }
+    computeSlab o d lo hi =
+      if Math.abs d < epsilon then
+        -- Ray parallel to slab - check if origin is inside
+        if o < lo || o > hi then
+          { tMin: infinity, tMax: negInfinity }  -- No intersection possible
+        else
+          { tMin: negInfinity, tMax: infinity }  -- Always inside this slab
+      else
+        let
+          invD = 1.0 / d
+          t1 = (lo - o) * invD
+          t2 = (hi - o) * invD
+        in
+          if invD < 0.0 then { tMin: t2, tMax: t1 }
+          else { tMin: t1, tMax: t2 }
+    
+    slabX = computeSlab ox dx minX maxX
+    slabY = computeSlab oy dy minY maxY
+    slabZ = computeSlab oz dz minZ maxZ
+    
+    -- Intersection is the overlap of all three slabs
+    tNear = max slabX.tMin (max slabY.tMin slabZ.tMin)
+    tFar = min slabX.tMax (min slabY.tMax slabZ.tMax)
+  in
+    -- No intersection if tNear > tFar or tFar < 0
+    if tNear > tFar || tFar < 0.0 then Nothing
+    -- If tNear < 0, we're inside the box; return tFar (exit point) or 0
+    else if tNear < 0.0 then Just 0.0
+    else Just tNear
+  where
+    epsilon = 1.0e-10
+    infinity = 1.0e30
+    negInfinity = negate 1.0e30
+
+-- | Intersect ray with a triangle using Möller–Trumbore algorithm.
+-- |
+-- | Returns Nothing if ray misses the triangle or (optionally) if backface.
+-- | Returns the parameter t at the intersection point.
+-- |
+-- | Algorithm: Möller–Trumbore intersection
+-- |   edge1 = v1 - v0, edge2 = v2 - v0
+-- |   h = direction × edge2, a = edge1 · h
+-- |   if |a| < ε, ray is parallel to triangle
+-- |   f = 1/a, s = origin - v0, u = f * (s · h)
+-- |   if u < 0 or u > 1, miss
+-- |   q = s × edge1, v = f * (direction · q)
+-- |   if v < 0 or u + v > 1, miss
+-- |   t = f * (edge2 · q)
+-- |
+-- | Three.js parity: Ray.intersectTriangle
+-- | Proof reference: Ray.lean intersectTriangleParameter (pending)
+intersectTriangleParameter
+  :: Ray
+  -> Vec3 Number  -- v0 (vertex A)
+  -> Vec3 Number  -- v1 (vertex B)
+  -> Vec3 Number  -- v2 (vertex C)
+  -> Boolean      -- backfaceCulling: if true, ignore back-facing triangles
+  -> Maybe Number
+intersectTriangleParameter (Ray origin direction) v0 v1 v2 backfaceCulling =
+  let
+    edge1 = subtractVec3 v1 v0
+    edge2 = subtractVec3 v2 v0
+    h = crossVec3 direction edge2
+    a = dotVec3 edge1 h
+  in
+    -- Check if ray is parallel to triangle (or backface culling)
+    if backfaceCulling && a < epsilon then Nothing  -- Backface (or parallel)
+    else if not backfaceCulling && Math.abs a < epsilon then Nothing  -- Parallel
+    else
+      let
+        f = 1.0 / a
+        s = subtractVec3 origin v0
+        u = f * dotVec3 s h
+      in
+        if u < 0.0 || u > 1.0 then Nothing
+        else
+          let
+            q = crossVec3 s edge1
+            v = f * dotVec3 direction q
+          in
+            if v < 0.0 || u + v > 1.0 then Nothing
+            else
+              let
+                t = f * dotVec3 edge2 q
+              in
+                if t < epsilon then Nothing  -- Intersection behind ray
+                else Just t
+  where
+    epsilon = 1.0e-10

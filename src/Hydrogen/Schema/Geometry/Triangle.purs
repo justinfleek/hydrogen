@@ -71,6 +71,7 @@ module Hydrogen.Schema.Geometry.Triangle
   
   -- * Barycentric Conversion
   , fromBarycentric
+  , getBarycoord
   
   -- * Accessors
   , getA
@@ -100,6 +101,7 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   , subtractVec3
   , scaleVec3
   , crossVec3
+  , dotVec3
   , lengthSquaredVec3
   , lengthVec3
   , vec3Zero
@@ -308,6 +310,51 @@ centroidTriangle (Triangle a b c) = scaleVec3 (1.0 / 3.0) (addVec3 (addVec3 a b)
 fromBarycentric :: Triangle -> Barycentric -> Vec3 Number
 fromBarycentric (Triangle a b c) (Barycentric u v w) =
   addVec3 (addVec3 (scaleVec3 u a) (scaleVec3 v b)) (scaleVec3 w c)
+
+-- | Compute barycentric coordinates of a point relative to triangle.
+-- |
+-- | Given a triangle ABC and a point P, computes (u, v, w) such that:
+-- |   P = u*A + v*B + w*C  (where u + v + w = 1)
+-- |
+-- | Uses the standard algorithm via dot products:
+-- |   v0 = C - A, v1 = B - A, v2 = P - A
+-- |   d00 = v0·v0, d01 = v0·v1, d02 = v0·v2, d11 = v1·v1, d12 = v1·v2
+-- |   denom = d00*d11 - d01*d01
+-- |   v = (d11*d02 - d01*d12) / denom
+-- |   w = (d00*d12 - d01*d02) / denom
+-- |   u = 1 - v - w
+-- |
+-- | Three.js parity: Triangle.getBarycoord
+-- | 
+-- | Note: For degenerate triangles (denom ≈ 0), returns centroid coordinates
+-- | as a safe fallback rather than producing NaN/Infinity.
+getBarycoord :: Triangle -> Vec3 Number -> Barycentric
+getBarycoord (Triangle a b c) p =
+  let
+    v0 = subtractVec3 c a
+    v1 = subtractVec3 b a
+    v2 = subtractVec3 p a
+    
+    d00 = dotVec3 v0 v0
+    d01 = dotVec3 v0 v1
+    d02 = dotVec3 v0 v2
+    d11 = dotVec3 v1 v1
+    d12 = dotVec3 v1 v2
+    
+    denom = d00 * d11 - d01 * d01
+  in
+    -- Guard against degenerate triangles (denom = 0)
+    -- Return centroid as safe fallback
+    if denom == 0.0
+      then barycentricCentroid
+      else
+        let
+          invDenom = 1.0 / denom
+          v = (d11 * d02 - d01 * d12) * invDenom
+          w = (d00 * d12 - d01 * d02) * invDenom
+          u = 1.0 - v - w
+        in
+          Barycentric u v w
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

@@ -559,6 +559,48 @@ coordination overhead). The import list should give them a clear path forward.
 The explicit import list defines the module's **semantic scope**. It answers:
 "What operations are natural and expected in this domain?"
 
+## The Speed Context: 1000 Tokens Per Second
+
+Imagine you are an agent operating at 1000 tokens/second in a billion-agent swarm.
+You have milliseconds to understand a module's purpose and extend it correctly.
+
+**What do you need?**
+
+1. **MORE functionality, not less**
+   - Every atom you might need should exist
+   - No "cleaned up" imports that removed tools you'd want
+   - Complete vocabulary for the domain
+
+2. **HYPER CLEAR data flow**
+   - Explicit imports = immediate understanding of module scope
+   - No guessing what's available
+   - No investigating whether functionality was "really needed"
+
+3. **ZERO ambiguity**
+   - Types with bounds, not unbounded primitives
+   - Deterministic behavior at every edge
+   - Same input = same output, always
+
+4. **TRUST the infrastructure**
+   - If an import exists, it belongs
+   - If a function is exported, it works completely
+   - If a type is defined, all its operations are implemented
+
+**The cost of incompleteness at speed:**
+
+- Missing import → Agent works around it → Inconsistency propagates
+- Stub function → Agent calls it → Silent failure at scale
+- Unbounded type → Agent passes edge value → Crash across swarm
+- Deleted "unused" code → Agent needs it → Deadlock waiting for implementation
+
+**When you're building, ask:**
+
+"If I were an agent with 50ms to understand this module and extend it,
+would the import list tell me everything I need? Would every function
+I might call actually work? Would every type I construct be valid?"
+
+The answer must be YES to all three. That's what "correct" means at scale.
+
 ## Lean4 Proofs
 
 - Define invariants FIRST
