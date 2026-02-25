@@ -20,7 +20,7 @@
 -- | | width         | Dimension | Pixel             | Editor width           |
 -- | | height        | Dimension | Pixel             | Bar height             |
 
-module Hydrogen.Element.Component.ColorPicker.Gradient
+module Hydrogen.Element.Compound.ColorPicker.Gradient
   ( -- * Component
     gradientBar
     

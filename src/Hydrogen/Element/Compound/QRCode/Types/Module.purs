@@ -25,7 +25,7 @@
 -- |
 -- | - Prelude (Eq, Show)
 
-module Hydrogen.Element.Component.QRCode.Types.Module
+module Hydrogen.Element.Compound.QRCode.Types.Module
   ( -- * Module Type
     ModuleType(DataModule, FinderModule, TimingModule, AlignmentModule, FormatModule, VersionModule, QuietModule)
   

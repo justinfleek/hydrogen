@@ -17,7 +17,7 @@
 -- | - Prelude (Eq, Show)
 -- | - Data.Maybe (optional fields)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Slack
+module Hydrogen.Element.Compound.QRCode.Content.Types.Slack
   ( -- * Slack Action Type
     SlackAction(SlackOpenChannel, SlackComposeMessage, SlackTriggerWorkflow)
   

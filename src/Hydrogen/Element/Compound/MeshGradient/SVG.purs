@@ -13,7 +13,7 @@
 -- | averaged vertex colors as fill. Higher subdivision counts produce
 -- | smoother gradients at the cost of more polygons.
 
-module Hydrogen.Element.Component.MeshGradient.SVG
+module Hydrogen.Element.Compound.MeshGradient.SVG
   ( renderMeshAsSVG
   , renderTriangle
   ) where

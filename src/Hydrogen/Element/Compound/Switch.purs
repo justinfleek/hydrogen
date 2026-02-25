@@ -23,7 +23,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Switch as Switch
+-- | import Hydrogen.Element.Compound.Switch as Switch
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic switch
@@ -48,7 +48,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Switch
+module Hydrogen.Element.Compound.Switch
   ( -- * Main Components
     switch
   , switchWithLabel

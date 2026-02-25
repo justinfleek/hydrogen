@@ -33,7 +33,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Calendar as Calendar
+-- | import Hydrogen.Element.Compound.Calendar as Calendar
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic calendar
@@ -64,7 +64,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Calendar
+module Hydrogen.Element.Compound.Calendar
   ( -- * Component
     calendar
   , calendarWithNav

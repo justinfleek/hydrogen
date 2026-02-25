@@ -43,7 +43,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Textarea as Textarea
+-- | import Hydrogen.Element.Compound.Textarea as Textarea
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic textarea (inherits all visual properties from context)
@@ -74,7 +74,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Textarea
+module Hydrogen.Element.Compound.Textarea
   ( -- * Textarea Components
     textarea
   , textareaWithLabel

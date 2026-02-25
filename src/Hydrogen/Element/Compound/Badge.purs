@@ -26,7 +26,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Badge as Badge
+-- | import Hydrogen.Element.Compound.Badge as Badge
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic badge with brand colors
@@ -51,7 +51,7 @@
 -- |   [ E.text "Draft" ]
 -- | ```
 
-module Hydrogen.Element.Component.Badge
+module Hydrogen.Element.Compound.Badge
   ( -- * Main Component
     badge
   

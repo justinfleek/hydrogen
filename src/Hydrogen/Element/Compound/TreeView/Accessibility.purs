@@ -34,7 +34,7 @@
 -- | - TreeView.Node (tree structure)
 -- | - TreeView.State (selection, expansion)
 
-module Hydrogen.Element.Component.TreeView.Accessibility
+module Hydrogen.Element.Compound.TreeView.Accessibility
   ( -- * ARIA Attributes
     AriaAttrs
   , ariaAttrs
@@ -112,14 +112,14 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , Depth
   , unwrapDepth
   , CheckState(Checked, Unchecked, Indeterminate)
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId

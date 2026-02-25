@@ -29,7 +29,7 @@
 -- |
 -- | - Schema.Geometry.Shape (shape primitives)
 
-module Hydrogen.Element.Component.Card.Shape
+module Hydrogen.Element.Compound.Card.Shape
   ( -- * Card Shape Config
     CardShape
   , cardShape

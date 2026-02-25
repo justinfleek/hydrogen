@@ -8,7 +8,7 @@
 -- | - Addition is XOR
 -- | - Multiplication uses the irreducible polynomial x^8 + x^4 + x^3 + x^2 + 1
 
-module Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon.GF
+module Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.GF
   ( GFElement(GFElement)
   , mkGFElement
   , gfElementValue

@@ -19,7 +19,7 @@
 -- | Within each 2-column strip, process right column then left column
 -- | for each row in the current direction.
 
-module Hydrogen.Element.Component.QRCode.Matrix.Data
+module Hydrogen.Element.Compound.QRCode.Matrix.Data
   ( getDataModulePositions
   , placeDataBits
   , collectDataPositions
@@ -46,7 +46,7 @@ import Data.Array (foldl, filter, reverse, index, snoc, (..))
 import Data.EuclideanRing (div, mod)
 import Data.Maybe (fromMaybe)
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRMatrix
   , Module(Dark, Light, Reserved)
   , ModuleType(DataModule)

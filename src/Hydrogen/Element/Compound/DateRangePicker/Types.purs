@@ -7,7 +7,7 @@
 -- | This module contains type definitions shared across the DateRangePicker
 -- | component family. Pure data types with no rendering logic.
 
-module Hydrogen.Element.Component.DateRangePicker.Types
+module Hydrogen.Element.Compound.DateRangePicker.Types
   ( -- * Re-export from Calendar
     module ReExports
   
@@ -41,13 +41,13 @@ import Prelude
   , not
   )
 
-import Hydrogen.Element.Component.Calendar 
+import Hydrogen.Element.Compound.Calendar 
   ( CalendarDate
   , DateRange
   , compareDates
   ) as ReExports
 
-import Hydrogen.Element.Component.Calendar (CalendarDate, DateRange, compareDates)
+import Hydrogen.Element.Compound.Calendar (CalendarDate, DateRange, compareDates)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // date range operations

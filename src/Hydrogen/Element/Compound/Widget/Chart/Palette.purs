@@ -10,7 +10,7 @@
 -- | - Vibrant: high-contrast, attention-grabbing
 -- | - Monochromatic: single-hue variations
 
-module Hydrogen.Element.Component.Widget.Chart.Palette
+module Hydrogen.Element.Compound.Widget.Chart.Palette
   ( -- * Palettes
     defaultPalette
   , pastelPalette

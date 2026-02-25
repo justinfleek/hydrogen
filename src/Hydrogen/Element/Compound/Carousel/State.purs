@@ -24,7 +24,7 @@
 -- | - Carousel.Gestures (GestureState)
 -- | - Carousel.Transitions (TransitionConfig)
 
-module Hydrogen.Element.Component.Carousel.State
+module Hydrogen.Element.Compound.Carousel.State
   ( -- * Transition State
     TransitionState
   , transitionState
@@ -59,7 +59,7 @@ import Prelude
   , (==)
   )
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( SlideIndex
   , unwrapSlideIndex
   , firstSlide
@@ -73,7 +73,7 @@ import Hydrogen.Element.Component.Carousel.Types
       , AutoplayOnRetinalFocus
       )
   )
-import Hydrogen.Element.Component.Carousel.Gestures (GestureState, initialGestureState)
+import Hydrogen.Element.Compound.Carousel.Gestures (GestureState, initialGestureState)
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
 -- ═══════════════════════════════════════════════════════════════════════════════

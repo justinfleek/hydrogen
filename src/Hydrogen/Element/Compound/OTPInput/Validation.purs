@@ -24,7 +24,7 @@
 -- |
 -- | - Types module for OTPInputType, OTPDigitCount, OTPValue
 
-module Hydrogen.Element.Component.OTPInput.Validation
+module Hydrogen.Element.Compound.OTPInput.Validation
   ( -- * Character Validation
     validateChar
   , isValidDigit
@@ -63,7 +63,7 @@ import Data.Char (toCharCode)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String.CodeUnits as SCU
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPInputType(Numeric, Alphanumeric)
   , OTPDigitCount
   , OTPValue

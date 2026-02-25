@@ -26,7 +26,7 @@
 -- | | borderColor   | Color     | RGB               | Panel border           |
 -- | | borderRadius  | Geometry  | Radius            | Corner rounding        |
 
-module Hydrogen.Element.Component.ColorPicker.Panel
+module Hydrogen.Element.Compound.ColorPicker.Panel
   ( -- * Component
     saturationPanel
   

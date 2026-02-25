@@ -9,7 +9,7 @@
 -- | - Segment.CharTable — Character lookup tables
 -- | - Segment.Accumulator — Incremental segment building
 
-module Hydrogen.Element.Component.QRCode.Encoding.Segment
+module Hydrogen.Element.Compound.QRCode.Encoding.Segment
   ( module Encoding
   , module CharTable
   , module Accumulator
@@ -69,7 +69,7 @@ import Data.Array (foldl, length, filter, head, (..))
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe, isJust)
 import Data.String.CodeUnits (toCharArray)
 
-import Hydrogen.Element.Component.QRCode.Types 
+import Hydrogen.Element.Compound.QRCode.Types 
   ( EncodingMode(ModeNumeric, ModeAlphanumeric, ModeByte, ModeKanji, ModeECI)
   , QRVersion
   , ErrorCorrection
@@ -78,9 +78,9 @@ import Hydrogen.Element.Component.QRCode.Types
   , modeIndicator
   , getCapacity
   )
-import Hydrogen.Element.Component.QRCode.Encoding.BitStream as BS
+import Hydrogen.Element.Compound.QRCode.Encoding.BitStream as BS
 
-import Hydrogen.Element.Component.QRCode.Encoding.Segment.Encoding
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment.Encoding
   ( encodeData
   , encodeNumeric
   , encodeAlphanumeric
@@ -89,14 +89,14 @@ import Hydrogen.Element.Component.QRCode.Encoding.Segment.Encoding
   , dataBitLength
   ) as Encoding
 
-import Hydrogen.Element.Component.QRCode.Encoding.Segment.CharTable
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment.CharTable
   ( alphanumericValue
   , isAlphanumericChar
   , isNumericChar
   , charToString
   ) as CharTable
 
-import Hydrogen.Element.Component.QRCode.Encoding.Segment.Accumulator
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment.Accumulator
   ( SegmentAccumulator
   , emptyAccumulator
   , addCharToAccumulator

@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Table as Table
+-- | import Hydrogen.Element.Compound.Table as Table
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | Table.table []
@@ -28,7 +28,7 @@
 -- |       ]
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.Table
+module Hydrogen.Element.Compound.Table
   ( -- * Table Components
     table
   , tableHeader

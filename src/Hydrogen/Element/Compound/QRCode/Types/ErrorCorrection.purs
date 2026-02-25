@@ -16,7 +16,7 @@
 -- |
 -- | - Prelude (Eq, Ord, Show)
 
-module Hydrogen.Element.Component.QRCode.Types.ErrorCorrection
+module Hydrogen.Element.Compound.QRCode.Types.ErrorCorrection
   ( -- * Error Correction
     ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
   , ecToString

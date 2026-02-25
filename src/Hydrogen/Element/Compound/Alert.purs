@@ -27,7 +27,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Alert as Alert
+-- | import Hydrogen.Element.Compound.Alert as Alert
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic alert
@@ -47,7 +47,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Alert
+module Hydrogen.Element.Compound.Alert
   ( -- * Main Component
     alert
   

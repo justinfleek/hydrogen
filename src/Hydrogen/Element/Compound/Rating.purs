@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Rating as Rating
+-- | import Hydrogen.Element.Compound.Rating as Rating
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic 5-star rating
@@ -38,7 +38,7 @@
 -- |   , Rating.isReadOnly true
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.Rating
+module Hydrogen.Element.Compound.Rating
   ( -- * Rating Component
     rating
   , ratingItem

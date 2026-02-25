@@ -25,7 +25,7 @@
 -- |
 -- | Components accept `Array (OTPInputProp msg)` which fold over `defaultProps`.
 
-module Hydrogen.Element.Component.OTPInput.Props
+module Hydrogen.Element.Compound.OTPInput.Props
   ( -- * Props Record
     OTPInputProps
   , OTPInputProp
@@ -136,7 +136,7 @@ module Hydrogen.Element.Component.OTPInput.Props
 
 import Data.Maybe (Maybe(Nothing, Just))
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPDigitCount
   , OTPInputType(Numeric)
   , OTPValue

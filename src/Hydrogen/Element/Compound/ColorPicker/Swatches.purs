@@ -26,7 +26,7 @@
 -- | | columns       | Dimension | Int               | Grid columns           |
 -- | | borderRadius  | Geometry  | Radius            | Swatch corner rounding |
 
-module Hydrogen.Element.Component.ColorPicker.Swatches
+module Hydrogen.Element.Compound.ColorPicker.Swatches
   ( -- * Component
     swatchGrid
   , swatchRow

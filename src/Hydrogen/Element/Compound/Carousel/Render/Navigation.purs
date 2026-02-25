@@ -24,7 +24,7 @@
 -- | - Carousel.Navigation (NavigationConfig)
 -- | - Hydrogen.Render.Element
 
-module Hydrogen.Element.Component.Carousel.Render.Navigation
+module Hydrogen.Element.Compound.Carousel.Render.Navigation
   ( -- * Main Navigation Renderer
     renderNavigation
   
@@ -75,7 +75,7 @@ import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Color.RGB as Color
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( SlideIndex
   , slideIndex
   , unwrapSlideIndex
@@ -99,12 +99,12 @@ import Hydrogen.Element.Component.Carousel.Types
       , PrevSlide
       )
   )
-import Hydrogen.Element.Component.Carousel.State 
+import Hydrogen.Element.Compound.Carousel.State 
   ( CarouselState
   , isTransitioning
   , transitionProgress
   )
-import Hydrogen.Element.Component.Carousel.Slide 
+import Hydrogen.Element.Compound.Carousel.Slide 
   ( SlideCollection
   , SlideData
   , ContentSource
@@ -115,7 +115,7 @@ import Hydrogen.Element.Component.Carousel.Slide
   , slideAt
   , slideCount
   )
-import Hydrogen.Element.Component.Carousel.Navigation 
+import Hydrogen.Element.Compound.Carousel.Navigation 
   ( NavigationConfig
   , ArrowPosition
       ( ArrowsInside
@@ -136,7 +136,7 @@ import Hydrogen.Element.Component.Carousel.Navigation
       , ThumbnailsRight
       )
   )
-import Hydrogen.Element.Component.Carousel.Gestures (isDragActive)
+import Hydrogen.Element.Compound.Carousel.Gestures (isDragActive)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // navigation container

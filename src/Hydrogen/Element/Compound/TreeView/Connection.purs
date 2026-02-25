@@ -26,7 +26,7 @@
 -- | - Schema.Graph.Connection (ConnectionStyle, routing)
 -- | - Schema.Graph.Layout (NodePosition)
 
-module Hydrogen.Element.Component.TreeView.Connection
+module Hydrogen.Element.Compound.TreeView.Connection
   ( -- * Connection Rendering
     renderConnections
   , renderConnection
@@ -80,11 +80,11 @@ import Data.Foldable (foldl)
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId
@@ -93,12 +93,12 @@ import Hydrogen.Element.Component.TreeView.Node
   , rootNodes
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( ExpandedState
   , isExpanded
   )
 
-import Hydrogen.Element.Component.TreeView.Layout
+import Hydrogen.Element.Compound.TreeView.Layout
   ( LayoutResult
   , nodePosition
   )

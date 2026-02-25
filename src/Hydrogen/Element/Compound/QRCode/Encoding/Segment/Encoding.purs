@@ -9,7 +9,7 @@
 -- | - Byte: 8 bits per character
 -- | - Kanji: 13 bits per character
 
-module Hydrogen.Element.Component.QRCode.Encoding.Segment.Encoding
+module Hydrogen.Element.Compound.QRCode.Encoding.Segment.Encoding
   ( encodeData
   , encodeNumeric
   , encodeAlphanumeric
@@ -34,11 +34,11 @@ import Data.EuclideanRing (div, mod)
 import Data.Maybe (Maybe(Just), fromMaybe)
 import Data.String.CodeUnits (toCharArray)
 
-import Hydrogen.Element.Component.QRCode.Types 
+import Hydrogen.Element.Compound.QRCode.Types 
   ( EncodingMode(ModeNumeric, ModeAlphanumeric, ModeByte, ModeKanji, ModeECI)
   )
-import Hydrogen.Element.Component.QRCode.Encoding.BitStream as BS
-import Hydrogen.Element.Component.QRCode.Encoding.Segment.CharTable (alphanumericValue)
+import Hydrogen.Element.Compound.QRCode.Encoding.BitStream as BS
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment.CharTable (alphanumericValue)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // data bit length

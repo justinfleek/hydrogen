@@ -21,7 +21,7 @@
 -- | - Validation module for input patterns
 -- | - Element module for rendering
 
-module Hydrogen.Element.Component.OTPInput.Digit
+module Hydrogen.Element.Compound.OTPInput.Digit
   ( -- * Digit Rendering
     renderDigit
   , renderDigitInput
@@ -66,7 +66,7 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.FontFamily as FontFamily
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPDigit(OTPDigit)
   , OTPIndex
   , OTPState(Idle, Entering, Verifying, Success, Error)
@@ -76,17 +76,17 @@ import Hydrogen.Element.Component.OTPInput.Types
   , otpIndex
   )
 
-import Hydrogen.Element.Component.OTPInput.Props
+import Hydrogen.Element.Compound.OTPInput.Props
   ( OTPInputProps
   )
 
-import Hydrogen.Element.Component.OTPInput.Validation
+import Hydrogen.Element.Compound.OTPInput.Validation
   ( getInputMode
   , getInputPattern
   , getAutoComplete
   )
 
-import Hydrogen.Element.Component.OTPInput.Animation
+import Hydrogen.Element.Compound.OTPInput.Animation
   ( computeDigitAnimationState
   , getAnimationDataAttrs
   )

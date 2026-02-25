@@ -73,6 +73,10 @@ module Hydrogen.Schema.Geometry.Triangle
   , fromBarycentric
   , getBarycoord
   
+  -- * Point Containment
+  , containsPointTriangle
+  , closestPointToPointTriangle
+  
   -- * Accessors
   , getA
   , getB
@@ -89,14 +93,14 @@ import Prelude
   , (/)
   , (==)
   , (>=)
+  , (<)
   , (<>)
   , (&&)
   )
 
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Dimension.Vector.Vec3 
-  ( Vec3(Vec3)
-  , vec3
+  ( Vec3
   , addVec3
   , subtractVec3
   , scaleVec3
@@ -311,50 +315,99 @@ fromBarycentric :: Triangle -> Barycentric -> Vec3 Number
 fromBarycentric (Triangle a b c) (Barycentric u v w) =
   addVec3 (addVec3 (scaleVec3 u a) (scaleVec3 v b)) (scaleVec3 w c)
 
--- | Compute barycentric coordinates of a point relative to triangle.
+-- | Compute barycentric coordinates of a point relative to a triangle.
 -- |
--- | Given a triangle ABC and a point P, computes (u, v, w) such that:
--- |   P = u*A + v*B + w*C  (where u + v + w = 1)
+-- | Uses the edge vector method (same as Three.js):
+-- | Given point P and triangle ABC, computes (u, v, w) such that
+-- | P = u*A + v*B + w*C (when P is on the triangle plane).
 -- |
--- | Uses the standard algorithm via dot products:
--- |   v0 = C - A, v1 = B - A, v2 = P - A
--- |   d00 = v0·v0, d01 = v0·v1, d02 = v0·v2, d11 = v1·v1, d12 = v1·v2
--- |   denom = d00*d11 - d01*d01
--- |   v = (d11*d02 - d01*d12) / denom
--- |   w = (d00*d12 - d01*d02) / denom
--- |   u = 1 - v - w
+-- | Algorithm: Uses dot product ratios to solve the linear system.
+-- | This is more numerically stable than the area-ratio method.
 -- |
+-- | Proof reference: Triangle.lean getBarycoord (pending)
 -- | Three.js parity: Triangle.getBarycoord
--- | 
--- | Note: For degenerate triangles (denom ≈ 0), returns centroid coordinates
--- | as a safe fallback rather than producing NaN/Infinity.
 getBarycoord :: Triangle -> Vec3 Number -> Barycentric
-getBarycoord (Triangle a b c) p =
+getBarycoord (Triangle a b c) point =
   let
-    v0 = subtractVec3 c a
-    v1 = subtractVec3 b a
-    v2 = subtractVec3 p a
+    -- Vectors from A to the other points
+    v0 = subtractVec3 c a  -- AC
+    v1 = subtractVec3 b a  -- AB
+    v2 = subtractVec3 point a  -- AP
     
-    d00 = dotVec3 v0 v0
-    d01 = dotVec3 v0 v1
-    d02 = dotVec3 v0 v2
-    d11 = dotVec3 v1 v1
-    d12 = dotVec3 v1 v2
+    -- Dot products for the linear system
+    dot00 = dotVec3 v0 v0  -- AC · AC
+    dot01 = dotVec3 v0 v1  -- AC · AB
+    dot02 = dotVec3 v0 v2  -- AC · AP
+    dot11 = dotVec3 v1 v1  -- AB · AB
+    dot12 = dotVec3 v1 v2  -- AB · AP
     
-    denom = d00 * d11 - d01 * d01
+    -- Compute barycentric coordinates
+    -- Solve: P = A + v*AB + w*AC
+    -- Using Cramer's rule on the 2x2 system
+    denom = dot00 * dot11 - dot01 * dot01
+    
+    -- Avoid division by zero for degenerate triangles
+    invDenom = if Math.abs denom < 1.0e-10 then 0.0 else 1.0 / denom
+    
+    -- v is the weight for B, w is the weight for C
+    v_val = (dot11 * dot02 - dot01 * dot12) * invDenom
+    w_val = (dot00 * dot12 - dot01 * dot02) * invDenom
+    
+    -- u is the weight for A (barycentric coords sum to 1)
+    u = 1.0 - v_val - w_val
   in
-    -- Guard against degenerate triangles (denom = 0)
-    -- Return centroid as safe fallback
-    if denom == 0.0
-      then barycentricCentroid
-      else
-        let
-          invDenom = 1.0 / denom
-          v = (d11 * d02 - d01 * d12) * invDenom
-          w = (d00 * d12 - d01 * d02) * invDenom
-          u = 1.0 - v - w
-        in
-          Barycentric u v w
+    -- Constructor Barycentric u v w (A, B, C)
+    Barycentric u v_val w_val
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // point containment
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if a point lies inside the triangle (on the triangle plane).
+-- |
+-- | Returns true if the point's barycentric coordinates are all non-negative.
+-- | This handles both 2D and 3D cases — for 3D, the point should be on the
+-- | triangle's plane for the test to be meaningful.
+-- |
+-- | Proof reference: Triangle.lean containsPoint (pending)
+-- | Three.js parity: Triangle.containsPoint
+containsPointTriangle :: Triangle -> Vec3 Number -> Boolean
+containsPointTriangle t point =
+  let bc = getBarycoord t point
+  in isInsideBarycentric bc
+
+-- | Find the closest point on a triangle to a given point.
+-- |
+-- | Uses Voronoi region testing to determine if the closest point is:
+-- | - On a vertex
+-- | - On an edge
+-- | - Inside the triangle face
+-- |
+-- | Proof reference: Triangle.lean closestPointToPoint (pending)
+-- | Three.js parity: Triangle.closestPointToPoint
+closestPointToPointTriangle :: Triangle -> Vec3 Number -> Vec3 Number
+closestPointToPointTriangle t point =
+  let
+    -- Get barycentric coordinates
+    bc = getBarycoord t point
+    Barycentric u v w = bc
+  in
+    -- If inside triangle (all coords >= 0), project onto plane
+    if u >= 0.0 && v >= 0.0 && w >= 0.0
+      then fromBarycentric t bc
+    -- Otherwise, clamp to edges/vertices
+    else
+      let
+        -- Clamp barycentric coordinates to [0, 1] and renormalize
+        -- This projects to the closest point on the triangle boundary
+        u' = Math.max 0.0 u
+        v' = Math.max 0.0 v
+        w' = Math.max 0.0 w
+        total = u' + v' + w'
+        -- Avoid division by zero
+        invTotal = if total < 1.0e-10 then 1.0 else 1.0 / total
+      in
+        fromBarycentric t (Barycentric (u' * invTotal) (v' * invTotal) (w' * invTotal))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

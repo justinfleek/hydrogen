@@ -26,7 +26,7 @@
 -- | - ChartAdvanced.Rainfall: Rainfall/distribution chart
 -- | - ChartAdvanced.DualAxis: Dual axis chart (line + column)
 
-module Hydrogen.Element.Component.Widget.ChartAdvanced
+module Hydrogen.Element.Compound.Widget.ChartAdvanced
   ( -- * Waterfall Chart (re-exported)
     module Waterfall
   
@@ -48,21 +48,21 @@ module Hydrogen.Element.Component.Widget.ChartAdvanced
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- Re-export from submodules using module aliases
-import Hydrogen.Element.Component.Widget.ChartAdvanced.Waterfall
+import Hydrogen.Element.Compound.Widget.ChartAdvanced.Waterfall
   ( WaterfallData
   , WaterfallConfig
   , defaultWaterfallConfig
   , waterfallChart
   ) as Waterfall
 
-import Hydrogen.Element.Component.Widget.ChartAdvanced.Grouped
+import Hydrogen.Element.Compound.Widget.ChartAdvanced.Grouped
   ( GroupedBarData
   , GroupedBarConfig
   , defaultGroupedBarConfig
   , groupedBarChart
   ) as Grouped
 
-import Hydrogen.Element.Component.Widget.ChartAdvanced.Stacked
+import Hydrogen.Element.Compound.Widget.ChartAdvanced.Stacked
   ( StackedData
   , StackedConfig
   , defaultStackedConfig
@@ -70,14 +70,14 @@ import Hydrogen.Element.Component.Widget.ChartAdvanced.Stacked
   , stackedColumnChart
   ) as Stacked
 
-import Hydrogen.Element.Component.Widget.ChartAdvanced.Rainfall
+import Hydrogen.Element.Compound.Widget.ChartAdvanced.Rainfall
   ( RainfallData
   , RainfallConfig
   , defaultRainfallConfig
   , rainfallChart
   ) as Rainfall
 
-import Hydrogen.Element.Component.Widget.ChartAdvanced.DualAxis
+import Hydrogen.Element.Compound.Widget.ChartAdvanced.DualAxis
   ( DualAxisData
   , DualAxisConfig
   , defaultDualAxisConfig

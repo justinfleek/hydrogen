@@ -10,7 +10,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.StatCard as StatCard
+-- | import Hydrogen.Element.Compound.StatCard as StatCard
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic stat card
@@ -43,7 +43,7 @@
 -- |   , StatCard.statCard [] { label: "Revenue", value: "$50k", trend: Nothing, description: Nothing }
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.StatCard
+module Hydrogen.Element.Compound.StatCard
   ( -- * StatCard Components
     statCard
   , statCardWithIcon

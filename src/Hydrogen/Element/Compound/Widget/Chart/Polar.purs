@@ -8,7 +8,7 @@
 -- | Pure Element output — no framework dependencies.
 -- | Math functions from Hydrogen.Math.Core (Taylor series, no FFI).
 
-module Hydrogen.Element.Component.Widget.Chart.Polar
+module Hydrogen.Element.Compound.Widget.Chart.Polar
   ( -- * Chart Renderers
     renderPieChart
   , renderDonutChart
@@ -36,9 +36,9 @@ import Prelude
 import Data.Array (foldl, index, length, mapWithIndex, replicate)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMax, arrayMin, mapPoints, sumArray)
-import Hydrogen.Element.Component.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
-import Hydrogen.Element.Component.Widget.Chart.Types (ChartData, ChartProps, DataPoint, SeriesData)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMax, arrayMin, mapPoints, sumArray)
+import Hydrogen.Element.Compound.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
+import Hydrogen.Element.Compound.Widget.Chart.Types (ChartData, ChartProps, DataPoint, SeriesData)
 import Hydrogen.Math.Core (cos, sin)
 import Hydrogen.Render.Element as E
 

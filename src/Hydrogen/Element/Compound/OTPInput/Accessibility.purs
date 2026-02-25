@@ -26,7 +26,7 @@
 -- | - Types module for OTPState, OTPIndex, OTPDigitCount
 -- | - Element module for attribute generation
 
-module Hydrogen.Element.Component.OTPInput.Accessibility
+module Hydrogen.Element.Compound.OTPInput.Accessibility
   ( -- * Container Accessibility
     getContainerA11yAttrs
   , getGroupLabel
@@ -88,7 +88,7 @@ import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPState(Idle, Entering, Verifying, Success, Error)
   , OTPIndex
   , OTPDigitCount

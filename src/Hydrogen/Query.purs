@@ -131,6 +131,27 @@ module Hydrogen.Query
   ) where
 
 import Prelude
+  ( class Ord
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , map
+  , not
+  , otherwise
+  , pure
+  , show
+  , unit
+  , void
+  , ($)
+  , (>)
+  , (+)
+  , (-)
+  , (/=)
+  , (<$>)
+  , (<>)
+  , (>>=)
+  )
 
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson)
 import Data.Array as Array

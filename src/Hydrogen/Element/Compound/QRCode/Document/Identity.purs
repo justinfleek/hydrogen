@@ -19,7 +19,7 @@
 -- | - Data.Char (character codes)
 -- | - Data.String (string manipulation)
 
-module Hydrogen.Element.Component.QRCode.Document.Identity
+module Hydrogen.Element.Compound.QRCode.Document.Identity
   ( -- * Identity Types
     UUID5
   , SHA256

@@ -26,7 +26,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Toggle as Toggle
+-- | import Hydrogen.Element.Compound.Toggle as Toggle
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Single toggle button
@@ -52,7 +52,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Toggle
+module Hydrogen.Element.Compound.Toggle
   ( -- * Main Components
     toggle
   , toggleGroup

@@ -32,7 +32,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Card as Card
+-- | import Hydrogen.Element.Compound.Card as Card
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Geometry.Radius as Geometry
 -- | import Hydrogen.Schema.Elevation.Shadow as Shadow
@@ -69,7 +69,7 @@
 -- | - `cardContent` — Main content area
 -- | - `cardFooter` — Footer with actions
 
-module Hydrogen.Element.Component.Card
+module Hydrogen.Element.Compound.Card
   ( -- * Main Component
     card
   

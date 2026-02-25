@@ -18,7 +18,7 @@
 -- | Theme.themeClass Theme.Dark  -- "dark"
 -- |
 -- | -- Generate CSS variables for a theme
--- | Theme.themeCss defaultLightTheme
+-- | Theme.themeLegacyCss defaultLightTheme
 -- | ```
 module Hydrogen.Style.Theme
   ( -- * Theme Mode
@@ -30,8 +30,8 @@ module Hydrogen.Style.Theme
   , defaultLightTheme
   , defaultDarkTheme
     -- * CSS Generation
-  , themeCss
-  , themeCssVars
+  , themeLegacyCss
+  , themeLegacyCssVars
     -- * Color Scheme
   , ColorScheme(..)
   , colorScheme
@@ -43,7 +43,7 @@ module Hydrogen.Style.Theme
 import Prelude
 
 import Data.Array (intercalate)
-import Hydrogen.Style.Color (HSL, toCssVar)
+import Hydrogen.Style.Color (HSL, toLegacyCssVar)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // theme mode
@@ -180,44 +180,44 @@ defaultDarkTheme =
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Generate CSS for a theme (for :root or .dark)
-themeCss :: Theme -> String
-themeCss theme = intercalate "\n"
-  [ "  --background: " <> toCssVar theme.background <> ";"
-  , "  --foreground: " <> toCssVar theme.foreground <> ";"
-  , "  --card: " <> toCssVar theme.card <> ";"
-  , "  --card-foreground: " <> toCssVar theme.cardForeground <> ";"
-  , "  --popover: " <> toCssVar theme.popover <> ";"
-  , "  --popover-foreground: " <> toCssVar theme.popoverForeground <> ";"
-  , "  --primary: " <> toCssVar theme.primary <> ";"
-  , "  --primary-foreground: " <> toCssVar theme.primaryForeground <> ";"
-  , "  --secondary: " <> toCssVar theme.secondary <> ";"
-  , "  --secondary-foreground: " <> toCssVar theme.secondaryForeground <> ";"
-  , "  --muted: " <> toCssVar theme.muted <> ";"
-  , "  --muted-foreground: " <> toCssVar theme.mutedForeground <> ";"
-  , "  --accent: " <> toCssVar theme.accent <> ";"
-  , "  --accent-foreground: " <> toCssVar theme.accentForeground <> ";"
-  , "  --destructive: " <> toCssVar theme.destructive <> ";"
-  , "  --destructive-foreground: " <> toCssVar theme.destructiveForeground <> ";"
-  , "  --border: " <> toCssVar theme.border <> ";"
-  , "  --input: " <> toCssVar theme.input <> ";"
-  , "  --ring: " <> toCssVar theme.ring <> ";"
-  , "  --chart-1: " <> toCssVar theme.chart1 <> ";"
-  , "  --chart-2: " <> toCssVar theme.chart2 <> ";"
-  , "  --chart-3: " <> toCssVar theme.chart3 <> ";"
-  , "  --chart-4: " <> toCssVar theme.chart4 <> ";"
-  , "  --chart-5: " <> toCssVar theme.chart5 <> ";"
+themeLegacyCss :: Theme -> String
+themeLegacyCss theme = intercalate "\n"
+  [ "  --background: " <> toLegacyCssVar theme.background <> ";"
+  , "  --foreground: " <> toLegacyCssVar theme.foreground <> ";"
+  , "  --card: " <> toLegacyCssVar theme.card <> ";"
+  , "  --card-foreground: " <> toLegacyCssVar theme.cardForeground <> ";"
+  , "  --popover: " <> toLegacyCssVar theme.popover <> ";"
+  , "  --popover-foreground: " <> toLegacyCssVar theme.popoverForeground <> ";"
+  , "  --primary: " <> toLegacyCssVar theme.primary <> ";"
+  , "  --primary-foreground: " <> toLegacyCssVar theme.primaryForeground <> ";"
+  , "  --secondary: " <> toLegacyCssVar theme.secondary <> ";"
+  , "  --secondary-foreground: " <> toLegacyCssVar theme.secondaryForeground <> ";"
+  , "  --muted: " <> toLegacyCssVar theme.muted <> ";"
+  , "  --muted-foreground: " <> toLegacyCssVar theme.mutedForeground <> ";"
+  , "  --accent: " <> toLegacyCssVar theme.accent <> ";"
+  , "  --accent-foreground: " <> toLegacyCssVar theme.accentForeground <> ";"
+  , "  --destructive: " <> toLegacyCssVar theme.destructive <> ";"
+  , "  --destructive-foreground: " <> toLegacyCssVar theme.destructiveForeground <> ";"
+  , "  --border: " <> toLegacyCssVar theme.border <> ";"
+  , "  --input: " <> toLegacyCssVar theme.input <> ";"
+  , "  --ring: " <> toLegacyCssVar theme.ring <> ";"
+  , "  --chart-1: " <> toLegacyCssVar theme.chart1 <> ";"
+  , "  --chart-2: " <> toLegacyCssVar theme.chart2 <> ";"
+  , "  --chart-3: " <> toLegacyCssVar theme.chart3 <> ";"
+  , "  --chart-4: " <> toLegacyCssVar theme.chart4 <> ";"
+  , "  --chart-5: " <> toLegacyCssVar theme.chart5 <> ";"
   , "  --radius: " <> theme.radius <> ";"
   ]
 
 -- | Generate complete CSS with light and dark themes
-themeCssVars :: Theme -> Theme -> String
-themeCssVars light' dark' = intercalate "\n"
+themeLegacyCssVars :: Theme -> Theme -> String
+themeLegacyCssVars light' dark' = intercalate "\n"
   [ ":root {"
-  , themeCss light'
+  , themeLegacyCss light'
   , "}"
   , ""
   , ".dark {"
-  , themeCss dark'
+  , themeLegacyCss dark'
   , "}"
   ]
 

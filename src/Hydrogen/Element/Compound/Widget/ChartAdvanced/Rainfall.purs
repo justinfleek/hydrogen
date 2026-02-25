@@ -18,7 +18,7 @@
 -- |
 -- | Pure Element output — no framework dependencies.
 
-module Hydrogen.Element.Component.Widget.ChartAdvanced.Rainfall
+module Hydrogen.Element.Compound.Widget.ChartAdvanced.Rainfall
   ( -- * Types
     RainfallData
   , RainfallConfig
@@ -47,7 +47,7 @@ import Prelude
 import Data.Array (length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Nothing))
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMax)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMax)
 import Hydrogen.Math.Core as Math
 import Hydrogen.Render.Element as E
 

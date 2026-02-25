@@ -11,7 +11,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Select as Select
+-- | import Hydrogen.Element.Compound.Select as Select
 -- |
 -- | -- Basic single select
 -- | Select.select
@@ -48,7 +48,7 @@
 -- |       ]
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.Select
+module Hydrogen.Element.Compound.Select
   ( -- * Select Component
     select
   , selectTrigger

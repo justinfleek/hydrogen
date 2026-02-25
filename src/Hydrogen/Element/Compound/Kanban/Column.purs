@@ -19,7 +19,7 @@
 -- | - Collapsed state
 -- | - Index position
 
-module Hydrogen.Element.Component.Kanban.Column
+module Hydrogen.Element.Compound.Kanban.Column
   ( -- * Column Data
     KanbanColumn
   , kanbanColumn
@@ -60,7 +60,7 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
-import Hydrogen.Element.Component.Kanban.Types
+import Hydrogen.Element.Compound.Kanban.Types
   ( ColumnId
   , WIPLimit
   , columnId

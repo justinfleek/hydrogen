@@ -44,7 +44,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.PasswordInput as PasswordInput
+-- | import Hydrogen.Element.Compound.PasswordInput as PasswordInput
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic password input (inherits all visual properties from context)
@@ -71,7 +71,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.PasswordInput
+module Hydrogen.Element.Compound.PasswordInput
   ( -- * PasswordInput Components
     passwordInput
   , passwordStrengthBar

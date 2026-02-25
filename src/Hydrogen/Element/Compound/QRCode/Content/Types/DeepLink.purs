@@ -18,7 +18,7 @@
 -- | - Data.Array (query params)
 -- | - Content.Types.Helpers (URI encoding)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.DeepLink
+module Hydrogen.Element.Compound.QRCode.Content.Types.DeepLink
   ( -- * DeepLink Content
     DeepLinkContent
   , deepLink
@@ -42,7 +42,7 @@ import Data.Array (length)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
-import Hydrogen.Element.Component.QRCode.Content.Types.Helpers (encodeURIComponent)
+import Hydrogen.Element.Compound.QRCode.Content.Types.Helpers (encodeURIComponent)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // deeplink content

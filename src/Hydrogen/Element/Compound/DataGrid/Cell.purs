@@ -16,7 +16,7 @@
 -- |
 -- | They return pure Element data that the runtime renders to DOM.
 
-module Hydrogen.Element.Component.DataGrid.Cell
+module Hydrogen.Element.Compound.DataGrid.Cell
   ( -- * Cell Rendering
     renderCell
   , renderCellByType
@@ -42,7 +42,7 @@ import Data.Maybe (Maybe(Nothing, Just), maybe)
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as Color
 import Hydrogen.Schema.Geometry.Radius as Geometry
-import Hydrogen.Element.Component.DataGrid.Types
+import Hydrogen.Element.Compound.DataGrid.Types
   ( CellType
       ( CellText
       , CellNumber

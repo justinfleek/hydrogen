@@ -38,7 +38,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Input as Input
+-- | import Hydrogen.Element.Compound.Input as Input
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- |
@@ -79,7 +79,7 @@
 -- | - `inputWithLabel` — Input with associated label
 -- | - `textareaWithLabel` — Textarea with associated label
 
-module Hydrogen.Element.Component.Input
+module Hydrogen.Element.Compound.Input
   ( -- * Main Components
     input
   , textarea

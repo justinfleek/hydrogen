@@ -25,7 +25,7 @@
 -- | - Prelude (Eq, Ord, Show, Bounded)
 -- | - Schema atoms (referenced, not imported here)
 
-module Hydrogen.Element.Component.Carousel.Types
+module Hydrogen.Element.Compound.Carousel.Types
   ( -- * Slide Index
     SlideIndex
   , slideIndex

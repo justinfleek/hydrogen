@@ -11,7 +11,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.AlertDialog as AlertDialog
+-- | import Hydrogen.Element.Compound.AlertDialog as AlertDialog
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Confirmation dialog
@@ -36,7 +36,7 @@
 -- |   , AlertDialog.onConfirm HandleOK
 -- |   ]
 -- | ```
-module Hydrogen.Element.Component.AlertDialog
+module Hydrogen.Element.Compound.AlertDialog
   ( -- * AlertDialog Components
     alertDialog
   , alertDialogCustom

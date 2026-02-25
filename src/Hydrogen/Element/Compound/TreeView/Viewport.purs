@@ -26,7 +26,7 @@
 -- | - TreeView.Node (Tree structure)
 -- | - Schema.Graph.Viewport (zoom, pan, bounds)
 
-module Hydrogen.Element.Component.TreeView.Viewport
+module Hydrogen.Element.Compound.TreeView.Viewport
   ( -- * Viewport State
     TreeViewport
   , treeViewport
@@ -112,11 +112,11 @@ import Data.Map as Map
 import Data.Foldable (foldl)
 import Data.Int (toNumber) as Int
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId
@@ -125,12 +125,12 @@ import Hydrogen.Element.Component.TreeView.Node
   , getNode
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( ExpandedState
   , isExpanded
   )
 
-import Hydrogen.Element.Component.TreeView.Layout
+import Hydrogen.Element.Compound.TreeView.Layout
   ( LayoutResult
   , nodePosition
   , contentBounds

@@ -37,7 +37,7 @@
 -- | └─────────────────────────────┘
 -- | ```
 
-module Hydrogen.Element.Component.QRCode.Types
+module Hydrogen.Element.Compound.QRCode.Types
   ( -- * Version (re-exported)
     module Version
   
@@ -61,7 +61,7 @@ module Hydrogen.Element.Component.QRCode.Types
   ) where
 
 -- Re-exported modules
-import Hydrogen.Element.Component.QRCode.Types.Version
+import Hydrogen.Element.Compound.QRCode.Types.Version
   ( QRVersion(QRVersion)
   , mkVersion
   , versionToInt
@@ -70,19 +70,19 @@ import Hydrogen.Element.Component.QRCode.Types.Version
   , versionSize
   ) as Version
 
-import Hydrogen.Element.Component.QRCode.Types.ErrorCorrection
+import Hydrogen.Element.Compound.QRCode.Types.ErrorCorrection
   ( ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
   , ecToString
   , ecRecoveryPercent
   ) as ErrorCorrection
 
-import Hydrogen.Element.Component.QRCode.Types.EncodingMode
+import Hydrogen.Element.Compound.QRCode.Types.EncodingMode
   ( EncodingMode(ModeNumeric, ModeAlphanumeric, ModeByte, ModeKanji, ModeECI)
   , modeIndicator
   , detectMode
   ) as EncodingMode
 
-import Hydrogen.Element.Component.QRCode.Types.Module
+import Hydrogen.Element.Compound.QRCode.Types.Module
   ( Module(Dark, Light, Reserved)
   , ModuleType(DataModule, FinderModule, TimingModule, AlignmentModule, FormatModule, VersionModule, QuietModule)
   , isDark
@@ -90,7 +90,7 @@ import Hydrogen.Element.Component.QRCode.Types.Module
   , isReserved
   ) as Module
 
-import Hydrogen.Element.Component.QRCode.Types.Matrix
+import Hydrogen.Element.Compound.QRCode.Types.Matrix
   ( QRMatrix
   , mkMatrix
   , matrixSize
@@ -100,12 +100,12 @@ import Hydrogen.Element.Component.QRCode.Types.Matrix
   , toNestedArray
   ) as Matrix
 
-import Hydrogen.Element.Component.QRCode.Types.Capacity
+import Hydrogen.Element.Compound.QRCode.Types.Capacity
   ( Capacity
   , getCapacity
   ) as Capacity
 
-import Hydrogen.Element.Component.QRCode.Types.Codeword
+import Hydrogen.Element.Compound.QRCode.Types.Codeword
   ( Codeword(Codeword)
   , mkCodeword
   , codewordValue

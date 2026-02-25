@@ -26,7 +26,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Tabs as Tabs
+-- | import Hydrogen.Element.Compound.Tabs as Tabs
 -- |
 -- | Tabs.tabs [ Tabs.activeTab state.currentTab ]
 -- |   [ Tabs.tabList []
@@ -42,7 +42,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Tabs
+module Hydrogen.Element.Compound.Tabs
   ( -- * Main Components
     tabs
   , tabList

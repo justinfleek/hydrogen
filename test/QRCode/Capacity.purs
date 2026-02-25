@@ -13,8 +13,8 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((<?>))
 import Test.QuickCheck.Gen (chooseInt)
 
-import Hydrogen.Element.Component.QRCode.Types as Types
-import Hydrogen.Element.Component.QRCode.Encoding.Capacity as Cap
+import Hydrogen.Element.Compound.QRCode.Types as Types
+import Hydrogen.Element.Compound.QRCode.Encoding.Capacity as Cap
 import Test.QRCode.Generators (genVersion, genEC)
 
 capacityTableTests :: Spec Unit

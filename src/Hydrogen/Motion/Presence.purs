@@ -77,7 +77,7 @@ module Hydrogen.Motion.Presence
   , exit
     -- * Serialization (for renderers)
   , variantToRecord
-  , variantToCss
+  , variantToLegacyCss
   ) where
 
 import Prelude
@@ -425,8 +425,8 @@ variantToRecord v =
   }
 
 -- | Convert variant to CSS style string (for legacy renderers)
-variantToCss :: Variant -> String
-variantToCss v =
+variantToLegacyCss :: Variant -> String
+variantToLegacyCss v =
   intercalate "; " (Array.filter (\s -> s /= "")
     [ styleProp "opacity" v.opacity
     , transformProp v

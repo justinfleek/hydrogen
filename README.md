@@ -162,7 +162,7 @@ htmlString = TS.render myCard
 
 - **[Schema Reference](docs/SCHEMA.md)** - Complete pillar enumeration
 - **[Design Ontology](docs/design-ontology.md)** - Type-safe primitives
-- **[Component Architecture](docs/COMPONENT_ARCHITECTURE.md)** - Schema-native components
+- **[Component Architecture](docs/COMPOUND_ARCHITECTURE.md)** - Schema-native components
 - **[Query Guide](docs/query.md)** - Caching, deduplication, pagination
 - **[Router Guide](docs/router.md)** - Route ADTs, metadata, navigation
 - **[SSG Guide](docs/ssg.md)** - Static generation

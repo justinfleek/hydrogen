@@ -19,7 +19,7 @@
 -- | Processing functions operate on `Array (Object String)` row data.
 -- | They compose together: filter -> sort -> paginate.
 
-module Hydrogen.Element.Component.DataGrid.Processing
+module Hydrogen.Element.Compound.DataGrid.Processing
   ( -- * Data Processing Pipeline
     processRows
   
@@ -74,7 +74,7 @@ import Data.Tuple (Tuple(Tuple))
 import Foreign.Object (Object)
 import Foreign.Object as Object
 
-import Hydrogen.Element.Component.DataGrid.Types
+import Hydrogen.Element.Compound.DataGrid.Types
   ( ColumnDef
   , FilterValue
       ( TextFilter

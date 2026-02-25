@@ -42,7 +42,7 @@
 -- | defaultZ = ZIndex.auto
 -- |
 -- | -- Convert to CSS
--- | css = ZIndex.toCss dropdownZ  -- "100"
+-- | css = ZIndex.toLegacyCss dropdownZ  -- "100"
 -- | ```
 
 module Hydrogen.Schema.Elevation.ZIndex

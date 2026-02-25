@@ -28,7 +28,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Kanban as Kanban
+-- | import Hydrogen.Element.Compound.Kanban as Kanban
 -- |
 -- | -- Build initial state
 -- | let state = Kanban.initialState
@@ -45,7 +45,7 @@
 -- |   state
 -- | ```
 
-module Hydrogen.Element.Component.Kanban
+module Hydrogen.Element.Compound.Kanban
   ( -- * Re-exports: Types
     module Types
   
@@ -62,7 +62,7 @@ module Hydrogen.Element.Component.Kanban
   , module Render
   ) where
 
-import Hydrogen.Element.Component.Kanban.Types
+import Hydrogen.Element.Compound.Kanban.Types
   ( BoardId
   , boardId
   , unwrapBoardId
@@ -102,7 +102,7 @@ import Hydrogen.Element.Component.Kanban.Types
   , DropPosition(DropBefore, DropAfter, DropInto)
   ) as Types
 
-import Hydrogen.Element.Component.Kanban.Card
+import Hydrogen.Element.Compound.Kanban.Card
   ( KanbanCard
   , kanbanCard
   , emptyCard
@@ -151,7 +151,7 @@ import Hydrogen.Element.Component.Kanban.Card
   , formatDueDate
   ) as Card
 
-import Hydrogen.Element.Component.Kanban.Column
+import Hydrogen.Element.Compound.Kanban.Column
   ( KanbanColumn
   , kanbanColumn
   , emptyColumn
@@ -175,7 +175,7 @@ import Hydrogen.Element.Component.Kanban.Column
   , columnCardCountLabel
   ) as Column
 
-import Hydrogen.Element.Component.Kanban.State
+import Hydrogen.Element.Compound.Kanban.State
   ( KanbanState
   , initialState
   , emptyState
@@ -220,7 +220,7 @@ import Hydrogen.Element.Component.Kanban.State
   , toggleColumnCollapsedInState
   ) as State
 
-import Hydrogen.Element.Component.Kanban.Render
+import Hydrogen.Element.Compound.Kanban.Render
   ( renderBoard
   , renderColumn
   , renderCard

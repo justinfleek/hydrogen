@@ -26,7 +26,7 @@
 -- | - Schema.Motion (Timecode, Easing)
 -- | - Schema.Graph.Connection (ConnectionAnimation)
 
-module Hydrogen.Element.Component.TreeView.Animation
+module Hydrogen.Element.Compound.TreeView.Animation
   ( -- * Animation State
     AnimationState
   , animationState
@@ -114,7 +114,7 @@ import Prelude
   , min
   )
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   )
 

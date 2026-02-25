@@ -6,7 +6,7 @@
 -- |
 -- | All functions are pure — no FFI, no effects.
 
-module Hydrogen.Element.Component.CreditCard.Format
+module Hydrogen.Element.Compound.CreditCard.Format
   ( formatCardNumber
   , formatStandard
   , formatAmex
@@ -39,7 +39,7 @@ import Data.String (length, take, drop, joinWith, toCodePointArray, fromCodePoin
 import Data.String.CodePoints (codePointFromChar) as CP
 import Data.String.CodeUnits (toCharArray, fromCharArray) as CU
 
-import Hydrogen.Element.Component.CreditCard.Types
+import Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   )
 

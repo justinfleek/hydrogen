@@ -26,7 +26,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.MeshGradient as MeshGrad
+-- | import Hydrogen.Element.Compound.MeshGradient as MeshGrad
 -- | import Hydrogen.Schema.Color.RGB (rgb)
 -- |
 -- | -- Simple 4-corner mesh gradient
@@ -56,7 +56,7 @@
 -- | - **SVG**: Polygon approximation with fill gradients
 -- | - **Fallback**: CSS gradient approximation (lossy)
 
-module Hydrogen.Element.Component.MeshGradient
+module Hydrogen.Element.Compound.MeshGradient
   ( -- * Component
     meshGradient
   
@@ -118,7 +118,7 @@ import Hydrogen.Schema.Geometry.Mesh2D
 import Hydrogen.Schema.Geometry.Point (Point2D, point2D)
 
 -- Submodule for SVG rendering
-import Hydrogen.Element.Component.MeshGradient.SVG (renderMeshAsSVG)
+import Hydrogen.Element.Compound.MeshGradient.SVG (renderMeshAsSVG)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types

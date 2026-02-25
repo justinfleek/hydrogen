@@ -22,7 +22,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Skeleton as Skeleton
+-- | import Hydrogen.Element.Compound.Skeleton as Skeleton
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
@@ -52,7 +52,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Skeleton
+module Hydrogen.Element.Compound.Skeleton
   ( -- * Main Components
     skeleton
   , circle

@@ -20,7 +20,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Widget.Table as Table
+-- | import Hydrogen.Element.Compound.Widget.Table as Table
 -- |
 -- | Table.tableWidget []
 -- |   { columns:
@@ -36,7 +36,7 @@
 -- |   }
 -- | ```
 
-module Hydrogen.Element.Component.Widget.Table
+module Hydrogen.Element.Compound.Widget.Table
   ( -- * Widget Component
     tableWidget
   , tableWidgetSimple
@@ -124,7 +124,7 @@ import Prelude
 import Data.Array (foldl, length, mapWithIndex, index)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.Widget.Types (Percentage, unwrapPercentage)
+import Hydrogen.Element.Compound.Widget.Types (Percentage, unwrapPercentage)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // column types

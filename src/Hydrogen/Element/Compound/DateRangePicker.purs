@@ -33,7 +33,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.DateRangePicker as DateRangePicker
+-- | import Hydrogen.Element.Compound.DateRangePicker as DateRangePicker
 -- | import Hydrogen.Schema.Attestation.Timestamp as Timestamp
 -- |
 -- | -- Basic range picker (today and timestamp are required)
@@ -68,16 +68,16 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.DateRangePicker
+module Hydrogen.Element.Compound.DateRangePicker
   ( -- * Component
     dateRangePicker
   , dateRangePickerWithLabel
   
   -- * Re-exports from Types
-  , module Hydrogen.Element.Component.DateRangePicker.Types
+  , module Hydrogen.Element.Compound.DateRangePicker.Types
   
   -- * Re-exports from Presets
-  , module Hydrogen.Element.Component.DateRangePicker.Presets
+  , module Hydrogen.Element.Compound.DateRangePicker.Presets
   
   -- * Props
   , DateRangePickerProps
@@ -154,10 +154,10 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
-import Hydrogen.Element.Component.Calendar (CalendarDate, WeekStart(Sunday))
+import Hydrogen.Element.Compound.Calendar (CalendarDate, WeekStart(Sunday))
 import Hydrogen.Schema.Attestation.Timestamp (Timestamp)
 import Hydrogen.Schema.Attestation.Timestamp as Timestamp
-import Hydrogen.Element.Component.DateRangePicker.Types
+import Hydrogen.Element.Compound.DateRangePicker.Types
   ( ComparisonMode(PreviousPeriod, PreviousYear, Custom)
   , SelectionState(SelectingStart, SelectingEnd, Complete)
   , comparisonModeLabel
@@ -167,7 +167,7 @@ import Hydrogen.Element.Component.DateRangePicker.Types
   , rangeDays
   , isValidRange
   )
-import Hydrogen.Element.Component.DateRangePicker.Presets
+import Hydrogen.Element.Compound.DateRangePicker.Presets
   ( PresetDef
   , defaultPresets
   , analyticsPresets
@@ -182,7 +182,7 @@ import Hydrogen.Element.Component.DateRangePicker.Presets
   , thisYearPreset
   , presetRange
   )
-import Hydrogen.Element.Component.DateRangePicker.Render as Render
+import Hydrogen.Element.Compound.DateRangePicker.Render as Render
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

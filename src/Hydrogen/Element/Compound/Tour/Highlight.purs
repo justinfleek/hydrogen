@@ -23,7 +23,7 @@
 -- | | GlowStyle       | Material  | Glow effect around target            |
 -- | | BorderStyle     | Material  | Border around spotlight              |
 
-module Hydrogen.Element.Component.Tour.Highlight
+module Hydrogen.Element.Compound.Tour.Highlight
   ( -- * Highlight Kind
     HighlightKind
       ( HighlightSpotlight

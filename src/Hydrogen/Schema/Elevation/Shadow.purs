@@ -54,7 +54,7 @@
 -- |   }
 -- |
 -- | -- Convert to CSS
--- | css = Shadow.toCss cardShadow
+-- | css = Shadow.toLegacyCss cardShadow
 -- | -- "0px 4px 6px -1px rgba(0, 0, 0, 0.1)"
 -- |
 -- | -- Layered shadows for depth

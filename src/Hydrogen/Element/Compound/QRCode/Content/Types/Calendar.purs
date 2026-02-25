@@ -26,7 +26,7 @@
 -- | - Data.Maybe (optional fields)
 -- | - Data.String (joining lines)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Calendar
+module Hydrogen.Element.Compound.QRCode.Content.Types.Calendar
   ( -- * Calendar Content
     CalendarContent
   , calendarContent

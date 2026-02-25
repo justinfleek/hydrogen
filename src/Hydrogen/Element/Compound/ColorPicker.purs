@@ -42,7 +42,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.ColorPicker as ColorPicker
+-- | import Hydrogen.Element.Compound.ColorPicker as ColorPicker
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic color picker
@@ -61,7 +61,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.ColorPicker
+module Hydrogen.Element.Compound.ColorPicker
   ( -- * Component
     colorPicker
   
@@ -132,8 +132,8 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
-import Hydrogen.Element.Component.Slider as Slider
-import Hydrogen.Element.Component.Checkbox as Checkbox
+import Hydrogen.Element.Compound.Slider as Slider
+import Hydrogen.Element.Compound.Checkbox as Checkbox
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // types

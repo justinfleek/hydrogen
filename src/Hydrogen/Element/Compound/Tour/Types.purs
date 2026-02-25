@@ -38,7 +38,7 @@
 -- | | ScrollBlock    | Spatial   | Vertical scroll alignment            |
 -- | | ScrollInline   | Spatial   | Horizontal scroll alignment          |
 
-module Hydrogen.Element.Component.Tour.Types
+module Hydrogen.Element.Compound.Tour.Types
   ( -- * Identifiers
     StepId
   , stepId

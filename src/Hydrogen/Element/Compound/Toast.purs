@@ -25,7 +25,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Toast as Toast
+-- | import Hydrogen.Element.Compound.Toast as Toast
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Toast container (place once at app root)
@@ -46,7 +46,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Toast
+module Hydrogen.Element.Compound.Toast
   ( -- * Main Components
     toast
   , toastContainer

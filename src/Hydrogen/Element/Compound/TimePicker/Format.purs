@@ -12,7 +12,7 @@
 -- | Uses the Schema's TimeOfDay molecule directly. No redundant Time type.
 -- | All formatting operations work on bounded Schema atoms.
 
-module Hydrogen.Element.Component.TimePicker.Format
+module Hydrogen.Element.Compound.TimePicker.Format
   ( -- * Formatting
     formatTime
   , format24H
@@ -59,7 +59,7 @@ import Data.String.Pattern (Pattern(Pattern))
 import Data.String.CodeUnits (take, drop) as String
 
 import Hydrogen.Schema.Temporal.TimeOfDay as TimeOfDay
-import Hydrogen.Element.Component.TimePicker.Types (HourFormat(Hour12, Hour24), Period(AM, PM))
+import Hydrogen.Element.Compound.TimePicker.Types (HourFormat(Hour12, Hour24), Period(AM, PM))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                 // formatting

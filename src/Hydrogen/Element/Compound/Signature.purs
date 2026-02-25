@@ -41,7 +41,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Signature as Sig
+-- | import Hydrogen.Element.Compound.Signature as Sig
 -- |
 -- | -- Basic signature pad
 -- | mySignature = Sig.signaturePad Sig.defaultConfig
@@ -62,7 +62,7 @@
 -- | display = Sig.signatureDisplay existingStrokeData
 -- | ```
 
-module Hydrogen.Element.Component.Signature
+module Hydrogen.Element.Compound.Signature
   ( -- * Components
     signaturePad
   , signaturePadWithToolbar
@@ -92,7 +92,7 @@ import Data.Number as Number
 
 import Hydrogen.Render.Element as E
 import Data.Maybe (Maybe(Just, Nothing), maybe, isJust)
-import Hydrogen.Element.Component.Signature.Types
+import Hydrogen.Element.Compound.Signature.Types
   ( Point
   , Stroke
   , StrokeData
@@ -133,7 +133,7 @@ import Hydrogen.Element.Component.Signature.Types
   , encodePoint
   , encodeStroke
   ) as Types
-import Hydrogen.Element.Component.Signature.Icons
+import Hydrogen.Element.Compound.Signature.Icons
   ( eraserIcon
   , undoIcon
   , trashIcon

@@ -13,7 +13,7 @@
 -- | - Validation result record
 -- | - Field-specific error types
 
-module Hydrogen.Element.Component.CreditCard.Types
+module Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   , CardField(CardNumberField, ExpiryField, CvvField, CardholderField, NoField)
   , CreditCardValue

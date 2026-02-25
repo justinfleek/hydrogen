@@ -7,7 +7,7 @@
 -- | Implements Luhn algorithm, card type detection, and field validation.
 -- | All functions are pure — no FFI, no effects.
 
-module Hydrogen.Element.Component.CreditCard.Validation
+module Hydrogen.Element.Compound.CreditCard.Validation
   ( luhnCheck
   , validateCardNumber
   , isAllDigits
@@ -41,14 +41,14 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.String (length, take, drop) as String
 import Data.String.CodeUnits (toCharArray) as CU
 
-import Hydrogen.Element.Component.CreditCard.Types
+import Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   , CardValidation
   , cardNumberLength
   , cvvLength
   )
 
-import Hydrogen.Element.Component.CreditCard.Format (stripSpaces, digitsOnly)
+import Hydrogen.Element.Compound.CreditCard.Format (stripSpaces, digitsOnly)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // luhn algorithm

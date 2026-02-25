@@ -21,7 +21,7 @@
 -- | Old: `Tour.step { target, title, content }`
 -- | New: Use the new Step type from Tour.Step module (when implemented)
 
-module Hydrogen.Element.Component.Tour.Compat
+module Hydrogen.Element.Compound.Tour.Compat
   ( -- * Legacy Types
     Step
   , StepConfig
@@ -82,7 +82,7 @@ import Prelude
 
 import Data.Array (index, length) as Array
 import Data.Maybe (Maybe(Nothing, Just))
-import Hydrogen.Element.Component.Tour.Types
+import Hydrogen.Element.Compound.Tour.Types
   ( Placement
       ( PlacementBottom
       )

@@ -29,7 +29,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Swatch as Swatch
+-- | import Hydrogen.Element.Compound.Swatch as Swatch
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Dimension.Swatch as SwatchDim
 -- |
@@ -55,7 +55,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Swatch
+module Hydrogen.Element.Compound.Swatch
   ( -- * Main Component
     swatch
   

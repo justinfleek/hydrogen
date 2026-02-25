@@ -17,7 +17,7 @@
 -- |
 -- | Pure Element output — no framework dependencies.
 
-module Hydrogen.Element.Component.Widget.ChartAdvanced.DualAxis
+module Hydrogen.Element.Compound.Widget.ChartAdvanced.DualAxis
   ( -- * Types
     DualAxisData
   , DualAxisConfig
@@ -47,7 +47,7 @@ import Prelude
 import Data.Array (foldl, length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Nothing))
-import Hydrogen.Element.Component.Widget.Chart.Helpers (arrayMin, arrayMax)
+import Hydrogen.Element.Compound.Widget.Chart.Helpers (arrayMin, arrayMax)
 import Hydrogen.Math.Core as Math
 import Hydrogen.Render.Element as E
 

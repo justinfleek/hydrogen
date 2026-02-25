@@ -15,7 +15,7 @@
 -- |
 -- | Pure Element output — can be rendered to DOM, Static HTML, or any target.
 
-module Hydrogen.Element.Component.Widget.Chart3D
+module Hydrogen.Element.Compound.Widget.Chart3D
   ( -- * 3D Bar Chart
     chart3DBar
   , Bar3DData

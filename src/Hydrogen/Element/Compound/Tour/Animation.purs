@@ -23,7 +23,7 @@
 -- | | EntranceKind    | Temporal  | How tooltip appears                  |
 -- | | ExitKind        | Temporal  | How tooltip disappears               |
 
-module Hydrogen.Element.Component.Tour.Animation
+module Hydrogen.Element.Compound.Tour.Animation
   ( -- * Transition Kind
     TransitionKind
       ( TransitionNone

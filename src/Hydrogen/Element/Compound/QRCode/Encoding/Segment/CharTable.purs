@@ -4,7 +4,7 @@
 
 -- | Character lookup tables for QR encoding modes.
 
-module Hydrogen.Element.Component.QRCode.Encoding.Segment.CharTable
+module Hydrogen.Element.Compound.QRCode.Encoding.Segment.CharTable
   ( alphanumericValue
   , isAlphanumericChar
   , isNumericChar

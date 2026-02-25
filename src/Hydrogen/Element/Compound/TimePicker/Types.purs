@@ -7,7 +7,7 @@
 -- | This module contains type definitions shared across the TimePicker
 -- | component family. Pure data types with no rendering logic.
 
-module Hydrogen.Element.Component.TimePicker.Types
+module Hydrogen.Element.Compound.TimePicker.Types
   ( -- * Hour Format
     HourFormat(Hour12, Hour24)
   , is12Hour

@@ -20,7 +20,7 @@
 -- |
 -- | - Carousel.Types (ContentKind, SlideIndex)
 
-module Hydrogen.Element.Component.Carousel.Slide
+module Hydrogen.Element.Compound.Carousel.Slide
   ( -- * Slide Data
     SlideData
   , slideData
@@ -62,7 +62,7 @@ import Prelude
 import Data.Array as Array
 import Data.Maybe (Maybe(Nothing, Just))
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( ContentKind
       ( ContentImage
       , ContentVideo

@@ -24,7 +24,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Avatar as Avatar
+-- | import Hydrogen.Element.Compound.Avatar as Avatar
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
@@ -43,7 +43,7 @@
 -- |   [ Avatar.avatarFallback [] [ E.text "AB" ] ]
 -- | ```
 
-module Hydrogen.Element.Component.Avatar
+module Hydrogen.Element.Compound.Avatar
   ( -- * Main Component
     avatar
   

@@ -24,7 +24,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.QRCode as QR
+-- | import Hydrogen.Element.Compound.QRCode as QR
 -- |
 -- | -- Simple URL
 -- | myQR = QR.qrCode (QR.url "https://example.com")
@@ -46,7 +46,7 @@
 -- | - Matrix (generateMatrix)
 -- | - Render/SVG (renderQRCode)
 
-module Hydrogen.Element.Component.QRCode.QRCode
+module Hydrogen.Element.Compound.QRCode.QRCode
   ( -- * Simple API
     qrCode
   , qrCodeWith
@@ -88,7 +88,7 @@ import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.String.CodeUnits (toCharArray)
 
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion
   , ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
   , QRMatrix
@@ -97,7 +97,7 @@ import Hydrogen.Element.Component.QRCode.Types
   , minVersion
   , getCapacity
   ) as Types
-import Hydrogen.Element.Component.QRCode.Content.Types
+import Hydrogen.Element.Compound.QRCode.Content.Types
   ( QRContent
   , urlContent
   , emailContent
@@ -106,7 +106,7 @@ import Hydrogen.Element.Component.QRCode.Content.Types
   , wifiContent
   , contentToString
   ) as ContentTypes
-import Hydrogen.Element.Component.QRCode.Encoding.BitStream
+import Hydrogen.Element.Compound.QRCode.Encoding.BitStream
   ( BitStream
   , empty
   , append
@@ -116,7 +116,7 @@ import Hydrogen.Element.Component.QRCode.Encoding.BitStream
   , addTerminator
   , addPadCodewords
   ) as BitStream
-import Hydrogen.Element.Component.QRCode.Encoding.Segment
+import Hydrogen.Element.Compound.QRCode.Encoding.Segment
   ( encodeString
   , encodeSegments
   , Segment
@@ -124,18 +124,18 @@ import Hydrogen.Element.Component.QRCode.Encoding.Segment
   , detectOptimalMode
   , minVersionForData
   ) as Segment
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon
   ( computeECCodewords
   ) as RS
-import Hydrogen.Element.Component.QRCode.Encoding.Capacity
+import Hydrogen.Element.Compound.QRCode.Encoding.Capacity
   ( BlockInfo
   , getBlockInfo
   , totalDataCodewords
   ) as Capacity
-import Hydrogen.Element.Component.QRCode.Matrix
+import Hydrogen.Element.Compound.QRCode.Matrix
   ( generateMatrix
   ) as Matrix
-import Hydrogen.Element.Component.QRCode.Render.SVG
+import Hydrogen.Element.Compound.QRCode.Render.SVG
   ( renderQRCode
   , RenderConfig
   , defaultRenderConfig

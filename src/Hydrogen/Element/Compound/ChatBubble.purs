@@ -33,7 +33,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.ChatBubble as ChatBubble
+-- | import Hydrogen.Element.Compound.ChatBubble as ChatBubble
 -- | import Hydrogen.Schema.Color as Color
 -- | import Hydrogen.Schema.Geometry as Geometry
 -- | import Hydrogen.Schema.Elevation.Shadow as Shadow
@@ -80,7 +80,7 @@
 -- | - `typingIndicator` — Animated typing dots
 -- | - `dateDivider` — Date separator between messages
 
-module Hydrogen.Element.Component.ChatBubble
+module Hydrogen.Element.Compound.ChatBubble
   ( -- * Main Component
     chatBubble
   

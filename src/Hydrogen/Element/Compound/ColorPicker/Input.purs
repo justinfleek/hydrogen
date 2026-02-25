@@ -24,7 +24,7 @@
 -- | | borderColor   | Color     | RGB               | Input border           |
 -- | | borderRadius  | Geometry  | Radius            | Corner rounding        |
 
-module Hydrogen.Element.Component.ColorPicker.Input
+module Hydrogen.Element.Compound.ColorPicker.Input
   ( -- * Hex Input
     hexInput
   , HexInputProps

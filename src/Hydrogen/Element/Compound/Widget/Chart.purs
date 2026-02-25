@@ -23,7 +23,7 @@
 -- | - Chart.Cartesian: Line, Area, Bar, Column, Scatter, Bubble renderers
 -- | - Chart.Polar: Pie, Donut, Radar, Polar renderers
 
-module Hydrogen.Element.Component.Widget.Chart
+module Hydrogen.Element.Compound.Widget.Chart
   ( -- * Widget Component
     chartWidget
   , chartWidgetSimple
@@ -47,9 +47,9 @@ import Prelude
 
 import Data.Array (foldl, mapWithIndex)
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Element.Component.Widget.Chart.Cartesian as Cartesian
-import Hydrogen.Element.Component.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
-import Hydrogen.Element.Component.Widget.Chart.Palette 
+import Hydrogen.Element.Compound.Widget.Chart.Cartesian as Cartesian
+import Hydrogen.Element.Compound.Widget.Chart.Palette (defaultPalette, getColorAtIndex)
+import Hydrogen.Element.Compound.Widget.Chart.Palette 
   ( defaultPalette
   , pastelPalette
   , vibrantPalette
@@ -57,8 +57,8 @@ import Hydrogen.Element.Component.Widget.Chart.Palette
   , generateSeriesColors
   , getColorAtIndex
   ) as Palette
-import Hydrogen.Element.Component.Widget.Chart.Polar as Polar
-import Hydrogen.Element.Component.Widget.Chart.Types 
+import Hydrogen.Element.Compound.Widget.Chart.Polar as Polar
+import Hydrogen.Element.Compound.Widget.Chart.Types 
   ( ChartType(Line, Area, Bar, Column, Pie, Donut, Scatter, Bubble, Radar, Polar)
   , chartTypeToString
   , isCartesian
@@ -80,7 +80,7 @@ import Hydrogen.Element.Component.Widget.Chart.Types
   , aspectRatio
   , className
   ) as Types
-import Hydrogen.Element.Component.Widget.Chart.Types 
+import Hydrogen.Element.Compound.Widget.Chart.Types 
   ( ChartType(Line, Area, Bar, Column, Pie, Donut, Scatter, Bubble, Radar, Polar)
   , ChartData
   , ChartProps

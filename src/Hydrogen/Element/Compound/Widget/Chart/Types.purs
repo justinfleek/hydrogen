@@ -10,7 +10,7 @@
 -- | - DataPoint, SeriesData, and ChartData for chart data
 -- | - ChartProps and ChartProp for widget configuration
 
-module Hydrogen.Element.Component.Widget.Chart.Types
+module Hydrogen.Element.Compound.Widget.Chart.Types
   ( -- * Chart Types
     ChartType
       ( Line

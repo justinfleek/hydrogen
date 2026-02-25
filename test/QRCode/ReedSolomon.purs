@@ -15,7 +15,7 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((===), (<?>))
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-import Hydrogen.Element.Component.QRCode.Encoding.ReedSolomon as RS
+import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon as RS
 import Test.QRCode.Generators (genGFElement)
 
 reedSolomonTests :: Spec Unit

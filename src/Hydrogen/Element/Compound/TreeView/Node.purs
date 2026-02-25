@@ -24,7 +24,7 @@
 -- |
 -- | - TreeView.Types (NodeId, NodeIcon, CheckState, Depth, TreePath)
 
-module Hydrogen.Element.Component.TreeView.Node
+module Hydrogen.Element.Compound.TreeView.Node
   ( -- * Node Data
     TreeNode
   , treeNode
@@ -101,7 +101,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Foldable (foldl)
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , NodeIcon
   , Depth

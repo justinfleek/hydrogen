@@ -24,7 +24,7 @@
 -- |
 -- | The Card wraps any chart Element, providing consistent styling.
 
-module Hydrogen.Element.Component.Widget.Card
+module Hydrogen.Element.Compound.Widget.Card
   ( -- * Widget Card
     widgetCard
   , WidgetCardData
@@ -59,7 +59,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Element.Component.Widget.Theme 
+import Hydrogen.Element.Compound.Widget.Theme 
   ( ThemeMode(..)
   , GlowIntensity(..)
   , containerBackground

@@ -28,7 +28,7 @@
 -- | | borderColor   | Color     | RGB               | Wheel border           |
 -- | | handleColor   | Color     | RGB               | Handle fill            |
 
-module Hydrogen.Element.Component.ColorPicker.Wheel
+module Hydrogen.Element.Compound.ColorPicker.Wheel
   ( -- * Component
     colorWheel
   

@@ -33,6 +33,8 @@ module Hydrogen.Realtime.WebSocket
   , WebSocketConfig
   , WebSocketState(..)
   , CloseCode
+    -- * Configuration
+  , defaultConfig
     -- * Connection
   , connect
   , connectWithProtocol
@@ -54,6 +56,26 @@ module Hydrogen.Realtime.WebSocket
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , flip
+  , pure
+  , show
+  , unit
+  , void
+  , when
+  , ($)
+  , (+)
+  , (-)
+  , (*)
+  , (<=)
+  , (==)
+  , (/=)
+  , (<)
+  )
 
 import Data.Array as Array
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson, stringify, parseJson)
@@ -61,7 +83,7 @@ import Data.Either (Either(Left, Right), hush)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
-import Effect.Aff (Aff, delay, launchAff_)
+import Effect.Aff (delay, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref

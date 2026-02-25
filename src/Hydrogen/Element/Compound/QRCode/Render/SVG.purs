@@ -30,7 +30,7 @@
 -- | - Matrix (QRMatrix, Module, getModule, matrixSize)
 -- | - Element (SVG primitives)
 
-module Hydrogen.Element.Component.QRCode.Render.SVG
+module Hydrogen.Element.Compound.QRCode.Render.SVG
   ( -- * Rendering
     renderQRCode
   , renderMatrix
@@ -74,7 +74,7 @@ import Data.Array (foldl, (..))
 import Data.Int (toNumber)
 
 import Hydrogen.Render.Element as E
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRMatrix
   , Module(Dark, Light, Reserved)
   , matrixSize

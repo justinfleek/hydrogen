@@ -25,7 +25,7 @@
 -- | - Prelude (Eq, Ord, Show)
 -- | - Data.Maybe (Maybe)
 
-module Hydrogen.Element.Component.TreeView.Types
+module Hydrogen.Element.Compound.TreeView.Types
   ( -- * Node Identifier
     NodeId
   , nodeId

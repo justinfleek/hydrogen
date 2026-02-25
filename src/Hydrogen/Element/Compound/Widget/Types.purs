@@ -24,7 +24,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Widget.Types as Widget
+-- | import Hydrogen.Element.Compound.Widget.Types as Widget
 -- |
 -- | -- Create a widget ID
 -- | myWidgetId = Widget.widgetId "dashboard-main" "revenue-metric"
@@ -36,7 +36,7 @@
 -- |   _ -> "Other widget type"
 -- | ```
 
-module Hydrogen.Element.Component.Widget.Types
+module Hydrogen.Element.Compound.Widget.Types
   ( -- * Widget Identity
     WidgetId
   , widgetId

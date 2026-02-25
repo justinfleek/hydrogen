@@ -27,7 +27,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.GradientEditor as GradientEditor
+-- | import Hydrogen.Element.Compound.GradientEditor as GradientEditor
 -- | import Hydrogen.Schema.Color.Gradient (linearGradient, colorStop, Gradient(Linear))
 -- | import Hydrogen.Schema.Color.RGB (rgb)
 -- |
@@ -42,7 +42,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.GradientEditor
+module Hydrogen.Element.Compound.GradientEditor
   ( gradientEditor
   , GradientEditorProps
   , GradientEditorProp

@@ -17,7 +17,7 @@
 -- |
 -- | The preset functions are then pure transformations.
 
-module Hydrogen.Element.Component.DateRangePicker.Presets
+module Hydrogen.Element.Compound.DateRangePicker.Presets
   ( -- * Preset Definitions
     PresetDef
   , presetId
@@ -57,7 +57,7 @@ import Prelude
   , (==)
   )
 
-import Hydrogen.Element.Component.Calendar 
+import Hydrogen.Element.Compound.Calendar 
   ( CalendarDate
   , DateRange
   , WeekStart(Sunday, Monday)

@@ -21,7 +21,7 @@
 -- | Runtime canvas interpretation
 -- | ```
 
-module Hydrogen.Element.Component.Signature.Types
+module Hydrogen.Element.Compound.Signature.Types
   ( -- * Core Types
     Point
   , Stroke

@@ -14,7 +14,7 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((===))
 import Test.QuickCheck.Gen (chooseInt, elements)
 
-import Hydrogen.Element.Component.QRCode.Matrix as Matrix
+import Hydrogen.Element.Compound.QRCode.Matrix as Matrix
 
 maskingTests :: Spec Unit
 maskingTests = describe "Masking" do

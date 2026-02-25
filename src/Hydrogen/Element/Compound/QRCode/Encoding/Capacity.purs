@@ -22,7 +22,7 @@
 -- |
 -- | Group 2 blocks have one more data codeword than group 1 blocks.
 
-module Hydrogen.Element.Component.QRCode.Encoding.Capacity
+module Hydrogen.Element.Compound.QRCode.Encoding.Capacity
   ( -- * Block Info
     BlockInfo
   , getBlockInfo
@@ -42,7 +42,7 @@ import Prelude
   , (*)
   )
 
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion
   , ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh)
   , versionToInt

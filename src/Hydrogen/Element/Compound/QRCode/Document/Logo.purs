@@ -16,7 +16,7 @@
 -- | - Prelude (Eq, Show)
 -- | - Data.Maybe (optional stroke)
 
-module Hydrogen.Element.Component.QRCode.Document.Logo
+module Hydrogen.Element.Compound.QRCode.Document.Logo
   ( -- * Logo Configuration
     LogoConfig(..)
   

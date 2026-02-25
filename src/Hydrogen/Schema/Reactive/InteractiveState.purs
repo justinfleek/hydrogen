@@ -36,7 +36,7 @@ module Hydrogen.Schema.Reactive.InteractiveState
   , isInteractable
   , isEngaged
   , toAriaAttributes
-  , toCssClasses
+  , toLegacyCssClasses
   -- * Pointer Device
   , PointerDevice(..)
   , pointerDevice
@@ -245,8 +245,8 @@ toAriaAttributes s =
   ]
 
 -- | Generate CSS class names from state
-toCssClasses :: InteractiveState -> Array String
-toCssClasses s = 
+toLegacyCssClasses :: InteractiveState -> Array String
+toLegacyCssClasses s = 
   (if isPointerOver s.pointer then ["hover"] else []) <>
   (if hasFocus s.focus then ["focus"] else []) <>
   (if showFocusRing s.focus then ["focus-visible"] else []) <>

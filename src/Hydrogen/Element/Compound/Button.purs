@@ -45,7 +45,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Button as Button
+-- | import Hydrogen.Element.Compound.Button as Button
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Geometry.Radius as Geometry
 -- | import Hydrogen.Schema.Dimension.Device as Device
@@ -87,7 +87,7 @@
 -- | - `iconButton` — Button optimized for icon-only content
 -- | - `loadingSpinner` — Spinner element for loading states
 
-module Hydrogen.Element.Component.Button
+module Hydrogen.Element.Compound.Button
   ( -- * Main Component
     button
   

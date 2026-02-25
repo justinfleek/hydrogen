@@ -27,7 +27,7 @@
 -- | - TreeView.State (ExpandedState, FocusState)
 -- | - TreeView.Node (Tree, node queries)
 
-module Hydrogen.Element.Component.TreeView.Navigation
+module Hydrogen.Element.Compound.TreeView.Navigation
   ( -- * Visible Node List
     visibleNodes
   , visibleNodeIds
@@ -77,11 +77,11 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.String.CodeUnits (take, length) as String
 import Data.String.Common (toLower) as String
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( ExpandedState
   , FocusState
   , isExpanded
@@ -90,7 +90,7 @@ import Hydrogen.Element.Component.TreeView.State
   , focusOn
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , rootNodes

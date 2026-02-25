@@ -32,7 +32,7 @@
 -- | - Schema.Graph.NodeContent (slots, templates)
 -- | - Hydrogen.Render.Element (Element)
 
-module Hydrogen.Element.Component.TreeView.Content
+module Hydrogen.Element.Compound.TreeView.Content
   ( -- * Content Rendering
     renderNodeContent
   , renderSlot
@@ -89,13 +89,13 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Render.Element as E
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( CheckState(Checked, Unchecked, Indeterminate)
   , iconToEmoji
   , iconToAria
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( TreeNode
   , nodeLabel
   , nodeIcon

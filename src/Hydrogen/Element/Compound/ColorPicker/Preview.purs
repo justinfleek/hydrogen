@@ -17,7 +17,7 @@
 -- |
 -- | All values are displayed simultaneously for easy copying/reference.
 
-module Hydrogen.Element.Component.ColorPicker.Preview
+module Hydrogen.Element.Compound.ColorPicker.Preview
   ( -- * Component
     colorPreview
   

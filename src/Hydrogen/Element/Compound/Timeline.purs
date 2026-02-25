@@ -11,7 +11,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Timeline as Timeline
+-- | import Hydrogen.Element.Compound.Timeline as Timeline
 -- | import Hydrogen.Render.Element as E
 -- |
 -- | -- Basic vertical timeline
@@ -36,7 +36,7 @@
 -- |   [ Timeline.orientation Timeline.Horizontal ]
 -- |   items
 -- | ```
-module Hydrogen.Element.Component.Timeline
+module Hydrogen.Element.Compound.Timeline
   ( -- * Timeline Components
     timeline
   , timelineItem

@@ -32,7 +32,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.OTPInput as OTP
+-- | import Hydrogen.Element.Compound.OTPInput as OTP
 -- |
 -- | -- Basic 6-digit OTP
 -- | OTP.otpInput
@@ -50,7 +50,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.OTPInput
+module Hydrogen.Element.Compound.OTPInput
   ( -- * Components (from Render)
     module Render
   
@@ -77,7 +77,7 @@ module Hydrogen.Element.Component.OTPInput
 --                                                              // re-exports
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-import Hydrogen.Element.Component.OTPInput.Types
+import Hydrogen.Element.Compound.OTPInput.Types
   ( OTPInputType(Numeric, Alphanumeric)
   , OTPDigitCount(OTPDigitCount)
   , OTPValue(OTPValue)
@@ -108,7 +108,7 @@ import Hydrogen.Element.Component.OTPInput.Types
   , maxDigits
   ) as Types
 
-import Hydrogen.Element.Component.OTPInput.Props
+import Hydrogen.Element.Compound.OTPInput.Props
   ( OTPInputProps
   , OTPInputProp
   , defaultProps
@@ -165,7 +165,7 @@ import Hydrogen.Element.Component.OTPInput.Props
   , cursorStyleProp
   ) as Props
 
-import Hydrogen.Element.Component.OTPInput.Validation
+import Hydrogen.Element.Compound.OTPInput.Validation
   ( validateChar
   , isValidDigit
   , isValidAlphanumeric
@@ -180,7 +180,7 @@ import Hydrogen.Element.Component.OTPInput.Validation
   , getAutoComplete
   ) as Validation
 
-import Hydrogen.Element.Component.OTPInput.Digit
+import Hydrogen.Element.Compound.OTPInput.Digit
   ( renderDigit
   , renderDigitInput
   , getDigitBorderColor
@@ -198,7 +198,7 @@ import Hydrogen.Element.Component.OTPInput.Digit
   , getDigitDisplayValue
   ) as Digit
 
-import Hydrogen.Element.Component.OTPInput.Animation
+import Hydrogen.Element.Compound.OTPInput.Animation
   ( OTPAnimation(OTPAnimation)
   , OTPAnimationProperty(TranslateX, TranslateY, Scale, ScaleX, ScaleY, Opacity, Rotate)
   , OTPKeyframe(OTPKeyframe)
@@ -221,7 +221,7 @@ import Hydrogen.Element.Component.OTPInput.Animation
   , animationFillMode
   ) as Animation
 
-import Hydrogen.Element.Component.OTPInput.Accessibility
+import Hydrogen.Element.Compound.OTPInput.Accessibility
   ( getContainerA11yAttrs
   , getGroupLabel
   , getDigitA11yAttrs
@@ -249,7 +249,7 @@ import Hydrogen.Element.Component.OTPInput.Accessibility
   , getSuccessMessageId
   ) as Accessibility
 
-import Hydrogen.Element.Component.OTPInput.Render
+import Hydrogen.Element.Compound.OTPInput.Render
   ( otpInput
   , otpInputWithResend
   , renderDigitsRow

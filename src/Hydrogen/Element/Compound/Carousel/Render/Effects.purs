@@ -26,7 +26,7 @@
 -- | - Carousel.Effects (SlideEffects)
 -- | - Hydrogen.Schema.Dimension.Device
 
-module Hydrogen.Element.Component.Carousel.Render.Effects
+module Hydrogen.Element.Compound.Carousel.Render.Effects
   ( -- * Position Computation
     computeSlidePosition
   , positionToClass
@@ -68,7 +68,7 @@ import Data.String.Common (joinWith) as String
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Color.RGB as Color
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( SlideIndex
   , unwrapSlideIndex
   , SlidePosition
@@ -79,8 +79,8 @@ import Hydrogen.Element.Component.Carousel.Types
       , PositionOffscreen
       )
   )
-import Hydrogen.Element.Component.Carousel.State (CarouselState)
-import Hydrogen.Element.Component.Carousel.Effects 
+import Hydrogen.Element.Compound.Carousel.State (CarouselState)
+import Hydrogen.Element.Compound.Carousel.Effects 
   ( SlideEffects
   , isEffectEnabled
   )

@@ -44,7 +44,7 @@
 -- | - TreeView.Accessibility (containerAriaAttrs, nodeAriaAttrs)
 -- | - Hydrogen.Render.Element (Element, Attribute)
 
-module Hydrogen.Element.Component.TreeView.Render
+module Hydrogen.Element.Compound.TreeView.Render
   ( -- * Main Renderer
     renderTreeView
   , renderTreeViewAdvanced
@@ -169,7 +169,7 @@ import Hydrogen.Schema.Dimension.Device (Pixel, unwrapPixel)
 import Hydrogen.Schema.Dimension.Device as Device
 import Data.Int (toNumber) as Int
 
-import Hydrogen.Element.Component.TreeView.Types
+import Hydrogen.Element.Compound.TreeView.Types
   ( NodeId
   , Depth
   , unwrapDepth
@@ -203,7 +203,7 @@ import Hydrogen.Element.Component.TreeView.Types
       )
   )
 
-import Hydrogen.Element.Component.TreeView.State
+import Hydrogen.Element.Compound.TreeView.State
   ( TreeViewState
   , ExpandedState
   , SelectedState
@@ -233,7 +233,7 @@ import Hydrogen.Element.Component.TreeView.State
   , noHover
   )
 
-import Hydrogen.Element.Component.TreeView.Node
+import Hydrogen.Element.Compound.TreeView.Node
   ( Tree
   , TreeNode
   , nodeId
@@ -249,15 +249,15 @@ import Hydrogen.Element.Component.TreeView.Node
   , getNode
   )
 
-import Hydrogen.Element.Component.TreeView.Navigation
+import Hydrogen.Element.Compound.TreeView.Navigation
   ( visibleNodes
   )
 
 -- Integration with new modules
-import Hydrogen.Element.Component.TreeView.Layout as Layout
-import Hydrogen.Element.Component.TreeView.Content as Content
-import Hydrogen.Element.Component.TreeView.Connection as Connection
-import Hydrogen.Element.Component.TreeView.Accessibility as A11y
+import Hydrogen.Element.Compound.TreeView.Layout as Layout
+import Hydrogen.Element.Compound.TreeView.Content as Content
+import Hydrogen.Element.Compound.TreeView.Connection as Connection
+import Hydrogen.Element.Compound.TreeView.Accessibility as A11y
 
 import Hydrogen.Schema.Graph.Layout as LayoutSchema
 import Hydrogen.Schema.Graph.Connection as ConnectionSchema

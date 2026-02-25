@@ -26,7 +26,7 @@
 -- |
 -- | - Carousel.Types (LayoutPath)
 
-module Hydrogen.Element.Component.Carousel.Render.Layout
+module Hydrogen.Element.Compound.Carousel.Render.Layout
   ( -- * Layout Transform
     computeLayoutTransform
   
@@ -69,7 +69,7 @@ import Data.Int (toNumber)
 import Data.Ord (max, min)
 import Data.Tuple (Tuple(Tuple))
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( LayoutPath
       ( PathCircular
       , PathHelix

@@ -15,7 +15,7 @@
 -- | - Carousel.Types (TransitionKind)
 -- | - Schema.Dimension.Temporal (Milliseconds for duration)
 
-module Hydrogen.Element.Component.Carousel.Transitions
+module Hydrogen.Element.Compound.Carousel.Transitions
   ( -- * Easing Functions
     EasingFunction
       ( EaseLinear
@@ -70,7 +70,7 @@ import Prelude
   , (<>)
   )
 
-import Hydrogen.Element.Component.Carousel.Types 
+import Hydrogen.Element.Compound.Carousel.Types 
   ( TransitionKind
       ( TransitionNone
       , TransitionSlide

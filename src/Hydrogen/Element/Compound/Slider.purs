@@ -27,7 +27,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Slider as Slider
+-- | import Hydrogen.Element.Compound.Slider as Slider
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- |
@@ -50,7 +50,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Slider
+module Hydrogen.Element.Compound.Slider
   ( -- * Slider Components
     slider
   , rangeSlider

@@ -12,7 +12,7 @@
 -- | ## Quick Start
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.QRCode as QR
+-- | import Hydrogen.Element.Compound.QRCode as QR
 -- |
 -- | -- Simple URL QR code
 -- | myQR = QR.qrCode (QR.urlContent "https://example.com")
@@ -42,7 +42,7 @@
 -- |
 -- | Pure data in, Element out. Deterministic. Same input = same pixels.
 
-module Hydrogen.Element.Component.QRCode
+module Hydrogen.Element.Compound.QRCode
   ( -- * Main API (re-exported from QRCode.QRCode)
     module QRCodeAPI
   
@@ -61,7 +61,7 @@ module Hydrogen.Element.Component.QRCode
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- Re-export the main QRCode API
-import Hydrogen.Element.Component.QRCode.QRCode
+import Hydrogen.Element.Compound.QRCode.QRCode
   ( qrCode
   , qrCodeWith
   , QRConfig
@@ -69,7 +69,7 @@ import Hydrogen.Element.Component.QRCode.QRCode
   ) as QRCodeAPI
 
 -- Re-export content constructors
-import Hydrogen.Element.Component.QRCode.Content.Types
+import Hydrogen.Element.Compound.QRCode.Content.Types
   ( QRContent
       ( ContentURL
       , ContentEmail
@@ -118,7 +118,7 @@ import Hydrogen.Element.Component.QRCode.Content.Types
   ) as ContentTypes
 
 -- Re-export core types
-import Hydrogen.Element.Component.QRCode.Types
+import Hydrogen.Element.Compound.QRCode.Types
   ( QRVersion(QRVersion)
   , mkVersion
   , versionToInt
@@ -148,7 +148,7 @@ import Hydrogen.Element.Component.QRCode.Types
   ) as Types
 
 -- Re-export render configuration
-import Hydrogen.Element.Component.QRCode.Render.SVG
+import Hydrogen.Element.Compound.QRCode.Render.SVG
   ( renderQRCode
   , renderMatrix
   , RenderConfig

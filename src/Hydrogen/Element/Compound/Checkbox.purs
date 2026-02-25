@@ -23,7 +23,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Checkbox as Checkbox
+-- | import Hydrogen.Element.Compound.Checkbox as Checkbox
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Basic checkbox
@@ -48,7 +48,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.Checkbox
+module Hydrogen.Element.Compound.Checkbox
   ( -- * Main Components
     checkbox
   , checkboxWithLabel

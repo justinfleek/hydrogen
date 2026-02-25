@@ -14,7 +14,7 @@
 -- |
 -- | - Data.String (replacement)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.Helpers
+module Hydrogen.Element.Compound.QRCode.Content.Types.Helpers
   ( -- * URI Encoding
     encodeURIComponent
   ) where

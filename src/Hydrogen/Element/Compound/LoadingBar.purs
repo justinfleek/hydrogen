@@ -21,7 +21,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.LoadingBar as LoadingBar
+-- | import Hydrogen.Element.Compound.LoadingBar as LoadingBar
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- | import Hydrogen.Schema.Dimension.Device as Device
 -- |
@@ -47,7 +47,7 @@
 -- |   ]
 -- | ```
 
-module Hydrogen.Element.Component.LoadingBar
+module Hydrogen.Element.Compound.LoadingBar
   ( -- * Main Components
     loadingBar
   , loadingBarInline

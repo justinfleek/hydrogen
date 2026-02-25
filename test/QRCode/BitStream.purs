@@ -14,7 +14,7 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((===))
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-import Hydrogen.Element.Component.QRCode.Encoding.BitStream as BS
+import Hydrogen.Element.Compound.QRCode.Encoding.BitStream as BS
 
 bitstreamTests :: Spec Unit
 bitstreamTests = describe "BitStream Operations" do

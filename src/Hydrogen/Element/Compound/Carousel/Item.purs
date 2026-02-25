@@ -33,7 +33,7 @@
 -- | - Card.Hover (hover effects)
 -- | - Schema.Geometry.AnimatedBorder (border effects)
 
-module Hydrogen.Element.Component.Carousel.Item
+module Hydrogen.Element.Compound.Carousel.Item
   ( -- * Item Config
     ItemConfig
   , itemConfig

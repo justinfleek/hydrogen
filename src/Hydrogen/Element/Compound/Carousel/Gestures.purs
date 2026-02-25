@@ -23,7 +23,7 @@
 -- | - Schema.Gestural.Gesture.Pan (PanState)
 -- | - Schema.Dimension.Device (Pixel)
 
-module Hydrogen.Element.Component.Carousel.Gestures
+module Hydrogen.Element.Compound.Carousel.Gestures
   ( -- * Swipe Gesture
     SwipeGesture
   , swipeGesture

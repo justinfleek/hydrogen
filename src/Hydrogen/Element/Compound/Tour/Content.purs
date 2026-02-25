@@ -23,7 +23,7 @@
 -- | | TooltipSize     | Dimension | Size constraints for tooltip         |
 -- | | ContentAlign    | Spatial   | How content is aligned               |
 
-module Hydrogen.Element.Component.Tour.Content
+module Hydrogen.Element.Compound.Tour.Content
   ( -- * Content Kind
     ContentKind
       ( ContentText

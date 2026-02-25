@@ -14,8 +14,8 @@ import Test.Spec.QuickCheck (quickCheck) as Spec
 import Test.QuickCheck ((===))
 import Test.QuickCheck.Gen (chooseInt)
 
-import Hydrogen.Element.Component.QRCode.Types as Types
-import Hydrogen.Element.Component.QRCode.Matrix as Matrix
+import Hydrogen.Element.Compound.QRCode.Types as Types
+import Hydrogen.Element.Compound.QRCode.Matrix as Matrix
 
 matrixStructureTests :: Spec Unit
 matrixStructureTests = describe "Matrix Structure" do

@@ -24,7 +24,7 @@
 -- |
 -- | - Schema.Dimension.Device (sizing)
 
-module Hydrogen.Element.Component.Card.Media
+module Hydrogen.Element.Compound.Card.Media
   ( -- * Media Position
     MediaPosition
       ( MediaTop

@@ -20,7 +20,7 @@
 -- | ## Usage
 -- |
 -- | ```purescript
--- | import Hydrogen.Element.Component.Separator as Separator
+-- | import Hydrogen.Element.Compound.Separator as Separator
 -- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Horizontal separator (default)
@@ -41,7 +41,7 @@
 -- |   [ E.text "OR" ]
 -- | ```
 
-module Hydrogen.Element.Component.Separator
+module Hydrogen.Element.Compound.Separator
   ( -- * Main Components
     separator
   , separatorWithLabel

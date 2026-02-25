@@ -29,7 +29,7 @@
 -- | - Data.Maybe (optional fields)
 -- | - Data.String (joining lines)
 
-module Hydrogen.Element.Component.QRCode.Content.Types.VCard
+module Hydrogen.Element.Compound.QRCode.Content.Types.VCard
   ( -- * vCard Content
     VCardContent
   , vCardContent

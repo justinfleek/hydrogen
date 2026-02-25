@@ -481,7 +481,7 @@ buildContainerQueryStyles props =
   let
     typeStyle = case props.containerTypeVal of
       Nothing -> []
-      Just ct -> [ E.style "container-type" (CQ.containerTypeToCSS ct) ]
+      Just ct -> [ E.style "container-type" (CQ.containerTypeToLegacyCss ct) ]
     nameStyle = case props.containerNameVal of
       Nothing -> []
       Just n -> [ E.style "container-name" n ]

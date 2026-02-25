@@ -21,7 +21,7 @@
 -- | - Prelude (Eq, Ord, Show, Bounded)
 -- | - Data.EuclideanRing (div)
 
-module Hydrogen.Element.Component.QRCode.Types.Codeword
+module Hydrogen.Element.Compound.QRCode.Types.Codeword
   ( -- * Codeword Type
     Codeword(Codeword)
   , mkCodeword
