@@ -52,6 +52,10 @@
 -- | - `Hydrogen.Schema.Geometry.Cylindrical` — 3D cylindrical coordinates (r, θ, z)
 -- | - `Hydrogen.Schema.Geometry.Spherical` — 3D spherical coordinates (r, θ, φ)
 -- |
+-- | ### Advanced Curves
+-- | - `Hydrogen.Schema.Geometry.Spline` — Catmull-Rom and B-Spline curves
+-- | - `Hydrogen.Schema.Geometry.Nurbs` — Non-Uniform Rational B-Splines (NURBS)
+-- |
 -- | ### Transforms
 -- | - `Hydrogen.Schema.Geometry.Transform` — 2D affine transforms
 -- | - `Hydrogen.Schema.Geometry.Transform3D` — 3D transforms
