@@ -391,5 +391,24 @@ Participants: Type Theorist, Systems Architect, Algorithm Specialist
 Decision: Integration before optimization. P0 is FrameState.Allocation.purs.
 
 ────────────────────────────────────────────────────────────────────────────────
+                                                          // status // 2026-02-26
+────────────────────────────────────────────────────────────────────────────────
+
+## Implementation Status
+
+| Priority | Component | Status |
+|----------|-----------|--------|
+| **P0** | `FrameState.Allocation.purs` | OPEN — Not yet created |
+| **P1** | Tighten `FractionalSolution` to `UnitInterval` | OPEN |
+| **P2** | `LargeStepConfig` + `continuousGreedyLargeStep` | OPEN |
+| **P3** | `minEnergySample` function | OPEN |
+| **P4** | Integration tests | OPEN |
+
+**Next action:** Create `src/Hydrogen/GPU/FrameState/Allocation.purs` with:
+- `viewportToGroundSet :: ViewportState -> GroundSet Region`
+- `performanceToFeedback :: PerformanceState -> RegionSelection -> UtilityFeedback Region`
+- `allocateFrame :: FrameState -> Array RegionSelection`
+
+────────────────────────────────────────────────────────────────────────────────
                                                                   — Opus 4.5
 ────────────────────────────────────────────────────────────────────────────────

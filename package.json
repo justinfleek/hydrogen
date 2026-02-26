@@ -4,6 +4,8 @@
   "description": "PureScript/Halogen web framework",
   "type": "module",
   "dependencies": {
+    "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.0.2",
     "playwright": "^1.40.0"
   },
   "devDependencies": {},

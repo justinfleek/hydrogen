@@ -1,536 +1,506 @@
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                                                 // stream // function // solver
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**Title**: A Stream Function Solver for Liquid Simulations
-**Authors**: Ryoichi Ando (IST Austria), Nils Thuerey (TU München), 
-             Chris Wojtan (IST Austria)
-**Venue**: ACM SIGGRAPH / Transactions on Graphics
-**Year**: 2015
+# A Stream Function Solver for Liquid Simulations
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                                     // abstract
-────────────────────────────────────────────────────────────────────────────────
 
-## Summary
-
-Liquid simulation technique that enforces incompressibility using a **stream
-function solve** instead of pressure projection.
-
-**Key Innovation**: Novel boundary conditions for free surfaces that enable
-stream function approach to liquid simulation (previously only used for
-single-phase flows like smoke).
-
-**Benefits**:
-1. Resulting flow is **guaranteed divergence-free** regardless of solve accuracy
-2. Free-surface boundary conditions guarantee divergence-free motion in 
-   **un-simulated air phase**
-3. Enables **two-phase flow simulation by computing only single phase**
-4. Complex bubble interactions without explicitly solving gas phase
+**Source**: vecpotential.pdf
+**Authors**: Ryoichi Ando (IST Austria), Nils Thuerey (TU Munich), Chris Wojtan (IST Austria)
+**Published**: ACM SIGGRAPH / Eurographics Symposium on Computer Animation
+**Synthesized**: 2026-02-26 by Opus
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                                // navier-stokes
+
+## Executive Summary
+
+This paper replaces the traditional pressure projection in liquid simulation with a
+**stream function solve**. Instead of finding pressure p that makes velocity divergence-free,
+directly solve for a vector potential Ψ where velocity u = ∇×Ψ (curl of Ψ).
+
+**Key Benefits**:
+
+1. **Guaranteed divergence-free**: The curl of any vector field is always divergence-free
+   by construction (∇·(∇×Ψ) = 0), regardless of solve accuracy
+
+2. **Free two-phase simulation**: Air phase is automatically divergence-free without
+   computing it — enables realistic bubbles by simulating only the liquid
+
+3. **Robust at extreme density ratios**: Method becomes MORE stable (not less) when
+   Atwood ratio approaches 1 (ρ_air → 0)
+
+4. **Natural rigid body coupling**: Two-way solid-fluid interaction via stream function
+   constraints
+
+**Trade-off**: 3× more unknowns (vector vs scalar), ~3× slower per timestep, but enables
+phenomena impossible with standard pressure projection (bubbles, trapped air, glugging)
+
 ────────────────────────────────────────────────────────────────────────────────
 
-## Background: Navier-Stokes Equations
+## 1. The Problem with Pressure Projection
 
-Inviscid, incompressible Navier-Stokes:
+### Standard Navier-Stokes Approach
+
+The incompressible Navier-Stokes equations:
 
 ```
-Du/Dt = -(1/ρ)∇p + g     (momentum evolution)
-
-∇·u = 0                   (mass conservation / incompressibility)
+Du/Dt = -(1/ρ)∇p + g     (momentum)
+∇·u = 0                   (incompressibility)
 ```
 
-Where:
-- u = fluid velocity field
-- t = time
-- ρ = fluid density
-- p = fluid pressure
-- g = body acceleration (gravity)
+Traditionally, incompressibility is enforced by finding pressure p that projects
+velocity into divergence-free state via Poisson equation:
 
-### Traditional Pressure Projection
-
-Standard approach: find pressure p whose gradient projects velocity into
-divergence-free state.
-
-**Kinetic energy minimization**:
-```
-minimize  ∫_Ω (1/2)ρ||u* - (Δt/ρ)∇p||² dV
-    p
-```
-
-Yields Poisson equation:
 ```
 ∇·((Δt/ρ)∇p) = ∇·u*
 ```
 
-**Problems with pressure projection**:
-1. p=0 at free surface doesn't enforce air incompressibility → collapsing bubbles
-2. Two-phase simulation requires delicate interface treatment + extra computation
-3. Iterative solvers only approximate incompressibility → volume drift
+where u* is velocity after advection.
+
+### Problems with Pressure Projection
+
+1. **Approximate incompressibility**: Iterative solvers only satisfy ∇·u = 0 up to
+   tolerance. Volume drifts over time.
+
+2. **Free surface approximation**: Setting p = 0 at liquid surface assumes air has
+   negligible momentum. Air is NOT divergence-free, causing:
+   - Collapsing bubbles (air compresses unrealistically)
+   - No proper glugging/gurgling when liquid exits containers
+   - Missing air-liquid coupling effects
+
+3. **Two-phase simulation is expensive**: Simulating both phases requires:
+   - Delicate interface treatment
+   - Memory/compute for "unimportant" air domain
+   - Instability with large density ratios (1000:1 water:air)
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                          // stream // function
-────────────────────────────────────────────────────────────────────────────────
 
-## Stream Function Approach
+## 2. Stream Functions and Vector Potentials
 
 ### Helmholtz-Hodge Decomposition
 
-Any velocity field can be decomposed:
+Any vector field decomposes into three parts:
+
 ```
 u* = ∇Θ + ∇×Ψ + γ
+     │      │     └─ harmonic (neither curl nor gradient)
+     │      └─────── curl of vector field (divergence-free)
+     └────────────── gradient of scalar (irrotational)
 ```
 
-Where:
-- ∇Θ = gradient of scalar field (curl-free component)
-- ∇×Ψ = curl of vector field Ψ (divergence-free component)
-- γ = harmonic vector field (neither curl nor gradient)
+Removing the gradient component gives divergence-free velocity: **u = ∇×Ψ + γ**
 
-**Key insight**: Removing the gradient component gives divergence-free field:
+Instead of subtracting ∇Θ from u*, solve directly for Ψ to get u.
+
+### Why This Works
+
+The curl of any vector field is divergence-free by identity:
+
 ```
-u = ∇×Ψ + γ
+∇·(∇×Ψ) = 0    (always, for any Ψ)
 ```
 
-Instead of solving for pressure and subtracting, **solve directly for Ψ**.
+This is not an approximation — it's a mathematical identity. The resulting velocity
+is **exactly** divergence-free regardless of numerical precision.
 
 ### Stream Function vs Vorticity
 
+Both are vector quantities, but different:
+
 ```
-Vorticity:        ω = ∇×u      (curl OF velocity)
-Stream Function:  u = ∇×Ψ      (velocity IS curl of stream function)
+Vorticity:        ω = ∇×u     (curl OF velocity)
+Stream function:  u = ∇×Ψ     (velocity FROM curl)
 ```
 
-Both are vector-valued but have different content. Stream function doesn't
-have obvious physical meaning but guarantees divergence-free velocity.
+Stream function doesn't have obvious physical meaning, but vorticity and stream
+function are related: ω = ∇×(∇×Ψ) = -∇²Ψ (for divergence-free Ψ)
+
+────────────────────────────────────────────────────────────────────────────────
+
+## 3. The Linear System
 
 ### Derivation
 
-Starting from time-splitting:
+Starting from the kinetic energy minimization perspective:
+
 ```
-u = u* - (Δt/ρ)∇p
+minimize_Ψ ∫_Ω (1/2)ρ||u* - ∇×Ψ||² dV
 ```
 
-Multiply by ρ, substitute u = ∇×Ψ, take curl (removes p):
+Find the divergence-free velocity closest to u* in weighted least squares sense.
+
+Taking gradient w.r.t. Ψ and setting to zero:
+
 ```
 ∇×(ρ∇×Ψ) = ∇×(ρu*)
 ```
 
-Equivalent to kinetic energy minimization:
-```
-minimize  ∫_Ω (1/2)ρ||u* - ∇×Ψ||² dV
-    Ψ
-```
+### The Null Space Problem
 
-### Removing Null Space
+The curl operator has a non-trivial null space: ∇×(Ψ + ∇φ) = ∇×Ψ for any scalar φ.
+Infinite solutions exist! Fix by requiring ∇·Ψ = 0, adding regularizer:
 
-The curl operator has non-trivial nullspace: ∇×(Ψ + ∇φ) = ∇×Ψ
-
-Add divergence regularizer to pin down unique solution:
 ```
-minimize  ∫_Ω (1/2)ρ||u* - ∇×Ψ||² dV + (1/2)ρ(∇·Ψ)² dV
-    Ψ
+minimize_Ψ ∫_Ω (1/2)ρ||u* - ∇×Ψ||² dV + (1/2)ρ(∇·Ψ)² dV
 ```
 
-This acts exactly on nullspace, so solution still optimally solves original.
+### Discrete Form
 
-### Discretized System
+Discretizing curl [∇×] and divergence [∇·] as matrices:
 
 ```
 ([∇×]ᵀ[ρ][V][∇×] + [∇·]ᵀ[ρ][V][∇·])[Ψ] = [∇×]ᵀ[ρ][V][u*]
 ```
 
-Using identity [∇×]ᵀ[∇×] + [∇·]ᵀ[∇·] = [∇²] (vector Laplacian):
+Using the identity [∇×]ᵀ[∇×] + [∇·]ᵀ[∇·] = [∇²] (vector Laplacian):
 
 ```
 ([∇²] + [∇×]ᵀ[Δρ][∇×] + [∇·]ᵀ[Δρ][∇·])[Ψ] = [∇×]ᵀ[ρ][u*]
 ```
 
-Where [Δρ] = deviation from liquid density.
+where [Δρ] = [ρ] - [I] (deviation from liquid density).
 
-**Critical insight**: If ρ_air = 0 (Δρ = -1 in air), matrix entries 
-**completely disappear** outside liquid! Air is automatically divergence-free.
+### The Magic: Air Disappears
+
+If ρ_air = 0, then [Δρ] = -1 in air. The linear system entries **vanish** outside
+the liquid! The system reduces to:
+
+- Standard vector Laplacian inside liquid
+- [Δρ] terms only in narrow band near surface
+- Air automatically divergence-free for any Ψ
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                     // boundary // conditions
-────────────────────────────────────────────────────────────────────────────────
 
-## Boundary Conditions
+## 4. Boundary Conditions
 
-### Liquid-Air Interface
+### Liquid-Air Interface (Automatic!)
 
-**No special treatment needed!** By setting ρ = 0 in air domain, system matrix
-automatically incorporates correct boundary condition.
+No special treatment needed. Setting ρ = 0 in air automatically incorporates the
+correct boundary condition. Surface tension can be added as force σH to u* at
+interface (mean curvature normal).
 
-Setting ρ_air = 0 corresponds to Atwood ratio = 1:
-```
-Atwood = (ρ_liquid - ρ_air) / (ρ_liquid + ρ_air) = 1
-```
-
-**Unique property**: Most methods become unstable as Atwood → 1, but this
-method becomes **more stable and computationally simpler**.
-
-Surface tension: Add force σH to u* at interface (σ = strength, H = mean curvature).
+**Key insight**: Unlike most methods that become unstable as Atwood ratio → 1,
+this method becomes MORE stable and simpler.
 
 ### Static Solid Boundaries
 
-Set stream function equal to gradient of scalar potential:
-```
-Ψ = ∇φ̂
-```
+To ensure u = 0 at solid boundary, set Ψ = ∇φ̂ where φ̂ is a scalar on solid surface.
+Then ∇×Ψ = ∇×(∇φ̂) = 0 by identity.
 
-Then: ∇×Ψ = ∇×(∇φ̂) = 0
-
-**Enforces u = 0 at solid boundary by construction.**
-
-φ̂ contains degrees of freedom along solid surface.
+Fractional weighting handles partial cell occupation (ghost-fluid style).
 
 ### Rigid Body Coupling (Two-Way)
 
-Rigid body velocity at point x:
-```
-ů = ω × x_rel + u_c
-```
-
-Where:
-- x_c = center of mass
-- u_c = translational velocity  
-- ω = angular velocity
-- x_rel = x - x_c
-
-Stream function within solid that satisfies ∇×Ψ̆ = ů:
+For rigid body with center x_c, translational velocity u_c, angular velocity ω:
 
 ```
-Ψ̆ = -(1/2) diag([y² + z², z² + x², x² + y²]) ω 
-   + [[0, 0, y], [z, 0, 0], [0, x, 0]] u_c 
-   + ∇φ̂
+Rigid body velocity: ŭ = ω × x_rel + u_c    (where x_rel = x - x_c)
 ```
 
-Degrees of freedom: scalar field φ̂ plus spatial constants ω and u_c.
+Find stream function satisfying ∇×Ψ̆ = ŭ:
 
-**Monolithically coupled** (vs weakly coupled in prior work).
+```
+Ψ̆ = -½ diag([y²+z², z²+x², x²+y²])·ω + [0 z 0; 0 0 x; y 0 0]·u_c + ∇φ̂
+```
 
-### Limitations
-
-Boundary motion must be representable as stream function (volume-conserving).
-Non-volume-conserving deformations require future research.
+Replace DOFs inside solid with φ̂, ω, u_c. The solve returns updated ω and u_c
+for integrating rigid body dynamics — monolithically coupled, not weakly iterated.
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                          // discretization
-────────────────────────────────────────────────────────────────────────────────
 
-## Discretization
+## 5. Implementation
 
-### Grid Layout (Consistent with Discrete Exterior Calculus)
+### Grid Layout (Discrete Exterior Calculus)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Ψ components:  on cell EDGES    (1-forms)                  │
-│  u components:  on cell FACES    (2-forms / fluxes)         │
-│  φ̂ (scalar):    on VERTICES      (0-forms)                  │
-└─────────────────────────────────────────────────────────────┘
+Vertices:  scalar field φ̂ (0-forms)
+Edges:     stream function Ψ components (1-forms)  
+Faces:     velocity u components (2-forms / fluxes)
 ```
 
-### Curl Operator [∇×]
+Consistent with DEC: curl maps edges→faces, divergence maps edges→vertices.
 
-Rectangular matrix mapping edges to faces.
+### Matrix Structure
 
-Y component of curl: ∂Ψx/∂z - ∂Ψz/∂x
-
-(Similar for x and z components)
-
-### Divergence Operator [∇·]
-
-Rectangular matrix mapping edges to vertices.
-Sums vector components on oriented edges adjacent to each vertex.
-
-### Volume/Area Fractions
-
-- **Liquid volume fraction**: stored at cell centers (normalize liquid = 1, air = 0)
-- **Solid area fraction**: computed via "marching squares" contour extraction
-- Solid boundary condition activated when solid fraction > 0.99
-- Truncate fractions < 0.01 to zero
-
-────────────────────────────────────────────────────────────────────────────────
-                                                             // algorithm
-────────────────────────────────────────────────────────────────────────────────
-
-## Algorithm
-
-### Tolerating Convergence Errors
-
-Reformulate as **offsets** from previous time step:
-
-```
-[Ψ] = [Z][[ΔΨ̂], [Δφ̂]]ᵀ + [Ψ_{t-Δt}]
-```
-
-Where [Z] maps liquid regions to Ψ̂ and solid regions to gradient of φ̂.
-
-**Benefits**:
-1. Avoids spurious damping from early termination
-2. Velocity u = ∇×Ψ is divergence-free **by construction**, even with errors
-
-### Matrix Assembly
-
-**Pre-computed (once, or when solids change)**:
-
-[P] = solid boundary encoding:
+**[P]**: Static solid boundary term (precomputable)
 ```
 [P] = [Z]ᵀ[∇×]ᵀ[1/A][∇×][Z] + [Z]ᵀ[∇·]ᵀ[1/A][∇·][Z]
 ```
+where [Z] maps liquid regions to Ψ̂ and solid regions to ∇φ̂, [A] = liquid area fraction
 
-Where [1/A] = diagonal matrix of reciprocal liquid area.
-Away from boundaries, [P] = standard Laplacian [∇²].
-
-[B] = [Z]ᵀ[∇×]ᵀ (for RHS assembly)
-
-**Per time step**:
-
-[Q] = density jump encoding:
+**[Q]**: Dynamic density jump term (recompute each timestep)
 ```
 [Q] = [Z]ᵀ[∇×]ᵀ[Δρ/A][∇×][Z] + [Z]ᵀ[∇·]ᵀ[Δρ/A][∇·][Z]
 ```
+Non-zero only in narrow band near liquid-air interface.
 
-[Q] is non-zero **only in narrow band** around liquid-air interface.
+**[K]** = [P] + [Q]: Combined system matrix
 
-[K] = [P] + [Q]
+### Tolerating Convergence Errors
 
-### Linear System
-
-```
-[K][[ΔΨ̂], [Δφ̂]]ᵀ = [B][ρ][u*] - [K][[Ψ̂_{t-Δt}], [φ̂_{t-Δt}]]ᵀ
-```
-
-Solve with **Preconditioned Conjugate Gradient (PCG)**.
-MIC(0) preconditioner with τ = 0.97, σ = 1.0.
-
-### Algorithm Pseudocode
+Solve for **change** from previous timestep, not absolute value:
 
 ```
-STREAM_FUNCTION_PROJECTION(u*, θF, θS):
-  
-  if first_call:
-    precompute [Z] from θS
-    precompute [P]  // Eq. 17
-    precompute [B] = [Z]ᵀ[∇×]ᵀ
-    set [Ψ̂_{t-Δt}], [φ̂_{t-Δt}] = 0
-  
-  compute [ρ], [Δρ] from θF (fluid level set)
-  compute [Q]  // Eq. 18
-  compute [K] = [P] + [Q]
-  
-  assemble linear system
-  solve with PCG
-  
-  [Ψ̂_t], [φ̂_t] = [ΔΨ̂], [Δφ̂] + [Ψ̂_{t-Δt}], [φ̂_{t-Δt}]
-  [u] = [∇×][Z][[Ψ̂_t], [φ̂_t]]ᵀ
-  
-  return [u]
+[Ψ] = [Z][ΔΨ̂; Δφ̂] + [Ψ_{t-Δt}]
+```
+
+Benefits:
+- No spurious damping from early termination
+- Still divergence-free by construction
+- Converges faster (solving for small delta)
+
+### Final Linear System
+
+```
+[K][ΔΨ̂; Δφ̂] = [B][ρ][u*] - [K][Ψ̂_{t-Δt}; φ̂_{t-Δt}]
+```
+
+Solve with PCG (MIC(0) preconditioner, τ=0.97, σ=1.0, tolerance 10⁻⁴).
+
+────────────────────────────────────────────────────────────────────────────────
+
+## 6. Implementable Algorithms
+
+### Algorithm 1: Stream Function Projection (Main Loop)
+
+```python
+def stream_function_projection(u_star, fluid_levelset, solid_levelset, 
+                                prev_psi, prev_phi):
+    """
+    Replace pressure projection with stream function solve.
+    
+    Args:
+        u_star: velocity after advection (on faces)
+        fluid_levelset: signed distance to liquid surface
+        solid_levelset: signed distance to solid surface
+        prev_psi: stream function from previous timestep
+        prev_phi: solid scalar from previous timestep
+    
+    Returns:
+        u: divergence-free velocity field
+    """
+    # First call: precompute static matrices
+    if first_time:
+        Z = compute_solid_mapping(solid_levelset)
+        P = compute_solid_boundary_matrix(Z, solid_levelset)
+        B = Z.T @ curl_matrix.T
+        prev_psi, prev_phi = zeros(), zeros()
+    
+    # Compute density matrices from fluid levelset
+    rho = compute_volume_fractions(fluid_levelset)  # 1 in liquid, 0 in air
+    delta_rho = rho - identity_matrix
+    
+    # Compute dynamic density jump matrix
+    Q = compute_density_jump_matrix(Z, delta_rho)
+    
+    # Combined system matrix
+    K = P + Q
+    
+    # Right-hand side
+    rhs = B @ (rho @ u_star) - K @ concatenate(prev_psi, prev_phi)
+    
+    # Solve for delta
+    delta = pcg_solve(K, rhs, tolerance=1e-4)
+    delta_psi, delta_phi = split(delta)
+    
+    # Update stream function
+    new_psi = delta_psi + prev_psi
+    new_phi = delta_phi + prev_phi
+    
+    # Compute divergence-free velocity
+    u = curl_matrix @ Z @ concatenate(new_psi, new_phi)
+    
+    return u, new_psi, new_phi
+```
+
+### Algorithm 2: Curl Operator (Edges → Faces)
+
+```python
+def build_curl_matrix(grid):
+    """
+    Build discrete curl operator mapping edge values to face values.
+    
+    For a face with normal in y-direction:
+        (∇×Ψ)_y = ∂Ψ_x/∂z - ∂Ψ_z/∂x
+    
+    Stencil: difference of Ψ values on edges surrounding the face.
+    """
+    curl = sparse_matrix(num_faces, num_edges)
+    
+    for face in grid.faces:
+        # Get the 4 edges surrounding this face
+        edges = face.surrounding_edges()
+        
+        # Curl is sum of edge values with orientation signs
+        for edge, sign in edges:
+            curl[face.id, edge.id] = sign / grid.cell_size
+    
+    return curl
+```
+
+### Algorithm 3: Rigid Body Stream Function
+
+```python
+def rigid_body_stream_function(x, x_center, omega, u_center):
+    """
+    Compute stream function Ψ such that ∇×Ψ = rigid body velocity.
+    
+    Args:
+        x: position in world space
+        x_center: rigid body center of mass
+        omega: angular velocity (3-vector)
+        u_center: translational velocity (3-vector)
+    
+    Returns:
+        psi: stream function value at x
+    """
+    x_rel = x - x_center
+    
+    # Rotation contribution
+    # Ψ_rot = -½ diag([y²+z², z²+x², x²+y²]) · ω
+    psi_rot = -0.5 * array([
+        (x_rel.y**2 + x_rel.z**2) * omega.x,
+        (x_rel.z**2 + x_rel.x**2) * omega.y,
+        (x_rel.x**2 + x_rel.y**2) * omega.z
+    ])
+    
+    # Translation contribution
+    # Ψ_trans = [0 z 0; 0 0 x; y 0 0] · u_c
+    psi_trans = array([
+        x_rel.z * u_center.y,
+        x_rel.x * u_center.z,
+        x_rel.y * u_center.x
+    ])
+    
+    return psi_rot + psi_trans  # plus ∇φ̂ from solve
+```
+
+### Algorithm 4: Volume Fraction Computation
+
+```python
+def compute_volume_fractions(fluid_levelset, grid):
+    """
+    Compute liquid volume fraction per cell for density matrix.
+    
+    Uses ghost-fluid style: fraction based on signed distance
+    along line between cell centers.
+    """
+    rho = diagonal_matrix(grid.num_cells)
+    
+    for cell in grid.cells:
+        phi_center = fluid_levelset.sample(cell.center)
+        
+        if phi_center < 0:  # Inside liquid
+            fraction = 1.0
+        elif phi_center > cell.diagonal:  # Far outside
+            fraction = 0.0
+        else:  # Near interface
+            # Compute fraction via interface crossing
+            fraction = compute_liquid_fraction(cell, fluid_levelset)
+        
+        # Clamp small fractions to avoid division issues
+        if fraction < 0.01:
+            fraction = 0.0
+        
+        rho[cell.id, cell.id] = fraction
+    
+    return rho
 ```
 
 ────────────────────────────────────────────────────────────────────────────────
-                                                                   // results
-────────────────────────────────────────────────────────────────────────────────
 
-## Results
+## 7. Hydrogen/PureScript Relevance
 
-### Performance
+### Direct Applications
 
-- Resolution 256×256×128: 54 sec/timestep, 3.9 min/frame
-- Resolution 128×256×128: 18-52 sec/timestep, 1.5-1.9 min/frame
-- Resolution 256×128×64: 49 sec/timestep, 1.5 min/frame
+**LATTICE Motion Graphics** — Fluid simulations for video:
+- Liquid logos, flowing text effects
+- Two-phase bubble effects without simulating air
+- "Guaranteed correct" divergence-free velocity for archival quality
 
-PCG residual tolerance: ||r||₂/||r₀||₂ < 10⁻⁴
+**Hydrogen.Target.Canvas/WebGL** — Real-time fluid elements:
+- Interactive liquid UI elements (buttons, sliders that "pour")
+- Background fluid animations
+- Particle systems advected by stream function velocity
 
-### Comparison with Pressure Projection
+### Schema Implications
 
-Stream function projection is **5.6× slower** than single-phase pressure projection.
-Whole timestep is **~3× slower** on average.
-
-However, compared to **two-phase solvers**:
-- Setting ρ_air = 0 makes two-phase methods unstable
-- Large density jumps require smaller timesteps
-- Air domain requires memory/computation
-
-### Key Demonstrations
-
-1. **Glugging container**: Violent splashes from air moving opposite to liquid
-   (without explicitly simulating second phase)
-
-2. **Bubble rising**: Complex deformation and breakup captured by
-   divergence-free motion in region around liquid
-
-3. **Rigid body coupling**: Non-grid-aligned boundaries, two-way coupled
-   rigid body, bubbles — all strongly coupled
-
-4. **Convergence error tolerance**: Less accurate solve = less accurate motion,
-   but **still divergence-free**
-
-────────────────────────────────────────────────────────────────────────────────
-                                                                // limitations
-────────────────────────────────────────────────────────────────────────────────
-
-## Limitations
-
-1. **3× more unknowns** than pressure solver (vector vs scalar Poisson)
-2. Components **strongly coupled** at boundaries (can't split into 3 scalar solves)
-3. Boundary motion must be **volume-conserving** (representable as stream function)
-4. **No inflow/outflow** boundary conditions yet (but should be possible if
-   total flux integrates to zero)
-5. **Compressible flows** require additional gradient term treatment
-
-────────────────────────────────────────────────────────────────────────────────
-                                                      // implementation // notes
-────────────────────────────────────────────────────────────────────────────────
-
-## Implementation Notes for Hydrogen
-
-### Relevant Schema Modules
-
-1. **Vector Fields on Staggered Grids**
-   - Ψ on edges: `Hydrogen.Schema.Geometry.EdgeField`
-   - u on faces: `Hydrogen.Schema.Geometry.FaceField`
-   - φ on vertices: `Hydrogen.Schema.Geometry.VertexField`
-
-2. **Differential Operators**
-   - Curl [∇×]: `Hydrogen.Schema.Physics.Curl`
-   - Divergence [∇·]: `Hydrogen.Schema.Physics.Divergence`
-   - Laplacian [∇²]: `Hydrogen.Schema.Physics.Laplacian`
-
-3. **Level Set / Distance Functions**
-   - Fluid surface: `Hydrogen.Schema.Geometry.LevelSet`
-   - Solid surface: `Hydrogen.Schema.Geometry.SDF`
-
-4. **Linear Algebra**
-   - Sparse matrices: `Hydrogen.Schema.Compute.SparseMatrix`
-   - PCG solver: `Hydrogen.Schema.Compute.ConjugateGradient`
-
-### Key Data Structures
+The paper's mathematical structure suggests types:
 
 ```purescript
-type StreamFunctionState =
-  { psi :: EdgeField Number        -- Stream function on edges
-  , phi :: VertexField Number      -- Scalar potential on vertices (solids)
-  , fluidLevelSet :: CellField Number
-  , solidSDF :: VertexField Number
+-- Stream function is a 3D vector field
+newtype StreamFunction = StreamFunction 
+  { components :: Array3D (Vec3 Number) }
+
+-- Velocity derived from stream function is guaranteed divergence-free
+newtype DivergenceFreeVelocity = DivergenceFreeVelocity
+  { field :: Array3D (Vec3 Number) 
+  , proof :: DivergenceFreeProof  -- curl-of-curl-is-zero
   }
 
-type StreamFunctionMatrices =
-  { z :: SparseMatrix              -- Boundary mapping
-  , p :: SparseMatrix              -- Solid-encoded Laplacian (precomputed)
-  , b :: SparseMatrix              -- RHS assembly (precomputed)
-  }
+-- The curl operation that guarantees divergence-free output
+curl :: StreamFunction -> DivergenceFreeVelocity
+
+-- Density field: 1 in liquid, 0 in air
+newtype DensityField = DensityField
+  { values :: Array3D UnitInterval }  -- bounded [0,1]
 ```
 
-### Discrete Exterior Calculus Connection
+### Type-Level Guarantees
 
-This discretization aligns with DEC:
-- 0-forms (scalars) on vertices
-- 1-forms (Ψ) on edges  
-- 2-forms (fluxes u) on faces
+The paper's key insight maps perfectly to dependent types:
 
-Operators [∇×] and [∇·] match DEC operators on regular grids.
+1. **Divergence-free by construction**: `curl :: StreamFunction -> DivergenceFreeVelocity`
+   The return type PROVES the result is divergence-free — not checked, constructed.
 
-────────────────────────────────────────────────────────────────────────────────
-                                                             // full-attribution
-────────────────────────────────────────────────────────────────────────────────
+2. **Bounded density**: Density in [0,1] via `UnitInterval` prevents the instabilities
+   that plague traditional two-phase solvers.
 
-## Full Attribution
+3. **Error tolerance without drift**: The "solve for delta" approach means early
+   termination doesn't accumulate error — compatible with iterative refinement
+   in real-time contexts.
 
-### This Paper
+### Implementation Path for Hydrogen
 
-**A Stream Function Solver for Liquid Simulations**
+1. **2D version first**: Stream functions in 2D are scalar (not vector), simpler
+   to implement and still useful for UI effects
 
-Ryoichi Ando¹, Nils Thuerey², Chris Wojtan¹
+2. **WebGL shader generation**: The linear system is sparse, structured — amenable
+   to GPU compute shaders
 
-¹ IST Austria
-² Technische Universität München
+3. **Composable with SDF**: Stream function velocity can advect SDF surfaces,
+   combining this paper with the SDF ray tracing work
 
-ACM Transactions on Graphics (Proceedings of SIGGRAPH)
-CR Categories: I.3.7 [Computer Graphics]: Three-Dimensional Graphics 
-and Realism—Animation
+### Why This Matters for Agents
 
-### Acknowledgements (from paper)
+At billion-agent scale, "approximately divergence-free" accumulates into visible
+artifacts. A stream function approach provides:
 
-- JSPS Postdoctoral Fellowship for Research Abroad (Ryoichi Ando)
-- ERC-2014-StG-637014 realFlow
-- ERC-2014-StG-638176 BigSplash
-- Reiji Tsuruno (computational resources)
-- Keenan Crane (discussions about Hodge decomposition)
-- Florian Ferstl (discussions about FLIP)
-
-### Key References Cited
-
-**Stable Fluids**
-Jos Stam.
-"Stable Fluids."
-SIGGRAPH 1999, pp. 121-128.
-
-**MAC Grid**
-Francis H. Harlow, J. Eddie Welch.
-"Numerical Calculation of Time-Dependent Viscous Incompressible Flow 
-of Fluid with Free Surface."
-Physics of Fluids 8(12), 1965, pp. 2182-2189.
-
-**Fast Variational Framework (Solid-Fluid Coupling)**
-Christopher Batty, Florence Bertails, Robert Bridson.
-"A Fast Variational Framework for Accurate Solid-Fluid Coupling."
-ACM Transactions on Graphics 26(3), 2007.
-
-**Circulation-Preserving Simplicial Fluids**
-Sharif Elcott, Yiying Tong, Eva Kanso, Peter Schröder, Mathieu Desbrun.
-"Stable, Circulation-Preserving, Simplicial Fluids."
-ACM Transactions on Graphics (TOG) 26(1), 2007.
-
-**FLIP Method**
-Robert Bridson.
-"Fluid Simulation for Computer Graphics."
-AK Peters/CRC Press, 2008.
-
-**MultiFLIP (Two-Phase)**
-Landon Boyd, Robert Bridson.
-"MultiFLIP for Energetic Two-Phase Fluid Simulation."
-ACM Transactions on Graphics 31(2), 2012.
-
-**Narrow-Band FLIP**
-Nuttapong Chentanez, Matthias Müller, Tae-Yong Kim.
-"Coupling 3D Eulerian, Heightfield and Particle Methods for Interactive 
-Simulation of Large Scale Liquid Phenomena."
-Eurographics/ACM SIGGRAPH Symposium on Computer Animation, 2014.
-
-**Discrete Exterior Calculus**
-Fernando de Goes, Keenan Crane, Mathieu Desbrun, Peter Schröder, et al.
-"Digital Geometry Processing with Discrete Exterior Calculus."
-ACM SIGGRAPH 2013 Courses.
-
-**Curl-Noise**
-Robert Bridson, Jim Houriham, Marcus Nordenstam.
-"Curl-Noise for Procedural Fluid Flow."
-ACM Transactions on Graphics (TOG) 26(3), 2007.
-
-**Vortex Methods**
-Andrew Selle, Nick Rasmussen, Ronald Fedkiw.
-"A Vortex Particle Method for Smoke, Water and Explosions."
-ACM Transactions on Graphics 24(3), 2005, pp. 910-914.
-
-**Rigid-Fluid Coupling**
-Mark Carlson, Peter J. Mucha, Greg Turk.
-"Rigid Fluid: Animating the Interplay Between Rigid Bodies and Fluid."
-ACM SIGGRAPH 2004, pp. 377-384.
-
-**Ghost Fluid Method**
-Frédéric Gibou, Ronald P. Fedkiw, Li-Tien Cheng, Myungjoo Kang.
-"A Second-Order-Accurate Symmetric Discretization of the Poisson 
-Equation on Irregular Domains."
-Journal of Computational Physics 176(1), 2002, pp. 205-227.
-
-**Marching Cubes**
-William E. Lorensen, Harvey E. Cline.
-"Marching Cubes: A High Resolution 3D Surface Construction Algorithm."
-SIGGRAPH 1987, pp. 163-169.
+- **Deterministic correctness**: Same input → exactly same divergence-free output
+- **No volume drift**: Physical plausibility without correction passes
+- **Graceful degradation**: Lower solve accuracy = less detail, not broken physics
 
 ────────────────────────────────────────────────────────────────────────────────
 
-                                                         — extracted 2026-02-26
+## References
+
+- Ando, Thuerey, Wojtan (2015). "A Stream Function Solver for Liquid Simulations."
+  SCA (Symposium on Computer Animation).
+
+- Bridson (2008). "Fluid Simulation for Computer Graphics." AK Peters/CRC Press.
+  (Standard time-splitting reference)
+
+- Elcott et al. (2007). "Stable, circulation-preserving, simplicial fluids." ACM TOG.
+  (DEC discretization, smoke stream functions)
+
+- Boyd & Bridson (2012). "MultiFLIP for energetic two-phase fluid simulation." ACM TOG.
+  (Two-phase FLIP comparison baseline)
+
+- Carlson, Mucha, Turk (2004). "Rigid fluid: Animating interplay between rigid bodies
+  and fluid." SIGGRAPH. (Rigid-fluid coupling)
+
+- Batty et al. (2007). "A fast variational framework for accurate solid-fluid coupling."
+  ACM TOG. (Kinetic energy minimization perspective)
+
+- de Goes et al. (2013). "Digital geometry processing with discrete exterior calculus."
+  SIGGRAPH Course. (DEC foundations)
+
+────────────────────────────────────────────────────────────────────────────────
+                                                                        — Opus

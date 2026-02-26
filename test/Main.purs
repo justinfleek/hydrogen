@@ -29,6 +29,7 @@ import Test.QRCode as QRCode
 import Test.Widget as Widget
 import Test.Scene3D as Scene3D
 import Test.WebGPU.Geometry as WebGPUGeometry
+import Test.Submodular.Property as SubmodularProperty
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -54,6 +55,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     Scene3D.scene3DTests
   describe "WebGPU Tests" do
     WebGPUGeometry.geometryTests
+  describe "FAA Submodular Allocation" do
+    SubmodularProperty.spec
 
 -- =============================================================================
 --                                                              // format tests
