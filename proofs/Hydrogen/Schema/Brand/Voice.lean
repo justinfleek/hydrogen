@@ -280,6 +280,270 @@ theorem has_one_tone (v : BrandVoice) : ∃ t : Tone, v.tone = t :=
 end BrandVoice
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION 5: VOICE ATTRIBUTE (IS/NOT PATTERN)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-! ## VoiceAttribute (IS/NOT Pattern)
+
+The IS/NOT pattern is the most valuable part of any brand voice specification.
+It converts subjective tone guidance into enforceable constraints.
+
+From SMART Brand Ingestion Framework:
+  "The IS/NOT pattern is the most valuable part of any brand voice 
+   specification. It converts subjective tone guidance into enforceable 
+   constraints. Always prioritize capturing this data."
+
+Example:
+  Authoritative:
+    IS: knowledgeable, trusted, confident, credible
+    IS NOT: overbearing, pompous, condescending
+
+─────────────────────────────────────────────────────────────────────────────────
+WHY DISJOINTNESS IS NECESSARY (NOT OPTIONAL)
+─────────────────────────────────────────────────────────────────────────────────
+
+At billion-agent scale, a term appearing in BOTH IS and IS NOT creates a 
+**semantic paradox** that cannot be resolved:
+
+  1. DEADLOCK: Agent asks "Is 'confident' allowed?" 
+     - IS says: YES, use it
+     - IS NOT says: NO, avoid it
+     - Agent cannot proceed → deadlock across swarm
+     
+  2. NONDETERMINISM: Different agents resolve the paradox differently
+     - Agent A: prefers IS → uses "confident"  
+     - Agent B: prefers IS NOT → avoids "confident"
+     - Brand voice becomes inconsistent across outputs
+     
+  3. SILENT FAILURE: Some agents might silently pick one
+     - No error raised, but brand integrity violated
+     - Undetectable until humans notice inconsistency
+     
+  4. CASCADE: One bad VoiceAttribute corrupts entire brand
+     - Content generation fails unpredictably
+     - Debugging requires manual inspection of all attributes
+
+The type-level disjointness guarantee means:
+  - **Paradoxical states are UNREPRESENTABLE**
+  - Construction fails at definition time, not generation time
+  - Zero runtime cost — the check happens once at brand ingestion
+  - Agents can TRUST the constraints without defensive checks
+
+This is the difference between "hopefully correct" and "provably correct".
+At scale, only provably correct survives.
+
+─────────────────────────────────────────────────────────────────────────────────
+INVARIANTS (PROVEN)
+─────────────────────────────────────────────────────────────────────────────────
+
+  1. name_nonempty: Attribute name is non-empty
+     WHY: Empty names prevent indexing, lookup, and error reporting
+     
+  2. is_nonempty: At least one IS term must be defined  
+     WHY: A constraint that constrains nothing is meaningless
+     
+  3. is_not_disjoint: IS ∩ IS NOT = ∅
+     WHY: See above — prevents semantic paradox at scale
+-/
+
+/-- Two lists are disjoint if no element appears in both -/
+def List.Disjoint {α : Type*} (l1 l2 : List α) : Prop :=
+  ∀ x, x ∈ l1 → x ∉ l2
+
+/-- Decidable disjointness check for lists with DecidableEq -/
+def List.disjointBool {α : Type*} [DecidableEq α] (l1 l2 : List α) : Bool :=
+  l1.all (fun x => !l2.contains x)
+
+/-- The boolean disjoint check correctly reflects the Prop -/
+theorem List.disjointBool_iff_Disjoint {α : Type*} [DecidableEq α] 
+    (l1 l2 : List α) : l1.disjointBool l2 = true ↔ l1.Disjoint l2 := by
+  simp only [disjointBool, Disjoint, List.all_eq_true, Bool.not_eq_true', 
+             List.contains_eq_any_beq, List.any_eq_true, beq_iff_eq]
+  constructor
+  · intro h x hx hcontra
+    have := h x hx
+    simp only [Bool.not_eq_true, List.any_eq_true, beq_iff_eq] at this
+    exact this ⟨x, hcontra, rfl⟩
+  · intro h x hx
+    simp only [Bool.not_eq_true, List.any_eq_true, beq_iff_eq, not_exists, not_and]
+    intro y hy heq
+    subst heq
+    exact h x hx hy
+
+/-- A voice attribute with IS/NOT constraints.
+
+    The `disjoint` proof field guarantees that no term appears in both
+    IS and IS NOT lists. This is not a runtime check — it's a compile-time
+    guarantee that paradoxical states cannot exist. -/
+structure VoiceAttribute where
+  /-- Attribute name (e.g., "Authoritative", "Approachable") -/
+  name : String
+  /-- What this attribute IS: positive descriptors to embrace -/
+  isTerms : List Term
+  /-- What this attribute IS NOT: negative descriptors to avoid -/
+  isNotTerms : List Term
+  /-- Name must be non-empty for indexing and error reporting -/
+  name_nonempty : name.length > 0
+  /-- At least one IS term required — constraints must constrain something -/
+  is_nonempty : isTerms.length > 0
+  /-- CRITICAL: IS and IS NOT are disjoint — no semantic paradoxes -/
+  disjoint : isTerms.Disjoint isNotTerms
+  deriving Repr
+
+namespace VoiceAttribute
+
+/-- Smart constructor that validates all invariants.
+    
+    Returns `none` if:
+    - name is empty
+    - isTerms is empty  
+    - any term appears in both isTerms and isNotTerms
+    
+    The disjointness check happens HERE, at construction time.
+    Once a VoiceAttribute exists, it is GUARANTEED disjoint. -/
+def make (name : String) (isTerms isNotTerms : List Term) : Option VoiceAttribute :=
+  if h_name : name.length > 0 then
+    if h_is : isTerms.length > 0 then
+      if h_disj : isTerms.disjointBool isNotTerms = true then
+        some ⟨name, isTerms, isNotTerms, h_name, h_is, 
+              (List.disjointBool_iff_Disjoint isTerms isNotTerms).mp h_disj⟩
+      else none
+    else none
+  else none
+
+/-- VoiceAttribute name is always non-empty -/
+theorem name_always_nonempty (va : VoiceAttribute) : va.name.length > 0 := 
+  va.name_nonempty
+
+/-- VoiceAttribute always has at least one IS term -/
+theorem always_has_is_terms (va : VoiceAttribute) : va.isTerms.length > 0 := 
+  va.is_nonempty
+
+/-- IS and IS NOT terms are always disjoint -/
+theorem is_not_disjoint (va : VoiceAttribute) (t : Term) : 
+    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+
+/-- Check if a term string is in the IS list -/
+def matchesTerm (va : VoiceAttribute) (s : String) : Bool :=
+  va.isTerms.any (fun t => t.value == s)
+
+/-- Check if a term string is in the IS NOT list (violation) -/
+def violatesTerm (va : VoiceAttribute) (s : String) : Bool :=
+  va.isNotTerms.any (fun t => t.value == s)
+
+/-- CRITICAL THEOREM: If a Term object is in IS, it cannot be in IS NOT.
+    
+    This is the fundamental guarantee that prevents semantic paradox.
+    An agent checking a term can TRUST that if it's approved (in IS),
+    it is NOT simultaneously forbidden (in IS NOT).
+    
+    This is proven by construction — the disjoint field is a proof term. -/
+theorem match_implies_no_violation (va : VoiceAttribute) (t : Term) :
+    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+
+/-- Contrapositive: If a term is in IS NOT, it cannot be in IS -/
+theorem violation_implies_no_match (va : VoiceAttribute) (t : Term) :
+    t ∈ va.isNotTerms → t ∉ va.isTerms := by
+  intro h_in_not h_in_is
+  exact va.disjoint t h_in_is h_in_not
+
+/-- A term can be in at most one of IS or IS NOT (exclusive) -/
+theorem exclusive_membership (va : VoiceAttribute) (t : Term) :
+    ¬(t ∈ va.isTerms ∧ t ∈ va.isNotTerms) := by
+  intro ⟨h_is, h_not⟩
+  exact va.disjoint t h_is h_not
+
+/-- The disjointness is symmetric — works both directions -/
+theorem disjoint_symmetric (va : VoiceAttribute) :
+    va.isNotTerms.Disjoint va.isTerms := by
+  intro t h_in_not h_in_is
+  exact va.disjoint t h_in_is h_in_not
+
+end VoiceAttribute
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION 6: VOICE CONSTRAINTS
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-! ## VoiceConstraints
+
+A collection of VoiceAttributes that together define the brand's voice
+guardrails. This is what AI content generation systems use to enforce
+brand-consistent copy.
+
+INVARIANTS:
+  1. attributes_unique: No duplicate attribute names
+  2. all_disjoint: Each attribute's IS/NOT are disjoint (by construction)
+-/
+
+/-- Collection of voice attribute constraints -/
+structure VoiceConstraints where
+  attributes : List VoiceAttribute
+  names_unique : attributes.map (·.name) = (attributes.map (·.name)).eraseDups
+  deriving Repr
+
+namespace VoiceConstraints
+
+/-- Empty constraints (no restrictions) -/
+def empty : VoiceConstraints := {
+  attributes := []
+  names_unique := by simp
+}
+
+/-- Number of constraints -/
+def count (vc : VoiceConstraints) : Nat := vc.attributes.length
+
+/-- Find violations across all constraints -/
+def findViolations (vc : VoiceConstraints) (term : String) : List String :=
+  vc.attributes.filterMap (fun va => 
+    if va.violatesTerm term then some va.name else none
+  )
+
+/-- All attributes maintain IS/NOT disjointness -/
+theorem all_attributes_disjoint (vc : VoiceConstraints) (va : VoiceAttribute) 
+    (h : va ∈ vc.attributes) (t : Term) :
+    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+
+end VoiceConstraints
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION 7: EXTENDED BRAND VOICE
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-! ## Extended BrandVoice with Constraints
+
+BrandVoice extended to include IS/NOT voice attribute constraints.
+-/
+
+/-- Complete brand voice configuration with IS/NOT constraints -/
+structure BrandVoiceWithConstraints where
+  tone : Tone
+  traits : TraitSet
+  vocabulary : Vocabulary
+  constraints : VoiceConstraints
+  deriving Repr
+
+namespace BrandVoiceWithConstraints
+
+/-- Default voice with empty constraints -/
+def default : BrandVoiceWithConstraints := {
+  tone := Tone.casual
+  traits := ⟨[Trait.friendly, Trait.approachable], by decide, by native_decide⟩
+  vocabulary := Vocabulary.empty
+  constraints := VoiceConstraints.empty
+}
+
+/-- Check if a term violates any voice constraint -/
+def checkTerm (bv : BrandVoiceWithConstraints) (term : String) : List String :=
+  bv.constraints.findViolations term
+
+/-- Voice with constraints maintains all trait guarantees -/
+theorem has_traits (v : BrandVoiceWithConstraints) : v.traits.traits.length > 0 :=
+  v.traits.nonempty
+
+end BrandVoiceWithConstraints
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 -- PURESCRIPT CODE GENERATION
 -- ═══════════════════════════════════════════════════════════════════════════════
 

@@ -11,6 +11,7 @@
 -- | - **Typography**: Font families, weights, and scale
 -- | - **Spacing**: Grid system or geometric scale
 -- | - **Voice**: Tone, personality traits, vocabulary
+-- | - **Logo**: Complete logo system (lockups, rules, errors)
 -- | - **Provenance**: Source URL, timestamp, content hash
 -- |
 -- | STATUS: ✓ PROVEN (Hydrogen.Schema.Brand.*)
@@ -27,6 +28,7 @@ module Hydrogen.Schema.Brand.Brand
   , brandTypography
   , brandSpacing
   , brandVoice
+  , brandLogo
   , brandProvenance
   
   -- * Content Addressing
@@ -41,6 +43,7 @@ module Hydrogen.Schema.Brand.Brand
   --   import Hydrogen.Schema.Brand.Typography (...)
   --   import Hydrogen.Schema.Brand.Spacing (...)
   --   import Hydrogen.Schema.Brand.Voice (...)
+  --   import Hydrogen.Schema.Brand.Logo (...)
   --   import Hydrogen.Schema.Brand.Provenance (...)
   --
   -- JSON serialization is handled at the ingestion/export boundary (Haskell).
@@ -51,6 +54,8 @@ import Prelude
   , (<>)
   , show
   )
+
+import Data.Maybe (Maybe)
 
 import Hydrogen.Schema.Brand.Identity 
   ( BrandIdentity
@@ -121,12 +126,26 @@ import Hydrogen.Schema.Brand.Voice
   , TraitSet
   , Vocabulary
   , Term
+  , VoiceAttribute
+  , VoiceConstraints
   , defaultVoice
   , toneToString
   , toneFromString
   , traitToString
   , mkTraitSet
+  , mkTerm
+  , mkVoiceAttribute
+  , mkVoiceConstraints
   , emptyVocabulary
+  , emptyConstraints
+  , checkConstraints
+  , findViolations
+  , showVoiceAttribute
+  , showVoiceConstraints
+  )
+
+import Hydrogen.Schema.Brand.Logo
+  ( LogoSystem
   )
 
 import Hydrogen.Schema.Brand.Provenance
@@ -158,6 +177,7 @@ import Hydrogen.Schema.Brand.Provenance
 -- | - typography weights are 100-900, multiples of 100
 -- | - spacing scale ratio > 1 (monotonically increasing)
 -- | - voice has at least one trait
+-- | - logo system has exactly one primary lockup (if present)
 -- | - provenance.contentHash matches serialized content
 type Brand =
   { identity :: BrandIdentity
@@ -165,6 +185,7 @@ type Brand =
   , typography :: BrandTypography
   , spacing :: BrandSpacing
   , voice :: BrandVoice
+  , logo :: Maybe LogoSystem
   , provenance :: Provenance
   }
 
@@ -175,16 +196,18 @@ type Brand =
 -- | Create a brand with all components.
 -- |
 -- | The provenance content hash is computed automatically from the other fields.
+-- | Logo is optional — use Nothing if logo system hasn't been ingested yet.
 mkBrand 
   :: BrandIdentity 
   -> BrandPalette 
   -> BrandTypography 
   -> BrandSpacing 
   -> BrandVoice 
+  -> Maybe LogoSystem
   -> SourceURL 
   -> Timestamp 
   -> Brand
-mkBrand identity palette typography spacing voice sourceUrl ingestedAt =
+mkBrand identity palette typography spacing voice logo sourceUrl ingestedAt =
   let 
     -- Serialize for hashing (without provenance to avoid circularity)
     contentStr = serializeForHash identity palette typography spacing voice
@@ -196,6 +219,7 @@ mkBrand identity palette typography spacing voice sourceUrl ingestedAt =
     , typography
     , spacing
     , voice
+    , logo
     , provenance
     }
 
@@ -245,6 +269,9 @@ brandSpacing b = b.spacing
 
 brandVoice :: Brand -> BrandVoice
 brandVoice b = b.voice
+
+brandLogo :: Brand -> Maybe LogoSystem
+brandLogo b = b.logo
 
 brandProvenance :: Brand -> Provenance
 brandProvenance b = b.provenance

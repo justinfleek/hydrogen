@@ -112,7 +112,7 @@ These must be implemented FIRST. Everything else depends on them.
 | Paper | arXiv/Source | Status | Why Critical |
 |-------|--------------|--------|--------------|
 | FLAME GPU | flamegpu.com | [ ] | Massively parallel agents |
-| TeraAgent | 2509.24063 | [ ] | 250x agent scaling |
+| TeraAgent | 2509.24063 | [DONE] | 250x agent scaling |
 | Boids | SIGGRAPH 1987 | [ ] | THE flocking paper |
 | Vicsek Model | PRL 1995 | [ ] | Phase transitions |
 | Topological Interaction | PNAS 2008 | [ ] | ~7 neighbors by rank |
@@ -143,6 +143,13 @@ These must be implemented FIRST. Everything else depends on them.
 | Perfect Spatial Hashing | SIGGRAPH 2006 | [ ] | GPU-friendly sparse data |
 | Voxel Hashing | TOG 2013 | [ ] | Memory-efficient 3D |
 
+#### Material & Texture Segmentation (NEW)
+| Paper | arXiv | Status | Why Critical |
+|-------|-------|--------|--------------|
+| MatSeg: Zero-Shot Material States | 2403.03309 | [DONE] | First general benchmark, pattern infusion |
+| SAM (Segment Anything) | 2304.02643 | [ ] | Foundation model baseline |
+| Materialistic | 2023 | [ ] | PBR-based material segmentation |
+
 ### Priority 3: VALUABLE (Specialized Capabilities)
 
 #### Voice & Multimodal (Section 10)
@@ -150,8 +157,8 @@ These must be implemented FIRST. Everything else depends on them.
 |-------|-------|--------|--------------|
 | VALL-E | 2301.02111 | [ ] | Zero-shot TTS |
 | F5-TTS | 2410.06885 | [ ] | Flow matching TTS |
-| CosyVoice 2 | 2412.10117 | [ ] | Streaming TTS |
-| Multimodal GUI for LLM | 2510.06223 | [ ] | Voice-driven UI |
+| CosyVoice 2 | 2412.10117 | [DONE] | Streaming TTS |
+| Multimodal GUI for LLM | 2510.06223 | [DONE] | Voice-driven UI |
 
 #### AI Self-Representation (Section 11)
 | Paper | Source | Status | Why Critical |
@@ -166,6 +173,10 @@ These must be implemented FIRST. Everything else depends on them.
 | DreamerV3 | 2301.04104 | [ ] | General world model RL |
 | GameNGen | 2408.14837 | [ ] | DOOM at 20+ FPS |
 | DIAMOND | 2405.12399 | [ ] | RL in diffusion world |
+| PAN | 2511.09057 | [DONE] | Long-horizon simulation |
+| GAIA-2 | 2503.20523 | [DONE] | Multi-view controllable world model |
+| GameFactory | 2501.08325 | [DONE] | Agent simulation factory |
+| WorldGen | 2511.16825 | [DONE] | Text to traversable 3D |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -176,30 +187,33 @@ These are 2024-2026 papers likely beyond my training cutoff. You'll need to fetc
 ### MUST FETCH (Critical, Recent)
 ```
 arXiv:2512.02010  - NVFP4 Adaptive Block Scaling (Blackwell GPUs)
-arXiv:2509.25149  - Pretraining LLMs with NVFP4 
-arXiv:2509.23202  - Microscaling FP4 Promise vs Performance
-arXiv:2505.19115  - FP4 All the Way (fully quantized training)
-arXiv:2505.14669  - Quartet: Native FP4 Training
-arXiv:2509.24063  - TeraAgent (250x agent scaling)
-arXiv:2503.20523  - GAIA-2 (multi-view world model)
+| arXiv:2509.25149  - Pretraining LLMs with NVFP4 
+arXiv:2509.23202  - Microscaling FP4 Promise vs Performance [DONE: docs/research/MICROSCALING_FP4_QUANTIZATION.md]
+arXiv:2505.19115  - FP4 All the Way [DONE: docs/research/FP4_ALL_THE_WAY.md]
+arXiv:2505.14669  - Quartet: Native FP4 Training [DONE: docs/research/QUARTET_FP4_TRAINING.md]
+arXiv:2509.24063  - TeraAgent [DONE: docs/research/TERAAGENT_SIMULATION.md]
+arXiv:2503.20523  - GAIA-2 (multi-view world model) [DONE: docs/research/GAIA2_WORLD_MODEL.md]
 arXiv:2509.24527  - Dreamer 4 (scalable world models)
 arXiv:2501.16496  - Open Problems in Mechanistic Interpretability
-arXiv:2501.14598  - Type-Based Rounding Error Analysis (dissertation)
-arXiv:2501.14550  - Bean: Backward Error Analysis
-arXiv:2510.06223  - Multimodal GUI for LLM Assistants
-arXiv:2412.10117  - CosyVoice 2 (streaming TTS)
-arXiv:2503.20215  - Qwen2.5-Omni (multimodal)
-arXiv:2501.06282  - MinMo (~100ms speech latency)
-arXiv:2503.17359  - Interactive Generative Video as Game Engine
-arXiv:2511.16825  - WorldGen (text to 3D)
-arXiv:2511.09057  - PAN (long-horizon simulation)
-arXiv:2501.08325  - GameFactory
+arXiv:2501.14598  - Type-Based Rounding Error Analysis [DONE: docs/research/ROUNDING_ERROR_TYPES.md]
+arXiv:2501.14550  - Bean: Backward Error Analysis [DONE: included in ROUNDING_ERROR_TYPES.md]
+arXiv:2510.06223  - Multimodal GUI for LLM Assistants [DONE: docs/research/MULTIMODAL_GUI.md]
+arXiv:2412.10117  - CosyVoice 2 (streaming TTS) [DONE: docs/research/COSYVOICE2_TTS.md]
+arXiv:2503.20215  - Qwen2.5-Omni (multimodal) [DONE: docs/research/QWEN25_OMNI.md]
+arXiv:2501.06282  - MinMo (~100ms speech latency) [DONE: docs/research/MinMo_Voice.md]
+arXiv:2503.17359  - Interactive Generative Video as Game Engine [DONE: docs/research/INTERACTIVE_GAME_VIDEO.md]
+arXiv:2511.16825  - WorldGen (text to 3D) [DONE: docs/research/WORLDGEN_3D.md]
+arXiv:2511.09057  - PAN (long-horizon simulation) [DONE: docs/research/PAN_WORLD_MODEL.md]
+arXiv:2501.08325  - GameFactory [DONE: docs/research/GAMEFACTORY.md]
 arXiv:2510.20532  - Sound and Complete Effect Inference
 arXiv:2507.09901  - Large Population Models (AgentTorch)
 arXiv:2507.10566  - AI Mother Tongue (emergent symbols)
 arXiv:2505.12872  - From Grunts to Grammar
 arXiv:2502.01568  - Visual Theory of Mind Writing
 arXiv:2502.19457  - 3DGS Compression Survey
+arXiv:2403.03309  - MatSeg: Zero-Shot Material States (DONE: docs/research/MATERIAL_STATE_SEGMENTATION.md)
+arXiv:2512.15716  - Spatia: Video Generation with Spatial Memory (DONE: docs/research/SPATIA_VIDEO_MEMORY.md)
+arXiv:2503.20215  - Qwen2.5-Omni (DONE: docs/research/QWEN25_OMNI.md)
 ```
 
 ### SHOULD FETCH (Valuable, Recent)
@@ -254,7 +268,7 @@ These are foundational/classic papers I have detailed knowledge of.
 - Consistency Models (2023) - ODE trajectory mapping
 - Flow Matching (2022) - Simulation-free CNF
 - Rectified Flow (2022) - Trajectory straightening
-- Feature Visualization (2017) - Activation maximization
+- Feature Visualization (2017) - Neural interpretability
 - GPTQ (2022) - Hessian-based quantization
 - AWQ (2023) - Activation-aware scaling
 - QLoRA (2023) - NF4, double quantization
@@ -265,6 +279,7 @@ These are foundational/classic papers I have detailed knowledge of.
 - TarMAC (2018) - Targeted attention communication
 - Perfect Spatial Hashing (2006) - Offset tables
 - Karras BVH (2012) - Morton codes, radix tree
+- MatSeg (2024) - Zero-shot material states, pattern infusion (SUMMARIZED)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -379,29 +394,30 @@ Only paper: DarthShader (fuzzing)
 
 ## Section 7: Paper Count Summary
 
-| Category | Total | To Implement | Notes |
-|----------|-------|--------------|-------|
-| Real-time Diffusion | 24 | 12 | Core capability |
-| NVFP4/Quantization | 14 | 6 | Blackwell optimization |
-| World Models | 14 | 5 | GameNGen critical |
-| Agent Swarms | 8 | 6 | FLAME GPU critical |
-| Formal Verification | 7 | 5 | NumFuzz critical |
-| Graded Monads | 12 | 6 | Granule critical |
-| FRP | 9 | 5 | Adapton critical |
-| WebGPU/GPU | 8 | 4 | Gap area |
-| Generative UI | 16 | 4 | Design2Code |
-| Voice/Multimodal | 14 | 6 | CosyVoice critical |
-| AI Self-Representation | 14 | 5 | Anthropic SAE |
-| Noise Scheduling | 19 | 8 | DPM-Solver++ default |
-| Submodular | 7 | 4 | Adaptive submodularity |
-| Quantum-Inspired | 6 | 2 | Dequantization |
-| Scene Graphs | 8 | 4 | Instant NGP |
-| Color Science | 7 | 3 | Oklab |
-| 3D Neural | 12 | 6 | 3DGS critical |
-| Emergent Comm | 9 | 4 | TarMAC |
-| Murmuration | 12 | 6 | Topological critical |
-| Constraint Solving | 4 | 4 | All critical |
-| **TOTAL** | **190+** | **~105** | **55% coverage** |
+| Category | Total | To Implement | Done | Notes |
+|----------|-------|--------------|------|-------|
+| Real-time Diffusion | 24 | 12 | 0 | Core capability |
+| NVFP4/Quantization | 14 | 3 | 3 | Quartet, Microscaling, FP4-All-Way |
+| World Models | 14 | 4 | 4 | GAIA-2, PAN, GameFactory, WorldGen done |
+| Agent Swarms | 8 | 6 | 0 | FLAME GPU critical |
+| Formal Verification | 7 | 5 | 2 | NumFuzz, Bean done |
+| Graded Monads | 12 | 6 | 0 | Granule critical |
+| FRP | 9 | 5 | 0 | Adapton critical |
+| WebGPU/GPU | 8 | 4 | 0 | Gap area |
+| Generative UI | 16 | 4 | 0 | Design2Code |
+| Voice/Multimodal | 14 | 6 | 4 | CosyVoice, Multimodal GUI, MinMo, Qwen2.5-Omni done |
+| AI Self-Representation | 14 | 5 | 0 | Anthropic SAE |
+| Noise Scheduling | 19 | 8 | 0 | DPM-Solver++ default |
+| Submodular | 7 | 4 | 0 | Adaptive submodularity |
+| Quantum-Inspired | 6 | 2 | 0 | Dequantization |
+| Scene Graphs | 8 | 4 | 0 | Instant NGP |
+| Color Science | 7 | 3 | 0 | Oklab |
+| 3D Neural | 12 | 6 | 0 | 3DGS critical |
+| Emergent Comm | 9 | 4 | 0 | TarMAC |
+| Murmuration | 12 | 6 | 0 | Topological critical |
+| Constraint Solving | 4 | 4 | 0 | All critical |
+| Material Segmentation | 3 | 1 | 1 | MatSeg done |
+| **TOTAL** | **190+** | **~96** | **15** | **~55% coverage** |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
