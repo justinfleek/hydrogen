@@ -34,9 +34,9 @@ import Data.Int (toNumber) as ReExports
 import Hydrogen.Element.Compound.Widget.Chart.Types (DataPoint)
 import Hydrogen.Math.Core (cos, sin) as ReExports
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // array operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Map data points to extract a value.
 mapPoints :: (DataPoint -> Number) -> Array DataPoint -> Array Number

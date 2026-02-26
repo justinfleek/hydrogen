@@ -125,9 +125,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Slider orientation
 data Orientation
@@ -142,9 +142,9 @@ type RangeValue =
   , high :: Number
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Slider properties
 -- |
@@ -225,9 +225,9 @@ defaultProps =
   , ariaLabel: "Slider"
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set slider value
 value :: forall msg. Number -> SliderProp msg
@@ -265,9 +265,9 @@ showTicks s props = props { showTicks = s }
 showTooltip :: forall msg. Boolean -> SliderProp msg
 showTooltip s props = props { showTooltip = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set track background color (Color.RGB atom)
 trackColor :: forall msg. Color.RGB -> SliderProp msg
@@ -301,9 +301,9 @@ tooltipBackgroundColor c props = props { tooltipBackgroundColor = Just c }
 tooltipTextColor :: forall msg. Color.RGB -> SliderProp msg
 tooltipTextColor c props = props { tooltipTextColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set track height/width (Device.Pixel atom)
 trackHeight :: forall msg. Device.Pixel -> SliderProp msg
@@ -317,25 +317,25 @@ thumbSize s props = props { thumbSize = Just s }
 thumbBorderWidth :: forall msg. Device.Pixel -> SliderProp msg
 thumbBorderWidth w props = props { thumbBorderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Radius atom)
 borderRadius :: forall msg. Geometry.Radius -> SliderProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> SliderProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set value change handler
 onChange :: forall msg. (Number -> msg) -> SliderProp msg
@@ -349,9 +349,9 @@ onRangeChange handler props = props { onRangeChange = Just handler }
 sliderAriaLabel :: forall msg. String -> SliderProp msg
 sliderAriaLabel l props = props { ariaLabel = l }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // defaults
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // defaults
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default track color (neutral gray)
 defaultTrackColor :: Color.RGB
@@ -405,9 +405,9 @@ defaultBorderRadius = Geometry.full
 defaultTransitionDuration :: Temporal.Milliseconds
 defaultTransitionDuration = Temporal.ms 150.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate percentage position
 toPercent :: Number -> Number -> Number -> Number
@@ -434,9 +434,9 @@ getRadius maybeRadius fallback = maybe fallback (\r -> r) maybeRadius
 getDuration :: Maybe Temporal.Milliseconds -> Temporal.Milliseconds -> Temporal.Milliseconds
 getDuration maybeDuration fallback = maybe fallback (\d -> d) maybeDuration
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Single value slider
 -- |
@@ -716,9 +716,9 @@ rangeSlider propMods =
           else E.text ""
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // supporting elements
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // supporting elements
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render tooltip
 renderTooltip :: forall msg. SliderProps msg -> Number -> E.Element msg

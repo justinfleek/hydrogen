@@ -67,9 +67,9 @@ module Hydrogen.Schema.Reactive.Flags
 
 import Prelude
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // core interactive flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // core interactive flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Element can receive interaction
 newtype EnabledFlag = EnabledFlag Boolean
@@ -111,9 +111,9 @@ newtype ActiveFlag = ActiveFlag Boolean
 derive instance eqActiveFlag :: Eq ActiveFlag
 derive newtype instance showActiveFlag :: Show ActiveFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // selection flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // selection flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Item is selected in a list/grid
 newtype SelectedFlag = SelectedFlag Boolean
@@ -145,9 +145,9 @@ newtype OpenFlag = OpenFlag Boolean
 derive instance eqOpenFlag :: Eq OpenFlag
 derive newtype instance showOpenFlag :: Show OpenFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // data flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // data flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Data is being fetched
 newtype LoadingFlag = LoadingFlag Boolean
@@ -179,9 +179,9 @@ newtype BusyFlag = BusyFlag Boolean
 derive instance eqBusyFlag :: Eq BusyFlag
 derive newtype instance showBusyFlag :: Show BusyFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // form flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // form flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Field has never been modified
 newtype PristineFlag = PristineFlag Boolean
@@ -223,9 +223,9 @@ newtype ReadOnlyFlag = ReadOnlyFlag Boolean
 derive instance eqReadOnlyFlag :: Eq ReadOnlyFlag
 derive newtype instance showReadOnlyFlag :: Show ReadOnlyFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // drag flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // drag flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Element is being dragged
 newtype DraggingFlag = DraggingFlag Boolean
@@ -242,9 +242,9 @@ newtype DropTargetFlag = DropTargetFlag Boolean
 derive instance eqDropTargetFlag :: Eq DropTargetFlag
 derive newtype instance showDropTargetFlag :: Show DropTargetFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // media flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // media flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Media is playing
 newtype PlayingFlag = PlayingFlag Boolean
@@ -271,9 +271,9 @@ newtype FullscreenFlag = FullscreenFlag Boolean
 derive instance eqFullscreenFlag :: Eq FullscreenFlag
 derive newtype instance showFullscreenFlag :: Show FullscreenFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // connection flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // connection flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Network connection is available
 newtype OnlineFlag = OnlineFlag Boolean
@@ -290,9 +290,9 @@ newtype ReconnectingFlag = ReconnectingFlag Boolean
 derive instance eqReconnectingFlag :: Eq ReconnectingFlag
 derive newtype instance showReconnectingFlag :: Show ReconnectingFlag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // presence flags
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // presence flags
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Component is mounted in DOM
 newtype MountedFlag = MountedFlag Boolean

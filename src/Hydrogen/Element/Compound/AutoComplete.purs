@@ -162,9 +162,9 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // suggestion types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // suggestion types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A suggestion with value, label, and disabled flag
 type Suggestion =
@@ -181,9 +181,9 @@ mkSuggestion s = { value: s, label: s, disabled: false }
 suggestionWithLabel :: String -> String -> Suggestion
 suggestionWithLabel val lbl = { value: val, label: lbl, disabled: false }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AutoComplete properties
 -- |
@@ -311,9 +311,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set suggestions from simple strings
 suggestionStrings :: forall msg. Array String -> AutoCompleteProp msg
@@ -375,9 +375,9 @@ acId i props = props { id = Just i }
 acName :: forall msg. String -> AutoCompleteProp msg
 acName n props = props { name = Just n }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input background color (Color.RGB atom)
 inputBackgroundColor :: forall msg. Color.RGB -> AutoCompleteProp msg
@@ -427,9 +427,9 @@ loadingTextColor c props = props { loadingTextColor = Just c }
 noResultsTextColor :: forall msg. Color.RGB -> AutoCompleteProp msg
 noResultsTextColor c props = props { noResultsTextColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input border radius (Geometry.Corners atom)
 inputBorderRadius :: forall msg. Geometry.Corners -> AutoCompleteProp msg
@@ -447,9 +447,9 @@ inputBorderWidth w props = props { inputBorderWidth = Just w }
 dropdownBorderWidth :: forall msg. Device.Pixel -> AutoCompleteProp msg
 dropdownBorderWidth w props = props { dropdownBorderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input height (Device.Pixel atom)
 inputHeight :: forall msg. Device.Pixel -> AutoCompleteProp msg
@@ -475,9 +475,9 @@ itemPaddingX p props = props { itemPaddingX = Just p }
 itemPaddingY :: forall msg. Device.Pixel -> AutoCompleteProp msg
 itemPaddingY p props = props { itemPaddingY = Just p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input font size (FontSize atom)
 inputFontSize :: forall msg. FontSize.FontSize -> AutoCompleteProp msg
@@ -487,9 +487,9 @@ inputFontSize s props = props { inputFontSize = Just s }
 itemFontSize :: forall msg. FontSize.FontSize -> AutoCompleteProp msg
 itemFontSize s props = props { itemFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input change handler
 onAcInput :: forall msg. (String -> msg) -> AutoCompleteProp msg
@@ -515,17 +515,17 @@ onAcFocus handler props = props { onFocus = Just handler }
 onAcBlur :: forall msg. msg -> AutoCompleteProp msg
 onAcBlur handler props = props { onBlur = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> AutoCompleteProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an autocomplete component with input and dropdown
 -- |
@@ -557,9 +557,9 @@ autoComplete propMods =
           else E.empty
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Build the input element
 buildInput :: forall msg. AutoCompleteProps msg -> E.Element msg
@@ -793,9 +793,9 @@ buildNoResults props =
       ([ E.style "text-align" "center" ] <> paddingXStyle <> paddingYStyle <> fontSizeStyle <> txtStyle)
       [ E.text props.noResultsText ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Small loading spinner
 spinnerIcon :: forall msg. E.Element msg

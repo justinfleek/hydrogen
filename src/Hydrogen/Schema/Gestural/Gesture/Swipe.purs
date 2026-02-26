@@ -48,9 +48,9 @@ import Hydrogen.Schema.Gestural.Gesture.Phase
   , isEnded
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // swipe // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // swipe // direction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cardinal direction for swipe gestures
 -- |
@@ -102,9 +102,9 @@ swipeDirectionFromDelta dx dy
   | abs dx > abs dy = if dx > 0.0 then SwipeRight else SwipeLeft
   | otherwise = if dy > 0.0 then SwipeDown else SwipeUp
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // swipe // threshold
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // swipe // threshold
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Minimum velocity threshold for swipe recognition (px/ms)
 -- |
@@ -129,9 +129,9 @@ defaultSwipeThreshold = SwipeVelocityThreshold 0.5
 unwrapSwipeThreshold :: SwipeVelocityThreshold -> Number
 unwrapSwipeThreshold (SwipeVelocityThreshold v) = v
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for SwipeVelocityThreshold [0.1, 5.0] px/ms
 -- |
@@ -141,9 +141,9 @@ swipeVelocityThresholdBounds :: Bounded.NumberBounds
 swipeVelocityThresholdBounds = Bounded.numberBounds 0.1 5.0 "SwipeVelocityThreshold"
   "Minimum velocity threshold for swipe recognition in pixels per millisecond"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // swipe // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // swipe // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State of a swipe gesture recognizer
 type SwipeState =

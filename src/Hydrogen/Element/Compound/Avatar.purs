@@ -96,9 +96,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Avatar properties
 type AvatarProps msg =
@@ -153,9 +153,9 @@ defaultImageProps =
   , imgAlt: ""
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set avatar size (Device.Pixel atom)
 -- |
@@ -163,9 +163,9 @@ defaultImageProps =
 size :: forall msg. Device.Pixel -> AvatarProp msg
 size s props = props { size = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set fallback background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> AvatarProp msg
@@ -179,17 +179,17 @@ textColor c props = props { textColor = Just c }
 borderColor :: forall msg. Color.RGB -> AvatarProp msg
 borderColor c props = props { borderColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border width (Device.Pixel atom)
 borderWidth :: forall msg. Device.Pixel -> AvatarProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set fallback font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> AvatarProp msg
@@ -199,9 +199,9 @@ fontSize s props = props { fontSize = Just s }
 fontWeight :: forall msg. FontWeight.FontWeight -> AvatarProp msg
 fontWeight w props = props { fontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: image
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: image
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set image source URL
 imgSrc :: String -> ImageProp
@@ -211,17 +211,17 @@ imgSrc s props = props { imgSrc = s }
 imgAlt :: String -> ImageProp
 imgAlt a props = props { imgAlt = a }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> AvatarProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an avatar container
 -- |
@@ -265,9 +265,9 @@ buildAvatarAttrs props =
   in
     coreStyles <> borderStyle <> props.extraAttributes
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // sub-components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // sub-components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Avatar image
 -- |

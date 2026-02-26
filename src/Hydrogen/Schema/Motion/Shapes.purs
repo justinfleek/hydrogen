@@ -100,9 +100,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // fill // rule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // fill // rule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Fill rule for determining inside/outside of paths.
 data FillRule
@@ -125,9 +125,9 @@ fillRuleFromString "nonzero" = Just FRNonzero
 fillRuleFromString "evenodd" = Just FREvenodd
 fillRuleFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // line // cap
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // line // cap
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Line cap style for stroke endpoints.
 data LineCap
@@ -154,9 +154,9 @@ lineCapFromString "round" = Just LCRound
 lineCapFromString "square" = Just LCSquare
 lineCapFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // line // join
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // line // join
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Line join style for stroke corners.
 data LineJoin
@@ -183,9 +183,9 @@ lineJoinFromString "round" = Just LJRound
 lineJoinFromString "bevel" = Just LJBevel
 lineJoinFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // trim // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // trim // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mode for Trim Paths operator.
 data TrimMode
@@ -208,9 +208,9 @@ trimModeFromString "simultaneously" = Just TMSimultaneously
 trimModeFromString "individually" = Just TMIndividually
 trimModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // merge // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // merge // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mode for Merge Paths operator.
 data MergeMode
@@ -249,9 +249,9 @@ mergeModeFromString "minus-front" = Just MMMinusFront
 mergeModeFromString "minus-back" = Just MMMinusBack
 mergeModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // offset // join
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // offset // join
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Join type for Offset Paths operator.
 data OffsetJoin
@@ -278,9 +278,9 @@ offsetJoinFromString "round" = Just OJRound
 offsetJoinFromString "bevel" = Just OJBevel
 offsetJoinFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // wiggle // point // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Point type for Wiggle Paths operator.
 data WigglePointType
@@ -303,9 +303,9 @@ wigglePointTypeFromString "corner" = Just WPTCorner
 wigglePointTypeFromString "smooth" = Just WPTSmooth
 wigglePointTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // zigzag // point // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Point type for ZigZag operator.
 data ZigZagPointType
@@ -328,9 +328,9 @@ zigZagPointTypeFromString "corner" = Just ZZPTCorner
 zigZagPointTypeFromString "smooth" = Just ZZPTSmooth
 zigZagPointTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // repeater // composite
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // repeater // composite
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Composite order for Repeater operator.
 data RepeaterComposite
@@ -353,9 +353,9 @@ repeaterCompositeFromString "above" = Just RCAbove
 repeaterCompositeFromString "below" = Just RCBelow
 repeaterCompositeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // shape // content // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // shape // content // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of shape content item (26 variants).
 -- |
@@ -507,9 +507,9 @@ isShapeContentTypeOperator SCTSimplifyPath = true
 isShapeContentTypeOperator SCTSmoothPath = true
 isShapeContentTypeOperator _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // gradient // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // gradient // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of gradient.
 data GradientType
@@ -532,9 +532,9 @@ gradientTypeFromString "linear" = Just GTLinear
 gradientTypeFromString "radial" = Just GTRadial
 gradientTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // shape // quality
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // shape // quality
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Rendering quality for shapes.
 data ShapeQuality
@@ -561,9 +561,9 @@ shapeQualityFromString "normal" = Just SQNormal
 shapeQualityFromString "high" = Just SQHigh
 shapeQualityFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // extrude // cap // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // extrude // cap // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cap type for 3D extrusion.
 data ExtrudeCapType
@@ -590,9 +590,9 @@ extrudeCapTypeFromString "round" = Just ECTRound
 extrudeCapTypeFromString "bevel" = Just ECTBevel
 extrudeCapTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // trace // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // trace // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mode for image trace operation.
 data TraceMode
@@ -619,9 +619,9 @@ traceModeFromString "grayscale" = Just TMGrayscale
 traceModeFromString "color" = Just TMColor
 traceModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // path // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // path // direction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Winding direction of a path.
 data PathDirection

@@ -39,9 +39,9 @@ import Hydrogen.Schema.Geometry.Spline.Conversion (catmullRomToBeziers, bSplineT
 import Hydrogen.Schema.Geometry.Spline.Geometry (catmullRomLength, bSplineLength)
 import Hydrogen.Schema.Geometry.Spline.Helpers (clamp01, toNumber, buildIntArray)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // arc length parameterization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // arc length parameterization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Evaluate Catmull-Rom spline at a given arc length.
 -- |
@@ -68,9 +68,9 @@ bSplinePointAtLength targetLength spline =
   in
     bSplinePointAt t spline
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // bisection search
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // bisection search
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bisection search for arc length parameterization (Catmull-Rom).
 bisectForLength :: Number -> CatmullRomSpline -> Number -> Number -> Int -> Number
@@ -103,9 +103,9 @@ bisectForLengthB targetRatio spline lo hi iterations =
       then bisectForLengthB targetRatio spline mid hi (iterations - 1)
       else bisectForLengthB targetRatio spline lo mid (iterations - 1)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // length up to t
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // length up to t
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Approximate arc length up to parameter t.
 catmullRomLengthUpTo :: Number -> CatmullRomSpline -> Number

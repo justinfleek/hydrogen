@@ -86,9 +86,9 @@ module Hydrogen.Schema.Spatial.Gizmo
   , showGizmo
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -104,9 +104,9 @@ import Hydrogen.Schema.Dimension.Device (Pixel(Pixel))
 import Hydrogen.Schema.Geometry.Shape (PixelPoint3D, pixelPoint3D, pixelOrigin3D)
 import Hydrogen.Schema.Spatial.Gimbal (Gimbal, gimbalZero)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // gizmo mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // gizmo mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The current manipulation mode of the gizmo.
 data GizmoMode
@@ -122,9 +122,9 @@ instance showGizmoMode :: Show GizmoMode where
   show GizmoRotate = "(GizmoMode Rotate)"
   show GizmoScale = "(GizmoMode Scale)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // gizmo space
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // gizmo space
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The coordinate space for gizmo axes.
 data GizmoSpace
@@ -140,9 +140,9 @@ instance showGizmoSpace :: Show GizmoSpace where
   show SpaceWorld = "(GizmoSpace World)"
   show SpaceView = "(GizmoSpace View)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // gizmo handle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // gizmo handle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Which part of the gizmo is being interacted with.
 data GizmoHandle
@@ -168,9 +168,9 @@ instance showGizmoHandle :: Show GizmoHandle where
   show HandleYZ = "(GizmoHandle YZ)"
   show HandleCenter = "(GizmoHandle Center)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // gizmo type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete gizmo state for 3D transform manipulation.
 -- |
@@ -216,9 +216,9 @@ instance showGizmoInstance :: Show Gizmo where
     <> " dragging:" <> show g.dragging
     <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a gizmo with specified mode and position.
 gizmo :: GizmoMode -> PixelPoint3D -> Gizmo
@@ -249,9 +249,9 @@ rotateGizmo = gizmo GizmoRotate pixelOrigin3D
 scaleGizmo :: Gizmo
 scaleGizmo = gizmo GizmoScale pixelOrigin3D
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current gizmo mode.
 gizmoMode :: Gizmo -> GizmoMode
@@ -269,9 +269,9 @@ cycleGizmoMode (Gizmo g) = Gizmo g { mode = nextMode g.mode }
     nextMode GizmoRotate = GizmoScale
     nextMode GizmoScale = GizmoTranslate
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // space
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // space
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current coordinate space.
 gizmoSpace :: Gizmo -> GizmoSpace
@@ -287,9 +287,9 @@ toggleGizmoSpace (Gizmo g) = Gizmo g { space = toggled }
   where
     toggled = if g.space == SpaceLocal then SpaceWorld else SpaceLocal
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // handle state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // handle state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the currently active (being dragged) handle.
 activeHandle :: Gizmo -> GizmoHandle
@@ -311,9 +311,9 @@ setHoveredHandle handle (Gizmo g) = Gizmo g { hovered = handle }
 clearActiveHandle :: Gizmo -> Gizmo
 clearActiveHandle (Gizmo g) = Gizmo g { active = HandleNone }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // transform state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the gizmo position.
 gizmoPosition :: Gizmo -> PixelPoint3D
@@ -339,9 +339,9 @@ setGizmoRotation rot (Gizmo g) = Gizmo g { rotation = rot }
 setGizmoScale :: PixelPoint3D -> Gizmo -> Gizmo
 setGizmoScale s (Gizmo g) = Gizmo g { scale = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // interaction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // interaction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Begin a drag operation on the active handle.
 beginDrag :: PixelPoint3D -> Gizmo -> Gizmo
@@ -379,9 +379,9 @@ dragDelta (Gizmo g) =
   in
     pixelPoint3D (Pixel (cx - sx)) (Pixel (cy - sy)) (Pixel (cz - sz))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // visibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // visibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if the gizmo is visible.
 gizmoVisible :: Gizmo -> Boolean
@@ -399,9 +399,9 @@ gizmoSize (Gizmo g) = g.size
 setGizmoSize :: Pixel -> Gizmo -> Gizmo
 setGizmoSize s (Gizmo g) = Gizmo g { size = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // debug
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // debug
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Debug string representation.
 showGizmo :: Gizmo -> String

@@ -5,7 +5,7 @@
 -- Platonic solid generators: Icosahedron, Octahedron, Tetrahedron, Dodecahedron.
 -- With subdivision support for geodesic sphere approximations.
 --
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 module Hydrogen.GPU.WebGPU.Scene3D.Geometry.Platonic
   ( generateIcosahedron
@@ -36,9 +36,9 @@ import Hydrogen.Schema.Dimension.Physical.SI (unwrapMeter)
 import Hydrogen.Schema.Dimension.Vector.Vec2 (Vec2, vec2)
 import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3, vec3, scaleVec3, getX3, getY3, getZ3)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- PLATONIC SOLIDS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Generate an icosahedron (20-faced regular polyhedron).
 -- |
@@ -223,9 +223,9 @@ generateDodecahedron params =
     , tangents: Nothing
     }
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- POLYHEDRON HELPERS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Subdivide a polyhedron by splitting each triangle into 4.
 -- |

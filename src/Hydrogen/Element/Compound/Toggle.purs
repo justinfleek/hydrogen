@@ -132,9 +132,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // toggle props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toggle button properties
 type ToggleProps msg =
@@ -217,9 +217,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // group props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // group props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toggle group properties
 type GroupProps msg =
@@ -244,9 +244,9 @@ defaultGroupProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set toggle value (identifier for UUID5 generation)
 -- |
@@ -263,9 +263,9 @@ pressed p props = props { pressed = p }
 isDisabled :: forall msg. Boolean -> ToggleProp msg
 isDisabled d props = props { disabled = d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color when not pressed (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> ToggleProp msg
@@ -299,9 +299,9 @@ borderColor c props = props { borderColor = Just c }
 focusRingColor :: forall msg. Color.RGB -> ToggleProp msg
 focusRingColor c props = props { focusRingColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> ToggleProp msg
@@ -315,9 +315,9 @@ borderWidth w props = props { borderWidth = Just w }
 focusRingWidth :: forall msg. Device.Pixel -> ToggleProp msg
 focusRingWidth w props = props { focusRingWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set toggle height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> ToggleProp msg
@@ -339,9 +339,9 @@ gap g props = props { gap = Just g }
 groupAriaLabel :: forall msg. String -> GroupProp msg
 groupAriaLabel label props = props { ariaLabel = Just label }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> ToggleProp msg
@@ -351,9 +351,9 @@ fontSize s props = props { fontSize = Just s }
 fontWeight :: forall msg. FontWeight.FontWeight -> ToggleProp msg
 fontWeight w props = props { fontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> ToggleProp msg
@@ -363,17 +363,17 @@ transitionDuration d props = props { transitionDuration = Just d }
 reducedMotion :: forall msg. Boolean -> ToggleProp msg
 reducedMotion r props = props { reducedMotion = r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: accessibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // prop builders: accessibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set ARIA label for screen readers
 ariaLabel :: forall msg. String -> ToggleProp msg
 ariaLabel label props = props { ariaLabel = Just label }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set press change handler
 onPressedChange :: forall msg. msg -> ToggleProp msg
@@ -383,17 +383,17 @@ onPressedChange handler props = props { onPressedChange = Just handler }
 onKeyDown :: forall msg. (String -> msg) -> ToggleProp msg
 onKeyDown handler props = props { onKeyDown = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ToggleProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a toggle button
 -- |
@@ -545,9 +545,9 @@ buildToggleAttrs props =
     <> keyboardHandler
     <> props.extraAttributes
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // toggle group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // toggle group
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a toggle group
 -- |

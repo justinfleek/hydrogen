@@ -11,9 +11,9 @@ module Hydrogen.Schema.Phone.Database.CentralAmerica
   ( centralAmericanCountries
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Phone.Country 
   ( Country
@@ -24,9 +24,9 @@ import Hydrogen.Schema.Phone.Country
 import Hydrogen.Schema.Phone.CountryCode (unsafeCountryCode)
 import Hydrogen.Schema.Phone.DialCode (unsafeDialCode)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // central american countries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // central american countries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All Central American countries.
 centralAmericanCountries :: Array Country

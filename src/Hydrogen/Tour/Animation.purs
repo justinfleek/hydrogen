@@ -95,9 +95,9 @@ import Data.Number (abs)
 import Data.Show.Generic (genericShow)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), Pixel(Pixel), Side(Bottom, Left, Right, Top))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // easing curves
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // easing curves
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Easing curve for animations
 -- |
@@ -208,9 +208,9 @@ easingToCss = case _ of
   CubicBezier x1 y1 x2 y2 ->
     "cubic-bezier(" <> show x1 <> ", " <> show y1 <> ", " <> show x2 <> ", " <> show y2 <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // spring configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // spring configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Spring physics configuration
 -- |
@@ -299,9 +299,9 @@ springBouncy = springConfig { stiffness: 180.0, damping: 12.0, mass: 1.0 }
 springStiff :: SpringConfig
 springStiff = springConfig { stiffness: 400.0, damping: 40.0, mass: 1.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // morph configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // morph configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for spotlight morph transitions
 -- |
@@ -360,9 +360,9 @@ derive instance genericMorphTarget :: Generic MorphTarget _
 instance showMorphTarget :: Show MorphTarget where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // animation types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // animation types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tour animation description
 -- |
@@ -461,9 +461,9 @@ derive instance genericAnimationPlayState :: Generic AnimationPlayState _
 instance showAnimationPlayState :: Show AnimationPlayState where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // animation builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // animation builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Fade in animation
 fadeIn :: Milliseconds -> EasingCurve -> TourAnimation
@@ -550,9 +550,9 @@ fadeSlideOut side duration easing = AnimComposite
   , composition: Parallel
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // animation composition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // animation composition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How multiple animations compose
 data AnimationComposition
@@ -602,9 +602,9 @@ withDuration duration anim = case anim of
   AnimSpring _ -> anim  -- Springs don't use duration
   AnimComposite cfg -> AnimComposite cfg
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // reduced motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // reduced motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Strategy for reduced motion preference
 -- |
@@ -690,9 +690,9 @@ applyReducedMotion strategy anim = case strategy of
 foreign import unsafeFloor :: Number -> Int
 foreign import toNumber :: Int -> Number
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // css generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // css generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert animation to CSS animation property value
 animationToCss :: TourAnimation -> String

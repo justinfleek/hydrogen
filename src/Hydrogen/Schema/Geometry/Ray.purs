@@ -105,9 +105,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   , vec3UnitZ
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A ray defined by an origin point and a direction vector.
 -- |
@@ -128,9 +128,9 @@ instance showRay :: Show Ray where
   show (Ray origin direction) =
     "(Ray origin:" <> show origin <> " direction:" <> show direction <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a ray from origin and direction
 ray :: Vec3 Number -> Vec3 Number -> Ray
@@ -146,9 +146,9 @@ rayDefault = Ray vec3Zero vec3UnitZ
 rayFromPoints :: Vec3 Number -> Vec3 Number -> Ray
 rayFromPoints origin target = Ray origin (subtractVec3 target origin)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // basic operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // basic operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get point at parameter t along the ray: P(t) = origin + t * direction
 -- | Proof reference: Ray.lean pointAt, pointAt_zero, pointAt_one, pointAt_add
@@ -170,9 +170,9 @@ recast r t = Ray (pointAt r t) (getDirection r)
 reverseRay :: Ray -> Ray
 reverseRay (Ray origin direction) = Ray origin (negateVec3 direction)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // closest point operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // closest point operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Parameter t for the closest point on ray to a given point.
 -- |
@@ -227,9 +227,9 @@ distanceSqToPoint :: Ray -> Vec3 Number -> Number
 distanceSqToPoint r point = 
   distanceSquaredVec3 point (closestPointToPoint r point)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the ray origin
 getOrigin :: Ray -> Vec3 Number
@@ -239,16 +239,16 @@ getOrigin (Ray origin _) = origin
 getDirection :: Ray -> Vec3 Number
 getDirection (Ray _ direction) = direction
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // intersection tests
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Small epsilon for numerical comparisons
 epsilon :: Number
 epsilon = 1.0e-10
 
 -- ─────────────────────────────────────────────────────────────────────────────
---                                                              // ray vs plane
+--                                                               // ray vs plane
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- | Intersect ray with a plane defined by normal and constant.
@@ -284,7 +284,7 @@ intersectPlanePoint r planeNormal planeConstant =
     Nothing -> Nothing
 
 -- ─────────────────────────────────────────────────────────────────────────────
---                                                             // ray vs sphere
+--                                                              // ray vs sphere
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- | Intersect ray with a sphere defined by center and radius.
@@ -342,7 +342,7 @@ intersectSpherePoint r sphereCenter sphereRadius =
     Nothing -> Nothing
 
 -- ─────────────────────────────────────────────────────────────────────────────
---                                                               // ray vs box
+--                                                                 // ray vs box
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- | Intersect ray with an axis-aligned bounding box (AABB).
@@ -410,7 +410,7 @@ intersectBoxPoint r boxMin boxMax =
     Nothing -> Nothing
 
 -- ─────────────────────────────────────────────────────────────────────────────
---                                                           // ray vs triangle
+--                                                            // ray vs triangle
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- | Intersect ray with a triangle using the Möller–Trumbore algorithm.

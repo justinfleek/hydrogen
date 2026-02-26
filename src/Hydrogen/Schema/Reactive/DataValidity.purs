@@ -218,9 +218,9 @@ import Data.Foldable (foldl, any, all)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // core aliases
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // core aliases
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sensor identifier (opaque string for now, could be UUID5)
 type SensorId = String
@@ -234,9 +234,9 @@ type Duration = Number
 -- | Percentage (0.0 to 100.0)
 type Percent = Number
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // data validity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Graduated data validity states for safety-critical systems.
 -- |
@@ -304,9 +304,9 @@ instance showDataValidity :: Show DataValidity where
   show (RateOfChangeExceeded r) = "RateOfChangeExceeded(current=" <> show r.current <> ")"
   show NeverReceived = "NeverReceived"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // failure modes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // failure modes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Specific failure modes for sensor failures
 data FailureMode
@@ -349,9 +349,9 @@ instance showDegradationReason :: Show DegradationReason where
   show FilteredData = "FilteredData"
   show Interpolated = "Interpolated"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // display response
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // display response
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How to display data based on validity state
 data DisplayResponse
@@ -395,9 +395,9 @@ instance showFailureFlag :: Show FailureFlag where
   show FlagNoData = "NO DATA"
   show FlagDegraded = "DEGD"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // data age
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // data age
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Graduated data age per DO-178C requirements
 data DataAge
@@ -437,9 +437,9 @@ computeDataAge thresholds ageMs
   | ageMs < thresholds.invalidMs = StaleAge ageMs
   | otherwise = Invalid
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create valid data
 validData :: Percent -> SensorId -> Timestamp -> DataValidity
@@ -482,9 +482,9 @@ rateExceeded current previous maxRate source timestamp =
 neverReceived :: DataValidity
 neverReceived = NeverReceived
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Is data currently valid (not degraded, stale, or failed)?
 isValid :: DataValidity -> Boolean
@@ -527,9 +527,9 @@ getAge (Stale r) = Just r.age
 getAge (CommsLost r) = Just r.since
 getAge _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // display response logic
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute display response from data validity
 computeDisplayResponse :: DataAgeThresholds -> DataValidity -> DisplayResponse
@@ -573,9 +573,9 @@ dataAgeToResponse thresholds ageMs
   | ageMs < thresholds.invalidMs = DisplayXThrough
   | otherwise = DisplayRemove
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // signal quality
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Signal quality indicator for medical displays
 data SignalQuality
@@ -612,9 +612,9 @@ signalQualityToString QualityPoor = "POOR"
 signalQualityToString QualityInvalid = "INVL"
 signalQualityToString QualityLeadOff = "LEAD OFF"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // sensor source
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // sensor source
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sensor source for redundancy tracking
 data SensorSource
@@ -655,9 +655,9 @@ compareSensorSources a b = compare (sensorSourcePriority a) (sensorSourcePriorit
 hasHigherPriority :: SensorSource -> SensorSource -> Boolean
 hasHigherPriority a b = sensorSourcePriority a < sensorSourcePriority b
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // validity comparisons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // validity comparisons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compare two validity states (more valid = greater)
 -- |
@@ -685,9 +685,9 @@ isWorseThan a b = validityScore a < validityScore b
 isEquivalentTo :: DataValidity -> DataValidity -> Boolean
 isEquivalentTo a b = validityScore a == validityScore b
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // validity combining
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Combine two validity states (take the worse)
 -- |
@@ -714,9 +714,9 @@ allValid = all isValid
 allUsable :: Array DataValidity -> Boolean
 allUsable = all isUsable
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // age arithmetic
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // age arithmetic
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute age from timestamps
 computeAge :: Timestamp -> Timestamp -> Duration
@@ -740,9 +740,9 @@ timeUntilInvalid thresholds currentAge =
     then 0.0 
     else thresholds.invalidMs - currentAge
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // confidence math
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // confidence math
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp confidence to valid range
 clampConfidence :: Percent -> Percent
@@ -771,9 +771,9 @@ confidenceMeetsThreshold confidence threshold = confidence >= threshold
 degradeConfidence :: Number -> Percent -> Percent
 degradeConfidence factor confidence = clampConfidence (confidence * factor)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // rate of change
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // rate of change
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute rate of change between two values
 computeRateOfChange :: Number -> Number -> Duration -> Number
@@ -793,9 +793,9 @@ computeDisagreement value1 value2 referenceRange =
     then 100.0
     else clampConfidence (absNum (value1 - value2) / referenceRange * 100.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // compound predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // compound predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Is data valid AND from primary sensor?
 isValidPrimary :: DataValidity -> SensorSource -> Boolean
@@ -854,9 +854,9 @@ eitherRequiresAttention :: DataAgeThresholds -> DataValidity -> DataValidity -> 
 eitherRequiresAttention thresholds a b =
   requiresImmediateAttention thresholds a || requiresImmediateAttention thresholds b
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // helper functions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Absolute value helper
 absNum :: Number -> Number

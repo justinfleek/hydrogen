@@ -10,9 +10,9 @@ module Hydrogen.Schema.Phone.Database.NorthAmerica
   ( northAmericanCountries
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Phone.Country 
   ( Country
@@ -23,9 +23,9 @@ import Hydrogen.Schema.Phone.Country
 import Hydrogen.Schema.Phone.CountryCode (unsafeCountryCode)
 import Hydrogen.Schema.Phone.DialCode (unsafeDialCode)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // north american countries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // north american countries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | North American countries (NANP zone primarily).
 northAmericanCountries :: Array Country

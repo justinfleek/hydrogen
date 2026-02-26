@@ -140,9 +140,9 @@ import Hydrogen.Element.Compound.Kanban.Column
 import Hydrogen.Schema.Gestural.DragDrop as DragDrop
 import Hydrogen.Schema.Gestural.Pointer (pointerPosition)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // swimlane
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // swimlane
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Swimlane for horizontal grouping
 type Swimlane =
@@ -163,9 +163,9 @@ swimlaneName s = s.name
 swimlaneCollapsed :: Swimlane -> Boolean
 swimlaneCollapsed s = s.collapsed
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // kanban state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete Kanban board state
 type KanbanState =
@@ -192,9 +192,9 @@ initialState =
 emptyState :: KanbanState
 emptyState = initialState
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // column operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all columns (sorted by index)
 getColumns :: KanbanState -> Array KanbanColumn
@@ -246,9 +246,9 @@ moveColumn colId newIndex state =
 columnCount :: KanbanState -> Int
 columnCount state = length state.columns
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // card operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all cards
 getCards :: KanbanState -> Array KanbanCard
@@ -353,9 +353,9 @@ cardCountInColumn :: ColumnId -> KanbanState -> Int
 cardCountInColumn colId state =
   length (getCardsInColumn colId state)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // swimlane operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // swimlane operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all swimlanes
 getSwimlanes :: KanbanState -> Array Swimlane
@@ -383,9 +383,9 @@ getCardsInSwimlane :: SwimlaneId -> KanbanState -> Array KanbanCard
 getCardsInSwimlane slId state =
   filter (\c -> cardSwimlaneId c == Just slId) state.cards
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // drag state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // drag state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get drag state
 getDragState :: KanbanState -> DragDrop.DragState
@@ -413,9 +413,9 @@ getDraggedCard state = case state.dragState.source of
     cardIdFromSourceId :: String -> CardId
     cardIdFromSourceId s = cardId s
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // selection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // selection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get selected card
 getSelectedCard :: KanbanState -> Maybe CardId
@@ -429,9 +429,9 @@ selectCard cId state = state { selectedCard = Just cId }
 clearSelection :: KanbanState -> KanbanState
 clearSelection state = state { selectedCard = Nothing }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // collapsed columns
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // collapsed columns
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if column is collapsed in state
 isColumnCollapsedInState :: ColumnId -> KanbanState -> Boolean
@@ -451,9 +451,9 @@ toggleColumnCollapsedInState colId state =
     then state { collapsedColumns = Set.delete colId state.collapsedColumns }
     else state { collapsedColumns = Set.insert colId state.collapsedColumns }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // message handler
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Handle a Kanban message and produce a new state
 -- |

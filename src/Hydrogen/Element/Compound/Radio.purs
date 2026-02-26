@@ -117,9 +117,9 @@ import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Radio group orientation
 data Orientation
@@ -132,9 +132,9 @@ instance showOrientation :: Show Orientation where
   show Horizontal = "horizontal"
   show Vertical = "vertical"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // radio props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // radio props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Radio button properties
 type RadioProps msg =
@@ -187,9 +187,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // group props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // group props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Radio group properties
 type RadioGroupProps msg =
@@ -244,9 +244,9 @@ defaultGroupProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: radio state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: radio state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checked state
 isChecked :: forall msg. Boolean -> RadioProp msg
@@ -264,9 +264,9 @@ radioName n props = props { name = Just n }
 radioValue :: forall msg. String -> RadioProp msg
 radioValue v props = props { value = Just v }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: group state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: group state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set group name
 groupName :: forall msg. String -> RadioGroupProp msg
@@ -284,9 +284,9 @@ orientation o props = props { orientation = o }
 groupDisabled :: forall msg. Boolean -> RadioGroupProp msg
 groupDisabled d props = props { disabled = d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set selected/checked color (Color.RGB atom)
 selectedColor :: forall msg. Color.RGB -> RadioProp msg
@@ -300,9 +300,9 @@ borderColor c props = props { borderColor = Just c }
 labelColor :: forall msg. Color.RGB -> RadioProp msg
 labelColor c props = props { labelColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set radio button size (Device.Pixel atom)
 size :: forall msg. Device.Pixel -> RadioProp msg
@@ -312,9 +312,9 @@ size s props = props { size = Just s }
 gap :: forall msg. Device.Pixel -> RadioGroupProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label font size (FontSize atom)
 labelFontSize :: forall msg. FontSize.FontSize -> RadioProp msg
@@ -324,17 +324,17 @@ labelFontSize s props = props { labelFontSize = Just s }
 labelFontWeight :: forall msg. FontWeight.FontWeight -> RadioProp msg
 labelFontWeight w props = props { labelFontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> RadioProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set select handler
 onSelect :: forall msg. msg -> RadioProp msg
@@ -344,17 +344,17 @@ onSelect handler props = props { onSelect = Just handler }
 onValueChange :: forall msg. (String -> msg) -> RadioGroupProp msg
 onValueChange handler props = props { onValueChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> RadioProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a radio button
 -- |
@@ -437,9 +437,9 @@ innerDot props =
       ]
       []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // labeled radio
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // labeled radio
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a radio button with label
 radioWithLabel :: forall msg. String -> Array (RadioProp msg) -> E.Element msg
@@ -477,9 +477,9 @@ radioWithLabel labelText propMods =
           [ E.text labelText ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // radio group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // radio group
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a radio group
 -- |

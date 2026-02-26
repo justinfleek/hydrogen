@@ -71,9 +71,9 @@ import Hydrogen.Element.Compound.OTPInput.Types
   , unwrapDigitCount
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // character validation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Validate a character for the given input type.
 -- | Returns Just normalizedChar if valid, Nothing if invalid.
@@ -111,9 +111,9 @@ isValidAlphanumeric c =
 normalizeChar :: Char -> Char
 normalizeChar c = c
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // string validation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Validate and convert a string to an OTPValue.
 -- | Invalid characters become empty slots.
@@ -148,9 +148,9 @@ isValidForType :: OTPInputType -> Char -> Boolean
 isValidForType Numeric c = isValidDigit c
 isValidForType Alphanumeric c = isValidAlphanumeric c
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // paste handling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Validate pasted text and extract valid OTP value.
 -- | Returns sanitized, filtered, truncated OTPValue.
@@ -195,9 +195,9 @@ takeArr n arr = go 0 n arr []
           Nothing -> acc
           Just x -> go (idx + 1) (remaining - 1) xs (snoc acc x)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // input mode helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get HTML inputmode attribute value for input type
 getInputMode :: OTPInputType -> String

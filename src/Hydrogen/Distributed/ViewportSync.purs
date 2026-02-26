@@ -252,9 +252,9 @@ import Hydrogen.Distributed.TimeAuthority
       )
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // core aliases
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // core aliases
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique viewport identifier
 type ViewportId = String
@@ -265,9 +265,9 @@ type EffectId = String
 -- | Frame offset (positive = ahead, negative = behind)
 type FrameOffset = Int
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // sync state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Synchronization state of a viewport relative to authority
 data SyncState
@@ -324,9 +324,9 @@ isDisconnected :: SyncState -> Boolean
 isDisconnected (Disconnected _) = true
 isDisconnected _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // viewport sync
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Viewport synchronization state
 type ViewportSync =
@@ -413,9 +413,9 @@ averageDrift arr =
     then 0.0
     else foldl (+) 0.0 arr / toNumber (Array.length arr)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // drift compensation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Drift compensation action
 data DriftCompensation
@@ -474,9 +474,9 @@ applyCompensation comp currentFrame = case comp of
   PauseAndWait _ -> currentFrame       -- Pause doesn't change frame
   HardResync frame -> frame
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // shared effect state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shared effect state for cross-viewport coordination
 type SharedEffectState =
@@ -539,9 +539,9 @@ isEffectOwner viewportId effect = effect.owningViewport == viewportId
 getSubscribers :: SharedEffectState -> Array ViewportId
 getSubscribers effect = Set.toUnfoldable effect.subscribedViewports
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // effect registry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // effect registry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Registry of shared effects
 type EffectRegistry =
@@ -604,9 +604,9 @@ tickEffect frame deltaProgress effect = case effect.currentPhase of
          else effect { currentPhase = EffectRunning newProgress, lastSyncFrame = frame }
   _ -> effect
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // multi-viewport coordination
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // multi-viewport coordination
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cluster of synchronized viewports
 type ViewportCluster =
@@ -683,9 +683,9 @@ computeClusterState cluster =
     else if synced > total / 2 then ClusterPartialSync drifting
     else ClusterDesync
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // frame reconciliation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Frame reconciliation result
 type FrameReconciliation =
@@ -779,9 +779,9 @@ adjustViewportOffset strategy sync = case strategy of
         else sync
   _ -> sync
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // helper functions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp to 0.0-1.0
 clamp01 :: Number -> Number
@@ -802,9 +802,9 @@ maxInt a b = if a >= b then a else b
 absInt :: Int -> Int
 absInt n = if n < 0 then negate n else n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                             // time authority integration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // time authority integration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create viewport sync with local authority
 mkViewportSyncLocal :: ViewportId -> AgentId -> WallClock -> ViewportSync
@@ -828,9 +828,9 @@ viewportUsesLocal sync = isLocalAuthority sync.authority
 getViewportAuthorityTime :: ViewportSync -> FrameTime
 getViewportAuthorityTime sync = getAuthorityTime sync.authority
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // frame schedule integration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // frame schedule integration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute expected frame for viewport at given time
 computeExpectedFrame :: FrameSchedule -> WallClock -> ViewportSync -> FrameNumber
@@ -863,9 +863,9 @@ getScheduleFps = framesPerSecond
 getScheduleFrameDuration :: FrameSchedule -> FrameTime
 getScheduleFrameDuration = frameDuration
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // clock sync integration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create viewport sync with clock sync state
 mkViewportSyncWithClockSync :: ViewportId -> AgentId -> ClockSync -> WallClock -> ViewportSync
@@ -900,9 +900,9 @@ viewportLocalToServer = localToServer
 viewportServerToLocal :: ClockSync -> WallClock -> WallClock
 viewportServerToLocal = serverToLocal
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                   // vector clock integration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ViewportSync with vector clock for causal ordering
 type ViewportSyncWithCausality =

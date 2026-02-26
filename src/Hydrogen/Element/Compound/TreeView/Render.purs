@@ -140,9 +140,9 @@ module Hydrogen.Element.Compound.TreeView.Render
   , computeIndentPixels
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -263,9 +263,9 @@ import Hydrogen.Schema.Graph.Layout as LayoutSchema
 import Hydrogen.Schema.Graph.Connection as ConnectionSchema
 import Hydrogen.Schema.Graph.Viewport as ViewportSchema
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TreeView rendering properties
 -- |
@@ -366,9 +366,9 @@ defaultProps =
   , ariaLabel: "Tree view"
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set tree background color
 backgroundColor :: forall msg. Color.RGB -> TreeViewProp msg
@@ -398,9 +398,9 @@ hoverBackground c props = props { hoverBackground = Just c }
 expandIconColor :: forall msg. Color.RGB -> TreeViewProp msg
 expandIconColor c props = props { expandIconColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set indent size per depth level
 indentSize :: forall msg. Device.Pixel -> TreeViewProp msg
@@ -418,17 +418,17 @@ iconSize s props = props { iconSize = Just s }
 expandIconSize :: forall msg. Device.Pixel -> TreeViewProp msg
 expandIconSize s props = props { expandIconSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius for selected/hover states
 borderRadius :: forall msg. Geometry.Corners -> TreeViewProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set node click handler
 onNodeClick :: forall msg. (NodeId -> msg) -> TreeViewProp msg
@@ -486,9 +486,9 @@ onNodeHoverEnd m props = props { onNodeHoverEnd = Just m }
 withPropsCheckable :: forall msg. Boolean -> TreeViewProp msg
 withPropsCheckable b props = props { checkable = b }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: layout
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: layout
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set layout configuration
 withLayoutConfig :: forall msg. LayoutSchema.LayoutConfig -> TreeViewProp msg
@@ -519,9 +519,9 @@ withAccessibilityConfig config props = props { a11yConfig = Just config }
 withPropsShowConnections :: forall msg. Boolean -> TreeViewProp msg
 withPropsShowConnections b props = props { showConnections = b }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // main renderer
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // main renderer
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the complete tree view
 -- |
@@ -668,9 +668,9 @@ buildContainerStyles props =
   in
     bgStyle <> a11yStyles
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // state-specific renders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // state-specific renders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render only the expanded nodes
 -- |
@@ -831,9 +831,9 @@ initialHoverState = noHover
 singleSelectMode :: SelectionMode
 singleSelectMode = SingleSelect
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // subtree renderers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a subtree starting from a specific node
 -- |
@@ -909,9 +909,9 @@ renderChildNodes props tree state parentId =
       ]
       (map (renderNodeRow props tree state) children)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // node renderer
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // node renderer
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a single node row (indented list style)
 renderNodeRow ::
@@ -1267,9 +1267,9 @@ buildAllNodeHandlers props nid =
   buildDragHandlers props nid <>
   buildHoverHandlers props nid
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // node content parts
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // node content parts
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Fallback node content rendering (when Content module not configured)
 -- |
@@ -1537,9 +1537,9 @@ renderDropIndicator props depth position =
           ]
           []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // default message props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // default message props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set expand handler using default TreeViewMsg
 -- |
@@ -1659,9 +1659,9 @@ withAllDefaultHandlers props =
     # withDefaultHoverHandlers
     # withDefaultKeyboardHandler
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a node is disabled
 -- |

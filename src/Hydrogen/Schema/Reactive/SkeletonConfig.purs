@@ -78,9 +78,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Nothing, Just))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // skeleton timing
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Timing constraints for skeleton display
 -- |
@@ -158,9 +158,9 @@ patientTiming = SkeletonTiming
   , animationDuration: 2000.0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // skeleton shape
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shape of skeleton placeholder
 -- |
@@ -206,9 +206,9 @@ paragraphShape lines = ShapeParagraph lines 20.0 8.0
 customShape :: String -> SkeletonShape
 customShape = ShapeCustomPath
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // content type validation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // content type validation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Content type classification for skeleton eligibility
 -- |
@@ -268,9 +268,9 @@ skeletonWarning ContentAction =
   Just "Skeletons should not be used on action elements"
 skeletonWarning _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // slow connection handling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // slow connection handling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Behavior when load time exceeds maxDisplayTime
 data SlowConnectionBehavior
@@ -293,9 +293,9 @@ instance showSlowConnectionBehavior :: Show SlowConnectionBehavior where
 slowConnectionConfig :: String -> SlowConnectionBehavior
 slowConnectionConfig = ShowWarningText
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // skeleton config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // skeleton config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete skeleton loading configuration
 -- |

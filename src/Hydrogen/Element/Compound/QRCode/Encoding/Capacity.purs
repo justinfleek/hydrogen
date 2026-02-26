@@ -33,9 +33,9 @@ module Hydrogen.Element.Compound.QRCode.Encoding.Capacity
   , totalCodewords
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( (+)
@@ -48,9 +48,9 @@ import Hydrogen.Element.Compound.QRCode.Types
   , versionToInt
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // block info
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // block info
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Block structure information for a version/EC combination.
 -- |
@@ -91,9 +91,9 @@ totalCodewords :: BlockInfo -> Int
 totalCodewords info =
   totalDataCodewords info + totalECCodewords info
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // ec level L (7% recovery)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // ec level L (7% recovery)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Block info for EC Level L (Low - 7% recovery)
 getBlockInfoL :: Int -> BlockInfo
@@ -140,9 +140,9 @@ getBlockInfoL v = case v of
   40 -> { ecPerBlock: 30,  group1Blocks: 19, group1Data: 118, group2Blocks: 6, group2Data: 119 }
   _  -> { ecPerBlock: 7,   group1Blocks: 1,  group1Data: 19,  group2Blocks: 0, group2Data: 0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // ec level M (15% recovery)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // ec level M (15% recovery)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Block info for EC Level M (Medium - 15% recovery)
 getBlockInfoM :: Int -> BlockInfo
@@ -189,9 +189,9 @@ getBlockInfoM v = case v of
   40 -> { ecPerBlock: 28,  group1Blocks: 18, group1Data: 47,  group2Blocks: 31, group2Data: 48 }
   _  -> { ecPerBlock: 10,  group1Blocks: 1,  group1Data: 16,  group2Blocks: 0, group2Data: 0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // ec level Q (25% recovery)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // ec level Q (25% recovery)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Block info for EC Level Q (Quartile - 25% recovery)
 getBlockInfoQ :: Int -> BlockInfo
@@ -238,9 +238,9 @@ getBlockInfoQ v = case v of
   40 -> { ecPerBlock: 30,  group1Blocks: 34, group1Data: 24,  group2Blocks: 34, group2Data: 25 }
   _  -> { ecPerBlock: 13,  group1Blocks: 1,  group1Data: 13,  group2Blocks: 0, group2Data: 0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // ec level H (30% recovery)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // ec level H (30% recovery)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Block info for EC Level H (High - 30% recovery)
 getBlockInfoH :: Int -> BlockInfo

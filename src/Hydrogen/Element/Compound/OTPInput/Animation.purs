@@ -93,9 +93,9 @@ import Hydrogen.Element.Compound.OTPInput.Props
   ( OTPInputProps
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // animation types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // animation types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Animation property — what aspect of the element is animated.
 -- |
@@ -181,9 +181,9 @@ instance showOTPAnimation :: Show OTPAnimation where
   show (OTPAnimation a) =
     show a.property <> " " <> show a.duration <> " " <> show a.easing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // animation definitions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // animation definitions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shake animation for error feedback.
 -- |
@@ -279,9 +279,9 @@ loadingAnimation =
       }
   ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // animation data retrieval
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // animation data retrieval
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get animation data for a digit based on its state.
 -- |
@@ -383,9 +383,9 @@ fillModeToString FillForwards = "forwards"
 fillModeToString FillBackwards = "backwards"
 fillModeToString FillBoth = "both"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // animation state computation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // animation state computation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute the animation state for a digit based on component state.
 -- |
@@ -420,9 +420,9 @@ computeDigitAnimationState state digit isEntering =
 shouldAnimate :: forall msg. OTPInputProps msg -> Boolean
 shouldAnimate props = props.animationEnabled
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the property being animated
 animationProperty :: OTPAnimation -> OTPAnimationProperty

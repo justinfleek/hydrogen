@@ -47,9 +47,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Element.Compound.TimePicker.Types (Period(AM, PM))
 import Hydrogen.Element.Compound.TimePicker.Format (padZero)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TimePicker properties (duplicated here for internal use)
 -- | The main module re-exports this.
@@ -86,9 +86,9 @@ type TimePickerProps msg =
   , onSecondDecrement :: Maybe msg
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // resolved config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // resolved config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Resolved configuration with defaults applied
 type ResolvedConfig =
@@ -119,9 +119,9 @@ resolveConfig props =
   , fontSizeVal: maybe "14px" FontSize.toLegacyCss props.fontSize
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // segment configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // segment configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for a time segment (hour, minute, second)
 type SegmentConfig msg =
@@ -135,9 +135,9 @@ type SegmentConfig msg =
   , onInputChange :: Maybe (String -> msg)
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // render helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // render helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a time segment (hour, minute, or second)
 renderTimeSegment :: forall msg. ResolvedConfig -> SegmentConfig msg -> E.Element msg
@@ -305,9 +305,9 @@ renderPeriodButton props config targetPeriod isActive =
       )
       [ E.text label ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Chevron up SVG icon
 renderChevronUp :: forall msg. E.Element msg

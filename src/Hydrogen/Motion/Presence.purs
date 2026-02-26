@@ -87,9 +87,9 @@ import Data.Foldable (intercalate)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Time.Duration (Milliseconds(Milliseconds))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Presence state for a component — pure enum
 -- |
@@ -157,9 +157,9 @@ instance showDirection :: Show Direction where
   show ToLeft = "ToLeft"
   show ToRight = "ToRight"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // variants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // variants
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Animation variant — pure data describing CSS transform properties
 -- |
@@ -278,9 +278,9 @@ popOut = emptyVariant
   , opacity = Just 0.0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // variant composition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // variant composition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Combine two variants (second takes precedence)
 combineVariants :: Variant -> Variant -> Variant
@@ -313,9 +313,9 @@ withDelay (Milliseconds ms) v = v { delay = Just ms }
 withEasing :: String -> Variant -> Variant
 withEasing e v = v { easing = Just e }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // variant interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // variant interpolation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Interpolate between two numbers
 interpolateNumber :: Number -> Number -> Number -> Number
@@ -344,9 +344,9 @@ interpolate t v1 v2 =
   lerpMaybe (Just a) Nothing = Just a
   lerpMaybe Nothing Nothing = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // motion element
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Motion element — pure data describing an animated component
 -- |
@@ -374,9 +374,9 @@ defaultMotionElement =
   , onComplete: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // presence transitions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // presence transitions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Transition presence state — pure function
 transitionTo :: forall msg. PresenceState -> MotionElement msg -> MotionElement msg
@@ -394,9 +394,9 @@ present = transitionTo Present
 exit :: forall msg. MotionElement msg -> MotionElement msg
 exit = transitionTo Exiting
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // serialization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert variant to a record for renderer consumption
 variantToRecord :: Variant -> 

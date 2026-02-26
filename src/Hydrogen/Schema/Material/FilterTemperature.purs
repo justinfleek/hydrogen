@@ -34,9 +34,9 @@ import Prelude
 
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // filtertemperature
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // filter-temperature
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter temperature adjustment (-1.0 to +1.0)
 -- |
@@ -49,17 +49,17 @@ derive instance ordFilterTemperature :: Ord FilterTemperature
 instance showFilterTemperature :: Show FilterTemperature where
   show (FilterTemperature t) = "FilterTemperature " <> show t
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a filter temperature, clamping to -1.0 to +1.0
 filterTemperature :: Number -> FilterTemperature
 filterTemperature n = FilterTemperature (Bounded.clampNumber (-1.0) 1.0 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Neutral temperature
 neutral :: FilterTemperature
@@ -79,9 +79,9 @@ warm = FilterTemperature 0.5
 invert :: FilterTemperature -> FilterTemperature
 invert (FilterTemperature t) = FilterTemperature (negate t)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract the raw Number value
 unwrap :: FilterTemperature -> Number

@@ -105,9 +105,9 @@ import Data.Array (foldl)
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core (abs, clamp)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // scroll // position
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // scroll // position
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Current scroll position
 type ScrollPosition =
@@ -139,9 +139,9 @@ scrollLeft = scrollX
 addScrollPosition :: ScrollPosition -> ScrollPosition -> ScrollPosition
 addScrollPosition a b = { x: a.x + b.x, y: a.y + b.y }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // scroll // delta
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // scroll // delta
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scroll delta from wheel or touch events
 type ScrollDelta =
@@ -183,9 +183,9 @@ isScrollingHorizontal sd = abs sd.deltaX > abs sd.deltaY
 isScrollingVertical :: ScrollDelta -> Boolean
 isScrollingVertical sd = abs sd.deltaY >= abs sd.deltaX
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // scroll // progress
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // scroll // progress
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scroll progress as percentage (0.0 to 1.0)
 type ScrollProgress =
@@ -235,9 +235,9 @@ isNearStart threshold sp = sp.x <= threshold || sp.y <= threshold
 isNearEnd :: Number -> ScrollProgress -> Boolean
 isNearEnd threshold sp = sp.x >= (1.0 - threshold) || sp.y >= (1.0 - threshold)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // scroll // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // scroll // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scrollable bounds (viewport and content dimensions)
 type ScrollBounds =
@@ -283,9 +283,9 @@ scrollableHeight bounds = max 0.0 (bounds.contentHeight - bounds.viewportHeight)
 scrollableWidth :: ScrollBounds -> Number
 scrollableWidth bounds = max 0.0 (bounds.contentWidth - bounds.viewportWidth)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // scroll // overscroll
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // scroll // over-scroll
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Overscroll behavior (CSS overscroll-behavior values)
 data OverscrollBehavior
@@ -332,9 +332,9 @@ applyOverscrollResistance maxOverscroll delta =
   in
     delta * factor
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // scroll // snap points
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // scroll // snap points
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Snap alignment (CSS scroll-snap-align)
 data SnapAlignment
@@ -403,9 +403,9 @@ shouldSnap snapType threshold currentPos point = case snapType of
   SnapMandatory -> true
   SnapProximity -> abs (point.position - currentPos) <= threshold
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // scroll // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // scroll // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete scroll state
 type ScrollState =
@@ -456,9 +456,9 @@ isScrolling ss = abs ss.velocity.x > 0.1 || abs ss.velocity.y > 0.1
 scrollVelocity :: ScrollState -> ScrollPosition
 scrollVelocity ss = ss.velocity
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // infinite scroll
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // infinite scroll
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Infinite scroll state for loading more content
 type InfiniteScrollState =
@@ -523,9 +523,9 @@ resetInfiniteScroll is = is
   , error = false
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // pull to refresh
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // pull to refresh
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Pull to refresh phase
 data PullToRefreshPhase

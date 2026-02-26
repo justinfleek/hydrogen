@@ -81,9 +81,9 @@ import Hydrogen.Schema.Material.NoiseAmplitude (noiseAmplitude, moderate) as Amp
 import Hydrogen.Schema.Material.NoiseSeed (NoiseSeed)
 import Hydrogen.Schema.Material.NoiseSeed (noiseSeed, zero) as Seed
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // perlinnoise
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // perlin-noise
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration record for creating PerlinNoise
 type PerlinNoiseConfig =
@@ -113,9 +113,9 @@ instance showPerlinNoise :: Show PerlinNoise where
       <> (if p.turbulent then " turbulent" else "")
       <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create PerlinNoise from configuration
 perlinNoise :: PerlinNoiseConfig -> PerlinNoise
@@ -164,9 +164,9 @@ perlinNoiseSubtle s = PerlinNoise
   , turbulent: false
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the frequency
 frequency :: PerlinNoise -> NoiseFrequency
@@ -180,9 +180,9 @@ amplitude (PerlinNoise p) = p.amplitude
 seed :: PerlinNoise -> NoiseSeed
 seed (PerlinNoise p) = p.seed
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // presets
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cloud-like noise
 -- |

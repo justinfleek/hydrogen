@@ -96,9 +96,9 @@ import Hydrogen.Schema.Color.RGB as Color
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Loading bar position
 data Position
@@ -113,9 +113,9 @@ instance showPosition :: Show Position where
   show Bottom = "bottom"
   show Inline = "inline"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | LoadingBar properties
 type LoadingBarProps msg =
@@ -156,9 +156,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set progress value (0-100)
 -- |
@@ -182,9 +182,9 @@ visible v props = props { visible = v }
 position :: forall msg. Position -> LoadingBarProp msg
 position p props = props { position = p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set bar/indicator color (Color.RGB atom)
 barColor :: forall msg. Color.RGB -> LoadingBarProp msg
@@ -194,17 +194,17 @@ barColor c props = props { barColor = Just c }
 trackColor :: forall msg. Color.RGB -> LoadingBarProp msg
 trackColor c props = props { trackColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set bar height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> LoadingBarProp msg
 height h props = props { height = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set animation duration (Temporal.Milliseconds atom)
 -- |
@@ -212,17 +212,17 @@ height h props = props { height = Just h }
 animationDuration :: forall msg. Temporal.Milliseconds -> LoadingBarProp msg
 animationDuration d props = props { animationDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> LoadingBarProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a loading bar
 -- |

@@ -148,9 +148,9 @@ import Hydrogen.Schema.Geometry.Spline.ArcLength
 import Hydrogen.Schema.Geometry.Spline.Types as T
 import Hydrogen.Schema.Geometry.Point (Point2D)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // legacy accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // legacy accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get control points of Catmull-Rom spline.
 -- | (Legacy name, use getCatmullRomPoints for clarity)

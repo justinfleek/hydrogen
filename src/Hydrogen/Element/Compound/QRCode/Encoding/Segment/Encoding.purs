@@ -40,9 +40,9 @@ import Hydrogen.Element.Compound.QRCode.Types
 import Hydrogen.Element.Compound.QRCode.Encoding.BitStream as BS
 import Hydrogen.Element.Compound.QRCode.Encoding.Segment.CharTable (alphanumericValue)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // data bit length
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // data bit length
+-- ═════════════════════════════════════════════════════════════════════════════
 
 dataBitLength :: EncodingMode -> Int -> Int
 dataBitLength mode charCount = case mode of
@@ -68,9 +68,9 @@ dataBitLength mode charCount = case mode of
   ModeKanji -> charCount * 13
   ModeECI -> 8
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // encoding
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 encodeData :: EncodingMode -> String -> BS.BitStream
 encodeData mode str = case mode of

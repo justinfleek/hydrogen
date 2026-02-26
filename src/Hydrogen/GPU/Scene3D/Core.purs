@@ -59,9 +59,9 @@ module Hydrogen.GPU.Scene3D.Core
   , flattenScene
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude (map, (<>))
 
@@ -80,9 +80,9 @@ import Hydrogen.Schema.Dimension.Physical.SI (meter)
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Geometry.Angle (degrees)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // scene command
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // scene command
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A 3D scene command — single GPU primitive operation.
 -- |
@@ -112,9 +112,9 @@ type Scene3D msg =
   , meshes :: Array (MeshParams msg)
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // scene construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Empty scene with default camera and black background.
 emptyScene :: forall msg. Scene3D msg
@@ -152,9 +152,9 @@ withLight light scene = scene { lights = Array.snoc scene.lights light }
 withMesh :: forall msg. MeshParams msg -> Scene3D msg -> Scene3D msg
 withMesh mesh scene = scene { meshes = Array.snoc scene.meshes mesh }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // command construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // command construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a SetCamera command.
 setCamera :: forall msg. Camera3D -> SceneCommand msg
@@ -188,9 +188,9 @@ pushTransform = PushTransform
 popTransform :: forall msg. SceneCommand msg
 popTransform = PopTransform
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // buffer operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Empty scene buffer.
 emptyBuffer3D :: forall msg. SceneBuffer msg
@@ -208,9 +208,9 @@ append3D cmd buffer = Array.snoc buffer cmd
 concat3D :: forall msg. SceneBuffer msg -> SceneBuffer msg -> SceneBuffer msg
 concat3D a b = a <> b
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // scene flattening
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // scene flattening
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Flatten a Scene3D to a SceneBuffer ready for GPU dispatch.
 -- |

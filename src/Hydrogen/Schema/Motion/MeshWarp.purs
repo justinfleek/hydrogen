@@ -75,9 +75,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Motion.Layer (LayerId)
 import Hydrogen.Schema.Motion.Property (AnimatablePropertyId)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // warp // pin // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // warp // pin // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of warp pin controlling how it deforms the mesh.
 -- |
@@ -158,9 +158,9 @@ warpPinTypeDefaultStiffness :: WarpPinType -> Number
 warpPinTypeDefaultStiffness WPTStarch = 1.0
 warpPinTypeDefaultStiffness _ = 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // warp // weight // method
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // warp // weight // method
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Method for calculating pin influence weights on mesh vertices.
 data WarpWeightMethod
@@ -193,9 +193,9 @@ warpWeightMethodFromString "radial-basis" = Just WWMRadialBasis
 warpWeightMethodFromString "bounded" = Just WWMBounded
 warpWeightMethodFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // warp // pin // id
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // warp // pin // id
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for a warp pin.
 newtype WarpPinId = WarpPinId String
@@ -212,9 +212,9 @@ mkWarpPinId :: String -> Maybe WarpPinId
 mkWarpPinId "" = Nothing
 mkWarpPinId s = Just (WarpPinId s)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // warp // pin
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // warp // pin
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A control pin for mesh warp deformation.
 -- |
@@ -258,9 +258,9 @@ defaultWarpPin pinId posProp rotProp scaleProp =
   , inFrontPropId: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // warp // pin // rest // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // warp // pin // rest // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Initial/rest state of a pin before animation.
 -- |
@@ -285,9 +285,9 @@ mkWarpPinRestState pinId =
   , inFront: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // warp // mesh
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // warp // mesh
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A triangulated mesh for warp deformation.
 -- |
@@ -333,9 +333,9 @@ warpMeshMarkDirty mesh = mesh { dirty = true }
 warpMeshMarkClean :: WarpMesh -> WarpMesh
 warpMeshMarkClean mesh = mesh { dirty = false }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // deformation // result
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // deformation // result
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Control point with bezier handles for path reconstruction.
 -- |
@@ -359,9 +359,9 @@ type WarpDeformationResult =
   , controlPoints :: Array DeformedControlPoint
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // weight // options
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Options for calculating pin influence weights.
 type WarpWeightOptions =

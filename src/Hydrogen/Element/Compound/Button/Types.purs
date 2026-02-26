@@ -100,9 +100,9 @@ import Hydrogen.Schema.Accessibility.State as AriaState
 import Hydrogen.Schema.Accessibility.Property as AriaProperty
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // button type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // button type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HTML button type attribute.
 data ButtonType
@@ -121,9 +121,9 @@ instance showButtonType :: Show ButtonType where
 buttonTypeToString :: ButtonType -> String
 buttonTypeToString = show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // button state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // button state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Interactive states for the button.
 data ButtonState
@@ -153,9 +153,9 @@ buttonStateToString = case _ of
   StateLoading -> "loading"
   StatePressed -> "pressed"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // button props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // button props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete Button properties spanning ALL pillars.
 -- |

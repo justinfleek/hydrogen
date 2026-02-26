@@ -83,9 +83,9 @@ import Hydrogen.Schema.Geometry.Spacing (SpacingValue)
 import Hydrogen.Schema.Geometry.Spacing as Spacing
 import Hydrogen.Schema.Reactive.Viewport (Breakpoint(Lg))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // layout variants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // layout variants
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Application shell layout variants.
 -- |
@@ -102,9 +102,9 @@ instance showLayout :: Show Layout where
   show HeaderFirst = "header-first"
   show Stacked = "stacked"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // scroll behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // scroll behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How scrolling is handled within the shell.
 -- |
@@ -121,9 +121,9 @@ instance showScrollBehavior :: Show ScrollBehavior where
   show ContentOnly = "content"
   show IndependentScroll = "independent"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // sidebar position
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // sidebar position
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sidebar positioning relative to main content.
 -- |
@@ -139,9 +139,9 @@ instance showSidebarPosition :: Show SidebarPosition where
   show LeftSide = "left"
   show RightSide = "right"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // slots
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // slots
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Content slots for the application shell.
 -- |
@@ -154,9 +154,9 @@ type AppShellSlots msg =
   , footer :: Maybe (Element msg)   -- ^ Bottom content / links
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete configuration for application shell.
 -- |
@@ -229,9 +229,9 @@ defaultProps =
   , footerClassName: ""
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // prop setters: layout
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set layout variant.
 layout :: Layout -> AppShellProp
@@ -245,9 +245,9 @@ scrollBehavior s props = props { scrollBehavior = s }
 mobileBreakpoint :: Breakpoint -> AppShellProp
 mobileBreakpoint b props = props { mobileBreakpoint = b }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                 // prop setters: fixed positioning
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                            // prop setters: fixed positioning
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set header as fixed (sticky).
 fixedHeader :: Boolean -> AppShellProp
@@ -261,9 +261,9 @@ fixedSidebar f props = props { fixedSidebar = f }
 fixedFooter :: Boolean -> AppShellProp
 fixedFooter f props = props { fixedFooter = f }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop setters: dimensions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop setters: dimensions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set header height.
 headerHeight :: SpacingValue -> AppShellProp
@@ -281,9 +281,9 @@ sidebarWidth w props = props { sidebarWidth = w }
 sidebarMiniWidth :: SpacingValue -> AppShellProp
 sidebarMiniWidth w props = props { sidebarMiniWidth = w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop setters: sidebar
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop setters: sidebar
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set sidebar position (left or right).
 sidebarPosition :: SidebarPosition -> AppShellProp
@@ -304,17 +304,17 @@ sidebarCollapsed c props = props { sidebarCollapsed = c }
 sidebarMiniMode :: Boolean -> AppShellProp
 sidebarMiniMode m props = props { sidebarMiniMode = m }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop setters: callbacks
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop setters: callbacks
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Handle sidebar collapse toggle.
 onSidebarCollapse :: (Boolean -> Effect Unit) -> AppShellProp
 onSidebarCollapse f props = props { onSidebarCollapse = Just f }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // prop setters: custom styling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // prop setters: custom styling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add custom class to shell container.
 className :: String -> AppShellProp

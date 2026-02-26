@@ -39,9 +39,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Color.Channel (Channel, channel, unwrap)
 import Hydrogen.Schema.Color.RGB (RGB, red, green, blue, rgbFromChannels)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- TYPES
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Single point on a curve (input/output mapping)
 -- Input and output are both 0-255 (Channel values)
@@ -72,9 +72,9 @@ newtype Curves = Curves
 
 derive newtype instance Eq Curves
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- SMART CONSTRUCTORS
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Create a curve point
 curvePoint :: Channel -> Channel -> CurvePoint
@@ -108,9 +108,9 @@ contrastCurve amount = curve
   , curvePoint (channel 255) (channel 255)
   ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- CURVE INTERPOLATION
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Apply curve to a single channel value
 -- Uses linear interpolation between control points
@@ -155,9 +155,9 @@ findNext inputVal prev points =
            then Just { before: prev, after: curr }
            else findNext inputVal curr rest
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- RGB APPLICATION
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Apply curves to an RGB color
 -- Master curve is applied first, then individual channel curves

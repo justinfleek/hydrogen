@@ -51,9 +51,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Schema.Geometry.Point (Point2D)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // catmull-rom spline
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // catmull-rom spline
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Catmull-Rom spline — interpolating spline through control points.
 -- |
@@ -114,9 +114,9 @@ getCatmullRomClosed (CatmullRomSpline s) = s.closed
 getCatmullRomTensionValue :: CatmullRomSpline -> Number
 getCatmullRomTensionValue (CatmullRomSpline s) = s.tension
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // b-spline
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // b-spline
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cubic uniform B-Spline — approximating spline with local control.
 -- |
@@ -160,9 +160,9 @@ getBSplinePoints (BSpline s) = s.points
 getBSplineClosed :: BSpline -> Boolean
 getBSplineClosed (BSpline s) = s.closed
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp value to [0, 1]
 -- |

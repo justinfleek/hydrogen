@@ -130,9 +130,9 @@ import Hydrogen.Schema.Reactive.Viewport as Viewport
 import Hydrogen.Schema.Reactive.ContainerQuery (ContainerType(InlineSize, BlockSize, Size, Normal))
 import Hydrogen.Schema.Reactive.ContainerQuery as CQ
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // max width presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // max width presets
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Container max-width presets.
 -- |
@@ -191,9 +191,9 @@ maxWidthToCss Narrow = "672px"
 maxWidthToCss Wide = "1280px"
 maxWidthToCss Prose = "65ch"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // container props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // container props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Container properties.
 type ContainerProps =
@@ -242,9 +242,9 @@ defaultContainerProps =
   , containerNameVal: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // prop setters: size
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // prop setters: size
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set max-width preset.
 maxWidth :: MaxWidth -> ContainerProp
@@ -254,9 +254,9 @@ maxWidth w props = props { maxWidthVal = w }
 maxWidthCustom :: Int -> ContainerProp
 maxWidthCustom w props = props { maxWidthCustomVal = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop setters: padding
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop setters: padding
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding on all sides.
 padding :: SpacingValue -> ContainerProp
@@ -274,9 +274,9 @@ paddingY p props = props { paddingYVal = Just p }
 paddingResponsive :: ResponsiveValue SpacingValue -> ContainerProp
 paddingResponsive rv props = props { paddingResponsiveVal = Just rv }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop setters: alignment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop setters: alignment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Center the container horizontally.
 centered :: Boolean -> ContainerProp
@@ -290,9 +290,9 @@ alignLeft props = props { centeredVal = false, alignVal = "left" }
 alignRight :: ContainerProp
 alignRight props = props { centeredVal = false, alignVal = "right" }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop setters: styling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop setters: styling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color.
 bgColor :: RGB -> ContainerProp
@@ -306,9 +306,9 @@ minHeight h props = props { minHeightVal = Just h }
 className :: String -> ContainerProp
 className c props = props { classNameVal = props.classNameVal <> " " <> c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                 // prop setters: container query
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // prop setters: container query
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set container-type for CSS container queries.
 containerType :: ContainerType -> ContainerProp
@@ -318,9 +318,9 @@ containerType ct props = props { containerTypeVal = Just ct }
 containerName :: String -> ContainerProp
 containerName n props = props { containerNameVal = Just n }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // responsive helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // responsive helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create responsive value from spec.
 responsive :: forall a. ResponsiveSpec a -> ResponsiveValue a
@@ -330,9 +330,9 @@ responsive = Viewport.responsive
 static :: forall a. a -> ResponsiveValue a
 static = Viewport.static
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // container components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // container components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard container with max-width and centering.
 -- |
@@ -406,9 +406,9 @@ section propMods children =
   in
     E.section_ attrs children
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // attribute builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Build container attributes from props.
 buildContainerAttributes :: forall msg. ContainerProps -> Array (E.Attribute msg)

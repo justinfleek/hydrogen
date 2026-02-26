@@ -70,9 +70,9 @@ import Data.Array (filter, snoc, find, uncons) as Array
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A variation axis identified by its 4-character tag
 newtype VariationAxis = VariationAxis String
@@ -100,9 +100,9 @@ derive instance eqFontVariation :: Eq FontVariation
 instance showFontVariation :: Show FontVariation where
   show fv = "FontVariation " <> toLegacyCSSValue fv
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // axis constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // axis constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Weight axis (wght)
 weight :: Number -> { axis :: VariationAxis, value :: AxisValue }
@@ -156,9 +156,9 @@ wonky n = { axis: VariationAxis "WONK", value: AxisValue n }
 customAxis :: String -> Number -> { axis :: VariationAxis, value :: AxisValue }
 customAxis tag n = { axis: VariationAxis tag, value: AxisValue n }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create FontVariation from array of axis settings
 fontVariation :: Array { axis :: VariationAxis, value :: AxisValue } -> FontVariation
@@ -172,9 +172,9 @@ single setting = FontVariation [setting]
 empty :: FontVariation
 empty = FontVariation []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add an axis setting (appends, may duplicate)
 addAxis :: { axis :: VariationAxis, value :: AxisValue } -> FontVariation -> FontVariation
@@ -209,9 +209,9 @@ merge (FontVariation a) (FontVariation b) =
     Just _ -> true
     Nothing -> false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // css output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // css output
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- NOT an FFI boundary - pure string generation.
 -- | Convert to CSS font-variation-settings value

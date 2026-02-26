@@ -47,9 +47,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // ramp // shape
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // ramp // shape
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shape of gradient ramp.
 data RampShape
@@ -76,9 +76,9 @@ rampShapeFromString "linear" = Just RSLinear
 rampShapeFromString "radial" = Just RSRadial
 rampShapeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // warp // style
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // warp // style
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Style of warp distortion (15 variants, matches Photoshop).
 data WarpStyle
@@ -173,9 +173,9 @@ warpStyleFromString "squeeze" = Just WSSqueeze
 warpStyleFromString "twist" = Just WSTwist
 warpStyleFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // displacement // map // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // displacement // map // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of displacement map source.
 data DisplacementMapType
@@ -235,9 +235,9 @@ displacementMapTypeFromString "sine-v" = Just DMTSineV
 displacementMapTypeFromString "checker" = Just DMTChecker
 displacementMapTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // displacement // channel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Channel used for displacement.
 data DisplacementChannel
@@ -287,9 +287,9 @@ displacementChannelFromString "luminance" = Just DCLuminance
 displacementChannelFromString "off" = Just DCOff
 displacementChannelFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // edge // behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Behavior at image edges.
 data EdgeBehavior

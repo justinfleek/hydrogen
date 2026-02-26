@@ -63,9 +63,9 @@ import Prelude
 
 import Effect (Effect)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // FFI
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 foreign import matchMediaImpl :: String -> Effect Boolean
 
@@ -74,9 +74,9 @@ foreign import onMediaChangeImpl
   -> (Boolean -> Effect Unit) 
   -> Effect (Effect Unit)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // core queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // core queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a media query matches
 -- |
@@ -97,9 +97,9 @@ matchMedia = matchMediaImpl
 onMediaChange :: String -> (Boolean -> Effect Unit) -> Effect (Effect Unit)
 onMediaChange = onMediaChangeImpl
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // breakpoint helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // breakpoint helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard breakpoints (following Tailwind conventions)
 -- | sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
@@ -123,9 +123,9 @@ isDesktop = matchMedia "(min-width: 1024px)"
 isLargeDesktop :: Effect Boolean
 isLargeDesktop = matchMedia "(min-width: 1280px)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // breakpoint listeners
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // breakpoint listeners
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Breakpoint enumeration
 data Breakpoint
@@ -181,9 +181,9 @@ onBreakpointChange callback = do
     unsub2
     unsub3
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // user preferences
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // user preferences
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if user prefers dark color scheme
 prefersDarkMode :: Effect Boolean
@@ -216,9 +216,9 @@ prefersContrast = matchMedia "(prefers-contrast: more)"
 onColorSchemeChange :: (Boolean -> Effect Unit) -> Effect (Effect Unit)
 onColorSchemeChange = onMediaChange "(prefers-color-scheme: dark)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // orientation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // orientation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if device is in portrait orientation
 isPortrait :: Effect Boolean
@@ -234,9 +234,9 @@ isLandscape = matchMedia "(orientation: landscape)"
 onOrientationChange :: (Boolean -> Effect Unit) -> Effect (Effect Unit)
 onOrientationChange = onMediaChange "(orientation: portrait)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // display features
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // display features
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if display is high DPI (retina)
 isHighDPI :: Effect Boolean

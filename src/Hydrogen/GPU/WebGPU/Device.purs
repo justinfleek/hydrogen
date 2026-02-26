@@ -7,7 +7,7 @@
 -- All other WebGPU modules are pure PureScript. This module contains
 -- the minimal FFI required to interact with the browser's WebGPU API.
 --
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 module Hydrogen.GPU.WebGPU.Device
   ( -- Foreign types (opaque)
@@ -116,9 +116,9 @@ import Hydrogen.GPU.WebGPU.Types
   , GPUTextureFormat(..)
   )
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- FOREIGN TYPES
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Opaque GPU device handle.
 foreign import data GPUDevice :: Type
@@ -177,9 +177,9 @@ foreign import data GPUCommandBuffer :: Type
 -- | Opaque query set handle.
 foreign import data GPUQuerySet :: Type
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- ERRORS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Errors that can occur during device initialization.
 data DeviceError
@@ -208,9 +208,9 @@ data DeviceLostReason
 
 derive instance eqDeviceLostReason :: Eq DeviceLostReason
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- INITIALIZATION — FFI IMPLEMENTATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Check if WebGPU is supported in the current environment.
 foreign import isWebGPUSupportedImpl :: Effect Boolean
@@ -270,9 +270,9 @@ foreign import getQueueImpl :: GPUDevice -> Effect GPUQueue
 getQueue :: GPUDevice -> Effect GPUQueue
 getQueue = getQueueImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- DEVICE INFO
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Get device limits.
 foreign import getLimitsImpl :: GPUDevice -> Effect Foreign
@@ -301,9 +301,9 @@ hasFeature device feature = do
     [] -> false
     _ -> x == x -- placeholder, would use Array.elem
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- ERROR HANDLING
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Register handler for uncaptured errors.
 foreign import onUncapturedErrorImpl :: GPUDevice -> (Error -> Effect Unit) -> Effect Unit
@@ -319,9 +319,9 @@ onDeviceLost device callback =
   onDeviceLostImpl device \reason ->
     callback (stringToLostReason reason)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- CANVAS OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Get the current texture from a canvas context.
 foreign import getCurrentTextureImpl :: GPUCanvasContext -> Effect GPUTexture
@@ -337,9 +337,9 @@ getPreferredCanvasFormat = do
   formatStr <- getPreferredCanvasFormatImpl
   pure (stringToTextureFormat formatStr)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- BUFFER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a buffer.
 foreign import createBufferImpl :: GPUDevice -> Foreign -> Effect GPUBuffer
@@ -389,9 +389,9 @@ foreign import getMappedRangeImpl :: GPUBuffer -> Int -> Int -> Effect ArrayBuff
 getMappedRange :: GPUBuffer -> Int -> Int -> Effect ArrayBuffer
 getMappedRange = getMappedRangeImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- TEXTURE OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a texture.
 foreign import createTextureImpl :: GPUDevice -> Foreign -> Effect GPUTexture
@@ -418,9 +418,9 @@ writeTexture :: GPUQueue -> GPUTexture -> ArrayBuffer -> { width :: Int, height 
 writeTexture queue texture data_ size =
   writeTextureImpl queue (toForeignTextureDest texture) data_ (toForeignDataLayout size) (toForeignSize size)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- SAMPLER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a sampler.
 foreign import createSamplerImpl :: GPUDevice -> Foreign -> Effect GPUSampler
@@ -428,9 +428,9 @@ foreign import createSamplerImpl :: GPUDevice -> Foreign -> Effect GPUSampler
 createSampler :: GPUDevice -> GPUSamplerDescriptor -> Effect GPUSampler
 createSampler device desc = createSamplerImpl device (toForeignSamplerDesc desc)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- SHADER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a shader module from WGSL source.
 foreign import createShaderModuleImpl :: GPUDevice -> Foreign -> Effect GPUShaderModule
@@ -438,9 +438,9 @@ foreign import createShaderModuleImpl :: GPUDevice -> Foreign -> Effect GPUShade
 createShaderModule :: GPUDevice -> GPUShaderModuleDescriptor -> Effect GPUShaderModule
 createShaderModule device desc = createShaderModuleImpl device (toForeignShaderDesc desc)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- PIPELINE OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a render pipeline.
 foreign import createRenderPipelineImpl :: GPUDevice -> Foreign -> Effect GPURenderPipeline
@@ -466,9 +466,9 @@ foreign import createPipelineLayoutImpl :: GPUDevice -> Foreign -> Effect GPUPip
 createPipelineLayout :: GPUDevice -> Foreign -> Effect GPUPipelineLayout
 createPipelineLayout = createPipelineLayoutImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- BIND GROUP OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a bind group.
 foreign import createBindGroupImpl :: GPUDevice -> Foreign -> Effect GPUBindGroup
@@ -476,9 +476,9 @@ foreign import createBindGroupImpl :: GPUDevice -> Foreign -> Effect GPUBindGrou
 createBindGroup :: GPUDevice -> Foreign -> Effect GPUBindGroup
 createBindGroup = createBindGroupImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- COMMAND ENCODING
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Create a command encoder.
 foreign import createCommandEncoderImpl :: GPUDevice -> Effect GPUCommandEncoder
@@ -517,9 +517,9 @@ foreign import endComputePassImpl :: GPUComputePassEncoder -> Effect Unit
 endComputePass :: GPUComputePassEncoder -> Effect Unit
 endComputePass = endComputePassImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- RENDER PASS OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Set the render pipeline.
 foreign import setPipelineImpl :: GPURenderPassEncoder -> GPURenderPipeline -> Effect Unit
@@ -576,9 +576,9 @@ foreign import setScissorRectImpl :: GPURenderPassEncoder -> Int -> Int -> Int -
 setScissorRect :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Effect Unit
 setScissorRect = setScissorRectImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- QUEUE OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Submit command buffers to the queue.
 foreign import submitImpl :: GPUQueue -> Array GPUCommandBuffer -> Effect Unit
@@ -586,9 +586,9 @@ foreign import submitImpl :: GPUQueue -> Array GPUCommandBuffer -> Effect Unit
 submit :: GPUQueue -> Array GPUCommandBuffer -> Effect Unit
 submit = submitImpl
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- INTERNAL HELPERS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 foreign import toForeignAdapterDesc :: GPUAdapterDescriptor -> Foreign
 foreign import toForeignDeviceDesc :: { requiredFeatures :: Array String, label :: Maybe String } -> Foreign

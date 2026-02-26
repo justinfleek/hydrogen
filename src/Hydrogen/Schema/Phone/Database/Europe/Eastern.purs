@@ -8,9 +8,9 @@ module Hydrogen.Schema.Phone.Database.Europe.Eastern
   ( easternEuropeanCountries
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Phone.Country 
   ( Country
@@ -21,9 +21,9 @@ import Hydrogen.Schema.Phone.Country
 import Hydrogen.Schema.Phone.CountryCode (unsafeCountryCode)
 import Hydrogen.Schema.Phone.DialCode (unsafeDialCode)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // eastern european countries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // eastern european countries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 easternEuropeanCountries :: Array Country
 easternEuropeanCountries =

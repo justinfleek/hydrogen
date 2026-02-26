@@ -92,9 +92,9 @@ import Data.Array (filter, intercalate)
 import Hydrogen.Schema.Motion.Easing (Easing)
 import Hydrogen.Schema.Motion.Easing (toLegacyCssString) as SchemaEasing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // transition config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS properties that can be transitioned
 data Property
@@ -180,9 +180,9 @@ transitionsStyle configs =
       SchemaEasing.toLegacyCssString cfg.easing <>
       (if cfg.delay > 0 then " " <> show cfg.delay <> "ms" else "")
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // animation config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Animation iteration count
 data Iteration
@@ -288,9 +288,9 @@ animationStyle cfg =
   fillModeToCss cfg.fillMode <> " " <>
   playStateToCss cfg.playState
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // transform utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // transform utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Transform configuration
 type TransformConfig =
@@ -378,9 +378,9 @@ skewX deg = "transform: skewX(" <> show deg <> "deg)"
 skewY :: Number -> String
 skewY deg = "transform: skewY(" <> show deg <> "deg)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // will-change utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // will-change utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Hint to browser about upcoming changes for optimization
 -- |

@@ -44,9 +44,9 @@ import Prelude
 import Hydrogen.Schema.Audio.Synthesis as Synth
 import Hydrogen.Schema.Audio.Envelope as Env
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // filter types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FilterType - frequency filter type.
 -- | Determines which frequencies are passed or attenuated.
@@ -81,9 +81,9 @@ filterTypeName LowShelf = "Low Shelf"
 filterTypeName HighShelf = "High Shelf"
 filterTypeName Resonant = "Resonant"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // filter slopes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FilterSlope - steepness of filter rolloff.
 -- | Measured in dB per octave.
@@ -110,9 +110,9 @@ filterSlopeDb Slope24dB = "24dB/oct"
 filterSlopeDb Slope36dB = "36dB/oct"
 filterSlopeDb Slope48dB = "48dB/oct"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // filter molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter configuration.
 -- | Complete filter setup for synthesis.

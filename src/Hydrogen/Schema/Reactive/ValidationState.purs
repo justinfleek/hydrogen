@@ -63,9 +63,9 @@ import Prelude
 import Data.Array (filter, head, length)
 import Data.Maybe (Maybe)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // validation result
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of validation check
 data ValidationResult
@@ -95,9 +95,9 @@ isPendingResult :: ValidationResult -> Boolean
 isPendingResult ValidationPending = true
 isPendingResult _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // validation severity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // validation severity
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Severity level of validation message
 data ValidationSeverity
@@ -125,9 +125,9 @@ isSeverityInfo :: ValidationSeverity -> Boolean
 isSeverityInfo SeverityInfo = true
 isSeverityInfo _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // validation message
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // validation message
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Validation message with severity and rule identifier
 type ValidationMessage =
@@ -154,9 +154,9 @@ warningMessage rule message = validationMessage SeverityWarning message rule []
 infoMessage :: String -> String -> ValidationMessage
 infoMessage rule message = validationMessage SeverityInfo message rule []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // modification state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // modification state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Field modification state
 data ModificationState
@@ -178,9 +178,9 @@ isDirty :: ModificationState -> Boolean
 isDirty Modified = true
 isDirty _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // touch state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // touch state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Field interaction state
 data TouchState
@@ -202,9 +202,9 @@ isUntouched :: TouchState -> Boolean
 isUntouched Untouched = true
 isUntouched _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // field validation molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // field validation molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete validation state for a single field
 type FieldValidation =
@@ -266,9 +266,9 @@ pendingField =
     , isValidating = true
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // computed properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Should show error state to user?
 -- | Only show errors for touched fields (don't punish before interaction)
@@ -301,9 +301,9 @@ allWarnings fv = filter (\m -> isSeverityWarning m.severity) fv.messages
 hasWarnings :: FieldValidation -> Boolean
 hasWarnings fv = length (allWarnings fv) > 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // form validation compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // form validation compound
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Aggregate validation state for entire form
 type FormValidation =

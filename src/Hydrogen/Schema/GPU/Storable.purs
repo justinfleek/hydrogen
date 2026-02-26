@@ -91,9 +91,9 @@ import Data.Array as Array
 import Data.Int (toNumber) as Int
 import Data.Int as Int
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // alignment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // alignment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Memory alignment in bytes (must be power of 2)
 newtype Alignment = Alignment Int
@@ -120,9 +120,9 @@ align16 = Alignment 16
 unwrapAlignment :: Alignment -> Int
 unwrapAlignment (Alignment n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // byte array
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // byte array
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A byte array for GPU serialization
 -- | In actual WebGPU, this would be ArrayBuffer/TypedArray
@@ -146,9 +146,9 @@ concatBytes (ByteArray a) (ByteArray b) = ByteArray (a <> b)
 bytesLength :: ByteArray -> Int
 bytesLength (ByteArray arr) = Array.length arr
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // padding utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate padding needed to reach alignment
 paddingNeeded :: Int -> Alignment -> Int
@@ -160,9 +160,9 @@ paddingNeeded size (Alignment align) =
 alignedSize :: Int -> Alignment -> Int
 alignedSize size align = size + paddingNeeded size align
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // gpustorable typeclass
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // gpustorable typeclass
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Types that can be stored in GPU buffers.
 -- |
@@ -191,9 +191,9 @@ class GPUStorable a where
   -- | Deserialize from bytes
   fromBytes :: ByteArray -> Maybe a
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // number instance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // number instance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Number to 4 bytes (IEEE 754 single-precision)
 -- | In real implementation, this would use Float32Array
@@ -225,9 +225,9 @@ instance gpuStorableNumber :: GPUStorable Number where
   toBytes = numberToBytes
   fromBytes = bytesToNumber
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // int instance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // int instance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Int to 4 bytes (i32)
 intToBytes :: Int -> ByteArray
@@ -255,9 +255,9 @@ instance gpuStorableInt :: GPUStorable Int where
   toBytes = intToBytes
   fromBytes = bytesToInt
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // boolean instance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // boolean instance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Boolean to 4 bytes (u32 in WGSL)
 -- | WebGPU uses 32-bit booleans

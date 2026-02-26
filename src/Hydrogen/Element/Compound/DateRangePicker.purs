@@ -184,9 +184,9 @@ import Hydrogen.Element.Compound.DateRangePicker.Presets
   )
 import Hydrogen.Element.Compound.DateRangePicker.Render as Render
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DateRangePicker properties
 type DateRangePickerProps msg =
@@ -297,9 +297,9 @@ defaultProps =
   , onComparisonModeChange: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set start date
 startDate :: forall msg. Maybe CalendarDate -> DateRangePickerProp msg
@@ -323,9 +323,9 @@ placeholder p props = props { placeholder = p }
 
 
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: calendar view
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // prop builders: calendar view
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set left calendar month (1-12)
 leftMonth :: forall msg. Int -> DateRangePickerProp msg
@@ -347,9 +347,9 @@ rightYear y props = props { rightYear = y }
 weekStartsOn :: forall msg. WeekStart -> DateRangePickerProp msg
 weekStartsOn ws props = props { weekStartsOn = ws }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: constraints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: constraints
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set minimum selectable date
 minDate :: forall msg. CalendarDate -> DateRangePickerProp msg
@@ -363,9 +363,9 @@ maxDate d props = props { maxDate = Just d }
 disabledDates :: forall msg. (CalendarDate -> Boolean) -> DateRangePickerProp msg
 disabledDates pred props = props { disabledDates = pred }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: presets
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Show presets sidebar
 showPresets :: forall msg. Boolean -> DateRangePickerProp msg
@@ -375,9 +375,9 @@ showPresets s props = props { showPresets = s }
 presets :: forall msg. Array PresetDef -> DateRangePickerProp msg
 presets p props = props { presets = p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: comparison
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: comparison
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Enable comparison mode
 enableComparison :: forall msg. Boolean -> DateRangePickerProp msg
@@ -395,9 +395,9 @@ comparisonStart d props = props { comparisonStart = d }
 comparisonEnd :: forall msg. Maybe CalendarDate -> DateRangePickerProp msg
 comparisonEnd d props = props { comparisonEnd = d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> DateRangePickerProp msg
@@ -423,17 +423,17 @@ primaryColor c props = props { primaryColor = Just c }
 primaryTextColor :: forall msg. Color.RGB -> DateRangePickerProp msg
 primaryTextColor c props = props { primaryTextColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> DateRangePickerProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> DateRangePickerProp msg
@@ -443,17 +443,17 @@ padding p props = props { padding = Just p }
 borderWidth :: forall msg. Device.Pixel -> DateRangePickerProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> DateRangePickerProp msg
 fontSize s props = props { fontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set open handler
 onOpen :: forall msg. msg -> DateRangePickerProp msg
@@ -483,9 +483,9 @@ onPresetSelect handler props = props { onPresetSelect = Just handler }
 onComparisonModeChange :: forall msg. (ComparisonMode -> msg) -> DateRangePickerProp msg
 onComparisonModeChange handler props = props { onComparisonModeChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a date range picker
 -- |
@@ -568,9 +568,9 @@ dateRangePickerWithLabel labelText todayDate ts propMods =
           ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // internal helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // internal helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert main props to Render.DateRangePickerProps
 toRenderProps :: forall msg. DateRangePickerProps msg -> Render.DateRangePickerProps msg

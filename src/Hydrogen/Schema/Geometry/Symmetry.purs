@@ -150,9 +150,9 @@ module Hydrogen.Schema.Geometry.Symmetry
   , wallpaperGroupNumber
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -186,9 +186,9 @@ import Hydrogen.Schema.Geometry.Angle
   , zero
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // reflection symmetry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // reflection symmetry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Axis of reflection symmetry.
 -- |
@@ -252,9 +252,9 @@ perpendicularAxis :: ReflectionAxis -> ReflectionAxis
 perpendicularAxis (ReflectionAxis r) = 
   ReflectionAxis { angle: addAngle r.angle (degrees 90.0) }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // rotational symmetry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // rotational symmetry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Rotational symmetry with N-fold rotation.
 -- |
@@ -334,9 +334,9 @@ isNFold n (RotationalSymmetry r) = r.folds == n
 hasRotationalSymmetry :: RotationalSymmetry -> Boolean
 hasRotationalSymmetry (RotationalSymmetry r) = r.folds >= 2 || r.folds < 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // dihedral symmetry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // dihedral symmetry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dihedral symmetry: rotation + reflection combined.
 -- |
@@ -394,9 +394,9 @@ dihedralFoldCount (DihedralSymmetry d) = d.n
 dihedralReflectionCount :: DihedralSymmetry -> Int
 dihedralReflectionCount (DihedralSymmetry d) = d.n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // translational symmetry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // translational symmetry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Translational symmetry: periodic repetition.
 -- |
@@ -453,9 +453,9 @@ hasTranslationalSymmetry :: TranslationalSymmetry -> Boolean
 hasTranslationalSymmetry (TranslationalSymmetry t) = 
   t.periodX > 0.0 || t.periodY > 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // glide reflection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // glide reflection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Glide reflection: reflection + translation along the axis.
 -- |
@@ -502,9 +502,9 @@ glideAxis (GlideReflection g) = g.axis
 glideDistance :: GlideReflection -> Number
 glideDistance (GlideReflection g) = g.distance
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // symmetry group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // symmetry group
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Combined symmetry group for a shape.
 -- |
@@ -632,9 +632,9 @@ combineSymmetry (SymmetryGroup a) (SymmetryGroup b) = SymmetryGroup
   , glide: combineGlide a.glide b.glide
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // chirality
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // chirality
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Chirality: handedness of a shape.
 -- |
@@ -665,9 +665,9 @@ isAchiral Chiral = false
 chiralityOf :: SymmetryGroup -> Chirality
 chiralityOf group = if hasReflection group then Achiral else Chiral
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // symmetry operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // symmetry operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Symmetry operations that can be applied to shapes.
 data SymmetryOp
@@ -727,9 +727,9 @@ inverseOp (Compose a b) = Compose (inverseOp b) (inverseOp a)
 opToString :: SymmetryOp -> String
 opToString = show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // point group classification
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // point group classification
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 2D Point groups (symmetry groups that fix a point).
 -- |
@@ -767,9 +767,9 @@ isDihedral :: PointGroup -> Boolean
 isDihedral (DihedralGroup _) = true
 isDihedral (CyclicGroup _) = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // wallpaper groups
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // wallpaper groups
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The 17 wallpaper groups (2D crystallographic groups).
 -- |
@@ -856,9 +856,9 @@ wallpaperGroupNumber P31M = 15
 wallpaperGroupNumber P6 = 16
 wallpaperGroupNumber P6M = 17
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Helper: convert Int to Number
 intToNumber :: Int -> Number

@@ -34,9 +34,9 @@ import Hydrogen.Schema.Geometry.Path.Types
   )
 import Hydrogen.Schema.Geometry.Path.Construction (emptyPath, pathFromPoints, closePath)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // transformation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // transformation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Reverse the direction of a path.
 -- |

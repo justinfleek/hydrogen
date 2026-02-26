@@ -136,9 +136,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Card properties
 -- |
@@ -209,9 +209,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set card background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> CardProp msg
@@ -233,9 +233,9 @@ titleColor c props = props { titleColor = Just c }
 descriptionColor :: forall msg. Color.RGB -> CardProp msg
 descriptionColor c props = props { descriptionColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 -- |
@@ -247,9 +247,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> CardProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: elevation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: elevation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set box shadow (Shadow.LayeredShadow atom)
 -- |
@@ -257,9 +257,9 @@ borderWidth w props = props { borderWidth = Just w }
 shadow :: forall msg. Shadow.LayeredShadow -> CardProp msg
 shadow s props = props { shadow = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set overall card padding (Device.Pixel atom)
 -- |
@@ -283,9 +283,9 @@ footerPadding p props = props { footerPadding = Just p }
 gap :: forall msg. Device.Pixel -> CardProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set title font size (FontSize atom)
 titleFontSize :: forall msg. FontSize.FontSize -> CardProp msg
@@ -299,9 +299,9 @@ titleFontWeight w props = props { titleFontWeight = Just w }
 descriptionFontSize :: forall msg. FontSize.FontSize -> CardProp msg
 descriptionFontSize s props = props { descriptionFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set click handler
 -- |
@@ -315,17 +315,17 @@ onClick handler props = props { onClick = Just handler }
 hoverable :: forall msg. Boolean -> CardProp msg
 hoverable h props = props { hoverable = h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> CardProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a card container
 -- |
@@ -417,9 +417,9 @@ buildCardStyles isInteractive props =
   in
     coreStyles <> textColorStyle <> borderStyle <> radiusStyle <> shadowStyle <> interactiveStyles
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // section components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Card header section
 -- |

@@ -34,9 +34,9 @@ import Hydrogen.Schema.Color.Saturation as Sat
 import Hydrogen.Schema.Color.Lightness as Light
 import Hydrogen.Schema.Color.Temperature (Temperature(VeryCool, Cool, Warm, VeryWarm), temperatureFromHSL)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // color psychology
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // color psychology
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Psychological/emotional associations
 data Mood

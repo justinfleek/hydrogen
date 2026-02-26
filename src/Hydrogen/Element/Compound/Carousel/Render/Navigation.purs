@@ -49,9 +49,9 @@ module Hydrogen.Element.Compound.Carousel.Render.Navigation
   , makeSlideIndex
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -141,9 +141,9 @@ import Hydrogen.Element.Compound.Carousel.Navigation
   )
 import Hydrogen.Element.Compound.Carousel.Gestures (isDragActive)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // navigation container
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // navigation container
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render navigation controls
 -- | Takes NavigationConfig and loop Boolean separately
@@ -162,9 +162,9 @@ isAnyGestureActive :: CarouselState -> Boolean
 isAnyGestureActive state = 
   isDragActive state.gesture.drag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // arrows
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // arrows
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render arrow navigation
 renderArrows :: NavigationConfig -> Boolean -> CarouselState -> SlideCollection -> E.Element CarouselMsg
@@ -209,9 +209,9 @@ arrowPositionToClass ArrowsInside = "carousel-arrows-inside"
 arrowPositionToClass ArrowsOutside = "carousel-arrows-outside"
 arrowPositionToClass ArrowsOverlay = "carousel-arrows-overlay"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // dots
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // dots
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render dot indicators with active state
 renderDots :: NavigationConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
@@ -254,9 +254,9 @@ renderDot config currentIdx index =
       ] <> E.styles [ Tuple "background-color" ("rgb(" <> show dotColor.r <> "," <> show dotColor.g <> "," <> show dotColor.b <> ")") ])
       []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // progress
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // progress
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render progress bar showing current position
 renderProgress :: NavigationConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
@@ -304,9 +304,9 @@ renderProgress config state slides' =
   else
     E.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // thumbnails
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // thumbnails
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render thumbnail navigation strip
 renderThumbnails :: NavigationConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
@@ -341,9 +341,9 @@ thumbnailPositionToClass ThumbnailsTop = "carousel-thumbnails-top"
 thumbnailPositionToClass ThumbnailsLeft = "carousel-thumbnails-left"
 thumbnailPositionToClass ThumbnailsRight = "carousel-thumbnails-right"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // thumbnail content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // thumbnail content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a single thumbnail
 renderThumbnail :: NavigationConfig -> Int -> Int -> SlideCollection -> E.Element CarouselMsg
@@ -464,9 +464,9 @@ renderPlaceholderThumbnail slideData' =
           [ E.text labelText ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // content icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // content icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get icon character for content kind
 contentKindToIcon :: ContentKind -> String
@@ -498,9 +498,9 @@ contentKindToLabel ContentGame = "Game"
 contentKindToLabel ContentLiveData = "Live"
 contentKindToLabel ContentInteractive = "Interactive"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // utility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a SlideIndex from an Int
 -- | Wraps the raw index value into the SlideIndex type

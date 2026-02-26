@@ -39,9 +39,9 @@ import Prelude
 
 import Data.Array (intercalate)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // politeness levels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // politeness levels
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Politeness level for live region announcements.
 -- |
@@ -64,9 +64,9 @@ politenessToString Off = "off"
 politenessToString Polite = "polite"
 politenessToString Assertive = "assertive"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // live region properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // live region properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | aria-live: Politeness setting for the region.
 newtype AriaLive = AriaLive Politeness
@@ -111,9 +111,9 @@ derive instance eqAriaRelevant :: Eq AriaRelevant
 instance showAriaRelevant :: Show AriaRelevant where
   show (AriaRelevant rs) = intercalate " " (map show rs)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // live region molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for a live region.
 -- |

@@ -112,9 +112,9 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Motion.Property (AnimatablePropertyId)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // font // style
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // font // style
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Font style variant.
 data FontStyle
@@ -137,9 +137,9 @@ fontStyleFromString "normal" = Just FSNormal
 fontStyleFromString "italic" = Just FSItalic
 fontStyleFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // text // align
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // text // align
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Text horizontal alignment.
 data TextAlign
@@ -166,9 +166,9 @@ textAlignFromString "center" = Just TACenter
 textAlignFromString "right" = Just TARight
 textAlignFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                // anchor // point // grouping
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Grouping for anchor point calculations.
 data AnchorPointGrouping
@@ -199,9 +199,9 @@ anchorPointGroupingFromString "line" = Just APGLine
 anchorPointGroupingFromString "all" = Just APGAll
 anchorPointGroupingFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // fill // and // stroke
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Order of fill and stroke rendering.
 data FillAndStroke
@@ -224,9 +224,9 @@ fillAndStrokeFromString "fill-over-stroke" = Just FASOFillOverStroke
 fillAndStrokeFromString "stroke-over-fill" = Just FASOStrokeOverFill
 fillAndStrokeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                             // inter // character // blending
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blend mode between overlapping characters.
 data InterCharacterBlending
@@ -257,9 +257,9 @@ interCharacterBlendingFromString "screen" = Just ICBScreen
 interCharacterBlendingFromString "overlay" = Just ICBOverlay
 interCharacterBlendingFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // text // case
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // text // case
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Text case transformation.
 data TextCase
@@ -290,9 +290,9 @@ textCaseFromString "lowercase" = Just TCLowercase
 textCaseFromString "small-caps" = Just TCSmallCaps
 textCaseFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // vertical // align
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // vertical // align
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vertical alignment for text.
 data VerticalAlign
@@ -319,9 +319,9 @@ verticalAlignFromString "superscript" = Just VASuperscript
 verticalAlignFromString "subscript" = Just VASubscript
 verticalAlignFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // range // selector // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // range // selector // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mode for range selector values.
 data RangeSelectorMode
@@ -344,9 +344,9 @@ rangeSelectorModeFromString "percent" = Just RSMPercent
 rangeSelectorModeFromString "index" = Just RSMIndex
 rangeSelectorModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // selection // based // on
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // selection // based // on
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | What the selection is based on.
 data SelectionBasedOn
@@ -377,9 +377,9 @@ selectionBasedOnFromString "words" = Just SBOWords
 selectionBasedOnFromString "lines" = Just SBOLines
 selectionBasedOnFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // selection // shape
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // selection // shape
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shape of the selection falloff.
 data SelectionShape
@@ -418,9 +418,9 @@ selectionShapeFromString "round" = Just SSRound
 selectionShapeFromString "smooth" = Just SSSmooth
 selectionShapeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // selector // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // selector // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How multiple selectors combine.
 data SelectorMode
@@ -459,9 +459,9 @@ selectorModeFromString "max" = Just SMMax
 selectorModeFromString "difference" = Just SMDifference
 selectorModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                              // text // animator // preset // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                         // text // animator // preset // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Preset animation types for text.
 data TextAnimatorPresetType
@@ -520,9 +520,9 @@ textAnimatorPresetTypeFromString "blur-in" = Just TAPBlurIn
 textAnimatorPresetTypeFromString "random-fade" = Just TAPRandomFade
 textAnimatorPresetTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // character // blur
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // character // blur
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Per-character blur amount.
 type CharacterBlur =
@@ -534,9 +534,9 @@ type CharacterBlur =
 mkCharacterBlur :: Number -> Number -> CharacterBlur
 mkCharacterBlur x y = { x, y }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // grouping // alignment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // grouping // alignment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Alignment within a grouping (percentages 0-100).
 type GroupingAlignment =
@@ -548,9 +548,9 @@ type GroupingAlignment =
 mkGroupingAlignment :: Number -> Number -> GroupingAlignment
 mkGroupingAlignment x y = { x, y }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // ease // settings
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // ease // settings
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Ease high/low settings for range selector.
 type EaseSettings =
@@ -566,9 +566,9 @@ mkEaseSettings high low = { high, low }
 defaultEaseSettings :: EaseSettings
 defaultEaseSettings = { high: 0.0, low: 0.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // text // range // selector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // text // range // selector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Range selector for text animation.
 -- |
@@ -609,9 +609,9 @@ defaultTextRangeSelector startId endId offsetId =
   , ease: defaultEaseSettings
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // text // wiggly // selector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // text // wiggly // selector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Wiggly selector for organic text animation.
 type TextWigglySelector =
@@ -640,9 +640,9 @@ defaultTextWigglySelector =
   , randomSeed: 0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // text // expression // selector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // text // expression // selector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Expression selector for procedural text animation.
 type TextExpressionSelector =
@@ -661,9 +661,9 @@ defaultTextExpressionSelector =
   , basedOn: SBOCharacters
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // text // animator // properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // text // animator // properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Animatable properties for text animator.
 -- |
@@ -712,9 +712,9 @@ defaultTextAnimatorProperties =
   , blurPropertyId: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // text // animator // id
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for a text animator.
 newtype TextAnimatorId = TextAnimatorId String
@@ -730,9 +730,9 @@ mkTextAnimatorId :: String -> Maybe TextAnimatorId
 mkTextAnimatorId "" = Nothing
 mkTextAnimatorId s = Just (TextAnimatorId s)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // text // animator
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // text // animator
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A text animator with selectors and properties.
 type TextAnimator =

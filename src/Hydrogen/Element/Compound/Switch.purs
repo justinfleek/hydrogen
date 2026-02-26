@@ -103,9 +103,9 @@ import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Switch properties
 type SwitchProps msg =
@@ -160,9 +160,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checked state
 isChecked :: forall msg. Boolean -> SwitchProp msg
@@ -172,9 +172,9 @@ isChecked c props = props { checked = c }
 isDisabled :: forall msg. Boolean -> SwitchProp msg
 isDisabled d props = props { disabled = d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set track color when unchecked (Color.RGB atom)
 trackColorOff :: forall msg. Color.RGB -> SwitchProp msg
@@ -192,9 +192,9 @@ thumbColor c props = props { thumbColor = Just c }
 labelColor :: forall msg. Color.RGB -> SwitchProp msg
 labelColor c props = props { labelColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set track width (Device.Pixel atom)
 width :: forall msg. Device.Pixel -> SwitchProp msg
@@ -208,9 +208,9 @@ height h props = props { height = Just h }
 thumbSize :: forall msg. Device.Pixel -> SwitchProp msg
 thumbSize s props = props { thumbSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label font size (FontSize atom)
 labelFontSize :: forall msg. FontSize.FontSize -> SwitchProp msg
@@ -220,33 +220,33 @@ labelFontSize s props = props { labelFontSize = Just s }
 labelFontWeight :: forall msg. FontWeight.FontWeight -> SwitchProp msg
 labelFontWeight w props = props { labelFontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> SwitchProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set toggle handler
 onToggle :: forall msg. msg -> SwitchProp msg
 onToggle handler props = props { onToggle = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> SwitchProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a switch toggle
 -- |
@@ -342,9 +342,9 @@ buildThumb props =
       ]
       []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // labeled switch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // labeled switch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a switch with label
 switchWithLabel :: forall msg. String -> Array (SwitchProp msg) -> E.Element msg

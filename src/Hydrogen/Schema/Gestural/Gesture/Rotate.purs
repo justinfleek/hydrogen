@@ -52,9 +52,9 @@ import Data.Array (foldl)
 import Hydrogen.Schema.Gestural.Gesture.Phase (GesturePhase(Possible, Began, Changed, Ended, Cancelled))
 import Hydrogen.Math.Core (atan2, pi, abs)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // rotate config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // rotate config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for rotation gesture
 type RotateConfig =
@@ -87,9 +87,9 @@ defaultRotateConfig = rotateConfig
 rotateSnapAngles :: RotateConfig -> Array Number
 rotateSnapAngles rc = rc.snapAngles
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // rotate gesture state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete rotation gesture state
 type RotateGesture =
@@ -200,9 +200,9 @@ cancelRotate rg = rg
   , angle = rg.initialAngle  -- Revert to initial angle
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current angle (radians)
 rotateGestureAngle :: RotateGesture -> Number
@@ -232,9 +232,9 @@ isRotateActive rg = rg.phase == Began || rg.phase == Changed
 isRotateEnded :: RotateGesture -> Boolean
 isRotateEnded rg = rg.phase == Ended || rg.phase == Cancelled
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // angle utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // angle utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Normalize angle to [-pi, pi]
 normalizeAngle :: Number -> Number

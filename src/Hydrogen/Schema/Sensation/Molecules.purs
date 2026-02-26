@@ -209,9 +209,9 @@ import Hydrogen.Schema.Sensation.Social
   , unwrapThreatLevel
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // body // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // body // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete body state — proprioceptive + contact sensation.
 -- |
@@ -272,9 +272,9 @@ isBodyRelaxed bs =
   unwrapStrain bs.strain < 0.2 &&
   isStable bs.balance
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // environment // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // environment // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete environment state — ambient + force sensation.
 -- |
@@ -341,9 +341,9 @@ isEnvironmentPleasant es =
   not (isConstrained es.freedom) &&
   isAirBreathable es.airQuality
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // social // awareness
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // social // awareness
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Social awareness — perception of other agents.
 -- |
@@ -410,9 +410,9 @@ hasSocialSupport sa =
 hasSocialThreat :: SocialAwareness -> Boolean
 hasSocialThreat sa = isInDanger sa.threat
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // contact // event
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // contact // event
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A single contact/touch event.
 -- |
@@ -482,9 +482,9 @@ isContactDangerous ce = isPressureDangerous ce.pressure
 isContactSafe :: ContactEvent -> Boolean
 isContactSafe ce = isPressureSafe ce.pressure
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // movement // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // movement // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Movement state — how the agent is currently moving.
 -- |
@@ -581,9 +581,9 @@ movementAcceleration ms = unwrapAcceleration ms.acceleration
 movementBalance :: MovementState -> Number
 movementBalance ms = unwrapBalance ms.balance
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // environment // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // environment // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the ambient light level (0 = dark, 1 = bright)
 environmentLightLevel :: EnvironmentState -> Number
@@ -601,9 +601,9 @@ environmentCrowdingLevel es = unwrapCrowding es.crowding
 environmentFreedomLevel :: EnvironmentState -> Number
 environmentFreedomLevel es = unwrapSpatialFreedom es.freedom
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // social // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // social // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the trust level toward nearest agents (0 = none, 1 = complete)
 socialTrustLevel :: SocialAwareness -> Number
@@ -621,9 +621,9 @@ hasSocialDanger sa = isInDanger sa.threat
 hasTrustedCompanions :: SocialAwareness -> Boolean
 hasTrustedCompanions sa = not (isAlone sa.nearestDistance) && isTrusted sa.trust
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // body // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // body // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current effort level (0 = none, 1 = maximum)
 bodyEffortLevel :: BodyState -> Number

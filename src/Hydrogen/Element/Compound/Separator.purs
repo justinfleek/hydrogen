@@ -87,9 +87,9 @@ import Hydrogen.Schema.Color.RGB as Color
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Separator orientation
 data Orientation
@@ -102,9 +102,9 @@ instance showOrientation :: Show Orientation where
   show Horizontal = "horizontal"
   show Vertical = "vertical"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Separator properties
 type SeparatorProps msg =
@@ -141,17 +141,17 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: orientation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: orientation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set separator orientation
 orientation :: forall msg. Orientation -> SeparatorProp msg
 orientation o props = props { orientation = o }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set separator color (Color.RGB atom)
 color :: forall msg. Color.RGB -> SeparatorProp msg
@@ -161,9 +161,9 @@ color c props = props { color = Just c }
 labelColor :: forall msg. Color.RGB -> SeparatorProp msg
 labelColor c props = props { labelColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set separator thickness (Device.Pixel atom)
 thickness :: forall msg. Device.Pixel -> SeparatorProp msg
@@ -173,25 +173,25 @@ thickness t props = props { thickness = Just t }
 gap :: forall msg. Device.Pixel -> SeparatorProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label font size (FontSize atom)
 labelFontSize :: forall msg. FontSize.FontSize -> SeparatorProp msg
 labelFontSize s props = props { labelFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> SeparatorProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a separator line
 -- |
@@ -236,9 +236,9 @@ buildSeparatorAttrs props =
   in
     coreStyles <> orientationStyles <> props.extraAttributes
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // labeled separator
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // labeled separator
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a separator with centered label
 -- |

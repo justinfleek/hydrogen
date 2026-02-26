@@ -102,9 +102,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Alert properties
 type AlertProps msg =
@@ -157,9 +157,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set alert background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> AlertProp msg
@@ -185,9 +185,9 @@ titleColor c props = props { titleColor = Just c }
 descriptionColor :: forall msg. Color.RGB -> AlertProp msg
 descriptionColor c props = props { descriptionColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> AlertProp msg
@@ -197,9 +197,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> AlertProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> AlertProp msg
@@ -213,9 +213,9 @@ gap g props = props { gap = Just g }
 iconSize :: forall msg. Device.Pixel -> AlertProp msg
 iconSize s props = props { iconSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set title font size (FontSize atom)
 titleFontSize :: forall msg. FontSize.FontSize -> AlertProp msg
@@ -229,17 +229,17 @@ titleFontWeight w props = props { titleFontWeight = Just w }
 descriptionFontSize :: forall msg. FontSize.FontSize -> AlertProp msg
 descriptionFontSize s props = props { descriptionFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> AlertProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an alert
 -- |
@@ -297,9 +297,9 @@ buildAlertAttrs props =
   in
     coreStyles <> textColorStyle <> borderStyle <> radiusStyle <> paddingStyle <> props.extraAttributes
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // section components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Alert title
 alertTitle :: forall msg. Array (AlertProp msg) -> Array (E.Element msg) -> E.Element msg

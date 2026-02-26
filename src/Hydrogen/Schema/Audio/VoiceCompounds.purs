@@ -111,9 +111,9 @@ import Data.Foldable (foldl)
 import Hydrogen.Schema.Audio.Voice as Voice
 import Hydrogen.Schema.Audio.Formant as Formant
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // persona
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Persona - high-level voice personality archetype.
 -- | Influences all aspects of voice synthesis.
@@ -155,9 +155,9 @@ personaDescription PersonaThoughtful = "Measured and reflective speech"
 personaDescription PersonaPlayful = "Light and engaging delivery"
 personaDescription PersonaEmpathetic = "Understanding and supportive communication"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // speaking style
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // speaking style
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SpeakingStyle - overall delivery style.
 data SpeakingStyle
@@ -183,9 +183,9 @@ speakingStyleName StylePresentational = "Presentational"
 speakingStyleName StyleIntimate = "Intimate"
 speakingStyleName StyleDeclamatory = "Declamatory"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // voice character
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // voice character
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VoiceCharacter - complete voice identity compound.
 -- | Combines physical voice parameters, persona, and speaking style.
@@ -231,9 +231,9 @@ voiceCharacterWithStyle charName p sty prof fset tract =
   , tractLength: tract
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // voice character presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Neutral assistant voice - balanced, professional.
 presetNeutralAssistant :: VoiceCharacter
@@ -306,9 +306,9 @@ presetEnthusiasticGuide =
   , tractLength: Formant.tractLengthFemale
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // speech patterns
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // speech patterns
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | PausePattern - how pauses are distributed in speech.
 data PausePattern
@@ -407,9 +407,9 @@ speechPatternDeliberate =
   , prosodyVariation: 0.5
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // speech act
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // speech act
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SpeechAct - pragmatic function of an utterance.
 -- | Enables appropriate prosodic rendering.
@@ -442,9 +442,9 @@ speechActName ActApology = "Apology"
 speechActName ActThanks = "Thanks"
 speechActName ActFarewell = "Farewell"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // dialogue turn
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // dialogue turn
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DialogueTurn - a single turn in a dialogue.
 type DialogueTurn =
@@ -475,9 +475,9 @@ dialogueTurn spk txt act expr dur =
       | d < 0.0 = 0.0
       | otherwise = d
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // dialogue
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // dialogue
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dialogue - a multi-turn conversation.
 type Dialogue =
@@ -503,9 +503,9 @@ dialogueAppend d t =
   where
     appendTurn ts newT = ts <> [newT]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // voice transition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // voice transition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VoiceTransition - how to transition between voice states.
 data VoiceTransition
@@ -530,9 +530,9 @@ transitionDurationMs TransitionSmooth = 100.0
 transitionDurationMs TransitionCrossfade = 300.0
 transitionDurationMs TransitionDramatic = 500.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // emotional shift
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // emotional shift
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | EmotionalShift - modifier to apply to a voice character.
 -- | Enables real-time emotional changes while preserving identity.

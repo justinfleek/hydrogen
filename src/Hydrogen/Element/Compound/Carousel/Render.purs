@@ -64,9 +64,9 @@ module Hydrogen.Element.Compound.Carousel.Render
   , defaultCase
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -211,9 +211,9 @@ import Hydrogen.Element.Compound.Carousel.Transitions
   )
 import Hydrogen.Element.Compound.Carousel.Gestures (GestureState, isDragActive, dragOffset)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // carousel config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // carousel config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete carousel configuration
 type CarouselConfig =
@@ -238,9 +238,9 @@ defaultConfig =
   , cssClass: ""
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // render functions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // render functions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a carousel from state and configuration
 -- |
@@ -533,9 +533,9 @@ getTransitionState state = state.transition
 getGestureState :: CarouselState -> GestureState
 getGestureState state = state.gesture
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // validation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // validation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a slide index is valid for the given collection
 isValidSlideIndex :: Int -> SlideCollection -> Boolean
@@ -559,9 +559,9 @@ clampSlideIndex loop idx slides' =
       let r = a - (a / b) * b
       in if r < 0 then r + b else r
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // slide visibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // slide visibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a slide should be visible (rendered) based on current position
 -- | Slides outside the visibility threshold are not rendered for performance
@@ -610,9 +610,9 @@ visibilityThreshold config = case config.layoutPath of
     -- Placeholder for when we need all slides
     slideCount' = 100
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // color effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate a color tint based on slide position
 -- | Returns an RGB color representing the intensity at this position
@@ -646,9 +646,9 @@ slidePositionTint effects position =
   in
     Color.rgb clampedChannel clampedChannel clampedChannel
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // carousel variants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a carousel with captions displayed below each slide
 carouselWithCaptions :: CarouselConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
@@ -671,9 +671,9 @@ renderCaptionBar _config state slides' =
     Nothing -> 
       E.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // position calculations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // position calculations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate a wave-based position offset for smooth oscillating effects
 -- | Uses sine wave for natural motion. Returns offset in range [-amplitude, amplitude]

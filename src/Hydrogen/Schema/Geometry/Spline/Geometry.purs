@@ -29,9 +29,9 @@ import Hydrogen.Schema.Geometry.Spline.Types (CatmullRomSpline, BSpline)
 import Hydrogen.Schema.Geometry.Spline.Conversion (catmullRomToBeziers, bSplineToBeziers)
 import Hydrogen.Schema.Geometry.Spline.Helpers (initialBounds, mergeBounds)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // arc length
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Approximate arc length of Catmull-Rom spline.
 -- |
@@ -47,9 +47,9 @@ bSplineLength spline =
   let beziers = bSplineToBeziers spline
   in foldl (\acc b -> acc + cubicLength b) 0.0 beziers
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // bounding box
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounding box of Catmull-Rom spline.
 catmullRomBoundingBox :: CatmullRomSpline -> { minX :: Number, minY :: Number, maxX :: Number, maxY :: Number }

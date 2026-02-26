@@ -104,9 +104,9 @@ import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Checkbox properties
 type CheckboxProps msg =
@@ -161,9 +161,9 @@ defaultProps =
   , onToggle: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checked state
 isChecked :: forall msg. Boolean -> CheckboxProp msg
@@ -177,9 +177,9 @@ isDisabled d props = props { disabled = d }
 checkboxId :: forall msg. String -> CheckboxProp msg
 checkboxId i props = props { id = Just i }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color when checked (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> CheckboxProp msg
@@ -197,9 +197,9 @@ checkColor c props = props { checkColor = Just c }
 labelColor :: forall msg. Color.RGB -> CheckboxProp msg
 labelColor c props = props { labelColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> CheckboxProp msg
@@ -209,17 +209,17 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> CheckboxProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checkbox size (Device.Pixel atom)
 size :: forall msg. Device.Pixel -> CheckboxProp msg
 size s props = props { size = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label font size (FontSize atom)
 labelFontSize :: forall msg. FontSize.FontSize -> CheckboxProp msg
@@ -229,25 +229,25 @@ labelFontSize s props = props { labelFontSize = Just s }
 labelFontWeight :: forall msg. FontWeight.FontWeight -> CheckboxProp msg
 labelFontWeight w props = props { labelFontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> CheckboxProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set toggle handler
 onToggle :: forall msg. msg -> CheckboxProp msg
 onToggle handler props = props { onToggle = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a checkbox
 -- |
@@ -353,9 +353,9 @@ checkmark props =
           []
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // labeled checkbox
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a checkbox with label
 checkboxWithLabel :: forall msg. String -> Array (CheckboxProp msg) -> E.Element msg

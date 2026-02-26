@@ -71,9 +71,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // scanlines // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Direction of scanlines effect.
 data ScanlinesDirection
@@ -100,9 +100,9 @@ scanlinesDirectionFromString "horizontal" = Just SDHorizontal
 scanlinesDirectionFromString "vertical" = Just SDVertical
 scanlinesDirectionFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // rgb // split // blend // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // rgb // split // blend // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blend mode for RGB split effect.
 data RGBSplitBlendMode
@@ -133,9 +133,9 @@ rgbSplitBlendModeFromString "add" = Just RSBMAdd
 rgbSplitBlendModeFromString "normal" = Just RSBMNormal
 rgbSplitBlendModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // pixel // sort // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // pixel // sort // direction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Direction of pixel sorting.
 data PixelSortDirection
@@ -162,9 +162,9 @@ pixelSortDirectionFromString "horizontal" = Just PSDHorizontal
 pixelSortDirectionFromString "vertical" = Just PSDVertical
 pixelSortDirectionFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // sort // by // criterion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // sort // by // criterion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Criterion for sorting pixels.
 data SortByCriterion
@@ -195,9 +195,9 @@ sortByCriterionFromString "brightness" = Just SBCBrightness
 sortByCriterionFromString "hue" = Just SBCHue
 sortByCriterionFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // halftone // color // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // halftone // color // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color mode for halftone effect.
 data HalftoneColorMode
@@ -228,9 +228,9 @@ halftoneColorModeFromString "rgb" = Just HCMRGB
 halftoneColorModeFromString "cmyk" = Just HCMCMYK
 halftoneColorModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // dither // method
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dithering method.
 data DitherMethod
@@ -261,9 +261,9 @@ ditherMethodFromString "floyd-steinberg" = Just DMFloydSteinberg
 ditherMethodFromString "atkinson" = Just DMAtkinson
 ditherMethodFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // dither // matrix // size
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // dither // matrix // size
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Size of dither matrix.
 data DitherMatrixSize
@@ -294,9 +294,9 @@ ditherMatrixSizeFromString "4x4" = Just DMS4x4
 ditherMatrixSizeFromString "8x8" = Just DMS8x8
 ditherMatrixSizeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // effect // color // channel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // effect // color // channel
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color channel selection for effects.
 data EffectColorChannel
@@ -335,9 +335,9 @@ effectColorChannelFromString "blue" = Just ECCBlue
 effectColorChannelFromString "alpha" = Just ECCAlpha
 effectColorChannelFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // hsl // channel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // hsl // channel
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HSL channel selection.
 data HSLChannel

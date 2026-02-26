@@ -100,9 +100,9 @@ import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3(Vec3), vec3, lengthVec3)
 import Hydrogen.Schema.Dimension.Matrix.Mat4 (Mat4(Mat4))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Quaternion with real components (w, x, y, z)
 -- | Convention: w is the scalar part, (x, y, z) is the vector part
@@ -118,9 +118,9 @@ instance showQuaternion :: Show Quaternion where
   show (Quaternion w x y z) =
     "Quaternion(" <> show w <> ", " <> show x <> ", " <> show y <> ", " <> show z <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a quaternion from components
 quaternion :: Number -> Number -> Number -> Number -> Quaternion
@@ -174,9 +174,9 @@ fromRotationZ angle =
   let halfAngle = angle / 2.0
   in Quaternion (Math.cos halfAngle) 0.0 0.0 (Math.sin halfAngle)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // basic operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // basic operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Quaternion addition
 addQuaternion :: Quaternion -> Quaternion -> Quaternion
@@ -204,9 +204,9 @@ conjugateQuaternion :: Quaternion -> Quaternion
 conjugateQuaternion (Quaternion w x y z) =
   Quaternion w (negate x) (negate y) (negate z)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // quaternion multiplication
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // quaternion multiplication
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Quaternion multiplication (Hamilton product)
 -- | This is the KEY operation. Non-commutative!
@@ -218,9 +218,9 @@ mulQuaternion (Quaternion w1 x1 y1 z1) (Quaternion w2 x2 y2 z2) = Quaternion
   (w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2)
   (w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // length and normalization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // length and normalization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Squared length (norm squared): ‖q‖² = w² + x² + y² + z²
 -- | Proof reference: Quaternion.lean lengthSq, lengthSq_nonneg, lengthSq_mul
@@ -249,9 +249,9 @@ isUnitQuaternion q =
   let lenSq = lengthSqQuaternion q
   in lenSq > 0.999 && lenSq < 1.001
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // inverse
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // inverse
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Inverse of a quaternion
 -- | For unit quaternions: q⁻¹ = q* (conjugate)
@@ -264,9 +264,9 @@ inverseQuaternion q =
   in if lenSq == 0.0 then quaternionIdentity
      else scaleQuaternion (1.0 / lenSq) (conjugateQuaternion q)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // interpolation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dot product of quaternions (as 4D vectors)
 -- | Proof reference: Quaternion.lean dot
@@ -303,9 +303,9 @@ slerpQuaternion a b t =
         s1 = Math.sin (t * theta) / sinTheta
       in addQuaternion (scaleQuaternion s0 a) (scaleQuaternion s1 b')
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert unit quaternion to rotation matrix
 -- | Proof reference: Quaternion.lean toMat4, toMat4_identity, det_toMat4_unit
@@ -342,9 +342,9 @@ rotateVec3 q (Vec3 vx vy vz) =
     Quaternion _ rx ry rz = result
   in vec3 rx ry rz
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get W component (scalar part)
 getW :: Quaternion -> Number

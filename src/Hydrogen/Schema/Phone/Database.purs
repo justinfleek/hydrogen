@@ -45,9 +45,9 @@ module Hydrogen.Schema.Phone.Database
   , module Hydrogen.Schema.Phone.Database.CentralAmerica
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( (<>)
@@ -90,9 +90,9 @@ import Hydrogen.Schema.Phone.Database.Caribbean (caribbeanCountries)
 import Hydrogen.Schema.Phone.Database.MiddleEast (middleEasternCountries)
 import Hydrogen.Schema.Phone.Database.CentralAmerica (centralAmericanCountries)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // all countries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete list of all countries with phone metadata.
 allCountries :: Array Country
@@ -111,9 +111,9 @@ allCountries =
 countryCount :: Int
 countryCount = Array.length allCountries
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // lookup
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Find country by ISO 3166-1 alpha-2 code.
 findByCode :: CountryCode -> Maybe Country
@@ -130,9 +130,9 @@ findByDialCode dc = Array.find (hasDialCode dc) allCountries
 findByName :: String -> Maybe Country
 findByName name = Array.find (matchesSearch name) allCountries
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // filtering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all countries in a specific region.
 countriesInRegion :: Region -> Array Country

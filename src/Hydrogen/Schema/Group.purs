@@ -127,9 +127,9 @@ import Data.Maybe (Maybe(Just, Nothing), isNothing, isJust)
 
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // group id
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Deterministic identifier for a group.
 -- |
@@ -159,9 +159,9 @@ makeGroupId pathComponents =
 unwrapGroupId :: GroupId -> String
 unwrapGroupId (GroupId gid) = gid
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The internal record structure of a group.
 type GroupRecord a =
@@ -244,9 +244,9 @@ setChildParent pid parentSlug (Group child) =
     updatedChildren = map (setChildParent newId (parentSlug <> "/" <> child.slug)) child.children
   in Group (child { id = newId, parent = Just pid, children = updatedChildren })
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the group's ID
 groupId :: forall a. Group a -> GroupId
@@ -272,9 +272,9 @@ groupChildren (Group g) = g.children
 groupParent :: forall a. Group a -> Maybe GroupId
 groupParent (Group g) = g.parent
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // modification
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // modification
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add an item to a group
 addItem :: forall a. a -> Group a -> Group a
@@ -309,9 +309,9 @@ setGroupName name (Group g) = Group (g { name = name })
 setParent :: forall a. Maybe GroupId -> Group a -> Group a
 setParent pid (Group g) = Group (g { parent = pid })
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // traversal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // traversal
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all items in a group and its descendants
 allItems :: forall a. Group a -> Array a
@@ -370,9 +370,9 @@ reverseArray :: forall b. Array b -> Array b
 reverseArray arr =
   Array.foldl (\acc item -> Array.cons item acc) [] arr
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a group has no items
 isEmpty :: forall a. Group a -> Boolean
@@ -423,9 +423,9 @@ findItem pred (Group g) =
             Just found -> Just found
             Nothing -> findInChildren (Array.filter (\c -> groupId c /= groupId child) children)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // forest operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // forest operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A forest is a collection of root groups.
 -- |

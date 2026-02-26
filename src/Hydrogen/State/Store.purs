@@ -73,9 +73,9 @@ import Effect.Class.Console as Console
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A store holds state and manages updates via a reducer
 newtype Store state action = Store
@@ -101,9 +101,9 @@ type Middleware state action =
   , dispatch :: action -> Effect Unit
   } -> (action -> Effect Unit) -> action -> Effect Unit
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // store creation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a new store with initial state and reducer
 createStore :: forall state action. state -> Reducer state action -> Effect (Store state action)
@@ -129,9 +129,9 @@ createStoreWithMiddleware initialState reducer middleware = do
     , nextListenerId: nextListenerIdRef
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // store operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // store operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dispatch an action to update state
 dispatch :: forall state action. Store state action -> action -> Effect Unit
@@ -176,9 +176,9 @@ subscribe (Store { listeners, nextListenerId }) listener = do
 replaceReducer :: forall state action. Store state action -> Reducer state action -> Effect Unit
 replaceReducer (Store { reducer }) newReducer = Ref.write newReducer reducer
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // middleware
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // middleware
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Logger middleware - logs all actions and state changes
 loggerMiddleware :: forall state action. Show action => Show state => Middleware state action
@@ -195,9 +195,9 @@ loggerMiddleware store next action = do
 thunkMiddleware :: forall state action. Middleware state action
 thunkMiddleware _store next action = next action
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // selectors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // selectors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Select a slice of state
 select :: forall state action a. Store state action -> (state -> a) -> Effect a
@@ -223,9 +223,9 @@ selectWith store selector callback = do
       Ref.write newValue lastValueRef
       callback newValue
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Combine multiple reducers into one
 -- | Each reducer handles a slice of state

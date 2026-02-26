@@ -88,9 +88,9 @@ module Hydrogen.Schema.Typography.TextAnimation
   , computeStaggerDelay
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -125,9 +125,9 @@ import Hydrogen.Schema.Typography.TextIndex
   , unwrapLineIndex
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // text target
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // text target
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | What level of text hierarchy to target.
 -- |
@@ -157,9 +157,9 @@ instance showTextTarget :: Show TextTarget where
   show TargetContour = "contour"
   show TargetControlPoint = "point"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // animation scope
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // animation scope
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How the animation applies across the scope.
 -- |
@@ -179,9 +179,9 @@ instance showAnimationScope :: Show AnimationScope where
   show ScopeStaggered = "staggered"
   show ScopeSynchronized = "synchronized"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // range selectors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // range selectors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Range of characters within a word.
 data CharacterRange
@@ -258,9 +258,9 @@ lineRange = LineRange
 lineAll :: LineRange
 lineAll = LineAll
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // point selectors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // point selectors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Selector for control points within a glyph.
 data PointSelector
@@ -277,9 +277,9 @@ instance showPointSelector :: Show PointSelector where
   show (ContourAll c) = "contour(" <> show c <> ":*)"
   show AllContours = "contours(*)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // compound selector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // compound selector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete text selector for animation targeting.
 -- |
@@ -369,9 +369,9 @@ selectEveryNth target n offset sel = case target of
   TargetCharacter -> sel { characters = CharEveryNth n offset }
   _ -> sel  -- Block, Contour, ControlPoint don't support this pattern
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // stagger patterns
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // stagger patterns
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Re-export canonical StaggerDirection from Animation.Types.
 -- |
@@ -412,9 +412,9 @@ staggerEdgesIn = AnimTypes.EdgesInStagger
 staggerRandom :: Int -> Number -> StaggerPattern
 staggerRandom = AnimTypes.RandomStagger
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // selector predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // selector predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a line index matches the selector.
 matchesLine :: LineIndex -> TextSelector -> Boolean
@@ -474,9 +474,9 @@ matchesCharRange idx range = case range of
     let idxN = unwrapCharacterIndex idx
     in (idxN - offset) `mod` n == 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // stagger computation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // stagger computation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute stagger delay for an element given its index and total count.
 -- |

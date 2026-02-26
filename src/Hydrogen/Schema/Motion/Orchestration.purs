@@ -121,9 +121,9 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Hydrogen.Schema.Dimension.Temporal (Milliseconds(Milliseconds), ms)
 import Hydrogen.Schema.Motion.Transition (TransitionConfig, transitionDuration)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // animation reference
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // animation reference
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Reference to an element and its animation configuration.
 -- |
@@ -145,9 +145,9 @@ animateWithConfig = identity
   identity :: forall a. a -> a
   identity x = x
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // orchestration adt
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // orchestration adt
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Orchestration ADT — recursive structure for composing animations.
 -- |
@@ -171,9 +171,9 @@ instance showOrchestration :: Show Orchestration where
   show (Delayed d _) = "Delayed(" <> show (unwrapMs d) <> "ms)"
   show (Timeline entries) = "Timeline[" <> show (Array.length entries) <> "]"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // timeline entry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // timeline entry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A point in a timeline with an associated animation.
 newtype TimelineEntry = TimelineEntry
@@ -195,9 +195,9 @@ entryTime (TimelineEntry e) = e.time
 entryAnimation :: TimelineEntry -> Orchestration
 entryAnimation (TimelineEntry e) = e.animation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // combinators
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // combinators
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Run animations in sequence (one after another).
 -- |
@@ -269,9 +269,9 @@ delay = Delayed
 at :: Milliseconds -> Orchestration -> TimelineEntry
 at = timelineEntry
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // inspection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // inspection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate total duration of an orchestration.
 -- |
@@ -315,9 +315,9 @@ allRefs (Stagger _ arr) = concatMap allRefs arr
 allRefs (Delayed _ inner) = allRefs inner
 allRefs (Timeline entries) = concatMap (allRefs <<< entryAnimation) entries
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if orchestration has no animations
 isEmpty :: Orchestration -> Boolean
@@ -343,9 +343,9 @@ isStaggered :: Orchestration -> Boolean
 isStaggered (Stagger _ _) = true
 isStaggered _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Reverse the order of animations in sequences and staggers.
 -- |
@@ -408,9 +408,9 @@ shiftBy amount (Timeline entries) =
 append :: Orchestration -> Orchestration -> Orchestration
 append a b = Sequence [a, b]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Function composition
 infixr 9 composeFlipped as <<<

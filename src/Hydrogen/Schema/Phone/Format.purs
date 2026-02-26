@@ -57,9 +57,9 @@ module Hydrogen.Schema.Phone.Format
   , formatOrDefault
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -90,9 +90,9 @@ import Hydrogen.Schema.Phone.Country (Country, FormatPattern, formatPattern, pat
 import Hydrogen.Schema.Phone.NationalNumber (NationalNumber)
 import Hydrogen.Schema.Phone.NationalNumber (toString, length) as NN
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // cursor result
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of formatting with cursor position tracking.
 -- |
@@ -117,9 +117,9 @@ formattedValue (CursorResult r) = r.formatted
 cursorPosition :: CursorResult -> Int
 cursorPosition (CursorResult r) = r.cursor
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format a national number using the country's format pattern.
 -- |
@@ -152,9 +152,9 @@ formatPartial pattern nn =
       formatted = applyPatternPartial (String.toCharArray patternStr) digits
   in String.fromCharArray (trimTrailingLiterals formatted)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // cursor handling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format a number and calculate the new cursor position.
 -- |
@@ -198,9 +198,9 @@ calculateCursorAfterDelete pattern currentFormatted cursorPos =
          if patternLen > 0 then 0 else 0
        Just idx -> digitIndexToPosition pattern idx
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // unformatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Remove formatting and extract just the digits.
 -- |
@@ -216,9 +216,9 @@ extractDigits :: String -> String
 extractDigits s = 
   String.fromCharArray $ Array.filter isDigit $ String.toCharArray s
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // pattern analysis
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all positions in the formatted string that contain digits.
 -- |
@@ -278,9 +278,9 @@ digitIndexToPosition pattern digitIdx =
              -- No positions at all, use pattern length as guide
              if patternLen > 0 then patternLen else digitIdx
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Apply a format pattern to digits.
 -- |
@@ -380,9 +380,9 @@ arrayDrop n arr = Array.drop n arr
 arrayReverse :: forall a. Array a -> Array a
 arrayReverse = Array.reverse
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // pattern utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // pattern utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Count the number of digit placeholders in a pattern.
 -- |

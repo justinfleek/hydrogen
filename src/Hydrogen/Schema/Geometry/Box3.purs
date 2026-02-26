@@ -111,9 +111,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   )
 import Hydrogen.Schema.Dimension.Matrix.Mat4 (Mat4, mulPointMat4)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Axis-Aligned Bounding Box defined by min and max corners.
 -- |
@@ -130,9 +130,9 @@ instance showBox3 :: Show Box3 where
   show (Box3 minV maxV) =
     "(Box3 min:" <> show minV <> " max:" <> show maxV <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a box from min and max corners
 box3 :: Vec3 Number -> Vec3 Number -> Box3
@@ -173,9 +173,9 @@ box3FromCorners (Vec3 ax ay az) (Vec3 bx by bz) =
     (vec3 (min ax bx) (min ay by) (min az bz))
     (vec3 (max ax bx) (max ay by) (max az bz))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // validity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if box is valid (non-empty): min ≤ max componentwise
 -- | Proof reference: Box3.lean IsValid
@@ -189,9 +189,9 @@ isEmptyBox3 :: Box3 -> Boolean
 isEmptyBox3 (Box3 (Vec3 minX minY minZ) (Vec3 maxX maxY maxZ)) =
   minX > maxX || minY > maxY || minZ > maxZ
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // basic queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // basic queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Center of the box
 -- | Proof reference: Box3.lean center, center_unit, center_fromCenterAndSize
@@ -222,9 +222,9 @@ surfaceAreaBox3 b =
   let Vec3 sx sy sz = sizeBox3 b
   in 2.0 * (sx * sy + sy * sz + sz * sx)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // containment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // containment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a point is inside the box (inclusive)
 -- | Proof reference: Box3.lean containsPoint, containsPoint_min, containsPoint_max
@@ -252,9 +252,9 @@ intersectsBoxBox3 (Box3 (Vec3 aMinX aMinY aMinZ) (Vec3 aMaxX aMaxY aMaxZ))
   aMinY <= bMaxY && aMaxY >= bMinY &&
   aMinZ <= bMaxZ && aMaxZ >= bMinZ
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // expansion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // expansion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Expand box to include a point
 -- | Proof reference: Box3.lean expandByPoint, expandByPoint_contains, expandByPoint_preserves_containment
@@ -275,9 +275,9 @@ expandByVectorBox3 (Box3 minV maxV) v =
 expandByScalarBox3 :: Box3 -> Number -> Box3
 expandByScalarBox3 b s = expandByVectorBox3 b (vec3 s s s)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // set operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Union of two boxes (smallest box containing both)
 -- | Proof reference: Box3.lean union
@@ -297,9 +297,9 @@ intersectBox3 (Box3 (Vec3 aMinX aMinY aMinZ) (Vec3 aMaxX aMaxY aMaxZ))
     (vec3 (max aMinX bMinX) (max aMinY bMinY) (max aMinZ bMinZ))
     (vec3 (min aMaxX bMaxX) (min aMaxY bMaxY) (min aMaxZ bMaxZ))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // clamping and distance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp a point to lie within the box
 -- | Proof reference: Box3.lean clampPoint
@@ -322,9 +322,9 @@ distanceSqToPointBox3 b p =
 distanceToPointBox3 :: Box3 -> Vec3 Number -> Number
 distanceToPointBox3 b p = Math.sqrt (distanceSqToPointBox3 b p)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // translation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // translation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Translate the box by a vector
 -- | Proof reference: Box3.lean translate, translate_zero, translate_translate, size_translate
@@ -332,9 +332,9 @@ translateBox3 :: Box3 -> Vec3 Number -> Box3
 translateBox3 (Box3 minV maxV) offset =
   Box3 (addVec3 minV offset) (addVec3 maxV offset)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // transform
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // transform
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Transform an AABB by a 4x4 matrix.
 -- |
@@ -377,9 +377,9 @@ applyMatrix4Box3 (Box3 (Vec3 minX minY minZ) (Vec3 maxX maxY maxZ)) matrix =
               c7
   in result
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the minimum corner
 getMinBox3 :: Box3 -> Vec3 Number

@@ -129,9 +129,9 @@ import Prelude
 import Data.Int (toNumber)
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // sample rate
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // sample rate
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SampleRate - audio sample rate in Hz.
 -- | Bounded to standard rates: 8000 Hz (telephony) to 192000 Hz (high-res).
@@ -179,9 +179,9 @@ isHighResSampleRate (SampleRate r) = r >= 96000
 sampleRateHigherThan :: SampleRate -> SampleRate -> Boolean
 sampleRateHigherThan (SampleRate r1) (SampleRate r2) = r1 > r2
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // bit depth
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // bit depth
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | BitDepth - bits per sample.
 -- | Bounded to standard depths: 8-bit (lo-fi) to 32-bit (float).
@@ -221,9 +221,9 @@ bit32 = BitDepth 32
 isProfessionalBitDepth :: BitDepth -> Boolean
 isProfessionalBitDepth (BitDepth b) = b >= 24
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // channel count
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // channel count
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ChannelCount - number of audio channels.
 -- | Bounded to 1-8 for standard configurations.
@@ -271,9 +271,9 @@ isStereoOrMore (ChannelCount c) = c >= 2
 isSurround :: ChannelCount -> Boolean
 isSurround (ChannelCount c) = c >= 6
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // audio buffer
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // audio buffer
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AudioBuffer - raw audio data container.
 -- | Represents PCM audio with sample rate, bit depth, channels, and frame count.
@@ -328,9 +328,9 @@ sameBufferFormat b1 b2 =
 isEmptyBuffer :: AudioBuffer -> Boolean
 isEmptyBuffer buf = buf.frameCount <= 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // audio region
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // audio region
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AudioRegion - a non-destructive slice of an AudioBuffer.
 -- | Defines start/end points, gain, and fade curves.
@@ -399,9 +399,9 @@ isValidRegion r =
   r.fadeInFrames >= 0 &&
   r.fadeOutFrames >= 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // loop mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // loop mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | LoopMode - how audio clips loop.
 data LoopMode
@@ -428,9 +428,9 @@ isLooping :: LoopMode -> Boolean
 isLooping LoopNone = false
 isLooping _ = true
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // audio clip
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // audio clip
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AudioClip - a playable audio unit.
 -- | Combines a region with playback options.
@@ -476,9 +476,9 @@ clipPitch c = c.pitchRatio
 isPitchShifted :: AudioClip -> Boolean
 isPitchShifted c = c.pitchRatio < 0.99 || c.pitchRatio > 1.01
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // audio format
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // audio format
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AudioFormat - supported audio file formats.
 data AudioFormat

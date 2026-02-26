@@ -64,9 +64,9 @@ module Hydrogen.Schema.Phone.NationalNumber
   , minUsableLength
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -91,9 +91,9 @@ import Data.Maybe (Maybe)
 import Data.String (length, take, drop) as String
 import Data.String.CodeUnits (toCharArray, fromCharArray) as String
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // national number
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // national number
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | National significant number (digits only, max 14 chars).
 -- |
@@ -109,9 +109,9 @@ instance ordNationalNumber :: Ord NationalNumber where
 instance showNationalNumber :: Show NationalNumber where
   show (NationalNumber s) = "NationalNumber \"" <> s <> "\""
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Maximum length per E.164 (15 total minus at least 1 for country code).
 maxLength :: Int
@@ -121,9 +121,9 @@ maxLength = 14
 minUsableLength :: Int
 minUsableLength = 4
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a national number from a string, extracting only digits.
 -- |
@@ -161,9 +161,9 @@ fromDigitAt c =
 empty :: NationalNumber
 empty = NationalNumber ""
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the digits as a string.
 toString :: NationalNumber -> String
@@ -185,9 +185,9 @@ length (NationalNumber s) = String.length s
 isEmpty :: NationalNumber -> Boolean
 isEmpty (NationalNumber s) = String.length s == 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // manipulation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Append a digit character at the end (ignored if not a digit or at max length).
 appendDigit :: Char -> NationalNumber -> NationalNumber
@@ -265,9 +265,9 @@ concat :: NationalNumber -> NationalNumber -> NationalNumber
 concat (NationalNumber a) (NationalNumber b) = 
   NationalNumber (String.take maxLength (a <> b))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // validation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if the national number has a valid length.
 isValid :: NationalNumber -> Boolean
@@ -293,9 +293,9 @@ isShorterThan a b = length a < length b
 hasSameLengthAs :: NationalNumber -> NationalNumber -> Boolean
 hasSameLengthAs a b = length a == length b
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract only digit characters from a string.
 extractDigits :: String -> String

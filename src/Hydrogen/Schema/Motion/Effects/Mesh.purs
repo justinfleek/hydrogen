@@ -34,9 +34,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // pin // falloff
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Falloff type for pin influence.
 data PinFalloff
@@ -63,9 +63,9 @@ pinFalloffFromString "inverse-distance" = Just PFInverseDistance
 pinFalloffFromString "radial-basis" = Just PFRadialBasis
 pinFalloffFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                 // turbulent // displace // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // turbulent // displace // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of turbulent displacement.
 data TurbulentDisplaceType
@@ -120,9 +120,9 @@ turbulentDisplaceTypeFromString "vertical" = Just TDTVertical
 turbulentDisplaceTypeFromString "cross" = Just TDTCross
 turbulentDisplaceTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // pinning // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // pinning // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Edge pinning mode for mesh deform.
 data PinningMode

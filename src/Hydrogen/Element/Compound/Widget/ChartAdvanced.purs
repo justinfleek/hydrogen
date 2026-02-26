@@ -43,9 +43,9 @@ module Hydrogen.Element.Compound.Widget.ChartAdvanced
   , module DualAxis
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Re-export from submodules using module aliases
 import Hydrogen.Element.Compound.Widget.ChartAdvanced.Waterfall

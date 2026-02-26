@@ -139,9 +139,9 @@ import Hydrogen.Schema.Gestural.Trigger.Atoms
   , unwrapTriggerWindow
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // proximity // trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // proximity // trigger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Proximity trigger molecule: Element + Radius + Target + Effect
 -- |
@@ -180,9 +180,9 @@ proximityFalloffValue pt = pt.falloff
 proximityTargetId :: ProximityTrigger -> String
 proximityTargetId pt = pt.targetId
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // gesture // trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // gesture // trigger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Gesture trigger molecule: GesturePattern + Target + Effect
 -- |
@@ -215,9 +215,9 @@ gestureTargetId gt = gt.targetId
 gestureWindowMs :: GestureTrigger -> Number
 gestureWindowMs gt = unwrapTriggerWindow gt.window
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // time // trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // time // trigger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Time trigger molecule: HoldDuration + Element + Effect
 -- |
@@ -246,9 +246,9 @@ timeDuration tt = unwrapTriggerDelay tt.duration
 timeElementId :: TimeTrigger -> String
 timeElementId tt = tt.elementId
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // combo // trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // combo // trigger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Combo trigger molecule: Condition[] + Effect
 -- |
@@ -277,9 +277,9 @@ comboConditions ct = ct.conditions
 comboWindowMs :: ComboTrigger -> Number
 comboWindowMs ct = unwrapTriggerWindow ct.window
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // tap // count // trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // tap // count // trigger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tap count trigger molecule: Element + Count + Window + Effect
 -- |
@@ -315,9 +315,9 @@ tapCount tct = unwrapTriggerCount tct.count
 tapWindowMs :: TapCountTrigger -> Number
 tapWindowMs tct = unwrapTriggerWindow tct.window
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // proximity // glow
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // proximity // glow
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ProximityGlow compound: Cursor approaching causes glow effect.
 -- |
@@ -357,9 +357,9 @@ glowColor pg = pg.color
 glowIntensity :: ProximityGlow -> Number
 glowIntensity pg = pg.intensity
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // proximity // expand
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // proximity // expand
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ProximityExpand compound: Cursor approaching expands element.
 -- |
@@ -393,9 +393,9 @@ expandRadius pe = unwrapProximityRadius pe.radius
 expandScale :: ProximityExpand -> Number
 expandScale pe = pe.scale
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // proximity // attract
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // proximity // attract
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ProximityAttract compound: Element subtly moves toward cursor.
 -- |
@@ -445,9 +445,9 @@ attractRadius pa = unwrapProximityRadius pa.radius
 attractStrength :: ProximityAttract -> Number
 attractStrength pa = pa.strength
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // hold // to // reveal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // hold // to // reveal
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HoldToReveal compound: Long-press reveals hidden content.
 -- |
@@ -497,9 +497,9 @@ holdToRevealSilent elementId durationMs targetId =
   , haptic: false
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // shake // to // undo
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // shake // to // undo
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ShakeToUndo compound: Device shake triggers undo action.
 -- |
@@ -533,9 +533,9 @@ shakeCooldown stu = unwrapTriggerCooldown stu.cooldown
 undoCallback :: ShakeToUndo -> String
 undoCallback stu = stu.callback
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // tilt // to // scroll
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // tilt // to // scroll
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TiltToScroll compound: Device tilt affects scroll position.
 -- |
@@ -582,9 +582,9 @@ tiltDeadzone tts = tts.deadzone
 scrollMultiplier :: TiltToScroll -> Number
 scrollMultiplier tts = tts.multiplier
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // easter // egg
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | EasterEgg compound: Arbitrary hidden trigger + reward.
 -- |
@@ -646,9 +646,9 @@ eggReward ee = ee.reward
 eggUnlocked :: EasterEgg -> Boolean
 eggUnlocked ee = ee.unlocked
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp a Number to a range
 clampNumber :: Number -> Number -> Number -> Number

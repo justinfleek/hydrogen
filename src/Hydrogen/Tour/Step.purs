@@ -77,9 +77,9 @@ import Data.Array (foldl)
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Tour.Types (Alignment, Milliseconds(Milliseconds), Pixel(Pixel), Placement, Side, StepId, Target(NoTarget), defaultPlacement, mkPlacement)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // step type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // step type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A single step in a product tour
 -- |
@@ -144,9 +144,9 @@ defaultPlacementConfig =
   , offsetCross: Pixel 0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // step configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Step property modifier
 type StepProp msg = Step msg -> Step msg
@@ -201,9 +201,9 @@ scrollIntoView cfg s = s { scroll = Just cfg }
 noScroll :: forall msg. StepProp msg
 noScroll s = s { scroll = Nothing }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // button configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Button in a tour step
 type Button msg =
@@ -264,9 +264,9 @@ completeButton label = button label ActionComplete Primary
 customButton :: forall msg. String -> msg -> ButtonVariant -> Button msg
 customButton label msg variant = button label (ActionCustom msg) variant
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // highlight configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for element highlighting (spotlight)
 type HighlightConfig =
@@ -294,9 +294,9 @@ highlightPadding p cfg = cfg { padding = p }
 highlightRadius :: Pixel -> HighlightConfig -> HighlightConfig
 highlightRadius r cfg = cfg { borderRadius = r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // scroll configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // scroll configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Auto-scroll behavior
 data ScrollBehavior

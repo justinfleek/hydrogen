@@ -125,9 +125,9 @@ import Data.Array (length, index, foldl, snoc, zipWith) as Array
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.String.CodeUnits (length, toCharArray, fromCharArray) as String
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // core diff types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // core diff types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Core diff type — represents the difference between two values.
 -- |
@@ -151,9 +151,9 @@ isNoChange :: forall a. Diff a -> Boolean
 isNoChange NoChange = true
 isNoChange _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // primitive deltas
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Delta for Number values — stores the difference.
 -- |
@@ -199,9 +199,9 @@ instance showStringPatchOp :: Show StringPatchOp where
   show (DeleteChars pos n) = "Delete@" <> show pos <> "(" <> show n <> ")"
   show (ReplaceChars pos n str) = "Replace@" <> show pos <> "(" <> show n <> ",\"" <> str <> "\")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // field changes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Change to a single field in a record.
 -- |
@@ -218,9 +218,9 @@ instance showFieldDiff :: Show a => Show (FieldDiff a) where
   show (FieldAdd name v) = "+" <> name <> ": " <> show v
   show (FieldRemove name v) = "-" <> name <> ": " <> show v
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // array changes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Diff for arrays — either full replace or sequence of operations.
 data ArrayDiff a
@@ -248,9 +248,9 @@ instance showArrayOp :: Show a => Show (ArrayOp a) where
   show (Move from to) = "Move(" <> show from <> "→" <> show to <> ")"
   show (Update idx d) = "Update@" <> show idx <> ":" <> show d
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // diffable typeclass
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // diffable typeclass
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Typeclass for values that can be diffed and patched.
 -- |
@@ -261,9 +261,9 @@ class Eq a <= Diffable a where
   diff :: a -> a -> Diff a
   apply :: Diff a -> a -> a
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // primitive diffs
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // primitive diffs
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Diff two numbers, producing a delta if different.
 diffNumbers :: Number -> Number -> Diff NumberDelta
@@ -398,9 +398,9 @@ applyMaybeDiff NoChange m = m
 applyMaybeDiff (Replace _ new) _ = new
 applyMaybeDiff (Delta new) _ = new
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // diff statistics
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // diff statistics
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Statistics about a diff for analysis.
 -- |

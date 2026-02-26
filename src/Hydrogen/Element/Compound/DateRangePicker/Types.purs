@@ -49,9 +49,9 @@ import Hydrogen.Element.Compound.Calendar
 
 import Hydrogen.Element.Compound.Calendar (CalendarDate, DateRange, compareDates)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // date range operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // date range operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a DateRange, swapping dates if start > end
 mkDateRange :: CalendarDate -> CalendarDate -> DateRange
@@ -89,9 +89,9 @@ isValidRange r =
   -- Valid range: start <= end means compareDates returns 0 or negative
   not (compareDates r.start r.end > 0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // comparison mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Comparison mode for analytics use cases.
 -- |
@@ -115,9 +115,9 @@ comparisonModeLabel PreviousPeriod = "Previous period"
 comparisonModeLabel PreviousYear = "Previous year"
 comparisonModeLabel Custom = "Custom"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // preset range
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Identifier for a preset (for event handling)
 type PresetId = String
@@ -132,9 +132,9 @@ type PresetConfig =
   , label :: String
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // selection state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State of range selection interaction.
 -- |

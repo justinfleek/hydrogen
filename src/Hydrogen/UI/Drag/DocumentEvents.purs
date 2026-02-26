@@ -56,9 +56,9 @@ import Effect (Effect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Callbacks invoked during drag operations
 type DragCallbacks =
@@ -78,9 +78,9 @@ type DragState =
 -- | Handle returned by startDrag, used to stop the drag
 foreign import data DragHandle :: Type
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                        // ffi
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Start listening for document-level mouse events
 -- | Returns a handle that must be used to stop the drag
@@ -104,9 +104,9 @@ foreign import getMovementXImpl :: DragHandle -> Effect Number
 -- | Get movementY from the last mouse event (delta since last event)
 foreign import getMovementYImpl :: DragHandle -> Effect Number
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Start a document-level drag operation
 -- |
@@ -122,9 +122,9 @@ startDrag callbacks = startDragImpl callbacks.onMove callbacks.onEnd
 stopDrag :: DragHandle -> Effect Unit
 stopDrag = stopDragImpl
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current clientX position
 getClientX :: DragHandle -> Effect Number

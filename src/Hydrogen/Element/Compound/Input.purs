@@ -158,9 +158,9 @@ import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HTML input types
 -- |
@@ -205,9 +205,9 @@ instance showInputType :: Show InputType where
 inputTypeToString :: InputType -> String
 inputTypeToString = show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Input properties
 -- |
@@ -298,9 +298,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input type
 inputType :: forall msg. InputType -> InputProp msg
@@ -338,9 +338,9 @@ inputName n props = props { name = Just n }
 rows :: forall msg. Int -> InputProp msg
 rows r props = props { rows = r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> InputProp msg
@@ -370,9 +370,9 @@ focusRingColor c props = props { focusRingColor = Just c }
 labelColor :: forall msg. Color.RGB -> InputProp msg
 labelColor c props = props { labelColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> InputProp msg
@@ -382,9 +382,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> InputProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> InputProp msg
@@ -402,9 +402,9 @@ paddingY p props = props { paddingY = Just p }
 minHeight :: forall msg. Device.Pixel -> InputProp msg
 minHeight h props = props { minHeight = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> InputProp msg
@@ -418,17 +418,17 @@ labelFontSize s props = props { labelFontSize = Just s }
 labelFontWeight :: forall msg. FontWeight.FontWeight -> InputProp msg
 labelFontWeight w props = props { labelFontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> InputProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input change handler
 -- |
@@ -436,17 +436,17 @@ transitionDuration d props = props { transitionDuration = Just d }
 onInputChange :: forall msg. (String -> msg) -> InputProp msg
 onInputChange handler props = props { onInputChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> InputProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a single-line text input
 -- |
@@ -573,9 +573,9 @@ buildInputStyles props =
     <> disabledStyles
     <> focusStyles
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // textarea
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // textarea
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a multi-line textarea
 -- |
@@ -640,9 +640,9 @@ buildTextareaStyles props =
   in
     baseStyles <> heightOverride <> resizeStyle
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // labeled components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Input with associated label
 -- |

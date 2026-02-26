@@ -172,9 +172,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Password strength levels
 data PasswordStrength
@@ -240,9 +240,9 @@ calculateStrength password =
     else if score < 5 then Strong
     else VeryStrong
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | PasswordInput properties
 -- |
@@ -362,9 +362,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set current password value
 passwordValue :: forall msg. String -> PasswordInputProp msg
@@ -420,9 +420,9 @@ passwordName n props = props { name = Just n }
 passwordAriaLabel :: forall msg. String -> PasswordInputProp msg
 passwordAriaLabel l props = props { ariaLabel = Just l }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> PasswordInputProp msg
@@ -480,9 +480,9 @@ strengthLabelColor c props = props { strengthLabelColor = Just c }
 strengthBarBgColor :: forall msg. Color.RGB -> PasswordInputProp msg
 strengthBarBgColor c props = props { strengthBarBgColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> PasswordInputProp msg
@@ -492,9 +492,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> PasswordInputProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> PasswordInputProp msg
@@ -512,9 +512,9 @@ paddingY p props = props { paddingY = Just p }
 iconSize :: forall msg. Device.Pixel -> PasswordInputProp msg
 iconSize s props = props { iconSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> PasswordInputProp msg
@@ -524,17 +524,17 @@ fontSize s props = props { fontSize = Just s }
 strengthLabelFontSize :: forall msg. FontSize.FontSize -> PasswordInputProp msg
 strengthLabelFontSize s props = props { strengthLabelFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> PasswordInputProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input handler (fires on each keystroke)
 -- |
@@ -560,17 +560,17 @@ onPasswordFocus handler props = props { onFocus = Just handler }
 onPasswordBlur :: forall msg. msg -> PasswordInputProp msg
 onPasswordBlur handler props = props { onBlur = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> PasswordInputProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a password input with optional visibility toggle and strength indicator
 -- |
@@ -608,9 +608,9 @@ passwordInput propMods =
 passwordStrengthBar :: forall msg. PasswordInputProps msg -> PasswordStrength -> E.Element msg
 passwordStrengthBar props strength = buildStrengthIndicator props strength
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Build the password input element
 buildPasswordInput :: forall msg. PasswordInputProps msg -> E.Element msg
@@ -839,9 +839,9 @@ getStrengthColor props Fair = props.strengthFairColor
 getStrengthColor props Strong = props.strengthStrongColor
 getStrengthColor props VeryStrong = props.strengthVeryStrongColor
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Eye icon (password hidden - click to show)
 eyeIcon :: forall msg. String -> E.Element msg

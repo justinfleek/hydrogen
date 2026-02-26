@@ -91,9 +91,9 @@ import Prelude
   , (<>)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // constants
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Speed of light in m/s (exact by definition)
 speedOfLight :: Number
@@ -123,9 +123,9 @@ metersPerEarthRadius = 6.3781e6
 metersPerLunarDistance :: Number
 metersPerLunarDistance = 3.844e8
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // light year
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // light year
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Light year - distance light travels in one Julian year
 newtype LightYear = LightYear Number
@@ -148,9 +148,9 @@ unwrapLightYear (LightYear n) = n
 lightYearsToMeters :: LightYear -> Number
 lightYearsToMeters (LightYear n) = n * metersPerLightYear
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // parsec
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // parsec
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Parsec - parallax of one arcsecond (~3.26 light years)
 newtype Parsec = Parsec Number
@@ -173,9 +173,9 @@ unwrapParsec (Parsec n) = n
 parsecsToMeters :: Parsec -> Number
 parsecsToMeters (Parsec n) = n * metersPerParsec
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // astronomical unit
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // astronomical unit
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Astronomical Unit - mean sun-earth distance (exact by definition)
 newtype AstronomicalUnit = AstronomicalUnit Number
@@ -198,9 +198,9 @@ unwrapAU (AstronomicalUnit n) = n
 auToMeters :: AstronomicalUnit -> Number
 auToMeters (AstronomicalUnit n) = n * metersPerAU
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // kiloparsec
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // kiloparsec
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Kiloparsec - 1000 parsecs (galactic scale)
 newtype Kiloparsec = Kiloparsec Number
@@ -223,9 +223,9 @@ unwrapKiloparsec (Kiloparsec n) = n
 kiloparsecsToMeters :: Kiloparsec -> Number
 kiloparsecsToMeters (Kiloparsec n) = n * metersPerParsec * 1000.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // megaparsec
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // megaparsec
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Megaparsec - 1 million parsecs (intergalactic scale)
 newtype Megaparsec = Megaparsec Number
@@ -248,9 +248,9 @@ unwrapMegaparsec (Megaparsec n) = n
 megaparsecsToMeters :: Megaparsec -> Number
 megaparsecsToMeters (Megaparsec n) = n * metersPerParsec * 1.0e6
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // light second
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // light second
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Light second - distance light travels in one second
 newtype LightSecond = LightSecond Number
@@ -273,9 +273,9 @@ unwrapLightSecond (LightSecond n) = n
 lightSecondsToMeters :: LightSecond -> Number
 lightSecondsToMeters (LightSecond n) = n * speedOfLight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // light minute
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // light minute
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Light minute - distance light travels in one minute
 newtype LightMinute = LightMinute Number
@@ -298,9 +298,9 @@ unwrapLightMinute (LightMinute n) = n
 lightMinutesToMeters :: LightMinute -> Number
 lightMinutesToMeters (LightMinute n) = n * speedOfLight * 60.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // solar radius
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // solar radius
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Solar radius - radius of the Sun (IAU nominal)
 -- |
@@ -326,9 +326,9 @@ unwrapSolarRadius (SolarRadius n) = n
 solarRadiusToMeters :: SolarRadius -> Number
 solarRadiusToMeters (SolarRadius n) = n * metersPerSolarRadius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // earth radius
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // earth radius
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Earth radius - equatorial radius of Earth (IAU nominal)
 -- |
@@ -354,9 +354,9 @@ unwrapEarthRadius (EarthRadius n) = n
 earthRadiusToMeters :: EarthRadius -> Number
 earthRadiusToMeters (EarthRadius n) = n * metersPerEarthRadius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // lunar distance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // lunar distance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Lunar distance - mean distance from Earth to Moon
 -- |

@@ -104,9 +104,9 @@ module Hydrogen.GPU.Precision.NVFP4
   , defaultTensorScaleDivisor
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -141,9 +141,9 @@ import Data.Number (abs) as Number
 import Data.Number as Number
 import Data.Foldable (sum, foldl)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // fp4 e2m1 type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // fp4 e2m1 type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FP4 E2M1 representable values (unsigned)
 -- |
@@ -225,9 +225,9 @@ signedFP4ToNumber sfp4 =
        Positive -> mag
        Negative -> negate mag
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // fp4 quantization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // fp4 quantization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Round a normalized value to the nearest FP4 representation
 -- |
@@ -258,9 +258,9 @@ quantizeToFP4 x =
 dequantizeFP4 :: SignedFP4 -> Number
 dequantizeFP4 = signedFP4ToNumber
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // block scaling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // block scaling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | NVFP4 block size (always 16)
 newtype BlockSize = BlockSize Int
@@ -308,9 +308,9 @@ type BlockScaledFP4 =
 mkBlockScaledFP4 :: Array SignedFP4 -> FP8Scale -> Boolean -> BlockScaledFP4
 mkBlockScaledFP4 values scale usedMax4 = { values, scale, usedMax4 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // tensor scale
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // tensor scale
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tensor-wide scale factor (FP32)
 newtype TensorScale = TensorScale Number
@@ -335,9 +335,9 @@ mkTensorScale maxAbs = TensorScale (maxAbs / defaultTensorScaleDivisor)
 unwrapTensorScale :: TensorScale -> Number
 unwrapTensorScale (TensorScale s) = s
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // four over six core
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // four over six core
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scale mode selection
 data ScaleMode = ScaleMax6 | ScaleMax4
@@ -417,9 +417,9 @@ isBlockBetterWithMax4 :: Array Number -> TensorScale -> Boolean
 isBlockBetterWithMax4 block tensorScale =
   selectScaleMode block tensorScale (foldl (\acc x -> max acc (Number.abs x)) 0.0 block) == ScaleMax4
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // block operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // block operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Quantize a block (standard, max=6)
 quantizeBlock :: Array Number -> TensorScale -> BlockScaledFP4
@@ -438,9 +438,9 @@ dequantizeBlock block tensorScale =
       delta = unwrapFP8Scale block.scale
   in map (\sfp4 -> signedFP4ToNumber sfp4 * delta * alpha) block.values
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // tensor operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // tensor operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | NVFP4 quantized tensor
 type NVFP4Tensor =
@@ -475,9 +475,9 @@ chunksOf n arr =
   else case Array.splitAt n arr of
          { before, after } -> [before] <> chunksOf n after
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // precision analysis
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // precision analysis
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Maximum quantization error in a block
 maxFP4Error :: Array Number -> Array Number -> Number

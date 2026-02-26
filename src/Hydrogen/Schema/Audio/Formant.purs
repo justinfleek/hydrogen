@@ -132,9 +132,9 @@ import Prelude
 
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // formant frequencies
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | F1 - First formant frequency in Hz.
 -- | Corresponds to tongue height: low F1 = close (high tongue),
@@ -238,9 +238,9 @@ f5 n
 unwrapF5 :: F5 -> Number
 unwrapF5 (F5 n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // formant bandwidth
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // formant bandwidth
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FormantBandwidth - width of formant resonance in Hz.
 -- | Narrow bandwidths = more resonant, nasal quality.
@@ -275,9 +275,9 @@ bandwidthMedium = FormantBandwidth 120.0
 bandwidthWide :: FormantBandwidth
 bandwidthWide = FormantBandwidth 200.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // formant amplitude
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // formant amplitude
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FormantAmplitude - relative amplitude of a formant.
 -- | 0.0 = silent, 1.0 = full amplitude.
@@ -300,9 +300,9 @@ formantAmplitude n
 unwrapFormantAmplitude :: FormantAmplitude -> Number
 unwrapFormantAmplitude (FormantAmplitude n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // vowel features
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // vowel features
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VowelHeight - tongue height position.
 -- | Corresponds inversely to F1 frequency.
@@ -363,9 +363,9 @@ vowelRoundingName :: VowelRounding -> String
 vowelRoundingName RoundingUnrounded = "Unrounded"
 vowelRoundingName RoundingRounded = "Rounded"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // ipa vowels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | IPAVowel - Standard IPA vowel phonemes.
 -- | Each has defined formant frequencies for synthesis.
@@ -443,9 +443,9 @@ ipaVowelToFormants VowelUpsilon = { f1: F1 440.0, f2: F2 1020.0, f3: F3 2240.0 }
 ipaVowelToFormants VowelWedge = { f1: F1 640.0, f2: F2 1190.0, f3: F3 2390.0 }
 ipaVowelToFormants VowelAsh = { f1: F1 730.0, f2: F2 1090.0, f3: F3 2440.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // formant set molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // formant set molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FormantSet - Complete set of formant frequencies for synthesis.
 -- | Includes frequencies, bandwidths, and amplitudes for five formants.
@@ -484,9 +484,9 @@ formantSetFromVowel v =
   let formants = ipaVowelToFormants v
   in formantSet formants.f1 formants.f2 formants.f3
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // vowel molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vowel - Complete vowel specification.
 -- | Combines articulatory features with acoustic formants.
@@ -565,9 +565,9 @@ vowelFromIPA v =
     inferRoundingFromIPA VowelUpsilon = RoundingRounded
     inferRoundingFromIPA _ = RoundingUnrounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // vocal tract
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // vocal tract
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TractLength - vocal tract length in cm.
 -- | Affects all formant frequencies (shorter tract = higher formants).
@@ -602,9 +602,9 @@ tractLengthFemale = TractLength 14.0
 tractLengthChild :: TractLength
 tractLengthChild = TractLength 10.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // vocoder parameters
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // vocoder parameters
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VocoderBands - number of frequency bands in vocoder.
 -- | More bands = higher resolution but more computation.
@@ -648,9 +648,9 @@ formantShift n
 unwrapFormantShift :: FormantShift -> Number
 unwrapFormantShift (FormantShift n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for F1
 -- |

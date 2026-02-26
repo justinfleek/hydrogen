@@ -57,9 +57,9 @@ module Hydrogen.Element.Compound.Carousel.Render.Content
   , showContentKind
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Show
@@ -103,9 +103,9 @@ import Hydrogen.Element.Compound.Carousel.Types
       )
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // main content render
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // main content render
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render slide content based on ContentKind
 renderSlideContent :: forall msg. SlideData -> E.Element msg
@@ -141,9 +141,9 @@ renderCaption slideData' =
     Nothing ->
       E.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // image content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // image content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render image content
 renderImageContent :: forall msg. SlideData -> E.Element msg
@@ -166,9 +166,9 @@ renderImageContent slideData' =
         [ E.class_ "carousel-image carousel-svg-container" ]
         [ E.text svgContent ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // video content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // video content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render video content with controls
 renderVideoContent :: forall msg. SlideData -> E.Element msg
@@ -193,9 +193,9 @@ renderVideoContent slideData' =
         [ E.class_ "carousel-video-placeholder" ]
         [ E.text slideData'.alt ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // audio content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // audio content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render audio content with visualization placeholder
 renderAudioContent :: forall msg. SlideData -> E.Element msg
@@ -222,9 +222,9 @@ renderAudioContent slideData' =
           E.empty
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // embed content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // embed content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render embed content (iframe for YouTube, Vimeo, etc.)
 renderEmbedContent :: forall msg. SlideData -> E.Element msg
@@ -256,9 +256,9 @@ renderEmbedContent slideData' =
         [ E.class_ "carousel-embed-placeholder" ]
         [ E.text slideData'.alt ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // text content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // text content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render text content (rich text block)
 renderTextContent :: forall msg. SlideData -> E.Element msg
@@ -271,9 +271,9 @@ renderTextContent slideData' =
         [ E.text (getSourceText slideData'.source) ]
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // card content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // card content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render card content (structured card)
 renderCardContent :: forall msg. SlideData -> E.Element msg
@@ -286,9 +286,9 @@ renderCardContent slideData' =
         [ E.text (getSourceText slideData'.source) ]
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // html content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // html content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render arbitrary HTML content
 renderHTMLContent :: forall msg. SlideData -> E.Element msg
@@ -297,9 +297,9 @@ renderHTMLContent slideData' =
     [ E.class_ "carousel-html" ]
     [ E.text (getSourceText slideData'.source) ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // canvas content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // canvas content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render canvas placeholder (2D rendering handled by runtime)
 renderCanvasContent :: forall msg. SlideData -> E.Element msg
@@ -321,9 +321,9 @@ renderWebGLContent slideData' =
     ]
     []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // game content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // game content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render game/simulation placeholder (handled by runtime)
 renderGameContent :: forall msg. SlideData -> E.Element msg
@@ -362,9 +362,9 @@ renderInteractiveContent slideData' =
     ]
     [ E.text slideData'.alt ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract text from content source
 getSourceText :: ContentSource -> String
@@ -423,9 +423,9 @@ containsSubstring (Pattern needle) haystack =
       | String.take (String.length needle) (String.drop idx haystack) == needle = true
       | otherwise = checkFrom (idx + 1) maxI
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // debug
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // debug
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate debug info for a slide (useful for development/logging)
 -- | Uses Show constraint to format any showable content metadata

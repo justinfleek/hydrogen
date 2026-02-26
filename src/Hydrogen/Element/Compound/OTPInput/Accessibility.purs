@@ -96,9 +96,9 @@ import Hydrogen.Element.Compound.OTPInput.Types
   , unwrapDigitCount
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // container accessibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // container accessibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get accessibility attributes for the OTP container
 getContainerA11yAttrs 
@@ -120,9 +120,9 @@ getGroupLabel :: OTPDigitCount -> String
 getGroupLabel count =
   "One-time password input with " <> show (unwrapDigitCount count) <> " digits"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // digit accessibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get accessibility attributes for a single digit input
 getDigitA11yAttrs 
@@ -164,9 +164,9 @@ getDigitLabel :: OTPIndex -> OTPDigitCount -> String
 getDigitLabel idx count =
   "Digit " <> show (unwrapOTPIndex idx + 1) <> " of " <> show (unwrapDigitCount count)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // state announcements
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // state announcements
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get state-related accessibility attributes
 -- |
@@ -207,9 +207,9 @@ getErrorA11yAttrs errorMsg instanceId =
 getSuccessA11yAttrs :: forall msg. Array (E.Attribute msg)
 getSuccessA11yAttrs = []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // live region helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // live region helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get attributes for a live region that announces state changes
 getLiveRegionAttrs :: forall msg. OTPState -> Array (E.Attribute msg)
@@ -251,9 +251,9 @@ getAnnouncementText state errorMsg =
         Nothing -> "Code verification failed"
         Just msg -> msg
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // ids for aria relationships
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // ids for aria relationships
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate error message element ID
 getErrorMessageId :: String -> String
@@ -268,9 +268,9 @@ getDigitId instanceId idx =
 getGroupId :: String -> String
 getGroupId instanceId = instanceId <> "-group"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // reduced motion support
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // reduced motion support
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get accessibility attributes for reduced motion preference.
 -- |
@@ -297,9 +297,9 @@ getMotionSafeStyles reducedMotion durationMs =
     then "0ms"
     else show durationMs <> "ms"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // keyboard navigation hints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // keyboard navigation hints
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get keyboard hint text for screen readers.
 -- |
@@ -346,9 +346,9 @@ getFocusTrapAttrs trapFocus =
     else 
       [ E.dataAttr "focus-trap" "false" ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // timer/expiration support
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // timer/expiration support
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get accessibility attributes for timer/countdown display.
 -- |
@@ -386,9 +386,9 @@ formatTimeRemaining seconds
       in
         show mins <> " minutes and " <> show secs <> " seconds"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // auto-advance behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // auto-advance behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get hint text explaining auto-advance behavior.
 -- |
@@ -408,9 +408,9 @@ getAutoAdvanceAttrs autoAdvance =
   , E.attr "aria-owns" ""  -- Will be populated with digit IDs
   ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // screen reader instructions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // screen reader instructions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get comprehensive screen reader instructions element content.
 -- |

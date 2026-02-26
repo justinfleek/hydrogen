@@ -101,9 +101,9 @@ module Hydrogen.Schema.Geometry.Transform3D
   , orbitAround
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -132,9 +132,9 @@ import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Geometry.Angle (Degrees, degrees, unwrapDegrees, addAngle)
 import Hydrogen.Schema.Geometry.Point (Point3D(Point3D), point3D)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // translate3d
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // translate3d
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 3D translation in pixels.
 newtype Translate3D = Translate3D { x :: Number, y :: Number, z :: Number }
@@ -187,9 +187,9 @@ translate3DToLegacyCss :: Translate3D -> String
 translate3DToLegacyCss (Translate3D t) =
   "translate3d(" <> show t.x <> "px, " <> show t.y <> "px, " <> show t.z <> "px)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // rotate3d
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // rotate3d
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 3D rotation using Euler angles (X, Y, Z rotations).
 -- |
@@ -258,9 +258,9 @@ rotate3DToLegacyCss (Rotate3D r) =
   in
     joinParts parts
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // scale3d
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // scale3d
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 3D scale with bounded values (-10.0 to 10.0).
 newtype Scale3D = Scale3D { x :: Number, y :: Number, z :: Number }
@@ -334,9 +334,9 @@ scale3DBounds :: Bounded.NumberBounds
 scale3DBounds = Bounded.numberBounds (-10.0) 10.0 "Scale3D"
   "3D scale factor per axis, allowing inversion via negative values"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // perspective
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // perspective
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Perspective depth in pixels.
 -- |
@@ -384,9 +384,9 @@ perspectiveBounds :: Bounded.NumberBounds
 perspectiveBounds = Bounded.numberBounds 1.0 10000.0 "Perspective"
   "Perspective depth in pixels controlling 3D foreshortening"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // perspective origin
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // perspective origin
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Perspective origin (vanishing point) in percentages.
 newtype PerspectiveOrigin = PerspectiveOrigin { x :: Number, y :: Number }
@@ -418,9 +418,9 @@ perspectiveOriginToLegacyCss :: PerspectiveOrigin -> String
 perspectiveOriginToLegacyCss (PerspectiveOrigin o) =
   show o.x <> "% " <> show o.y <> "%"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // composed transform3d
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // composed transform3d
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete 3D transform.
 newtype Transform3D = Transform3D
@@ -501,9 +501,9 @@ transform3DToLegacyCss (Transform3D t) =
   in
     joinParts parts
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // camera utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // camera utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute rotation to look at a target point from current position.
 -- |
@@ -542,9 +542,9 @@ orbitAround (Point3D center) radius angle =
   in
     point3D x center.y z
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Maybe to singleton or empty array
 maybeToArray :: forall a. Maybe a -> Array a

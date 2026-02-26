@@ -81,9 +81,9 @@ import Effect.Ref (Ref)
 import Effect.Ref as Ref
 import Foreign.Object as Object
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | I18n instance
 newtype I18n = I18n
@@ -110,9 +110,9 @@ type TranslationKey = String
 -- | Translations map: locale -> key -> value
 type Translations = Map.Map Locale (Map.Map TranslationKey String)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // initialization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // initialization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default configuration
 defaultConfig :: I18nConfig
@@ -145,9 +145,9 @@ createWithLoader config _loader = do
   -- Start with empty translations, load on demand
   create config Map.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // translation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // translation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Translate a key
 t :: I18n -> TranslationKey -> Effect String
@@ -208,9 +208,9 @@ interpolate prefix suffix template values =
   replaceOne pattern replacement str = 
     String.replaceAll (String.Pattern pattern) (String.Replacement replacement) str
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // locale management
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // locale management
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current locale
 getLocale :: I18n -> Effect Locale
@@ -245,9 +245,9 @@ onLocaleChange (I18n { listeners }) callback = do
   Ref.modify_ (flip Array.snoc sub) listeners
   pure $ Ref.modify_ (Array.filter (\s -> s.id /= nextId)) listeners
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // formatting
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format a number according to locale
 formatNumber :: I18n -> Number -> Effect String
@@ -279,9 +279,9 @@ foreign import formatCurrencyImpl :: Locale -> Number -> String -> String
 foreign import formatDateImpl :: Locale -> String -> String -> String
 foreign import formatRelativeTimeImpl :: Locale -> Int -> String -> String
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a translation exists
 hasTranslation :: I18n -> TranslationKey -> Effect Boolean

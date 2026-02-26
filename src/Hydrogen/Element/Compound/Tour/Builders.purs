@@ -60,9 +60,9 @@ module Hydrogen.Element.Compound.Tour.Builders
   , byMultiple
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( map
@@ -99,9 +99,9 @@ import Hydrogen.Element.Compound.Tour.Highlight
   ( Opacity
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // step builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // step builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set tour steps.
 steps :: forall msg. Array Step -> TourProp msg
@@ -143,9 +143,9 @@ goToStep idx props = props
   , history = Array.snoc props.history props.currentStepIndex
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // event handlers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set next step handler.
 onNext :: forall msg. msg -> TourProp msg
@@ -183,9 +183,9 @@ onKeyboardEvent f props = props { onKeyboardEvent = Just f }
 onProgressDotClick :: forall msg. (StepIndex -> msg) -> TourProp msg
 onProgressDotClick f props = props { onProgressDotClick = Just f }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // display options
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // display options
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Show/hide progress indicator.
 showProgress :: forall msg. Boolean -> TourProp msg
@@ -203,9 +203,9 @@ showNavigation s props = props { showNavigation = s }
 placement :: forall msg. Placement -> TourProp msg
 placement p props = props { placement = p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set scroll behavior.
 scrollBehavior :: forall msg. ScrollBehavior -> TourProp msg
@@ -223,17 +223,17 @@ closeOnOverlayClick c props = props { closeOnOverlayClick = c }
 closeOnEscape :: forall msg. Boolean -> TourProp msg
 closeOnEscape c props = props { closeOnEscape = c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // persistence
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set localStorage key for persistence.
 persistKey :: forall msg. String -> TourProp msg
 persistKey k props = props { persistKey = Just k }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // accessibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // accessibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set accessible label.
 ariaLabel :: forall msg. String -> TourProp msg
@@ -243,9 +243,9 @@ ariaLabel l props = props { ariaLabel = l }
 announceSteps :: forall msg. Boolean -> TourProp msg
 announceSteps a props = props { announceSteps = a }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // styling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // styling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add custom CSS class.
 className :: forall msg. String -> TourProp msg
@@ -259,9 +259,9 @@ overlayOpacity o props = props { overlayOpacity = o }
 spotlightPadding :: forall msg. Int -> TourProp msg
 spotlightPadding p props = props { spotlightPadding = p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // target builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // target builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | No target (centered modal).
 noTarget :: TargetKind

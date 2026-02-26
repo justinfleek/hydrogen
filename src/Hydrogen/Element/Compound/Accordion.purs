@@ -132,9 +132,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // container props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // container props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Accordion container properties
 type AccordionProps msg =
@@ -169,9 +169,9 @@ accordionReducedMotion r props = props { reducedMotion = r }
 extraAttributes :: forall msg. Array (E.Attribute msg) -> AccordionProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // item props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Accordion item properties
 type ItemProps msg =
@@ -216,9 +216,9 @@ itemBorderWidth w props = props { borderWidth = Just w }
 itemExtraAttributes :: forall msg. Array (E.Attribute msg) -> ItemProp msg
 itemExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // trigger props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Accordion trigger properties
 type TriggerProps msg =
@@ -369,9 +369,9 @@ onTriggerKeyDown handler props = props { onKeyDown = Just handler }
 triggerExtraAttributes :: forall msg. Array (E.Attribute msg) -> TriggerProp msg
 triggerExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // content props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Accordion content properties
 type ContentProps msg =
@@ -462,9 +462,9 @@ contentReducedMotion r props = props { reducedMotion = r }
 contentExtraAttributes :: forall msg. Array (E.Attribute msg) -> ContentProp msg
 contentExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // accordion container
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // accordion container
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the accordion container
 -- |
@@ -493,9 +493,9 @@ accordion propMods children =
       )
       children
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // accordion item
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // accordion item
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an accordion item (section)
 item :: forall msg. Array (ItemProp msg) -> Array (E.Element msg) -> E.Element msg
@@ -521,9 +521,9 @@ item propMods children =
       )
       children
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // accordion trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an accordion trigger (clickable header)
 trigger :: forall msg. Array (TriggerProp msg) -> Array (E.Element msg) -> E.Element msg
@@ -694,9 +694,9 @@ chevronIcon props =
           [ E.attr "points" "6 9 12 15 18 9" ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // accordion content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render accordion content (collapsible area)
 content :: forall msg. Array (ContentProp msg) -> Array (E.Element msg) -> E.Element msg

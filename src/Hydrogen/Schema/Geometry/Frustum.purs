@@ -95,9 +95,9 @@ import Hydrogen.Schema.Geometry.Sphere
   , getRadiusSphere
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A view frustum defined by six clipping planes.
 -- |
@@ -119,9 +119,9 @@ instance showFrustum :: Show Frustum where
     " near:" <> show near <>
     " far:" <> show far <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a frustum from six planes
 frustum :: Plane -> Plane -> Plane -> Plane -> Plane -> Plane -> Frustum
@@ -143,9 +143,9 @@ frustumDefault = Frustum
 frustumFromPlanes :: Plane -> Plane -> Plane -> Plane -> Plane -> Plane -> Frustum
 frustumFromPlanes = Frustum
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // plane access
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // plane access
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the left clipping plane
 -- | Proof reference: Frustum.lean getPlane_left
@@ -183,9 +183,9 @@ getAllPlanes :: Frustum -> Array Plane
 getAllPlanes (Frustum left right top bottom near far) =
   [left, right, top, bottom, near, far]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // containment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // containment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a point is on the positive side of a plane (inside halfspace)
 -- | Proof reference: Frustum.lean inHalfspace
@@ -203,9 +203,9 @@ containsPointFrustum (Frustum left right top bottom near far) p =
   inHalfspace near p &&
   inHalfspace far p
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // sphere intersection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // sphere intersection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a sphere is completely outside a plane (in negative halfspace)
 -- | Proof reference: Frustum.lean sphereOutsidePlane
@@ -225,9 +225,9 @@ intersectsSphereFrustum (Frustum left right top bottom near far) s =
   not (sphereOutsidePlane near s) &&
   not (sphereOutsidePlane far s)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // box intersection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // box intersection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the "positive vertex" of a box relative to a plane normal.
 -- | This is the box vertex furthest in the direction of the plane normal.

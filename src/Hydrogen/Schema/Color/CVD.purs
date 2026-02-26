@@ -74,9 +74,9 @@ import Hydrogen.Schema.Color.Channel as Ch
 import Hydrogen.Schema.Color.Contrast as Contrast
 import Data.Int (toNumber, round) as Int
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // cvd type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // cvd type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Types of color vision deficiency
 data CVDType
@@ -127,9 +127,9 @@ cvdPrevalence = case _ of
   -- Complete color blindness (monochromacy)
   Achromatopsia -> { males: 0.003, females: 0.003 } -- No color at all (~1 in 33,000)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // accessibility issue
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // accessibility issue
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Single accessibility issue for one CVD type
 type AccessibilityIssue =
@@ -147,9 +147,9 @@ type AccessibilityIssue =
 -- | The list is never empty if Left - at least one CVD type must fail.
 type AccessibilityReport = Either (Array AccessibilityIssue) Unit
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // simulation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // simulation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Simulate how a color appears with a given CVD type
 -- |
@@ -171,9 +171,9 @@ simulateCVD cvdType color = case cvdType of
   Tritanomaly -> applyMatrix tritanomalyMatrix color
   Achromatopsia -> toGrayscale color
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // distinguishability
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // distinguishability
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if two colors are distinguishable for a given CVD type
 -- |
@@ -317,9 +317,9 @@ cvdSafeContrast fg bg =
     minimum [] = 1.0
     minimum xs = foldr min 21.0 xs
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // internal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // internal
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Apply a 3x3 transformation matrix to RGB color
 applyMatrix :: Matrix3x3 -> RGB.RGB -> RGB.RGB

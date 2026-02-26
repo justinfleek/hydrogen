@@ -43,9 +43,9 @@ module Hydrogen.Element.Compound.Carousel.Render.Effects
   , interpolateEffect
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -88,9 +88,9 @@ import Hydrogen.Element.Compound.Carousel.Effects
   , isEffectEnabled
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // position computation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // position computation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute slide position relative to active slide
 computeSlidePosition :: CarouselState -> Int -> SlidePosition
@@ -127,9 +127,9 @@ positionOffset PositionNext = 1
 positionOffset (PositionNearby n) = n
 positionOffset PositionOffscreen = 100  -- Large value indicating far away
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // effect styles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // effect styles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute effect styles based on slide position
 computeEffectStyles :: SlideEffects -> SlidePosition -> Array (Tuple String String)
@@ -179,9 +179,9 @@ computeEffectStyles effects position =
     
   in opacityStyle <> transformStyle <> perspectiveStyle <> filterStyle <> glowStyle
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // transform components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // transform components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute transform CSS components (scale, rotation)
 computeTransformComponents :: SlideEffects -> SlidePosition -> Array String
@@ -226,9 +226,9 @@ computeTransformComponents effects position =
     
   in scaleComponent <> rotationComponent
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // filter components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // filter components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute filter CSS components (blur, grayscale)
 computeFilterComponents :: SlideEffects -> SlidePosition -> Array String
@@ -250,9 +250,9 @@ computeFilterComponents effects position =
     
   in blurComponent <> grayscaleComponent
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Simple power function for falloff calculations
 pow :: Number -> Number -> Number

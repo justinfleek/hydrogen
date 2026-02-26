@@ -80,9 +80,9 @@ import Data.Int (toNumber)
 import Data.Array (length)
 import Data.Foldable (foldl)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // animation ref
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // animation ref
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AnimationRef - reference to an animation with its duration.
 type AnimationRef =
@@ -109,9 +109,9 @@ animationRefDuration a = a.durationMs
 showAnimationRef :: AnimationRef -> String
 showAnimationRef a = "(AnimationRef " <> a.id <> " " <> show a.durationMs <> "ms)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // sequence
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // sequence
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sequence - animations that play one after another.
 type Sequence =
@@ -148,9 +148,9 @@ showSequence s =
   "(Sequence " <> show (length s.animations) <> " anims, " <>
   show s.delayBetween <> "ms delay, total=" <> show (sequenceTotalDuration s) <> "ms)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // parallel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // parallel
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Parallel - animations that play simultaneously.
 type Parallel =
@@ -175,9 +175,9 @@ showParallel p =
   "(Parallel " <> show (length p.animations) <> " anims, " <>
   "duration=" <> show (parallelDuration p) <> "ms)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // stagger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // stagger
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Stagger - animations with incremental start delays.
 type Stagger =
@@ -220,9 +220,9 @@ showStagger s =
   "(Stagger " <> show (length s.animations) <> " anims, " <>
   show s.delayIncrement <> "ms increment, total=" <> show (staggerTotalDuration s) <> "ms)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // fill mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // fill mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FillMode - what happens before/after animation.
 data FillMode
@@ -244,9 +244,9 @@ fillModeLabel FillForwards = "forwards"
 fillModeLabel FillBackwards = "backwards"
 fillModeLabel FillBoth = "both"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // transition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // transition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Transition - CSS transition definition.
 type Transition =
@@ -287,9 +287,9 @@ showTransition t =
   "(Transition " <> t.property <> " " <> show t.durationMs <> "ms " <>
   t.easing <> " delay=" <> show t.delayMs <> "ms)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // animation group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // animation group
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | AnimationGroup - union of composition types.
 data AnimationGroup
@@ -310,9 +310,9 @@ groupDuration (GroupSequence s) = sequenceTotalDuration s
 groupDuration (GroupParallel p) = parallelDuration p
 groupDuration (GroupStagger s) = staggerTotalDuration s
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 intToNumber :: Int -> Number
 intToNumber = toNumber

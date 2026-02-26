@@ -56,9 +56,9 @@ module Hydrogen.Schema.Motion.Camera3D
   , module Hydrogen.Schema.Motion.Camera3D.Keyframe
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // re-exports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // re-exports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Motion.Camera3D.Enums
   ( CameraType(CTOneNode, CTTwoNode)

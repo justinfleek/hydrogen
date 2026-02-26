@@ -72,9 +72,9 @@ import Prelude
 
 import Data.Maybe (Maybe)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // credential type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // credential type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CredentialType - common credential types.
 data CredentialType
@@ -108,9 +108,9 @@ credentialTypeLabel HealthCredential = "HealthCredential"
 credentialTypeLabel LicenseCredential = "LicenseCredential"
 credentialTypeLabel (CustomCredential t) = t
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // credential status
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // credential status
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CredentialStatus - revocation status.
 data CredentialStatus
@@ -132,9 +132,9 @@ credentialStatusLabel StatusRevoked = "revoked"
 credentialStatusLabel StatusSuspended = "suspended"
 credentialStatusLabel StatusExpired = "expired"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // proof type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // proof type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ProofType - cryptographic proof types.
 data ProofType
@@ -158,9 +158,9 @@ proofTypeLabel JsonWebSignature2020 = "JsonWebSignature2020"
 proofTypeLabel BbsBlsSignature2020 = "BbsBlsSignature2020"
 proofTypeLabel BbsBlsSignatureProof2020 = "BbsBlsSignatureProof2020"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // proof
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // proof
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Proof - cryptographic proof for credential.
 type Proof =
@@ -201,9 +201,9 @@ proofProofPurpose p = p.proofPurpose
 proofProofValue :: Proof -> String
 proofProofValue p = p.proofValue
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // credential subject
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // credential subject
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CredentialSubject - who the credential is about.
 type CredentialSubject =
@@ -223,9 +223,9 @@ subjectId s = s.id
 subjectClaims :: CredentialSubject -> Array { key :: String, value :: String }
 subjectClaims s = s.claims
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // verifiable credential
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // verifiable credential
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VerifiableCredential - W3C VC 1.1 compliant credential.
 type VerifiableCredential =
@@ -292,9 +292,9 @@ vcProof vc = vc.proof
 vcStatus :: VerifiableCredential -> Maybe CredentialStatus
 vcStatus vc = vc.credentialStatus
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // verifiable presentation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // verifiable presentation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VerifiablePresentation - collection of credentials presented together.
 type VerifiablePresentation =

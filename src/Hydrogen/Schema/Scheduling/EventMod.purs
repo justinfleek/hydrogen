@@ -65,9 +65,9 @@ import Hydrogen.Schema.Temporal.Timezone as Timezone
 import Hydrogen.Schema.Temporal.TimeOfDay (TimeOfDay)
 import Hydrogen.Schema.Temporal.TimeOfDay as TimeOfDay
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // modifiers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set the event location
 setLocation :: Event -> Location -> Event
@@ -97,9 +97,9 @@ setRecurrence (Event e) rec = Event (e { recurrence = Just rec })
 cancel :: Event -> Event
 cancel (Event e) = Event (e { status = Cancelled })
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // offset operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get start time as UTC offset in minutes from midnight
 getStartOffsetMinutes :: Event -> Int
@@ -125,9 +125,9 @@ getEndOffsetMinutes e =
 getTimezoneOffset :: Event -> UtcOffset
 getTimezoneOffset e = Timezone.getStandardOffset (getTimezone e)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // display
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // display
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Human-readable display string
 toDisplayString :: Event -> String
@@ -148,9 +148,9 @@ toICalString e =
   "CLASS:" <> visibilityToICalString (getVisibility e) <> "\r\n" <>
   "END:VEVENT\r\n"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // formatting helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format datetime for display
 formatDateTimeShort :: DateTime -> String
@@ -184,9 +184,9 @@ visibilityToICalString Public = "PUBLIC"
 visibilityToICalString Private = "PRIVATE"
 visibilityToICalString Confidential = "CONFIDENTIAL"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Pad to 2 digits
 padZero :: Int -> String

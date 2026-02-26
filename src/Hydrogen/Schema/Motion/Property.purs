@@ -76,9 +76,9 @@ import Data.Array (null, uncons) as Array
 import Data.String (split) as String
 import Data.String.Pattern (Pattern(Pattern))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // property // value // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // property // value // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of value a property can hold.
 -- |
@@ -124,9 +124,9 @@ isPropertyValueVector PVTPosition = true
 isPropertyValueVector PVTVector3 = true
 isPropertyValueVector _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // expression // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // expression // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of expression that can be applied to a property.
 -- |
@@ -257,9 +257,9 @@ isExpressionTypeTime ETNoise = true
 isExpressionTypeTime ETSimplexNoise = true
 isExpressionTypeTime _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // property // expression
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // property // expression
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Property expression for procedural animation.
 -- |
@@ -291,9 +291,9 @@ defaultPropertyExpression = PropertyExpression
 propertyExpressionEnabled :: PropertyExpression -> Boolean
 propertyExpressionEnabled (PropertyExpression e) = e.enabled
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                              // animatable // property // id
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // animatable // property // id
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for an animatable property.
 -- |
@@ -316,9 +316,9 @@ mkAnimatablePropertyId s = Just (AnimatablePropertyId s)
 unwrapAnimatablePropertyId :: AnimatablePropertyId -> String
 unwrapAnimatablePropertyId (AnimatablePropertyId s) = s
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // animatable // property
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // animatable // property
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | An animatable property on a layer.
 -- |
@@ -381,9 +381,9 @@ propertyHasExpression (AnimatableProperty p) =
     Just (PropertyExpression e) -> e.enabled
     Nothing -> false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // property // group
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // property // group
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Group of related properties.
 -- |
@@ -408,9 +408,9 @@ propertyGroupName (PropertyGroup g) = g.name
 propertyGroupProperties :: PropertyGroup -> Array AnimatableProperty
 propertyGroupProperties (PropertyGroup g) = g.properties
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // property // path
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // property // path
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Path to a property in the property tree.
 -- |

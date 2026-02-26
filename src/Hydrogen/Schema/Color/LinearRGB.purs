@@ -123,9 +123,9 @@ import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbToRecord) as RGB
 import Hydrogen.Schema.Color.RGB (RGBA, rgba, rgbaToRecord) as RGBA
 import Hydrogen.Schema.Color.Opacity (Opacity, opacity, toUnitInterval, fromUnitInterval) as Op
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // linear channel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // linear channel
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear-light channel value (0.0-1.0, can exceed for HDR)
 -- |
@@ -154,9 +154,9 @@ linearChannelSafe n
 unwrapLinearChannel :: LinearChannel -> Number
 unwrapLinearChannel (LinearChannel n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // linear channel operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // linear channel operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blend two linear channels (correct in linear space)
 linearChannelBlend :: Number -> LinearChannel -> LinearChannel -> LinearChannel
@@ -172,9 +172,9 @@ linearChannelScale factor (LinearChannel n) = linearChannel (n * factor)
 linearChannelAdd :: LinearChannel -> LinearChannel -> LinearChannel
 linearChannelAdd (LinearChannel a) (LinearChannel b) = linearChannel (a + b)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // linear rgb
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // linear rgb
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear RGB color (pre-gamma, for math operations)
 -- |
@@ -224,9 +224,9 @@ linearRGBToRecord (LinearRGB c) =
   , b: unwrapLinearChannel c.b
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // linear rgba
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // linear rgba
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear RGBA color (pre-gamma with alpha)
 newtype LinearRGBA = LinearRGBA
@@ -270,9 +270,9 @@ linearRGBAToRecord (LinearRGBA c) =
   , a: Op.toUnitInterval c.a
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // srgb conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // srgb conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert sRGB (gamma-encoded) to LinearRGB
 -- |
@@ -334,9 +334,9 @@ linearToSrgbChannel lin
   | lin <= 0.0031308 = lin * 12.92
   | otherwise = 1.055 * Math.pow lin (1.0 / 2.4) - 0.055
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blend two LinearRGB colors (correct in linear space!)
 -- |
@@ -385,9 +385,9 @@ luminance (LinearRGB c) =
   0.7152 * unwrapLinearChannel c.g +
   0.0722 * unwrapLinearChannel c.b
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // comparison
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // comparison
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if color is black (all channels zero)
 isBlack :: LinearRGB -> Boolean

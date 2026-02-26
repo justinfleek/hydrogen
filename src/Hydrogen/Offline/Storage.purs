@@ -75,9 +75,9 @@ import Prelude
 import Data.Array as Array
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Store name — type alias for clarity
 type StoreName = String
@@ -131,9 +131,9 @@ instance showTransactionMode :: Show TransactionMode where
   show ReadOnly = "ReadOnly"
   show ReadWrite = "ReadWrite"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // storage commands
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Storage command — pure data describing a storage operation
 -- |
@@ -188,9 +188,9 @@ instance showStorageCommand :: Show a => Show (StorageCommand a) where
   show (Keys r) = "Keys { store: " <> r.store <> " }"
   show (Exists r) = "Exists { store: " <> r.store <> ", key: " <> r.key <> " }"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // storage results
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Storage error — pure data
 data StorageError
@@ -234,9 +234,9 @@ instance showStorageResult :: Show a => Show (StorageResult a) where
   show (AllFound as) = "AllFound " <> show as
   show (Error e) = "Error " <> show e
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // command builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // command builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a put command
 put :: forall a. StoreName -> a -> StorageCommand a
@@ -275,9 +275,9 @@ keys store = Keys { store }
 exists :: forall a. StoreName -> StoreKey -> StorageCommand a
 exists store key = Exists { store, key }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // database schema
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // database schema
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Store definition in schema
 type SchemaStore =
@@ -311,9 +311,9 @@ addStoreWithIndexes :: StoreName -> StoreConfig -> Array IndexConfig -> Database
 addStoreWithIndexes name config indexes db =
   db { stores = Array.snoc db.stores { name, config, indexes } }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // transactions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // transactions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Transaction — pure data grouping multiple commands
 type Transaction a =

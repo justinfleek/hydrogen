@@ -54,9 +54,9 @@ import Hydrogen.Schema.Typography.TypeScale as TypeScale
 import Hydrogen.Schema.Typography.TypeStyle (TypeStyle, FontStack)
 import Hydrogen.Schema.Typography.TypeStyle as TypeStyle
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // hierarchy level
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // hierarchy level
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic hierarchy levels
 -- |
@@ -106,9 +106,9 @@ levelStep Small = -1
 levelStep Caption = -2
 levelStep Overline = -2  -- Same size as caption, but different styling
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // type hierarchy
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // type hierarchy
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete typographic hierarchy
 -- |
@@ -132,9 +132,9 @@ derive instance eqTypeHierarchy :: Eq TypeHierarchy
 instance showTypeHierarchy :: Show TypeHierarchy where
   show _ = "TypeHierarchy {...}"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a type hierarchy from explicit styles
 typeHierarchy
@@ -153,9 +153,9 @@ typeHierarchy
   -> TypeHierarchy
 typeHierarchy = TypeHierarchy
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the hero (display) style
 hero :: TypeHierarchy -> TypeStyle
@@ -215,9 +215,9 @@ styleFor Small th = small th
 styleFor Caption th = caption th
 styleFor Overline th = overline th
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for generating a type hierarchy
 type GenerateConfig =
@@ -302,9 +302,9 @@ generate cfg = TypeHierarchy
     LetterSpacing.uppercase
     Uppercase
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // css output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- NOT an FFI boundary - pure string generation.
 -- | Generate CSS custom properties for the hierarchy

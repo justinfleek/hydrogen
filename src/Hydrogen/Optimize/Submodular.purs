@@ -87,9 +87,9 @@ module Hydrogen.Optimize.Submodular
   , module Hydrogen.Optimize.Submodular.Online
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // re-exports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // re-exports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Core types: Element, GroundSet, Matroid, SubmodularOracle, etc.
 import Hydrogen.Optimize.Submodular.Types

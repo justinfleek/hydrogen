@@ -78,9 +78,9 @@ import Hydrogen.Schema.Color.Gradient as Gradient
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Geometry
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | GradientEditor properties
 -- |
@@ -128,9 +128,9 @@ defaultProps =
   , spacing: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set gradient value
 gradient :: forall msg. Gradient.Gradient -> GradientEditorProp msg
@@ -144,9 +144,9 @@ onChange handler props = props { onChange = Just handler }
 showPreview :: forall msg. Boolean -> GradientEditorProp msg
 showPreview s props = props { showPreview = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border color (Color.RGB atom)
 borderColor :: forall msg. Color.RGB -> GradientEditorProp msg
@@ -164,17 +164,17 @@ textColor c props = props { textColor = Just c }
 stopMarkerBorderColor :: forall msg. Color.RGB -> GradientEditorProp msg
 stopMarkerBorderColor c props = props { stopMarkerBorderColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Radius atom)
 borderRadius :: forall msg. Geometry.Radius -> GradientEditorProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set preview section height (Device.Pixel atom)
 previewHeight :: forall msg. Device.Pixel -> GradientEditorProp msg
@@ -196,9 +196,9 @@ padding p props = props { padding = Just p }
 spacing :: forall msg. Device.Pixel -> GradientEditorProp msg
 spacing s props = props { spacing = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // defaults
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // defaults
+-- ═════════════════════════════════════════════════════════════════════════════
 
 defaultBorderColor :: Color.RGB
 defaultBorderColor = Color.rgb 255 255 255
@@ -230,9 +230,9 @@ defaultPadding = Device.px 16.0
 defaultSpacing :: Device.Pixel
 defaultSpacing = Device.px 16.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 getColor :: Maybe Color.RGB -> Color.RGB -> Color.RGB
 getColor maybeColor fallback = maybe fallback (\c -> c) maybeColor
@@ -243,9 +243,9 @@ getPixel maybePixel fallback = maybe fallback (\p -> p) maybePixel
 getRadius :: Maybe Geometry.Radius -> Geometry.Radius -> Geometry.Radius
 getRadius maybeRadius fallback = maybe fallback (\r -> r) maybeRadius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Gradient editor component
 -- |

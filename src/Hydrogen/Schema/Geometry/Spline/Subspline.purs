@@ -38,9 +38,9 @@ import Hydrogen.Schema.Geometry.Spline.Types
   , getBSplinePoints
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // catmull-rom subsplines
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract a subspline from a Catmull-Rom spline.
 -- |
@@ -68,9 +68,9 @@ catmullRomTail (CatmullRomSpline s) =
   in if length pts < 4 then Nothing
      else Just (CatmullRomSpline { points: pts, closed: false, tension: s.tension })
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // b-spline subsplines
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // b-spline subsplines
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract a subspline from a B-spline.
 bSplineSubspline :: Int -> BSpline -> Maybe BSpline

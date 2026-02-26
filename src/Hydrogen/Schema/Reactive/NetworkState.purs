@@ -62,9 +62,9 @@ import Prelude
 import Data.Maybe (Maybe(Nothing))
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // connection status
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Network connection status
 data ConnectionStatus
@@ -92,9 +92,9 @@ isReconnecting :: ConnectionStatus -> Boolean
 isReconnecting Reconnecting = true
 isReconnecting _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // connection type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Physical connection type (Navigator.connection.type)
 data ConnectionType
@@ -134,9 +134,9 @@ isUnknownType :: ConnectionType -> Boolean
 isUnknownType UnknownType = true
 isUnknownType _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // effective connection type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // effective connection type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Effective connection type (Network Information API)
 -- | Based on measured round-trip time and downlink speed
@@ -171,9 +171,9 @@ is4g :: EffectiveType -> Boolean
 is4g Ect4g = true
 is4g _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // latency atoms
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // latency atoms
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Round-trip time in milliseconds (bounded, non-negative)
 newtype RoundTripTime = RoundTripTime Number
@@ -202,9 +202,9 @@ isLowLatency (RoundTripTime ms) = ms < 100.0
 isHighLatency :: RoundTripTime -> Boolean
 isHighLatency (RoundTripTime ms) = ms > 300.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // bandwidth atoms
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Downlink bandwidth in megabits per second
 newtype Downlink = Downlink Number
@@ -233,9 +233,9 @@ isFastDownlink (Downlink mbps) = mbps > 5.0
 isSlowDownlink :: Downlink -> Boolean
 isSlowDownlink (Downlink mbps) = mbps < 1.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // connection quality molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // connection quality molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Connection quality metrics
 type ConnectionQuality =
@@ -278,9 +278,9 @@ isLowQuality q =
 shouldReduceData :: ConnectionQuality -> Boolean
 shouldReduceData q = q.saveData || isLowQuality q
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // network state compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete network state for application
 type NetworkState =
@@ -338,9 +338,9 @@ adaptiveImageQuality ns
   | shouldReduceData ns.quality = 0.5
   | otherwise = 1.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for RoundTripTime [0, 30000] ms
 -- |

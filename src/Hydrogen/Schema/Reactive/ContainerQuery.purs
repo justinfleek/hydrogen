@@ -126,9 +126,9 @@ import Hydrogen.Schema.Reactive.Viewport
   , breakpointMax
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // container type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // container type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How a container's size is measured for queries.
 -- |
@@ -157,9 +157,9 @@ containerTypeToLegacyCss BlockSize = "block-size"
 containerTypeToLegacyCss Size = "size"
 containerTypeToLegacyCss Normal = "normal"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // container definition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // container definition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A generic container (any element).
 type Container =
@@ -202,9 +202,9 @@ containerName qc = qc.name
 containerType :: QueryContainer -> ContainerType
 containerType qc = qc.containerType
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // container query conditions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // container query conditions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A condition for a container query.
 -- |
@@ -283,9 +283,9 @@ aspectRatioMin = AspectRatioMin
 aspectRatioMax :: Number -> QueryCondition
 aspectRatioMax = AspectRatioMax
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // container query
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A complete container query.
 -- |
@@ -319,9 +319,9 @@ queryToLegacyCss cq = case cq.containerName of
   Nothing -> "@container " <> show cq.condition
   Just name -> "@container " <> name <> " " <> show cq.condition
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // container-responsive values
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // container-responsive values
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Specification for container-responsive values.
 -- |
@@ -417,9 +417,9 @@ isAtLeastBreakpoint width bp = width >= breakpointMin bp
 isBelowBreakpoint :: Int -> Breakpoint -> Boolean
 isBelowBreakpoint width bp = width < breakpointMin bp
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // css generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // css generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate CSS for container-type property.
 containerTypeLegacyCss :: QueryContainer -> String

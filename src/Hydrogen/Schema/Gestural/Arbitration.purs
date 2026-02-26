@@ -74,9 +74,9 @@ import Prelude
 import Data.Array (all, any, elem, filter, length, notElem, snoc)
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // gesture // identity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // gesture // identity
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for a gesture recognizer
 newtype GestureId = GestureId String
@@ -95,9 +95,9 @@ gestureId = GestureId
 unwrapGestureId :: GestureId -> String
 unwrapGestureId (GestureId id) = id
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // gesture // priority
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // gesture // priority
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Priority levels for gesture recognition
 data GesturePriority
@@ -125,9 +125,9 @@ comparePriority = compare
 higherPriority :: GesturePriority -> GesturePriority -> Boolean
 higherPriority a b = a > b
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // recognition // policy
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // recognition // policy
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How gesture interacts with others
 data RecognitionPolicy
@@ -155,9 +155,9 @@ allowsSimultaneous :: RecognitionPolicy -> Boolean
 allowsSimultaneous Simultaneous = true
 allowsSimultaneous _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // failure // requirement
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // failure // requirement
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Gestures that must fail before this one can begin
 type FailureRequirement =
@@ -181,9 +181,9 @@ requiredFailures fr = fr.required
 isFailureRequired :: GestureId -> FailureRequirement -> Boolean
 isFailureRequired gid fr = elem gid fr.required
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // gesture // relationship
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // gesture // relationship
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Relationship between two gestures
 type GestureRelationship =
@@ -226,9 +226,9 @@ shouldRequireFailure gr = gr.aRequiresBFailure
 shouldBeRequired :: GestureRelationship -> Boolean
 shouldBeRequired gr = gr.bRequiresAFailure
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // arbiter // decision
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // arbiter // decision
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Decision from arbiter
 data ArbiterDecision
@@ -261,9 +261,9 @@ isDeferred :: ArbiterDecision -> Boolean
 isDeferred Defer = true
 isDeferred _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // gesture // registration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // gesture // registration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Registration info for a gesture
 type GestureRegistration =
@@ -298,9 +298,9 @@ registrationPolicy gr = gr.policy
 registrationFailures :: GestureRegistration -> FailureRequirement
 registrationFailures gr = gr.failures
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // arbitration // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // arbitration // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete arbitration state
 type ArbitrationState =

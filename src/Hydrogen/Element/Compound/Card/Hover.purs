@@ -60,18 +60,18 @@ module Hydrogen.Element.Compound.Card.Hover
   , interactiveHover
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
   , class Show
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // card hover config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // card hover config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete hover effect configuration for a card
 data CardHoverConfig = CardHoverConfigPlaceholder
@@ -93,9 +93,9 @@ defaultCardHover = CardHoverConfigPlaceholder
 noHover :: CardHoverConfig
 noHover = CardHoverConfigPlaceholder
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // visual effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // visual effects
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Lift card on hover (translateY)
 liftOnHover :: CardHoverConfig
@@ -113,9 +113,9 @@ glowOnHover = CardHoverConfigPlaceholder
 tiltOnHover :: CardHoverConfig
 tiltOnHover = CardHoverConfigPlaceholder
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // audio effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // audio effects
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Play sound when hover starts
 soundOnHover :: CardHoverConfig
@@ -125,9 +125,9 @@ soundOnHover = CardHoverConfigPlaceholder
 soundOnClick :: CardHoverConfig
 soundOnClick = CardHoverConfigPlaceholder
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // animation effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // animation effects
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Start Lottie animation when hover starts
 playLottieOnHover :: CardHoverConfig
@@ -137,9 +137,9 @@ playLottieOnHover = CardHoverConfigPlaceholder
 pauseLottieOnLeave :: CardHoverConfig
 pauseLottieOnLeave = CardHoverConfigPlaceholder
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // combined presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // combined presets
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Subtle hover (small lift + shadow increase)
 subtleHover :: CardHoverConfig

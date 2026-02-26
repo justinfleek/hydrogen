@@ -80,9 +80,9 @@ module Hydrogen.Element.Compound.TreeView.Viewport
   , handleViewportEvent
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -149,9 +149,9 @@ import Hydrogen.Schema.Graph.Viewport as Schema
 
 import Hydrogen.Schema.Graph.Layout (NodePosition) as Layout
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // viewport state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // viewport state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TreeView-specific viewport state
 type TreeViewport =
@@ -189,9 +189,9 @@ viewportPan vp = vp.state.pan
 viewportScreenSize :: TreeViewport -> { width :: Number, height :: Number }
 viewportScreenSize vp = { width: vp.state.screenWidth, height: vp.state.screenHeight }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // viewport updates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // viewport updates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set zoom level
 setViewportZoom :: Schema.ViewportZoom -> TreeViewport -> TreeViewport
@@ -246,9 +246,9 @@ fitToContent layout vp =
   in
     vp { state = Schema.fitContent content vp.state }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // visible nodes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all visible nodes in viewport order
 visibleNodes :: Tree -> ExpandedState -> LayoutResult -> TreeViewport -> Array TreeNode
@@ -334,9 +334,9 @@ collectIfVisible tree expanded layout bounds acc node =
       else
         newAcc
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // virtualization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Virtualized tree state
 type VirtualizedTree =
@@ -371,9 +371,9 @@ shouldRenderNode :: NodeId -> VirtualizedTree -> Boolean
 shouldRenderNode nid vt =
   Array.elem nid vt.visibleNodeIds
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // chunked rendering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // chunked rendering
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A chunk of nodes to render in one frame
 type RenderChunk =
@@ -436,9 +436,9 @@ isRenderComplete renderedChunks chunkSize vt =
   in
     renderedChunks >= totalChunks
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // progressive loading
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // progressive loading
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Request to load lazy node data
 type LoadRequest =
@@ -461,9 +461,9 @@ acknowledgeLoad :: NodeId -> VirtualizedTree -> VirtualizedTree
 acknowledgeLoad nid vt =
   vt { pendingLoads = Array.filter (\id -> id /= nid) vt.pendingLoads }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // level of detail
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // level of detail
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get LOD for a node based on viewport
 nodeLOD :: NodeId -> LayoutResult -> TreeViewport -> Schema.LevelOfDetail
@@ -500,9 +500,9 @@ simplifiedNode nid layout vp =
     , showDot: lod == LOD_Dot
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // viewport events
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Events that affect the viewport
 data ViewportEvent

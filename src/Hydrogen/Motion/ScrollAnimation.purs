@@ -93,9 +93,9 @@ import Prelude
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Data.Number (abs) as Math
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // animation presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Predefined animation presets — pure enum
 data AnimationPreset
@@ -214,9 +214,9 @@ presetToClasses = case _ of
 initialClasses :: AnimationPreset -> String
 initialClasses preset = (presetToClasses preset).initial
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // scroll state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // scroll state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scroll direction — pure enum
 data ScrollDirection
@@ -279,9 +279,9 @@ scrollVelocity state deltaTime
   | deltaTime <= 0.0 = 0.0
   | otherwise = Math.abs (state.scrollY - state.previousY) / deltaTime
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // viewport state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Viewport state for an element — pure data
 -- |
@@ -318,9 +318,9 @@ isInViewport = _.isIntersecting
 viewportRatio :: ViewportState -> Number
 viewportRatio = _.ratio
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // animation configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // animation configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scroll animation configuration — pure data
 type ScrollAnimationConfig =
@@ -373,9 +373,9 @@ defaultProgressConfig =
   , clampOutput: true
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // animation computation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // animation computation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute animation state from viewport state — pure function
 -- |
@@ -427,9 +427,9 @@ computeTransformFromProgress config progress =
   "translateY(" <> show (config.translateY * (1.0 - progress)) <> "px) " <>
   "scale(" <> show (1.0 - (1.0 - config.scale) * (1.0 - progress)) <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // direction helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // direction helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Detect direction from two scroll positions — pure function
 detectDirection :: Number -> Number -> ScrollDirection
@@ -442,9 +442,9 @@ detectDirection previousY currentY
 directionChanged :: ScrollDirection -> ScrollDirection -> Boolean
 directionChanged prev curr = prev /= curr && curr /= NotScrolling
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // scroll targets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Scroll behavior — pure enum
 data ScrollBehavior
@@ -532,9 +532,9 @@ scrollToElement _elementId behavior block =
   , inline: InlineNearest
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp a number to a range — pure function
 clampNumber :: Number -> Number -> Number -> Number

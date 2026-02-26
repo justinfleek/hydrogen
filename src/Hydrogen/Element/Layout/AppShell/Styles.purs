@@ -63,9 +63,9 @@ import Hydrogen.Element.Layout.AppShell.Types
   , SidebarPosition(LeftSide, RightSide)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // computed values
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate effective sidebar width based on collapse state.
 -- |
@@ -86,9 +86,9 @@ effectiveSidebarWidth cfg =
          else Spacing.spacingZero
     else cfg.fullWidth
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // overflow css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // overflow css
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS overflow for shell container based on scroll behavior.
 containerOverflowCss :: ScrollBehavior -> String
@@ -108,9 +108,9 @@ sidebarOverflowCss PageScroll = ""
 sidebarOverflowCss ContentOnly = ""
 sidebarOverflowCss IndependentScroll = "overflow-y: auto; overflow-x: hidden;"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // positioning css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS for fixed positioning.
 fixedPositionCss :: Boolean -> String
@@ -127,9 +127,9 @@ stickyBottomCss :: Boolean -> String
 stickyBottomCss true = "position: sticky; bottom: 0;"
 stickyBottomCss false = ""
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // dimension css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS height from SpacingValue.
 heightCss :: SpacingValue -> String
@@ -143,9 +143,9 @@ widthCss sv = "width: " <> Spacing.toLegacyCss sv <> ";"
 minHeightCss :: SpacingValue -> String
 minHeightCss sv = "min-height: " <> Spacing.toLegacyCss sv <> ";"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // flex direction css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // flex direction css
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS flex-direction based on sidebar position.
 -- |
@@ -155,9 +155,9 @@ flexDirectionCss :: SidebarPosition -> String
 flexDirectionCss LeftSide = "flex-direction: row;"
 flexDirectionCss RightSide = "flex-direction: row-reverse;"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // border css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CSS border on appropriate side based on sidebar position.
 -- |
@@ -166,9 +166,9 @@ borderSideCss :: SidebarPosition -> String
 borderSideCss LeftSide = "border-right: 1px solid var(--border-color, #e5e7eb);"
 borderSideCss RightSide = "border-left: 1px solid var(--border-color, #e5e7eb);"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // responsive css
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // responsive css
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate responsive visibility class for breakpoint.
 -- |
@@ -204,9 +204,9 @@ breakpointClass Lg = "lg:"
 breakpointClass Xl = "xl:"
 breakpointClass Xxl = "2xl:"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // data attributes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // data attributes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a data attribute string.
 -- |

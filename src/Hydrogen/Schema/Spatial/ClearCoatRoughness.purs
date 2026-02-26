@@ -29,9 +29,9 @@ import Prelude
 
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // clearcoatroughness
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // clear-coat-roughness
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clear coat surface roughness for PBR (0.0 to 1.0)
 -- |
@@ -44,17 +44,17 @@ derive instance ordClearCoatRoughness :: Ord ClearCoatRoughness
 instance showClearCoatRoughness :: Show ClearCoatRoughness where
   show (ClearCoatRoughness r) = show r
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a clear coat roughness value, clamping to 0.0-1.0
 clearCoatRoughness :: Number -> ClearCoatRoughness
 clearCoatRoughness n = ClearCoatRoughness (Bounded.clampNumber 0.0 1.0 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mirror-smooth clear coat (show car finish)
 smooth :: ClearCoatRoughness
@@ -72,9 +72,9 @@ semiRough = ClearCoatRoughness 0.5
 matte :: ClearCoatRoughness
 matte = ClearCoatRoughness 1.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract the raw Number value
 unwrap :: ClearCoatRoughness -> Number

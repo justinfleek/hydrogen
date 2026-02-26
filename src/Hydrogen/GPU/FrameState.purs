@@ -149,9 +149,9 @@ module Hydrogen.GPU.FrameState
   , showFrameState
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -301,9 +301,9 @@ import Hydrogen.GPU.FrameState.Animation
 -- Qualified import for internal use (same module, different alias)
 import Hydrogen.GPU.FrameState.Animation as Animation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // core types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // core types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Time in milliseconds since epoch or start
 type FrameTime = Number
@@ -321,9 +321,9 @@ type FrameState =
   , performance :: PerformanceState
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // time state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Temporal state for the current frame
 type TimeState =
@@ -370,9 +370,9 @@ frameNumber state = state.frame
 fps :: TimeState -> Number
 fps state = if state.delta > 0.0 then 1000.0 / state.delta else 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // mouse state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mouse button identifiers
 data MouseButton
@@ -444,9 +444,9 @@ mouseDelta state = { dx: state.x - state.prevX, dy: state.y - state.prevY }
 mouseVelocity :: MouseState -> { vx :: Number, vy :: Number }
 mouseVelocity state = { vx: state.velocityX, vy: state.velocityY }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // viewport state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // viewport state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Viewport/window state
 -- |
@@ -587,9 +587,9 @@ viewportDPI state = state.devicePixelRatio
 viewportOrientation :: ViewportState -> ViewportOrientation
 viewportOrientation state = state.orientation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // viewport change detection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // viewport change detection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if viewport was resized this frame
 -- |
@@ -626,9 +626,9 @@ viewportAnyChange :: ViewportState -> Boolean
 viewportAnyChange state = 
   state.resized || state.orientationChanged || state.dprChanged || state.shapeChanged
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // viewport tensor access
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // viewport tensor access
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the ViewportTensor for tensor/GPU computation
 -- |
@@ -658,9 +658,9 @@ viewportLatentHeight state = Viewport.latentHeight state.tensor
 viewportLatentSize :: ViewportState -> Int
 viewportLatentSize state = Viewport.totalLatents state.tensor
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // viewport shape
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // viewport shape
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the geometric clip shape of the viewport
 -- |
@@ -680,9 +680,9 @@ viewportSafeArea state =
   , left: state.safeAreaLeft
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // viewport shape constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // viewport shape constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create viewport state with a custom clip shape
 -- |
@@ -861,9 +861,9 @@ mkEllipticalViewport width height devicePixelRatioVal =
   in
     mkViewportStateWithShape width height devicePixelRatioVal clipShape noInsets
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // viewport deltas
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // viewport deltas
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get viewport width delta (current - previous)
 -- |
@@ -881,9 +881,9 @@ viewportHeightDelta :: ViewportState -> Int
 viewportHeightDelta state = 
   Viewport.pixelHeight state.tensor - Viewport.pixelHeight state.prevTensor
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // performance state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // performance state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Performance metrics for frame budgeting
 type PerformanceState =
@@ -932,9 +932,9 @@ gpuUsedMs state = state.gpuUsedMs
 frameDropped :: PerformanceState -> Boolean
 frameDropped state = state.gpuUsedMs > state.gpuBudgetMs
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // framestate construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create frame state with initial values
 mkFrameState 
@@ -953,9 +953,9 @@ mkFrameState startTime targetFrameRate width height devicePixelRatioVal =
   , performance: mkPerformanceState targetFrameRate
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // default values
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // default values
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default viewport width (1920 pixels)
 -- |
@@ -1025,9 +1025,9 @@ emptyFrameState = mkFrameState
   defaultViewportHeight 
   defaultDevicePixelRatio
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // framestate updates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // framestate updates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Update time state
 updateTime :: FrameTime -> FrameState -> FrameState
@@ -1133,9 +1133,9 @@ tick newTime state =
       , springs = Animation.tickSprings deltaTime state.springs
       }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // framestate queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // framestate queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if mouse is hovering over element with given PickId
 isHovering :: Int -> FrameState -> Boolean
@@ -1189,9 +1189,9 @@ hasActiveAnimations state = not $ Map.isEmpty state.animations.animations
 frameNumberAsNumber :: FrameState -> Number
 frameNumberAsNumber state = Int.toNumber $ frameNumber state.time
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // debug output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // debug output
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Debug string for TimeState.
 -- |

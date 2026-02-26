@@ -46,9 +46,9 @@ import Data.String.CodeUnits as CU
 import Hydrogen.Schema.Gestural.Keyboard.Keys (KeyCode(KeyCode))
 import Hydrogen.Schema.Gestural.Keyboard.Modifiers (ModifierState, hasCtrlOrCmd, noModifiers)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // key // event type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // key // event type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of keyboard event
 data KeyEventType
@@ -79,9 +79,9 @@ isKeyPress :: KeyEventType -> Boolean
 isKeyPress KeyPress = true
 isKeyPress _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // key // event
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // key // event
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete keyboard event data
 -- |
@@ -146,9 +146,9 @@ isRepeat ke = ke.repeat
 eventTimestamp :: KeyEvent -> Number
 eventTimestamp ke = ke.timestamp
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // event // classification
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // event // classification
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if event is for a printable character
 -- |

@@ -111,9 +111,9 @@ import Hydrogen.Schema.Color.OKLAB (OKLAB, oklabFromRecord, oklabToRecord) as OK
 import Hydrogen.Schema.Color.Opacity (Opacity, fromUnitInterval, toUnitInterval) as Opacity
 import Hydrogen.Math.Core as Math
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // lcha - lch + alpha
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // lcha - lch + alpha
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | LCHA - LCH (Cylindrical LAB) with Alpha
 -- |
@@ -156,9 +156,9 @@ lchaToRecord (LCHA c) =
   let lchRec = LCH.lchToRecord c.lch
   in { l: lchRec.l, c: lchRec.c, h: lchRec.h, a: Opacity.toUnitInterval c.alpha }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // p3a - display p3 + alpha
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // p3a - display p3 + alpha
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | P3A - Display P3 with Alpha
 -- |
@@ -200,9 +200,9 @@ getP3 (P3A c) = { r: c.r, g: c.g, b: c.b }
 p3aToRecord :: P3A -> { r :: Number, g :: Number, b :: Number, a :: Number }
 p3aToRecord (P3A c) = { r: c.r, g: c.g, b: c.b, a: Opacity.toUnitInterval c.alpha }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // oklcha - oklch + alpha
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // oklcha - oklch + alpha
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | OKLCHA - OKLCH with Alpha
 -- |
@@ -242,9 +242,9 @@ oklchaToRecord (OKLCHA c) =
   let oklchRec = OKLCH.oklchToRecord c.oklch
   in { l: oklchRec.l, c: oklchRec.c, h: toNumber oklchRec.h, a: Opacity.toUnitInterval c.alpha }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // laba - lab + alpha
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // laba - lab + alpha
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | LABA - CIE LAB with Alpha
 -- |
@@ -283,9 +283,9 @@ labaToRecord (LABA c) =
   let labRec = LAB.labToRecord c.lab
   in { l: labRec.l, a: labRec.a, b: labRec.b, alpha: Opacity.toUnitInterval c.alpha }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // oklaba - oklab + alpha
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // oklaba - oklab + alpha
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | OKLABA - OKLAB (Cartesian) with Alpha
 -- |
@@ -330,9 +330,9 @@ oklabaToRecord (OKLABA c) =
   let oklabRec = OKLAB.oklabToRecord c.oklab
   in { l: oklabRec.l, a: oklabRec.a, b: oklabRec.b, alpha: Opacity.toUnitInterval c.alpha }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // alpha operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // alpha operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type class for colors with alpha
 class HasAlpha a where
@@ -363,9 +363,9 @@ instance hasAlphaOKLABA :: HasAlpha OKLABA where
 multiplyAlpha :: forall a. HasAlpha a => Number -> a -> a
 multiplyAlpha factor color = setAlpha (getAlpha color * factor) color
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // with alpha (add alpha)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // with alpha (add alpha)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add alpha to LCH color
 withAlphaLCH :: Number -> LCH.LCH -> LCHA
@@ -399,9 +399,9 @@ withAlphaOKLAB a oklabColor = OKLABA
 withAlphaP3 :: Number -> { r :: Number, g :: Number, b :: Number } -> P3A
 withAlphaP3 a p3Color = p3a p3Color.r p3Color.g p3Color.b a
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // remove alpha (strip alpha)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // remove alpha (strip alpha)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Remove alpha from LCHA, returning LCH
 removeAlphaLCHA :: LCHA -> LCH.LCH
@@ -423,9 +423,9 @@ removeAlphaOKLABA (OKLABA c) = c.oklab
 removeAlphaP3A :: P3A -> { r :: Number, g :: Number, b :: Number }
 removeAlphaP3A (P3A c) = { r: c.r, g: c.g, b: c.b }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // compositing
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // compositing
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Porter-Duff "over" operation (source over destination)
 -- |
@@ -543,9 +543,9 @@ blendHue srcH dstH srcA dstA =
         else (srcH * srcA + dstH * dstA * (1.0 - srcA)) / outA
   in Bounded.clampNumber 0.0 359.0 blend
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                    // conversions (cylindrical <-> Cartesian)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert OKLCHA (cylindrical) to OKLABA (Cartesian)
 -- |

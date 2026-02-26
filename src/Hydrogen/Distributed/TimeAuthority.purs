@@ -168,9 +168,9 @@ import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Tuple (Tuple(Tuple))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // core aliases
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // core aliases
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique agent identifier (UUID5 string)
 type AgentId = String
@@ -184,9 +184,9 @@ type FrameNumber = Int
 -- | Wall clock time in milliseconds since epoch
 type WallClock = Number
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // lamport timestamps
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // lamport timestamps
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Lamport timestamp — scalar logical clock
 -- |
@@ -229,9 +229,9 @@ lamportCompare (LamportTime a) (LamportTime b) = compare a b
 happenedBefore :: LamportTime -> LamportTime -> Boolean
 happenedBefore (LamportTime a) (LamportTime b) = a < b
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // logical time
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Logical time combining Lamport timestamp with agent identity
 -- |
@@ -281,9 +281,9 @@ logicalCompare a b =
 logicalHappenedBefore :: LogicalTime -> LogicalTime -> Boolean
 logicalHappenedBefore a b = a.logicalCounter < b.logicalCounter
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // vector clocks
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vector clock — detects concurrent events
 -- |
@@ -372,9 +372,9 @@ isConcurrent a b = vectorCompare a b == VectorConcurrent
 isHappenedBefore :: VectorClock -> VectorClock -> Boolean
 isHappenedBefore a b = vectorCompare a b == VectorLT
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // time authority
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Time authority — determines whose clock is authoritative
 data TimeAuthority
@@ -420,9 +420,9 @@ getAuthorityTime :: TimeAuthority -> FrameTime
 getAuthorityTime (LocalAuthority r) = r.currentTime
 getAuthorityTime (NetworkAuthority r) = r.serverTime
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // clock synchronization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // clock synchronization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clock synchronization state (NTP-style)
 -- |
@@ -543,9 +543,9 @@ computeQuality rtt
   | rtt < 1000.0 = SyncPoor
   | otherwise = SyncUnsynced
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // frame scheduling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Frame schedule for deterministic timing
 -- |
@@ -594,9 +594,9 @@ framesSince :: FrameSchedule -> WallClock -> WallClock -> Int
 framesSince sched startTime currentTime =
   timeToFrame sched currentTime - timeToFrame sched startTime
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // deterministic frame identity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // deterministic frame identity
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Deterministic frame identifier
 -- |
@@ -636,9 +636,9 @@ sameFrame a b =
   a.scheduleEpoch == b.scheduleEpoch &&
   a.fps == b.fps
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // helper functions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Maximum of two integers
 maxInt :: Int -> Int -> Int
@@ -653,9 +653,9 @@ arrayNub = foldl (\acc x -> if elemArray x acc then acc else Array.snoc acc x) [
 elemArray :: forall a. Eq a => a -> Array a -> Boolean
 elemArray x arr = Array.any (_ == x) arr
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // additional predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // additional predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if all vector clocks in array have happened-before reference
 allHappenedBefore :: VectorClock -> Array VectorClock -> Boolean

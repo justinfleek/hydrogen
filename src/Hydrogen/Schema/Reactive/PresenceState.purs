@@ -68,9 +68,9 @@ import Prelude
 import Data.Array (filter, length, snoc)
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // presence phase
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Lifecycle phase of component presence
 data PresencePhase
@@ -117,9 +117,9 @@ isAnimating PhaseEntering = true
 isAnimating PhaseExiting = true
 isAnimating _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // mount status
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DOM mount lifecycle status
 data MountStatus
@@ -153,9 +153,9 @@ isUnmounting :: MountStatus -> Boolean
 isUnmounting Unmounting = true
 isUnmounting _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // animation direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Direction of navigation/animation
 data AnimationDirection
@@ -183,9 +183,9 @@ isNoDirection :: AnimationDirection -> Boolean
 isNoDirection NoDirection = true
 isNoDirection _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // presence config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // presence config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for presence animations
 type PresenceConfig =
@@ -224,9 +224,9 @@ withEnterDuration ms config = config { enterDurationMs = max 0.0 ms }
 withExitDuration :: Number -> PresenceConfig -> PresenceConfig
 withExitDuration ms config = config { exitDurationMs = max 0.0 ms }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // presence state molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // presence state molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete presence state for a component
 type PresenceState =
@@ -273,9 +273,9 @@ exitedPresence :: PresenceConfig -> PresenceState
 exitedPresence config = (presenceState PhaseExited Unmounted config)
   { progress = 0.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // presence lifecycle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Begin enter animation
 startEnter :: Number -> PresenceState -> PresenceState
@@ -317,9 +317,9 @@ completeExit ps = ps
 cancelAnimation :: PresenceState -> PresenceState
 cancelAnimation ps = ps { startedAt = Nothing }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // computed properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Should component be rendered in DOM?
 shouldRender :: PresenceState -> Boolean
@@ -344,9 +344,9 @@ animationRemainingTime currentTime ps = case ps.startedAt of
         elapsed = currentTime - start
     in max 0.0 (duration - elapsed)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // presence group compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Manages multiple presence states (for AnimatePresence)
 type PresenceGroup =
