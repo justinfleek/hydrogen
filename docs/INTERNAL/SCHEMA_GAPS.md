@@ -822,17 +822,29 @@ All atoms (15+), molecules (5+), and compounds (13+) are implemented per SCHEMA.
 8. **Spatial** — Camera/Light/Material compound types
 9. **Temporal** — Animation composition (Sequence, Parallel, Stagger)
 
-### Phase 3: Extended (P1-P2)
+### Phase 3: Extended (P1-P2) — **MOSTLY COMPLETE**
 
-10. **Gestural** — Advanced gestures, triggers, Easter eggs
-11. **Haptic** — Impact/Notification/Selection compounds
-12. **Audio** — Full synthesis/effects/analysis chains
-13. **Brand** — Component tokens, Export formats
+10. ~~**Gestural**~~ ✓ — Advanced gestures, triggers complete
+11. ~~**Haptic**~~ ✓ — Impact/Notification/Selection compounds complete
+12. ~~**Audio**~~ ✓ — Full synthesis/effects/analysis chains complete
+13. **Brand** — Export formats remaining (CSS, JSON, Figma, Tailwind)
 
-### Phase 4: New Pillars
+### Phase 4: New Pillars — **COMPLETE**
 
-14. **Attestation** — Cryptographic primitives
-15. **Scheduling** — Calendar/time primitives
+14. ~~**Attestation**~~ ✓ — Cryptographic primitives complete (11 files)
+15. ~~**Scheduling**~~ ✓ — Calendar/time primitives complete (8 files)
+16. ~~**Accessibility**~~ ✓ — WAI-ARIA 1.2 complete (7 files)
+17. ~~**Sensation**~~ ✓ — Proprioceptive/environmental sensing complete (8 files)
+
+### Council Review Gaps — **ALL P0/P1 CLOSED**
+
+- ~~Diffusion primitives~~ ✓ — GPU/Diffusion.purs
+- ~~Distributed time sync~~ ✓ — Distributed/TimeAuthority.purs, ViewportSync.purs
+- ~~AudioEffect system~~ ✓ — Audio/AudioEffect.purs, AVSync.purs
+- ~~ARIA accessibility~~ ✓ — Schema/Accessibility/
+- ~~SDF text kernels~~ ✓ — GPU/Kernel/Text.purs
+- ~~DataValidity~~ ✓ — Schema/Reactive/DataValidity.purs
+- ~~Fixed timestep springs~~ ✓ — Motion/Spring.purs
 
 ---
 

@@ -1,3 +1,9 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                      // hydrogen // schema // color // curves
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | RGB/Luminance curve adjustments for color grading.
+
 module Hydrogen.Schema.Color.Curves
   ( Curve
   , CurvePoint

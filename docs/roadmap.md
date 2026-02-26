@@ -34,8 +34,8 @@ All atoms, molecules, and compounds implemented with full type safety.
 
 ### Schema Pillars — In Progress
 
-- [ ] **Brand** (24 files, ~60%) — Token naming, palette/spacing/typography tokens implemented. Missing: component tokens (button, input, card), theme configuration (light/dark/contrast), export formats (CSS variables, Tailwind, Figma tokens, JSON)
-- [ ] **Attestation** (11 files, ~80%) — Cryptographic attestation primitives. Missing: DID (Decentralized Identifiers), VC (Verifiable Credentials), VP (Verifiable Presentations)
+- [x] **Brand** (37 files, ~90%) — Tokens (color, spacing, shadow, radius, duration, easing, z-index, size), themes (light/dark/contrast/auto), logo system, typography, palette, voice, identity, mission, tagline, values, provenance. Missing: export formats (CSS variables, Tailwind, Figma tokens, JSON)
+- [x] **Attestation** (11 files) — Cryptographic attestation primitives: SHA-256/512, Keccak-256, UUID5, Merkle trees, timestamps, signed data (ECDSA/Ed25519/RSA), W3C DIDs (key/web/ethr/ion/pkh methods, DID documents, verification methods), W3C Verifiable Credentials (credential types, proofs, status), W3C Verifiable Presentations
 
 ### Runtime Targets
 

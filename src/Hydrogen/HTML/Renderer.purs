@@ -1,3 +1,7 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                               // hydrogen // html // renderer
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 -- | Static HTML string renderer for Halogen
 -- |
 -- | Renders `HH.HTML w i` to a plain HTML string, suitable for:

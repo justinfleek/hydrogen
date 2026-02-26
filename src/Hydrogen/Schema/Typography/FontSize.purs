@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                  // hydrogen // schema // typography // fontsize
+--                               // hydrogen // schema // typography // fontsize
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | FontSize - typographic scale in pixels.
@@ -27,9 +27,44 @@ module Hydrogen.Schema.Typography.FontSize
   , browserDefault
   , compact
   , readable
+  -- Operations
+  , blend
+  , lerp
+  , add
+  , subtract
+  , toNumber
+  , toRem
+  -- Predicates
+  , isReadable
+  , isCompact
+  , isDisplay
+  , isHero
+  -- Type scale
+  , minor
+  , major
+  , heading1
+  , heading2
+  , heading3
+  , body
+  , caption
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (<>)
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (&&)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 
@@ -99,6 +134,125 @@ readable = FontSize 18.0
 -- | Used for type scale calculations. The factor must be positive.
 scale :: Number -> FontSize -> FontSize
 scale factor (FontSize s) = fontSize (s * factor)
+
+-- | Blend two font sizes with weight (0.0 = all first, 1.0 = all second)
+-- |
+-- | Linear interpolation for animated type sizes:
+-- | ```purescript
+-- | blend 0.5 compact readable  -- FontSize 16px (midpoint)
+-- | ```
+blend :: Number -> FontSize -> FontSize -> FontSize
+blend weight (FontSize a) (FontSize b) =
+  let w = Bounded.clampNumber 0.0 1.0 weight
+  in fontSize (a * (1.0 - w) + b * w)
+
+-- | Linear interpolation (standard lerp signature)
+lerp :: FontSize -> FontSize -> Number -> FontSize
+lerp from to t = blend t from to
+
+-- | Add to font size (clamped)
+add :: Number -> FontSize -> FontSize
+add amount (FontSize s) = fontSize (s + amount)
+
+-- | Subtract from font size (clamped)
+subtract :: Number -> FontSize -> FontSize
+subtract amount (FontSize s) = fontSize (s - amount)
+
+-- | Convert to Number for calculations
+toNumber :: FontSize -> Number
+toNumber (FontSize s) = s
+
+-- | Convert to rem value (assuming 16px base)
+-- |
+-- | For responsive typography that respects user's browser settings:
+-- | ```purescript
+-- | toRem browserDefault  -- 1.0
+-- | toRem (fontSize 24.0) -- 1.5
+-- | ```
+toRem :: FontSize -> Number
+toRem (FontSize s) = s / 16.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                // type // scale
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Minor second type scale step (1.067x)
+-- |
+-- | Very subtle size increase, used for fine distinctions.
+minor :: FontSize -> FontSize
+minor = scale 1.067
+
+-- | Major second type scale step (1.125x)
+-- |
+-- | Standard step for type hierarchies.
+major :: FontSize -> FontSize
+major = scale 1.125
+
+-- | Heading 1 size (32px)
+heading1 :: FontSize
+heading1 = FontSize 32.0
+
+-- | Heading 2 size (24px)
+heading2 :: FontSize
+heading2 = FontSize 24.0
+
+-- | Heading 3 size (20px)
+heading3 :: FontSize
+heading3 = FontSize 20.0
+
+-- | Body text size (16px)
+body :: FontSize
+body = FontSize 16.0
+
+-- | Caption/small text size (12px)
+caption :: FontSize
+caption = FontSize 12.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // predicates
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if font size is readable for body text (14-20px)
+-- |
+-- | This is the recommended range for extended reading:
+-- | ```purescript
+-- | isReadable browserDefault  -- true (16px)
+-- | isReadable caption         -- false (12px)
+-- | isReadable heading1        -- false (32px)
+-- | ```
+isReadable :: FontSize -> Boolean
+isReadable (FontSize s) = s >= 14.0 && s <= 20.0
+
+-- | Check if font size is compact (10-14px)
+-- |
+-- | Small text for data-dense interfaces:
+-- | ```purescript
+-- | isCompact caption      -- true (12px)
+-- | isCompact browserDefault  -- false (16px)
+-- | ```
+isCompact :: FontSize -> Boolean
+isCompact (FontSize s) = s >= 10.0 && s < 14.0
+
+-- | Check if font size is display (24-48px)
+-- |
+-- | Large text for headings and emphasis:
+-- | ```purescript
+-- | isDisplay heading1  -- true (32px)
+-- | isDisplay heading2  -- true (24px)
+-- | isDisplay body      -- false (16px)
+-- | ```
+isDisplay :: FontSize -> Boolean
+isDisplay (FontSize s) = s >= 24.0 && s <= 48.0
+
+-- | Check if font size is hero (> 48px)
+-- |
+-- | Extra large text for hero sections and dramatic impact:
+-- | ```purescript
+-- | isHero (fontSize 72.0)  -- true
+-- | isHero heading1         -- false (32px)
+-- | ```
+isHero :: FontSize -> Boolean
+isHero (FontSize s) = s > 48.0
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

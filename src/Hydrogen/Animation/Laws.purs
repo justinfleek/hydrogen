@@ -1,13 +1,11 @@
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- Hydrogen.Animation.Laws
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---
--- Laws that must hold for the animation algebra.
--- These serve as documentation, test specifications, and proof obligations.
---
--- Every combinator must satisfy these laws for the algebra to be lawful.
---
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                              // hydrogen // animation // laws
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Laws that must hold for the animation algebra.
+-- |
+-- | These serve as documentation, test specifications, and proof obligations.
+-- | Every combinator must satisfy these laws for the algebra to be lawful.
 
 module Hydrogen.Animation.Laws 
   ( module Hydrogen.Animation.Algebra
