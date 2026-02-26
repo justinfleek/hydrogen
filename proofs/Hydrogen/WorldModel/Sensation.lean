@@ -323,6 +323,33 @@ def sensationToUrgency (s : SensationCompound) : Urgency :=
   else
     .background
 
+/-- Lemma: raw valence computation is bounded in [-50, 50].
+    
+    Given comfort ∈ [0,1] and distress ∈ [0,1]:
+    - comfort * 50 ∈ [0, 50]
+    - distress * (-50) ∈ [-50, 0]  
+    - Sum ∈ [-50, 50] -/
+lemma raw_valence_bounded (comfort distress : BoundedUnit) :
+    -50 ≤ comfort.value * 50 + distress.value * (-50) ∧ 
+    comfort.value * 50 + distress.value * (-50) ≤ 50 := by
+  constructor
+  · -- Lower bound: raw ≥ -50
+    have h_comfort_nonneg : 0 ≤ comfort.value * 50 := by
+      apply mul_nonneg comfort.lower_bound
+      norm_num
+    have h_distress_lower : -50 ≤ distress.value * (-50) := by
+      have h := distress.upper_bound
+      linarith
+    linarith
+  · -- Upper bound: raw ≤ 50
+    have h_comfort_upper : comfort.value * 50 ≤ 50 := by
+      have h := comfort.upper_bound
+      linarith
+    have h_distress_upper : distress.value * (-50) ≤ 0 := by
+      have h := distress.lower_bound
+      linarith
+    linarith
+
 /-- Map sensation compound to valence.
     
     Comfort produces positive valence, distress produces negative. -/
@@ -330,8 +357,26 @@ def sensationToValence (s : SensationCompound) : Valence :=
   let comfort_contrib := s.comfort.comfort.value * 50
   let distress_contrib := s.distress.distress.value * (-50)
   let raw_valence := comfort_contrib + distress_contrib
-  -- Clamp to [-100, 100]
-  ⟨⌊raw_valence⌋, by sorry⟩  -- Proof that floor is in bounds
+  let bounds := raw_valence_bounded s.comfort.comfort s.distress.distress
+  ⟨⌊raw_valence⌋, by
+    constructor
+    · -- Lower bound: ⌊raw_valence⌋ ≥ -100
+      -- We have raw_valence ≥ -50, so ⌊raw_valence⌋ ≥ -50 ≥ -100
+      have h_raw_lower : -50 ≤ raw_valence := bounds.1
+      have h1 : (-50 : ℤ) ≤ ⌊raw_valence⌋ := by
+        rw [Int.le_floor]
+        simp only [Int.cast_neg, Int.cast_ofNat]
+        exact h_raw_lower
+      linarith
+    · -- Upper bound: ⌊raw_valence⌋ ≤ 100
+      -- We have raw_valence ≤ 50, so ⌊raw_valence⌋ ≤ 50 ≤ 100
+      have h_raw_upper : raw_valence ≤ 50 := bounds.2
+      -- floor(x) ≤ x, and x ≤ 50, so floor(x) ≤ 50
+      have h1 : (⌊raw_valence⌋ : ℝ) ≤ raw_valence := Int.floor_le raw_valence
+      have h2 : (⌊raw_valence⌋ : ℝ) ≤ 50 := le_trans h1 h_raw_upper
+      have h3 : ⌊raw_valence⌋ ≤ (50 : ℤ) := by
+        exact_mod_cast h2
+      linarith⟩
 
 /-- Theorem: Sensation compounds with valid bounds produce valid affective states -/
 theorem sensation_produces_valid_affective (s : SensationCompound) :

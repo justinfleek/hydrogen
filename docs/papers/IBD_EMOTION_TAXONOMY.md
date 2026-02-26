@@ -2480,5 +2480,660 @@ Art that says 'you can do this' — work with a gentle but firm optimism that me
 
 ---
 
+#### Empowerment
+
+**Slug:** `empowerment`
+**Keywords:** empowering, enabling, liberating, agency, self-determined
+
+**Definition:**
+Art that declares the viewer's agency and capability — work that feels like armor being donned or wings being unfurled. Empowerment art transforms the space from passive to active, from observed to owned.
+
+**Color Palette:**
+- Primary: `#8E44AD` | `#C0392B` | `#2C3E50`
+- Accent: `#F39C12` | `#ECF0F1` | `#1ABC9C`
+- *Pairing Notes:* Power palette — deep purple authority, red determination, dark blue confidence. Gold achievement accent. Bold and unwavering.
+
+**Textures:** Solid and commanding, Upright surfaces, Armor-like, Unfurling
+
+**Shapes:**
+- Geometric: Strong verticals, Expanding forms, Rising power compositions
+- Organic: Wings spreading, Fists rising, Crowns, Flames ascending
+
+**Art Styles:** Power portraiture, Bold abstract, Strength photography, Liberation art
+
+**Art Mediums:** Large-scale photography, Bold oil painting, Mixed media, AI-generated empowerment imagery
+
+**Suggested Placements:**
+- Women's Empowerment Center: Visual declaration of capability and strength
+- Gym Entrance: Setting the tone for self-transformation
+- Founder's Office: Reinforcing the agency that built the company
+
+**Relationships:**
+- Complements: Strength, Bold Individuality, Ambition, Freedom
+- Contrasts: Softness, Delicacy, Melancholy, Stillness
+
+**Use Cases:**
+- *Women's Center:* Bold abstract in purple, red, and gold — ascending forms suggesting wings or crowns — oversized on canvas
+- *Executive Suite:* Power photography — dramatic portrait with commanding composition, large-scale metal print
+
+**Tags:** Powerful, Agency, Declared, Rising, Owned
+
+---
+
+#### Focus
+
+**Slug:** `focus`
+**Keywords:** focused, concentrated, intent, laser, singular
+
+**Definition:**
+Art that sharpens the mind — work with a single, clear focal point that trains the eye (and therefore the attention) to concentrate. Focus art eliminates distraction by design, creating an environment of productive intensity.
+
+**Color Palette:**
+- Primary: `#1A1A2E` | `#16213E` | `#0F3460`
+- Accent: `#E94560` | `#FFFFFF` | `#53354A`
+- *Pairing Notes:* Dark, focused field with a single bright focal point. Everything recedes to make the center shine. Laser precision.
+
+**Textures:** Sharp center, soft periphery, Concentrated detail, Clean and precise, Technical quality
+
+**Shapes:**
+- Geometric: Single focal point, Converging lines, Vignette compositions, Target forms
+- Organic: Single eye, Lens aperture, Pinpoint of light in darkness
+
+**Art Styles:** Tilt-shift photography, Vignette abstract, Focal-point painting, Precision art
+
+**Art Mediums:** Photography (selective focus), Precision digital art, Oil painting (sharp vs. soft), AI-generated focus studies
+
+**Suggested Placements:**
+- Study / Work Room: Reinforcing concentration and mental clarity
+- Exam Room: Supporting focused thinking
+- Trading Desk: Maintaining sharp attention
+
+**Relationships:**
+- Complements: Clarity, Purpose, Order, Awareness
+- Contrasts: Whimsy, Playfulness, Eccentricity, Fantasy
+
+**Use Cases:**
+- *Private Study:* Dark abstract with single luminous focal point — deep navy field with bright red center — creating visual focus aid
+- *Executive Meeting Room:* Architectural photograph with extreme tilt-shift focus, directing attention to the precise center
+
+**Tags:** Concentrated, Singular, Sharp, Intense, Undistracted
+
+---
+
+#### Purpose
+
+**Slug:** `purpose`
+**Keywords:** purposeful, driven, intentional, mission, directed
+
+**Definition:**
+Art that embodies 'why' — work that feels deeply intentional, where every element serves the whole and nothing exists by accident. Purpose art creates environments where mission clarity is reinforced by visual clarity.
+
+**Color Palette:**
+- Primary: `#2C3E50` | `#E74C3C` | `#ECF0F1`
+- Accent: `#3498DB` | `#F39C12` | `#2ECC71`
+- *Pairing Notes:* Clear, decisive palette. Corporate confidence without sterility. Each color has a 'job' — blue for trust, red for urgency, green for growth.
+
+**Textures:** Clean and intentional, Every element deliberate, No accidental marks, Mission-quality finish
+
+**Shapes:**
+- Geometric: Arrow forms, Pathway compositions, Directed layouts, Clear hierarchy
+- Organic: Compass roses, North stars, Guided paths, Rivers with direction
+
+**Art Styles:** Mission-driven abstract, Directional composition, Intentional photography, Purpose-built design
+
+**Art Mediums:** Graphic art, Photography (journalistic), Bold painting, AI-generated purposeful compositions
+
+**Suggested Placements:**
+- Company Headquarters: Embodying the mission on the walls
+- Non-profit Office: Constant visual reminder of why the work matters
+- Personal office: Anchoring daily work to larger purpose
+
+**Relationships:**
+- Complements: Focus, Ambition, Clarity, Strength
+- Contrasts: Whimsy, Humor, Eccentricity, Playfulness
+
+**Use Cases:**
+- *Non-Profit HQ:* Bold abstract with clear directional energy — forms converging toward a bright focal point — mission-aligned colors
+- *Startup Office:* Photography series documenting the 'why' behind the work — authentic, purposeful, inspiring
+
+**Tags:** Intentional, Directed, Mission, Deliberate, Clear
+
+---
+
+#### Curiosity
+
+**Slug:** `curiosity`
+**Keywords:** curious, inquisitive, exploratory, questioning, wondering
+
+**Definition:**
+Art that raises more questions than it answers — work designed to spark the 'what if' and 'how come' that drives discovery. Curiosity art is deliberately incomplete, inviting the viewer to participate in completing the meaning.
+
+**Color Palette:**
+- Primary: `#2980B9` | `#F39C12` | `#8E44AD`
+- Accent: `#1ABC9C` | `#E74C3C` | `#ECF0F1`
+- *Pairing Notes:* Bright, exploratory palette. Colors that say 'look closer.' Active, questioning, never settled.
+
+**Textures:** Layered (peel back to discover), Hidden detail, Partially revealed, Magnification quality
+
+**Shapes:**
+- Geometric: Question marks, Open doors, Magnifying glass frames, Puzzle forms
+- Organic: Partially unraveled, Opening buds, Doors ajar, Paths disappearing around corners
+
+**Art Styles:** Conceptual art, Interactive installations, Layered mixed media, Discovery-based art
+
+**Art Mediums:** Mixed media with hidden layers, Lenticular prints, Interactive digital, AI-generated puzzle compositions
+
+**Suggested Placements:**
+- Science Museum: Encouraging the spirit of inquiry
+- University Common Room: Fostering intellectual curiosity
+- Children's Discovery Center: Making wondering visible and valued
+
+**Relationships:**
+- Complements: Imagination, Creativity, Exploration, Mystery
+- Contrasts: Order, Certainty, Timelessness, Simplicity
+
+**Use Cases:**
+- *Science Center:* Multi-layered mixed media with hidden elements that reveal themselves over time — bright, active palette
+- *University Lounge:* Conceptual photography series posing visual questions — each piece incomplete without the viewer's interpretation
+
+**Tags:** Questioning, Discovering, Open, Unfinished, Participatory
+
+---
+
 ### Connection / Passion
+
+**Category Color Signature:** `#C0392B`
+
+Human bonds, desire, and emotional closeness.
+
+**Tokens:** 5
+
+---
+
+#### Romance
+
+**Slug:** `romance`
+**Keywords:** romantic, loving, love, amorous, tender, devoted
+
+**Definition:**
+The art of love made visible — work that captures the tenderness, excitement, and beauty of romantic connection. Romance art creates intimate environments where love feels celebrated and honored.
+
+**Color Palette:**
+- Primary: `#C0392B` | `#E74C3C` | `#922B21`
+- Accent: `#F5B7B1` | `#FADBD8` | `#FFFFFF`
+- *Pairing Notes:* Classic romance reds with soft pink and white. Heart's palette. Can range from passionate deep red to tender blush depending on the specific tone.
+
+**Textures:** Silk, Rose petals, Candlelight, Soft focus, Brushed velvet
+
+**Shapes:**
+- Geometric: Intertwining forms, Paired elements, Two becoming one
+- Organic: Embracing figures, Intertwined flowers, Two trees growing together
+
+**Art Styles:** Romantic Impressionism, Love photography, Abstract intimacy, Classical romance
+
+**Art Mediums:** Oil painting, Intimate photography, Soft mixed media, AI-generated romantic scenes
+
+**Suggested Placements:**
+- Master Bedroom: Celebrating the intimacy of the relationship
+- Wedding Venue: Setting the atmosphere for declarations of love
+- Anniversary Gift: Commemorating a love story
+
+**Relationships:**
+- Complements: Intimacy, Passion, Warmth, Softness
+- Contrasts: Solitude, Order, Structure, Tension
+
+**Use Cases:**
+- *Master Bedroom:* Abstract intertwining forms in deep red and blush, suggestive of embrace without being literal, oil on canvas
+- *Wedding Venue:* Romantic impressionist floral in red and cream, large scale, creating a backdrop of love
+
+**Tags:** Tender, Devoted, Passionate, Intimate, Celebrated
+
+---
+
+#### Intimacy
+
+**Slug:** `intimacy`
+**Keywords:** intimate, close, personal, private, seductive, vulnerable
+
+**Definition:**
+The art of emotional closeness — work that creates a sense of private, shared space between the art and the viewer. Intimacy art requires proximity; it rewards the viewer who steps closer and stays longer.
+
+**Color Palette:**
+- Primary: `#4A1A2E` | `#6B2D4A` | `#8B3A62`
+- Accent: `#D4A0B0` | `#F0D8E0` | `#C49EAA`
+- *Pairing Notes:* Deep, warm darks with revealing soft light. Bedroom palette — low lamplight on skin. Nothing harsh, nothing distant.
+
+**Textures:** Whispered surfaces, Close-up skin, Bedsheet folds, Candlelit warmth
+
+**Shapes:**
+- Geometric: Close crops, Tight framing, Two forms touching, Enclosed spaces
+- Organic: Curves of bodies, Closed eyes, Touching hands, Shared breath
+
+**Art Styles:** Intimate portraiture, Boudoir photography, Close-up abstract, Private moments
+
+**Art Mediums:** Photography (intimate), Oil painting (close observation), Charcoal, AI-generated intimate compositions
+
+**Suggested Placements:**
+- Bedroom: The most private space, celebrating closeness
+- Couples Suite: Luxury hotel boudoir atmosphere
+- Private Dining (for two): Creating a cocoon for connection
+
+**Relationships:**
+- Complements: Romance, Connection, Softness, Warmth
+- Contrasts: Boldness, Energy, Freedom, Adventure
+
+**Use Cases:**
+- *Luxury Bedroom:* Intimate abstract in deep rose and warm shadows, suggestive of closeness, small to medium scale inviting proximity
+- *Boutique Hotel Suite:* Tasteful body-form photography, warm tones, intimate scale, creating atmosphere of sophisticated closeness
+
+**Tags:** Private, Close, Vulnerable, Warm-dark, Rewarding
+
+---
+
+#### Unity
+
+**Slug:** `unity`
+**Keywords:** united, together, collective, joined, communal
+
+**Definition:**
+The art of togetherness — work that visualizes the power of many becoming one. Unity art speaks to shared purpose, collective identity, and the strength found in coming together.
+
+**Color Palette:**
+- Primary: `#2980B9` | `#27AE60` | `#8E44AD`
+- Accent: `#F39C12` | `#ECF0F1` | `#E74C3C`
+- *Pairing Notes:* Multiple colors in harmony — no single color dominates. The palette itself demonstrates unity through diversity.
+
+**Textures:** Woven patterns, Interlocking elements, Merged surfaces, Collective marks
+
+**Shapes:**
+- Geometric: Interlocking forms, Chain links, Tessellation, Converging lines
+- Organic: Hands joining, Roots connecting, Flocking birds, Rivers merging
+
+**Art Styles:** Collaborative art, Social realism, Unity abstract, Community muralism
+
+**Art Mediums:** Community-created art, Collaborative painting, Photography (groups), AI-generated collective imagery
+
+**Suggested Placements:**
+- Community Center: Embodying the mission of togetherness
+- Corporate All-Hands Room: Reinforcing team unity
+- Place of Worship: Celebrating congregational bonds
+
+**Relationships:**
+- Complements: Connection, Harmony, Peace, Encouragement
+- Contrasts: Solitude, Bold Individuality, Freedom, Eccentricity
+
+**Use Cases:**
+- *Corporate Town Hall:* Abstract with many individual elements merging into a cohesive whole — diverse colors harmonizing — large scale
+- *Community Center:* Collaborative mural project where each panel was contributed by a community member, creating visual unity from diversity
+
+**Tags:** Together, Collective, Converging, Shared, Woven
+
+---
+
+#### Connection
+
+**Slug:** `connection`
+**Keywords:** connected, bonded, linked, related, bridged
+
+**Definition:**
+The visible thread between people, places, and ideas — art that makes the invisible bonds of relationship tangible. Connection art doesn't depict togetherness; it makes the viewer feel the pull of attachment.
+
+**Color Palette:**
+- Primary: `#E67E22` | `#D35400` | `#F39C12`
+- Accent: `#3498DB` | `#1ABC9C` | `#ECF0F1`
+- *Pairing Notes:* Warm connecting tones bridged to cool complement. Palette should feel like two things meeting. Orange-blue axis of complementary attraction.
+
+**Textures:** Bridge-like surfaces, Thread and string, Neural networks, Root systems
+
+**Shapes:**
+- Geometric: Bridges, Connecting lines, Network nodes, Paired forms with visible link
+- Organic: Root networks, Mycelium, Synapses, Reaching branches touching
+
+**Art Styles:** Network art, Relationship abstract, Bridge photography, Connection-focused design
+
+**Art Mediums:** String/thread installation, Network-visualization digital art, Photography (bridges/connections), AI-generated network imagery
+
+**Suggested Placements:**
+- Couples Therapy Office: Visualizing the bonds being strengthened
+- Networking Event Space: Encouraging connection between attendees
+- Long-distance relationship home: Paired pieces that 'connect' across distance
+
+**Relationships:**
+- Complements: Unity, Intimacy, Warmth, Harmony
+- Contrasts: Solitude, Freedom, Isolation, Stillness
+
+**Use Cases:**
+- *Couples Counselor:* Abstract with two distinct color fields meeting and intertwining at the center — orange warmth meeting blue depth
+- *Tech Conference:* Network visualization as art — nodes and connections in warm and cool tones, representing the power of professional bonds
+
+**Tags:** Bonded, Threaded, Networked, Bridged, Attracted
+
+---
+
+#### Passion
+
+**Slug:** `passion`
+**Keywords:** passionate, fervent, intense, burning, consuming
+
+**Definition:**
+The art of all-consuming intensity — work that burns with emotional fire. Passion art doesn't hold back; it commits fully to its emotional statement, creating spaces that vibrate with concentrated feeling.
+
+**Color Palette:**
+- Primary: `#C0392B` | `#E74C3C` | `#FF0000`
+- Accent: `#F39C12` | `#8E44AD` | `#000000`
+- *Pairing Notes:* Red at maximum intensity. Fire palette — red, orange, gold against black. Nothing cool, nothing calm. The palette should feel hot.
+
+**Textures:** Burning surfaces, Thick impasto, Aggressive brushwork, Molten textures
+
+**Shapes:**
+- Geometric: Explosive compositions, Radiating from center, Consuming expansions
+- Organic: Flames, Eruptions, Consuming waves, Intertwined bodies
+
+**Art Styles:** Neo-Expressionism, Action painting, Passionate abstract, Fire photography
+
+**Art Mediums:** Heavy oil painting, Mixed media with texture, Fire photography, AI-generated passionate abstracts
+
+**Suggested Placements:**
+- Dance Studio (Tango/Flamenco): Matching the intensity of passionate dance forms
+- Wine Bar: Adding sensory intensity to the experience
+- Intimate Restaurant: Creating an atmosphere of heightened sensation
+
+**Relationships:**
+- Complements: Romance, Energy, Bold Individuality, Tension
+- Contrasts: Peace, Serenity, Minimalism, Stillness
+
+**Use Cases:**
+- *Tango Studio:* Explosive red and black abstract — visible brushwork suggesting the rapid movement of dance — oversized canvas
+- *Wine Tasting Room:* Deep red abstract with burgundy, crimson, and gold, textured impasto suggesting the complexity of fine wine
+
+**Tags:** Burning, Consuming, Intense, Committed, Fiery
+
+---
+
 ### Boldness / Self-Expression
+
+**Category Color Signature:** `#F39C12`
+
+Unapologetic identity, courage, and making a statement.
+
+**Tokens:** 7
+
+---
+
+#### Adventure
+
+**Slug:** `adventure`
+**Keywords:** adventurous, daring, intrepid, brave, expeditionary
+
+**Definition:**
+The art of the unknown horizon — work that captures the exhilaration of setting out into uncharted territory. Adventure art creates a visceral pull toward the edge of the map.
+
+**Color Palette:**
+- Primary: `#1E8449` | `#D4AC0D` | `#2874A6`
+- Accent: `#CB4335` | `#F39C12` | `#ECF0F1`
+- *Pairing Notes:* Explorer's palette — forest green, compass gold, ocean blue. The colors of maps and expeditions. Rich, saturated, worldly.
+
+**Textures:** Weathered maps, Worn leather, Trail dust, Ocean spray, Compass patina
+
+**Shapes:**
+- Geometric: Compass roses, Map grids, Directional arrows, Horizon lines
+- Organic: Mountain trails, Winding rivers, Open seas, Dense forests parting
+
+**Art Styles:** Expedition photography, Adventure illustration, Explorer's map art, Wilderness realism
+
+**Art Mediums:** Large-format landscape photography, Vintage map art, Mixed media with found materials, AI-generated adventure landscapes
+
+**Suggested Placements:**
+- Travel Agency: Inspiring wanderlust
+- Adventure Company HQ: Living the brand
+- Teen Bedroom: Fueling dreams of exploration
+
+**Relationships:**
+- Complements: Exploration, Freedom, Bold Individuality, Tenacity
+- Contrasts: Comfort, Coziness, Stillness, Order
+
+**Use Cases:**
+- *Travel Company:* Dramatic expedition photography — mountain summits, ocean crossings — oversized on metal for maximum impact
+- *Adventure Bar/Restaurant:* Vintage-style map art combined with exploration photography, creating an atmosphere of worldly experience
+
+**Tags:** Expeditionary, Horizons, Uncharted, Daring, Pulling
+
+---
+
+#### Bold Individuality
+
+**Slug:** `bold-individuality`
+**Keywords:** bold, individual, distinctive, defiant, unapologetic, stand-out
+
+**Definition:**
+The art of being unmistakably yourself — work that declares personal identity with confidence, refusing to blend in or conform. Bold Individuality art makes the space it occupies feel like a manifesto.
+
+**Color Palette:**
+- Primary: `#000000` | `#FF0000` | `#FFFFFF`
+- Accent: `#FFD700` | `#FF1493` | `#00FF00`
+- *Pairing Notes:* Maximum contrast triads. Black and white as the bold statement, with one screaming accent. Unmissable.
+
+**Textures:** Street art quality, Bold graphic, Statement-making surfaces, Confrontational
+
+**Shapes:**
+- Geometric: Bold type forms, Graphic silhouettes, Statement compositions, Rule-breaking layouts
+- Organic: Self-portrait, Unique fingerprint, Signature gesture
+
+**Art Styles:** Street Art, Pop Art, Graphic design as art, Self-expression
+
+**Art Mediums:** Screen print, Spray paint on canvas, Bold digital art, AI-generated individuality statements
+
+**Suggested Placements:**
+- Personal apartment/home: Making the space unmistakably yours
+- Brand HQ: Embodying the brand's distinctive identity
+- Creative Office: Declaring that conformity is not welcome
+
+**Relationships:**
+- Complements: Freedom, Originality, Tenacity, Eccentricity
+- Contrasts: Harmony, Unity, Symmetry, Comfort
+
+**Use Cases:**
+- *Fashion Brand HQ:* Bold graphic art in black, white, and signature brand red — unmistakable and unapologetic — oversized screen print
+- *Personal Loft:* Street art-inspired canvas with unique personal symbols and bold color, making the space a self-portrait
+
+**Tags:** Unmistakable, Declaring, Manifesto, Unapologetic, Standout
+
+---
+
+#### Freedom
+
+**Slug:** `freedom`
+**Keywords:** free, liberated, unbound, open, unrestricted
+
+**Definition:**
+The art of limitlessness — work that captures the exhilarating sensation of barriers removed, horizons expanded, and possibilities made infinite. Freedom art creates spaces that feel expansive and unbounded.
+
+**Color Palette:**
+- Primary: `#87CEEB` | `#F0F8FF` | `#FFFFFF`
+- Accent: `#FFD700` | `#20B2AA` | `#FF6347`
+- *Pairing Notes:* Open sky palette — wide blue, white, and gold. Colors should feel like they're dissolving into infinite space. Nothing enclosed.
+
+**Textures:** Open sky, Wind, Boundless space, Light and air
+
+**Shapes:**
+- Geometric: No frames or borders, Expanding forms, Horizon-to-horizon compositions
+- Organic: Flying birds, Open wings, Vast landscapes, Unbroken horizons
+
+**Art Styles:** Expansive landscape, Open sky photography, Liberation abstract, Boundary-dissolving art
+
+**Art Mediums:** Panoramic photography, Open composition painting, Sky art, AI-generated boundless scenes
+
+**Suggested Placements:**
+- Cramped urban apartment: Creating the sensation of space where there is none
+- Prison / Restricted facility: Providing visual escape and hope
+- Home of a new chapter: Celebrating a fresh start and open future
+
+**Relationships:**
+- Complements: Adventure, Exploration, Bold Individuality, Ambition
+- Contrasts: Order, Structure, Stillness, Coziness
+
+**Use Cases:**
+- *Urban Studio Apartment:* Panoramic sky photograph — nothing but clouds and light — spanning the longest wall, creating visual infinity
+- *New Home:* Abstract in sky blue and gold, forms expanding outward beyond the canvas edges, frameless mounting
+
+**Tags:** Boundless, Expanding, Infinite, Unframed, Open
+
+---
+
+#### Ambition
+
+**Slug:** `ambition`
+**Keywords:** ambitious, driven, aspiring, hungry, climbing
+
+**Definition:**
+The art of reaching higher — work that embodies the determined upward trajectory of someone who sees the summit and has already begun climbing. Ambition art doesn't dream; it climbs.
+
+**Color Palette:**
+- Primary: `#1B2631` | `#2C3E50` | `#1A5276`
+- Accent: `#F39C12` | `#D4AC0D` | `#C0392B`
+- *Pairing Notes:* Dark professional base with gold achievement and red determination accents. Power blue + gold = classic ambition palette.
+
+**Textures:** Polished surfaces, Sharp edges, Ascending textures, Competitive quality
+
+**Shapes:**
+- Geometric: Ascending stairs, Skyscraper forms, Upward arrows, Summit compositions
+- Organic: Mountain ascent, Rising flames, Growing towers, Reaching hands
+
+**Art Styles:** Corporate power art, Aspirational photography, Achievement abstract, Competitive art
+
+**Art Mediums:** Architecture photography (skyscrapers), Bold graphic art, Metal prints, AI-generated achievement imagery
+
+**Suggested Placements:**
+- Corner Office: Projecting and reinforcing personal drive
+- Sales Floor: Maintaining competitive fire
+- Young Professional's First Apartment: Visual promise of what's coming
+
+**Relationships:**
+- Complements: Tenacity, Purpose, Bold Individuality, Dynamism
+- Contrasts: Peace, Comfort, Stillness, Coziness
+
+**Use Cases:**
+- *Sales Office:* Skyscraper photography from ground looking up — dramatic perspective, power blue and gold evening light — large-scale metal print
+- *Corner Office:* Abstract in navy and gold suggesting upward trajectory, every element ascending, frameless for modern authority
+
+**Tags:** Climbing, Summit, Driven, Upward, Determined
+
+---
+
+#### Tenacity
+
+**Slug:** `tenacity`
+**Keywords:** tenacious, persistent, determined, unyielding, grit
+
+**Definition:**
+The art of never giving up — work that embodies the beauty of persistence, endurance, and the refusal to be stopped. Tenacity art draws from images of things that survive against all odds.
+
+**Color Palette:**
+- Primary: `#4A4A4A` | `#6B4423` | `#2C1810`
+- Accent: `#C0392B` | `#F39C12` | `#228B22`
+- *Pairing Notes:* Weathered, tested palette. Colors of things that survived: storm-tested wood, fire-tempered steel. Beauty in the evidence of endurance.
+
+**Textures:** Weathered steel, Storm-tested surfaces, Scar tissue, Cracked but unbroken
+
+**Shapes:**
+- Geometric: Compressed but unbroken forms, Bent but standing, Resistance shapes
+- Organic: Trees growing through concrete, Rivers cutting through stone, Plants in desert
+
+**Art Styles:** Endurance photography, Grit abstract, Survival realism, Persistence art
+
+**Art Mediums:** Photography (endurance subjects), Heavily textured painting, Steel/iron art, AI-generated resilience imagery
+
+**Suggested Placements:**
+- Rehabilitation Center: Inspiring continued effort through recovery
+- Startup (post-pivot): Celebrating the refusal to quit
+- Athletic Training Facility: Building mental toughness through visual grit
+
+**Relationships:**
+- Complements: Strength, Ambition, Bold Individuality, Presence
+- Contrasts: Softness, Delicacy, Comfort, Playfulness
+
+**Use Cases:**
+- *Athletic Training Center:* Photography of weathered surfaces that survived — ship hull, mountain face, ancient tree — printed large on metal with visible texture
+- *Startup Office:* Abstract in steel gray with molten red accents — bent but unbroken forms — celebrating the company's resilience
+
+**Tags:** Unbroken, Surviving, Persistent, Weathered, Grit
+
+---
+
+#### Originality
+
+**Slug:** `originality`
+**Keywords:** original, unique, one-of-a-kind, novel, unprecedented
+
+**Definition:**
+The art of the genuinely new — work that creates rather than references, invents rather than iterates. Originality art makes the viewer see something they've never seen before and can't unsee after.
+
+**Color Palette:**
+- Primary: `#FF6B6B` | `#4ECDC4` | `#45B7D1`
+- Accent: `#96CEB4` | `#FFEAA7` | `#DFE6E9`
+- *Pairing Notes:* Deliberately unplaceable palette — not warm or cool, not primary or pastel. Colors that feel like they were invented for this piece.
+
+**Textures:** Never-before-seen surfaces, Novel materials, First-time techniques, Inventive application
+
+**Shapes:**
+- Geometric: Forms without precedent, Invented geometries, New combinations
+- Organic: Shapes that don't exist in nature, Invented organisms, Novel forms
+
+**Art Styles:** Pioneering abstract, New media art, Experimental, Category-defying
+
+**Art Mediums:** Novel material combinations, Experimental technique, New media, AI-generated novel forms
+
+**Suggested Placements:**
+- Contemporary Gallery: Where new art belongs
+- Innovation Lab: Reminding the team that truly new things are possible
+- Collector's Featured Wall: The piece that defines the collection
+
+**Relationships:**
+- Complements: Creativity, Bold Individuality, Eccentricity, Curiosity
+- Contrasts: Timelessness, Nostalgia, Legacy, Tradition
+
+**Use Cases:**
+- *Innovation Lab:* Art made with techniques or materials never combined before — the medium IS the message of originality
+- *Collector's Home:* The singular piece that anchors the collection — unlike anything else on any wall anywhere — conversation-starting by nature
+
+**Tags:** Novel, Invented, Unprecedented, Unseen, First
+
+---
+
+#### Exploration
+
+**Slug:** `exploration`
+**Keywords:** explorative, discovering, seeking, investigating, pioneering
+
+**Definition:**
+The art of the journey itself — not the destination but the act of seeking. Exploration art celebrates the process of discovery, the courage to look beyond the known, and the beauty found in unfamiliar territory.
+
+**Color Palette:**
+- Primary: `#1A5276` | `#117A65` | `#784212`
+- Accent: `#F39C12` | `#E74C3C` | `#D5D8DC`
+- *Pairing Notes:* Deep ocean, dense forest, rich earth — the colors of unmapped territory. Compass gold as the guiding accent.
+
+**Textures:** Map surfaces, Terrain textures, Dense forest, Deep water, Uncharted territory
+
+**Shapes:**
+- Geometric: Compass forms, Grid lines over unknown territory, Survey marks
+- Organic: Winding paths, Deep cave openings, Uncharted coastlines, Dense canopy
+
+**Art Styles:** Exploration photography, Discovery art, New territory abstract, Expedition illustration
+
+**Art Mediums:** Expedition photography, Map-based mixed media, Terrain art, AI-generated uncharted landscapes
+
+**Suggested Placements:**
+- Research Lab: Celebrating the spirit of scientific discovery
+- Travel Company: Inspiring clients to explore
+- University Department: Honoring the pursuit of knowledge
+
+**Relationships:**
+- Complements: Adventure, Curiosity, Freedom, Creativity
+- Contrasts: Comfort, Coziness, Stillness, Order
+
+**Use Cases:**
+- *Research University:* Large-format photograph of uncharted terrain — deep ocean floor, dense rainforest, polar ice — representing the unknown yet to be discovered
+- *Adventure Travel Company:* Mixed media combining vintage maps with modern exploration photography, compass gold accents, oversized on canvas
+
+**Tags:** Seeking, Uncharted, Journeying, Discovering, Pioneering
