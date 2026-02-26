@@ -124,9 +124,9 @@ import Prelude
 
 import Hydrogen.Math.Core as Math
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // pixel types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // pixel types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generic pixel - a discrete unit on some display
 -- | The physical size depends entirely on the display's PPI
@@ -190,9 +190,9 @@ derive instance ordScaledPixel :: Ord ScaledPixel
 instance showScaledPixel :: Show ScaledPixel where
   show (ScaledPixel n) = show n <> "sp"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // display properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // display properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Pixels per inch - the density of a display
 -- | This is what bridges device pixels to physical inches
@@ -230,9 +230,9 @@ derive instance ordDevicePixelRatio :: Ord DevicePixelRatio
 instance showDevicePixelRatio :: Show DevicePixelRatio where
   show (DevicePixelRatio n) = show n <> "x"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a Pixel value
 px :: Number -> Pixel
@@ -266,9 +266,9 @@ ppcm = PixelsPerCentimeter
 dpr :: Number -> DevicePixelRatio
 dpr = DevicePixelRatio
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add two Pixel values
 addPx :: Pixel -> Pixel -> Pixel
@@ -290,9 +290,9 @@ negatePx (Pixel n) = Pixel (negate n)
 absPx :: Pixel -> Pixel
 absPx (Pixel n) = Pixel (Math.abs n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // common display densities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // common display densities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard desktop monitor (96 PPI)
 -- | This is the CSS reference density
@@ -321,9 +321,9 @@ ppiPrint300 = PixelsPerInch 300.0
 ppiPrint600 :: PixelsPerInch
 ppiPrint600 = PixelsPerInch 600.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract the raw Number from a Pixel
 unwrapPixel :: Pixel -> Number
@@ -357,9 +357,9 @@ unwrapPpcm (PixelsPerCentimeter n) = n
 unwrapDpr :: DevicePixelRatio -> Number
 unwrapDpr (DevicePixelRatio n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // device profiles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // device profiles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Device form factor classification.
 data DeviceFormFactor
@@ -441,9 +441,9 @@ deviceProfile name formFactor width height ratio density saTop saRight saBottom 
   , capabilities: caps
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // common device profiles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // common device profiles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default phone capabilities
 phoneCapabilities :: DeviceCapabilities
@@ -651,9 +651,9 @@ desktopProfile = deviceProfile
   (Pixel 0.0)
   desktopCapabilities
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // device profile accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // device profile accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get profile viewport width.
 profileWidth :: DeviceProfile -> Pixel
@@ -708,9 +708,9 @@ supportsFaceID p = p.capabilities.faceID
 supportsForceTouch :: DeviceProfile -> Boolean
 supportsForceTouch p = p.capabilities.forceTouch
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // ppi/ppcm conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // ppi/ppcm conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Conversion factor: 1 inch = 2.54 centimeters
 inchesPerCm :: Number

@@ -130,9 +130,9 @@ import Hydrogen.Schema.Brand.Token.Color
   )
 import Hydrogen.Schema.Color.OKLCH (OKLCH)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // palette // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // palette // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Theme mode for color palettes.
 data PaletteMode
@@ -187,9 +187,9 @@ paletteModeFromString s = case toLower (trim s) of
 allPaletteModes :: Array PaletteMode
 allPaletteModes = [ModeLight, ModeDark, ModeContrast]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // color // palette
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // color // palette
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A palette of color tokens for a specific mode.
 type ColorPalette =
@@ -229,9 +229,9 @@ hasPaletteColor name p = case getPaletteColor name p of
   Just _ -> true
   Nothing -> false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // shade // scale
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A scale of shades for a single color (e.g., primary-50 through primary-950).
 type ShadeScale =
@@ -265,9 +265,9 @@ allShades scale = map (\s -> s.token) scale.shades
 shadeCount :: ShadeScale -> Int
 shadeCount scale = length scale.shades
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // color // system
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete color system with semantic organization.
 -- |
@@ -335,9 +335,9 @@ colorSystemDisplay cs =
   show (length cs.component) <> " component, " <>
   show (length cs.state) <> " state)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // themed // color // system
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // themed // color // system
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color system with multiple theme modes.
 -- |
@@ -396,9 +396,9 @@ resolveColor name mode tcs = do
   palette <- getPaletteForMode mode tcs
   getPaletteColor name palette
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // color // filtering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // color // filtering
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter colors by role.
 -- |
@@ -436,9 +436,9 @@ sortPaletteByName palette = Array.sortBy compareTokenNames (paletteColors palett
   compareTokenNames :: ColorToken -> ColorToken -> Ordering
   compareTokenNames a b = compare (unTokenName (colorTokenName a)) (unTokenName (colorTokenName b))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // palette // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // palette // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Merge two palettes, combining all colors.
 -- |
@@ -473,9 +473,9 @@ firstColor palette = head palette.colors
 restColors :: ColorPalette -> Maybe (Array ColorToken)
 restColors palette = tail palette.colors
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // shade // scale // generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // shade // scale // generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard shade levels used in design systems.
 -- |

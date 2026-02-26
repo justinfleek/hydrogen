@@ -74,9 +74,9 @@ import Effect.Ref as Ref
 import Data.DateTime.Instant (Instant, unInstant)
 import Data.Newtype (unwrap)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Session manager
 newtype Session user = Session
@@ -132,9 +132,9 @@ instance showAuthState :: Show AuthState where
   show Refreshing = "Refreshing"
   show Expired = "Expired"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // FFI
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 foreign import getStorageItem :: String -> String -> Effect (Maybe String)
 
@@ -142,9 +142,9 @@ foreign import setStorageItem :: String -> String -> String -> Effect Unit
 
 foreign import removeStorageItem :: String -> String -> Effect Unit
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // session management
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // session management
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default session configuration
 defaultConfig :: SessionConfig
@@ -261,9 +261,9 @@ refresh session@(Session s) refreshFn = do
       liftEffect $ setTokens session result
       pure $ Just result
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // token access
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current access token
 getAccessToken :: forall user. Session user -> Effect (Maybe String)
@@ -289,9 +289,9 @@ isExpired (Session { expiresAt }) = do
       currentTime <- now
       pure $ unInstant currentTime > unInstant expires
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // auth state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // auth state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current auth state
 getAuthState :: forall user. Session user -> Effect AuthState
@@ -317,9 +317,9 @@ onAuthStateChange (Session { listeners }) callback = do
   Ref.modify_ (flip Array.snoc sub) listeners
   pure $ Ref.modify_ (Array.filter (\s -> s.id /= nextId)) listeners
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // user data
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // user data
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set user data
 setUser :: forall user. EncodeJson user => Session user -> user -> Effect Unit
@@ -339,9 +339,9 @@ clearUser (Session s) = do
   let storageKey = storageTypeToKey s.config.storage
   removeStorageItem storageKey s.config.userKey
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 storageTypeToKey :: StorageType -> String
 storageTypeToKey = case _ of

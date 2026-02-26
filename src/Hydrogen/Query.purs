@@ -295,7 +295,7 @@ isEntryStale entry currentTime =
   toMs instant = unwrap (unInstant instant)
 
 -- =============================================================================
---                                                            // query operations
+--                                                           // query operations
 -- =============================================================================
 
 -- | Execute a query with caching and deduplication.
@@ -488,7 +488,7 @@ setQueryData (QueryClient c) key value = do
   Ref.modify_ (Map.insert (keyToString key) entry) c.cache
 
 -- =============================================================================
---                                                          // cache invalidation
+--                                                         // cache invalidation
 -- =============================================================================
 
 -- | Invalidate all queries matching a key prefix.
@@ -616,7 +616,7 @@ fetchNextPage _client opts state = do
             }
 
 -- =============================================================================
---                                                    // batching (DataLoader)
+--                                                      // batching (DataLoader)
 -- =============================================================================
 
 -- | Options for a batcher.

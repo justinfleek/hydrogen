@@ -128,9 +128,9 @@ import Hydrogen.Schema.Geometry.Radius
   )
 import Hydrogen.Schema.Color.RGB as Color
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // border side
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // border side
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A single border side (molecule)
 -- |
@@ -182,9 +182,9 @@ sideToLegacyCss s =
 sideToCss :: BorderSide -> String
 sideToCss = sideToLegacyCss
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // border edges
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // border edges
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All four border edges (compound)
 -- |
@@ -316,9 +316,9 @@ edgesToLegacyCss e =
 edgesToCss :: BorderEdges -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String }
 edgesToCss = edgesToLegacyCss
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // border (full)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // border (full)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Full border specification (compound)
 -- |
@@ -385,9 +385,9 @@ borderToLegacyCss b =
 borderToCss :: Border -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String, borderRadius :: String }
 borderToCss = borderToLegacyCss
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Update width on all sides
 withWidth :: StrokeWidth -> Border -> Border

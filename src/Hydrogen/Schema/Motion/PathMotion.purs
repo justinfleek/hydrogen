@@ -114,9 +114,9 @@ module Hydrogen.Schema.Motion.PathMotion
   , mapSampledPositions
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -162,9 +162,9 @@ import Hydrogen.Schema.Geometry.Spline
 import Hydrogen.Schema.Motion.Easing (Easing, evaluate, linear, easeInOut)
 import Hydrogen.Schema.Dimension.Temporal (Frames(Frames), unwrapFrames)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Source path for motion.
 -- |
@@ -238,9 +238,9 @@ instance showMotionPath :: Show MotionPath where
   show (MotionPath mp) = "(MotionPath dur:" <> show mp.durationFrames 
     <> " orient:" <> show mp.orientMode <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a motion path with full configuration.
 motionPath :: PathSource -> Number -> Easing -> MotionPath
@@ -269,9 +269,9 @@ motionPathWithBank source dur eas bankMax =
       (MotionPath mp) = base
   in MotionPath (mp { orientMode = OrientToPath, bankAngle = bankMax })
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // evaluation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // evaluation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get position at a specific frame number.
 positionAtFrame :: Number -> MotionPath -> Point2D
@@ -371,9 +371,9 @@ sampleAtProgress progress (MotionPath mp) =
       , bank: bank
       }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set duration in frames.
 setDuration :: Number -> MotionPath -> MotionPath
@@ -408,9 +408,9 @@ setOffset :: Number -> Number -> MotionPath -> MotionPath
 setOffset start end (MotionPath mp) = 
   MotionPath (mp { startOffset = clamp01 start, endOffset = clamp01 end })
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get path source.
 pathSource :: MotionPath -> PathSource
@@ -436,9 +436,9 @@ isLooping (MotionPath mp) = mp.loop
 isPingPong :: MotionPath -> Boolean
 isPingPong (MotionPath mp) = mp.pingPong
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // path length
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // path length
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get total path length.
 pathLength :: MotionPath -> Number
@@ -455,9 +455,9 @@ arcLengthToProgress arcLen mp =
   let total = pathLength mp
   in if total < epsilon then 0.0 else clamp01 (arcLen / total)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // frame utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // frame utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert frame number to progress (0-1).
 frameToProgress :: Number -> MotionPath -> Number
@@ -487,9 +487,9 @@ isActiveAtFrame frame (MotionPath mp) =
   in if mp.loop then true
      else relativeFrame >= 0.0 && relativeFrame <= mp.durationFrames
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // batch sampling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // batch sampling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sample motion at every frame in range.
 sampleFrameRange :: Number -> Number -> MotionPath -> Array MotionSample
@@ -511,9 +511,9 @@ samplePoints n mp =
     in Just (positionAtProgress progress mp)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Evaluate position on path source.
 evaluatePathPosition :: PathSource -> Number -> Point2D
@@ -686,17 +686,17 @@ buildArrayImpl i n f acc =
 buildIntArray :: Int -> Array Int
 buildIntArray n = buildArray n Just
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // presets
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default easing (ease in-out).
 defaultEasing :: Easing
 defaultEasing = easeInOut
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // frame conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // frame conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Frames to duration number.
 framesToDuration :: Frames -> Number
@@ -706,9 +706,9 @@ framesToDuration f = unwrapFrames f
 durationToFrames :: Number -> Frames
 durationToFrames n = Frames n
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // path filtering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter frame numbers to only those where path is active.
 filterActiveFrames :: Array Number -> MotionPath -> Array Number

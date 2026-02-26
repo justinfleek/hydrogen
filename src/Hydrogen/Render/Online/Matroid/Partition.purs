@@ -64,9 +64,9 @@ import Hydrogen.Render.Online.Core
   )
 import Hydrogen.Render.Online.Matroid.Class (class Matroid, independent)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // tier // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for each render tier
 -- |
@@ -115,9 +115,9 @@ defaultTierBounds = TierBounds
   , backgroundBound: 32
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // tier // counts
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Count of selections per tier
 newtype TierCounts = TierCounts
@@ -157,9 +157,9 @@ addToCount (TierCounts counts) (RegionSelection { region: Region r }) =
     Peripheral -> TierCounts counts { peripheralCount = counts.peripheralCount + 1 }
     Background -> TierCounts counts { backgroundCount = counts.backgroundCount + 1 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // tiered // partition // matroid
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // tiered // partition // matroid
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Partition matroid over render tiers
 -- |

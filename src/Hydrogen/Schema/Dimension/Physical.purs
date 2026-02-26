@@ -277,9 +277,9 @@ import Hydrogen.Schema.Dimension.Physical.Astronomical
   , metersPerAU
   ) as Astronomical
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // type class
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // type class
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type class for physical length units.
 -- | All conversions go through Meter as the canonical representation.
@@ -495,9 +495,9 @@ instance physicalLengthLightMinute :: PhysicalLength Astronomical.LightMinute wh
   toMeters (Astronomical.LightMinute n) = SI.Meter (n * Astronomical.speedOfLight * 60.0)
   fromMeters (SI.Meter n) = Astronomical.LightMinute (n / Astronomical.speedOfLight / 60.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // generic conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // generic conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert between any two physical length units.
 -- | Goes through Meter as canonical representation.

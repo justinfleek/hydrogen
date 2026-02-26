@@ -129,9 +129,9 @@ module Hydrogen.Optimize.Submodular.Online
   , polytopeGroundSet
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -188,9 +188,9 @@ import Hydrogen.Optimize.Submodular.Continuous
   , dependentRound
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // online configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // online configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for online submodular maximization.
 newtype OnlineConfig = OnlineConfig
@@ -241,9 +241,9 @@ defaultOnlineConfig = OnlineConfig
   , adaptiveSteps: true
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // utility feedback
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // utility feedback
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Utility feedback from the environment (adversary's reveal).
 -- |
@@ -274,9 +274,9 @@ mkUtilityFeedback utilityValue executionTime round = UtilityFeedback
   , round
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // regret tracking
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // regret tracking
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State for tracking regret over time.
 -- |
@@ -366,9 +366,9 @@ regretBound (RegretState r) = r.theoreticalBound
 isWithinBound :: RegretState -> Boolean
 isWithinBound state = currentRegret state <= regretBound state
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // blackwell approachability
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // blackwell approachability
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State for Blackwell approachability algorithm.
 -- |
@@ -445,9 +445,9 @@ computeDual avg = map (\x -> if x > 0.0 then negate x else 0.0) avg
 blackwellResponse :: BlackwellState -> Array Number
 blackwellResponse (BlackwellState { dualVariable }) = dualVariable
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // online state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // online state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete state for online submodular maximization.
 newtype OnlineState v = OnlineState
@@ -528,9 +528,9 @@ resetOnlineState groundSet (OnlineState s) =
       , matroidRank: s.matroidRank
       }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // online algorithm
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // online algorithm
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Perform one step of online submodular maximization.
 -- |
@@ -664,9 +664,9 @@ runOnlineLoop matroid groundSet oracle numRounds state selections currentRound =
       in
         runOnlineLoop matroid groundSet oracle numRounds nextState newSelections (currentRound + 1)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // first-order bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute first-order regret bound.
 -- |
@@ -703,9 +703,9 @@ adaptiveStepSize (RegretState r) (OnlineConfig c) t =
       in
         min 1.0 adaptive
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Update gradient estimate from utility feedback.
 updateGradientEstimate 
@@ -763,9 +763,9 @@ mod a b = a - (a / b) * b
 intToNum :: Int -> Number
 intToNum i = foldl (\acc _ -> acc + 1.0) 0.0 (Array.range 1 i)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if we're still in the warmup phase (uses < operator).
 -- |
@@ -789,9 +789,9 @@ solutionFromCoords gs coords = mkFractionalSolution gs coords
 getSolutionCoord :: forall v. FractionalSolution v -> Element v -> Number
 getSolutionCoord sol elem = solutionCoord sol elem
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // lean proof accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract ground set size from a fractional solution.
 -- |

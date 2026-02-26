@@ -59,9 +59,9 @@ import Effect (Effect)
 import Effect.Aff (Aff, makeAff, nonCanceler)
 import Effect.Exception (Error)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Service Worker Registration
 foreign import data Registration :: Type
@@ -86,9 +86,9 @@ instance showServiceWorkerState :: Show ServiceWorkerState where
 -- | Handler for update found events
 type UpdateFoundHandler = Effect Unit
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // FFI
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 foreign import isSupportedImpl :: Effect Boolean
 
@@ -128,9 +128,9 @@ foreign import isControlledImpl :: Effect Boolean
 
 foreign import skipWaitingImpl :: Registration -> Effect Unit
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // registration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // registration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if service workers are supported
 isSupported :: Effect Boolean
@@ -161,9 +161,9 @@ getRegistration = makeAff \callback -> do
     (callback (Right Nothing))
   pure nonCanceler
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // updates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // updates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check for service worker updates
 checkForUpdate :: Registration -> Aff Unit
@@ -181,9 +181,9 @@ skipWaiting = skipWaitingImpl
 onUpdateFound :: Registration -> UpdateFoundHandler -> Effect Unit
 onUpdateFound = onUpdateFoundImpl
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current service worker state
 getState :: Registration -> Effect (Maybe ServiceWorkerState)
@@ -203,9 +203,9 @@ onStateChange reg callback =
     "redundant" -> Redundant
     _ -> Redundant
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // communication
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // communication
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Post a message to the service worker
 postMessage :: Registration -> String -> Effect Unit
@@ -215,9 +215,9 @@ postMessage = postMessageImpl
 onMessage :: (String -> Effect Unit) -> Effect Unit
 onMessage = onMessageImpl
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if page is controlled by a service worker
 isControlled :: Effect Boolean

@@ -75,9 +75,9 @@ import Data.Maybe (Maybe(Nothing), isJust)
 
 import Hydrogen.Schema.Color.RGB (RGBA, rgba)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // focus visibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus indicator visibility mode
 data FocusVisibility
@@ -107,9 +107,9 @@ shouldShowRing FocusVisible _ = true
 shouldShowRing FocusHidden _ = false
 shouldShowRing FocusAuto origin = isKeyboardOrigin origin
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // focus origin
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How focus was acquired
 data FocusOrigin
@@ -143,9 +143,9 @@ isProgrammaticOrigin :: FocusOrigin -> Boolean
 isProgrammaticOrigin ProgrammaticOrigin = true
 isProgrammaticOrigin _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // focus ring style
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Visual style of focus indicator
 data FocusRingStyle
@@ -173,9 +173,9 @@ isBorderRing :: FocusRingStyle -> Boolean
 isBorderRing BorderRing = true
 isBorderRing _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // focus ring molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // focus ring molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus ring appearance configuration
 -- |
@@ -292,9 +292,9 @@ withTwoRing innerCol outerCol ring = ring
   , outerColor = outerCol
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // focus trap mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // focus trap mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus trap behavior
 data FocusTrapMode
@@ -322,9 +322,9 @@ isNoTrap :: FocusTrapMode -> Boolean
 isNoTrap NoTrap = true
 isNoTrap _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // focus trap molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // focus trap molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus trap configuration
 type FocusTrap =
@@ -375,9 +375,9 @@ isTrapActive trap = trap.active && not (isNoTrap trap.mode)
 shouldReturnFocus :: FocusTrap -> Boolean
 shouldReturnFocus trap = trap.returnFocusOnDeactivate && isJust trap.finalFocusId
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // roving tabindex
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // roving tabindex
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Roving tabindex state for composite widgets (toolbars, menus, listboxes)
 type RovingTabindex =
@@ -445,9 +445,9 @@ rovingMoveLast rt
 isRovingFocused :: Int -> RovingTabindex -> Boolean
 isRovingFocused idx rt = idx == rt.focusedIndex
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // focus scope compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus scope - manages focus within a region
 type FocusScope =

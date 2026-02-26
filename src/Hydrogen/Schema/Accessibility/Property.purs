@@ -40,9 +40,9 @@ import Prelude
 
 import Data.Maybe (Maybe)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // relationship properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // relationship properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | aria-labelledby: ID references to elements that label this element.
 newtype AriaLabelledBy = AriaLabelledBy (Array String)
@@ -97,9 +97,9 @@ newtype AriaErrorMessage = AriaErrorMessage String
 derive instance eqAriaErrorMessage :: Eq AriaErrorMessage
 derive newtype instance showAriaErrorMessage :: Show AriaErrorMessage
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // widget properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | aria-autocomplete: Type of autocomplete interaction for combobox/textbox.
 data AriaAutocomplete
@@ -195,9 +195,9 @@ newtype AriaValueText = AriaValueText String
 derive instance eqAriaValueText :: Eq AriaValueText
 derive newtype instance showAriaValueText :: Show AriaValueText
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // label properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // label properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | aria-label: Human-readable label text.
 newtype AriaLabel = AriaLabel String

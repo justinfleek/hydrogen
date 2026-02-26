@@ -227,9 +227,9 @@ import Hydrogen.Element.Compound.DataGrid.Column
 import Hydrogen.Element.Compound.DataGrid.Cell as Cell
 import Hydrogen.Element.Compound.DataGrid.Processing as Processing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // grid component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // grid component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the data grid
 -- |
@@ -282,9 +282,9 @@ dataGrid propMods =
         renderPagination props (length processedRows)
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // global search
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render global search input
 renderGlobalSearch :: forall msg. GridProps msg -> Array (ColumnDef msg) -> E.Element msg
@@ -313,9 +313,9 @@ renderGlobalSearch props cols =
         ]
       else E.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // header
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // header
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render table header
 renderHeader :: forall msg. GridProps msg -> Array (ColumnDef msg) -> E.Element msg
@@ -411,9 +411,9 @@ renderHeaderCell props colIndex col =
       )
       [ headerContent ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // body
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // body
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render table body
 renderBody :: forall msg. GridProps msg -> Array (ColumnDef msg) -> Array (Object String) -> E.Element msg
@@ -620,9 +620,9 @@ renderDataCell props col rowIndex colIndex rowData isSelected isExpanded =
       )
       [ Cell.renderCell props col rowIndex colIndex cellContext ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // loading overlay
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render loading overlay
 renderLoadingOverlay :: forall msg. GridProps msg -> E.Element msg
@@ -672,9 +672,9 @@ defaultLoadingState props =
         [ E.text "Loading..." ]
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // pagination
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // pagination
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render pagination controls
 renderPagination :: forall msg. GridProps msg -> Int -> E.Element msg
@@ -752,9 +752,9 @@ renderPaginationControls props currentPg totalPages total _ps =
         ]
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Data Props
 
@@ -930,9 +930,9 @@ onPageChange handler props = props { onPageChange = Just handler }
 onGlobalSearch :: forall msg. (String -> msg) -> GridProp msg
 onGlobalSearch handler props = props { onGlobalSearch = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // export
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Export grid data to CSV string
 exportCsv :: forall msg. GridProps msg -> String

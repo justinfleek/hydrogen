@@ -130,9 +130,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toast position on screen
 data ToastPosition
@@ -159,9 +159,9 @@ type ToastActionConfig msg =
   , onAction :: msg
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // toast props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // toast props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toast properties
 type ToastProps msg =
@@ -234,9 +234,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // container props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // container props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Container properties
 type ContainerProps msg =
@@ -263,9 +263,9 @@ defaultContainerProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set toast title
 title :: forall msg. String -> ToastProp msg
@@ -287,9 +287,9 @@ action a props = props { action = Just a }
 toastId :: forall msg. String -> ToastProp msg
 toastId i props = props { id = Just i }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> ToastProp msg
@@ -315,9 +315,9 @@ titleColor c props = props { titleColor = Just c }
 descriptionColor :: forall msg. Color.RGB -> ToastProp msg
 descriptionColor c props = props { descriptionColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> ToastProp msg
@@ -327,17 +327,17 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> ToastProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: elevation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: elevation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set shadow (Shadow.LayeredShadow atom)
 shadow :: forall msg. Shadow.LayeredShadow -> ToastProp msg
 shadow s props = props { shadow = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> ToastProp msg
@@ -351,9 +351,9 @@ maxWidth w props = props { maxWidth = Just w }
 gap :: forall msg. Device.Pixel -> ToastProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set title font size (FontSize atom)
 titleFontSize :: forall msg. FontSize.FontSize -> ToastProp msg
@@ -367,9 +367,9 @@ titleFontWeight w props = props { titleFontWeight = Just w }
 descriptionFontSize :: forall msg. FontSize.FontSize -> ToastProp msg
 descriptionFontSize s props = props { descriptionFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: container
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: container
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set container position
 position :: forall msg. ToastPosition -> ContainerProp msg
@@ -379,25 +379,25 @@ position p props = props { position = p }
 containerGap :: forall msg. Device.Pixel -> ContainerProp msg
 containerGap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set dismiss handler
 onDismiss :: forall msg. msg -> ToastProp msg
 onDismiss handler props = props { onDismiss = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ToastProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a toast notification
 -- |
@@ -521,9 +521,9 @@ buildToastContent props =
     , actionEl
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // sub-components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // sub-components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toast title element
 toastTitle :: forall msg. ToastProps msg -> String -> E.Element msg
@@ -606,9 +606,9 @@ toastClose props =
         ]
         [ E.text "×" ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // toast container
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // toast container
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Container for multiple toasts
 -- |

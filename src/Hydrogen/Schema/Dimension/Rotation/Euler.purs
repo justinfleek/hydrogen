@@ -95,9 +95,9 @@ import Hydrogen.Schema.Dimension.Rotation.Quaternion
   , mulQuaternion
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // rotation order
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // rotation order
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The six possible rotation orders for Euler angles.
 -- | Each order specifies which axis to rotate around first, second, third.
@@ -127,9 +127,9 @@ instance showRotationOrder :: Show RotationOrder where
 defaultOrder :: RotationOrder
 defaultOrder = XYZ
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Euler angles representing a 3D rotation.
 -- |
@@ -150,9 +150,9 @@ instance showEuler :: Show Euler where
   show (Euler x y z order) =
     "Euler(" <> show x <> ", " <> show y <> ", " <> show z <> ", " <> show order <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create Euler angles from components
 euler :: Number -> Number -> Number -> RotationOrder -> Euler
@@ -188,9 +188,9 @@ eulerFromVec3 (Vec3 x y z) = Euler x y z XYZ
 eulerFromVec3WithOrder :: Vec3 Number -> RotationOrder -> Euler
 eulerFromVec3WithOrder (Vec3 x y z) order = Euler x y z order
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // basic operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // basic operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Euler angles to Vec3 (loses order information)
 -- | Proof reference: Euler.lean toVec3, toVec3_fromVec3
@@ -209,9 +209,9 @@ setOrderEuler order (Euler x y z _) = Euler x y z order
 negEuler :: Euler -> Euler
 negEuler (Euler x y z order) = Euler (negate x) (negate y) (negate z) order
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // conversion to mat3
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // conversion to mat3
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Euler angles to Mat3 rotation matrix.
 -- |
@@ -236,9 +236,9 @@ toMat3Euler (Euler x y z order) =
     YXZ -> mulMat3 (mulMat3 rz rx) ry  -- Z(X(Y))
     ZYX -> mulMat3 (mulMat3 rx ry) rz  -- X(Y(Z))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // conversion to mat4
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // conversion to mat4
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Euler angles to Mat4 rotation matrix.
 -- | The translation component is zero (pure rotation).
@@ -258,9 +258,9 @@ toMat4Euler (Euler x y z order) =
     YXZ -> mulMat4 (mulMat4 rz rx) ry  -- Z(X(Y))
     ZYX -> mulMat4 (mulMat4 rx ry) rz  -- X(Y(Z))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // conversion to quaternion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // conversion to quaternion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Euler angles to Quaternion.
 -- |
@@ -282,9 +282,9 @@ toQuaternionEuler (Euler x y z order) =
     YXZ -> mulQuaternion (mulQuaternion qz qx) qy  -- qz * qx * qy
     ZYX -> mulQuaternion (mulQuaternion qx qy) qz  -- qx * qy * qz
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get X component (rotation around X axis in radians)
 getX :: Euler -> Number

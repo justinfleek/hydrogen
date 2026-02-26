@@ -34,9 +34,9 @@ import Prelude
 
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // filterhighlights
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // filter-highlights
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter highlights adjustment (-1.0 to +1.0)
 -- |
@@ -49,17 +49,17 @@ derive instance ordFilterHighlights :: Ord FilterHighlights
 instance showFilterHighlights :: Show FilterHighlights where
   show (FilterHighlights h) = "FilterHighlights " <> show h
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a filter highlights, clamping to -1.0 to +1.0
 filterHighlights :: Number -> FilterHighlights
 filterHighlights n = FilterHighlights (Bounded.clampNumber (-1.0) 1.0 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | No highlight adjustment
 normal :: FilterHighlights
@@ -79,9 +79,9 @@ boosted = FilterHighlights 0.5
 invert :: FilterHighlights -> FilterHighlights
 invert (FilterHighlights h) = FilterHighlights (negate h)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract the raw Number value
 unwrap :: FilterHighlights -> Number

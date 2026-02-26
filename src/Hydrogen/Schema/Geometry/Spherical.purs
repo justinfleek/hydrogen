@@ -93,9 +93,9 @@ module Hydrogen.Schema.Geometry.Spherical
   , showSpherical
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -141,9 +141,9 @@ import Hydrogen.Schema.Geometry.Angle
   , shortestPath
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // spherical point type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // spherical point type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Spherical coordinate point.
 -- |
@@ -214,9 +214,9 @@ sphericalTheta (SphericalPoint p) = p.theta
 sphericalPhi :: SphericalPoint -> Degrees
 sphericalPhi (SphericalPoint p) = p.phi
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert spherical coordinates to Cartesian.
 -- |
@@ -276,9 +276,9 @@ fromLatLon latitude longitude =
       theta = if longitude < 0.0 then longitude + 360.0 else longitude
   in SphericalPoint { radius: 1.0, theta: Degrees theta, phi: Degrees phi }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Rotate around the Z-axis (change theta).
 rotateTheta :: Degrees -> SphericalPoint -> SphericalPoint
@@ -330,9 +330,9 @@ mirrorPhi (SphericalPoint p) =
       mirrored = 180.0 - phiDeg
   in SphericalPoint { radius: p.radius, theta: p.theta, phi: Degrees mirrored }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // common points
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // common points
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Origin in spherical coordinates.
 sphericalOrigin :: SphericalPoint
@@ -346,9 +346,9 @@ northPole = SphericalPoint { radius: 1.0, theta: Degrees 0.0, phi: Degrees 0.0 }
 southPole :: SphericalPoint
 southPole = SphericalPoint { radius: 1.0, theta: Degrees 0.0, phi: Degrees 180.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // interpolation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear interpolation between spherical points.
 -- |
@@ -395,9 +395,9 @@ slerp t sp1 sp2 =
             , phi: sphericalPhi result
             }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // comparison
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // comparison
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Squared distance between two spherical points in Cartesian space.
 sphericalDistanceSquared :: SphericalPoint -> SphericalPoint -> Number
@@ -449,9 +449,9 @@ sameTheta (SphericalPoint p1) (SphericalPoint p2) = p1.theta == p2.theta
 samePhi :: SphericalPoint -> SphericalPoint -> Boolean
 samePhi (SphericalPoint p1) (SphericalPoint p2) = p1.phi == p2.phi
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // surface sampling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // surface sampling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate evenly distributed points on a sphere using Fibonacci spiral.
 -- |
@@ -484,9 +484,9 @@ fibonacciSphere n =
       | cur > end = acc
       | otherwise = rangeHelper (cur + 1) end (snoc acc cur)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // display
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // display
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format spherical point for display.
 showSpherical :: SphericalPoint -> String

@@ -117,9 +117,9 @@ module Hydrogen.Optimize.Submodular.Continuous
   , dependentRound
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -172,9 +172,9 @@ import Hydrogen.Optimize.Submodular.Types
   , canExtend
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // fractional solution
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // fractional solution
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A fractional solution x ∈ [0,1]^n.
 -- |
@@ -275,9 +275,9 @@ uniform (GroundSet { size, elements }) p =
       coords = foldl (\acc (Element i) -> Map.insert i clampedP acc) Map.empty elements
   in FractionalSolution { groundSetSize: unwrapDim size, coords }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // multilinear extension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // multilinear extension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The multilinear extension of a submodular function.
 -- |
@@ -414,9 +414,9 @@ gradientSampled ext@(MultilinearExt { groundSet }) sol samplesPerCoord seed =
        in Map.insert i deriv acc
      ) Map.empty elements
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // matroid polytope
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // matroid polytope
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | The matroid polytope P(M) for a matroid M.
 -- |
@@ -488,9 +488,9 @@ greedySelectWeighted matroid sorted current =
         then greedySelectWeighted matroid rest (Set.insert e current)
         else greedySelectWeighted matroid rest current
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // continuous greedy
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for continuous greedy algorithm.
 newtype ContinuousGreedyConfig = ContinuousGreedyConfig
@@ -588,9 +588,9 @@ addScaled (FractionalSolution { groundSetSize, coords: x }) alpha (FractionalSol
       clamped = map clampUnit newCoords
   in FractionalSolution { groundSetSize, coords: clamped }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                              // faa-enhanced continuous greedy
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // faa-enhanced continuous greedy
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | FAA (Floquet Adiabatic Algorithm) Configuration.
 -- |
@@ -725,9 +725,9 @@ continuousGreedyStepFAA ext polytope (FAAConfig { targetIterations, samplesPerGr
       -- Update
   in addScaled current stepSize direction
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // gradient estimation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // gradient estimation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A gradient estimate with variance information.
 newtype GradientEstimate :: Type -> Type
@@ -820,9 +820,9 @@ averageGradients grads =
       sumGrad = foldl (Map.unionWith (+)) Map.empty grads
   in map (\x -> x / intToNum n) sumGrad
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // solution rounding
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sample a discrete solution from fractional solution.
 -- |
@@ -895,9 +895,9 @@ greedyRoundSorted matroid sorted current seed =
                else greedyRoundSorted matroid rest current seed
         else greedyRoundSorted matroid rest current seed
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Int to Number.
 intToNum :: Int -> Number

@@ -22,9 +22,9 @@ module Hydrogen.Element.Compound.QRCode.Types.Capacity
   , getCapacity
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( (+)
@@ -37,9 +37,9 @@ import Data.EuclideanRing (div)
 import Hydrogen.Element.Compound.QRCode.Types.Version (QRVersion(QRVersion))
 import Hydrogen.Element.Compound.QRCode.Types.ErrorCorrection (ErrorCorrection(ECLow, ECMedium, ECQuartile, ECHigh))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // capacity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // capacity
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Capacity information for a version/EC combination.
 -- |

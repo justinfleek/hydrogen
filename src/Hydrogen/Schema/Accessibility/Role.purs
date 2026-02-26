@@ -33,9 +33,9 @@ module Hydrogen.Schema.Accessibility.Role
 
 import Prelude
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // widget roles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // widget roles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Widget roles for interactive UI elements.
 -- |
@@ -90,9 +90,9 @@ widgetRoleToString RoleTabpanel = "tabpanel"
 widgetRoleToString RoleTextbox = "textbox"
 widgetRoleToString RoleTreeitem = "treeitem"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // composite widget roles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // composite widget roles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Composite widget roles — containers that manage child widgets.
 -- |
@@ -125,9 +125,9 @@ compositeRoleToString RoleTablist = "tablist"
 compositeRoleToString RoleTree = "tree"
 compositeRoleToString RoleTreegrid = "treegrid"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // document structure roles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // document structure roles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Document structure roles — content organization.
 -- |
@@ -196,9 +196,9 @@ structureRoleToString RoleTerm = "term"
 structureRoleToString RoleToolbar = "toolbar"
 structureRoleToString RoleTooltip = "tooltip"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // window roles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // window roles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Window roles — dialogs and alerts.
 -- |

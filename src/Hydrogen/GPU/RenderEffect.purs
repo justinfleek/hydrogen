@@ -167,9 +167,9 @@ module Hydrogen.GPU.RenderEffect
   , centeredZoomBlur
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -186,9 +186,9 @@ import Hydrogen.GPU.ComputeKernel
   , RadialBlurType(RadialTypeSpin, RadialTypeZoom)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // core types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // core types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A render effect — composable GPU operation.
 -- |
@@ -308,9 +308,9 @@ instance showBlendMode :: Show BlendMode where
   show BlendDifference = "BlendDifference"
   show BlendExclusion = "BlendExclusion"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // blur effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blur effect variants
 data BlurEffect
@@ -379,9 +379,9 @@ instance showZoomBlur :: Show ZoomBlur where
 -- and re-exported for API completeness. The canonical definitions live at the
 -- GPU compute level where quality/performance tradeoffs are actually implemented.
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // glow effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Glow effect variants
 data GlowEffect
@@ -473,9 +473,9 @@ data GlowEasing
 
 derive instance eqGlowEasing :: Eq GlowEasing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // shadow effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Shadow effect variants
 data ShadowEffect
@@ -531,9 +531,9 @@ derive instance eqContactShadow :: Eq ContactShadow
 instance showContactShadow :: Show ContactShadow where
   show (ContactShadow s) = "(ContactShadow blur:" <> show s.blur <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // border effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Border effect variants
 data BorderEffect
@@ -625,9 +625,9 @@ derive instance eqGlowingBorder :: Eq GlowingBorder
 instance showGlowingBorder :: Show GlowingBorder where
   show (GlowingBorder b) = "(GlowingBorder width:" <> show b.width <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // material effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Material effect variants
 data MaterialEffect
@@ -709,9 +709,9 @@ derive instance eqGrainEffect :: Eq GrainEffect
 instance showGrainEffect :: Show GrainEffect where
   show (GrainEffect m) = "(GrainEffect amount:" <> show m.amount <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // temporal effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Temporal effect variants
 data TemporalEffect
@@ -772,9 +772,9 @@ derive instance eqTimeWarp :: Eq TimeWarp
 instance showTimeWarp :: Show TimeWarp where
   show (TimeWarp t) = "(TimeWarp displacement:" <> show t.displacement <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // particle effects
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Particle effect variants
 data ParticleEffect
@@ -826,9 +826,9 @@ derive instance eqParticleEmitter :: Eq ParticleEmitter
 instance showParticleEmitter :: Show ParticleEmitter where
   show (ParticleEmitter p) = "(ParticleEmitter rate:" <> show p.rate <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // effect composition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sequence effects (apply in order)
 effectSequence :: Array RenderEffect -> RenderEffect
@@ -857,9 +857,9 @@ effectIfThenElse condition thenEffect elseEffect = EffectConditional
 effectAnimated :: RenderEffect -> RenderEffect -> Number -> RenderEffect
 effectAnimated from to progress = EffectAnimated { from, to, progress }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // effect constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Blur constructors
 gaussianBlur :: Number -> RenderEffect
@@ -969,9 +969,9 @@ particleEmitter positionX positionY rate color = EffectParticle (ParticleEmitter
   { positionX, positionY, rate, sizeMin: 2.0, sizeMax: 4.0, color
   , velocity: 100.0, gravity: 50.0, spread: 45.0, lifetime: 2.0 }))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Preset: subtle blur (8px)
 subtleBlur :: RenderEffect

@@ -70,9 +70,9 @@ import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Subscriber with ID for tracking
 type AtomSubscriber a = { id :: Int, callback :: a -> Effect Unit }
@@ -94,9 +94,9 @@ newtype AtomStore = AtomStore
   { atoms :: Ref (Map.Map String (Ref String))  -- Serialized snapshots
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // atom creation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a new atom with an initial value
 atom :: forall a. a -> Effect (Atom a)
@@ -240,9 +240,9 @@ asyncAtom initial fetchFn = do
     liftEffect $ set atomRef result
   pure atomRef
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // atom operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // atom operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the current value of an atom
 get :: forall a. Atom a -> Effect a
@@ -267,9 +267,9 @@ modify a@(Atom { ref }) f = do
 reset :: forall a. Atom a -> Effect Unit
 reset a@(Atom { initial }) = set a initial
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // subscriptions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // subscriptions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Subscribe to atom changes, returns unsubscribe function
 subscribe :: forall a. Atom a -> (a -> Effect Unit) -> Effect (Effect Unit)
@@ -295,9 +295,9 @@ subscribeWithPrevious (Atom { ref, subscribers, nextId }) callback = do
   Ref.modify_ (Array.cons sub) subscribers
   pure $ Ref.modify_ (Array.filter (\s -> s.id /= id)) subscribers
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // store management
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // store management
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a new atom store
 newStore :: Effect AtomStore
@@ -330,9 +330,9 @@ restore (AtomStore { atoms }) a@(Atom { key }) parse = do
             Nothing -> pure unit
             Just val -> set a val
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // utilities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // utilities
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert an atom to read-only
 toReadOnly :: forall a. Atom a -> ReadOnlyAtom a

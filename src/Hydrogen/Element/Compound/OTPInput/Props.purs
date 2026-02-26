@@ -159,9 +159,9 @@ import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.FontFamily as FontFamily
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // props record
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // props record
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete OTP input configuration using Schema atoms.
 -- |
@@ -391,9 +391,9 @@ defaultProps =
   , cursorStyle: "text"
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // content prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // content prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set number of OTP digits (4-8)
 digitCountProp :: forall msg. OTPDigitCount -> OTPInputProp msg
@@ -451,9 +451,9 @@ resendRemainingProp r props = props { resendRemaining = r }
 instanceIdProp :: forall msg. UUID5.UUID5 -> OTPInputProp msg
 instanceIdProp id props = props { instanceId = Just id }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // color prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // color prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set digit input background color
 backgroundColorProp :: forall msg. Color.RGB -> OTPInputProp msg
@@ -519,9 +519,9 @@ focusBackgroundColorProp c props = props { focusBackgroundColor = Just c }
 hoverBackgroundColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 hoverBackgroundColorProp c props = props { hoverBackgroundColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // gradient prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // gradient prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background gradient (takes precedence over solid color)
 backgroundGradientProp :: forall msg. Gradient.Gradient -> OTPInputProp msg
@@ -531,9 +531,9 @@ backgroundGradientProp g props = props { backgroundGradient = Just g }
 focusBackgroundGradientProp :: forall msg. Gradient.Gradient -> OTPInputProp msg
 focusBackgroundGradientProp g props = props { focusBackgroundGradient = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // elevation prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // elevation prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set digit box shadow
 shadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
@@ -555,9 +555,9 @@ errorShadowProp s props = props { errorShadow = Just s }
 successShadowProp :: forall msg. Shadow.LayeredShadow -> OTPInputProp msg
 successShadowProp s props = props { successShadow = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // geometry prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // geometry prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set digit border radius
 borderRadiusProp :: forall msg. Geometry.Radius -> OTPInputProp msg
@@ -579,9 +579,9 @@ hoverScaleProp s props = props { hoverScale = Just s }
 pressScaleProp :: forall msg. Transform.Scale -> OTPInputProp msg
 pressScaleProp s props = props { pressScale = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // dimension prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // dimension prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set digit input width
 digitWidthProp :: forall msg. Device.Pixel -> OTPInputProp msg
@@ -599,9 +599,9 @@ gapProp g props = props { gap = Just g }
 separatorWidthProp :: forall msg. Device.Pixel -> OTPInputProp msg
 separatorWidthProp w props = props { separatorWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // typography prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // typography prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set digit font size
 fontSizeProp :: forall msg. FontSize.FontSize -> OTPInputProp msg
@@ -619,9 +619,9 @@ fontFamilyProp f props = props { fontFamily = Just f }
 letterSpacingProp :: forall msg. Device.Pixel -> OTPInputProp msg
 letterSpacingProp s props = props { letterSpacing = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // behavior prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // behavior prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set handler for OTP value changes
 onDigitChangeProp :: forall msg. (OTPValue -> msg) -> OTPInputProp msg
@@ -678,9 +678,9 @@ autoSubmitProp enabled props = props { autoSubmit = enabled }
 autoFocusProp :: forall msg. Boolean -> OTPInputProp msg
 autoFocusProp enabled props = props { autoFocus = enabled }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // animation prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // animation prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Enable/disable animations
 animationEnabledProp :: forall msg. Boolean -> OTPInputProp msg
@@ -714,9 +714,9 @@ transitionEasingProp easing props = props { transitionEasing = easing }
 staggerDelayProp :: forall msg. Temporal.Milliseconds -> OTPInputProp msg
 staggerDelayProp delay props = props { staggerDelay = delay }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // separator prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // separator prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Enable/disable separators (for XXX-XXX patterns)
 separatorEnabledProp :: forall msg. Boolean -> OTPInputProp msg
@@ -735,9 +735,9 @@ separatorCharProp c props = props { separatorChar = c }
 separatorColorProp :: forall msg. Color.RGB -> OTPInputProp msg
 separatorColorProp c props = props { separatorColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // label and text prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // label and text prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label color (Schema Color.RGB)
 labelColorProp :: forall msg. Color.RGB -> OTPInputProp msg
@@ -749,9 +749,9 @@ labelColorProp c props = props { labelColor = Just c }
 autoAdvanceProp :: forall msg. Boolean -> OTPInputProp msg
 autoAdvanceProp enabled props = props { autoAdvance = enabled }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // cursor prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // cursor prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set cursor style (text, pointer, not-allowed)
 cursorStyleProp :: forall msg. String -> OTPInputProp msg

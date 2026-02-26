@@ -135,9 +135,9 @@ import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Element.Compound.Slider as Slider
 import Hydrogen.Element.Compound.Checkbox as Checkbox
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color picker mode
 data ColorMode
@@ -162,9 +162,9 @@ modeName = case _ of
 allModes :: Array ColorMode
 allModes = [ModeHSL, ModeRGB, ModeHWB, ModeOKLAB, ModeOKLCH]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ColorPicker properties
 -- |
@@ -229,9 +229,9 @@ defaultProps =
   , onModeToggle: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set current color
 color :: forall msg. Color.RGB -> ColorPickerProp msg
@@ -241,9 +241,9 @@ color c props = props { color = c }
 enabledModes :: forall msg. Array ColorMode -> ColorPickerProp msg
 enabledModes modes props = props { enabledModes = modes }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set panel background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> ColorPickerProp msg
@@ -265,9 +265,9 @@ primaryColor c props = props { primaryColor = Just c }
 sliderTrackColor :: forall msg. Color.RGB -> ColorPickerProp msg
 sliderTrackColor c props = props { sliderTrackColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set color preview border radius (Geometry.Radius atom)
 previewBorderRadius :: forall msg. Geometry.Radius -> ColorPickerProp msg
@@ -277,9 +277,9 @@ previewBorderRadius r props = props { previewBorderRadius = Just r }
 panelBorderRadius :: forall msg. Geometry.Radius -> ColorPickerProp msg
 panelBorderRadius r props = props { panelBorderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set internal padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> ColorPickerProp msg
@@ -297,9 +297,9 @@ borderWidth w props = props { borderWidth = Just w }
 previewHeight :: forall msg. Device.Pixel -> ColorPickerProp msg
 previewHeight h props = props { previewHeight = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set label font size (Typography.FontSize atom)
 labelFontSize :: forall msg. FontSize.FontSize -> ColorPickerProp msg
@@ -317,9 +317,9 @@ headerFontSize s props = props { headerFontSize = Just s }
 headerFontWeight :: forall msg. FontWeight.FontWeight -> ColorPickerProp msg
 headerFontWeight w props = props { headerFontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set color change handler
 onChange :: forall msg. (Color.RGB -> msg) -> ColorPickerProp msg
@@ -329,9 +329,9 @@ onChange handler props = props { onChange = Just handler }
 onModeToggle :: forall msg. (ColorMode -> Boolean -> msg) -> ColorPickerProp msg
 onModeToggle handler props = props { onModeToggle = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // defaults
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // defaults
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default background color (dark surface)
 defaultBackgroundColor :: Color.RGB
@@ -393,9 +393,9 @@ defaultHeaderFontSize = FontSize.fontSize 12.0
 defaultHeaderFontWeight :: FontWeight.FontWeight
 defaultHeaderFontWeight = FontWeight.bold
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get effective value with fallback
 getColor :: Maybe Color.RGB -> Color.RGB -> Color.RGB
@@ -424,9 +424,9 @@ type ResolvedConfig =
   , hdrFontWeight :: FontWeight.FontWeight
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a color picker
 -- |
@@ -500,9 +500,9 @@ colorPicker propMods =
           ( map (renderModeSection props resolvedConfig) props.enabledModes )
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // color preview
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // color preview
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render color preview swatch
 renderColorPreview :: forall msg. Color.RGB -> Geometry.Radius -> Device.Pixel -> Color.RGB -> Device.Pixel -> E.Element msg
@@ -518,9 +518,9 @@ renderColorPreview currentColor radius height borderClr borderWdth =
     ]
     []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // mode toggles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // mode toggles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render mode toggle checkboxes
 renderModeToggles :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -566,9 +566,9 @@ renderModeCheckbox props cfg mode =
           [ E.text (modeName mode) ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // mode sections
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // mode sections
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a mode section with sliders
 renderModeSection :: forall msg. ColorPickerProps msg -> ResolvedConfig -> ColorMode -> E.Element msg
@@ -598,9 +598,9 @@ renderModeSection props cfg mode =
         ModeOKLCH -> renderOKLCHSliders props cfg
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // hsl sliders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // hsl sliders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render HSL sliders
 renderHSLSliders :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -628,9 +628,9 @@ buildHSLHandler props _ mkHsl = case props.onChange of
   Just handler -> Just (\v -> handler (Convert.hslToRgb (mkHsl v)))
   Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // rgb sliders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // rgb sliders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render RGB sliders
 renderRGBSliders :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -657,9 +657,9 @@ buildRGBHandler props mkRgb = case props.onChange of
   Just handler -> Just (\v -> handler (mkRgb v))
   Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // hwb sliders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // hwb sliders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render HWB sliders
 renderHWBSliders :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -687,9 +687,9 @@ buildHWBHandler props _ mkHwb = case props.onChange of
   Just handler -> Just (\v -> handler (Convert.hwbToRgb (mkHwb v)))
   Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // oklab sliders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // oklab sliders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render OKLAB sliders
 renderOKLABSliders :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -717,9 +717,9 @@ buildOKLABHandler props _ mkOklab = case props.onChange of
   Just handler -> Just (\v -> handler (Convert.oklabToRgb (mkOklab v)))
   Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // oklch sliders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // oklch sliders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render OKLCH sliders
 renderOKLCHSliders :: forall msg. ColorPickerProps msg -> ResolvedConfig -> E.Element msg
@@ -753,9 +753,9 @@ buildOKLCHHueHandler props oklchRec = case props.onChange of
   Just handler -> Just (\v -> handler (Convert.oklchToRgb (OKLCH.oklch oklchRec.l oklchRec.c (round v))))
   Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // slider row
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // slider row
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a labeled slider row (Int values)
 renderSliderRow :: forall msg. String -> Number -> Number -> Number -> Number -> ResolvedConfig -> Maybe (Number -> msg) -> E.Element msg

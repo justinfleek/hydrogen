@@ -38,9 +38,9 @@ import Hydrogen.Element.Compound.Widget.Chart.Palette (defaultPalette, getColorA
 import Hydrogen.Element.Compound.Widget.Chart.Types (ChartData, ChartProps, DataPoint, SeriesData)
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // line chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // line chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render line chart.
 renderLineChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -113,9 +113,9 @@ generateLinePath scaleX scaleY points =
   in
     foldl (\acc part -> acc <> " " <> part) "" pathParts
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // area chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // area chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render area chart (line with filled area to baseline).
 renderAreaChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -221,9 +221,9 @@ generateAreaPath scaleX scaleY baselineY points =
   in
     startPath <> dataPath <> closePath
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // bar chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // bar chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render bar chart (horizontal bars).
 renderBarChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -262,9 +262,9 @@ renderBarSeries barHeight padding idx series =
       , E.attr "rx" "4"
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // column chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // column chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render column chart (vertical bars).
 renderColumnChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -305,9 +305,9 @@ renderColumnSeries barWidth padding chartHeight idx series =
       , E.attr "rx" "4"
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // scatter chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // scatter chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render scatter chart.
 renderScatterChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -348,9 +348,9 @@ renderScatterChart _props chartData =
         ) s.data
       ) [] chartData.series)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // bubble chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // bubble chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render bubble chart (scatter with variable radius from z dimension).
 renderBubbleChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -410,9 +410,9 @@ renderBubbleChart _props chartData =
         ) s.data
       ) [] chartData.series)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // shared: axes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // shared: axes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render axes.
 renderAxes :: forall msg. ChartData -> Number -> Number -> Number -> E.Element msg

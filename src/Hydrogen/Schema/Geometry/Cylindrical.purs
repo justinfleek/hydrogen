@@ -87,9 +87,9 @@ module Hydrogen.Schema.Geometry.Cylindrical
   , showCylindrical
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -132,9 +132,9 @@ import Hydrogen.Schema.Geometry.Angle
 
 import Hydrogen.Schema.Geometry.Polar as Polar
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // cylindrical point type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // cylindrical point type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cylindrical coordinate point.
 -- |
@@ -184,9 +184,9 @@ cylindricalAngle (CylindricalPoint p) = p.angle
 cylindricalHeight :: CylindricalPoint -> Number
 cylindricalHeight (CylindricalPoint p) = p.height
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert cylindrical coordinates to Cartesian.
 -- |
@@ -229,9 +229,9 @@ fromPolar h polar =
     , height: h
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Rotate a cylindrical point around the Z-axis.
 rotateCylindrical :: Degrees -> CylindricalPoint -> CylindricalPoint
@@ -279,17 +279,17 @@ mirrorZ (CylindricalPoint p) =
       mirrored = if d == 0.0 then 0.0 else 360.0 - d
   in CylindricalPoint { radius: p.radius, angle: Degrees mirrored, height: p.height }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // common points
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // common points
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Origin in cylindrical coordinates.
 cylindricalOrigin :: CylindricalPoint
 cylindricalOrigin = CylindricalPoint { radius: 0.0, angle: Degrees 0.0, height: 0.0 }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // interpolation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear interpolation between cylindrical points.
 -- |
@@ -315,9 +315,9 @@ lerpCylindricalShortest t (CylindricalPoint p1) (CylindricalPoint p2) =
       angle = Degrees (d1 + t * dd)
   in CylindricalPoint { radius: r, angle: angle, height: h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // comparison
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // comparison
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Squared distance between two cylindrical points in Cartesian space.
 cylindricalDistanceSquared :: CylindricalPoint -> CylindricalPoint -> Number
@@ -345,9 +345,9 @@ sameAngle (CylindricalPoint p1) (CylindricalPoint p2) = p1.angle == p2.angle
 sameHeight :: CylindricalPoint -> CylindricalPoint -> Boolean
 sameHeight (CylindricalPoint p1) (CylindricalPoint p2) = p1.height == p2.height
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // helix generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // helix generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate a point on a helix.
 -- |
@@ -363,9 +363,9 @@ helixPoint radius pitch turns =
       height = turns * pitch
   in CylindricalPoint { radius: radius, angle: angle, height: height }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // display
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // display
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format cylindrical point for display.
 showCylindrical :: CylindricalPoint -> String

@@ -144,9 +144,9 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SearchInput properties
 -- |
@@ -248,9 +248,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set current search value
 searchValue :: forall msg. String -> SearchInputProp msg
@@ -290,9 +290,9 @@ searchName n props = props { name = Just n }
 searchAriaLabel :: forall msg. String -> SearchInputProp msg
 searchAriaLabel l props = props { ariaLabel = Just l }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> SearchInputProp msg
@@ -330,9 +330,9 @@ clearButtonColor c props = props { clearButtonColor = Just c }
 submitButtonColor :: forall msg. Color.RGB -> SearchInputProp msg
 submitButtonColor c props = props { submitButtonColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> SearchInputProp msg
@@ -342,9 +342,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> SearchInputProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> SearchInputProp msg
@@ -362,25 +362,25 @@ paddingY p props = props { paddingY = Just p }
 iconSize :: forall msg. Device.Pixel -> SearchInputProp msg
 iconSize s props = props { iconSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> SearchInputProp msg
 fontSize s props = props { fontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> SearchInputProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input handler (fires on each keystroke)
 -- |
@@ -412,17 +412,17 @@ onSearchFocus handler props = props { onFocus = Just handler }
 onSearchBlur :: forall msg. msg -> SearchInputProp msg
 onSearchBlur handler props = props { onBlur = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> SearchInputProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a search input with icon, optional loading spinner, and clear/submit
 -- |
@@ -450,9 +450,9 @@ searchInput propMods =
       , buildRightButtons props hasValue iconSizeVal
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Build the left icon container (search icon or spinner)
 buildLeftIcon :: forall msg. SearchInputProps msg -> String -> E.Element msg
@@ -706,9 +706,9 @@ buildSubmitButton props iconSizeVal =
       )
       [ arrowRightIcon iconSizeVal ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Search (magnifying glass) icon
 searchIcon :: forall msg. String -> E.Element msg

@@ -42,9 +42,9 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // tristate values
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tristate for aria-pressed, aria-checked where "mixed" is valid.
 data Tristate
@@ -63,9 +63,9 @@ tristateToString TriFalse = "false"
 tristateToString TriTrue = "true"
 tristateToString TriMixed = "mixed"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // aria states
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // aria states
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | aria-expanded: Indicates if a collapsible element is expanded.
 newtype AriaExpanded = AriaExpanded Boolean
@@ -161,9 +161,9 @@ instance showAriaGrabbed :: Show AriaGrabbed where
   show (AriaGrabbed Nothing) = "undefined"
   show (AriaGrabbed (Just b)) = show b
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // state rendering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert AriaExpanded to attribute value.
 expandedToAttr :: AriaExpanded -> String

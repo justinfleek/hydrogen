@@ -149,9 +149,9 @@ import Hydrogen.Element.Compound.DatePicker.Format
   )
 import Hydrogen.Element.Compound.DatePicker.Render as Render
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DatePicker properties
 type DatePickerProps msg =
@@ -246,9 +246,9 @@ defaultProps =
   , onToday: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set the selected date value
 value :: forall msg. Maybe Calendar.CalendarDate -> DatePickerProp msg
@@ -290,9 +290,9 @@ hasError e props = props { hasError = e }
 errorMessage :: forall msg. String -> DatePickerProp msg
 errorMessage msg props = props { errorMessage = Just msg }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: constraints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: constraints
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set minimum selectable date
 minDate :: forall msg. Calendar.CalendarDate -> DatePickerProp msg
@@ -310,9 +310,9 @@ disabledDates pred props = props { disabledDates = pred }
 weekStartsOn :: forall msg. Calendar.WeekStart -> DatePickerProp msg
 weekStartsOn ws props = props { weekStartsOn = ws }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: display
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: display
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Show "Today" button in calendar
 showTodayButton :: forall msg. Boolean -> DatePickerProp msg
@@ -326,9 +326,9 @@ showClearButton s props = props { showClearButton = s }
 showCalendarIcon :: forall msg. Boolean -> DatePickerProp msg
 showCalendarIcon s props = props { showCalendarIcon = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> DatePickerProp msg
@@ -354,17 +354,17 @@ errorColor c props = props { errorColor = Just c }
 focusColor :: forall msg. Color.RGB -> DatePickerProp msg
 focusColor c props = props { focusColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> DatePickerProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> DatePickerProp msg
@@ -374,17 +374,17 @@ padding p props = props { padding = Just p }
 borderWidth :: forall msg. Device.Pixel -> DatePickerProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> DatePickerProp msg
 fontSize s props = props { fontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set date select handler
 onSelect :: forall msg. (Calendar.CalendarDate -> msg) -> DatePickerProp msg
@@ -410,9 +410,9 @@ onClear msg props = props { onClear = Just msg }
 onToday :: forall msg. msg -> DatePickerProp msg
 onToday msg props = props { onToday = Just msg }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a date picker
 -- |

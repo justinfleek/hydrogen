@@ -52,9 +52,9 @@ import Hydrogen.Element.Compound.DateRangePicker.Presets (PresetDef, presetId, p
 import Hydrogen.Element.Compound.DatePicker.Format (formatDate)
 import Hydrogen.Element.Compound.DatePicker.Types (DateFormat(ISO))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DateRangePicker properties for rendering
 type DateRangePickerProps msg =
@@ -108,9 +108,9 @@ type DateRangePickerProps msg =
   , onApply :: Maybe msg
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // resolved config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // resolved config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Resolved configuration with defaults applied
 type ResolvedConfig =
@@ -141,9 +141,9 @@ resolveConfig props =
   , fontSizeVal: maybe "14px" FontSize.toLegacyCss props.fontSize
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // render helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // render helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the trigger button
 renderTrigger :: forall msg. DateRangePickerProps msg -> ResolvedConfig -> E.Element msg

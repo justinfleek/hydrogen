@@ -41,9 +41,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Element.Compound.Calendar as Calendar
 import Hydrogen.Element.Compound.DatePicker.Types (DateFormat)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DatePicker properties (duplicated here for internal use)
 -- | The main module re-exports this.
@@ -83,9 +83,9 @@ type DatePickerProps msg =
   , onToday :: Maybe msg
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // resolved config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // resolved config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Resolved configuration with defaults applied
 type ResolvedConfig =
@@ -116,9 +116,9 @@ resolveConfig props =
   , fontSizeVal: maybe "14px" FontSize.toLegacyCss props.fontSize
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // render helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // render helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the input field
 renderInput :: forall msg. DatePickerProps msg -> ResolvedConfig -> String -> String -> E.Element msg

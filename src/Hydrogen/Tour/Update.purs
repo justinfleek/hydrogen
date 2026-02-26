@@ -79,9 +79,9 @@ import Hydrogen.Tour.State
 import Hydrogen.Tour.Step (Step, stepId)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), StepId, TourPhase(TourActive, TourCompleted, TourDismissed, TourInactive, TourPaused, TourSkipped))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // commands
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // commands
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Commands produced by the update function
 -- |
@@ -120,9 +120,9 @@ data AnalyticsEvent
   | AnalyticsStepCompleted Int
   | AnalyticsTourSnoozed Int
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // update function
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of an update operation
 type UpdateResult msg =
@@ -320,9 +320,9 @@ update msg state = case msg of
     -- The tour state doesn't change, but the message is propagated
     noChange state
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | No state change, no commands
 noChange :: forall msg. TourState msg -> UpdateResult msg

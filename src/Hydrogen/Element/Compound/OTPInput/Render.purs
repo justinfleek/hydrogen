@@ -99,9 +99,9 @@ import Hydrogen.Element.Compound.OTPInput.Accessibility
 -- Animations are attached to elements as data, NOT injected as CSS.
 -- The Target layer (DOM, WebGL) interprets animation data.
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the complete OTP input component.
 -- |
@@ -176,9 +176,9 @@ otpInputWithResend propMods =
       , renderLiveRegion props
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // sub-components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the row of digit inputs (simple, no separators)
 renderDigitsRow :: forall msg. OTPInputProps msg -> E.Element msg
@@ -452,9 +452,9 @@ renderLiveRegion props =
       )
       [ E.text announcement ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate a stable instance ID for accessibility relationships
 generateInstanceId :: forall msg. OTPInputProps msg -> String

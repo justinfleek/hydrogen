@@ -59,9 +59,9 @@ import Data.Number (cos, sin, pi)
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Color.Channel as Ch
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // wheel adjustment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // wheel adjustment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color wheel adjustment for one tonal range
 -- |
@@ -98,9 +98,9 @@ wheelAdjustment angle intensity lum =
 neutralAdjustment :: WheelAdjustment
 neutralAdjustment = wheelAdjustment 0.0 0.0 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // color wheels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete color wheels grading system
 type ColorWheels =
@@ -125,9 +125,9 @@ colorWheels liftAdj gammaAdj gainAdj =
 neutralWheels :: ColorWheels
 neutralWheels = colorWheels neutralAdjustment neutralAdjustment neutralAdjustment
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get lift (shadows) adjustment
 lift :: ColorWheels -> WheelAdjustment
@@ -141,9 +141,9 @@ gamma wheels = wheels.gamma
 gain :: ColorWheels -> WheelAdjustment
 gain wheels = wheels.gain
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Apply color wheels grading to RGB color
 -- |

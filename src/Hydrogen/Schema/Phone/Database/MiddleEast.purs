@@ -11,9 +11,9 @@ module Hydrogen.Schema.Phone.Database.MiddleEast
   ( middleEasternCountries
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Phone.Country 
   ( Country
@@ -24,9 +24,9 @@ import Hydrogen.Schema.Phone.Country
 import Hydrogen.Schema.Phone.CountryCode (unsafeCountryCode)
 import Hydrogen.Schema.Phone.DialCode (unsafeDialCode)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // middle eastern countries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // middle eastern countries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All Middle Eastern countries.
 middleEasternCountries :: Array Country

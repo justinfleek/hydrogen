@@ -169,9 +169,9 @@ import Hydrogen.Schema.Color.Opacity as Opacity
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Radius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Raw bytes as array of integers (0-255).
 -- | This is the pure representation — actual TypedArray created at boundary.
@@ -225,9 +225,9 @@ instance showCommandType :: Show CommandType where
   show CmdDefinePathData = "DefinePathData"
   show CmdUpdateAnimationState = "UpdateAnimationState"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // constants
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Magic number: "HYDG" in little-endian ASCII
 magic :: Int
@@ -282,7 +282,7 @@ particlePayloadSize :: Int
 particlePayloadSize = 36
 
 -- ─────────────────────────────────────────────────────────────────────────────────
---                                                      // v2 payload size constants
+--                                                  // v2 payload size constants
 -- ─────────────────────────────────────────────────────────────────────────────────
 
 -- | DrawGlyphPath payload size (VARIABLE - this is the header portion)
@@ -345,9 +345,9 @@ pathDataHeaderSize = 32
 animationStateHeaderSize :: Int
 animationStateHeaderSize = 12
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // low level ops
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // low level ops
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert Bytes to raw byte array.
 toByteArray :: Bytes -> Array Int
@@ -501,9 +501,9 @@ nativeLog x =
     powNum _ 0 = 1.0
     powNum base pexp = base * powNum base (pexp - 1)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // serialization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Serialize a command buffer to bytes.
 serialize :: forall msg. DC.CommandBuffer msg -> Bytes
@@ -737,7 +737,7 @@ serializeClipRegion = case _ of
        <> Array.concatMap serializePathSegment segments
 
 -- ─────────────────────────────────────────────────────────────────────────────────
---                                                  // v2 typography serialization
+--                                                // v2 typography serialization
 -- ─────────────────────────────────────────────────────────────────────────────────
 
 -- | Serialize DrawGlyphPath payload (variable length).
@@ -968,7 +968,7 @@ serializeAnimTarget t =
   <> writeF32 t.phaseAdvance
 
 -- ─────────────────────────────────────────────────────────────────────────────────
---                                                             // v2 enum encoders
+--                                                           // v2 enum encoders
 -- ─────────────────────────────────────────────────────────────────────────────────
 
 -- | Encode StaggerDirection to u8.
@@ -1014,9 +1014,9 @@ targetTypeToInt = case _ of
   DC.TargetPathData -> 2
   DC.TargetControlPoint -> 3
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // deserialization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Deserialize bytes to command buffer.
 -- | Returns Nothing if invalid format.
@@ -1047,9 +1047,9 @@ deserializeCommand arr offset = do
     0x01 -> Just (Tuple DC.Noop (offset + 4 + rectPayloadSize))  -- Placeholder
     _ -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unwrap Pixel to Number.
 unwrapPixel :: Device.Pixel -> Number

@@ -83,9 +83,9 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Array (head, filter, reverse, sortBy)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // breakpoint
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // break-point
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic breakpoint names.
 data BreakpointName
@@ -128,9 +128,9 @@ instance showBreakpoint :: Show Breakpoint where
 -- | A set of breakpoints for a design system.
 type BreakpointSet = Array Breakpoint
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a breakpoint.
 breakpoint :: BreakpointName -> Number -> Maybe Number -> Breakpoint
@@ -140,9 +140,9 @@ breakpoint n minW maxW = Breakpoint { name: n, minWidth: minW, maxWidth: maxW }
 breakpointFromRecord :: { name :: BreakpointName, minWidth :: Number, maxWidth :: Maybe Number } -> Breakpoint
 breakpointFromRecord = Breakpoint
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // standard breakpoints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tailwind CSS breakpoints.
 -- |
@@ -180,9 +180,9 @@ materialBreakpoints =
   , Breakpoint { name: LG, minWidth: 840.0, maxWidth: Nothing }
   ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get breakpoint name.
 name :: Breakpoint -> BreakpointName
@@ -200,9 +200,9 @@ maxWidth (Breakpoint bp) = bp.maxWidth
 toRecord :: Breakpoint -> { name :: BreakpointName, minWidth :: Number, maxWidth :: Maybe Number }
 toRecord (Breakpoint bp) = bp
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if viewport width falls within this breakpoint.
 matchesWidth :: Number -> Breakpoint -> Boolean
@@ -236,9 +236,9 @@ isAtOrBelow w (Breakpoint bp) = case bp.maxWidth of
   Nothing -> true
   Just maxW -> w <= maxW
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // css output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // css output
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate CSS media query for this breakpoint.
 -- |
@@ -261,9 +261,9 @@ toContainerQuery (Breakpoint bp) =
     Nothing -> minPart
     Just maxW -> minPart <> " and (max-width: " <> show maxW <> "px)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if breakpoint is in mobile range (xs or sm).
 isMobile :: Breakpoint -> Boolean
@@ -278,9 +278,9 @@ isDesktop :: Breakpoint -> Boolean
 isDesktop (Breakpoint bp) = 
   bp.name == LG || bp.name == XL || bp.name == XXL
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // internal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // internal
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compare two numbers for sorting
 compareNum :: Number -> Number -> Ordering

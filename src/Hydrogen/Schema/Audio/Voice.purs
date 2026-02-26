@@ -139,9 +139,9 @@ import Prelude
 
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // voice pitch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // voice pitch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VoicePitch - fundamental frequency of the voice in Hz.
 -- | Human speech typically ranges from 85Hz (bass) to 255Hz (soprano).
@@ -185,9 +185,9 @@ pitchHigh = VoicePitch 200.0
 pitchVeryHigh :: VoicePitch
 pitchVeryHigh = VoicePitch 255.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // speech rate
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SpeechRate - speaking speed as multiplier of normal rate.
 -- | 1.0 = normal conversational pace (~150 words per minute).
@@ -231,9 +231,9 @@ rateFast = SpeechRate 1.25
 rateVeryFast :: SpeechRate
 rateVeryFast = SpeechRate 1.5
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // voice qualities
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Breathiness - amount of air in the voice.
 -- | 0.0 = clear, pressed voice; 1.0 = very breathy, whisper-adjacent.
@@ -319,9 +319,9 @@ strain n
 unwrapStrain :: Strain -> Number
 unwrapStrain (Strain n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // resonance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // resonance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Resonance - primary resonance location in the vocal tract.
 -- | Affects the overall "color" and perceived placement of the voice.
@@ -356,9 +356,9 @@ resonanceThroat = ResonanceThroat
 resonanceMixed :: Resonance
 resonanceMixed = ResonanceMixed
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // prosody atoms
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | PitchVariation - range of pitch movement during speech.
 -- | 0.0 = monotone; 1.0 = highly expressive pitch contours.
@@ -423,9 +423,9 @@ pause n
 unwrapPause :: Pause -> Number
 unwrapPause (Pause n) = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // expression
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // expression
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Expression - emotional quality of the voice.
 -- | These are fundamental affective states that modify all other parameters.
@@ -488,9 +488,9 @@ expressionUrgent = ExpressionUrgent
 expressionCalm :: Expression
 expressionCalm = ExpressionCalm
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // articulation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Articulation - how precisely sounds are produced.
 -- | Affects consonant clarity and vowel definition.
@@ -529,9 +529,9 @@ articulationClipped = ArticulationClipped
 articulationDrawn :: Articulation
 articulationDrawn = ArticulationDrawn
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // voice profile molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // voice profile molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VoiceProfile - complete voice characterization.
 -- | Combines pitch, rate, quality, and expression atoms.
@@ -584,9 +584,9 @@ voiceProfileDefault =
   , articulation: ArticulationRelaxed
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for VoicePitch
 -- |

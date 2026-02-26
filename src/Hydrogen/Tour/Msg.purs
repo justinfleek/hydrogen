@@ -75,9 +75,9 @@ import Data.Show.Generic (genericShow)
 import Hydrogen.Tour.Target (ResolutionError, TargetRect)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), StepId)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // tour messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // tour messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All possible tour events
 -- |
@@ -117,9 +117,9 @@ derive instance genericTourMsg :: Generic (TourMsg msg) _
 instance showTourMsg :: Show msg => Show (TourMsg msg) where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // lifecycle messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // lifecycle messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tour lifecycle events
 -- |
@@ -153,9 +153,9 @@ derive instance genericLifecycleMsg :: Generic LifecycleMsg _
 instance showLifecycleMsg :: Show LifecycleMsg where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // navigation messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // navigation messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Step navigation events
 -- |
@@ -184,9 +184,9 @@ derive instance genericNavigationMsg :: Generic NavigationMsg _
 instance showNavigationMsg :: Show NavigationMsg where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // target messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // target messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Target element events
 -- |
@@ -215,9 +215,9 @@ derive instance genericTargetMsg :: Generic TargetMsg _
 instance showTargetMsg :: Show TargetMsg where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // animation messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // animation messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Animation lifecycle events
 -- |
@@ -244,9 +244,9 @@ derive instance genericAnimationMsg :: Generic AnimationMsg _
 instance showAnimationMsg :: Show AnimationMsg where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // interaction messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // interaction messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Direct user interaction events
 -- |
@@ -298,9 +298,9 @@ derive instance genericSwipeDir :: Generic SwipeDir _
 instance showSwipeDir :: Show SwipeDir where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // dismiss reasons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // dismiss reasons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Why the tour was dismissed
 -- |
@@ -330,9 +330,9 @@ derive instance genericDismissReason :: Generic DismissReason _
 instance showDismissReason :: Show DismissReason where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // snooze duration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // snooze duration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Snooze duration presets
 -- |
@@ -359,9 +359,9 @@ snoozeToMs = case _ of
   SnoozeOneWeek -> Milliseconds (7 * 24 * 60 * 60 * 1000)
   SnoozeCustom ms -> ms
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // event metadata
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Event metadata for analytics/logging
 type EventMeta =
@@ -402,9 +402,9 @@ withTimestamp ts meta = meta { timestamp = Just ts }
 withSource :: EventSource -> EventMeta -> EventMeta
 withSource src meta = meta { source = Just src }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // message helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // message helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Message category
 data MsgCategory

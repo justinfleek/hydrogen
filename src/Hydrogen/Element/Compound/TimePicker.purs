@@ -138,9 +138,9 @@ import Hydrogen.Element.Compound.TimePicker.Format
   )
 import Hydrogen.Element.Compound.TimePicker.Render as Render
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TimePicker properties
 type TimePickerProps msg =
@@ -217,9 +217,9 @@ defaultProps =
   , onPeriodChange: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set time value
 value :: forall msg. Maybe TimeOfDay.TimeOfDay -> TimePickerProp msg
@@ -253,9 +253,9 @@ readOnly r props = props { readOnly = r }
 showIncrementButtons :: forall msg. Boolean -> TimePickerProp msg
 showIncrementButtons s props = props { showIncrementButtons = s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: constraints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // prop builders: constraints
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set minimum time
 minTime :: forall msg. TimeOfDay.TimeOfDay -> TimePickerProp msg
@@ -265,9 +265,9 @@ minTime t props = props { minTime = Just t }
 maxTime :: forall msg. TimeOfDay.TimeOfDay -> TimePickerProp msg
 maxTime t props = props { maxTime = Just t }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> TimePickerProp msg
@@ -293,17 +293,17 @@ primaryColor c props = props { primaryColor = Just c }
 primaryTextColor :: forall msg. Color.RGB -> TimePickerProp msg
 primaryTextColor c props = props { primaryTextColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> TimePickerProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> TimePickerProp msg
@@ -313,17 +313,17 @@ padding p props = props { padding = Just p }
 borderWidth :: forall msg. Device.Pixel -> TimePickerProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> TimePickerProp msg
 fontSize s props = props { fontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set change handler (fires when time changes)
 onChange :: forall msg. (TimeOfDay.TimeOfDay -> msg) -> TimePickerProp msg
@@ -345,9 +345,9 @@ onSecondChange handler props = props { onSecondChange = Just handler }
 onPeriodChange :: forall msg. (Period -> msg) -> TimePickerProp msg
 onPeriodChange handler props = props { onPeriodChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a time picker
 -- |
@@ -435,9 +435,9 @@ timePickerInline propMods =
       ]
       [ timePicker propsWithButtons ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // internal helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // internal helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the seconds section (separator + segment)
 renderSecondsSection :: forall msg. Render.ResolvedConfig -> TimePickerProps msg -> Int -> E.Element msg

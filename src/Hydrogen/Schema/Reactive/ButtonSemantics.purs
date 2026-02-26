@@ -138,9 +138,9 @@ import Prelude
 
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // button purpose
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // button purpose
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic purpose of a button — WHAT it does, not HOW it looks.
 -- |
@@ -178,9 +178,9 @@ instance showButtonPurpose :: Show ButtonPurpose where
   show IconAction = "icon"
   show FloatingAction = "fab"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // constructor helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // constructor helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | General action trigger ("Save", "Continue", "Apply")
 actionButton :: ButtonPurpose
@@ -230,9 +230,9 @@ iconAction = IconAction
 floatingAction :: ButtonPurpose
 floatingAction = FloatingAction
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // aria role mapping
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // aria role mapping
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the appropriate ARIA role for a button purpose.
 -- |
@@ -270,9 +270,9 @@ requiresAriaLabel MediaControl = true     -- "Play", "Pause", "Stop", etc.
 requiresAriaLabel FloatingAction = true   -- FABs are typically icon-only
 requiresAriaLabel _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // toggle state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // toggle state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toggle button state for aria-pressed attribute.
 -- |
@@ -314,9 +314,9 @@ toggleStateToAria Pressed = "true"
 toggleStateToAria Unpressed = "false"
 toggleStateToAria Mixed = "mixed"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // popup type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // popup type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of popup triggered by a button (aria-haspopup values).
 -- |
@@ -367,9 +367,9 @@ popupTypeToAria TreePopup = "tree"
 popupTypeToAria GridPopup = "grid"
 popupTypeToAria DialogPopup = "dialog"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // button identity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Deterministic button identity for billion-agent scale.
 -- |
@@ -442,9 +442,9 @@ serializePopup :: Maybe PopupType -> String
 serializePopup Nothing = "none"
 serializePopup (Just popup) = show popup
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // media action
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // media action
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Specific media control actions for MediaControl buttons.
 -- |

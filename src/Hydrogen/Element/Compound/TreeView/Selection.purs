@@ -66,9 +66,9 @@ module Hydrogen.Element.Compound.TreeView.Selection
   , getParentNode
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( Ordering
@@ -120,9 +120,9 @@ import Hydrogen.Schema.Reactive.SelectionState
   , computeParentStatus
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // selection operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // selection operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Handle selecting a node based on selection mode
 -- |
@@ -214,9 +214,9 @@ handleSelectSubtree tree node state =
 handleClearSelection :: SelectedState -> SelectedState
 handleClearSelection = clearSelection
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // checkbox operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // checkbox operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check a node (set to Checked state)
 handleCheck :: NodeId -> CheckedState -> CheckedState
@@ -338,9 +338,9 @@ compareByDepth tree a b =
     -- Reverse order: deeper nodes come first
     compare depthB depthA
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // hierarchical status
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // hierarchical status
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get hierarchical selection status for a node
 -- |
@@ -361,9 +361,9 @@ hierarchicalToCheckState FullySelected = Checked
 hierarchicalToCheckState NotSelected = Unchecked
 hierarchicalToCheckState PartiallySelected = Indeterminate
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // selection queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // selection queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a node is selected
 isNodeSelected :: NodeId -> SelectedState -> Boolean
@@ -393,9 +393,9 @@ getPartiallyCheckedNodes tree state =
   in
     map nodeId (Array.filter (\n -> getCheckState (nodeId n) state == Indeterminate) nodes)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get all nodes in the tree (flattened)
 allTreeNodes :: Tree -> Array TreeNode

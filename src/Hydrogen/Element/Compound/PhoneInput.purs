@@ -103,9 +103,9 @@ module Hydrogen.Element.Compound.PhoneInput
   , dropdownMaxHeight
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -133,9 +133,9 @@ import Hydrogen.Schema.Phone.PhoneNumber (phoneNumber, isComplete) as Phone
 import Hydrogen.Schema.Phone.PhoneNumber (toE164) as PhoneE164
 import Hydrogen.Schema.Phone.Format (formatPartial) as Format
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // phone value
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Phone value — the controlled state for a phone input.
 -- |
@@ -200,9 +200,9 @@ setCountry c (PhoneValue v) = PhoneValue { country: Just c, national: v.national
 isValidPhone :: PhoneValue -> Boolean
 isValidPhone pv = isJust (toE164 pv)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Phone input properties.
 type PhoneInputProps msg =
@@ -279,9 +279,9 @@ defaultProps =
   , dropdownMaxHeight: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set placeholder text.
 placeholder :: forall msg. String -> PhoneInputProp msg
@@ -391,9 +391,9 @@ borderWidth w props = props { borderWidth = Just w }
 dropdownMaxHeight :: forall msg. Device.Pixel -> PhoneInputProp msg
 dropdownMaxHeight h props = props { dropdownMaxHeight = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a phone input component.
 -- |
@@ -547,9 +547,9 @@ renderNumberInput props displayValue displayPlaceholder txtColor =
        , E.style "background" "transparent"
        ] <> inputAttrs <> idAttrs <> nameAttrs)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // country dropdown
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // country dropdown
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the country selection dropdown.
 renderCountryDropdown :: forall msg. PhoneInputProps msg -> E.Element msg
@@ -622,9 +622,9 @@ renderCountryRow props ctry =
           [ E.text dialCodeText ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // labeled component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // labeled component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Phone input with associated label.
 phoneInputWithLabel :: forall msg. String -> Array (PhoneInputProp msg) -> E.Element msg

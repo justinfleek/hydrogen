@@ -147,9 +147,9 @@ module Hydrogen.Schema.Physics.Force
   , accelerationFromForce
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -175,9 +175,9 @@ import Data.Array as Array
 import Data.Array (foldl, snoc)
 import Data.Number (sqrt, atan2)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // force vector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // force vector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 2D force vector.
 -- |
@@ -270,9 +270,9 @@ forceClamp maxMag f =
      then forceScale (maxMag / mag) f
      else f
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // force types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // force types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Classification of force types.
 data ForceType
@@ -295,9 +295,9 @@ isConservative NonConservative = false
 isNonConservative :: ForceType -> Boolean
 isNonConservative = not <<< isConservative
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // gravitational force
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // gravitational force
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Gravitational force configuration.
 -- |
@@ -354,9 +354,9 @@ gravityMagnitude (Gravity g) = g.magnitude
 gravityDirection :: Gravity -> Force2D
 gravityDirection (Gravity g) = g.direction
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // spring force
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // spring force
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Spring force following Hooke's Law: F = -k * x
 -- |
@@ -419,9 +419,9 @@ springStiffness (SpringForce s) = s.stiffness
 springRestLength :: SpringForce -> Number
 springRestLength (SpringForce s) = s.restLength
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // drag force
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // drag force
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Drag force proportional to velocity: F = -c * v
 -- |
@@ -463,9 +463,9 @@ dragForceValue (DragForce d) velocity =
 dragCoefficient :: DragForce -> Number
 dragCoefficient (DragForce d) = d.coefficient
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // friction force
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // friction force
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Friction force opposing motion at contact.
 -- |
@@ -533,9 +533,9 @@ staticCoefficient (FrictionForce f) = f.staticCoeff
 kineticCoefficient :: FrictionForce -> Number
 kineticCoefficient (FrictionForce f) = f.kineticCoeff
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // damping force
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // damping force
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Damping force for oscillation control.
 -- |
@@ -576,9 +576,9 @@ dampingForceValue (DampingForce d) velocity =
 dampingCoefficient :: DampingForce -> Number
 dampingCoefficient (DampingForce d) = d.coefficient
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // attractive/repulsive
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Point force: attraction or repulsion from a point.
 -- |
@@ -642,9 +642,9 @@ pointForceStrength (PointForce p) = p.strength
 pointForceFalloff :: PointForce -> Number
 pointForceFalloff (PointForce p) = p.falloff
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // force field
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // force field
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A collection of forces that can be evaluated at any point.
 data ForceField
@@ -687,9 +687,9 @@ fieldContains EmptyField = false
 fieldContains (UniformField _) = true
 fieldContains (CompositeField fields) = arrayLength fields > 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // force application
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // force application
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Apply a force to calculate acceleration (F = ma, so a = F/m)
 applyForce :: Force2D -> Number -> Force2D
@@ -705,9 +705,9 @@ netForce forces = foldl forceAdd forceZero forces
 accelerationFromForce :: Force2D -> Number -> Force2D
 accelerationFromForce = applyForce
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp force component to reasonable bounds
 clampForceComponent :: Number -> Number

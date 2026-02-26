@@ -88,9 +88,9 @@ import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | WebSocket connection wrapper
 newtype WebSocketConnection = WebSocketConnection
@@ -142,9 +142,9 @@ newtype Channel = Channel
   , nextHandlerId :: Ref Int
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // FFI
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 foreign import newWebSocket :: String -> Array String -> Effect WebSocketRaw
 
@@ -164,9 +164,9 @@ foreign import wsCloseWithCode :: WebSocketRaw -> Int -> String -> Effect Unit
 
 foreign import wsReadyState :: WebSocketRaw -> Effect Int
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // connection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // connection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default WebSocket configuration
 defaultConfig :: WebSocketConfig
@@ -273,9 +273,9 @@ closeWithCode (WebSocketConnection { socket, state }) code reason = do
     Nothing -> pure unit
     Just ws -> wsCloseWithCode ws code reason
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // messaging
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // messaging
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Send a JSON-encodable message
 send :: forall a. EncodeJson a => WebSocketConnection -> a -> Effect Unit
@@ -293,9 +293,9 @@ sendText (WebSocketConnection { socket }) text = do
     Nothing -> pure unit
     Just ws -> wsSend ws text
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current connection state
 getState :: WebSocketConnection -> Effect WebSocketState
@@ -311,9 +311,9 @@ isConnected conn = do
 getUrl :: WebSocketConnection -> String
 getUrl (WebSocketConnection { url }) = url
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // channels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // channels
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Channel handler with ID
 type ChannelHandler = { id :: Int, callback :: String -> Effect Unit }

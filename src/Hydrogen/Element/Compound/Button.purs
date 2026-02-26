@@ -172,9 +172,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Motion.Easing as Easing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HTML button type attribute
 -- |
@@ -199,9 +199,9 @@ buttonTypeToString TypeButton = "button"
 buttonTypeToString TypeSubmit = "submit"
 buttonTypeToString TypeReset = "reset"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Button properties
 -- |
@@ -290,9 +290,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set button type (button, submit, reset)
 buttonType :: forall msg. ButtonType -> ButtonProp msg
@@ -312,9 +312,9 @@ loading l props = props { loading = l }
 onClick :: forall msg. msg -> ButtonProp msg
 onClick handler props = props { onClick = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set button background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> ButtonProp msg
@@ -348,9 +348,9 @@ activeBackgroundColor c props = props { activeBackgroundColor = Just c }
 focusRingColor :: forall msg. Color.RGB -> ButtonProp msg
 focusRingColor c props = props { focusRingColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 -- |
@@ -362,9 +362,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> ButtonProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: elevation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: elevation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set box shadow (Shadow.LayeredShadow atom)
 -- |
@@ -376,9 +376,9 @@ shadow s props = props { shadow = Just s }
 hoverShadow :: forall msg. Shadow.LayeredShadow -> ButtonProp msg
 hoverShadow s props = props { hoverShadow = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set button height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> ButtonProp msg
@@ -404,9 +404,9 @@ iconSize s props = props { iconSize = Just s }
 gap :: forall msg. Device.Pixel -> ButtonProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> ButtonProp msg
@@ -416,9 +416,9 @@ fontSize s props = props { fontSize = Just s }
 fontWeight :: forall msg. FontWeight.FontWeight -> ButtonProp msg
 fontWeight w props = props { fontWeight = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> ButtonProp msg
@@ -428,17 +428,17 @@ transitionDuration d props = props { transitionDuration = Just d }
 transitionEasing :: forall msg. Easing.Easing -> ButtonProp msg
 transitionEasing e props = props { transitionEasing = Just e }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ButtonProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a button
 -- |
@@ -604,9 +604,9 @@ buildButtonContent props children =
     then [ loadingSpinner, E.span_ [ E.style "margin-left" "8px" ] children ]
     else children
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // companion components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // companion components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a button-styled link
 -- |

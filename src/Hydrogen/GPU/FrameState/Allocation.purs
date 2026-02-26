@@ -82,9 +82,9 @@ module Hydrogen.GPU.FrameState.Allocation
   , RegionIndex
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -174,9 +174,9 @@ import Hydrogen.Schema.Tensor.Dimension (Dim(Dim))
 -- Math functions
 import Hydrogen.Math.Core (sqrt) as Math
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // viewport // to // regions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // viewport // to // regions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Select appropriate grid level based on viewport latent dimensions.
 -- |
@@ -195,9 +195,9 @@ selectGridLevel latentWidth latentHeight =
     else if minDim >= 32 then Medium
     else Coarse
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // region // generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // region // generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate all regions for a viewport at given grid level.
 -- |
@@ -286,9 +286,9 @@ intToNum = Int.toNumber
 viewportToGroundSet :: ViewportState -> Set.Set Region
 viewportToGroundSet vs = Set.fromFoldable (viewportToRegions vs)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // performance // to // feedback
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // performance // to // feedback
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute quality metric from performance state.
 -- |
@@ -312,9 +312,9 @@ performanceToFeedback :: PerformanceState -> RegionSelection -> Number
 performanceToFeedback perf _sel =
   qualityFromPerformance perf
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // allocation // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State for allocation across frames.
 -- |
@@ -347,9 +347,9 @@ allocationEpoch state = state.epoch
 allocationRegions :: AllocationState -> Array Region
 allocationRegions state = state.regions
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // frame // allocation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // frame // allocation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of allocating a frame.
 type AllocationResult =
@@ -424,9 +424,9 @@ adjustStepsForQuality quality tier (DiffusionSteps steps) =
     -- Use unsafe constructor since we've clamped to valid range
     DiffusionSteps clamped
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // quality // and // utility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // quality // and // utility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a Quality value from a raw number.
 -- |
@@ -440,9 +440,9 @@ mkQuality n = Quality (clampToBounds 0.0 1.0 n)
 mkUtility :: Number -> Utility
 mkUtility n = Utility (clampToBounds 0.0 1.0e12 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // region // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // region // queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extract the grid coordinate from a region.
 regionCoord :: Region -> GridCoord
@@ -478,9 +478,9 @@ adjacentRegions (Region target) allRegions =
 regionsInTier :: RenderTier -> Array Region -> Array Region
 regionsInTier tier = Array.filter (\(Region r) -> r.tier == tier)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // safe // step // construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // safe // step // construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Safely construct DiffusionSteps with validation.
 -- |
@@ -489,9 +489,9 @@ regionsInTier tier = Array.filter (\(Region r) -> r.tier == tier)
 safeSteps :: Int -> Maybe DiffusionSteps
 safeSteps = mkDiffusionSteps
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                              // faa-enhanced allocation (p2)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // faa-enhanced allocation (p2)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Index type for mapping between Regions and submodular Elements.
 -- |

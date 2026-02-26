@@ -175,9 +175,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 import Hydrogen.Schema.Reactive.ScrollState (ScrollPosition, originScroll)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // viewport identity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // viewport identity
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Deterministic identifier for a viewport.
 -- |
@@ -218,9 +218,9 @@ unwrapViewportId (ViewportId id) = id
 viewportIdToString :: ViewportId -> String
 viewportIdToString = unwrapViewportId
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // breakpoint type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // breakpoint type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard breakpoint tiers.
 -- |
@@ -269,9 +269,9 @@ instance showBreakpoint :: Show Breakpoint where
 allBreakpoints :: Array Breakpoint
 allBreakpoints = [Xs, Sm, Md, Lg, Xl, Xxl]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // breakpoint values
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // breakpoint values
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Minimum width (in CSS pixels) where this breakpoint begins.
 breakpointMin :: Breakpoint -> Int
@@ -296,9 +296,9 @@ breakpointMax Xxl = Nothing
 breakpointRange :: Breakpoint -> { min :: Int, max :: Maybe Int }
 breakpointRange bp = { min: breakpointMin bp, max: breakpointMax bp }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // breakpoint detection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // breakpoint detection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Determine breakpoint from width in CSS pixels.
 breakpointFromWidth :: Int -> Breakpoint
@@ -317,9 +317,9 @@ breakpointFromDimensions width height =
   , orientation: orientationFromDimensions width height
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // orientation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // orientation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Screen/viewport orientation.
 data Orientation
@@ -348,9 +348,9 @@ orientationFromDimensions width height
   | width < height = Portrait
   | otherwise = Square
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // device class
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // device class
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic device classification.
 -- |
@@ -383,9 +383,9 @@ deviceClassFromBreakpoint Xxl = LargeDesktop
 deviceClassFromWidth :: Int -> DeviceClass
 deviceClassFromWidth w = deviceClassFromBreakpoint (breakpointFromWidth w)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // viewport core
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A viewport — a bounded viewing region with identity and state.
 -- |
@@ -449,9 +449,9 @@ viewportWithId cfg =
     , state: initialState
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // viewport accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // viewport accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get viewport ID.
 getId :: Viewport -> ViewportId
@@ -481,9 +481,9 @@ getDeviceClass vp = vp.deviceClass
 getDimensions :: Viewport -> { width :: Int, height :: Int }
 getDimensions vp = { width: vp.width, height: vp.height }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // viewport controls
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // viewport controls
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Available viewport controls.
 -- |
@@ -529,9 +529,9 @@ removeControl ctrl ctrls = Array.filter (\c -> not (c == ctrl)) ctrls
 hasControl :: ViewportControl -> ViewportControls -> Boolean
 hasControl ctrl ctrls = Array.elem ctrl ctrls
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // viewport settings
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // viewport settings
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Zoom level for viewport content.
 -- |
@@ -577,9 +577,9 @@ unwrapZoom (ZoomLevel z) = z
 -- NOTE: ScrollPosition is imported from ScrollState to avoid duplication.
 -- Use ScrollState.scrollPosition, ScrollState.originScroll, etc.
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // viewport state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mutable state of a viewport.
 type ViewportState =
@@ -608,9 +608,9 @@ withScroll pos state = state { scroll = pos }
 withFullscreen :: Boolean -> ViewportState -> ViewportState
 withFullscreen fs state = state { isFullscreen = fs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // responsive value
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // responsive value
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Specification for responsive values.
 -- |
@@ -676,9 +676,9 @@ resolve rv Xxl = rv.xxl
 resolveFor :: forall a. ResponsiveValue a -> Viewport -> a
 resolveFor rv vp = resolve rv vp.breakpoint
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // css generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // css generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate CSS media query for breakpoint (min-width).
 -- |
@@ -722,9 +722,9 @@ breakpointClass :: Breakpoint -> String -> String
 breakpointClass Xs cls = cls
 breakpointClass bp cls = show bp <> ":" <> cls
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // comparison
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // comparison
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if breakpoint is at least the threshold.
 isAtLeast :: Breakpoint -> Breakpoint -> Boolean

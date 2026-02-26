@@ -80,9 +80,9 @@ import Prelude
 import Data.Array (find)
 import Data.Maybe (Maybe)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // utc offset
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // utc offset
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | UTC offset in minutes
 -- |
@@ -96,9 +96,9 @@ derive instance ordUtcOffset :: Ord UtcOffset
 instance showUtcOffset :: Show UtcOffset where
   show o = formatOffset o
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // offset constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // offset constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a UTC offset from hours and minutes
 -- |
@@ -135,9 +135,9 @@ unsafeUtcOffset = UtcOffset
 utc :: UtcOffset
 utc = UtcOffset 0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // offset accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // offset accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the hours component of the offset
 offsetHours :: UtcOffset -> Int
@@ -151,9 +151,9 @@ offsetMinutes (UtcOffset mins) = abs (mins `mod` 60)
 totalOffsetMinutes :: UtcOffset -> Int
 totalOffsetMinutes (UtcOffset mins) = mins
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // offset formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // offset formatting
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format offset as human-readable string
 -- |
@@ -184,9 +184,9 @@ formatOffsetISO (UtcOffset mins) =
   in
     sign <> padZero h <> ":" <> padZero m
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // timezone identifier
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // timezone identifier
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | IANA timezone identifier
 -- |
@@ -204,9 +204,9 @@ derive instance ordTimezoneId :: Ord TimezoneId
 instance showTimezoneId :: Show TimezoneId where
   show (TimezoneId tz) = tz.identifier
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // timezone constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // timezone constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a timezone identifier
 -- |
@@ -222,9 +222,9 @@ timezoneId id name offset = TimezoneId
 unsafeTimezoneId :: String -> String -> UtcOffset -> TimezoneId
 unsafeTimezoneId = timezoneId
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // timezone accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // timezone accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the IANA identifier string
 getIdentifier :: TimezoneId -> String
@@ -238,9 +238,9 @@ getDisplayName (TimezoneId tz) = tz.displayName
 getStandardOffset :: TimezoneId -> UtcOffset
 getStandardOffset (TimezoneId tz) = tz.standardOffset
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // common timezones
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // common timezones
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | UTC timezone
 utcZone :: TimezoneId
@@ -294,9 +294,9 @@ australiaSydney = timezoneId "Australia/Sydney" "Australian Eastern Time" (utcOf
 pacificHonolulu :: TimezoneId
 pacificHonolulu = timezoneId "Pacific/Honolulu" "Hawaii-Aleutian Time" (utcOffset (-10) 0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // lookup
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // lookup
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All predefined timezones
 allTimezones :: Array TimezoneId
@@ -320,9 +320,9 @@ allTimezones =
 findTimezone :: String -> Maybe TimezoneId
 findTimezone id = find (\tz -> getIdentifier tz == id) allTimezones
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Pad number to 2 digits with leading zero
 padZero :: Int -> String

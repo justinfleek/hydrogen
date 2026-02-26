@@ -105,9 +105,9 @@ module Hydrogen.GPU.EffectEvent
   , atProgress
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -129,9 +129,9 @@ import Data.Array as Array
 import Data.Maybe (Maybe(Nothing, Just))
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                    // triggers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // triggers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Effect trigger — condition that starts/stops effects
 -- |
@@ -333,9 +333,9 @@ instance showAnimPhase :: Show AnimPhase where
   show PhaseComplete = "PhaseComplete"
   show PhasePaused = "PhasePaused"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // events
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // events
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Effect event — discrete happening during effect lifecycle
 data EffectEvent
@@ -459,9 +459,9 @@ instance showSwipeDirection :: Show SwipeDirection where
   show SwipeLeft = "SwipeLeft"
   show SwipeRight = "SwipeRight"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // snapshots
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // snapshots
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Effect state snapshot — serializable for undo/save/replay
 newtype EffectSnapshot = EffectSnapshot
@@ -511,9 +511,9 @@ type RenderSnapshot =
   , gpuBudgetUsed :: Number
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // state transitions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State transition — describes how effect state changes
 data StateTransition
@@ -554,9 +554,9 @@ data TransitionResult
 
 derive instance eqTransitionResult :: Eq TransitionResult
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // trigger evaluation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // trigger evaluation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Evaluate a trigger against frame state
 -- |
@@ -721,9 +721,9 @@ isConditionMet _ = false
 isConditionNotMet :: TriggerCondition -> Boolean
 isConditionNotMet cond = not (cond == ConditionMet || cond == ConditionUnknown)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // snapshot operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // snapshot operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a snapshot with generated UUID5
 createSnapshot :: Number -> FrameSnapshot -> Array AnimationSnapshot -> Array SpringSnapshot -> EffectSnapshot
@@ -768,9 +768,9 @@ type SnapshotDiff =
 snapshotId :: EffectSnapshot -> UUID5.UUID5
 snapshotId (EffectSnapshot s) = s.id
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // event construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // event construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create effect started event
 effectStarted :: UUID5.UUID5 -> Number -> EffectEvent
@@ -796,9 +796,9 @@ animationTick handle progress deltaMs = EventAnimation $ AnimationTick { handle,
 interactionOccurred :: InteractionEvent -> EffectEvent
 interactionOccurred = EventInteraction
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Trigger on hover over element
 onHover :: Int -> EffectTrigger

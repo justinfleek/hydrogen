@@ -45,9 +45,9 @@ import Hydrogen.Schema.Gestural.Keyboard.Modifiers
   )
 import Hydrogen.Schema.Gestural.Keyboard.Event (KeyEvent, isPrintableKey)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // keyboard // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // keyboard // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete keyboard state
 -- |
@@ -84,9 +84,9 @@ stateIsTyping ks = ks.isTyping
 stateTimestamp :: KeyboardState -> Number
 stateTimestamp ks = ks.timestamp
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // state // updates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // state // updates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Update keyboard state with new event
 updateKeyboardState :: KeyEvent -> KeyboardState -> KeyboardState
@@ -110,9 +110,9 @@ resetModifiers :: KeyboardState -> KeyboardState
 resetModifiers ks =
   ks { modifiers = noModifiers }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // state // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // state // queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if any modifiers are currently active
 hasActiveModifiers :: KeyboardState -> Boolean

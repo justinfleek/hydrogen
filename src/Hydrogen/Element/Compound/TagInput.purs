@@ -153,9 +153,9 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Typography.FontSize as FontSize
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // tag types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // tag types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A tag with value, label, and removable flag
 type Tag =
@@ -172,9 +172,9 @@ mkTag s = { value: s, label: s, removable: true }
 tagWithLabel :: String -> String -> Tag
 tagWithLabel val lbl = { value: val, label: lbl, removable: true }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | TagInput properties
 -- |
@@ -278,9 +278,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set tags from simple strings
 tagValues :: forall msg. Array String -> TagInputProp msg
@@ -326,9 +326,9 @@ tagInputId i props = props { id = Just i }
 tagInputName :: forall msg. String -> TagInputProp msg
 tagInputName n props = props { name = Just n }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set container background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> TagInputProp msg
@@ -362,9 +362,9 @@ tagTextColor c props = props { tagTextColor = Just c }
 tagRemoveColor :: forall msg. Color.RGB -> TagInputProp msg
 tagRemoveColor c props = props { tagRemoveColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set container border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> TagInputProp msg
@@ -378,9 +378,9 @@ tagBorderRadius r props = props { tagBorderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> TagInputProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set container minimum height (Device.Pixel atom)
 minHeight :: forall msg. Device.Pixel -> TagInputProp msg
@@ -406,9 +406,9 @@ tagPaddingX p props = props { tagPaddingX = Just p }
 tagPaddingY :: forall msg. Device.Pixel -> TagInputProp msg
 tagPaddingY p props = props { tagPaddingY = Just p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> TagInputProp msg
@@ -418,9 +418,9 @@ fontSize s props = props { fontSize = Just s }
 tagFontSize :: forall msg. FontSize.FontSize -> TagInputProp msg
 tagFontSize s props = props { tagFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set add handler (fires when Enter or delimiter is pressed)
 -- |
@@ -446,17 +446,17 @@ onTagInputFocus handler props = props { onFocus = Just handler }
 onTagInputBlur :: forall msg. msg -> TagInputProp msg
 onTagInputBlur handler props = props { onBlur = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> TagInputProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a tag input with tags and input field
 -- |
@@ -539,9 +539,9 @@ tagList props tagStrs =
       ] <> gapStyle)
       tagElements
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Build container styles from Schema atoms
 buildContainerStyles :: forall msg. TagInputProps msg -> Array (E.Attribute msg)
@@ -701,9 +701,9 @@ buildRemoveButton props handler =
       )
       [ removeIcon ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Small X icon for remove button
 removeIcon :: forall msg. E.Element msg

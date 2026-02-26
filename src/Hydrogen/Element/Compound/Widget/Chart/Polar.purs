@@ -42,9 +42,9 @@ import Hydrogen.Element.Compound.Widget.Chart.Types (ChartData, ChartProps, Data
 import Hydrogen.Math.Core (cos, sin)
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // pie chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // pie chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render pie chart.
 renderPieChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -137,9 +137,9 @@ renderPieSlice cx cy r startAngle endAngle color =
       , E.attr "stroke-width" "2"
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // donut chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // donut chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render donut chart.
 renderDonutChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -158,9 +158,9 @@ renderDonutChart props chartData =
         ]
     ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // radar chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // radar chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render radar chart (spider/web chart).
 renderRadarChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -368,9 +368,9 @@ renderRadarSeries cx cy scaleToRadius angles idx series =
           ) vertices)
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // polar chart
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // polar chart
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render polar chart (circular bar chart with angular positioning).
 renderPolarChart :: forall msg. ChartProps -> ChartData -> E.Element msg

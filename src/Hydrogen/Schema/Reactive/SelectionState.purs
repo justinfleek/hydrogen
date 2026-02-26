@@ -69,9 +69,9 @@ import Prelude
 import Data.Array (concat, elem, filter, length, nub, range, sort, (..))
 import Data.Maybe (Maybe(Just, Nothing), isJust)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // selection mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Selection behavior mode
 data SelectionMode
@@ -105,9 +105,9 @@ isNoneMode :: SelectionMode -> Boolean
 isNoneMode SelectionNone = true
 isNoneMode _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // selection status
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Selection state of individual item
 data SelectionStatus
@@ -135,9 +135,9 @@ isIndeterminate :: SelectionStatus -> Boolean
 isIndeterminate Indeterminate = true
 isIndeterminate _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // selection anchor
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Anchor point for range selection (where shift+click started)
 type SelectionAnchor =
@@ -160,9 +160,9 @@ hasAnchor a = isJust a.index
 anchorIndex :: SelectionAnchor -> Maybe Int
 anchorIndex a = a.index
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // selection range
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Contiguous selection range
 type SelectionRange =
@@ -197,9 +197,9 @@ isInRange i r = i >= r.start && i <= r.end
 expandRange :: Int -> SelectionRange -> SelectionRange
 expandRange i r = selectionRange (min i r.start) (max i r.end)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // single selection molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // single selection molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Single item selection state
 type SingleSelection =
@@ -240,9 +240,9 @@ selectedIndex s = s.selected
 hasSelection :: SingleSelection -> Boolean
 hasSelection s = isJust s.selected
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // multi selection molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // multi selection molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Multiple item selection state
 type MultiSelection =
@@ -332,9 +332,9 @@ isSomeSelected ms =
   let count = length ms.indices
   in count > 0 && count < ms.totalCount
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                              // hierarchical selection compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                            // hierarchical selection compound
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Hierarchical selection status (for tree structures)
 data HierarchicalStatus

@@ -97,9 +97,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   , lengthSquaredVec3
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                        // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                       // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A sphere defined by center point and radius.
 -- |
@@ -117,9 +117,9 @@ instance showSphere :: Show Sphere where
   show (Sphere center radius) =
     "(Sphere center:" <> show center <> " radius:" <> show radius <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a sphere from center and radius
 sphere :: Vec3 Number -> Number -> Sphere
@@ -145,9 +145,9 @@ spherePoint p = Sphere p 0.0
 sphereFromCenterAndRadius :: Vec3 Number -> Number -> Sphere
 sphereFromCenterAndRadius = Sphere
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // validity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if sphere is valid (non-empty): radius ≥ 0
 -- | Proof reference: Sphere.lean IsValid
@@ -159,9 +159,9 @@ isValidSphere (Sphere _ radius) = radius >= 0.0
 isEmptySphere :: Sphere -> Boolean
 isEmptySphere (Sphere _ radius) = radius < 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // basic queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // basic queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Diameter of the sphere
 -- | Proof reference: Sphere.lean diameter, diameter_unit, diameter_point
@@ -178,9 +178,9 @@ surfaceAreaSphere (Sphere _ radius) = 4.0 * Math.pi * radius * radius
 volumeSphere :: Sphere -> Number
 volumeSphere (Sphere _ radius) = (4.0 / 3.0) * Math.pi * radius * radius * radius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // containment and distance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // containment and distance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Squared distance from a point to the sphere center
 -- | Proof reference: Sphere.lean distanceSqToCenter
@@ -203,9 +203,9 @@ containsPointSphere s p = distanceSqToCenterSphere s p <= (getRadiusSphere s * g
 distanceToPointSphere :: Sphere -> Vec3 Number -> Number
 distanceToPointSphere s p = distanceToCenterSphere s p - getRadiusSphere s
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // sphere-sphere intersection
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // sphere-sphere intersection
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if two spheres intersect
 -- | Proof reference: Sphere.lean intersectsSphere, intersectsSphere_self, intersectsSphere_comm
@@ -218,9 +218,9 @@ intersectsSphere (Sphere c1 r1) (Sphere c2 r2) =
 centerDistanceSqSphere :: Sphere -> Sphere -> Number
 centerDistanceSqSphere (Sphere c1 _) (Sphere c2 _) = distanceSquaredVec3 c1 c2
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // translation and scaling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // translation and scaling
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Translate the sphere by a vector
 -- | Proof reference: Sphere.lean translate, translate_zero, translate_translate
@@ -237,9 +237,9 @@ scaleRadiusSphere (Sphere center radius) factor = Sphere center (radius * factor
 expandRadiusSphere :: Sphere -> Number -> Sphere
 expandRadiusSphere (Sphere center radius) amount = Sphere center (radius + amount)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // bounding sphere
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a bounding sphere for a single point
 -- | Proof reference: Sphere.lean boundingPoint
@@ -255,9 +255,9 @@ boundingTwoPointsSphere a b =
     halfDist = scaleVec3 0.5 (subtractVec3 b a)
   in Sphere center (Math.sqrt (lengthSquaredVec3 halfDist))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the sphere center
 getCenterSphere :: Sphere -> Vec3 Number

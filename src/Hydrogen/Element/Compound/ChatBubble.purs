@@ -152,9 +152,9 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Elevation.Shadow as Shadow
 import Hydrogen.Schema.Dimension.Device as Device
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Message direction
 -- |
@@ -195,9 +195,9 @@ instance showStatus :: Show Status where
   show Read = "read"
   show Failed = "failed"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | ChatBubble properties
 -- |
@@ -270,9 +270,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set message text
 message :: forall msg. String -> ChatBubbleProp msg
@@ -298,9 +298,9 @@ timestamp t props = props { timestamp = Just t }
 status :: forall msg. Status -> ChatBubbleProp msg
 status s props = props { status = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set bubble background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> ChatBubbleProp msg
@@ -324,9 +324,9 @@ timestampTextColor c props = props { timestampTextColor = Just c }
 glow :: forall msg. Glow.Glow -> ChatBubbleProp msg
 glow g props = props { glow = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 -- |
@@ -334,9 +334,9 @@ glow g props = props { glow = Just g }
 borderRadius :: forall msg. Geometry.Corners -> ChatBubbleProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: elevation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: elevation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set box shadow (Shadow.LayeredShadow atom)
 -- |
@@ -344,9 +344,9 @@ borderRadius r props = props { borderRadius = Just r }
 shadow :: forall msg. Shadow.LayeredShadow -> ChatBubbleProp msg
 shadow s props = props { shadow = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set bubble padding (Device.Pixel atom)
 padding :: forall msg. Device.Pixel -> ChatBubbleProp msg
@@ -364,9 +364,9 @@ avatarSize s props = props { avatarSize = Just s }
 gap :: forall msg. Device.Pixel -> ChatBubbleProp msg
 gap g props = props { gap = Just g }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Show bubble tail pointer
 showTail :: forall msg. Boolean -> ChatBubbleProp msg
@@ -380,9 +380,9 @@ onClick handler props = props { onClick = Just handler }
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ChatBubbleProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a chat bubble
 -- |
@@ -620,9 +620,9 @@ statusToIcon Delivered = doubleCheckIcon
 statusToIcon Read = doubleCheckReadIcon
 statusToIcon Failed = errorIcon
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // companion components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Container for chat messages
 -- |
@@ -699,9 +699,9 @@ dividerLine =
     ]
     []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clock icon (sending status)
 clockIcon :: forall msg. E.Element msg

@@ -49,9 +49,9 @@ module Hydrogen.GPU.Scene3D.GizmoGeometry
   , partToAxis
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -68,9 +68,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.GPU.Scene3D.Gizmo (GizmoAxis(AxisX, AxisY, AxisZ, PlaneXY, PlaneXZ, PlaneYZ, AxisAll, AxisNone))
 import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3, vec3)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // gizmo part
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Identifier for individual gizmo geometry pieces.
 -- |
@@ -111,9 +111,9 @@ instance showGizmoPart :: Show GizmoPart where
   show ScaleHandleZ = "ScaleHandleZ"
   show ScaleHandleCenter = "ScaleHandleCenter"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // axis mapping
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // axis mapping
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert GizmoAxis to the corresponding translate gizmo part.
 axisToTranslatePart :: GizmoAxis -> Maybe GizmoPart
@@ -157,9 +157,9 @@ partToAxis ScaleHandleY = AxisY
 partToAxis ScaleHandleZ = AxisZ
 partToAxis ScaleHandleCenter = AxisAll
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // hit test boxes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Axis-aligned bounding box for gizmo hit testing.
 -- |

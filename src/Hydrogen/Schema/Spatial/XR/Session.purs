@@ -74,9 +74,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3, vec3, addVec3, scaleVec3, crossVec3, lengthVec3)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // session mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // session mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | XR session mode
 -- |
@@ -148,9 +148,9 @@ instance showXRReferenceSpace :: Show XRReferenceSpace where
   show BoundedFloorSpace = "bounded-floor"
   show UnboundedSpace = "unbounded"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // session state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // session state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | XR session lifecycle state
 data XRSessionState
@@ -182,9 +182,9 @@ instance showXRVisibilityState :: Show XRVisibilityState where
   show VisibleBlurred = "visible-blurred"
   show Hidden = "hidden"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // session
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | XR session configuration
 newtype XRSession = XRSession
@@ -249,9 +249,9 @@ sessionSupportsFeature feature (XRSession s) =
   elem :: forall a. Eq a => a -> Array a -> Boolean
   elem x arr = foldl (\acc y -> acc || x == y) false arr
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // anchors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // anchors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique anchor identifier
 newtype XRAnchorId = XRAnchorId String
@@ -330,9 +330,9 @@ anchorDistance (XRAnchor a1) (XRAnchor a2) =
   subtractVec3 :: Vec3 Number -> Vec3 Number -> Vec3 Number
   subtractVec3 v1 v2 = addVec3 v1 (scaleVec3 (-1.0) v2)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // planes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // planes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique plane identifier
 newtype XRPlaneId = XRPlaneId String
@@ -457,9 +457,9 @@ planeArea (XRPlane p) = computePolygonArea p.polygon
     | current >= total = acc
     | otherwise = buildIndices total (current + 1) (acc <> [current])
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // meshes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // meshes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique mesh identifier
 newtype XRMeshId = XRMeshId String

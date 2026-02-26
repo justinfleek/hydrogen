@@ -41,9 +41,9 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // clear space multiplier
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // clear space multiplier
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clear space multiplier atom.
 -- |
@@ -72,9 +72,9 @@ mkClearSpaceMultiplier n =
 unClearSpaceMultiplier :: ClearSpaceMultiplier -> Number
 unClearSpaceMultiplier (ClearSpaceMultiplier m) = m
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // clear space reference
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // clear space reference
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clear space reference atom.
 -- |
@@ -102,9 +102,9 @@ mkClearSpaceReference s =
 unClearSpaceReference :: ClearSpaceReference -> String
 unClearSpaceReference (ClearSpaceReference r) = r
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // clear space rule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // clear space rule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clear space rule molecule.
 -- |

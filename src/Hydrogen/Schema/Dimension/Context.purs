@@ -96,9 +96,9 @@ import Hydrogen.Schema.Dimension.Device
   , DevicePixelRatio(DevicePixelRatio)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // display context
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete display context for unit conversions
 -- | This captures all the information needed to convert between
@@ -127,9 +127,9 @@ defaultDisplayContext =
   , fontScale: 1.0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // context properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // context properties
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get PPI from context
 contextPpi :: DisplayContext -> PixelsPerInch
@@ -143,9 +143,9 @@ contextDpr ctx = ctx.devicePixelRatio
 contextFontScale :: DisplayContext -> Number
 contextFontScale ctx = ctx.fontScale
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // physical <-> device conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                            // physical <-> device conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert physical inches to device pixels
 inchToPixels :: DisplayContext -> Inch -> Pixel
@@ -174,9 +174,9 @@ pixelsToMeter ctx (Pixel p) =
       inches' = p / ppiVal
   in Meter (inches' / 39.3701)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // css <-> device conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // css <-> device conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert CSS pixels to device pixels
 cssPixelToDevicePixel :: DisplayContext -> CSSPixel -> DevicePixel
@@ -190,9 +190,9 @@ devicePixelToCssPixel ctx (DevicePixel dp') =
   let DevicePixelRatio dpr' = ctx.devicePixelRatio
   in CSSPixel (dp' / dpr')
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // dp <-> pixel conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // dp <-> pixel conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert density-independent pixels to device pixels
 -- | Android formula: pixels = dp * (ppi / 160)
@@ -207,9 +207,9 @@ pixelsToDp ctx (Pixel p) =
   let PixelsPerInch ppiVal = ctx.ppi
   in DensityIndependentPixel (p * (160.0 / ppiVal))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // sp <-> pixel conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // sp <-> pixel conversions
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert scaled pixels to device pixels
 -- | Respects user font scale preference
@@ -226,9 +226,9 @@ pixelsToSp ctx (Pixel p) =
       scale = ctx.fontScale
   in ScaledPixel (p * (160.0 / ppiVal) / scale)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // viewing distance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // viewing distance
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Viewing distance from display to eye
 -- | Affects perceived angular size of elements
@@ -256,9 +256,9 @@ typicalDesktop = ViewingDistance (Meter 0.60)
 typicalTV :: ViewingDistance
 typicalTV = ViewingDistance (Meter 3.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // angular size
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate angular size of a pixel in arcminutes
 -- | This is what the human eye actually perceives

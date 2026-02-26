@@ -55,9 +55,9 @@ module Hydrogen.Element.Compound.Carousel.State
   , isRetinalFocusAutoplay
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( max
@@ -83,9 +83,9 @@ import Hydrogen.Element.Compound.Carousel.Types
 import Hydrogen.Element.Compound.Carousel.Gestures (GestureState, initialGestureState)
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // transition state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // transition state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State of an ongoing transition between slides
 -- |
@@ -127,9 +127,9 @@ transitionProgress t = t.progress
 clampProgress :: Number -> Number
 clampProgress n = max 0.0 (min 1.0 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // autoplay state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // autoplay state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Autoplay timer state
 -- |
@@ -167,9 +167,9 @@ paused =
 isAutoplaying :: AutoplayState -> Boolean
 isAutoplaying s = s.playing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // carousel state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // carousel state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete carousel runtime state
 -- |
@@ -210,9 +210,9 @@ isFirstSlide s = unwrapSlideIndex s.current == 0
 isLastSlide :: CarouselState -> Boolean
 isLastSlide s = unwrapSlideIndex s.current == s.total - 1
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // autoplay mode queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // autoplay mode queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if autoplay is content-aware mode
 -- | Content-aware autoplay adjusts timing based on content type (video vs image)

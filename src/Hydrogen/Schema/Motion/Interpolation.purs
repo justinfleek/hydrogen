@@ -129,9 +129,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // full // interpolation // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // full // interpolation // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete interpolation type enumeration.
 -- |
@@ -321,9 +321,9 @@ isBaseInterpolation _ = false
 isEasingInterpolation :: FullInterpolationType -> Boolean
 isEasingInterpolation fit = not (isBaseInterpolation fit)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // constructor // aliases
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // constructor // aliases
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear interpolation (constant speed)
 fitLinear :: FullInterpolationType
@@ -437,9 +437,9 @@ fitEaseOutBounce = FITEaseOutBounce
 fitEaseInOutBounce :: FullInterpolationType
 fitEaseInOutBounce = FITEaseInOutBounce
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // spatial // tangent
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // spatial // tangent
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Spatial tangent for position keyframes.
 -- |
@@ -469,9 +469,9 @@ defaultSpatialTangent = SpatialTangent { x: 0.0, y: 0.0, z: 0.0 }
 spatialTangentZero :: SpatialTangent
 spatialTangentZero = defaultSpatialTangent
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // bezier // handle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // bezier // handle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bezier handle for temporal interpolation.
 -- |
@@ -503,9 +503,9 @@ defaultInHandle = BezierHandle { frame: -5.0, value: 0.0, enabled: true }
 defaultOutHandle :: BezierHandle
 defaultOutHandle = BezierHandle { frame: 5.0, value: 0.0, enabled: true }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // control // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Control mode for bezier handles.
 -- |
@@ -538,9 +538,9 @@ controlModeFromString "smooth" = Just CMSmooth
 controlModeFromString "corner" = Just CMCorner
 controlModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // extended // keyframe // data
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // extended // keyframe // data
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extended keyframe interpolation data.
 -- |

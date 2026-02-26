@@ -90,9 +90,9 @@ import Hydrogen.Element.Compound.Widget.Chart.Types
   )
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a chart widget.
 -- |
@@ -167,9 +167,9 @@ chartWidgetSimple ct simpleSeries =
   in
     chartWidget [] chartData
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // render dispatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // render dispatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the chart SVG based on chart type.
 renderChart :: forall msg. ChartProps -> ChartData -> E.Element msg
@@ -186,9 +186,9 @@ renderChart props chartData =
     Radar -> Polar.renderRadarChart props chartData
     Polar -> Polar.renderPolarChart props chartData
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // render helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // render helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render chart title and subtitle.
 renderTitle :: forall msg. Maybe String -> Maybe String -> E.Element msg

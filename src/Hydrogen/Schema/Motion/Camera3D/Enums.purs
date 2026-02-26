@@ -65,9 +65,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // camera // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // camera // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Camera type: one-node or two-node.
 -- |
@@ -97,9 +97,9 @@ cameraTypeFromString "one-node" = Just CTOneNode
 cameraTypeFromString "two-node" = Just CTTwoNode
 cameraTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // auto-orient // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // auto-orient // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Auto-orientation mode for camera.
 data AutoOrientMode
@@ -130,9 +130,9 @@ autoOrientModeFromString "along-path" = Just AOMOrientAlongPath
 autoOrientModeFromString "towards-poi" = Just AOMOrientTowardsPOI
 autoOrientModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // measure-film // size
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // measure-film // size
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How film size is measured for lens calculations.
 data MeasureFilmSize
@@ -163,9 +163,9 @@ measureFilmSizeFromString "vertical" = Just MFSVertical
 measureFilmSizeFromString "diagonal" = Just MFSDiagonal
 measureFilmSizeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // wireframe // visibility
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // wireframe // visibility
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Wireframe visibility mode for 3D objects.
 data WireframeVisibility
@@ -196,9 +196,9 @@ wireframeVisibilityFromString "selected" = Just WVSelected
 wireframeVisibilityFromString "off" = Just WVOff
 wireframeVisibilityFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // view // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // view // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | View type for 3D viewport.
 data ViewType
@@ -268,9 +268,9 @@ viewTypeFromString "top" = Just VTTop
 viewTypeFromString "bottom" = Just VTBottom
 viewTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // view // layout
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // view // layout
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Viewport layout for multiple views.
 data ViewLayout
@@ -305,9 +305,9 @@ viewLayoutFromString "two-view-vertical" = Just VLTwoViewVertical
 viewLayoutFromString "four-view" = Just VLFourView
 viewLayoutFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                   // spatial // interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Spatial interpolation type for 3D motion paths.
 data SpatialInterpolation
@@ -342,9 +342,9 @@ spatialInterpolationFromString "auto-bezier" = Just SIAutoBezier
 spatialInterpolationFromString "continuous-bezier" = Just SIContinuousBezier
 spatialInterpolationFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                  // temporal // interpolation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Temporal interpolation type for keyframes.
 data TemporalInterpolation

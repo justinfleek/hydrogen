@@ -188,9 +188,9 @@ import Hydrogen.Schema.Accessibility.State as AriaState
 import Hydrogen.Schema.Accessibility.Property as AriaProperty
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // behavior props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // behavior props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set button type (button, submit, reset).
 buttonType :: forall msg. ButtonType -> ButtonProp msg
@@ -220,9 +220,9 @@ onHoverEnter handler props = props { onHoverEnter = Just handler }
 onHoverLeave :: forall msg. msg -> ButtonProp msg
 onHoverLeave handler props = props { onHoverLeave = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // pillar 1: color props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // pillar 1: color props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (OKLCH).
 background :: forall msg. OKLCH.OKLCH -> ButtonProp msg
@@ -296,9 +296,9 @@ focusRingWidth w props = props { focusRingWidth = Just w }
 focusRingOffset :: forall msg. Device.Pixel -> ButtonProp msg
 focusRingOffset o props = props { focusRingOffset = Just o }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // pillar 2: dimension props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // pillar 2: dimension props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set button height.
 height :: forall msg. Device.Pixel -> ButtonProp msg
@@ -344,9 +344,9 @@ gap g props = props { gap = Just g }
 iconSize :: forall msg. Device.Pixel -> ButtonProp msg
 iconSize s props = props { iconSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // pillar 3: geometry props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // pillar 3: geometry props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius.
 borderRadius :: forall msg. Radius.Corners -> ButtonProp msg
@@ -364,9 +364,9 @@ borderStyle s props = props { borderStyle = Just s }
 clipPath :: forall msg. ClipPath.ClipPath -> ButtonProp msg
 clipPath c props = props { clipPath = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // pillar 4: typography props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                 // pillar 4: typography props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font family/stack.
 fontFamily :: forall msg. TypeStyle.FontStack -> ButtonProp msg
@@ -388,9 +388,9 @@ letterSpacing s props = props { letterSpacing = Just s }
 textTransform :: forall msg. String -> ButtonProp msg
 textTransform t props = props { textTransform = Just t }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // pillar 5: elevation props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // pillar 5: elevation props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set box shadow.
 shadow :: forall msg. Shadow.LayeredShadow -> ButtonProp msg
@@ -416,9 +416,9 @@ zIndex z props = props { zIndex = Just z }
 perspective :: forall msg. Perspective.Perspective -> ButtonProp msg
 perspective p props = props { perspective = Just p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // pillar 6: material props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // pillar 6: material props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set backdrop blur (glassmorphism).
 backdropBlur :: forall msg. BlurRadius.BlurRadius -> ButtonProp msg
@@ -464,9 +464,9 @@ filterChain f props = props { filterChain = Just f }
 filterChainHover :: forall msg. FilterChain.FilterChain -> ButtonProp msg
 filterChainHover f props = props { filterChainHover = Just f }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // pillar 7: motion props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // pillar 7: motion props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration.
 transitionDuration :: forall msg. Duration.Duration -> ButtonProp msg
@@ -516,9 +516,9 @@ transformHover t props = props { transformHover = Just t }
 transformActive :: forall msg. Transform.LayerTransform2D -> ButtonProp msg
 transformActive t props = props { transformActive = Just t }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // pillar 8: haptic props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // pillar 8: haptic props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set click haptic feedback.
 hapticClick :: forall msg. HapticFeedback.ImpactFeedback -> ButtonProp msg
@@ -540,9 +540,9 @@ hapticSuccess h props = props { hapticSuccess = Just h }
 hapticError :: forall msg. HapticFeedback.NotificationFeedback -> ButtonProp msg
 hapticError h props = props { hapticError = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // pillar 9: audio props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // pillar 9: audio props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set click sound.
 soundClick :: forall msg. AudioTrigger.AudioTrigger -> ButtonProp msg
@@ -560,9 +560,9 @@ soundSuccess s props = props { soundSuccess = Just s }
 soundError :: forall msg. AudioTrigger.AudioTrigger -> ButtonProp msg
 soundError s props = props { soundError = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // pillar 10: gestural props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // pillar 10: gestural props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set long press threshold.
 longPressThreshold :: forall msg. LongPress.LongPressThreshold -> ButtonProp msg
@@ -572,9 +572,9 @@ longPressThreshold t props = props { longPressThreshold = Just t }
 keyboardShortcut :: forall msg. Shortcut.Shortcut -> ButtonProp msg
 keyboardShortcut s props = props { keyboardShortcut = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                // pillar 11: accessibility props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // pillar 11: accessibility props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set ARIA role.
 ariaRole :: forall msg. AriaRole.WidgetRole -> ButtonProp msg
@@ -616,9 +616,9 @@ ariaHasPopup h props = props { ariaHasPopup = Just h }
 ariaControls :: forall msg. String -> ButtonProp msg
 ariaControls c props = props { ariaControls = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch).
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ButtonProp msg

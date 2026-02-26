@@ -147,9 +147,9 @@ import Hydrogen.Schema.Dimension.Physical (Meter(Meter), Millimeter(Millimeter))
 import Hydrogen.Schema.Dimension.Angular (Degrees(Degrees))
 import Hydrogen.Schema.Dimension.Vector (Vec3(Vec3))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // camera pose
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete camera pose in 3D space
 -- | Position is in world units (meters), rotation in world coordinates
@@ -185,9 +185,9 @@ defaultCameraPose =
   , farPlane: Meter 1000.0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // camera movements
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Abstract camera movement - renderer interprets direction
 data CameraMove
@@ -281,9 +281,9 @@ type Arc =
   , center :: Vec3 Meter
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // movement constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // movement constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Move camera toward subject
 dollyIn :: Meter -> CameraMove
@@ -349,9 +349,9 @@ orbitAround center azimuth elevation = MoveOrbit { center, azimuth, elevation }
 arcMove :: Vec3 Meter -> Meter -> Degrees -> Degrees -> CameraMove
 arcMove center radius startAngle endAngle = MoveArc { center, radius, startAngle, endAngle }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // lens properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focal length in millimeters
 newtype FocalLength = FocalLength Millimeter
@@ -398,9 +398,9 @@ derive instance ordFieldOfView :: Ord FieldOfView
 instance showFieldOfView :: Show FieldOfView where
   show (FieldOfView (Degrees d)) = show d <> "° FOV"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // lens constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create focal length in mm
 focalLength :: Number -> FocalLength
@@ -418,9 +418,9 @@ focusDistance m = FocusDistance (Meter m)
 fov :: Number -> FieldOfView
 fov d = FieldOfView (Degrees d)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // common focal lengths
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Ultra wide angle (14mm full frame equivalent)
 ultraWide :: FocalLength
@@ -446,9 +446,9 @@ telephoto = FocalLength (Millimeter 200.0)
 superTelephoto :: FocalLength
 superTelephoto = FocalLength (Millimeter 400.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // common apertures
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // common apertures
+-- ═════════════════════════════════════════════════════════════════════════════
 
 f1_4 :: Aperture
 f1_4 = Aperture 1.4
@@ -477,9 +477,9 @@ f16 = Aperture 16.0
 f22 :: Aperture
 f22 = Aperture 22.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // sensor sizes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // sensor sizes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Full frame (35mm film equivalent, 43.3mm diagonal)
 fullFrame :: SensorSize
@@ -505,9 +505,9 @@ superThirtyFive = SensorSize (Millimeter 28.0)
 imax :: SensorSize
 imax = SensorSize (Millimeter 87.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // fov calculations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate vertical FOV from focal length and sensor height
 -- | fov = 2 * atan(sensorHeight / (2 * focalLength))
@@ -540,9 +540,9 @@ equivalentFocalLength :: FocalLength -> SensorSize -> FocalLength
 equivalentFocalLength (FocalLength (Millimeter fl)) sensor =
   FocalLength (Millimeter (fl * cropFactor sensor))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // depth of field
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // depth of field
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Depth of field results
 type DepthOfField =

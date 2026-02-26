@@ -87,9 +87,9 @@ import Effect.Now (now) as Now
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Event Bus Core
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | An event bus for type-safe pub/sub
 type EventBus a =
@@ -128,9 +128,9 @@ createNamed name = do
   bus <- create
   pure bus { name = Just name }
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Subscriptions
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Subscribe to events on the bus
 -- | Returns an unsubscribe function
@@ -182,9 +182,9 @@ unsubscribe bus id = do
 unsubscribeAll :: forall a. EventBus a -> Effect Unit
 unsubscribeAll bus = Ref.write [] bus.subscribers
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Emitting Events
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Emit an event to all subscribers
 emit :: forall a. EventBus a -> a -> Effect Unit
@@ -240,9 +240,9 @@ emitDelayed bus (Milliseconds ms) event = do
   delay (Milliseconds ms)
   liftEffect $ emit bus event
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Channels (Namespaced Events)
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A named channel for organizing events
 newtype Channel = Channel String
@@ -284,9 +284,9 @@ emitToChannel :: forall a. EventBus (ChanneledEvent a) -> Channel -> a -> Effect
 emitToChannel bus ch payload =
   emit bus { channel: ch, payload }
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- History
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Event history for replay/debugging
 type History a =
@@ -340,9 +340,9 @@ replay bus handler = do
   for_ :: forall b. Array b -> (b -> Effect Unit) -> Effect Unit
   for_ arr f = void $ Traversable.traverse f arr
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Debugging
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Enable debug mode for a bus
 debugBus :: forall a. EventBus a -> Boolean -> Effect Unit
@@ -352,9 +352,9 @@ debugBus bus enabled = Ref.write enabled bus.debugMode
 getSubscriberCount :: forall a. EventBus a -> Effect Int
 getSubscriberCount bus = Array.length <$> Ref.read bus.subscribers
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Typed Channels (Heterogeneous Events)
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A typed channel that carries a specific event type
 -- | Used for heterogeneous event buses
@@ -397,9 +397,9 @@ emitTyped :: forall a. EventBus AnyEvent -> TypedChannel a -> a -> Effect Unit
 emitTyped bus (TypedChannel name) event =
   emit bus (wrapEvent name event)
 
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 -- Utilities
--- ═══════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Note: Using Control.Monad.when and Control.Monad.unless from standard library
 

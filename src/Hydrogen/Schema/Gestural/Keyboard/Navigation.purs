@@ -47,9 +47,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Gestural.Keyboard.Keys (KeyCode, unwrapKeyCode)
 import Hydrogen.Schema.Gestural.Keyboard.Event (KeyEvent)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // arrow // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // arrow // direction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Direction for arrow key navigation
 data ArrowDirection
@@ -99,9 +99,9 @@ oppositeArrow ArrowDown = ArrowUp
 oppositeArrow ArrowLeft = ArrowRight
 oppositeArrow ArrowRight = ArrowLeft
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // tab // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // tab // direction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tab navigation direction
 data TabDirection
@@ -127,9 +127,9 @@ oppositeTab :: TabDirection -> TabDirection
 oppositeTab TabForward = TabBackward
 oppositeTab TabBackward = TabForward
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // vim // movement
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // vim // movement
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vim-style movement (hjkl)
 data VimMovement
@@ -173,9 +173,9 @@ vimToArrow VimDown = ArrowDown
 vimToArrow VimLeft = ArrowLeft
 vimToArrow VimRight = ArrowRight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // focus // navigation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // focus // navigation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Focus navigation action
 data FocusAction

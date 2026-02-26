@@ -220,9 +220,9 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // core // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // core // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Namespace for elements (HTML vs SVG vs MathML)
 data Namespace
@@ -362,9 +362,9 @@ mapHandlerMsg f = case _ of
   OnTouchCancel m -> OnTouchCancel (f m)
   CustomEvent n m -> CustomEvent n (f m)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // element // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // element // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create an element with a tag name, attributes, and children
 element :: forall msg. String -> Array (Attribute msg) -> Array (Element msg) -> Element msg
@@ -405,9 +405,9 @@ keyed tag attributes children = Keyed
 lazy :: forall msg. String -> (Unit -> Element msg) -> Element msg
 lazy key thunk = Lazy { thunk, key }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // common // elements
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // common // elements
+-- ═════════════════════════════════════════════════════════════════════════════
 
 div_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 div_ = element "div"
@@ -547,9 +547,9 @@ script_ = element "script"
 textarea_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 textarea_ = element "textarea"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // svg // elements
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // svg // elements
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | SVG namespace
 svgNS :: Namespace
@@ -607,9 +607,9 @@ tspan_ = svgElement "tspan"
 polyline_ :: forall msg. Array (Attribute msg) -> Element msg
 polyline_ attrs = svgElement "polyline" attrs []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // attributes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // attributes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create an HTML attribute
 attr :: forall msg. String -> String -> Attribute msg
@@ -758,9 +758,9 @@ ariaRole = Attr "role"
 dataAttr :: forall msg. String -> String -> Attribute msg
 dataAttr key = Attr ("data-" <> key)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // event // handlers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // event // handlers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 onClick :: forall msg. msg -> Attribute msg
 onClick = Handler <<< OnClick
@@ -846,9 +846,9 @@ onTouchEnd = Handler <<< OnTouchEnd
 onTouchCancel :: forall msg. msg -> Attribute msg
 onTouchCancel = Handler <<< OnTouchCancel
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // element // manipulation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // element // manipulation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Map over the message type of an element
 mapMsg :: forall a b. (a -> b) -> Element a -> Element b

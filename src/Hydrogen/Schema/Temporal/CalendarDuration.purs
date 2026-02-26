@@ -68,9 +68,9 @@ import Prelude
 
 import Data.Foldable (foldl)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // calendar duration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // calendar duration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | CalendarDuration - duration in calendar units.
 -- | Stored as years, months, and days separately because they
@@ -111,9 +111,9 @@ durationDays (CalendarDuration d) = d.days
 durationWeeks :: CalendarDuration -> Int
 durationWeeks (CalendarDuration d) = d.days / 7
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create duration from days.
 days :: Int -> CalendarDuration
@@ -135,9 +135,9 @@ years n = CalendarDuration { years: max 0 n, months: 0, days: 0 }
 yearsMonthsDays :: Int -> Int -> Int -> CalendarDuration
 yearsMonthsDays = calendarDuration
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add two durations.
 addDurations :: CalendarDuration -> CalendarDuration -> CalendarDuration
@@ -205,9 +205,9 @@ normalizeDuration (CalendarDuration d) =
        , days: d.days
        }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // formatting
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format as ISO 8601 duration (P1Y2M3D).
 durationToISO8601 :: CalendarDuration -> String

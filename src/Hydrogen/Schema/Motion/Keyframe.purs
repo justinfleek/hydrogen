@@ -95,9 +95,9 @@ import Prelude
 import Data.Int (round)
 import Hydrogen.Schema.Dimension.Temporal (Frames(Frames))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // core types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // core types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for a keyframe
 newtype KeyframeId = KeyframeId String
@@ -178,9 +178,9 @@ instance showKeyframe :: Show Keyframe where
 instance ordKeyframe :: Ord Keyframe where
   compare (Keyframe a) (Keyframe b) = compare a.frame b.frame
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a basic keyframe with auto-generated ID
 -- |
@@ -233,9 +233,9 @@ generateId (Frames f) val =
     valueHash (AngleValue a) = show (round a)
     valueHash (PercentValue p) = show (round p) <> "p"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // keyframe builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // keyframe builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set interpolation type
 withInterpolation :: InterpolationType -> Keyframe -> Keyframe
@@ -269,9 +269,9 @@ withLinear = withInterpolation Linear
 withAuto :: Keyframe -> Keyframe
 withAuto = withInterpolation Auto
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get keyframe frame position
 frame :: Keyframe -> Frames
@@ -297,9 +297,9 @@ outTangent (Keyframe kf) = kf.outTangent
 keyframeId :: Keyframe -> KeyframeId
 keyframeId (Keyframe kf) = kf.id
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if keyframe uses bezier interpolation
 isBezier :: Keyframe -> Boolean
@@ -317,9 +317,9 @@ isLinear kf = interpolationType kf == Linear
 isAuto :: Keyframe -> Boolean
 isAuto kf = interpolationType kf == Auto
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set keyframe to a new frame position
 setFrame :: Frames -> Keyframe -> Keyframe
@@ -338,9 +338,9 @@ shiftFrame (Frames offset) (Keyframe kf) =
   in
     Keyframe kf { frame = Frames newFrame }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // value operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // value operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Linear interpolation between two values
 -- |

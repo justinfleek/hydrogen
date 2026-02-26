@@ -31,9 +31,9 @@ import Hydrogen.Schema.Color.HSL as HSL
 import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // color temperature
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // color temperature
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Perceived color temperature
 data Temperature

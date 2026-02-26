@@ -66,9 +66,9 @@ import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split, joinWith)
 import Data.Array (length, (!!), drop)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // did method
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // did method
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DIDMethod - supported DID methods.
 data DIDMethod
@@ -103,9 +103,9 @@ parseDIDMethod "ion" = MethodIon
 parseDIDMethod "pkh" = MethodPkh
 parseDIDMethod other = MethodOther other
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // did
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                        // did
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DID - Decentralized Identifier.
 type DID =
@@ -159,9 +159,9 @@ parseDID s =
 dropFirst :: forall a. Int -> Array a -> Array a
 dropFirst = drop
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                   // verification method type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VerificationMethodType - cryptographic key types.
 data VerificationMethodType
@@ -187,9 +187,9 @@ verificationMethodTypeLabel X25519KeyAgreementKey2020 = "X25519KeyAgreementKey20
 verificationMethodTypeLabel Bls12381G1Key2020 = "Bls12381G1Key2020"
 verificationMethodTypeLabel Bls12381G2Key2020 = "Bls12381G2Key2020"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // verification method
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // verification method
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | VerificationMethod - public key associated with a DID.
 type VerificationMethod =
@@ -237,9 +237,9 @@ showVerificationMethod :: VerificationMethod -> String
 showVerificationMethod v =
   "(VerificationMethod " <> v.id <> " " <> show v.methodType <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // did document
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // did document
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | DIDDocument - DID resolution result containing verification methods.
 type DIDDocument =

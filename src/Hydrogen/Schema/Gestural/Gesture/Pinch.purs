@@ -49,9 +49,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Gestural.Gesture.Phase (GesturePhase(Possible, Began, Changed, Ended, Cancelled))
 import Hydrogen.Math.Core (sqrt)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // pinch config
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // pinch config
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration for pinch gesture
 type PinchConfig =
@@ -85,9 +85,9 @@ pinchMinScale pc = pc.minScale
 pinchMaxScale :: PinchConfig -> Number
 pinchMaxScale pc = pc.maxScale
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // pinch gesture state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete pinch gesture state
 type PinchGesture =
@@ -189,9 +189,9 @@ cancelPinch pg = pg
   , scale = pg.initialScale  -- Revert to initial scale
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get current scale
 pinchGestureScale :: PinchGesture -> Number
@@ -213,9 +213,9 @@ isPinchActive pg = pg.phase == Began || pg.phase == Changed
 isPinchEnded :: PinchGesture -> Boolean
 isPinchEnded pg = pg.phase == Ended || pg.phase == Cancelled
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // scale helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clamp scale to configured bounds
 clampScale :: PinchConfig -> Number -> Number

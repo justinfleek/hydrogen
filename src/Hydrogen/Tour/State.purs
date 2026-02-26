@@ -61,9 +61,9 @@ import Data.Show.Generic (genericShow)
 import Hydrogen.Tour.Step (Step)
 import Hydrogen.Tour.Types (Milliseconds, Progress, StepId, TourId, TourPhase(TourActive, TourCompleted, TourDismissed, TourInactive, TourPaused, TourSkipped), mkProgress)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // tour state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete state for a product tour
 -- |
@@ -158,9 +158,9 @@ isLastStep state = case state.phase of
   TourActive idx -> idx == length state.steps - 1
   _ -> false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // tour messages
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // tour messages
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | All possible tour events
 -- |
@@ -232,9 +232,9 @@ derive instance genericDismissReason :: Generic DismissReason _
 instance showDismissReason :: Show DismissReason where
   show = genericShow
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // tour configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration options for tour behavior
 type TourConfig =

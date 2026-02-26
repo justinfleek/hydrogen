@@ -33,9 +33,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3(Vec3), vec3, vec3Zero, vec3On
 import Hydrogen.Schema.Dimension.Vector.Vec4 (Vec4(Vec4), vec4, vec4Zero, vec4One, addVec4, subtractVec4, scaleVec4, negateVec4, dotVec4, lengthSquaredVec4, lengthVec4, normalizeVec4, lerpVec4, getX4, getY4, getZ4, getW4, setX4, setY4, setZ4, setW4)
 import Hydrogen.Schema.Dimension.Vector.VecN (VecN(VecN), vecN, vecNZero, vecNFromArray, vecNToArray, dimVecN, addVecN, subtractVecN, scaleVecN, negateVecN, dotVecN, lengthSquaredVecN, lengthVecN, normalizeVecN, distanceVecN, lerpVecN, getComponentN, setComponentN)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // conversions
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Extend 2D to 3D with z=zero
 vec2ToVec3 :: forall a. Semiring a => Vec2 a -> Vec3 a

@@ -86,9 +86,9 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core (sqrt, atan2, cos, sin, abs, pi)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // velocity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 2D velocity in pixels per second
 -- |
@@ -133,9 +133,9 @@ isMoving v = velocityMagnitude v > 1.0
 isFastMotion :: Velocity2D -> Boolean
 isFastMotion v = velocityMagnitude v > 500.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // acceleration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 2D acceleration in pixels per second squared
 -- |
@@ -172,9 +172,9 @@ isDecelerating :: Velocity2D -> Acceleration2D -> Boolean
 isDecelerating v a = 
   (v.vx * a.ax < 0.0) || (v.vy * a.ay < 0.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // distance
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Distance in pixels (always non-negative)
 newtype Distance = Distance Number
@@ -204,9 +204,9 @@ unwrapDistance (Distance d) = d
 isSignificantDistance :: Distance -> Boolean
 isSignificantDistance (Distance d) = d > 10.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // direction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cardinal and intermediate directions
 data Direction
@@ -277,9 +277,9 @@ oppositeDirection DirectionDownLeft = DirectionUpRight
 oppositeDirection DirectionDownRight = DirectionUpLeft
 oppositeDirection DirectionNone = DirectionNone
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // gesture vector
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // gesture vector
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete gesture motion from start to current position
 -- |
@@ -336,9 +336,9 @@ vectorDirection gv = directionFromDelta (gv.currentX - gv.startX) (gv.currentY -
 vectorVelocity :: GestureVector -> Velocity2D
 vectorVelocity gv = gv.velocity
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // momentum
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Momentum state for inertial scrolling and fling gestures
 -- |
@@ -391,9 +391,9 @@ momentumPosition m = { x: m.x, y: m.y }
 isMomentumActive :: Momentum -> Boolean
 isMomentumActive m = m.active
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // motion state (compound)
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // motion state (compound)
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete motion state for tracking gesture physics
 type MotionState =

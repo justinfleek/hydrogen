@@ -135,9 +135,9 @@ import Prelude
 import Data.Array (drop, head, length, snoc)
 import Data.Maybe (Maybe(Just, Nothing), isJust)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // feedback type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of feedback notification
 data FeedbackType
@@ -177,9 +177,9 @@ isDialog :: FeedbackType -> Boolean
 isDialog DialogType' = true
 isDialog _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // feedback severity
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Severity/intent of feedback
 data FeedbackSeverity
@@ -219,9 +219,9 @@ isFeedbackNeutral :: FeedbackSeverity -> Boolean
 isFeedbackNeutral FeedbackNeutral = true
 isFeedbackNeutral _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // feedback position
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Screen position for feedback
 data FeedbackPosition
@@ -267,9 +267,9 @@ isBottomRight :: FeedbackPosition -> Boolean
 isBottomRight BottomRight = true
 isBottomRight _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // duration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Display duration for auto-dismissing feedback
 data FeedbackDuration
@@ -310,9 +310,9 @@ durationMs DurationMedium = Just 4000.0
 durationMs DurationLong = Just 8000.0
 durationMs DurationPersistent = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // dismissal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How feedback can be dismissed
 data DismissalMethod
@@ -346,9 +346,9 @@ isSwipeDismiss :: DismissalMethod -> Boolean
 isSwipeDismiss SwipeDismiss = true
 isSwipeDismiss _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // action button
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Action button for feedback
 type FeedbackAction =
@@ -378,9 +378,9 @@ dismissAction = feedbackAction "Dismiss" "dismiss" true
 actionLabel :: FeedbackAction -> String
 actionLabel a = a.label
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // toast molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // toast molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Toast notification
 type Toast =
@@ -420,9 +420,9 @@ infoToast id message = toast id message FeedbackInfo
 warningToast :: String -> String -> Toast
 warningToast id message = toast id message FeedbackWarning
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // snackbar molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // snackbar molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Snackbar notification (with optional action)
 type Snackbar =
@@ -452,9 +452,9 @@ snackbarWithAction id message action =
 snackbarWithUndo :: String -> String -> Snackbar
 snackbarWithUndo id message = snackbarWithAction id message undoAction
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // banner molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // banner molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Banner notification (persistent, full-width)
 type Banner =
@@ -490,9 +490,9 @@ errorBanner :: String -> String -> Banner
 errorBanner id message = (banner id message FeedbackError)
   { dismissible = false }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // alert molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // alert molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Inline alert
 type Alert =
@@ -525,9 +525,9 @@ alertWithActions :: String -> String -> FeedbackSeverity -> Array FeedbackAction
 alertWithActions id message severity actions =
   (alert id message severity) { actions = actions }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // dialog compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // dialog compound
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Dialog type
 data DialogType
@@ -603,9 +603,9 @@ destructiveDialog id title message =
     , confirmLabel = "Delete"
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // notification queue compound
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // notification queue compound
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Queue of pending notifications
 type NotificationQueue =
@@ -638,9 +638,9 @@ queueLength queue = length queue.items
 currentNotification :: NotificationQueue -> Maybe Toast
 currentNotification queue = head queue.items
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // computed properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Should auto-dismiss based on duration?
 shouldAutoDismiss :: FeedbackDuration -> Boolean
@@ -655,9 +655,9 @@ hasAction sb = isJust sb.action
 isBlocking :: Dialog -> Boolean
 isBlocking _ = true  -- Dialogs are always blocking
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // tooltip molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // tooltip molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tooltip placement relative to trigger
 data TooltipPlacement
@@ -725,9 +725,9 @@ interactiveTooltip content placement = (tooltip content placement)
   , hideDelay = 300.0
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // popover molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // popover molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Popover trigger mode
 data PopoverTrigger
@@ -790,9 +790,9 @@ openPopover p = p { isOpen = true }
 closePopover :: Popover -> Popover
 closePopover p = p { isOpen = false }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // drawer molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // drawer molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Drawer position (which edge it slides from)
 data DrawerPosition
@@ -861,9 +861,9 @@ closeDrawer d = d { isOpen = false }
 toggleDrawer :: Drawer -> Drawer
 toggleDrawer d = d { isOpen = not d.isOpen }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // sheet molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // sheet molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sheet snap point (height detents)
 data SheetSnapPoint

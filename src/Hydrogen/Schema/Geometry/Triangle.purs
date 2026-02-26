@@ -113,9 +113,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec3
   , vec3UnitY
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // barycentric type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // barycentric type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Barycentric coordinates (u, v, w) where point = u*a + v*b + w*c
 -- |
@@ -129,9 +129,9 @@ instance showBarycentric :: Show Barycentric where
   show (Barycentric u v w) =
     "(Barycentric " <> show u <> " " <> show v <> " " <> show w <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // triangle type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // triangle type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A triangle defined by three vertices.
 -- |
@@ -148,9 +148,9 @@ instance showTriangle :: Show Triangle where
   show (Triangle a b c) =
     "(Triangle a:" <> show a <> " b:" <> show b <> " c:" <> show c <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // triangle constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a triangle from three vertices
 triangle :: Vec3 Number -> Vec3 Number -> Vec3 Number -> Triangle
@@ -171,9 +171,9 @@ triangleDegenerate = Triangle vec3Zero vec3Zero vec3Zero
 triangleFromPoints :: Vec3 Number -> Vec3 Number -> Vec3 Number -> Triangle
 triangleFromPoints = Triangle
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // barycentric constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // barycentric constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create barycentric coordinates
 barycentric :: Number -> Number -> Number -> Barycentric
@@ -199,9 +199,9 @@ barycentricVertexC = Barycentric 0.0 0.0 1.0
 barycentricCentroid :: Barycentric
 barycentricCentroid = Barycentric (1.0 / 3.0) (1.0 / 3.0) (1.0 / 3.0)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // barycentric queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sum of barycentric coordinates (should be 1 for valid coords)
 -- | Proof reference: Triangle.lean Barycentric.sum
@@ -218,9 +218,9 @@ isValidBarycentric bc = sumBarycentric bc == 1.0
 isInsideBarycentric :: Barycentric -> Boolean
 isInsideBarycentric (Barycentric u v w) = u >= 0.0 && v >= 0.0 && w >= 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // triangle edges
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // triangle edges
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Edge from A to B
 -- | Proof reference: Triangle.lean edgeAB
@@ -252,9 +252,9 @@ edgeCA (Triangle a _ c) = subtractVec3 a c
 edgeCB :: Triangle -> Vec3 Number
 edgeCB (Triangle _ b c) = subtractVec3 b c
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // normal and area
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Cross product of two edges (twice the area vector)
 -- | Proof reference: Triangle.lean crossEdges
@@ -281,9 +281,9 @@ areaTriangle t = lengthVec3 (crossEdges t) / 2.0
 isDegenerate :: Triangle -> Boolean
 isDegenerate t = normalLengthSq t == 0.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // centroid and midpoints
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // centroid and midpoints
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Midpoint of edge AB
 -- | Proof reference: Triangle.lean midpointAB
@@ -305,9 +305,9 @@ midpointCA (Triangle a _ c) = scaleVec3 0.5 (addVec3 c a)
 centroidTriangle :: Triangle -> Vec3 Number
 centroidTriangle (Triangle a b c) = scaleVec3 (1.0 / 3.0) (addVec3 (addVec3 a b) c)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // barycentric conversion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // barycentric conversion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert barycentric coordinates to a point
 -- | Proof reference: Triangle.lean fromBarycentric, fromBarycentric_vertexA/B/C
@@ -359,9 +359,9 @@ getBarycoord (Triangle a b c) point =
     -- Constructor Barycentric u v w (A, B, C)
     Barycentric u v_val w_val
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // point containment
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // point containment
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if a point lies inside the triangle (on the triangle plane).
 -- |
@@ -409,9 +409,9 @@ closestPointToPointTriangle t point =
       in
         fromBarycentric t (Barycentric (u' * invTotal) (v' * invTotal) (w' * invTotal))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get vertex A
 getA :: Triangle -> Vec3 Number

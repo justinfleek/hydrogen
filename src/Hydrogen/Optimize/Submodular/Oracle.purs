@@ -96,9 +96,9 @@ module Hydrogen.Optimize.Submodular.Oracle
   , restrictOracle
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -138,9 +138,9 @@ import Hydrogen.Optimize.Submodular.Types
   , extensionElements
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // coverage oracle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // coverage oracle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Coverage specification for a ground set.
 -- |
@@ -217,9 +217,9 @@ marginalCoverage spec e s =
     intToNum :: Int -> Number
     intToNum n = foldl (\acc _ -> acc + 1.0) 0.0 (Array.range 1 n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // weighted coverage oracle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // weighted coverage oracle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a weighted coverage oracle.
 -- |
@@ -277,9 +277,9 @@ marginalWeightedCoverage spec weights e s =
       newlyCovered = Set.difference elementNeighborhood currentCovered
   in MarginalGain (totalWeight newlyCovered weights)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // facility location oracle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // facility location oracle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Facility location specification.
 -- |
@@ -362,9 +362,9 @@ userMarginalGain spec e s user =
       newSim = facilitySimilarity spec user e
   in max 0.0 (newSim - currentMax)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // saturating quality oracle
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // saturating quality oracle
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Quality function parameters (council design).
 -- |
@@ -453,9 +453,9 @@ marginalSaturating activations params e _ =
   -- In pure modular form, marginal gain is just the element's quality
   MarginalGain (elementQuality activations params e)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // oracle operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // oracle operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Evaluate an oracle on a set.
 evalOracle :: forall v. SubmodularOracle v -> ElementSet v -> SetValue
@@ -581,9 +581,9 @@ findInsertPos gain heap idx =
     Just (Tuple g _) -> 
       if gain >= g then idx else findInsertPos gain heap (idx + 1)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // oracle composition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // oracle composition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sum of two submodular oracles.
 -- |

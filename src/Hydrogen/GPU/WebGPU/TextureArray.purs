@@ -56,9 +56,9 @@ module Hydrogen.GPU.WebGPU.TextureArray
 
 import Prelude
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // texture // array
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // texture // array
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Texture array descriptor
 type TextureArrayDescriptor = 
@@ -70,9 +70,9 @@ type TextureArrayDescriptor =
 maxArrayLayers :: Int
 maxArrayLayers = 256
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // texture // sample
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bindless texture sample
 -- |
@@ -101,9 +101,9 @@ type BindlessBinding =
 bindless :: BindlessTextureIndex -> BindlessSamplerIndex -> BindlessBinding
 bindless ti si = { textureIndex: ti, samplerIndex: si }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // texture // atlas
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // texture // atlas
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Texture atlas for bindless rendering
 -- |
@@ -135,9 +135,9 @@ withUVTransform :: AtlasEntry -> { u :: Number, v :: Number } -> { u :: Number, 
 withUVTransform entry offset scale =
   entry { uvOffset = offset, uvScale = scale }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // virtual // texture
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // virtual // texture
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Virtual texture page (for mega-textures)
 type VirtualTexturePage =
@@ -182,9 +182,9 @@ loadPage p = p { state = PageLoaded }
 isPageReady :: VirtualTexturePage -> Boolean
 isPageReady p = p.state == PageLoaded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // type // placeholder
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // type // placeholder
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Placeholder for GPUTextureDescriptor (import from Types in full implementation)
 type GPUTextureDescriptor = Unit

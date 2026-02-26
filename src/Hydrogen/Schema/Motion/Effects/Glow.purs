@@ -53,9 +53,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // glow // composite // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // glow // composite // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How glow is composited with source.
 data GlowCompositeMode
@@ -86,9 +86,9 @@ glowCompositeModeFromString "behind" = Just GCMBehind
 glowCompositeModeFromString "none" = Just GCMNone
 glowCompositeModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // glow // colors // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // glow // colors // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | How glow colors are determined.
 data GlowColorsMode
@@ -115,9 +115,9 @@ glowColorsModeFromString "original" = Just GCMOriginal
 glowColorsModeFromString "ab" = Just GCMAB
 glowColorsModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // color // looping
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // color // looping
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color cycling behavior for glow.
 data ColorLooping
@@ -152,9 +152,9 @@ colorLoopingFromString "sawtooth-ba" = Just CLSawtoothBA
 colorLoopingFromString "triangle" = Just CLTriangle
 colorLoopingFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // falloff // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // falloff // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Intensity falloff mode.
 data FalloffMode
@@ -185,9 +185,9 @@ falloffModeFromString "gaussian" = Just FMGaussian
 falloffModeFromString "exponential" = Just FMExponential
 falloffModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // tonemap // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // tonemap // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | HDR tonemapping mode.
 data TonemapMode
@@ -222,9 +222,9 @@ tonemapModeFromString "reinhard" = Just TMReinhard
 tonemapModeFromString "hable" = Just TMHable
 tonemapModeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // bloom // blend // mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // bloom // blend // mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bloom effect blend mode.
 data BloomBlendMode

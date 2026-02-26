@@ -71,9 +71,9 @@ module Hydrogen.Element.Compound.TreeView.Content
   , avatarTemplate
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( show
@@ -107,9 +107,9 @@ import Hydrogen.Schema.Graph.NodeContent
   , ContentTemplate(TemplateTextOnly, TemplateIconText, TemplateTitleSubtitle, TemplateCard, TemplateAvatar, TemplateMetric, TemplateProgress, TemplateThumbnail, TemplateCustom)
   ) as Schema
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // content props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // content props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Custom slot renderer function type
 type SlotRenderer msg = 
@@ -158,9 +158,9 @@ withExpandIcon b p = p { showExpandIcon = b }
 withCheckbox :: forall msg. Boolean -> ContentProps msg -> ContentProps msg
 withCheckbox b p = p { showCheckbox = b }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // content rendering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // content rendering
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render complete node content based on template
 renderNodeContent ::
@@ -245,9 +245,9 @@ findCustomRenderer targetSlot customs =
     Just found -> Just found.renderer
     Nothing -> Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // slot rendering
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // slot rendering
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a specific slot
 renderSlot ::
@@ -445,9 +445,9 @@ renderBelowSlot _props _node _expanded =
   -- Would be shown when node is expanded
   E.empty
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // slot builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // slot builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Empty slot (renders nothing)
 emptySlot :: forall msg. SlotRenderer msg
@@ -500,9 +500,9 @@ buttonSlot label onClick _ =
 customSlot :: forall msg. E.Element msg -> SlotRenderer msg
 customSlot element _ = element
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // template builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // template builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Apply a template to props
 applyTemplate :: forall msg. Schema.ContentTemplate -> ContentProps msg -> ContentProps msg

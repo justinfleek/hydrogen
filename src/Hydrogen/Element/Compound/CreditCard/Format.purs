@@ -43,9 +43,9 @@ import Hydrogen.Element.Compound.CreditCard.Types
   ( CardType(Visa, Mastercard, Amex, Discover, DinersClub, JCB, UnionPay, Unknown)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // card number formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // card number formatting
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format card number with appropriate spacing for card type.
 formatCardNumber :: String -> CardType -> String
@@ -90,9 +90,9 @@ formatDiners digits =
     g3 = String.take 4 (String.drop 10 digits)
   in String.joinWith " " (filterNonEmpty [g1, g2, g3])
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // expiry formatting
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Format expiry input to MM/YY.
 formatExpiry :: String -> String
@@ -106,9 +106,9 @@ formatExpiry input =
     else if len == 2 then digits <> "/"
     else String.take 2 digits <> "/" <> String.take 2 (String.drop 2 digits)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // placeholder generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // placeholder generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Placeholder text for card number input.
 placeholderCardNumber :: CardType -> String
@@ -125,9 +125,9 @@ placeholderCvv :: CardType -> String
 placeholderCvv Amex = "••••"
 placeholderCvv _ = "•••"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // display helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Mask card number showing only last 4 digits.
 maskCardNumber :: String -> String
@@ -165,9 +165,9 @@ displayCardholder name =
     then String.toUpper name
     else "YOUR NAME"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // input processing
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // input processing
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Remove all spaces from a string.
 stripSpaces :: String -> String
@@ -182,9 +182,9 @@ digitsOnly :: String -> String
 digitsOnly str =
   CU.fromCharArray (Array.filter isDigitChar (CU.toCharArray str))
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // internal
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Filter empty strings from an array.
 filterNonEmpty :: Array String -> Array String

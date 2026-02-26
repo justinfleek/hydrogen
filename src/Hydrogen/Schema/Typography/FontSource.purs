@@ -62,9 +62,9 @@ import Prelude
 import Hydrogen.Schema.Typography.FontFamily (FontFamily)
 import Hydrogen.Schema.Typography.FontFamily as FontFamily
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // font source
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // font source
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Source of a font — system-installed or requires import
 data FontSource
@@ -77,9 +77,9 @@ instance showFontSource :: Show FontSource where
   show (System sf) = "System " <> show sf
   show (Custom cf) = "Custom " <> show cf
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // system fonts
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // system fonts
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Well-known system fonts that are pre-installed on common operating systems.
 -- |
@@ -150,9 +150,9 @@ instance showSystemFont :: Show SystemFont where
 systemFontToFamily :: SystemFont -> FontFamily
 systemFontToFamily = FontFamily.fontFamily <<< show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // custom fonts
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // custom fonts
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Custom font requiring import
 -- |
@@ -209,17 +209,17 @@ instance showFontFormat :: Show FontFormat where
   show OTF = "opentype"
   show EOT = "embedded-opentype"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a custom font source
 customFont :: FontFamily -> ImportMethod -> CustomFont
 customFont family import' = CustomFont { family, import' }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the font family from a custom font
 customFontFamily :: CustomFont -> FontFamily
@@ -261,9 +261,9 @@ toLegacyCssImport (Custom (CustomFont { family, import' })) = case import' of
     "  font-display: " <> config.display <> ";\n" <>
     "}"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // system font constants
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // system font constants
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- Sans-serif
 arial :: FontSource

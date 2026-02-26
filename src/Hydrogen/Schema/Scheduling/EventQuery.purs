@@ -59,9 +59,9 @@ import Hydrogen.Schema.Scheduling.Event
   )
 import Hydrogen.Schema.Temporal.TimeOfDay as TimeOfDay
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // boolean queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if event has recurrence
 hasRecurrence :: Event -> Boolean
@@ -111,9 +111,9 @@ isSameDay e =
 needsLocation :: Event -> Boolean
 needsLocation e = isNothing (getLocation e) && isNothing (getConferenceLink e)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // computed properties
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get event duration in minutes
 getDurationMinutes :: Event -> Int
@@ -132,9 +132,9 @@ getAttendeeCount e = length (getAttendeeIds e)
 getReminderMinutes :: Event -> Array Int
 getReminderMinutes e = map (\r -> r.minutesBefore) (getReminders e)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert datetime to minutes since epoch (simplified)
 -- |

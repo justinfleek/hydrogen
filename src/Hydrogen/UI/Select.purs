@@ -97,9 +97,9 @@ import Data.Array as Array
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Hydrogen.Render.Element as E
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // option types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // option types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A single selectable option
 type SelectOption =
@@ -127,9 +127,9 @@ optionWithMeta val lbl meta = { value: val, label: lbl, disabled: false, meta: J
 optionGroup :: String -> Array SelectOption -> SelectOptionGroup
 optionGroup lbl opts = { label: lbl, options: opts }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // configuration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // configuration
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Select configuration
 type SelectConfig msg =
@@ -166,9 +166,9 @@ defaultConfig =
   , onOpenChange: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // config modifiers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // config modifiers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Configuration modifier type
 type ConfigMod cfg = cfg -> cfg
@@ -225,9 +225,9 @@ onMultiSelect handler cfg = cfg { onMultiSelect = Just handler }
 onOpenChange :: forall msg. (Boolean -> msg) -> ConfigMod (SelectConfig msg)
 onOpenChange handler cfg = cfg { onOpenChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // classes
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // classes
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Trigger button classes
 triggerClasses :: String
@@ -254,9 +254,9 @@ itemClasses =
 groupLabelClasses :: String
 groupLabelClasses = "py-1.5 pl-8 pr-2 text-sm font-semibold text-muted-foreground"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // icons
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // icons
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Chevron down icon
 chevronDown :: forall msg. E.Element msg
@@ -272,9 +272,9 @@ checkIcon =
     [ E.class_ "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" ]
     [ E.text "\x2713" ] -- Unicode checkmark
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // primitive components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // primitive components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Select trigger button (standalone)
 selectTrigger :: forall msg.
@@ -356,9 +356,9 @@ selectSeparator =
     [ E.class_ "-mx-1 my-1 h-px bg-muted" ]
     []
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // composed component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // composed component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Full select component
 select :: forall msg. Array (ConfigMod (SelectConfig msg)) -> E.Element msg
@@ -475,9 +475,9 @@ renderGroups cfg =
     (\grp -> [ selectLabel grp.label ] <> map (renderOption cfg) grp.options)
     cfg.optionGroups
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Disabled attribute
 disabledAttr :: forall msg. Boolean -> Array (E.Attribute msg)

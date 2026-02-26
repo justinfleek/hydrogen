@@ -164,9 +164,9 @@ module Hydrogen.GPU.ComputeKernel
   , animatedNoise
   ) where
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // imports
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
   ( class Eq
@@ -186,9 +186,9 @@ import Data.Array as Array
 import Data.Int as Int
 import Data.Maybe (Maybe(Nothing, Just))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // core types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // core types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Workgroup size for compute dispatch
 type WorkgroupSize =
@@ -303,9 +303,9 @@ type SizeThreshold =
   , minHeight :: Int
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // blur kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Blur kernel variants
 data BlurKernel
@@ -404,9 +404,9 @@ derive instance eqBoxBlurKernel :: Eq BoxBlurKernel
 instance showBoxBlurKernel :: Show BoxBlurKernel where
   show (BoxBlurKernel k) = "(BoxBlurKernel radius:" <> show k.radius <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // glow kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Glow kernel variants
 data GlowKernel
@@ -486,9 +486,9 @@ derive instance eqInnerGlowKernel :: Eq InnerGlowKernel
 instance showInnerGlowKernel :: Show InnerGlowKernel where
   show (InnerGlowKernel k) = "(InnerGlowKernel radius:" <> show k.radius <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // noise kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Noise kernel variants
 data NoiseKernel
@@ -574,9 +574,9 @@ data WorleyDistance
 
 derive instance eqWorleyDistance :: Eq WorleyDistance
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // particle kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Particle kernel variants
 data ParticleKernel
@@ -666,9 +666,9 @@ data SortAxis
 
 derive instance eqSortAxis :: Eq SortAxis
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // color kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Color processing kernel variants
 data ColorKernel
@@ -766,9 +766,9 @@ instance showColorSpaceType :: Show ColorSpaceType where
   show ColorSpaceOKLab = "OKLab"
   show ColorSpaceOKLCH = "OKLCH"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // distortion kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Distortion kernel variants
 data DistortionKernel
@@ -852,9 +852,9 @@ derive instance eqRippleKernel :: Eq RippleKernel
 instance showRippleKernel :: Show RippleKernel where
   show (RippleKernel k) = "(RippleKernel amplitude:" <> show k.amplitude <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // composite kernels
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // composite kernels
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Composite kernel variants
 data CompositeKernel
@@ -966,9 +966,9 @@ instance showAlphaOperation :: Show AlphaOperation where
   show AlphaInvert = "AlphaInvert"
   show (AlphaRemapRange min' max') = "(AlphaRemapRange " <> show min' <> " " <> show max' <> ")"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // kernel construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // kernel construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Default kernel config
 defaultConfig :: Int -> Int -> KernelConfig
@@ -1070,9 +1070,9 @@ maskKernel :: KernelInput -> KernelInput -> MaskChannel -> Boolean -> Int -> Int
 maskKernel source mask' channel invert width height = KernelComposite $ CompositeMask $ MaskKernel
   { source, mask: mask', channel, invert, config: defaultConfig width height }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // kernel dispatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // kernel dispatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compute appropriate workgroup size for kernel type
 computeWorkgroupSize :: ComputeKernel -> WorkgroupSize
@@ -1130,9 +1130,9 @@ estimateKernelCost = case _ of
     foldlSum arr = foldlArr (\acc x -> acc + x) 0.0 arr
     foldlMax arr = foldlArr (\acc x -> if x > acc then x else acc) 0.0 arr
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // kernel composition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // kernel composition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sequence kernels (execute in order)
 sequenceKernels :: Array ComputeKernel -> ComputeKernel
@@ -1147,9 +1147,9 @@ conditionalKernel :: KernelCondition -> ComputeKernel -> Maybe ComputeKernel -> 
 conditionalKernel condition thenKernel elseKernel = KernelConditional
   { condition, thenKernel, elseKernel }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // presets
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Standard Gaussian blur preset (balanced quality/performance)
 standardGaussian :: Int -> Int -> ComputeKernel
@@ -1185,9 +1185,9 @@ animatedNoise time width height = KernelNoise $ NoiseFBM $ FBMNoiseKernel
   { scale: 1.0, seed: 42, octaves: 4, persistence: 0.5, lacunarity: 2.0
   , time, turbulent: false, config: defaultConfig width height }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Array.uncons helper
 foldlArr :: forall a b. (b -> a -> b) -> b -> Array a -> b

@@ -81,9 +81,9 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Motion.MeshWarp (WarpPin)
 import Hydrogen.Schema.Motion.Property (AnimatablePropertyId)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // effect // parameter // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // effect // parameter // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of parameter an effect can have.
 data EffectParameterType
@@ -158,9 +158,9 @@ effectParameterTypeFromString "curve" = Just EPTCurve
 effectParameterTypeFromString "data" = Just EPTData
 effectParameterTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                 // effect // animatable // type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // effect // animatable // type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Type of animatable value for effects.
 data EffectAnimatableType
@@ -199,9 +199,9 @@ effectAnimatableTypeFromString "enum" = Just EATEnum
 effectAnimatableTypeFromString "vector3" = Just EATVector3
 effectAnimatableTypeFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // effect // category
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // effect // category
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Category of effect for organization.
 data EffectCategory
@@ -281,9 +281,9 @@ effectCategoryFromString "transition" = Just ECTransition
 effectCategoryFromString "utility" = Just ECUtility
 effectCategoryFromString _ = Nothing
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // parameter // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // parameter // types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | 2D point for effect parameters.
 type EffectPoint2D =
@@ -423,9 +423,9 @@ defaultEffectParameter id name paramType defaultVal =
   , group: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // effect // types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Unique identifier for an effect.
 newtype EffectId = EffectId String

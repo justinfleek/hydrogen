@@ -67,9 +67,9 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Bounded as Bounded
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // click count
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // click count
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Number of consecutive clicks [1, ∞)
 -- |
@@ -123,9 +123,9 @@ resetClickCount = singleClick
 clickCountBounds :: Bounded.IntBounds
 clickCountBounds = Bounded.intBounds 1 100 "clickCount" "Consecutive click count (1+)"
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // hold duration
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Duration of a press/hold gesture in milliseconds [0, ∞)
 -- |
@@ -182,9 +182,9 @@ isLongHold (HoldDuration ms) = ms >= 500.0
 holdDurationBounds :: Bounded.NumberBounds
 holdDurationBounds = Bounded.numberBounds 0.0 30000.0 "holdDuration" "Hold duration in milliseconds"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // tap interval
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // tap interval
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Maximum time between taps for multi-tap detection [0, ∞)
 -- |
@@ -232,9 +232,9 @@ isWithinInterval elapsed (TapInterval maxInterval) = elapsed <= maxInterval
 tapIntervalBounds :: Bounded.NumberBounds
 tapIntervalBounds = Bounded.numberBounds 0.0 10000.0 "tapInterval" "Maximum ms between taps for multi-tap"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // timing state molecule
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // timing state molecule
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete timing state for gesture recognition
 -- |

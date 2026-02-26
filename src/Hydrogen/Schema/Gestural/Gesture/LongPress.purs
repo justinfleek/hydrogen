@@ -41,9 +41,9 @@ import Hydrogen.Schema.Gestural.Gesture.Phase
   , isActive
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // long // press threshold
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // long // press threshold
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Minimum duration threshold for long press (ms)
 -- |
@@ -71,9 +71,9 @@ defaultLongPressThreshold = LongPressThreshold 500.0
 unwrapLongPressThreshold :: LongPressThreshold -> Number
 unwrapLongPressThreshold (LongPressThreshold ms) = ms
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // bounds
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                     // bounds
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Bounds for LongPressThreshold [100, 2000] ms
 -- |
@@ -85,9 +85,9 @@ longPressThresholdBounds :: Bounded.NumberBounds
 longPressThresholdBounds = Bounded.numberBounds 100.0 2000.0 "LongPressThreshold"
   "Minimum duration threshold for long press in milliseconds"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // long // press state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // long // press state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State of a long press gesture recognizer
 -- |

@@ -48,9 +48,9 @@ import Hydrogen.Schema.Color.Hue as Hue
 import Hydrogen.Schema.Color.Saturation as Sat
 import Hydrogen.Schema.Color.Lightness as Light
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // palette type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // palette type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A palette entry pairs a color with an optional role
 type PaletteEntry = 
@@ -61,9 +61,9 @@ type PaletteEntry =
 -- | A palette is an array of color entries
 type Palette = Array PaletteEntry
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // semantic roles
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // semantic roles
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic role of a color in a design system
 data Role
@@ -103,9 +103,9 @@ instance showRole :: Show Role where
     Info -> "info"
     Unassigned -> "unassigned"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // palette generation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // palette generation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Generate tints (lighter versions) of a color
 -- |
@@ -149,9 +149,9 @@ tones count color =
 monochromatic :: Int -> HSL.HSL -> Array HSL.HSL
 monochromatic count color = tints (count / 2) color <> shades (count / 2) color
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // palette construction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // palette construction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Empty palette
 emptyPalette :: Palette

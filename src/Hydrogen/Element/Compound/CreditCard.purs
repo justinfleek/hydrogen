@@ -150,9 +150,9 @@ import Hydrogen.Element.Compound.CreditCard.Format
 
 import Hydrogen.Element.Compound.CreditCard.Render as Render
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Credit card component properties.
 type CreditCardProps msg =
@@ -212,9 +212,9 @@ defaultProps =
   , onFocusChange: Nothing
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // prop builders
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // prop builders
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set card number value.
 cardNumber :: forall msg. String -> CreditCardProp msg
@@ -280,9 +280,9 @@ onValidate handler props = props { onValidate = Just handler }
 onFocusChange :: forall msg. (CardField -> msg) -> CreditCardProp msg
 onFocusChange handler props = props { onFocusChange = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Main credit card input component.
 creditCard :: forall msg. Array (CreditCardProp msg) -> E.Element msg
@@ -340,9 +340,9 @@ creditCardWithPreview propMods =
       , creditCard propMods
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // individual inputs
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Card number input field.
 cardNumberInput :: forall msg. CreditCardProps msg -> CardType -> E.Element msg
@@ -410,9 +410,9 @@ cardPreview props cardType =
     , focusedField: props.focusedField
     }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if card number has error.
 hasCardNumberError :: CardErrors -> Boolean

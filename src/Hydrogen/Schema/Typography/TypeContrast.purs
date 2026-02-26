@@ -62,9 +62,9 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // contrast level
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // contrast level
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Semantic contrast levels
 -- |
@@ -88,9 +88,9 @@ levelToRatio LevelHigh = 7.0    -- WCAG AAA for normal text
 levelToRatio LevelNormal = 4.5  -- WCAG AA for normal text
 levelToRatio LevelReduced = 3.0 -- WCAG AA for large text
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // contrast mode
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // contrast mode
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Contrast mode selection
 -- |
@@ -108,9 +108,9 @@ instance showContrastMode :: Show ContrastMode where
   show ModeAuto = "ModeAuto"
   show (ModeCustomRatio ratio) = "ModeCustomRatio " <> show ratio
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // type contrast
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // type contrast
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete contrast specification
 -- |
@@ -129,9 +129,9 @@ instance showTypeContrast :: Show TypeContrast where
     ", minimumRatio: " <> show tc.minimumRatio <>
     ", prefersDarkMode: " <> show tc.prefersDarkMode <> " }"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Normal contrast (default)
 normal :: TypeContrast
@@ -190,9 +190,9 @@ custom ratio = TypeContrast
   , prefersDarkMode: false
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // modifiers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // modifiers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set a minimum contrast ratio override
 withMinimumRatio :: Number -> TypeContrast -> TypeContrast
@@ -202,9 +202,9 @@ withMinimumRatio ratio (TypeContrast tc) = TypeContrast tc { minimumRatio = Just
 withPrefersDarkMode :: Boolean -> TypeContrast -> TypeContrast
 withPrefersDarkMode pref (TypeContrast tc) = TypeContrast tc { prefersDarkMode = pref }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // predicates
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // predicates
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Is this high contrast mode?
 isHighContrast :: TypeContrast -> Boolean
@@ -240,9 +240,9 @@ meetsWCAGAA tc = minimumContrastRatio tc >= 4.5
 meetsWCAGAAA :: TypeContrast -> Boolean
 meetsWCAGAAA tc = minimumContrastRatio tc >= 7.0
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // calculations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the minimum contrast ratio for this setting
 -- |
@@ -314,9 +314,9 @@ recommendedBackground fgLuminance tc =
     | n > 1.0 = 1.0
     | otherwise = n
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // css output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // css output
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- NOT an FFI boundary — pure string generation.
 -- | Generate CSS media query for contrast preferences

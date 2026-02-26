@@ -34,9 +34,9 @@ import Hydrogen.Element.Compound.QRCode.Encoding.ReedSolomon.Polynomial
   , polyDivide
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // generator polynomials
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // generator polynomials
+-- ═════════════════════════════════════════════════════════════════════════════
 
 generatorPoly :: Int -> Polynomial
 generatorPoly n
@@ -57,9 +57,9 @@ generatorPoly n
 generatorPolyCoeffs :: Int -> Array Int
 generatorPolyCoeffs n = reverse (generatorPoly n)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // error correction
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // error correction
+-- ═════════════════════════════════════════════════════════════════════════════
 
 computeECCodewords :: Array Int -> Int -> Array Int
 computeECCodewords dataCodewords numEC =

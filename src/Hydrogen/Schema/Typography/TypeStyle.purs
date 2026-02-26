@@ -65,9 +65,9 @@ import Hydrogen.Schema.Typography.LineHeight as LineHeight
 import Hydrogen.Schema.Typography.TextTransform (TextTransform)
 import Hydrogen.Schema.Typography.TextTransform as TextTransform
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // font stack
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // font stack
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Font stack — ordered list of font families for fallback
 -- |
@@ -103,9 +103,9 @@ fontStackToLegacyCss :: FontStack -> String
 fontStackToLegacyCss (FontStack fs) = 
   intercalate ", " (map FontFamily.toLegacyCss (NEA.toArray fs))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // type style
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // type style
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Complete typographic style specification
 -- |
@@ -132,9 +132,9 @@ instance showTypeStyle :: Show TypeStyle where
     <> ", transform: " <> show ts.transform
     <> " }"
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                // constructors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // constructors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create a type style with a single font family
 typeStyle 
@@ -172,9 +172,9 @@ typeStyleWithStack fs w s lh ls tt = TypeStyle
   , transform: tt
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get the primary font family
 family :: TypeStyle -> FontFamily
@@ -204,9 +204,9 @@ letterSpacing (TypeStyle ts) = ts.letterSpacing
 transform :: TypeStyle -> TextTransform
 transform (TypeStyle ts) = ts.transform
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // modifiers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // modifiers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Replace the font family (keeps existing fallbacks)
 withFamily :: FontFamily -> TypeStyle -> TypeStyle
@@ -238,9 +238,9 @@ withTransform tt (TypeStyle ts) = TypeStyle ts { transform = tt }
 scale :: Number -> TypeStyle -> TypeStyle
 scale factor (TypeStyle ts) = TypeStyle ts { size = FontSize.scale factor ts.size }
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // css output
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- NOT an FFI boundary - pure string generation.
 -- | Convert to CSS declarations (for stylesheet)

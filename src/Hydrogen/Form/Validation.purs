@@ -67,9 +67,9 @@ import Data.String as String
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags as RegexFlags
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // validation result
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // validation result
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of validation
 data ValidationResult
@@ -105,9 +105,9 @@ getErrors :: ValidationResult -> Array String
 getErrors Valid = []
 getErrors (Invalid errs) = errs
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // validator type
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // validator type
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A validator is a function from value to result
 newtype Validator a = Validator (a -> ValidationResult)
@@ -128,9 +128,9 @@ validateM v a = case validate v a of
   Valid -> Right a
   Invalid errs -> Left errs
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // common validators
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // common validators
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Value must not be empty
 required :: String -> Validator String
@@ -231,9 +231,9 @@ custom pred err = Validator \a ->
     then Valid
     else Invalid [ err ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // combinators
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // combinators
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Make a validator optional (empty string passes)
 optional :: Validator String -> Validator String

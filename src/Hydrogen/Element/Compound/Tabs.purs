@@ -126,9 +126,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // container props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // container props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tabs container properties
 type TabsProps msg =
@@ -171,9 +171,9 @@ tabsReducedMotion r props = props { reducedMotion = r }
 extraAttributes :: forall msg. Array (E.Attribute msg) -> TabsProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // list props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // list props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tab list properties
 type ListProps msg =
@@ -224,9 +224,9 @@ listGap g props = props { gap = Just g }
 listExtraAttributes :: forall msg. Array (E.Attribute msg) -> ListProp msg
 listExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // tab props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // tab props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Individual tab properties
 type TabProps msg =
@@ -391,9 +391,9 @@ onTabKeyDown handler props = props { onKeyDown = Just handler }
 tabExtraAttributes :: forall msg. Array (E.Attribute msg) -> TabProp msg
 tabExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                 // panel props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // panel props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Tab panel properties
 type PanelProps msg =
@@ -444,9 +444,9 @@ panelLabelledBy tabId props = props { labelledBy = Just tabId }
 panelExtraAttributes :: forall msg. Array (E.Attribute msg) -> PanelProp msg
 panelExtraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // tabs container
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // tabs container
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the tabs container
 -- |
@@ -475,9 +475,9 @@ tabs propMods children =
       )
       children
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // tab list
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render the tab list (container for tab triggers)
 tabList :: forall msg. Array (ListProp msg) -> Array (E.Element msg) -> E.Element msg
@@ -517,9 +517,9 @@ tabList propMods children =
       )
       children
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // tab trigger
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an individual tab trigger
 tab :: forall msg. Array (TabProp msg) -> Array (E.Element msg) -> E.Element msg
@@ -672,9 +672,9 @@ buildTabAttrs props =
     <> keyDownHandler
     <> props.extraAttributes
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // tab panel
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a tab panel (content area)
 tabPanel :: forall msg. Array (PanelProp msg) -> Array (E.Element msg) -> E.Element msg

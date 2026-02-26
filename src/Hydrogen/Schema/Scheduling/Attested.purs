@@ -118,9 +118,9 @@ import Hydrogen.Schema.Scheduling.RSVP as RSVP
 import Hydrogen.Schema.Scheduling.Contact as Contact
 
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // attested types
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // attested types
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | An event with cryptographic attestation.
 -- |
@@ -154,9 +154,9 @@ type RSVPResponse =
   , comment :: Maybe String
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // event attestation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // event attestation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create an attested event.
 -- |
@@ -212,9 +212,9 @@ getEventTimestamp attested = getTimestamp attested.attestation
 getEventContentHashHex :: AttestedEvent -> String
 getEventContentHashHex attested = getContentHashHex attested.attestation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                           // invite attestation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // invite attestation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create an attested invite.
 -- |
@@ -267,9 +267,9 @@ getInviteTimestamp attested = getTimestamp attested.attestation
 getInviteContentHashHex :: AttestedInvite -> String
 getInviteContentHashHex attested = getContentHashHex attested.attestation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // rsvp attestation
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // rsvp attestation
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Create an attested RSVP response.
 -- |
@@ -336,9 +336,9 @@ getRSVPTimestamp attested = getTimestamp attested.attestation
 getRSVPContentHashHex :: AttestedRSVP -> String
 getRSVPContentHashHex attested = getContentHashHex attested.attestation
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // serialization
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // serialization
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Serialize an Event to bytes for hashing.
 -- |
@@ -392,9 +392,9 @@ serializeRSVPResponse r =
   in
     stringToBytes str
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert a string to bytes (ASCII)
 stringToBytes :: String -> Array Int

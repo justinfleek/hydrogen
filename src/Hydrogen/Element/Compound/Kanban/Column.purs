@@ -70,9 +70,9 @@ import Hydrogen.Element.Compound.Kanban.Types
   )
 import Hydrogen.Schema.Color.RGB as Color
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // kanban column
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Kanban column data
 type KanbanColumn =
@@ -101,9 +101,9 @@ kanbanColumn id title =
 emptyColumn :: String -> String -> KanbanColumn
 emptyColumn idStr title = kanbanColumn (columnId idStr) title
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // accessors
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // accessors
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Get column ID
 columnIdOf :: KanbanColumn -> ColumnId
@@ -133,9 +133,9 @@ columnIndex c = c.index
 columnCollapsible :: KanbanColumn -> Boolean
 columnCollapsible c = c.collapsible
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // modifiers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // modifiers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set column title
 setColumnTitle :: String -> KanbanColumn -> KanbanColumn
@@ -173,9 +173,9 @@ setColumnIndex idx c = c { index = idx }
 setColumnCollapsible :: Boolean -> KanbanColumn -> KanbanColumn
 setColumnCollapsible collapsible c = c { collapsible = collapsible }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if column is over WIP limit
 isColumnOverWIP :: Int -> KanbanColumn -> Boolean

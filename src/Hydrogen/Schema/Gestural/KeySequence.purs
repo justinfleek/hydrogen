@@ -82,9 +82,9 @@ import Data.Maybe (Maybe(Just, Nothing), fromMaybe, isJust)
 import Data.String.CodeUnits as CU
 import Hydrogen.Schema.Gestural.Keyboard.Keys (KeyCode, unwrapKeyCode)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // sequence // key
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | A single key in a sequence with optional modifiers
 type SequenceKey =
@@ -120,9 +120,9 @@ matchesKey expected actual =
   && expected.shift == actual.shift
   && expected.meta == actual.meta
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // sequence // definition
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // sequence // definition
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Definition of a key sequence
 type KeySequenceDef =
@@ -147,9 +147,9 @@ sequenceId sd = sd.id
 sequenceDescription :: KeySequenceDef -> String
 sequenceDescription sd = sd.description
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // match // result
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // match // result
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Result of matching input against sequences
 data MatchResult
@@ -179,9 +179,9 @@ isFullMatch :: MatchResult -> Boolean
 isFullMatch (FullMatch _) = true
 isFullMatch _ = false
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // sequence // matcher
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // sequence // matcher
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Matcher containing registered sequences
 type SequenceMatcher =
@@ -205,9 +205,9 @@ removeSequence seqId sm =
 matcherSequences :: SequenceMatcher -> Array KeySequenceDef
 matcherSequences sm = sm.sequences
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // count // prefix
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // count // prefix
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Numeric count prefix (e.g., 3dd = delete 3 lines)
 newtype CountPrefix = CountPrefix (Maybe Int)
@@ -239,9 +239,9 @@ multiplyCount :: Int -> CountPrefix -> CountPrefix
 multiplyCount n (CountPrefix mc) =
   CountPrefix (Just (n * fromMaybe 1 mc))
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // operator // pending
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // operator // pending
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vim-style operator waiting for motion
 data OperatorPending
@@ -272,9 +272,9 @@ isOperatorPending _ = true
 operatorName :: OperatorPending -> String
 operatorName = show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                               // vim // motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // vim // motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Vim motion commands
 data VimMotion
@@ -326,9 +326,9 @@ isLineMotion _ = false
 motionName :: VimMotion -> String
 motionName = show
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                            // sequence // state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // sequence // state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | State of sequence recognition
 type SequenceState =

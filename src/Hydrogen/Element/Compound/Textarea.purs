@@ -166,9 +166,9 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.LineHeight as LineHeight
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Textarea properties
 -- |
@@ -286,9 +286,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: content
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // prop builders: content
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set placeholder text
 placeholder :: forall msg. String -> TextareaProp msg
@@ -334,9 +334,9 @@ maxLength l props = props { maxLength = Just l }
 autoResize :: forall msg. Boolean -> TextareaProp msg
 autoResize a props = props { autoResize = a }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: error
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: error
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set error state
 textareaError :: forall msg. Boolean -> TextareaProp msg
@@ -346,9 +346,9 @@ textareaError e props = props { error = e }
 errorMessage :: forall msg. String -> TextareaProp msg
 errorMessage msg props = props { errorMsg = msg, error = true }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set background color (Color.RGB atom)
 backgroundColor :: forall msg. Color.RGB -> TextareaProp msg
@@ -394,9 +394,9 @@ counterColor c props = props { counterColor = Just c }
 requiredColor :: forall msg. Color.RGB -> TextareaProp msg
 requiredColor c props = props { requiredColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> TextareaProp msg
@@ -406,9 +406,9 @@ borderRadius r props = props { borderRadius = Just r }
 borderWidth :: forall msg. Device.Pixel -> TextareaProp msg
 borderWidth w props = props { borderWidth = Just w }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                     // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set minimum height (Device.Pixel atom)
 minHeight :: forall msg. Device.Pixel -> TextareaProp msg
@@ -422,9 +422,9 @@ paddingX p props = props { paddingX = Just p }
 paddingY :: forall msg. Device.Pixel -> TextareaProp msg
 paddingY p props = props { paddingY = Just p }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: typography
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // prop builders: typography
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set font size (FontSize atom)
 fontSize :: forall msg. FontSize.FontSize -> TextareaProp msg
@@ -446,17 +446,17 @@ labelFontWeight w props = props { labelFontWeight = Just w }
 counterFontSize :: forall msg. FontSize.FontSize -> TextareaProp msg
 counterFontSize s props = props { counterFontSize = Just s }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> TextareaProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: behavior
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: behavior
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set input handler (fires on each keystroke)
 -- |
@@ -478,17 +478,17 @@ onTextareaFocus handler props = props { onFocus = Just handler }
 onTextareaBlur :: forall msg. msg -> TextareaProp msg
 onTextareaBlur handler props = props { onBlur = Just handler }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> TextareaProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                             // main components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // main components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a textarea
 -- |
@@ -650,9 +650,9 @@ buildTextareaStyles props =
     <> disabledStyles
     <> focusStyles
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // labeled components
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // labeled components
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Textarea with associated label
 -- |
@@ -817,9 +817,9 @@ textareaField labelText propMods =
           ]
       ]
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                     // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // helpers
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render error message
 -- |

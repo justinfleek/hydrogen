@@ -58,9 +58,9 @@ import Prelude
   , min
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // bounding sphere
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // bounding sphere
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | BoundingSphere - center point and radius.
 type BoundingSphere =
@@ -87,9 +87,9 @@ sphereCenter s = { x: s.centerX, y: s.centerY, z: s.centerZ }
 sphereRadius :: BoundingSphere -> Number
 sphereRadius s = s.radius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // operations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // operations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Check if sphere contains point.
 containsPoint :: BoundingSphere -> Number -> Number -> Number -> Boolean
@@ -170,9 +170,9 @@ merge s1 s2 =
                 newCz = s1.centerZ + dz * ratio
             in boundingSphere newCx newCy newCz newRadius
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // transformations
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // transformations
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Translate sphere by offset.
 translateSphere :: Number -> Number -> Number -> BoundingSphere -> BoundingSphere
@@ -185,9 +185,9 @@ scaleSphere factor s =
   let absFactor = if factor < 0.0 then negate factor else factor
   in boundingSphere s.centerX s.centerY s.centerZ (s.radius * absFactor)
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                  // queries
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // queries
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Calculate surface area.
 surfaceArea :: BoundingSphere -> Number

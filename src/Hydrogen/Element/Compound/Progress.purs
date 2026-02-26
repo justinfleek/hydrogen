@@ -90,9 +90,9 @@ import Hydrogen.Schema.Geometry.Radius as Geometry
 import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Dimension.Temporal as Temporal
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                       // props
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // props
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Progress properties
 type ProgressProps msg =
@@ -133,9 +133,9 @@ defaultProps =
   , extraAttributes: []
   }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // prop builders: value
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: value
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set progress value (0-100)
 value :: forall msg. Int -> ProgressProp msg
@@ -145,9 +145,9 @@ value v props = props { value = v }
 maxValue :: forall msg. Int -> ProgressProp msg
 maxValue m props = props { maxValue = m }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                          // prop builders: color
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // prop builders: color
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set track background color (Color.RGB atom)
 trackColor :: forall msg. Color.RGB -> ProgressProp msg
@@ -157,41 +157,41 @@ trackColor c props = props { trackColor = Just c }
 indicatorColor :: forall msg. Color.RGB -> ProgressProp msg
 indicatorColor c props = props { indicatorColor = Just c }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: geometry
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // prop builders: geometry
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set border radius (Geometry.Corners atom)
 borderRadius :: forall msg. Geometry.Corners -> ProgressProp msg
 borderRadius r props = props { borderRadius = Just r }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: dimension
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // prop builders: dimension
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set bar height (Device.Pixel atom)
 height :: forall msg. Device.Pixel -> ProgressProp msg
 height h props = props { height = Just h }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                        // prop builders: motion
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                      // prop builders: motion
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set transition duration (Temporal.Milliseconds atom)
 transitionDuration :: forall msg. Temporal.Milliseconds -> ProgressProp msg
 transitionDuration d props = props { transitionDuration = Just d }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: escape hatch
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                // prop builders: escape hatch
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add extra attributes (escape hatch)
 extraAttributes :: forall msg. Array (E.Attribute msg) -> ProgressProp msg
 extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // main component
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                             // main component
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render a progress bar
 -- |
@@ -263,9 +263,9 @@ buildIndicatorAttrs percentage props =
   in
     coreStyles <> transitionStyle
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                         // indeterminate state
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // indeterminate state
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Render an indeterminate progress bar (loading state)
 -- |

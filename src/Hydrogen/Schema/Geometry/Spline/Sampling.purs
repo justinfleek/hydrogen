@@ -39,9 +39,9 @@ import Hydrogen.Schema.Geometry.Spline.Evaluation (catmullRomPointAt, bSplinePoi
 import Hydrogen.Schema.Geometry.Spline.Conversion (catmullRomToBeziers, bSplineToBeziers)
 import Hydrogen.Schema.Geometry.Spline.Helpers (buildArray, toNumber)
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // point sampling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sample Catmull-Rom spline at n evenly-spaced parameter values.
 -- |
@@ -63,9 +63,9 @@ sampleBSpline n spline =
     in Just (bSplinePointAt t spline)
   )
 
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // tangent sampling
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Sample tangent vectors along Catmull-Rom spline.
 -- |
