@@ -1650,6 +1650,181 @@ Audio synthesis, processing, and analysis for interactive applications.
 | Spectrogram   | FFT display                             |
 | PhaseScope    | Phase correlation meter                 |
 
+## Pillar 10c: Voice
+
+Voice synthesis, speech recognition, and audio accessibility for AI agents.
+
+### Atoms
+
+#### Voice Synthesis Parameters
+
+| Name           | Type   | Min   | Max   | Behavior | Notes                          |
+|----------------|--------|-------|-------|----------|--------------------------------|
+| VoicePitch     | Number | 50    | 500   | clamps   | Fundamental frequency (Hz)     |
+| SpeechRate     | Number | 50    | 400   | clamps   | Words per minute               |
+| Breathiness    | Number | 0.0   | 1.0   | clamps   | Breath noise mix               |
+| Roughness      | Number | 0.0   | 1.0   | clamps   | Vocal roughness/rasp           |
+| Nasality       | Number | 0.0   | 1.0   | clamps   | Nasal resonance                |
+| Strain         | Number | 0.0   | 1.0   | clamps   | Vocal tension/strain           |
+| Resonance      | Number | 0.0   | 1.0   | clamps   | Chest/head resonance balance   |
+| PitchVariation | Number | 0.0   | 1.0   | clamps   | Prosodic pitch range           |
+| Emphasis       | Number | 0.0   | 1.0   | clamps   | Emphasis/stress strength       |
+| Pause          | Number | 0     | 10000 | clamps   | Pause duration (ms)            |
+
+#### Expression Types
+
+| Name              | Description                              |
+|-------------------|------------------------------------------|
+| ExpressionNeutral | Baseline, unaffected                     |
+| ExpressionHappy   | Raised pitch, faster rate                |
+| ExpressionSad     | Lower pitch, slower rate                 |
+| ExpressionAngry   | Tense, strained, emphatic                |
+| ExpressionFearful | Higher pitch, breathy                    |
+| ExpressionSurprised | Wide pitch variation                   |
+| ExpressionDisgusted | Nasality, throat tension               |
+| ExpressionContemplative | Slower, deliberate                  |
+
+#### Articulation Types
+
+| Name                  | Description                          |
+|-----------------------|--------------------------------------|
+| ArticulationPrecise   | Clear consonants, formal             |
+| ArticulationRelaxed   | Reduced sounds, casual               |
+| ArticulationEmphatic  | Strong emphasis on syllables         |
+| ArticulationWhisper   | Unvoiced, breathy                    |
+| ArticulationMurmur    | Quiet, intimate                      |
+| ArticulationClipped   | Short, truncated syllables           |
+| ArticulationDrawn     | Lengthened vowels                    |
+
+#### Formant Parameters
+
+| Name            | Type   | Min  | Max   | Behavior | Notes                        |
+|-----------------|--------|------|-------|----------|------------------------------|
+| F1Frequency     | Number | 200  | 1200  | clamps   | First formant (Hz)           |
+| F2Frequency     | Number | 500  | 3500  | clamps   | Second formant (Hz)          |
+| F3Frequency     | Number | 1500 | 4500  | clamps   | Third formant (Hz)           |
+| F4Frequency     | Number | 3000 | 5000  | clamps   | Fourth formant (Hz)          |
+| F5Frequency     | Number | 4000 | 6000  | clamps   | Fifth formant (Hz)           |
+| FormantBandwidth| Number | 30   | 500   | clamps   | Formant bandwidth (Hz)       |
+| TractLength     | Number | 0.12 | 0.20  | clamps   | Vocal tract length (m)       |
+
+#### Vowel Classification
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| VowelClose    | High tongue position                     |
+| VowelCloseMid | Mid-high tongue position                 |
+| VowelMid      | Middle tongue position                   |
+| VowelOpenMid  | Mid-low tongue position                  |
+| VowelOpen     | Low tongue position                      |
+| VowelFront    | Front tongue position                    |
+| VowelCentral  | Central tongue position                  |
+| VowelBack     | Back tongue position                     |
+| VowelRounded  | Rounded lips                             |
+| VowelUnrounded| Unrounded lips                           |
+
+#### IPA Vowels (with formant frequencies)
+
+| Name       | F1 (Hz) | F2 (Hz) | F3 (Hz) | Description             |
+|------------|---------|---------|---------|-------------------------|
+| VowelI     | 270     | 2290    | 3010    | /i/ as in "beet"        |
+| VowelE     | 400     | 2080    | 2720    | /e/ as in "bait"        |
+| VowelEh    | 530     | 1840    | 2480    | /ɛ/ as in "bet"         |
+| VowelAe    | 660     | 1720    | 2410    | /æ/ as in "bat"         |
+| VowelAh    | 730     | 1090    | 2440    | /ɑ/ as in "bot"         |
+| VowelAw    | 570     | 840     | 2410    | /ɔ/ as in "bought"      |
+| VowelU     | 300     | 870     | 2240    | /u/ as in "boot"        |
+| VowelUh    | 440     | 1020    | 2240    | /ʊ/ as in "book"        |
+| VowelSchwa | 500     | 1500    | 2500    | /ə/ schwa (unstressed)  |
+
+#### Speech Recognition Atoms
+
+| Name            | Type   | Min  | Max   | Behavior | Notes                        |
+|-----------------|--------|------|-------|----------|------------------------------|
+| Confidence      | Number | 0.0  | 1.0   | clamps   | Recognition confidence       |
+| WordStart       | Number | 0    | none  | finite   | Word start time (ms)         |
+| WordEnd         | Number | 0    | none  | finite   | Word end time (ms)           |
+| PhonemeDuration | Number | 10   | 500   | clamps   | Phoneme duration (ms)        |
+| SignalToNoise   | Number | -20  | 60    | clamps   | SNR in dB                    |
+| Intelligibility | Number | 0.0  | 1.0   | clamps   | Speech intelligibility score |
+
+#### Accessibility Atoms
+
+| Name              | Type   | Min  | Max   | Behavior | Notes                      |
+|-------------------|--------|------|-------|----------|----------------------------|
+| AnnouncementPriority | Enum | -    | -     | enum     | urgent/high/normal/low     |
+| Politeness        | Enum   | -    | -     | enum     | off/polite/assertive       |
+| ReadingSpeed      | Number | 25   | 800   | clamps   | Words per minute           |
+
+### Molecules
+
+#### Voice Profile
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| VoiceProfile      | VoicePitch + SpeechRate + Breathiness + Roughness + Nasality + Strain + Resonance + PitchVariation |
+| FormantSet        | F1 + F2 + F3 + F4 + F5 (all with bandwidth)              |
+| Vowel             | IPAVowel + FormantSet + Duration                         |
+
+#### Speech Recognition
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| RecognizedPhoneme | IPA + Confidence + StartMs + DurationMs                  |
+| RecognizedWord    | Text + Confidence + StartMs + EndMs + Phonemes           |
+| RecognizedUtterance | Words + TotalConfidence + DurationMs + LanguageCode   |
+| SpeakerTurn       | SpeakerId + Utterances + StartMs + EndMs                 |
+
+#### Audio Accessibility
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| Announcement      | Text + Priority + Politeness + Language                  |
+| LiveRegion        | Politeness + Atomic + Relevant                           |
+| AudioDescription  | Text + StartMs + DurationMs + Priority                   |
+| Earcon            | Sound + Meaning + Duration                               |
+| AudioCue          | Frequency + Duration + Gain + Pan                        |
+| NavigationSound   | Direction + Distance + Tempo                             |
+
+### Compounds
+
+#### Voice Character
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| Persona           | Neutral/Friendly/Authoritative/Calm/Energetic/Thoughtful/Playful/Empathetic |
+| SpeakingStyle     | Conversational/Formal/Narrative/Instructional/Dramatic/Intimate/Broadcast/Announcement |
+| VoiceCharacter    | Name + Persona + VoiceProfile + FormantSet + SpeakingStyle |
+
+#### Speech Patterns
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| PausePattern      | Regular/Emphatic/Minimal/Dramatic/Natural                |
+| EmphasisPattern   | Even/StartHeavy/EndHeavy/Contrastive/Rhythmic           |
+| FillerUsage       | None/Minimal/Natural/Frequent                            |
+| SpeechPattern     | PausePattern + EmphasisPattern + FillerUsage + AvgPause  |
+
+#### Dialogue
+
+| Name              | Composition                                              |
+|-------------------|----------------------------------------------------------|
+| SpeechAct         | Statement/Question/Command/Exclamation/Greeting/Farewell/Acknowledgment/Clarification |
+| DialogueTurn      | Speaker + Utterance + SpeechAct + StartMs + DurationMs   |
+| Dialogue          | Array DialogueTurn + TotalDurationMs                     |
+| VoiceTransition   | Immediate/Crossfade/FadeThrough/Morph (with duration)    |
+| EmotionalShift    | FromExpression + ToExpression + Transition + DurationMs  |
+
+#### Voice Character Presets
+
+| Name                      | Description                              |
+|---------------------------|------------------------------------------|
+| NeutralAssistant          | Professional baseline voice              |
+| FriendlyHelper            | Warm, approachable assistant             |
+| ProfessionalNarrator      | Clear, authoritative narration           |
+| EmpatheticCounselor       | Gentle, understanding voice              |
+| EnergeticPresenter        | Dynamic, enthusiastic voice              |
+
 ## Pillar 11: Spatial
 
 3D and extended reality.

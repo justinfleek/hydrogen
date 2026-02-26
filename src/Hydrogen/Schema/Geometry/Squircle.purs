@@ -67,11 +67,10 @@ import Prelude
   , class Show
   , show
   , (<>)
-  , (>)
   , (<)
   , (*)
   , (+)
-  , (==)
+  , (-)
   , max
   , min
   )

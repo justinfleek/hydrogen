@@ -62,6 +62,11 @@ module Hydrogen.Schema.Temporal.CubicBezierEasing
   , easeInBack
   , easeOutBack
   , easeInOutBack
+  
+  -- * Sinusoidal Presets
+  , easeInSine
+  , easeOutSine
+  , easeInOutSine
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -310,3 +315,17 @@ easeOutBack = cubicBezierFromNumbers 0.175 0.885 0.32 1.275
 -- | Back ease-in-out (anticipation + overshoot)
 easeInOutBack :: CubicBezierEasing
 easeInOutBack = cubicBezierFromNumbers 0.68 (-0.55) 0.265 1.55
+
+-- Sinusoidal
+
+-- | Sinusoidal ease-in (gentle start based on sine wave)
+easeInSine :: CubicBezierEasing
+easeInSine = cubicBezierFromNumbers 0.12 0.0 0.39 0.0
+
+-- | Sinusoidal ease-out (gentle end based on sine wave)
+easeOutSine :: CubicBezierEasing
+easeOutSine = cubicBezierFromNumbers 0.61 1.0 0.88 1.0
+
+-- | Sinusoidal ease-in-out (smooth sine wave transition)
+easeInOutSine :: CubicBezierEasing
+easeInOutSine = cubicBezierFromNumbers 0.37 0.0 0.63 1.0
