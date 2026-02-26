@@ -29,7 +29,9 @@
 module Hydrogen.Element.Compound.Carousel.Render.Effects
   ( -- * Position Computation
     computeSlidePosition
+  , computeSlidePositionFromIndex
   , positionToClass
+  , positionOffset
   
   -- * Effect Styles
   , computeEffectStyles
@@ -38,6 +40,7 @@ module Hydrogen.Element.Compound.Carousel.Render.Effects
   
   -- * Helpers
   , pow
+  , interpolateEffect
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -102,6 +105,11 @@ computeSlidePosition state index =
     else if diff >= (-3) && diff <= 3 then PositionNearby diff
     else PositionOffscreen
 
+-- | Compute slide position using SlideIndex type
+-- | Type-safe version that accepts SlideIndex instead of raw Int
+computeSlidePositionFromIndex :: CarouselState -> SlideIndex -> SlidePosition
+computeSlidePositionFromIndex state idx = computeSlidePosition state (unwrapSlideIndex idx)
+
 -- | Convert position to CSS class
 positionToClass :: SlidePosition -> String
 positionToClass PositionActive = "carousel-slide-active"
@@ -109,6 +117,15 @@ positionToClass PositionPrev = "carousel-slide-prev"
 positionToClass PositionNext = "carousel-slide-next"
 positionToClass (PositionNearby n) = "carousel-slide-nearby carousel-slide-nearby-" <> show n
 positionToClass PositionOffscreen = "carousel-slide-offscreen"
+
+-- | Get the numeric offset from active position
+-- | Returns 0 for active, negative for previous, positive for next
+positionOffset :: SlidePosition -> Int
+positionOffset PositionActive = 0
+positionOffset PositionPrev = negate 1
+positionOffset PositionNext = 1
+positionOffset (PositionNearby n) = n
+positionOffset PositionOffscreen = 100  -- Large value indicating far away
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // effect styles
@@ -245,3 +262,15 @@ pow base exp = powImpl base exp 1.0
     powImpl b e acc
       | e <= 0.0 = acc
       | otherwise = powImpl b (e - 1.0) (acc * b)
+
+-- | Interpolate between two effect values based on position
+-- | Useful for smooth transitions between active/inactive states
+-- | t is progress (0.0 = from, 1.0 = to)
+interpolateEffect :: Number -> Number -> Number -> Number
+interpolateEffect from to t =
+  let 
+    -- Clamp t to [0, 1]
+    clampedT = if t < 0.0 then 0.0 else if t >= 1.0 then 1.0 else t
+    -- Linear interpolation: from + (to - from) * t
+    delta = to - from
+  in from + delta * clampedT

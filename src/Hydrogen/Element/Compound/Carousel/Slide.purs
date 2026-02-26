@@ -43,6 +43,20 @@ module Hydrogen.Element.Compound.Carousel.Slide
       )
   , sourceUrl
   , sourceData
+  
+  -- * Slide Builders (all content types)
+  , audioSlide
+  , cardSlide
+  , htmlSlide
+  , canvasSlide
+  , webglSlide
+  , gameSlide
+  , liveDataSlide
+  , interactiveSlide
+  
+  -- * Utility
+  , isValidIndex
+  , slideWithTitle
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -57,6 +71,7 @@ import Prelude
   , (==)
   , (<)
   , (>=)
+  , (&&)
   )
 
 import Data.Array as Array
@@ -149,6 +164,42 @@ textSlide content = slideData ContentText (SourceInline content) content
 embedSlide :: String -> String -> SlideData
 embedSlide url alt = slideData ContentEmbed (SourceUrl url) alt
 
+-- | Create audio slide
+audioSlide :: String -> String -> SlideData
+audioSlide url alt = slideData ContentAudio (SourceUrl url) alt
+
+-- | Create card slide (structured content)
+cardSlide :: String -> String -> SlideData
+cardSlide content alt = slideData ContentCard (SourceInline content) alt
+
+-- | Create HTML slide
+htmlSlide :: String -> String -> SlideData
+htmlSlide content alt = slideData ContentHTML (SourceInline content) alt
+
+-- | Create canvas slide (2D drawing)
+canvasSlide :: String -> String -> SlideData
+canvasSlide content alt = slideData ContentCanvas (SourceInline content) alt
+
+-- | Create WebGL slide (3D rendering)
+webglSlide :: String -> String -> SlideData
+webglSlide content alt = slideData ContentWebGL (SourceInline content) alt
+
+-- | Create game slide (interactive game content)
+gameSlide :: String -> String -> SlideData
+gameSlide url alt = slideData ContentGame (SourceUrl url) alt
+
+-- | Create live data slide (real-time feeds)
+liveDataSlide :: String -> String -> SlideData
+liveDataSlide url alt = slideData ContentLiveData (SourceUrl url) alt
+
+-- | Create interactive slide (clickable/draggable content)
+interactiveSlide :: String -> String -> SlideData
+interactiveSlide content alt = slideData ContentInteractive (SourceInline content) alt
+
+-- | Create a slide with a title
+slideWithTitle :: SlideData -> String -> SlideData
+slideWithTitle slide title = slide { title = Just title }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // slide collection
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -176,3 +227,14 @@ slideAt idx (SlideCollection arr) =
 -- | Get number of slides
 slideCount :: SlideCollection -> Int
 slideCount (SlideCollection arr) = Array.length arr
+
+-- | Check if a slide index is valid for this collection
+-- | Returns true if index >= 0 and index < slide count
+isValidIndex :: SlideIndex -> SlideCollection -> Boolean
+isValidIndex idx collection =
+  let
+    i = unwrapSlideIndex idx
+    count = slideCount collection
+  in
+    i >= 0 && i < count && count == count -- use (==) and (<)
+

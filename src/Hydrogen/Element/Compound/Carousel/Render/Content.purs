@@ -51,6 +51,10 @@ module Hydrogen.Element.Compound.Carousel.Render.Content
   , guessVideoMimeType
   , guessAudioMimeType
   , isVideoEmbedUrl
+  
+  -- * Debug
+  , debugSlideInfo
+  , showContentKind
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -418,3 +422,19 @@ containsSubstring (Pattern needle) haystack =
       | idx > maxI = false
       | String.take (String.length needle) (String.drop idx haystack) == needle = true
       | otherwise = checkFrom (idx + 1) maxI
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                       // debug
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Generate debug info for a slide (useful for development/logging)
+-- | Uses Show constraint to format any showable content metadata
+debugSlideInfo :: forall a. Show a => a -> SlideData -> String
+debugSlideInfo metadata slideData' =
+  "Slide[" <> showContentKind slideData'.kind <> "]: " 
+    <> slideData'.alt 
+    <> " (meta: " <> show metadata <> ")"
+
+-- | Convert ContentKind to display string
+showContentKind :: ContentKind -> String
+showContentKind = show

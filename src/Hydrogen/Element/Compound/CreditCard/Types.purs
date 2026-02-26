@@ -24,6 +24,7 @@ module Hydrogen.Element.Compound.CreditCard.Types
   , cvvLength
   , cardTypeName
   , cardTypeGradient
+  , cardTypeFullName
   ) where
 
 import Prelude
@@ -177,3 +178,9 @@ cardTypeGradient DinersClub = "from-gray-600 to-gray-800"
 cardTypeGradient JCB = "from-green-600 to-green-800"
 cardTypeGradient UnionPay = "from-red-600 to-red-800"
 cardTypeGradient Unknown = "from-gray-600 to-gray-800"
+
+-- | Full display name for card type (using Show instance)
+-- | Useful for accessibility and detailed UI
+cardTypeFullName :: CardType -> String
+cardTypeFullName = show
+

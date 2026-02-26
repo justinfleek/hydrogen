@@ -53,10 +53,21 @@ module Hydrogen.Element.Compound.Carousel.Transitions
   -- * Preset Transitions
   , fadeTransition
   , slideTransition
+  , slideVerticalTransition
   , zoomTransition
   , flipTransition
+  , flipVerticalTransition
   , cubeTransition
   , coverflowTransition
+  , cardsTransition
+  , wheelTransition
+  , spiralTransition
+  , parallaxTransition
+  , morphTransition
+  , dissolveTransition
+  , blurTransition
+  , wipeTransition
+  , revealTransition
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -267,3 +278,80 @@ coverflowTransition = transitionConfig
   TransitionCoverflow 
   (Temporal.milliseconds 400.0) 
   EaseOutQuart
+
+-- | Vertical slide transition
+slideVerticalTransition :: TransitionConfig
+slideVerticalTransition = transitionConfig 
+  TransitionSlideVertical 
+  (Temporal.milliseconds 300.0) 
+  EaseOutCubic
+
+-- | Vertical 3D flip transition
+flipVerticalTransition :: TransitionConfig
+flipVerticalTransition = transitionConfig 
+  TransitionFlipVertical 
+  (Temporal.milliseconds 600.0) 
+  EaseInOutQuart
+
+-- | Card stack transition
+cardsTransition :: TransitionConfig
+cardsTransition = transitionConfig 
+  TransitionCards 
+  (Temporal.milliseconds 450.0) 
+  EaseOutBack
+
+-- | Spinning wheel transition
+wheelTransition :: TransitionConfig
+wheelTransition = transitionConfig 
+  TransitionWheel 
+  (Temporal.milliseconds 800.0) 
+  EaseInOutCubic
+
+-- | Spiral inward/outward transition
+spiralTransition :: TransitionConfig
+spiralTransition = transitionConfig 
+  TransitionSpiral 
+  (Temporal.milliseconds 700.0) 
+  EaseInOutQuart
+
+-- | Parallax scrolling transition
+parallaxTransition :: TransitionConfig
+parallaxTransition = transitionConfig 
+  TransitionParallax 
+  (Temporal.milliseconds 350.0) 
+  EaseOutCubic
+
+-- | Shape-morphing transition
+morphTransition :: TransitionConfig
+morphTransition = transitionConfig 
+  TransitionMorph 
+  (Temporal.milliseconds 500.0) 
+  EaseInOutCubic
+
+-- | Pixel dissolve transition
+dissolveTransition :: TransitionConfig
+dissolveTransition = transitionConfig 
+  TransitionDissolve 
+  (Temporal.milliseconds 450.0) 
+  EaseLinear
+
+-- | Blur in/out transition
+blurTransition :: TransitionConfig
+blurTransition = transitionConfig 
+  TransitionBlur 
+  (Temporal.milliseconds 400.0) 
+  EaseInOut
+
+-- | Wipe across transition
+wipeTransition :: TransitionConfig
+wipeTransition = transitionConfig 
+  TransitionWipe 
+  (Temporal.milliseconds 350.0) 
+  EaseOutQuad
+
+-- | Reveal from edge transition
+revealTransition :: TransitionConfig
+revealTransition = transitionConfig 
+  TransitionReveal 
+  (Temporal.milliseconds 400.0) 
+  EaseOutCubic

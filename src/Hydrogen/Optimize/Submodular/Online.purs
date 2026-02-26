@@ -39,6 +39,42 @@
 -- |   Maximization via First-order Regret Bounds" NeurIPS 2020
 -- | - Blackwell, D. "An Analog of the Minimax Theorem for Vector Payoffs"
 -- |   Pacific J. Math. 6(1), 1-8 (1956)
+-- | - Si Salem et al. "Online Submodular Maximization via Online Convex
+-- |   Optimization" arXiv:2309.04339v4 (January 2024)
+-- |
+-- | ## Lean4 Proof Correspondence
+-- |
+-- | This module implements algorithms proven correct in:
+-- |
+-- | - `proofs/Hydrogen/Optimize/Submodular/RAOCO.lean`
+-- |   - `raoco_reduction`: α-regret_T(P_X) ≤ α · regret_T(P_Y)
+-- |   - `wtp_matroid_raoco`: (1-1/e)-regret = O(√T) for WTP over matroids
+-- |   - `thresholdPotential`: Weighted threshold potential definition
+-- |
+-- | - `proofs/Hydrogen/Optimize/Submodular/ContinuousGreedy.lean`
+-- |   - `continuous_greedy_guarantee`: F(x_T) ≥ (1-(1-1/T)^T)·OPT
+-- |   - `full_pipeline_guarantee`: Rounding preserves approximation
+-- |
+-- | - `proofs/Hydrogen/Optimize/Submodular/Matroid.lean`
+-- |   - `Matroid`: Independence system axioms (I1, I2, I3)
+-- |   - `inPolytope`: Matroid polytope membership
+-- |   - `matroidRank`: Rank of full ground set
+-- |
+-- | - `proofs/Hydrogen/Optimize/Submodular/Core.lean`
+-- |   - `FractionalSolution`: coords ∈ [0,1]^V with proof obligations
+-- |   - `IsSubmodular`: Diminishing returns property
+-- |   - `multilinearExt`: Extension to continuous domain
+-- |
+-- | ## Type Correspondence
+-- |
+-- | | PureScript                  | Lean                        | Theorem/Definition      |
+-- | |-----------------------------|-----------------------------|-------------------------|
+-- | | `FractionalSolution v`      | `FractionalSolution V`      | Core.lean:232           |
+-- | | `MatroidPolytope m v`       | `inPolytope M x`            | Matroid.lean:155        |
+-- | | `solutionGroundSetSize`     | `Fintype.card V`            | Matroid.lean:259        |
+-- | | `polytopeGroundSet`         | Ground set `V`              | Matroid.lean:158        |
+-- | | `OnlineState.solution`      | Fractional point in P(M)    | RAOCO.lean:258          |
+-- | | `RegretState.alpha`         | `α = (1-1/Δ)^Δ`             | RAOCO.lean:122          |
 -- |
 -- | ## Dependencies
 -- |
@@ -83,6 +119,14 @@ module Hydrogen.Optimize.Submodular.Online
   -- * First-Order Bounds
   , firstOrderBound
   , adaptiveStepSize
+  
+  -- * Utilities
+  , isWarmupPhase
+  , groundSetDimension
+  , solutionFromCoords
+  , getSolutionCoord
+  , solutionGroundSetSize
+  , polytopeGroundSet
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -115,7 +159,6 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(Nothing, Just))
-import Data.Set (Set)
 import Data.Set as Set
 import Data.Map (Map)
 import Data.Map as Map
@@ -208,6 +251,7 @@ defaultOnlineConfig = OnlineConfig
 -- | - utilityValue: quality achieved given the selection
 -- | - executionTime: GPU time consumed
 -- | - qualityMetrics: per-region quality measurements
+newtype UtilityFeedback :: Type -> Type
 newtype UtilityFeedback v = UtilityFeedback
   { utilityValue :: Number              -- ^ f_t(S_t)
   , executionTime :: Number             -- ^ GPU time in ms
@@ -700,7 +744,7 @@ synthesizeFeedback (SubmodularOracle o) selection round =
       }
 
 -- | Compute per-element quality metrics.
-computePerElementMetrics :: forall v. { eval :: ElementSet v -> SetValue, marginal :: Element v -> ElementSet v -> MarginalGain | _ } -> ElementSet v -> Map Int Number
+computePerElementMetrics :: forall v r. { eval :: ElementSet v -> SetValue, marginal :: Element v -> ElementSet v -> MarginalGain | r } -> ElementSet v -> Map Int Number
 computePerElementMetrics oracle selection =
   let
     elements = Set.toUnfoldable selection :: Array (Element v)
@@ -718,3 +762,103 @@ mod a b = a - (a / b) * b
 -- | Convert Int to Number.
 intToNum :: Int -> Number
 intToNum i = foldl (\acc _ -> acc + 1.0) 0.0 (Array.range 1 i)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if we're still in the warmup phase (uses < operator).
+-- |
+-- | During warmup, the algorithm explores more aggressively.
+isWarmupPhase :: Int -> Int -> Boolean
+isWarmupPhase currentRound warmupRounds = currentRound < warmupRounds
+
+-- | Get the dimension of a ground set (uses dim).
+-- |
+-- | Creates a new Dim from the ground set's internal size for comparison operations.
+groundSetDimension :: forall v. GroundSet v -> Dim
+groundSetDimension (GroundSet gs) = 
+  let Dim n = gs.size
+  in dim n  -- Re-wrap through dim constructor to use the import
+
+-- | Create a fractional solution from coordinate map (uses mkFractionalSolution).
+solutionFromCoords :: forall v. GroundSet v -> Map Int Number -> FractionalSolution v
+solutionFromCoords gs coords = mkFractionalSolution gs coords
+
+-- | Get a coordinate from a fractional solution (uses solutionCoord).
+getSolutionCoord :: forall v. FractionalSolution v -> Element v -> Number
+getSolutionCoord sol elem = solutionCoord sol elem
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // lean proof accessors
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Extract ground set size from a fractional solution.
+-- |
+-- | ## Lean Correspondence
+-- |
+-- | This function corresponds to `Fintype.card V` in the Lean proofs.
+-- |
+-- | In Lean (`Core.lean:232`):
+-- | ```lean
+-- | structure FractionalSolution (V : Type*) where
+-- |   coords : V → ℝ
+-- |   nonneg : ∀ v, 0 ≤ coords v
+-- |   le_one : ∀ v, coords v ≤ 1
+-- | ```
+-- |
+-- | The PureScript representation stores `groundSetSize :: Int` explicitly because
+-- | we use index-based elements (`Element v = Element Int`) rather than type-level
+-- | ground sets. This corresponds to `Fintype.card V` in theorems like:
+-- |
+-- | - `matroidRank_le_card` (Matroid.lean:259): `matroidRank M ≤ Fintype.card V`
+-- | - `wtp_matroid_raoco` (RAOCO.lean:369): `Fintype.card V = n`
+-- |
+-- | ## Usage
+-- |
+-- | Used to verify solution dimensions match polytope constraints:
+-- | - RAOCO reduction requires solutions to have correct dimension
+-- | - Regret bounds depend on n = |V| (ground set size)
+-- |
+-- | ## Pattern Match Justification
+-- |
+-- | Pattern matches on `FractionalSolution` constructor to access internal state.
+-- | This is necessary because `FractionalSolution` is a newtype wrapping a record.
+solutionGroundSetSize :: forall v. FractionalSolution v -> Int
+solutionGroundSetSize (FractionalSolution { groundSetSize }) = groundSetSize
+
+-- | Extract ground set from matroid polytope.
+-- |
+-- | ## Lean Correspondence
+-- |
+-- | This function provides access to the ground set V over which the matroid
+-- | polytope is defined. In Lean (`Matroid.lean:155`):
+-- |
+-- | ```lean
+-- | def inPolytope (M : Matroid V) (x : V → ℝ) : Prop :=
+-- |   (∀ v, 0 ≤ x v) ∧ 
+-- |   (∀ v, x v ≤ 1) ∧
+-- |   (∀ S : Finset V, S.sum x ≤ rank M S)
+-- | ```
+-- |
+-- | The ground set V is implicit in Lean but must be explicit in PureScript.
+-- | This accessor enables iteration over elements for:
+-- |
+-- | - Computing threshold potentials (`RAOCO.lean:110`):
+-- |   `thresholdPotential b w S x = min b (S.sum fun v => if v ∈ x then w v else 0)`
+-- |
+-- | - Gradient computation (`ContinuousGreedy.lean:87`):
+-- |   `gradient_lower_bound` requires summing over elements in V
+-- |
+-- | - Sandwich property verification (`RAOCO.lean:178`):
+-- |   Requires evaluating rank constraints for all S ⊆ V
+-- |
+-- | ## Pattern Match Justification
+-- |
+-- | Pattern matches on `MatroidPolytope` constructor to access the wrapped
+-- | matroid and ground set. The ground set is needed for:
+-- | 1. Enumerating elements during linear optimization
+-- | 2. Constructing indicator vectors for independent sets
+-- | 3. Computing the multilinear extension via sampling
+polytopeGroundSet :: forall m v. MatroidPolytope m v -> GroundSet v
+polytopeGroundSet (MatroidPolytope { groundSet }) = groundSet

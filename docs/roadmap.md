@@ -45,7 +45,7 @@ All atoms, molecules, and compounds implemented with full type safety.
 - [ ] **Hydrogen.Target.Static** — HTML strings for SSG (partial: SSG.purs exists)
 - [ ] **Hydrogen.Target.Canvas** — 2D canvas rendering
 - [ ] **Hydrogen.Target.WebGL** — 3D rendering
-- [ ] **Hydrogen.Target.Halogen** — Legacy adapter (deprecating)
+- [ ] **Hydrogen.Target.Halogen** — Full Halogen integration (pending)
 
 ### Lean Proofs
 

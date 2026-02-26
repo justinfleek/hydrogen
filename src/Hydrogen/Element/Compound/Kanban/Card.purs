@@ -77,6 +77,10 @@ module Hydrogen.Element.Compound.Kanban.Card
   , isDueDateToday
   , isDueDateSoon
   , formatDueDate
+  
+  -- * Utility
+  , labelTexts
+  , hasLabel
   ) where
 
 import Prelude
@@ -366,3 +370,21 @@ setCardSwimlane sId c = c { swimlaneId = sId }
 -- | Set card index
 setCardIndex :: Int -> KanbanCard -> KanbanCard
 setCardIndex idx c = c { index = idx }
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // utility
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Extract all label texts from a card
+-- | Useful for searching/filtering cards by labels
+labelTexts :: KanbanCard -> Array String
+labelTexts c = map (\lbl -> lbl.text) c.labels
+
+-- | Check if a card has a label with the given text
+hasLabel :: String -> KanbanCard -> Boolean
+hasLabel labelName c = 
+  let
+    texts = labelTexts c
+    matches = filter (\t -> t == labelName) texts
+  in
+    not (matches == [])

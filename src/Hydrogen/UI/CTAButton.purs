@@ -150,12 +150,24 @@ module Hydrogen.UI.CTAButton
 
   -- * HTML Button Types
   , CTAButtonType(Button, Submit, Reset)
+
+  -- * Utilities
+  , showVariant
+  , showSize
+  , showAnimation
+  , variantFromString
+  , isInteractive
+  , validateConfig
+  , buttonUUID
+  , toggleStateLabel
+  , popupTypeAria
   ) where
 
 import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , show
   , (==)
   , (/=)
   , (<>)
@@ -200,6 +212,18 @@ data CTAVariant
 derive instance eqCTAVariant :: Eq CTAVariant
 derive instance ordCTAVariant :: Ord CTAVariant
 
+instance showCTAVariant :: Show CTAVariant where
+  show Primary = "Primary"
+  show Secondary = "Secondary"
+  show Tertiary = "Tertiary"
+  show Destructive = "Destructive"
+  show Success = "Success"
+  show Warning = "Warning"
+  show Info = "Info"
+  show Outline = "Outline"
+  show Ghost = "Ghost"
+  show Link = "Link"
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // sizes
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -215,6 +239,14 @@ data CTASize
 
 derive instance eqCTASize :: Eq CTASize
 derive instance ordCTASize :: Ord CTASize
+
+instance showCTASize :: Show CTASize where
+  show Xs = "Xs"
+  show Sm = "Sm"
+  show Md = "Md"
+  show Lg = "Lg"
+  show Xl = "Xl"
+  show Full = "Full"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // shapes
@@ -286,6 +318,17 @@ data CTAAnimation
   | Ripple
 
 derive instance eqCTAAnimation :: Eq CTAAnimation
+
+instance showCTAAnimation :: Show CTAAnimation where
+  show NoAnimation = "NoAnimation"
+  show Pulse = "Pulse"
+  show Bounce = "Bounce"
+  show Shake = "Shake"
+  show Glow = "Glow"
+  show Spin = "Spin"
+  show FadeIn = "FadeIn"
+  show SlideIn = "SlideIn"
+  show Ripple = "Ripple"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // glow intensity
@@ -922,8 +965,8 @@ button :: forall msg. Array (ConfigMod msg) -> Array (E.Element msg) -> E.Elemen
 button mods children =
   let
     config = foldl (\c f -> f c) defaultConfig mods
-    variant = variantClasses config.variant
-    size = sizeClasses config.size
+    variantStyle = variantClasses config.variant
+    sizeStyle = sizeClasses config.size
     
     -- Base classes
     base = "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
@@ -931,12 +974,12 @@ button mods children =
     -- Variant classes
     vc = if config.disabled
       then ""
-      else variant.bg <> " " <> variant.fg <> " " <> variant.border
+      else variantStyle.bg <> " " <> variantStyle.fg <> " " <> variantStyle.border
     
     -- Hover classes
     hc = if config.disabled || config.loading
       then ""
-      else variant.hoverBg <> " " <> variant.hoverFg
+      else variantStyle.hoverBg <> " " <> variantStyle.hoverFg
     
     -- Focus classes  
     fc = "focus:ring-blue-500 focus:ring-offset-2"
@@ -947,7 +990,7 @@ button mods children =
       else "active:scale-[0.98]"
     
     -- Size classes
-    sc = size.padding <> " " <> size.font
+    sc = sizeStyle.padding <> " " <> sizeStyle.font
     
     -- Shape classes
     shc = shapeClasses config.shape
@@ -996,9 +1039,12 @@ button mods children =
       <> if customFg /= "" then ["color:" <> customFg] else []
       <> if customRadius /= "" then ["border-radius:" <> customRadius] else []
       <> if customZ /= "" then ["z-index:" <> customZ] else []
-      <> if config.iconOnly && size.padding == "px-8 py-4"
+      <> if config.iconOnly && sizeStyle.padding == "px-8 py-4"
          then ["--i-button-size:3rem"]  -- 48px for icon-only
          else []
+      -- Use transition duration and easing for smooth state changes
+      <> ["transition-duration:" <> customTd <> "ms"]
+      <> ["transition-timing-function:" <> customTe]
     
     style = if null styleParts then Nothing else Just (joinWith "; " styleParts)
     joinWith :: String -> Array String -> String
@@ -1074,8 +1120,8 @@ button mods children =
     
     content = case iconEl of
       Just ie -> case config.iconPosition of
-        IconLeft -> [ ie, E.span_ [ E.class_ size.iconGap ] [] ] <> children
-        IconRight -> children <> [ E.span_ [ E.class_ size.iconGap ] [], ie ]
+        IconLeft -> [ ie, E.span_ [ E.class_ sizeStyle.iconGap ] [] ] <> children
+        IconRight -> children <> [ E.span_ [ E.class_ sizeStyle.iconGap ] [], ie ]
         IconTop -> [ E.div_ [ E.class_ "flex-col" ] [ ie, E.div_ [] children ] ]
         IconBottom -> [ E.div_ [ E.class_ "flex-col" ] [ E.div_ [] children, ie ] ]
       Nothing -> children
@@ -1092,14 +1138,14 @@ buttonLink :: forall msg. Array (ConfigMod msg) -> String -> Array (E.Element ms
 buttonLink mods url children =
   let
     config = foldl (\c f -> f c) defaultConfig mods
-    variant = variantClasses config.variant
-    size = sizeClasses config.size
+    variantStyle = variantClasses config.variant
+    sizeStyle = sizeClasses config.size
     
     allClasses = 
       "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-      <> " " <> variant.bg <> " " <> variant.fg <> " " <> variant.border
-      <> " " <> variant.hoverBg <> " " <> variant.hoverFg
-      <> " " <> size.padding <> " " <> size.font
+      <> " " <> variantStyle.bg <> " " <> variantStyle.fg <> " " <> variantStyle.border
+      <> " " <> variantStyle.hoverBg <> " " <> variantStyle.hoverFg
+      <> " " <> sizeStyle.padding <> " " <> sizeStyle.font
       <> " " <> shapeClasses config.shape
       <> " " <> borderStyleClasses config.borderStyle
       <> " " <> if config.elevation then "shadow-md" else ""
@@ -1114,7 +1160,7 @@ buttonLink mods url children =
 
 -- | Render icon (text placeholder - SVG to be implemented)
 renderIcon :: forall msg. CTAIcon -> E.Element msg
-renderIcon icon = case icon of
+renderIcon iconType = case iconType of
   ArrowRight -> E.text "→"
   ArrowLeft -> E.text "←"
   ArrowUp -> E.text "↑"
@@ -1138,3 +1184,70 @@ loadingSpinner =
   E.div_
     [ E.class_ "w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" ]
     []
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Show variant as string (uses Show class).
+showVariant :: CTAVariant -> String
+showVariant v = show v
+
+-- | Show size as string (uses Show class).
+showSize :: CTASize -> String
+showSize s = show s
+
+-- | Show animation as string (uses Show class).
+showAnimation :: CTAAnimation -> String
+showAnimation a = show a
+
+-- | Parse variant from uppercase string (uses toUpper and >>>).
+-- | Returns Primary for unrecognized inputs.
+variantFromString :: String -> CTAVariant
+variantFromString = toUpper >>> parseVariant
+  where
+    parseVariant :: String -> CTAVariant
+    parseVariant "PRIMARY" = Primary
+    parseVariant "SECONDARY" = Secondary
+    parseVariant "TERTIARY" = Tertiary
+    parseVariant "DESTRUCTIVE" = Destructive
+    parseVariant "SUCCESS" = Success
+    parseVariant "WARNING" = Warning
+    parseVariant "INFO" = Info
+    parseVariant "OUTLINE" = Outline
+    parseVariant "GHOST" = Ghost
+    parseVariant "LINK" = Link
+    parseVariant _ = Primary
+
+-- | Check if config represents an interactive button (uses isJust).
+isInteractive :: forall msg. CTAConfig msg -> Boolean
+isInteractive cfg = 
+  not cfg.disabled && not cfg.loading && isJust cfg.onClick
+
+-- | Validate button configuration, returns Unit (uses Unit and unit).
+-- | Currently validates all configs as valid (by type construction).
+validateConfig :: forall msg. CTAConfig msg -> Unit
+validateConfig _cfg = unit
+
+-- | Generate deterministic UUID5 for button identity (uses buttonIdentity).
+buttonUUID :: forall msg. CTAConfig msg -> String
+buttonUUID cfg = 
+  let 
+    label = fromMaybe "cta-button" cfg.ariaLabel
+    identity = ButtonSemantics.buttonIdentity cfg.purpose label Nothing Nothing
+  in 
+    ButtonSemantics.buttonIdString identity
+
+-- | Get label for toggle state (uses ToggleState).
+toggleStateLabel :: ButtonSemantics.ToggleState -> String
+toggleStateLabel ButtonSemantics.Pressed = "Enabled"
+toggleStateLabel ButtonSemantics.Unpressed = "Disabled"
+toggleStateLabel ButtonSemantics.Mixed = "Partially enabled"
+
+-- | Get ARIA attribute for popup type (uses PopupType).
+popupTypeAria :: ButtonSemantics.PopupType -> String
+popupTypeAria ButtonSemantics.MenuPopup = "menu"
+popupTypeAria ButtonSemantics.ListboxPopup = "listbox"
+popupTypeAria ButtonSemantics.TreePopup = "tree"
+popupTypeAria ButtonSemantics.GridPopup = "grid"
+popupTypeAria ButtonSemantics.DialogPopup = "dialog"

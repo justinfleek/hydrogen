@@ -43,6 +43,10 @@ module Hydrogen.Element.Compound.ColorPicker.Gradient
   , StopSelectChange
   , StopMoveChange
   , StopAddChange
+  
+  -- * Utilities
+  , stopColors
+  , stopCount
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -54,6 +58,7 @@ import Prelude
   , map
   , (<>)
   , ($)
+  , (+)
   , (-)
   , (*)
   , (/)
@@ -239,16 +244,17 @@ renderCheckerboard radiusStyle =
     []
 
 -- | Render a stop handle
+-- | Parameters: bar width, bar height, stop index, color stop data
 renderStopHandle :: forall msg. Number -> Number -> Int -> Grad.ColorStop -> E.Element msg
-renderStopHandle barWidth barHeight idx (Grad.ColorStop stop) =
+renderStopHandle handleBarWidth handleBarHeight stopIndex (Grad.ColorStop stop) =
   let
     -- Position handle at stop location
-    x = Grad.unwrapRatio stop.position * barWidth
+    x = Grad.unwrapRatio stop.position * handleBarWidth
     handleSize = 12.0
     halfHandle = handleSize / 2.0
     
     -- Handle extends below the bar
-    topOffset = barHeight - 2.0
+    topOffset = handleBarHeight - 2.0
   in
     E.div_
       [ E.style "position" "absolute"
@@ -258,6 +264,12 @@ renderStopHandle barWidth barHeight idx (Grad.ColorStop stop) =
       , E.style "height" (show handleSize <> "px")
       , E.style "pointer-events" "auto"
       , E.style "cursor" "ew-resize"
+      , E.dataAttr "stop-index" $ show stopIndex
+      , E.attr "role" "slider"
+      , E.attr "aria-label" $ "Color stop " <> show (stopIndex + 1)
+      , E.attr "aria-valuenow" $ show (Grad.unwrapRatio stop.position * 100.0)
+      , E.attr "aria-valuemin" "0"
+      , E.attr "aria-valuemax" "100"
       ]
       [ -- Triangle pointer
         E.div_
@@ -279,3 +291,26 @@ renderStopHandle barWidth barHeight idx (Grad.ColorStop stop) =
           ]
           []
       ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                   // utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Extract all stop colors from a gradient as CSS strings
+-- | Useful for color palettes, legends, or external processing
+stopColors :: Grad.LinearGradient -> Array String
+stopColors grad =
+  let
+    stops = Grad.getStops (Grad.Linear grad)
+  in
+    map (\(Grad.ColorStop stop) -> RGB.rgbToLegacyCss stop.color) stops
+
+-- | Get the number of color stops in a gradient
+-- | Useful for validation (minimum 2 stops required) and UI display
+stopCount :: Grad.LinearGradient -> Int
+stopCount grad =
+  let
+    stops = Grad.getStops (Grad.Linear grad)
+  in
+    length stops
+

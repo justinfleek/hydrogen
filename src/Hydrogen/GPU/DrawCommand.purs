@@ -151,6 +151,8 @@ module Hydrogen.GPU.DrawCommand
   -- * Sorting & Batching (for interpreter)
   , sortByDepth
   , batchByMaterial
+  , compareDepth
+  , validateBuffer
 
   -- * Backward-Compatible Constructors
   , staggerLeftToRight
@@ -179,6 +181,7 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , Ordering
   , Unit
   , compare
   , map
@@ -742,18 +745,43 @@ easingIdSpring :: EasingFunction
 easingIdSpring = AnimTypes.EasingIdSpring
 
 -- | Backward compatible aliases (old Ease* names)
+easeLinear :: EasingFunction
 easeLinear = easingIdLinear
+
+easeInQuad :: EasingFunction
 easeInQuad = easingIdInQuad
+
+easeOutQuad :: EasingFunction
 easeOutQuad = easingIdOutQuad
+
+easeInOutQuad :: EasingFunction
 easeInOutQuad = easingIdInOutQuad
+
+easeInCubic :: EasingFunction
 easeInCubic = easingIdInCubic
+
+easeOutCubic :: EasingFunction
 easeOutCubic = easingIdOutCubic
+
+easeInOutCubic :: EasingFunction
 easeInOutCubic = easingIdInOutCubic
+
+easeInElastic :: EasingFunction
 easeInElastic = easingIdInElastic
+
+easeOutElastic :: EasingFunction
 easeOutElastic = easingIdOutElastic
+
+easeInOutElastic :: EasingFunction
 easeInOutElastic = easingIdInOutElastic
+
+easeInBounce :: EasingFunction
 easeInBounce = easingIdInBounce
+
+easeOutBounce :: EasingFunction
 easeOutBounce = easingIdOutBounce
+
+easeSpring :: EasingFunction
 easeSpring = easingIdSpring
 
 -- | Create word parameters with defaults.
@@ -1051,3 +1079,20 @@ batchByMaterial buf =
   let sorted = sortByDepth buf
       grouped = Array.groupBy (\a b -> getMaterial a == getMaterial b) sorted
   in map NEA.toArray grouped
+
+-- | Compare two commands by their depth values.
+-- |
+-- | Returns Ordering (LT, EQ, GT) based on depth comparison.
+-- | Useful for custom sorting strategies or priority queues.
+compareDepth :: forall msg. DrawCommand msg -> DrawCommand msg -> Ordering
+compareDepth a b = compare (getDepth a) (getDepth b)
+
+-- | Validate a command buffer, returning Unit.
+-- |
+-- | Currently performs no-op validation (all buffers are valid by construction
+-- | due to the type system). This function exists for:
+-- | 1. Future invariant checking (e.g., clip push/pop balance)
+-- | 2. Integration with effect pipelines that expect Unit
+-- | 3. Explicit documentation that validation was considered
+validateBuffer :: forall msg. CommandBuffer msg -> Unit
+validateBuffer _buf = unit
