@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                 // hydrogen // schema // motion // timeremap
+--                                 // hydrogen // schema // motion // time-remap
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | TimeRemap — Variable speed, time remapping, and ramps for animation.
@@ -80,6 +80,7 @@ module Hydrogen.Schema.Motion.TimeRemap
   
   -- * Evaluation
   , apply
+  , applyInverse
   , applyToProgress
   , speedAt
   , derivativeAt
@@ -372,6 +373,98 @@ apply inputFrame (TimeRemap tr) = case tr.mode of
   
   KeyframeRemap ->
     integrateKeyframes inputFrame tr.keyframes
+
+-- | Apply inverse time remap: given output frame, find input frame.
+-- |
+-- | This is the inverse of `apply`: `applyInverse (apply x remap) remap ≈ x`
+-- |
+-- | **Limitations:**
+-- | - FreezeRemap: Returns the freeze frame (not truly invertible)
+-- | - KeyframeRemap: Uses linear approximation (may have error for complex curves)
+-- | - CurveRemap: Uses Newton-Raphson iteration (may have numerical error)
+-- |
+-- | For modes where many inputs map to one output (freeze, loop), this returns
+-- | a single representative input.
+applyInverse :: Number -> TimeRemap -> Number
+applyInverse outputFrame (TimeRemap tr) = case tr.mode of
+  FreezeRemap _ -> 
+    -- Not invertible: any input maps to freezeFrame
+    -- Return 0 as representative input
+    0.0
+  
+  LinearRemap ->
+    -- output = input * speed → input = output / speed
+    if abs tr.speedFactor < epsilon then 0.0
+    else outputFrame / tr.speedFactor
+  
+  PingPongRemap ->
+    -- Forward: output = progress * duration
+    -- Reverse: output = (1 - progress) * duration
+    -- Invert by determining which phase and inverting
+    let normalizedOutput = outputFrame / tr.originalDuration
+    in if normalizedOutput <= 1.0
+       then outputFrame  -- Forward phase: input = output
+       else tr.originalDuration * 2.0 - outputFrame  -- Reverse phase
+  
+  LoopRemap _ ->
+    -- output = input mod loopLen
+    -- Inverse: just return the output (within one loop)
+    outputFrame
+  
+  CurveRemap eas ->
+    -- Use Newton-Raphson to solve: apply(x) = outputFrame
+    invertCurveRemap outputFrame tr.startSpeed tr.endSpeed eas tr.originalDuration
+  
+  KeyframeRemap ->
+    -- Approximate inverse using binary search
+    invertKeyframeRemap outputFrame tr.keyframes tr.originalDuration
+
+-- | Invert curve remap using Newton-Raphson iteration.
+-- |
+-- | Solves: integrateSpeed(x) = target for x
+invertCurveRemap :: Number -> Number -> Number -> Easing -> Number -> Number
+invertCurveRemap target startSpd endSpd eas dur =
+  let
+    -- Initial guess: assume average speed
+    avgSpeed = (startSpd + endSpd) / 2.0
+    initialGuess = if abs avgSpeed < epsilon then 0.0 else target / avgSpeed
+    
+    -- Newton-Raphson iteration
+    iterate :: Int -> Number -> Number
+    iterate 0 x = x
+    iterate n x =
+      let
+        progress = clamp01 (x / dur)
+        fx = integrateSpeed progress startSpd endSpd eas dur
+        dfx = speedAtProgress progress startSpd endSpd eas
+        newX = if abs dfx < epsilon then x else x - (fx - target) / dfx
+      in
+        if abs (fx - target) < epsilon then x
+        else iterate (n - 1) (clamp01 newX * dur)
+  in
+    iterate 10 (clamp01 (initialGuess / dur) * dur)
+
+-- | Speed at normalized progress for curve remap
+speedAtProgress :: Number -> Number -> Number -> Easing -> Number
+speedAtProgress progress startSpd endSpd eas =
+  let easedProgress = evaluate eas progress
+  in startSpd + easedProgress * (endSpd - startSpd)
+
+-- | Invert keyframe remap using binary search.
+invertKeyframeRemap :: Number -> Array SpeedKeyframe -> Number -> Number
+invertKeyframeRemap target keyframes dur =
+  let
+    -- Binary search for input that produces target output
+    search :: Number -> Number -> Int -> Number
+    search lo hi 0 = (lo + hi) / 2.0
+    search lo hi n =
+      let mid = (lo + hi) / 2.0
+          midOutput = integrateKeyframes mid keyframes
+      in if abs (midOutput - target) < epsilon then mid
+         else if midOutput < target then search mid hi (n - 1)
+         else search lo mid (n - 1)
+  in
+    search 0.0 dur 20
 
 -- | Apply remap to normalized progress (0-1).
 applyToProgress :: Number -> TimeRemap -> Number

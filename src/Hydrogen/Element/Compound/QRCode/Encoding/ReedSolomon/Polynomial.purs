@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---             // hydrogen // element // qrcode // encoding // reedsolomon // polynomial
+--     // hydrogen // element // qrcode // encoding // reedsolomon // polynomial
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Polynomial Operations — Polynomials over GF(2^8).

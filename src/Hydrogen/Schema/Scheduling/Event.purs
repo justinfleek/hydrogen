@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                    // hydrogen // schema // scheduling // event
+--                                  // hydrogen // schema // scheduling // event
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Event — Calendar event core types and accessors.
@@ -89,7 +89,7 @@ instance showEventId :: Show EventId where
   show (EventId id) = id
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                                   // datetime
+--                                                                 // date-time
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Complete datetime with date and time components

@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                  // hydrogen // schema // spatial // light range
+--                               // hydrogen // schema // spatial // light range
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | LightRange Atom — Distance at which light intensity falls to zero.
@@ -15,9 +15,19 @@ module Hydrogen.Schema.Spatial.LightRange
   , unsafeLightRange
   , unwrapLightRange
   , infinite
+  , lightRangeBounds
+  , clampLightRange
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , otherwise
+  , (<)
+  , (<>)
+  )
 import Hydrogen.Schema.Bounded as Bounded
 
 -- | Light attenuation range
@@ -44,3 +54,16 @@ unwrapLightRange (LightRange n) = n
 -- | Infinite range (physically correct inverse-square falloff without cutoff)
 infinite :: LightRange
 infinite = LightRange 0.0
+
+-- | Bounds documentation for LightRange.
+-- |
+-- | Light range is non-negative. 0.0 represents infinite range.
+-- | Maximum is bounded at 10000.0 meters for practical purposes.
+lightRangeBounds :: Bounded.NumberBounds
+lightRangeBounds = Bounded.numberBounds 0.0 10000.0 "LightRange" "Light attenuation distance in meters"
+
+-- | Clamp a number to valid light range bounds.
+-- |
+-- | Ensures the value is non-negative.
+clampLightRange :: Number -> LightRange
+clampLightRange n = LightRange (Bounded.clampNumber 0.0 10000.0 n)

@@ -36,6 +36,10 @@
 
 import Hydrogen.Schema.Color.Hue
 import Hydrogen.Schema.Color.Conversions
+import Hydrogen.Schema.Color.OnoSendai
+import Hydrogen.Schema.Diff
+import Hydrogen.Schema.Group
+import Hydrogen.Schema.Priority
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- MATH (3D Primitives with Zero-Latency Invariants)
@@ -84,3 +88,11 @@ import Hydrogen.WorldModel
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Optimize
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- GPU (GPU Precision and Quantization Proofs)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+import Hydrogen.GPU.Precision
+import Hydrogen.GPU.Landauer
+import Hydrogen.GPU.Diffusion
