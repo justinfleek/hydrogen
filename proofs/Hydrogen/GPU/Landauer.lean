@@ -31,6 +31,8 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
+set_option linter.unusedVariables false
+
 noncomputable section
 
 namespace Hydrogen.GPU.Landauer
@@ -364,7 +366,169 @@ theorem effective_precision_bounds (fH bH : ℝ) (hf : 0 ≤ fH) (hb : 0 ≤ bH)
   · exact le_max_right fH bH
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- SECTION 11: DETERMINISM
+-- SECTION 11: DISTORTION TOLERANCE (Definition 2 from paper)
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/-- Distortion tolerance for precision selection.
+    
+    From the paper, Definition 2 requires dual criteria:
+    - Forward tolerance (ε_fwd): How much output distortion is acceptable?
+    - Backward tolerance (ε_bwd): How much gradient distortion is acceptable?
+    
+    Both are measured in bits of acceptable information loss. -/
+structure DistortionTolerance where
+  forward : ℝ   -- ε_fwd: Forward (Shannon) tolerance
+  backward : ℝ  -- ε_bwd: Backward (Gibbs) tolerance
+  forward_nonneg : 0 ≤ forward
+  backward_nonneg : 0 ≤ backward
+
+/-- Symmetric tolerance (same for forward and backward) -/
+def DistortionTolerance.symmetric (eps : ℝ) (h : 0 ≤ eps) : DistortionTolerance where
+  forward := eps
+  backward := eps
+  forward_nonneg := h
+  backward_nonneg := h
+
+/-- THEOREM: Symmetric tolerance has equal forward and backward -/
+theorem symmetric_tolerance_equal (eps : ℝ) (h : 0 ≤ eps) :
+    (DistortionTolerance.symmetric eps h).forward = 
+    (DistortionTolerance.symmetric eps h).backward := rfl
+
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- SECTION 12: INFORMATION BUNDLE (Definition 3 from paper)
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/-- Information bundle — data described by entropy, not precision.
+    
+    From the paper, Definition 3: (S, H, σ) where:
+    - S: Shape (logical dimensions)
+    - H: Entropy bound (bits of information)
+    - σ: Semantic type
+    
+    Precision is a GAUGE CHOICE at materialization time,
+    not part of the bundle definition. -/
+structure InfoBundle where
+  shape : List ℕ          -- Logical dimensions
+  entropy : Entropy       -- Upper bound on bits of information
+  semanticType : SemanticType
+
+/-- THEOREM: Bundle entropy is always valid -/
+theorem bundle_entropy_valid (b : InfoBundle) : 
+    0 ≤ b.entropy.value ∧ b.entropy.value ≤ 64 :=
+  entropy_in_range b.entropy
+
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- SECTION 13: OPERATIONAL PRECISION (Definitions 1 & 2 from paper)
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/-- Operational natural precision (Definition 1 from paper).
+    
+    b*_v(ε) = min{ b ∈ ℕ : E[D(φ_v(x), φ_v(Q_b(x)))] ≤ ε }
+    
+    Given entropy and tolerance, find minimum bits where distortion ≤ tolerance.
+    This is computed as (entropy - tolerance), representing the effective bits needed. -/
+def operationalPrecision (h : ℝ) (tolerance : ℝ) : ℝ :=
+  max 0 (h - tolerance)
+
+/-- THEOREM: Operational precision is non-negative -/
+theorem operationalPrecision_nonneg (h tolerance : ℝ) : 
+    0 ≤ operationalPrecision h tolerance := by
+  simp only [operationalPrecision]
+  exact le_max_left 0 (h - tolerance)
+
+/-- THEOREM: Higher tolerance requires fewer bits -/
+theorem operationalPrecision_monotone_tolerance (h t1 t2 : ℝ) (hle : t1 ≤ t2) :
+    operationalPrecision h t2 ≤ operationalPrecision h t1 := by
+  simp only [operationalPrecision]
+  apply max_le_max_left
+  linarith
+
+/-- THEOREM: Higher entropy requires more bits -/
+theorem operationalPrecision_monotone_entropy (h1 h2 t : ℝ) (hle : h1 ≤ h2) :
+    operationalPrecision h1 t ≤ operationalPrecision h2 t := by
+  simp only [operationalPrecision]
+  apply max_le_max_left
+  linarith
+
+/-- Effective precision under dual criteria (Definition 2 from paper).
+    
+    b*_v = min{ b : Δ→_v(b) ≤ ε_fwd AND Δ←_v(b) ≤ ε_bwd }
+    
+    This finds the minimum precision that satisfies BOTH forward and backward
+    tolerance requirements. The effective precision is:
+    
+      b* = max(H_fwd - ε_fwd, H_bwd - ε_bwd) -/
+def effectivePrecisionWithTolerance (forwardH backwardH : ℝ) (tol : DistortionTolerance) : ℝ :=
+  max 0 (max (forwardH - tol.forward) (backwardH - tol.backward))
+
+/-- THEOREM: Effective precision with tolerance is non-negative -/
+theorem effectivePrecisionWithTolerance_nonneg (fH bH : ℝ) (tol : DistortionTolerance) :
+    0 ≤ effectivePrecisionWithTolerance fH bH tol := by
+  simp only [effectivePrecisionWithTolerance]
+  exact le_max_left 0 _
+
+/-- THEOREM: Effective precision satisfies forward requirement -/
+theorem effectivePrecision_satisfies_forward (fH bH : ℝ) (tol : DistortionTolerance) :
+    fH - tol.forward ≤ effectivePrecisionWithTolerance fH bH tol := by
+  simp only [effectivePrecisionWithTolerance]
+  calc fH - tol.forward 
+      ≤ max (fH - tol.forward) (bH - tol.backward) := le_max_left _ _
+    _ ≤ max 0 (max (fH - tol.forward) (bH - tol.backward)) := le_max_right _ _
+
+/-- THEOREM: Effective precision satisfies backward requirement -/
+theorem effectivePrecision_satisfies_backward (fH bH : ℝ) (tol : DistortionTolerance) :
+    bH - tol.backward ≤ effectivePrecisionWithTolerance fH bH tol := by
+  simp only [effectivePrecisionWithTolerance]
+  calc bH - tol.backward 
+      ≤ max (fH - tol.forward) (bH - tol.backward) := le_max_right _ _
+    _ ≤ max 0 (max (fH - tol.forward) (bH - tol.backward)) := le_max_right _ _
+
+/-- THEOREM: If entropy ≤ tolerance on both flows, precision is zero (free) -/
+theorem effectivePrecision_free (fH bH : ℝ) (tol : DistortionTolerance)
+    (hfwd : fH ≤ tol.forward) (hbwd : bH ≤ tol.backward) :
+    effectivePrecisionWithTolerance fH bH tol = 0 := by
+  simp only [effectivePrecisionWithTolerance]
+  have h1 : fH - tol.forward ≤ 0 := by linarith
+  have h2 : bH - tol.backward ≤ 0 := by linarith
+  have h3 : max (fH - tol.forward) (bH - tol.backward) ≤ 0 := max_le h1 h2
+  exact max_eq_left h3
+
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- SECTION 14: SENSITIVITY SATISFACTION
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/-- Predicate: precision b satisfies forward tolerance -/
+def satisfiesForwardTolerance (h : Entropy) (b : ℕ) (tol : DistortionTolerance) : Prop :=
+  forwardSensitivity h.value b ≤ tol.forward
+
+/-- Predicate: precision b satisfies backward tolerance -/
+def satisfiesBackwardTolerance (h : Entropy) (b : ℕ) (tol : DistortionTolerance) : Prop :=
+  backwardSensitivity h.value b ≤ tol.backward
+
+/-- Predicate: precision b satisfies dual tolerance criteria -/
+def satisfiesDualTolerance (forwardH backwardH : Entropy) (b : ℕ) (tol : DistortionTolerance) : Prop :=
+  satisfiesForwardTolerance forwardH b tol ∧ satisfiesBackwardTolerance backwardH b tol
+
+/-- THEOREM: If entropy ≤ bits, forward tolerance is always satisfied -/
+theorem satisfiesForward_when_sufficient (h : Entropy) (b : ℕ) (tol : DistortionTolerance)
+    (hle : h.value ≤ b) : satisfiesForwardTolerance h b tol := by
+  simp only [satisfiesForwardTolerance, forwardSensitivity]
+  have hsub : h.value - ↑b ≤ 0 := by linarith
+  have hmax : max 0 (h.value - ↑b) = 0 := max_eq_left hsub
+  rw [hmax]
+  exact tol.forward_nonneg
+
+/-- THEOREM: If entropy ≤ bits, backward tolerance is always satisfied -/
+theorem satisfiesBackward_when_sufficient (h : Entropy) (b : ℕ) (tol : DistortionTolerance)
+    (hle : h.value ≤ b) : satisfiesBackwardTolerance h b tol := by
+  simp only [satisfiesBackwardTolerance, backwardSensitivity]
+  have hsub : h.value - ↑b ≤ 0 := by linarith
+  have hmax : max 0 (h.value - ↑b) = 0 := max_eq_left hsub
+  rw [hmax]
+  exact tol.backward_nonneg
+
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- SECTION 15: DETERMINISM
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 /-- THEOREM: Entropy bounds are deterministic -/

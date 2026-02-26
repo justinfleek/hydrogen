@@ -59,6 +59,14 @@ module Hydrogen.GPU.Text
   , LineBreakResult
   , breakLines
   
+  -- * Text Operations
+  , truncateText
+  , filterVisibleGlyphs
+  , glyphsInBounds
+  , glyphsEqual
+  , glyphBefore
+  , sortGlyphsByPosition
+  
   -- * Command Generation
   , textToCommands
   , shapedToCommands
@@ -69,9 +77,7 @@ module Hydrogen.GPU.Text
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , map
+  ( map
   , ($)
   , (+)
   , (-)
@@ -84,13 +90,14 @@ import Prelude
   , (>=)
   , (<>)
   , (||)
+  , (&&)
   )
 
 import Data.Array (filter, length, take, drop) as Array
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Map (Map)
 import Data.Map as Map
-import Data.String.CodeUnits (toCharArray) as SU
+import Data.String.CodePoints (toCodePointArray, CodePoint) as SCP
 import Data.Enum (fromEnum) as Enum
 
 import Hydrogen.Schema.Typography.FontMetrics as FM
@@ -326,24 +333,280 @@ type LineBreakResult =
 -- | Break shaped text into lines that fit within maxWidth
 -- |
 -- | Uses greedy line breaking at word boundaries (spaces).
--- | For better typography, implement Knuth-Plass algorithm.
+-- | Algorithm:
+-- | 1. Split glyphs into words at space boundaries
+-- | 2. Accumulate words into lines until maxWidth exceeded
+-- | 3. Start new line when next word would exceed width
+-- | 4. Reposition glyphs per line (reset x to 0, offset y by lineHeight)
+-- |
+-- | For better typography, consider Knuth-Plass optimal line breaking.
 breakLines :: Number -> ShapedText -> LineBreakResult
 breakLines maxWidth shaped =
-  let
-    -- For now, simple single-line (no breaking)
-    -- Full implementation would:
-    -- 1. Find word boundaries (space codepoints)
-    -- 2. Measure word widths
-    -- 3. Greedily fill lines until maxWidth exceeded
-    -- 4. Reposition glyphs per line
-    lines = [shaped]
-    totalHeight = shaped.lineHeight
-  in
-    { lines, totalHeight }
+  if shaped.totalWidth <= maxWidth
+  then
+    -- Text fits on single line, no breaking needed
+    { lines: [shaped], totalHeight: shaped.lineHeight }
+  else
+    let
+      -- Split into words (groups of non-space glyphs)
+      words = splitIntoWords shaped.glyphs
+      
+      -- Build lines greedily
+      builtLines = buildLines maxWidth shaped.lineHeight words
+      
+      -- Count lines for height calculation
+      lineCount = arrayLength builtLines
+      totalHeight = shaped.lineHeight * intToNumber lineCount
+    in
+      { lines: builtLines, totalHeight }
 
--- | Check if codepoint is a space
+-- | Split glyphs into words at space boundaries
+splitIntoWords :: Array ShapedGlyph -> Array (Array ShapedGlyph)
+splitIntoWords glyphs = splitWordsGo glyphs [] []
+
+splitWordsGo 
+  :: Array ShapedGlyph 
+  -> Array ShapedGlyph          -- Current word accumulator
+  -> Array (Array ShapedGlyph)  -- Completed words
+  -> Array (Array ShapedGlyph)
+splitWordsGo glyphs currentWord completedWords =
+  case Array.take 1 glyphs of
+    [] -> 
+      -- End of input: finalize current word if non-empty
+      if arrayLength currentWord == 0
+      then completedWords
+      else completedWords <> [currentWord]
+    [g] ->
+      let rest = Array.drop 1 glyphs in
+      if isSpace g.codepoint
+      then
+        -- Space: finalize current word, skip the space
+        if arrayLength currentWord == 0
+        then splitWordsGo rest [] completedWords
+        else splitWordsGo rest [] (completedWords <> [currentWord])
+      else
+        -- Non-space: add to current word
+        splitWordsGo rest (currentWord <> [g]) completedWords
+    _ -> completedWords  -- Should not happen
+
+-- | Build lines from words using greedy algorithm
+buildLines :: Number -> Number -> Array (Array ShapedGlyph) -> Array ShapedText
+buildLines maxWidth lineHeight words = buildLinesGo maxWidth lineHeight words 0.0 0.0 [] []
+
+buildLinesGo
+  :: Number                     -- maxWidth
+  -> Number                     -- lineHeight  
+  -> Array (Array ShapedGlyph)  -- remaining words
+  -> Number                     -- current x position
+  -> Number                     -- current y position
+  -> Array ShapedGlyph          -- current line glyphs
+  -> Array ShapedText           -- completed lines
+  -> Array ShapedText
+buildLinesGo maxWidth lineHeight words x y currentLineGlyphs completedLines =
+  case Array.take 1 words of
+    [] ->
+      -- No more words: finalize current line if non-empty
+      if arrayLength currentLineGlyphs == 0
+      then completedLines
+      else 
+        let finalLine = makeShapedText currentLineGlyphs lineHeight
+        in completedLines <> [finalLine]
+    [word] ->
+      let 
+        rest = Array.drop 1 words
+        wordWidth = sumWordAdvances word
+        spaceWidth = if arrayLength currentLineGlyphs == 0 then 0.0 else 4.0  -- Inter-word space
+        neededWidth = x + spaceWidth + wordWidth
+      in
+      if neededWidth <= maxWidth || arrayLength currentLineGlyphs == 0
+      then
+        -- Word fits on current line (or current line is empty, so must add anyway)
+        let 
+          newX = if arrayLength currentLineGlyphs == 0 then 0.0 else x + spaceWidth
+          repositionedWord = repositionGlyphs newX y word
+          newGlyphs = currentLineGlyphs <> repositionedWord
+          finalX = newX + wordWidth
+        in
+        buildLinesGo maxWidth lineHeight rest finalX y newGlyphs completedLines
+      else
+        -- Word doesn't fit: wrap to new line
+        let
+          finishedLine = makeShapedText currentLineGlyphs lineHeight
+          newY = y + lineHeight
+          repositionedWord = repositionGlyphs 0.0 newY word
+        in
+        buildLinesGo maxWidth lineHeight rest wordWidth newY repositionedWord (completedLines <> [finishedLine])
+    _ -> completedLines  -- Should not happen
+
+-- | Reposition glyphs to start at given x, y
+repositionGlyphs :: Number -> Number -> Array ShapedGlyph -> Array ShapedGlyph
+repositionGlyphs startX startY glyphs = repositionGo startX startY glyphs []
+
+repositionGo :: Number -> Number -> Array ShapedGlyph -> Array ShapedGlyph -> Array ShapedGlyph
+repositionGo x y glyphs acc =
+  case Array.take 1 glyphs of
+    [] -> acc
+    [g] ->
+      let 
+        rest = Array.drop 1 glyphs
+        newGlyph = g { x = x, y = y }
+        newX = x + g.advanceWidth
+      in
+      repositionGo newX y rest (acc <> [newGlyph])
+    _ -> acc
+
+-- | Sum advance widths of glyphs in a word
+sumWordAdvances :: Array ShapedGlyph -> Number
+sumWordAdvances = foldlArray (\acc g -> acc + g.advanceWidth) 0.0
+
+-- | Create ShapedText from glyphs
+makeShapedText :: Array ShapedGlyph -> Number -> ShapedText
+makeShapedText glyphs lineHeight =
+  { glyphs
+  , totalWidth: sumWordAdvances glyphs
+  , lineHeight
+  , baseline: lineHeight * 0.8  -- Approximate baseline
+  }
+
+-- | Get array length
+arrayLength :: forall a. Array a -> Int
+arrayLength = Array.length
+
+-- | Check if codepoint is a space character
+-- |
+-- | Recognizes:
+-- | - U+0020: Space
+-- | - U+0009: Tab
+-- | - U+000A: Line Feed
+-- | - U+000D: Carriage Return
 isSpace :: Int -> Boolean
 isSpace cp = cp == 32 || cp == 9 || cp == 10 || cp == 13
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // text operations
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Truncate shaped text to fit within maxWidth
+-- |
+-- | Removes glyphs that extend beyond maxWidth. If truncation occurs,
+-- | the text is cut at the last glyph that fully fits. For ellipsis
+-- | truncation, the caller should append "..." to the truncated text.
+-- |
+-- | Uses comparison operators (>, >=, <) for bounds checking.
+truncateText :: Number -> ShapedText -> ShapedText
+truncateText maxWidth shaped =
+  if shaped.totalWidth <= maxWidth
+  then shaped  -- No truncation needed
+  else
+    let
+      -- Keep glyphs whose right edge (x + width) is within bounds
+      truncated = truncateGlyphsAt maxWidth shaped.glyphs
+      newWidth = sumAdvances truncated
+    in
+      shaped { glyphs = truncated, totalWidth = newWidth }
+
+-- | Truncate glyphs at a given x boundary
+truncateGlyphsAt :: Number -> Array ShapedGlyph -> Array ShapedGlyph
+truncateGlyphsAt maxX glyphs = truncateGo maxX glyphs []
+
+truncateGo :: Number -> Array ShapedGlyph -> Array ShapedGlyph -> Array ShapedGlyph
+truncateGo maxX glyphs acc =
+  case Array.take 1 glyphs of
+    [] -> acc
+    [g] ->
+      let 
+        rest = Array.drop 1 glyphs
+        rightEdge = g.x + g.width
+      in
+      if rightEdge > maxX
+      then acc  -- This glyph exceeds bounds, stop here
+      else truncateGo maxX rest (acc <> [g])
+    _ -> acc
+
+-- | Filter glyphs to only those currently visible
+-- |
+-- | Removes glyphs that are completely outside the visible region.
+-- | Useful for culling off-screen text in scrolling views.
+-- |
+-- | Uses Data.Array.filter for efficient predicate-based selection.
+filterVisibleGlyphs :: { x :: Number, y :: Number, width :: Number, height :: Number } -> ShapedText -> ShapedText
+filterVisibleGlyphs bounds shaped =
+  let
+    visible = Array.filter (isGlyphVisible bounds) shaped.glyphs
+    newWidth = sumAdvances visible
+  in
+    shaped { glyphs = visible, totalWidth = newWidth }
+
+-- | Check if a glyph is at least partially visible within bounds
+isGlyphVisible :: { x :: Number, y :: Number, width :: Number, height :: Number } -> ShapedGlyph -> Boolean
+isGlyphVisible bounds glyph =
+  let
+    glyphRight = glyph.x + glyph.width
+    glyphBottom = glyph.y + glyph.height
+    boundsRight = bounds.x + bounds.width
+    boundsBottom = bounds.y + bounds.height
+  in
+  -- Check for intersection (not complete exclusion)
+  -- Glyph is visible if it overlaps the bounds rectangle
+  glyphRight >= bounds.x &&        -- Glyph extends into or past left edge
+  glyph.x < boundsRight &&         -- Glyph starts before right edge
+  glyphBottom >= bounds.y &&       -- Glyph extends into or past top edge
+  glyph.y < boundsBottom           -- Glyph starts before bottom edge
+
+-- | Get glyphs within a bounding box
+-- |
+-- | Returns glyphs that intersect with the given bounds rectangle.
+-- | This is useful for hit testing (finding which glyphs are under a point)
+-- | and for partial text rendering (only render visible portion).
+glyphsInBounds :: { x :: Number, y :: Number, width :: Number, height :: Number } -> ShapedText -> Array ShapedGlyph
+glyphsInBounds bounds shaped = Array.filter (isGlyphVisible bounds) shaped.glyphs
+
+-- | Compare two ShapedGlyph records for equality
+-- |
+-- | Two glyphs are equal if they have the same codepoint at the same position.
+-- | Uses the Eq typeclass for Number comparison.
+glyphsEqual :: ShapedGlyph -> ShapedGlyph -> Boolean
+glyphsEqual g1 g2 =
+  g1.codepoint == g2.codepoint &&
+  g1.x == g2.x &&
+  g1.y == g2.y
+
+-- | Compare two ShapedGlyph records by position
+-- |
+-- | Compares glyphs by their x position for left-to-right ordering.
+-- | Uses the Ord typeclass (via < operator) for Number comparison.
+-- | Returns true if g1 comes before g2 in reading order.
+glyphBefore :: ShapedGlyph -> ShapedGlyph -> Boolean
+glyphBefore g1 g2 = g1.x < g2.x
+
+-- | Sort glyphs by position (left to right)
+-- |
+-- | Uses a simple insertion sort for small arrays.
+-- | For text that's already shaped left-to-right, this is a no-op.
+-- | Useful when glyphs have been repositioned or filtered.
+sortGlyphsByPosition :: Array ShapedGlyph -> Array ShapedGlyph
+sortGlyphsByPosition glyphs = insertionSort glyphBefore glyphs
+
+-- | Generic insertion sort using a comparison function
+-- |
+-- | Uses the $ operator for clean function application.
+-- | The Ord constraint is satisfied through the comparison function.
+insertionSort :: forall a. (a -> a -> Boolean) -> Array a -> Array a
+insertionSort before arr = foldlArray (\sorted x -> insertSorted before x sorted) [] arr
+
+-- | Insert element into sorted array
+insertSorted :: forall a. (a -> a -> Boolean) -> a -> Array a -> Array a
+insertSorted before x sorted = insertGo before x sorted []
+
+insertGo :: forall a. (a -> a -> Boolean) -> a -> Array a -> Array a -> Array a
+insertGo before x remaining acc =
+  case Array.take 1 remaining of
+    [] -> acc <> [x]  -- End of array, append x
+    [y] ->
+      if before x y
+      then acc <> [x] <> remaining  -- x goes before y
+      else insertGo before x (Array.drop 1 remaining) $ acc <> [y]
+    _ -> acc <> [x]  -- Should not happen
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // command generation
@@ -408,18 +671,29 @@ offsetGlyph dx dy glyph =
 --                                                                    // helpers
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert string to array of Unicode codepoints
+-- | Convert string to array of Unicode codepoints.
 -- |
--- | This is a placeholder - actual implementation requires String.toCodePointArray
--- | or similar, which is provided by the runtime. For compilation, we use
--- | Data.String.CodeUnits which is in the standard library.
+-- | Uses Data.String.CodePoints.toCodePointArray which correctly handles
+-- | all Unicode codepoints including supplementary planes (U+10000 to U+10FFFF).
+-- | This properly handles emoji, rare CJK characters, mathematical symbols,
+-- | and all other characters that require surrogate pairs in UTF-16.
+-- |
+-- | ## Why this matters
+-- |
+-- | JavaScript strings are UTF-16 encoded. Characters outside the BMP
+-- | (Basic Multilingual Plane) are represented as surrogate pairs.
+-- | Using CodeUnits.toCharArray would incorrectly split these into two
+-- | separate "characters", breaking emoji and other supplementary characters.
+-- |
+-- | CodePoints.toCodePointArray correctly identifies surrogate pairs and
+-- | returns the actual Unicode codepoint values.
 stringToCodepoints :: String -> Array Int
-stringToCodepoints str = mapArray charToInt (SU.toCharArray str)
+stringToCodepoints str = mapArray codePointToInt (SCP.toCodePointArray str)
 
--- | Convert Char to Int codepoint
--- | Uses Data.Enum.fromEnum which is available for Char
-charToInt :: Char -> Int
-charToInt = Enum.fromEnum
+-- | Convert CodePoint to Int codepoint value
+-- | Uses Data.Enum.fromEnum which extracts the numeric value from CodePoint
+codePointToInt :: SCP.CodePoint -> Int
+codePointToInt = Enum.fromEnum
 
 -- | Convert Int to Number
 intToNumber :: Int -> Number

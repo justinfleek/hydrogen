@@ -25,6 +25,7 @@ import Mathlib.Data.Nat.Basic
 import Mathlib.Tactic
 
 set_option linter.dupNamespace false
+set_option linter.unnecessarySeqFocus false
 
 namespace Hydrogen.Schema.Priority
 
@@ -229,13 +230,29 @@ def PriorityEntry.compare {α : Type*} (a b : PriorityEntry α) : Ordering :=
   -- Higher priority comes first (reverse order)
   Ord.compare b.priority.value a.priority.value
 
+/-- Helper: compareOfLessAndEq returns lt iff the first arg is less -/
+theorem compareOfLessAndEq_lt {a b : ℕ} : 
+    compareOfLessAndEq a b = Ordering.lt ↔ a < b := by
+  simp only [compareOfLessAndEq]
+  constructor
+  · intro h
+    split_ifs at h with h1
+    exact h1
+  · intro h
+    simp only [h, ↓reduceIte]
+
 /-- THEOREM: Priority comparison is transitive -/
 theorem priority_compare_trans {α : Type*} (a b c : PriorityEntry α)
     (hab : a.compare b = Ordering.lt) (hbc : b.compare c = Ordering.lt) :
     a.compare c = Ordering.lt := by
-  simp only [PriorityEntry.compare] at *
-  -- Compare reverses order, so lt means b.priority > a.priority
-  sorry  -- Requires Ordering lemmas
+  simp only [PriorityEntry.compare, Ord.compare] at *
+  -- hab says compareOfLessAndEq b.value a.value = lt, so b.value < a.value
+  -- hbc says compareOfLessAndEq c.value b.value = lt, so c.value < b.value
+  -- We need compareOfLessAndEq c.value a.value = lt, i.e., c.value < a.value
+  have hab' : b.priority.value < a.priority.value := compareOfLessAndEq_lt.mp hab
+  have hbc' : c.priority.value < b.priority.value := compareOfLessAndEq_lt.mp hbc
+  have hac : c.priority.value < a.priority.value := Nat.lt_trans hbc' hab'
+  exact compareOfLessAndEq_lt.mpr hac
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- SECTION 7: PRIORITY OPERATIONS

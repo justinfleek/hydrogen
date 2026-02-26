@@ -38,6 +38,7 @@ module Hydrogen.GPU.EffectEvent
   , TriggerCombinator(..)
   , MouseTrigger(..)
   , KeyboardTrigger(..)
+  , FocusTrigger(..)
   , Modifier(..)
   , TimeTrigger(..)
   , ScrollTrigger(..)
@@ -140,6 +141,7 @@ import Hydrogen.Schema.Attestation.UUID5 as UUID5
 data EffectTrigger
   = TriggerMouse MouseTrigger
   | TriggerKeyboard KeyboardTrigger
+  | TriggerFocus FocusTrigger          -- Focus-based triggers
   | TriggerTime TimeTrigger
   | TriggerScroll ScrollTrigger
   | TriggerViewport ViewportTrigger
@@ -157,6 +159,7 @@ instance showEffectTrigger :: Show EffectTrigger where
   show (TriggerScroll s) = "(TriggerScroll " <> show s <> ")"
   show (TriggerViewport v) = "(TriggerViewport " <> show v <> ")"
   show (TriggerAnimation a) = "(TriggerAnimation " <> show a <> ")"
+  show (TriggerFocus f) = "(TriggerFocus " <> show f <> ")"
   show (TriggerCombined c) = "(TriggerCombined " <> show c <> ")"
   show TriggerAlways = "TriggerAlways"
   show TriggerNever = "TriggerNever"
@@ -224,6 +227,25 @@ instance showKeyboardTrigger :: Show KeyboardTrigger where
   show (KeyUp k) = "(KeyUp " <> k <> ")"
   show (KeyHeld k ms) = "(KeyHeld " <> k <> " " <> show ms <> ")"
   show (ModifierActive m) = "(ModifierActive " <> show m <> ")"
+
+-- | Focus-based triggers
+-- |
+-- | Focus triggers handle keyboard navigation and accessibility focus states.
+-- | These work with the focus management system to track which element has
+-- | keyboard focus, enabling proper keyboard-driven UI interactions.
+data FocusTrigger
+  = FocusGained Int              -- Element gained focus (PickId)
+  | FocusLost Int                -- Element lost focus (PickId)
+  | FocusWithin Int              -- Element or descendant has focus (PickId)
+  | FocusVisible Int             -- Focus visible (keyboard navigation, not mouse)
+
+derive instance eqFocusTrigger :: Eq FocusTrigger
+
+instance showFocusTrigger :: Show FocusTrigger where
+  show (FocusGained id) = "(FocusGained " <> show id <> ")"
+  show (FocusLost id) = "(FocusLost " <> show id <> ")"
+  show (FocusWithin id) = "(FocusWithin " <> show id <> ")"
+  show (FocusVisible id) = "(FocusVisible " <> show id <> ")"
 
 -- | Modifier keys
 data Modifier
@@ -558,10 +580,14 @@ derive instance eqTransitionResult :: Eq TransitionResult
 --                                                         // trigger evaluation
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Evaluate a trigger against frame state
+-- | Evaluate a trigger without frame state (static evaluation).
 -- |
--- | This is a stub that returns the expected type. In practice,
--- | this would take a FrameState and evaluate the predicate.
+-- | Evaluates boolean logic (And, Or, Not, Xor) and constant triggers
+-- | (Always, Never). Returns `ConditionUnknown` for triggers that require
+-- | runtime state (viewport, mouse, scroll, time, animation progress).
+-- |
+-- | For full evaluation with frame state, use `evaluateTriggerWithState`
+-- | from the runtime module.
 evaluateTrigger :: EffectTrigger -> TriggerCondition
 evaluateTrigger trigger = case trigger of
   TriggerAlways -> ConditionMet
@@ -804,9 +830,14 @@ interactionOccurred = EventInteraction
 onHover :: Int -> EffectTrigger
 onHover pickId = TriggerMouse (MouseHover pickId)
 
--- | Trigger on focus (placeholder - needs element ID system)
+-- | Trigger on focus.
+-- |
+-- | Fires when an element gains keyboard focus. Works with both mouse clicks
+-- | that set focus and keyboard navigation (Tab, Shift+Tab). The runtime's
+-- | focus management system tracks the currently focused element and evaluates
+-- | this trigger accordingly.
 onFocus :: Int -> EffectTrigger
-onFocus pickId = TriggerMouse (MouseHover pickId)  -- Simplified
+onFocus pickId = TriggerFocus (FocusGained pickId)
 
 -- | Trigger on active/pressed state
 onActive :: Int -> EffectTrigger

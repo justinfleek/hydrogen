@@ -1,7 +1,7 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-26 (Session 8 — Council Gaps Complete)
-**Build Status:** **PASSING** (0 errors, 0 warnings)
+**Last Updated:** 2026-02-26 (Session 9 — GPU Limitations Fixed)
+**Build Status:** **PASSING** (579 tests, 0 errors, 0 warnings)
 
 ---
 
@@ -79,6 +79,59 @@ Remaining P2 gaps:
    - ✓ OpenType features (ligatures, numerals, fractions, stylistic, kerning)
    - ✓ Text decoration/emphasis
    - ✓ CJK features (ruby, vertical, traditional/simplified)
+
+---
+
+## Session 9 (2026-02-26) — GPU Limitations Fixed + Lean Proofs Complete
+
+### Three Remaining Limitations Resolved
+
+This session completed the 3 documented GPU limitations from the previous session.
+
+**1. FocusTrigger Implementation (EffectEvent.purs)**
+- Added `FocusTrigger` data type with 4 variants:
+  - `FocusGained Int` — Element gained keyboard focus
+  - `FocusLost Int` — Element lost focus
+  - `FocusWithin Int` — Element or descendant has focus
+  - `FocusVisible Int` — Focus visible (keyboard navigation only)
+- Added `TriggerFocus FocusTrigger` constructor to `EffectTrigger`
+- Updated `onFocus` preset to use proper `TriggerFocus` instead of mouse workaround
+- Exported `FocusTrigger(..)` from module
+
+**2. Unicode Codepoint Support (Text.purs)**
+- Switched from `Data.String.CodeUnits.toCharArray` to `Data.String.CodePoints.toCodePointArray`
+- Now correctly handles all Unicode codepoints including:
+  - Emoji and supplementary planes (U+10000 to U+10FFFF)
+  - Surrogate pair handling for UTF-16 encoded strings
+- Implemented full line breaking algorithm:
+  - `breakLines` with word boundary detection at spaces
+  - `splitIntoWords`, `buildLines` helper functions
+  - `repositionGlyphs` for per-line positioning
+- Added text operations:
+  - `truncateText` — Cut text at maxWidth boundary
+  - `filterVisibleGlyphs` — Cull off-screen glyphs
+  - `glyphsInBounds` — Hit testing for glyphs
+  - `glyphsEqual`, `glyphBefore`, `sortGlyphsByPosition` — Comparison utilities
+
+**3. Text Metrics Integration (Flatten.purs + Text.purs)**
+- Font configuration now propagates from element styles to child text elements
+- Implemented CSS parsers (previously stubs):
+  - `parsePixelValue` — Parses "100px" or "100" to Number
+  - `parseColorString` — Parses hex (#RGB, #RRGGBB) and 12 named colors
+  - `parseRadiusString` — Parses pixel radius values
+  - `parseHexColor`, `parseHex6`, `parseHex3` — Full hex color parsing
+  - `hexCharToInt` — Character-level hex conversion
+- Updated `flattenElement` to extract `fontConfig` from attributes
+
+### Documentation Updated
+
+- `src/Hydrogen/GPU/Flatten.purs` line 36-40 — Updated limitations section
+- `src/Hydrogen/GPU/Text.purs` line 411-428 — Updated Unicode documentation
+
+### Build Verification
+
+- **PureScript**: 579 tests pass, 0 warnings, 0 errors
+- **Lean4**: 3188 jobs complete
 
 ---
 
@@ -518,15 +571,65 @@ Modified files:
 
 ---
 
-## Next Steps (Recommended Order)
+## Next Steps (Council Recommended Order)
 
-**ALL P0/P1 COUNCIL GAPS CLOSED.** Remaining work is P2:
+**ALL P0/P1 COUNCIL GAPS CLOSED.** Remaining work from Council review:
 
-1. **GPU/Kernel/Video.purs** — YUV→RGB, LUT3D, frame scaling (unblocks Frame.io)
-2. **GPU/Kernel/Chart.purs** — Waveforms, trends, threshold overlays (medical/audio)
-3. **Brand Export Formats** — CSSExport, JSONExport, FigmaExport, TailwindExport
-4. **GPU/Resource.purs** — TextureDescriptor, BufferDescriptor, PipelineCache
-5. **GPU/Interpreter.purs** — Execute ComputeKernel against WebGPU
+### Infrastructure (Unblocks rendering)
+
+1. **GPU/Resource.purs** — TextureDescriptor, BufferDescriptor, PipelineCache
+   - TextureFormat enum (RGBA8Unorm, RGBA16Float, RGBA32Float, R32Float, RG32Float)
+   - TextureUsage flags (Sampled, Storage, RenderTarget, CopySrc, CopyDst)
+   - PipelineKey for caching compiled shaders
+
+2. **GPU/Interpreter.purs** — Execute ComputeKernel against WebGPU
+   - WGSL shader generation from kernel descriptions
+   - Bind group layout creation
+   - Pipeline compilation and caching
+
+### Domain-Specific (Unblocks applications)
+
+3. **GPU/Kernel/Video.purs** — Video processing kernels (unblocks Frame.io)
+   - `KernelYUVtoRGB` — Color space conversion
+   - `KernelScaler` — Lanczos/bicubic scaling
+   - `KernelDeinterlace` — Field processing
+   - `KernelLUT3D` — Color LUT application
+
+4. **GPU/Kernel/Chart.purs** — Visualization kernels (medical/audio)
+   - `KernelLinePlot` — Vital sign traces
+   - `KernelSparkline` — Inline charts
+   - `KernelGradientFill` — Area fills
+   - `KernelThresholdOverlay` — Alert zones
+
+5. **Schema/Temporal/Timecode.purs** — Broadcast timecode (SMPTE)
+   - SMPTETimecode molecule with drop-frame support
+   - GenlockStatus for sync tracking
+   - SafeArea for title/action/graphics safe
+
+### Brand Export (Unblocks design systems)
+
+6. **Brand/Export/CSS.purs** — CSS custom properties export
+7. **Brand/Export/JSON.purs** — Design token JSON export
+8. **Brand/Export/Figma.purs** — Figma plugin format
+9. **Brand/Export/Tailwind.purs** — Tailwind config generation
+
+### Distributed (Unblocks billion-agent scale)
+
+10. **Input canonicalization and rollback** — Deterministic input ordering
+    - Canonical input queue with timestamps
+    - Rollback/resimulation for network latency
+
+### Production Readiness (From PRODUCTION_READINESS.md)
+
+11. **JSON codecs for Schema atoms** — 2-3 weeks effort
+    - EncodeJson/DecodeJson for all bounded types
+    - Roundtrip property tests
+
+12. **WebGL runtime MVP** — 4-6 weeks effort
+    - Element tree → GPU command buffer
+    - Diff/patch for minimal updates
+
+13. **Test coverage to 20%** — Currently 2.4%, need property tests
 
 ---
 
