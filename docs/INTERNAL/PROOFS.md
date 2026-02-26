@@ -127,7 +127,7 @@ proofs/
             └── RAOCO.lean           # Online submodular via OCO (8 theorems)
 ```
 
-**Total:** 66 Lean proof files, ~1050 theorems/lemmas, 16 axioms, 0 sorry
+**Total:** 80 Lean proof files, ~1100 theorems/lemmas, 16 axioms, 0 sorry
 
 ## CURRENT PROOF STATUS
 
