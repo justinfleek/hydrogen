@@ -49,7 +49,7 @@ noncomputable def oneMinusInvE : ℝ := 1 - Real.exp (-1)
 /-- Verify that (1-1/e) > 0.63 -/
 theorem oneMinusInvE_pos : 0 < oneMinusInvE := by
   simp only [oneMinusInvE]
-  have h : Real.exp (-1) < 1 := Real.exp_neg_one_lt_one
+  have h : Real.exp (-1) < 1 := Real.exp_lt_one_iff.mpr (by linarith : (-1 : ℝ) < 0)
   linarith
 
 /-- Verify that (1-1/e) < 1 -/
@@ -141,51 +141,98 @@ After T steps of continuous greedy with step size 1/T:
 For finite T, we get (1 - 1/e - ε) where ε = O(1/T).
 -/
 
-/-- The recurrence relation: gap shrinks by factor (1-1/T) each step -/
-theorem gap_shrinks (F_t OPT : ℝ) (T : ℕ) (hT : 0 < T) (hOPT : 0 ≤ OPT) 
-    (hF : F_t ≤ OPT) :
-    let δ := (1 : ℝ) / T
-    let gap_t := OPT - F_t
-    let F_next := F_t + δ * gap_t
-    let gap_next := OPT - F_next
-    gap_next = (1 - δ) * gap_t := by
-  simp only []
-  ring
+/-- The recurrence relation: gap shrinks by factor (1-δ) each step.
+    
+    Given: F_{t+1} ≥ F_t + δ * (OPT - F_t) (step progress)
+    Then: gap_{t+1} = OPT - F_{t+1} ≤ (1 - δ) * gap_t
+    
+    This is pure algebra - the key insight from Calinescu et al. (2011).
+    Reference: Section 5.1 of the paper, following continuous greedy analysis.
+-/
+theorem gap_shrinks (F_t F_next OPT δ : ℝ) 
+    (hProgress : F_next ≥ F_t + δ * (OPT - F_t)) :
+    OPT - F_next ≤ (1 - δ) * (OPT - F_t) := by
+  -- gap_next = OPT - F_next ≤ OPT - (F_t + δ * (OPT - F_t)) = (1 - δ) * (OPT - F_t)
+  calc OPT - F_next 
+      ≤ OPT - (F_t + δ * (OPT - F_t)) := by linarith
+    _ = (1 - δ) * (OPT - F_t) := by ring
 
-/-- After k steps, the gap is at most (1-1/T)^k · OPT -/
-theorem gap_after_k_steps (T k : ℕ) (hT : 0 < T) (hk : k ≤ T) (OPT : ℝ) (hOPT : 0 ≤ OPT) :
-    let δ := (1 : ℝ) / T
-    let shrink := (1 - δ) ^ k
-    -- Gap after k steps ≤ shrink · OPT (statement only, proof by induction on k)
-    shrink = (1 - (1 : ℝ) / T) ^ k := by
-  simp only []
+/-- After k steps with step progress, gap is at most (1-δ)^k times initial gap.
+    
+    This is the inductive core of the continuous greedy analysis.
+    Given a sequence F₀, F₁, ..., Fₖ where each step satisfies
+    F_{t+1} ≥ F_t + δ*(OPT - F_t), we prove gap(k) ≤ (1-δ)^k * gap(0).
+    
+    Reference: Calinescu et al. (2011), proof of Theorem 1.1
+-/
+theorem gap_after_k_steps 
+    (F : ℕ → ℝ)           -- Value sequence
+    (OPT : ℝ)              -- Optimal value
+    (δ : ℝ)                -- Step size (typically 1/T)
+    (k : ℕ)                -- Number of steps
+    (hδ_nonneg : 0 ≤ δ)
+    (hδ_le_one : δ ≤ 1)
+    (hF0 : F 0 = 0)        -- Start at 0
+    (hProgress : ∀ t < k, F (t + 1) ≥ F t + δ * (OPT - F t)) :
+    OPT - F k ≤ (1 - δ) ^ k * OPT := by
+  -- Key: 0 ≤ δ ≤ 1 implies 0 ≤ 1 - δ ≤ 1
+  have h1_sub_δ_nonneg : 0 ≤ 1 - δ := by linarith
+  have h1_sub_δ_le_one : 1 - δ ≤ 1 := by linarith
+  induction k with
+  | zero => 
+    simp only [pow_zero, one_mul]
+    rw [hF0]
+    linarith
+  | succ n ih =>
+    -- Need: OPT - F (n+1) ≤ (1-δ)^(n+1) * OPT
+    have hProgress_n : F (n + 1) ≥ F n + δ * (OPT - F n) := by
+      apply hProgress n
+      exact Nat.lt_succ_self n
+    have hgap_shrinks := gap_shrinks (F n) (F (n + 1)) OPT δ hProgress_n
+    have hih : OPT - F n ≤ (1 - δ) ^ n * OPT := by
+      apply ih
+      intro t ht
+      apply hProgress t
+      exact Nat.lt_succ_of_lt ht
+    calc OPT - F (n + 1) 
+        ≤ (1 - δ) * (OPT - F n) := hgap_shrinks
+      _ ≤ (1 - δ) * ((1 - δ) ^ n * OPT) := by
+          apply mul_le_mul_of_nonneg_left hih h1_sub_δ_nonneg
+      _ = (1 - δ) ^ (n + 1) * OPT := by ring
 
-/-- The core theorem: after T steps, F(x_T) ≥ (1-(1-1/T)^T) · OPT -/
-theorem continuous_greedy_guarantee (T : ℕ) (hT : 0 < T) (OPT : ℝ) (hOPT : 0 ≤ OPT) :
-    let δ := (1 : ℝ) / T
-    let factor := 1 - (1 - δ) ^ T
-    -- F(x_T) ≥ factor · OPT
-    0 ≤ factor ∧ factor ≤ 1 := by
-  constructor
-  · -- factor ≥ 0
-    simp only []
-    have h1 : (1 - (1 : ℝ) / T) ^ T ≤ 1 := by
-      apply pow_le_one
-      · simp only [sub_nonneg]
-        apply div_le_one_of_le
-        · exact Nat.one_le_cast.mpr hT
-        · exact Nat.cast_nonneg T
-      · linarith [div_pos (by linarith : (0 : ℝ) < 1) (Nat.cast_pos.mpr hT)]
-    linarith
-  · -- factor ≤ 1
-    simp only []
-    have h1 : 0 ≤ (1 - (1 : ℝ) / T) ^ T := by
-      apply pow_nonneg
-      simp only [sub_nonneg]
-      apply div_le_one_of_le
-      · exact Nat.one_le_cast.mpr hT
-      · exact Nat.cast_nonneg T
-    linarith
+/-- The core theorem: after T steps, F(x_T) ≥ (1-(1-1/T)^T) · OPT
+    
+    Starting from F_0 = 0, if each step satisfies the step progress property
+    F_{t+1} ≥ F_t + (1/T)*(OPT - F_t), then after T steps:
+    
+    F_T ≥ (1 - (1-1/T)^T) * OPT
+    
+    As T → ∞, (1-1/T)^T → 1/e, so the factor approaches (1 - 1/e) ≈ 0.632.
+    
+    Note: In practice, for monotone submodular functions, OPT ≥ 0 always holds.
+    The theorem is stated algebraically without this assumption since the bound
+    is valid for any real OPT.
+    
+    Reference: Calinescu et al. (2011), Theorem 1.1
+-/
+theorem continuous_greedy_guarantee 
+    (F : ℕ → ℝ)           -- Value sequence from continuous greedy
+    (OPT : ℝ)              -- Optimal value (typically ≥ 0 for submodular functions)
+    (T : ℕ)                -- Number of steps
+    (hT : 0 < T)
+    (hF0 : F 0 = 0)
+    (hProgress : ∀ t < T, F (t + 1) ≥ F t + (1 / T) * (OPT - F t)) :
+    F T ≥ (1 - (1 - (1 : ℝ) / T) ^ T) * OPT := by
+  -- From gap_after_k_steps: OPT - F T ≤ (1 - 1/T)^T * OPT
+  have hTpos : (0 : ℝ) < T := Nat.cast_pos.mpr hT
+  have hδ_nonneg : 0 ≤ (1 : ℝ) / T := div_nonneg one_pos.le (le_of_lt hTpos)
+  have hδ_le_one : (1 : ℝ) / T ≤ 1 := by
+    rw [div_le_one hTpos]
+    exact Nat.one_le_cast.mpr hT
+  have hgap := gap_after_k_steps F OPT ((1 : ℝ) / T) T hδ_nonneg hδ_le_one hF0 hProgress
+  -- OPT - F T ≤ (1 - 1/T)^T * OPT
+  -- => F T ≥ OPT - (1 - 1/T)^T * OPT = (1 - (1 - 1/T)^T) * OPT
+  linarith
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SECTION 5: LIMIT THEOREM
