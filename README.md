@@ -1,7 +1,5 @@
 # HYDROGEN
 
-A PureScript web framework for building correct web applications.
-
 ```
     ██╗  ██╗██╗   ██╗██████╗ ██████╗  ██████╗  ██████╗ ███████╗███╗   ██╗
     ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██╔═══██╗██╔════╝ ██╔════╝████╗  ██║
@@ -11,77 +9,118 @@ A PureScript web framework for building correct web applications.
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═══╝
 ```
 
-> *The most fundamental element. The foundation everything else builds on.*
+**The purest web design language ever created.**
+
+UI as data, not framework-specific code. Pure PureScript describing interfaces that render targets interpret to reality. Zero external framework dependencies. Formally verified with Lean4 proofs.
+
+| | |
+|---|---|
+| **Build** | 0 errors, 0 warnings |
+| **Schema** | 516 files across 17 pillars |
+| **Proofs** | 80 Lean files, ~1100 theorems, **0 sorry** |
+
+---
+
+## Why Hydrogen?
+
+Web frameworks optimize for developer ergonomics. Hydrogen optimizes for **correctness at scale**.
+
+When AI agents compose UI — not one agent, but millions operating in parallel — the framework must guarantee:
+
+- **Determinism**: Same input → same pixels. Always.
+- **Bounded types**: No `undefined`, no `NaN`, no invalid states.
+- **Algebraic composition**: UI primitives that compose lawfully.
+- **Formal verification**: Properties proven in Lean4, not just tested.
+
+Hydrogen is infrastructure for autonomous systems that need to reason about UI algebraically.
+
+---
 
 ## Architecture
 
-Hydrogen is a **pure rendering abstraction** — UI as data, not framework-specific code.
-
 ```
-Hydrogen.Element × Hydrogen.Event → Hydrogen.Element × [Hydrogen.Effect]
+State × Msg → State × [Effect]
+view :: State → Element Msg
 ```
 
-Elements are pure PureScript data structures describing UI. They can be interpreted
-to multiple render targets:
+Elements are pure PureScript data structures. Targets interpret them:
 
 | Target | Description |
 |--------|-------------|
-| `Hydrogen.Target.DOM` | Direct browser DOM manipulation with diff/patch |
+| `Hydrogen.Target.DOM` | Browser DOM with diff/patch |
 | `Hydrogen.Target.Static` | HTML strings for SSG |
-| `Hydrogen.Target.Canvas` | 2D canvas for motion graphics |
-| `Hydrogen.Target.WebGL` | 3D rendering for spatial UI |
-| `Hydrogen.Target.Halogen` | Legacy adapter (deprecating) |
+| `Hydrogen.Target.Canvas` | 2D canvas rendering |
+| `Hydrogen.Target.WebGL` | 3D/WebGPU rendering |
 
-This follows libevring's pattern: **separate what from how**. Elements describe
-*what* to render. Targets handle *how* to render it.
+Same Element, multiple outputs. **Separate what from how.**
+
+---
 
 ## Design System Ontology
 
-Hydrogen defines 12 pillars of design primitives — bounded, type-safe atoms that
-compose into molecules, compounds, and ultimately brand identity.
+17 pillars of bounded, type-safe design primitives:
 
-| Pillar | Description |
-|--------|-------------|
-| Color | Color spaces, conversions, palettes |
-| Dimension | Units, measurements, spacing |
-| Geometry | Shapes, transforms, paths |
-| Typography | Fonts, metrics, hierarchy |
-| Material | Surfaces, textures, blur |
-| Elevation | Depth, shadow, z-index |
-| Temporal | Time, animation, easing |
-| Reactive | State, interaction feedback |
-| Gestural | Touch, pointer, gestures |
-| Haptic | Tactile feedback primitives |
-| Spatial | 3D space, AR/VR primitives |
-| Brand | Identity composition layer |
+| Pillar | Atoms |
+|--------|-------|
+| **Color** | sRGB, P3, LAB, OKLCH, camera log curves, LUTs, CDL |
+| **Dimension** | SI units (yocto→quetta), device units, typography units |
+| **Geometry** | Shapes, curves (Bezier, NURBS, B-spline), transforms |
+| **Typography** | OpenType features, metrics, type scales, font stacks |
+| **Material** | Gradients, noise (Perlin, Worley), blur, surfaces |
+| **Elevation** | Shadows, z-index, depth of field, parallax |
+| **Temporal** | Easing (30 functions), spring physics, keyframes |
+| **Reactive** | States (loading, error, success), validation, focus |
+| **Gestural** | Touch, pointer, multi-touch, drag/drop, vim keys |
+| **Haptic** | Vibration patterns, iOS system feedback |
+| **Audio** | Synthesis, effects, analysis, spatial audio |
+| **Spatial** | 3D primitives, PBR materials, XR, scene graphs |
+| **Accessibility** | WAI-ARIA 1.2 roles, states, live regions |
+| **Sensation** | Proprioceptive, environmental, social awareness |
+| **Scheduling** | Time-based primitives |
+| **Epistemic** | Model-level phenomenology |
+| **Brand** | Token composition, theme configuration |
 
-See `docs/SCHEMA.md` for complete pillar enumeration.
+Atoms compose into molecules. Molecules compose into compounds. Compounds compose into brands.
 
-## Core Modules
+---
 
-| Module | Description |
-|--------|-------------|
-| `Hydrogen.Render.Element` | Pure data UI elements |
-| `Hydrogen.Schema.*` | Design system atoms |
-| `Hydrogen.Query` | Data fetching with caching |
-| `Hydrogen.Data.RemoteData` | Lawful Monad for async state |
-| `Hydrogen.Router` | Type-safe routing |
-| `Hydrogen.API.Client` | HTTP client with auth |
-| `Hydrogen.SSG` | Static site generation |
+## Formal Verification
+
+Hydrogen properties are proven in Lean4, not just tested:
+
+```lean
+-- Hue rotation is associative
+theorem rotate_assoc (h : Hue) (a b : Float) :
+  rotate (rotate h a) b = rotate h (a + b)
+
+-- Color conversion roundtrips
+theorem srgb_to_linear_to_srgb (c : SRGB) :
+  linearToSRGB (srgbToLinear c) = c
+
+-- Submodular optimization guarantees
+theorem continuous_greedy_guarantee (F : Set V → ℝ) (k : ℕ) :
+  F(solution) ≥ (1 - 1/e) * F(optimal)
+```
+
+**80 proof files. ~1100 theorems. 0 sorry.**
+
+The type system encodes invariants. The proofs verify properties. Invalid states don't compile.
+
+---
 
 ## Quick Start
 
 ```purescript
 import Hydrogen.Render.Element as E
-import Hydrogen.Query as Q
 import Hydrogen.Data.RemoteData as RD
+import Hydrogen.Query as Q
 
--- Define UI as pure data
-myButton :: forall msg. msg -> String -> E.Element msg
-myButton onClick label =
+-- UI as pure data
+button :: forall msg. msg -> String -> E.Element msg
+button onClick label =
   E.button_
     [ E.onClick onClick
-    , E.class_ "btn btn-primary"
+    , E.class_ "btn"
     ]
     [ E.text label ]
 
@@ -92,83 +131,78 @@ state <- Q.query client
   , fetch: Api.getUser userId
   }
 
--- Combine queries with ado (RemoteData is a lawful Monad)
+-- RemoteData is a lawful Monad
 let dashboard = ado
       user <- userState.data
       posts <- postsState.data
       in { user, posts }
 ```
 
-## Design Principles
+---
 
-### Pure Data Elements
+## Core Modules
 
-UI is described as pure PureScript data, not framework-specific virtual DOM:
+| Module | Purpose |
+|--------|---------|
+| `Hydrogen.Render.Element` | Pure data UI elements |
+| `Hydrogen.Schema.*` | 516 design system atoms |
+| `Hydrogen.Query` | Data fetching, caching, deduplication |
+| `Hydrogen.Data.RemoteData` | Lawful Monad for async state |
+| `Hydrogen.Router` | Type-safe ADT routing |
+| `Hydrogen.API.Client` | HTTP client with auth |
+| `Hydrogen.SSG` | Static site generation |
 
-```purescript
--- This is data, not Halogen HTML
-myCard :: E.Element Msg
-myCard = E.div_
-  [ E.class_ "card" ]
-  [ E.h2_ [] [ E.text "Title" ]
-  , E.p_ [] [ E.text "Content" ]
-  ]
+---
+
+## Development
+
+```bash
+# Enter dev environment (Nix)
+nix develop
+
+# Build PureScript
+spago build
+
+# Build Lean proofs
+lake build
+
+# Run tests
+spago test
 ```
 
-### Bounded Types Everywhere
+### Requirements
 
-All design atoms have defined bounds with explicit behavior:
+- Nix (with flakes enabled)
+- Or manually: PureScript 0.15.15, Node 22, Lean 4.7.0
 
-```purescript
--- Hue wraps: 360 -> 0, -10 -> 350
--- Saturation clamps: 150 -> 100, -10 -> 0
--- No Infinity, no NaN, no undefined
-```
-
-### Lawful Algebra
-
-`RemoteData` is a **lawful Monad**:
-
-```purescript
--- Applicative (parallel)
-ado
-  user <- userState.data
-  posts <- postsState.data
-  in { user, posts }
-
--- Monad (sequential)
-do
-  user <- userState.data
-  posts <- postsState.data
-  pure { user, posts }
-```
-
-### Multi-Target Rendering
-
-Same elements render to different targets:
-
-```purescript
-import Hydrogen.Target.Halogen as TH
-import Hydrogen.Target.Static as TS
-
--- To Halogen for reactive web
-halogenHtml = TH.toHalogen myCard
-
--- To static HTML for SSG
-htmlString = TS.render myCard
-```
+---
 
 ## Documentation
 
-- **[Schema Reference](docs/SCHEMA.md)** - Complete pillar enumeration
-- **[Design Ontology](docs/design-ontology.md)** - Type-safe primitives
-- **[Component Architecture](docs/COMPOUND_ARCHITECTURE.md)** - Schema-native components
-- **[Query Guide](docs/query.md)** - Caching, deduplication, pagination
-- **[Router Guide](docs/router.md)** - Route ADTs, metadata, navigation
-- **[SSG Guide](docs/ssg.md)** - Static generation
-- **[Proofs Guide](docs/PROOFS.md)** - Lean4 formal verification
-- **[Runtime Spec](docs/RUNTIME_SPEC.md)** - Diff/patch runtime architecture
+| Document | Description |
+|----------|-------------|
+| [Schema Reference](docs/SCHEMA.md) | Complete pillar enumeration |
+| [Design Ontology](docs/design-ontology.md) | Type-safe primitives |
+| [Component Architecture](docs/COMPOUND_ARCHITECTURE.md) | Schema-native components |
+| [Query Guide](docs/query.md) | Caching, pagination |
+| [Router Guide](docs/router.md) | Route ADTs, navigation |
+| [Proofs Guide](docs/PROOFS.md) | Lean4 verification |
+| [Roadmap](docs/roadmap.md) | Project status and estimates |
+
+---
+
+## Project Status
+
+Hydrogen is in **alpha**. The Schema is complete. Runtime targets are in progress.
+
+See [roadmap.md](docs/roadmap.md) for detailed status and completion estimates.
+
+---
 
 ## License
 
 MIT
+
+---
+
+<sub>Built for the Continuity Project. Infrastructure for AI autonomy done correctly.</sub>
