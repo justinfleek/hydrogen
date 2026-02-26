@@ -17,11 +17,18 @@
     Type scales must be monotonically increasing. If "h1" is smaller than "h2",
     the visual hierarchy breaks. We prove this by construction.
   
-  Status: FOUNDATIONAL — ZERO SORRY
+  DESIGN DECISION:
+    Font sizes and scale ratios use ℝ (reals) with bounds carried in the
+    structure — same pattern as WorldModel proofs and Palette.lean.
+    NO Float. NO native_decide.
+  
+  Status: FOUNDATIONAL — ZERO SORRY — NO NATIVE_DECIDE
 -/
 
 import Mathlib.Tactic
 import Mathlib.Data.Nat.Basic
+import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Order.GroupWithZero.Unbundled.Basic
 
 namespace Hydrogen.Schema.Brand
 
@@ -147,100 +154,112 @@ Common ratios: 1.125 (major second), 1.25 (major third), 1.333 (perfect fourth),
 1.414 (augmented fourth), 1.5 (perfect fifth), 1.618 (golden ratio).
 
 We model this as a base size and ratio, proving the ratio must be > 1.
+Uses ℝ with bounds carried in the structure — same pattern as WorldModel proofs.
 -/
 
 /-- A positive font size in pixels -/
 structure FontSize where
-  px : Float
+  px : ℝ
   positive : px > 0
-  finite : px.isFinite
-  deriving Repr
+
+namespace FontSize
+
+/-- Standard base size (16px) -/
+noncomputable def base16 : FontSize := ⟨16, by norm_num⟩
+
+/-- 12px size -/
+noncomputable def px12 : FontSize := ⟨12, by norm_num⟩
+
+/-- 14px size -/
+noncomputable def px14 : FontSize := ⟨14, by norm_num⟩
+
+/-- 18px size -/
+noncomputable def px18 : FontSize := ⟨18, by norm_num⟩
+
+/-- 24px size -/
+noncomputable def px24 : FontSize := ⟨24, by norm_num⟩
+
+/-- 32px size -/
+noncomputable def px32 : FontSize := ⟨32, by norm_num⟩
+
+end FontSize
 
 /-- A type scale ratio (must be > 1 for sizes to increase) -/
 structure ScaleRatio where
-  val : Float
+  val : ℝ
   gt_one : val > 1
-  finite : val.isFinite
-  deriving Repr
+
+namespace ScaleRatio
+
+/-- Major second (1.125) -/
+noncomputable def majorSecond : ScaleRatio := ⟨1.125, by norm_num⟩
+
+/-- Major third (1.25) -/
+noncomputable def majorThird : ScaleRatio := ⟨1.25, by norm_num⟩
+
+/-- Perfect fourth (1.333) -/
+noncomputable def perfectFourth : ScaleRatio := ⟨1.333, by norm_num⟩
+
+/-- Perfect fifth (1.5) -/
+noncomputable def perfectFifth : ScaleRatio := ⟨1.5, by norm_num⟩
+
+/-- Golden ratio (1.618) -/
+noncomputable def golden : ScaleRatio := ⟨1.618, by norm_num⟩
+
+/-- A scale ratio is always positive (follows from > 1) -/
+theorem positive (r : ScaleRatio) : r.val > 0 := by linarith [r.gt_one]
+
+end ScaleRatio
 
 /-- A complete type scale -/
 structure TypeScale where
   base : FontSize    -- Base font size (typically 16px)
   ratio : ScaleRatio -- Scale ratio (typically 1.25-1.5)
-  deriving Repr
 
 namespace TypeScale
 
-/-- Convert Int to Float (axiomatized as Float arithmetic is already axiomatic) -/
-def intToFloat (n : Int) : Float :=
-  if n ≥ 0 then Float.ofNat n.toNat else -(Float.ofNat (-n).toNat)
+/-! ### Integer power for type scales
 
-/-- Axiom: intToFloat preserves ordering -/
-axiom intToFloat_lt : ∀ (a b : Int), a < b → intToFloat a < intToFloat b
+We use integer exponents for scale levels (level -2, -1, 0, 1, 2, etc.).
+For ℝ with integer exponent, we use `zpow` which is well-defined and provable.
+-/
 
-/-- Axiom: intToFloat produces finite values -/
-axiom intToFloat_finite : ∀ (n : Int), (intToFloat n).isFinite
-
-/-- Axiom: Float power preserves positivity for positive base and any exponent -/
-axiom float_pow_pos : ∀ (base exp : Float), base > 0 → (Float.pow base exp) > 0
-
-/-- Axiom: Float power is finite for finite inputs -/
-axiom float_pow_finite : ∀ (base exp : Float), base.isFinite → exp.isFinite → 
-  (Float.pow base exp).isFinite
-
-/-- Axiom: Float multiplication preserves positivity -/
-axiom float_mul_pos : ∀ (a b : Float), a > 0 → b > 0 → a * b > 0
-
-/-- Axiom: Float multiplication is finite for finite inputs -/
-axiom float_mul_finite : ∀ (a b : Float), a.isFinite → b.isFinite → (a * b).isFinite
-
-/-- Axiom: ratio > 1 implies ratio > 0 -/
-axiom gt_one_implies_pos : ∀ (x : Float), x > 1 → x > 0
-
-/-- Calculate font size at a given scale level
+/-- Calculate font size at a given scale level using integer power.
     Level 0 = base size
     Level 1 = base * ratio
     Level 2 = base * ratio^2
+    Level -1 = base / ratio
     etc. -/
-def sizeAt (scale : TypeScale) (level : Int) : FontSize :=
-  let multiplier := Float.pow scale.ratio.val (intToFloat level)
+noncomputable def sizeAt (scale : TypeScale) (level : ℤ) : FontSize :=
+  let multiplier := scale.ratio.val ^ level
   let size := scale.base.px * multiplier
-  ⟨size, 
-   float_mul_pos scale.base.px multiplier scale.base.positive 
-     (float_pow_pos scale.ratio.val (intToFloat level) (gt_one_implies_pos scale.ratio.val scale.ratio.gt_one)),
-   float_mul_finite scale.base.px multiplier scale.base.finite
-     (float_pow_finite scale.ratio.val (intToFloat level) scale.ratio.finite 
-       (intToFloat_finite level))⟩
-
-/-- Axiom: pow is monotonic for ratio > 1 -/
-axiom pow_monotonic : ∀ (r : Float) (a b : Float), r > 1 → a < b → 
-  Float.pow r a < Float.pow r b
-
-/-- Axiom: Positive multiplication preserves strict inequality
-    Justification: IEEE 754 multiplication preserves ordering for positive finite floats -/
-axiom float_mul_pos_lt : ∀ (c a b : Float), c > 0 → a < b → c * a < c * b
+  ⟨size, by
+    have h_base_pos := scale.base.positive
+    have h_ratio_pos := ScaleRatio.positive scale.ratio
+    -- ratio^level > 0 for positive ratio
+    have h_mult_pos : multiplier > 0 := zpow_pos h_ratio_pos level
+    exact mul_pos h_base_pos h_mult_pos⟩
 
 /-- Higher levels produce larger sizes (monotonicity) -/
-theorem monotonic (scale : TypeScale) (l1 l2 : Int) (h : l1 < l2) :
+theorem monotonic (scale : TypeScale) (l1 l2 : ℤ) (h : l1 < l2) :
     (sizeAt scale l1).px < (sizeAt scale l2).px := by
   simp only [sizeAt]
-  -- base * ratio^l1 < base * ratio^l2
-  -- Step 1: l1 < l2 implies intToFloat l1 < intToFloat l2
-  have h_float : intToFloat l1 < intToFloat l2 := intToFloat_lt l1 l2 h
-  -- Step 2: ratio > 1 and intToFloat l1 < intToFloat l2 implies ratio^l1 < ratio^l2
-  have h_pow : Float.pow scale.ratio.val (intToFloat l1) < Float.pow scale.ratio.val (intToFloat l2) :=
-    pow_monotonic scale.ratio.val (intToFloat l1) (intToFloat l2) scale.ratio.gt_one h_float
-  -- Step 3: base > 0 and ratio^l1 < ratio^l2 implies base * ratio^l1 < base * ratio^l2
-  exact float_mul_pos_lt scale.base.px _ _ scale.base.positive h_pow
+  have h_base_pos := scale.base.positive
+  have h_ratio_gt_one := scale.ratio.gt_one
+  -- ratio > 1 implies ratio^l1 < ratio^l2 when l1 < l2
+  have h_pow : scale.ratio.val ^ l1 < scale.ratio.val ^ l2 := 
+    zpow_lt_zpow_right₀ h_ratio_gt_one h
+  -- base > 0 and ratio^l1 < ratio^l2 implies base * ratio^l1 < base * ratio^l2
+  exact mul_lt_mul_of_pos_left h_pow h_base_pos
 
 /-- Standard scale levels -/
-def xs (scale : TypeScale) : FontSize := sizeAt scale (-2)
-def sm (scale : TypeScale) : FontSize := sizeAt scale (-1)
-def md (scale : TypeScale) : FontSize := sizeAt scale 0
-def lg (scale : TypeScale) : FontSize := sizeAt scale 1
-def xl (scale : TypeScale) : FontSize := sizeAt scale 2
-def xxl (scale : TypeScale) : FontSize := sizeAt scale 3
-def xxxl (scale : TypeScale) : FontSize := sizeAt scale 4
+noncomputable def xs (scale : TypeScale) : FontSize := sizeAt scale (-2)
+noncomputable def sm (scale : TypeScale) : FontSize := sizeAt scale (-1)
+noncomputable def md (scale : TypeScale) : FontSize := sizeAt scale 0
+noncomputable def lg (scale : TypeScale) : FontSize := sizeAt scale 1
+noncomputable def xl (scale : TypeScale) : FontSize := sizeAt scale 2
+noncomputable def xxl (scale : TypeScale) : FontSize := sizeAt scale 3
+noncomputable def xxxl (scale : TypeScale) : FontSize := sizeAt scale 4
 
 end TypeScale
 
@@ -261,18 +280,17 @@ structure BrandTypography where
   scale : TypeScale
   regularWeight : FontWeight
   boldWeight : FontWeight
-  deriving Repr
 
 namespace BrandTypography
 
 /-- Default typography (Inter family, 1.25 scale) -/
-def default : BrandTypography := {
+noncomputable def default : BrandTypography := {
   headingFamily := ⟨"Inter", by decide⟩
   bodyFamily := ⟨"Inter", by decide⟩
   monoFamily := FontFamily.monospace
   scale := {
-    base := ⟨16.0, by native_decide, by native_decide⟩
-    ratio := ⟨1.25, by native_decide, by native_decide⟩
+    base := FontSize.base16
+    ratio := ScaleRatio.majorThird
   }
   regularWeight := FontWeight.regular
   boldWeight := FontWeight.bold

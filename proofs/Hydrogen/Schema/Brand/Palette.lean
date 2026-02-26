@@ -18,12 +18,16 @@
   
   These invariants are enforced by construction. Invalid palettes cannot exist.
   
-  Status: FOUNDATIONAL - NO SORRY
+  DESIGN DECISION:
+    OKLCH uses continuous values (lightness, chroma, hue). We use ℝ with
+    bounds carried in the type structure — same pattern as WorldModel proofs.
+    NO Float. NO native_decide.
+  
+  Status: FOUNDATIONAL - NO SORRY - NO NATIVE_DECIDE ON FLOAT
 -/
 
 import Mathlib.Tactic
 import Mathlib.Data.List.Basic
-import Mathlib.Data.Finset.Basic
 
 namespace Hydrogen.Schema.Brand
 
@@ -42,38 +46,71 @@ We use OKLCH because:
 1. Perceptually uniform — equal numeric differences = equal perceived differences
 2. Predictable lightness — contrast calculations are reliable
 3. Better than HSL for design work
+
+We model these using ℝ with bounds carried in the structure.
 -/
 
 /-- Lightness in OKLCH (0 to 1) -/
 structure Lightness where
-  val : Float
+  val : ℝ
   nonneg : 0 ≤ val
   le_one : val ≤ 1
-  finite : val.isFinite
-  deriving Repr
+
+namespace Lightness
+
+/-- Zero lightness (black) -/
+def zero : Lightness := ⟨0, le_refl 0, by norm_num⟩
+
+/-- Full lightness (white) -/
+def one : Lightness := ⟨1, by norm_num, le_refl 1⟩
+
+/-- Half lightness -/
+def half : Lightness := ⟨0.5, by norm_num, by norm_num⟩
+
+end Lightness
 
 /-- Chroma in OKLCH (0 to max_chroma, typically ~0.4 for sRGB) -/
 structure Chroma where
-  val : Float
+  val : ℝ
   nonneg : 0 ≤ val
   bounded : val ≤ 0.5  -- Conservative bound covering all sRGB colors
-  finite : val.isFinite
-  deriving Repr
+
+namespace Chroma
+
+/-- Zero chroma (achromatic) -/
+def zero : Chroma := ⟨0, le_refl 0, by norm_num⟩
+
+/-- Maximum chroma -/
+def max : Chroma := ⟨0.5, by norm_num, le_refl 0.5⟩
+
+end Chroma
 
 /-- Hue in OKLCH (0 to 360, wrapping) -/
 structure Hue where
-  val : Float
+  val : ℝ
   nonneg : 0 ≤ val
   lt_360 : val < 360
-  finite : val.isFinite
-  deriving Repr
+
+namespace Hue
+
+/-- Zero hue (red) -/
+def zero : Hue := ⟨0, le_refl 0, by norm_num⟩
+
+/-- Common hue values -/
+def red : Hue := zero
+def yellow : Hue := ⟨60, by norm_num, by norm_num⟩
+def green : Hue := ⟨120, by norm_num, by norm_num⟩
+def cyan : Hue := ⟨180, by norm_num, by norm_num⟩
+def blue : Hue := ⟨240, by norm_num, by norm_num⟩
+def magenta : Hue := ⟨300, by norm_num, by norm_num⟩
+
+end Hue
 
 /-- OKLCH color (perceptually uniform) -/
 structure OKLCH where
   l : Lightness
   c : Chroma
   h : Hue
-  deriving Repr
 
 namespace OKLCH
 
@@ -85,6 +122,12 @@ theorem in_gamut (color : OKLCH) :
   ⟨color.l.nonneg, color.l.le_one, 
    color.c.nonneg, color.c.bounded,
    color.h.nonneg, color.h.lt_360⟩
+
+/-- Black -/
+def black : OKLCH := ⟨Lightness.zero, Chroma.zero, Hue.zero⟩
+
+/-- White -/
+def white : OKLCH := ⟨Lightness.one, Chroma.zero, Hue.zero⟩
 
 end OKLCH
 
@@ -119,7 +162,6 @@ inductive Role where
 structure PaletteEntry where
   color : OKLCH
   role : Role
-  deriving Repr
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SECTION 3: BRAND PALETTE
@@ -145,7 +187,6 @@ structure BrandPalette where
   entries : List PaletteEntry
   has_primary : hasRole entries Role.primary = true
   unique_roles : rolesUnique entries = true
-  deriving Repr
 
 namespace BrandPalette
 
@@ -160,10 +201,8 @@ def primary (palette : BrandPalette) : OKLCH :=
   | none => 
     -- This case is impossible due to has_primary invariant,
     -- but we need to handle it for totality.
-    -- We return a default black color.
-    ⟨⟨0, by native_decide, by native_decide, by native_decide⟩,
-     ⟨0, by native_decide, by native_decide, by native_decide⟩,
-     ⟨0, by native_decide, by native_decide, by native_decide⟩⟩
+    -- We return a default black color with proper proofs.
+    OKLCH.black
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Palette Invariant Proofs
@@ -204,19 +243,35 @@ but lightness difference provides a useful approximation.
 -/
 
 /-- Absolute lightness difference between two colors -/
-def lightnessDiff (c1 c2 : OKLCH) : Float :=
-  if c1.l.val ≥ c2.l.val then c1.l.val - c2.l.val else c2.l.val - c1.l.val
+noncomputable def lightnessDiff (c1 c2 : OKLCH) : ℝ :=
+  |c1.l.val - c2.l.val|
 
 /-- Approximate contrast check using lightness difference
     A difference of 0.4 in OKLCH lightness roughly corresponds to WCAG AA -/
-def hasMinimumContrast (c1 c2 : OKLCH) (minDiff : Float) : Bool :=
+def hasMinimumContrast (c1 c2 : OKLCH) (minDiff : ℝ) : Prop :=
   lightnessDiff c1 c2 ≥ minDiff
 
 /-- WCAG AA minimum lightness difference (approximation) -/
-def wcagAALightnessDiff : Float := 0.4
+def wcagAALightnessDiff : ℝ := 0.4
 
 /-- WCAG AAA minimum lightness difference (approximation) -/
-def wcagAAALightnessDiff : Float := 0.55
+def wcagAAALightnessDiff : ℝ := 0.55
+
+/-- Theorem: lightness difference is always non-negative -/
+theorem lightnessDiff_nonneg (c1 c2 : OKLCH) : 0 ≤ lightnessDiff c1 c2 := by
+  simp only [lightnessDiff]
+  exact abs_nonneg _
+
+/-- Theorem: lightness difference is bounded by 1 -/
+theorem lightnessDiff_bounded (c1 c2 : OKLCH) : lightnessDiff c1 c2 ≤ 1 := by
+  simp only [lightnessDiff]
+  have h1 := c1.l.nonneg
+  have h2 := c1.l.le_one
+  have h3 := c2.l.nonneg
+  have h4 := c2.l.le_one
+  -- |a - b| ≤ 1 when both a, b ∈ [0, 1]
+  rw [abs_le]
+  constructor <;> linarith
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SECTION 5: NEUTRAL SCALE
@@ -232,7 +287,6 @@ Typically 9-11 steps from white to black.
 structure Neutral where
   color : OKLCH
   low_chroma : color.c.val ≤ 0.02  -- Near achromatic
-  deriving Repr
 
 /-- A neutral scale from light to dark -/
 structure NeutralScale where
@@ -240,7 +294,6 @@ structure NeutralScale where
   ordered : ∀ i j (hi : i < steps.length) (hj : j < steps.length), i < j → 
     (steps.get ⟨i, hi⟩).color.l.val ≥ (steps.get ⟨j, hj⟩).color.l.val
   nonempty : steps.length ≥ 2  -- At least light and dark
-  deriving Repr
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- PURESCRIPT CODE GENERATION

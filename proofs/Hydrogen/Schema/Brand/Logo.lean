@@ -216,7 +216,6 @@ structure ClearSpaceMultiplier where
   value : ℝ
   positive : 0 < value
   bounded : value ≤ 10
-  deriving Repr
 
 namespace ClearSpaceMultiplier
 
@@ -260,7 +259,6 @@ structure ClearSpaceReference where
 structure ClearSpaceRule where
   multiplier : ClearSpaceMultiplier
   reference : ClearSpaceReference
-  deriving Repr
 
 namespace ClearSpaceRule
 
@@ -299,7 +297,6 @@ structure PrintSize where
   inches : ℝ
   min_bound : (1 : ℝ) / 10 ≤ inches
   max_bound : inches ≤ 24
-  deriving Repr
 
 namespace PrintSize
 
@@ -369,7 +366,6 @@ end DigitalSize
 structure SizeConstraint where
   printMin : PrintSize
   digitalMin : DigitalSize
-  deriving Repr
 
 namespace SizeConstraint
 
@@ -521,7 +517,6 @@ structure LogoLockup where
   contexts : List UsageContext
   clearSpace : ClearSpaceRule
   minSize : SizeConstraint
-  deriving Repr
 
 namespace LogoLockup
 
@@ -661,7 +656,6 @@ structure LogoSystem where
   primary : LogoLockup
   alternates : List LogoLockup
   errors : LogoErrorSet
-  deriving Repr
 
 namespace LogoSystem
 
@@ -679,7 +673,7 @@ def forContext (ls : LogoSystem) (ctx : UsageContext) : List LogoLockup :=
 
 /-- The system always has at least one lockup (the primary) -/
 theorem has_primary (ls : LogoSystem) : (allLockups ls).length ≥ 1 := by
-  simp [allLockups]
+  simp only [allLockups, List.length_cons]
   omega
 
 /-- The primary lockup has valid variants -/

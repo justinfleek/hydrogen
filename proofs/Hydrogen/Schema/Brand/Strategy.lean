@@ -334,7 +334,7 @@ def single (name desc : String) (motivations : List String) : Option TargetCusto
 def primary (tc : TargetCustomers) : CustomerSegment :=
   match tc.segmentList with
   | s :: _ => s
-  | [] => ⟨"User", "Target user", [], by native_decide, by native_decide⟩  -- Impossible
+  | [] => ⟨"User", "Target user", [], by decide, by decide⟩  -- Impossible
 
 /-- Brand always has at least one target segment -/
 theorem always_has_segment (tc : TargetCustomers) : tc.segmentList.length > 0 := tc.nonempty
