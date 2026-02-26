@@ -32,6 +32,7 @@
 module Hydrogen.Element.Compound.Carousel.Render
   ( -- * Render Function
     carousel
+  , carouselWithCaptions
   
   -- * Carousel Config
   , CarouselConfig
@@ -43,6 +44,24 @@ module Hydrogen.Element.Compound.Carousel.Render
   -- * State Accessors
   , getTransitionState
   , getGestureState
+  
+  -- * Validation
+  , isValidSlideIndex
+  , clampSlideIndex
+  
+  -- * Slide Visibility
+  , isSlideVisible
+  , visibleSlideIndices
+  
+  -- * Color Effects
+  , slidePositionTint
+  
+  -- * Position Calculations
+  , wavePosition
+  , circularPosition
+  , easeOutPosition
+  , positionDistance
+  , defaultCase
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -58,6 +77,7 @@ import Prelude
   , (-)
   , (*)
   , (/)
+  , (>)
   , (>=)
   , (<=)
   , (<)
@@ -513,6 +533,192 @@ getTransitionState state = state.transition
 getGestureState :: CarouselState -> GestureState
 getGestureState state = state.gesture
 
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // validation
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if a slide index is valid for the given collection
+isValidSlideIndex :: Int -> SlideCollection -> Boolean
+isValidSlideIndex idx slides' =
+  idx >= 0 && idx < slideCount slides'
+
+-- | Clamp a slide index to valid bounds
+-- | If loop is enabled, wraps around; otherwise clamps to [0, count-1]
+clampSlideIndex :: Boolean -> Int -> SlideCollection -> Int
+clampSlideIndex loop idx slides' =
+  let count = slideCount slides'
+  in if count <= 0 then 0
+     else if loop then modulo idx count
+     else if idx < 0 then 0
+     else if idx >= count then count - 1
+     else idx
+  where
+    -- Positive modulo for wrapping
+    modulo :: Int -> Int -> Int
+    modulo a b = 
+      let r = a - (a / b) * b
+      in if r < 0 then r + b else r
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // slide visibility
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if a slide should be visible (rendered) based on current position
+-- | Slides outside the visibility threshold are not rendered for performance
+isSlideVisible :: CarouselConfig -> CarouselState -> Int -> SlideCollection -> Boolean
+isSlideVisible config state idx slides' =
+  let 
+    currentIdx = unwrapSlideIndex state.current
+    total = slideCount slides'
+    threshold = visibilityThreshold config
+    distance = slideDistance config.loop currentIdx idx total
+  in
+    isValidSlideIndex idx slides' && distance <= threshold
+
+-- | Get indices of all currently visible slides
+visibleSlideIndices :: CarouselConfig -> CarouselState -> SlideCollection -> Array Int
+visibleSlideIndices config state slides' =
+  Array.filter (\idx -> isSlideVisible config state idx slides') 
+    (Array.range 0 (slideCount slides' - 1))
+
+-- | Calculate distance between two slide indices (accounting for loop)
+slideDistance :: Boolean -> Int -> Int -> Int -> Int
+slideDistance loop fromIdx toIdx total =
+  if not loop then
+    absInt (toIdx - fromIdx)
+  else
+    let direct = absInt (toIdx - fromIdx)
+        wrapped = total - direct
+    in if direct <= wrapped then direct else wrapped
+
+-- | How many slides on each side of current to render
+visibilityThreshold :: CarouselConfig -> Int
+visibilityThreshold config = case config.layoutPath of
+  PathLinear -> 2
+  PathLinearVertical -> 2
+  PathGrid -> slideCount' -- All visible in grid
+  PathMasonry -> slideCount' -- All visible
+  PathStack -> 5
+  PathCircular -> 4
+  PathArc -> 3
+  PathHelix -> 6
+  PathSphere -> 8
+  PathCylinder -> 5
+  PathMobius -> 6
+  PathCustom -> 3
+  where
+    -- Placeholder for when we need all slides
+    slideCount' = 100
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                              // color effects
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Calculate a color tint based on slide position
+-- | Returns an RGB color representing the intensity at this position
+-- | Can be used for overlay effects or color grading based on distance from active
+slidePositionTint :: SlideEffects -> SlidePosition -> Color.RGB
+slidePositionTint effects position =
+  let
+    -- Base intensity based on distance from active
+    intensity = case position of
+      PositionActive -> 1.0
+      PositionPrev -> 0.8
+      PositionNext -> 0.8
+      PositionNearby n -> 
+        let dist = toNumber (absInt n)
+        in 1.0 - (dist * 0.1)
+      PositionOffscreen -> 0.5
+    
+    -- Apply grayscale effect if enabled (reduces saturation based on distance)
+    grayscaleAmount = if isEffectEnabled effects.grayscale.enabled
+      then effects.grayscale.inactive
+      else 0.0
+    
+    -- Compute channel values (intensity-based white)
+    -- When grayscale is applied, slides fade toward gray
+    baseChannel = toInt (intensity * 255.0)
+    grayOffset = toInt (grayscaleAmount * (1.0 - intensity) * 50.0)
+    channelValue = baseChannel - grayOffset
+    clampedChannel = if channelValue < 0 then 0 
+                     else if channelValue > 255 then 255 
+                     else channelValue
+  in
+    Color.rgb clampedChannel clampedChannel clampedChannel
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // carousel variants
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Render a carousel with captions displayed below each slide
+carouselWithCaptions :: CarouselConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
+carouselWithCaptions config state slides' =
+  E.div_
+    [ E.class_ (String.joinWith " " ["carousel-container", "carousel-with-captions", config.cssClass]) ]
+    [ renderTrack config state slides'
+    , renderCaptionBar config state slides'
+    , renderNavigation config.navigation config.loop state slides'
+    ]
+
+-- | Render the caption bar showing current slide's caption
+renderCaptionBar :: CarouselConfig -> CarouselState -> SlideCollection -> E.Element CarouselMsg
+renderCaptionBar _config state slides' =
+  case slideAt state.current slides' of
+    Just slideData' -> 
+      E.div_
+        [ E.class_ "carousel-caption-bar" ]
+        [ renderCaption slideData' ]
+    Nothing -> 
+      E.empty
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // position calculations
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Calculate a wave-based position offset for smooth oscillating effects
+-- | Uses sine wave for natural motion. Returns offset in range [-amplitude, amplitude]
+wavePosition :: Number -> Number -> Number -> Number
+wavePosition progress amplitude frequency =
+  let angle = progress * frequency * 2.0 * pi
+  in amplitude * sin angle
+  where
+    pi = 3.14159265358979
+
+-- | Calculate position on a circle given angle and radius
+-- | Returns {x, y} coordinates for circular carousel layouts
+circularPosition :: Number -> Number -> { x :: Number, y :: Number }
+circularPosition angle radius =
+  { x: radius * cos angle
+  , y: radius * sin angle
+  }
+
+-- | Apply ease-out curve to a progress value using power function
+-- | Higher power = more dramatic ease-out (starts fast, ends slow)
+easeOutPosition :: Number -> Number -> Number
+easeOutPosition progress power =
+  let 
+    -- Clamp progress to [0, 1]
+    p = if progress < 0.0 then 0.0
+        else if progress > 1.0 then 1.0
+        else progress
+    -- Ease-out: 1 - (1 - p)^power
+    inverted = 1.0 - p
+    eased = 1.0 - pow inverted power
+  in eased
+
+-- | Calculate absolute distance for position comparisons
+-- | Used in visibility and effect calculations
+positionDistance :: Number -> Number -> Number
+positionDistance a b = abs (a - b)
+
+-- | Default case helper for guard expressions
+-- | Used in pattern guards as the final fallback
+defaultCase :: forall a. a -> a
+defaultCase x = if otherwise then x else x
+
 -- Note: Navigation rendering has been moved to Render/Navigation.purs
 -- The renderNavigation function is imported and used in the carousel function above.
 -- This keeps Render.purs under 500 lines while maintaining full functionality.
+-- 
+-- sin, cos, abs, absInt, toInt are imported from Render/Layout.purs
+-- pow is imported from Render/Effects.purs

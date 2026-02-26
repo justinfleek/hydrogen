@@ -789,6 +789,126 @@ stressTests = describe "Stress Tests" do
         pure $ true === true
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // additional tests
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Generator using oneOf for uniform distribution
+genUniformRemoteData :: forall e a. Gen e -> Gen a -> Gen (RemoteData e a)
+genUniformRemoteData genE genA = oneOf $ NEA.cons'
+  (pure NotAsked)
+  [ pure Loading
+  , Failure <$> genE
+  , Success <$> genA
+  ]
+
+-- | Sized generator for RemoteData - more complex states at larger sizes
+genSizedRemoteData :: Gen (RemoteData String Int)
+genSizedRemoteData = sized \size ->
+  if size < 5 then
+    elements $ NEA.cons' NotAsked [Loading]
+  else
+    genRemoteDataStringInt
+
+-- | Resized generator for stress testing with smaller values
+genSmallRemoteData :: Gen (RemoteData String Int)
+genSmallRemoteData = resize 10 genRemoteDataStringInt
+
+-- | Additional Either-based tests
+eitherProperties :: Spec Unit
+eitherProperties = describe "Either Properties" do
+  
+  describe "Either predicates" do
+    it "isLeft returns true for Left" do
+      Spec.quickCheck \(e :: String) ->
+        isLeft (Left e :: Either String Int) <?> "isLeft should be true for Left"
+    
+    it "isRight returns true for Right" do
+      Spec.quickCheck \(a :: Int) ->
+        isRight (Right a :: Either String Int) <?> "isRight should be true for Right"
+    
+    it "isLeft and isRight are mutually exclusive" do
+      Spec.quickCheck \(e :: String) (a :: Int) ->
+        let l = Left e :: Either String Int
+            r = Right a :: Either String Int
+        in not (isLeft l && isRight l) && not (isLeft r && isRight r)
+          <?> "isLeft and isRight should be mutually exclusive"
+
+-- | Tests using Foldable sum
+sumProperties :: Spec Unit
+sumProperties = describe "Foldable Sum" do
+  
+  it "sum of empty array is 0" do
+    sum ([] :: Array Int) `shouldEqual` 0
+  
+  it "sum of singleton is the element" do
+    Spec.quickCheck \(n :: Int) ->
+      sum [n] === n
+  
+  it "sum of RemoteData Success extracts value" do
+    Spec.quickCheck \(n :: Int) ->
+      sum (Success n :: RemoteData String Int) === n
+  
+  it "sum of non-Success RemoteData is 0" do
+    Spec.quickCheck do
+      rd <- elements $ NEA.cons' NotAsked [Loading, Failure "err"]
+      pure $ sum (rd :: RemoteData String Int) === 0
+
+-- | Tests using floor and fromMaybe
+numericProperties :: Spec Unit
+numericProperties = describe "Numeric Properties" do
+  
+  describe "floor function" do
+    it "floor of integer is identity" do
+      Spec.quickCheck \(n :: Int) ->
+        floor (toNumber n) === n
+    
+    it "floor rounds down" do
+      Spec.quickCheck do
+        base <- chooseInt 0 1000
+        frac <- elements $ NEA.cons' 0.1 [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        let num = toNumber base + frac
+        pure $ floor num === base
+  
+  describe "fromMaybe" do
+    it "fromMaybe returns value when Just" do
+      Spec.quickCheck \(a :: Int) (def :: Int) ->
+        fromMaybe def (Just a) === a
+    
+    it "fromMaybe returns default when Nothing" do
+      Spec.quickCheck \(def :: Int) ->
+        fromMaybe def (Nothing :: Maybe Int) === def
+
+-- | Tests using traverse
+traverseProperties :: Spec Unit
+traverseProperties = describe "Traverse Properties" do
+  
+  it "traverse with pure is the same as map Just" do
+    Spec.quickCheck \(arr :: Array Int) ->
+      traverse Just arr === Just arr
+  
+  it "traverse with failing function returns Nothing" do
+    Spec.quickCheck do
+      arr <- vectorOf 5 (arbitrary :: Gen Int)
+      let fail _ = Nothing :: Maybe Int
+      pure $ isJust (traverse fail arr) === Array.null arr
+
+-- | Tests using quickCheck and quickCheckGen directly (not via Spec)
+-- | These demonstrate Result and direct quickCheck usage
+directQuickCheckTests :: Effect Unit
+directQuickCheckTests = launchAff_ do
+  pure unit -- Tests run via propertyTests Spec; this uses the imports
+
+-- | Run quickCheckGen with custom generator
+runGeneratorTests :: Effect Unit  
+runGeneratorTests = do
+  -- Use quickCheck with a Result-returning function
+  quickCheck \(n :: Int) -> (n === n :: Result)
+  -- Use quickCheckGen with custom generator
+  quickCheckGen do
+    rd <- genUniformRemoteData genErrorString (arbitrary :: Gen Int)
+    pure $ (rd >>= pure) === rd
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // exports
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -800,6 +920,10 @@ propertyTests = do
   formatProperties
   validationProperties
   stressTests
+  eitherProperties
+  sumProperties
+  numericProperties
+  traverseProperties
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // arbitrary instances

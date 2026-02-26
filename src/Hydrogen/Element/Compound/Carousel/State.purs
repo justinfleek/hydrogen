@@ -46,6 +46,13 @@ module Hydrogen.Element.Compound.Carousel.State
   , totalSlides
   , isFirstSlide
   , isLastSlide
+  
+  -- * Autoplay Mode Queries
+  , isContentAwareAutoplay
+  , isAdaptiveAutoplay
+  , isVisibilityBasedAutoplay
+  , isFocusBasedAutoplay
+  , isRetinalFocusAutoplay
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -202,3 +209,42 @@ isFirstSlide s = unwrapSlideIndex s.current == 0
 -- | Check if on last slide
 isLastSlide :: CarouselState -> Boolean
 isLastSlide s = unwrapSlideIndex s.current == s.total - 1
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // autoplay mode queries
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if autoplay is content-aware mode
+-- | Content-aware autoplay adjusts timing based on content type (video vs image)
+isContentAwareAutoplay :: AutoplayState -> Boolean
+isContentAwareAutoplay s = case s.mode of
+  AutoplayContentAware -> true
+  _ -> false
+
+-- | Check if autoplay is adaptive mode
+-- | Adaptive autoplay learns from user behavior
+isAdaptiveAutoplay :: AutoplayState -> Boolean
+isAdaptiveAutoplay s = case s.mode of
+  AutoplayAdaptive -> true
+  _ -> false
+
+-- | Check if autoplay is visibility-based
+-- | Visibility-based autoplay only plays when carousel is visible
+isVisibilityBasedAutoplay :: AutoplayState -> Boolean
+isVisibilityBasedAutoplay s = case s.mode of
+  AutoplayOnVisible -> true
+  _ -> false
+
+-- | Check if autoplay is focus-based
+-- | Focus-based autoplay only plays when carousel has focus
+isFocusBasedAutoplay :: AutoplayState -> Boolean
+isFocusBasedAutoplay s = case s.mode of
+  AutoplayOnFocus -> true
+  _ -> false
+
+-- | Check if autoplay is retinal-focus based
+-- | Retinal-focus autoplay uses gaze detection for optimal timing
+isRetinalFocusAutoplay :: AutoplayState -> Boolean
+isRetinalFocusAutoplay s = case s.mode of
+  AutoplayOnRetinalFocus -> true
+  _ -> false

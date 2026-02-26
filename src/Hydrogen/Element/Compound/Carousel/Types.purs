@@ -145,6 +145,16 @@ module Hydrogen.Element.Compound.Carousel.Types
       , StopAutoplay
       , ToggleAutoplay
       )
+  
+  -- * Transition Bounds
+  , firstTransition
+  , lastTransition
+  
+  -- * Slide Index Validation
+  , isValidSlide
+  , slideIndexEq
+  , minSlideIndex
+  , slideIndexInBounds
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -505,3 +515,36 @@ instance showCarouselMsg :: Show CarouselMsg where
   show StartAutoplay = "StartAutoplay"
   show StopAutoplay = "StopAutoplay"
   show ToggleAutoplay = "ToggleAutoplay"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                            // utility functions
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Get the first (simplest) transition kind
+-- | Useful for defaulting when no transition is desired
+firstTransition :: TransitionKind
+firstTransition = bottom
+
+-- | Get the last (most complex) transition kind
+-- | Useful for getting the bounds of transition options
+lastTransition :: TransitionKind
+lastTransition = top
+
+-- | Check if a slide index is valid (>= 0) for navigation
+-- | Returns true if the raw index is non-negative
+isValidSlide :: SlideIndex -> Boolean
+isValidSlide idx = unwrapSlideIndex idx >= 0
+
+-- | Check if two slide indices point to the same slide
+slideIndexEq :: SlideIndex -> SlideIndex -> Boolean
+slideIndexEq a b = unwrapSlideIndex a == unwrapSlideIndex b
+
+-- | Get the lesser of two slide indices
+-- | Useful for determining which slide comes first
+minSlideIndex :: SlideIndex -> SlideIndex -> SlideIndex
+minSlideIndex a b = slideIndex (min (unwrapSlideIndex a) (unwrapSlideIndex b))
+
+-- | Check if a slide index is within a maximum bound
+-- | Useful for capping navigation to valid ranges
+slideIndexInBounds :: SlideIndex -> Int -> Boolean
+slideIndexInBounds idx maxIdx = unwrapSlideIndex idx <= maxIdx

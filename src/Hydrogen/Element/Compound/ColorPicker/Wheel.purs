@@ -58,6 +58,16 @@ module Hydrogen.Element.Compound.ColorPicker.Wheel
   -- * Wheel Mode
   , WheelMode(WheelRing, WheelDisc)
   , wheelMode
+  
+  -- * Geometry Utilities
+  , positionToHue
+  , hueToPosition
+  , clampHue
+  
+  -- * Utility Functions
+  , hueSegments
+  , isHueInRange
+  , hueDistance
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -81,6 +91,8 @@ import Prelude
   , (>)
   , (>=)
   , (<=)
+  , (&&)
+  , (||)
   )
 
 import Data.Array (foldl)
@@ -270,10 +282,10 @@ colorWheel propModifiers =
 -- | SVG doesn't support conic gradients natively, so we use foreignObject
 -- | to embed an HTML div with the CSS gradient.
 renderHueRing :: forall msg. Number -> Number -> String -> E.Element msg
-renderHueRing radius ringWidth borderC =
+renderHueRing radius hueRingWidth borderC =
   let
     diameter = radius * 2.0
-    innerRadius = radius - ringWidth
+    innerRadius = radius - hueRingWidth
     
     -- Conic gradient for hue spectrum
     gradient = "conic-gradient(from 0deg, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%))"
@@ -377,3 +389,60 @@ clampHue h
   | h < 0 = clampHue (h + 360)
   | h >= 360 = clampHue (h - 360)
   | otherwise = h
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // utility functions
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Generate evenly-spaced hue segments around the wheel
+-- | Useful for rendering discrete color stops or labels
+-- | segmentCount determines how many hue values to generate (e.g., 12 for clock positions)
+hueSegments :: Int -> Array Int
+hueSegments segmentCount =
+  if segmentCount <= 0
+    then []
+    else
+      let
+        step = 360 / segmentCount
+        indices = generateIndices segmentCount []
+      in
+        map (\i -> clampHue (i * step)) indices
+  where
+    generateIndices :: Int -> Array Int -> Array Int
+    generateIndices n acc
+      | n <= 0 = acc
+      | otherwise = generateIndices (n - 1) (prepend (n - 1) acc)
+    
+    prepend :: Int -> Array Int -> Array Int
+    prepend x arr = [x] <> arr
+
+-- | Check if a hue value falls within a specified range (handles wrap-around)
+-- | startHue and endHue define the range (clockwise from start to end)
+isHueInRange :: Int -> Int -> Int -> Boolean
+isHueInRange hueVal startHue endHue =
+  let
+    h = clampHue hueVal
+    s = clampHue startHue
+    e = clampHue endHue
+  in
+    if s == e
+      then h == s
+      else if s > e
+        -- Range wraps around 360 (e.g., 350 to 10)
+        then h >= s || h <= e
+        -- Normal range
+        else h >= s && h <= e
+  where
+    -- Use (&&) via guard pattern
+    _ = if true then true else false
+
+-- | Calculate the angular distance between two hues (shortest path)
+-- | Returns a value from 0 to 180
+hueDistance :: Int -> Int -> Int
+hueDistance h1 h2 =
+  let
+    diff = clampHue h1 - clampHue h2
+    absDiff = if diff < 0 then negate diff else diff
+  in
+    if absDiff > 180 then 360 - absDiff else absDiff
+

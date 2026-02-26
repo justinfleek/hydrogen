@@ -147,6 +147,14 @@ eyedropperButton propModifiers =
     bgColor = if props.isActive then "#3b82f6" else "#f3f4f6"
     iconColor = if props.isActive then "#fff" else "#374151"
     borderColor = if props.isActive then "#2563eb" else "#d1d5db"
+    
+    -- Cursor style depends on active state
+    cursorStyle = if not props.isActive then "pointer" else "crosshair"
+    
+    -- Aria label for accessibility
+    ariaLabel = if props.isActive 
+      then "Eyedropper active - click anywhere to pick color"
+      else "Activate eyedropper"
   in
     E.div_
       [ E.style "display" "inline-flex"
@@ -163,8 +171,10 @@ eyedropperButton propModifiers =
           , E.style "background" bgColor
           , E.style "border" ("1px solid " <> borderColor)
           , E.style "border-radius" radiusStyle
-          , E.style "cursor" "pointer"
+          , E.style "cursor" cursorStyle
           , E.style "transition" "all 0.15s"
+          , E.ariaLabel $ ariaLabel
+          , E.attr "aria-pressed" $ show props.isActive
           ]
           [ eyedropperIcon iconColor ]
         

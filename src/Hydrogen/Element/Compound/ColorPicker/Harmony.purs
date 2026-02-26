@@ -57,6 +57,11 @@ module Hydrogen.Element.Compound.ColorPicker.Harmony
   -- * Utility
   , harmonyColors
   , harmonyName
+  , harmonyAngleOffset
+  , harmonySaturationWeight
+  , harmonyBaseHue
+  , harmonyBaseSaturation
+  , harmonyAngularDistance
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -73,9 +78,14 @@ import Prelude
   , ($)
   , (-)
   , (+)
+  , (<)
+  , (>)
+  , (/)
+  , (*)
   )
 
 import Data.Array (foldl)
+import Data.Array as Array
 import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Render.Element as E
@@ -115,6 +125,64 @@ instance showHarmonyType :: Show HarmonyType where
 -- | Get display name for harmony type
 harmonyName :: HarmonyType -> String
 harmonyName = show
+
+-- | Calculate the angular offset for each color in a harmony
+-- | Returns the hue offset from base in degrees for each color
+-- | Useful for visualizing harmony relationships on a color wheel
+harmonyAngleOffset :: HarmonyType -> Array Int
+harmonyAngleOffset Complementary = [0, 180]
+harmonyAngleOffset Analogous = [negate 30, 0, 30]
+harmonyAngleOffset Triadic = [0, 120, 240]
+harmonyAngleOffset SplitComplementary = [0, 150, 210]
+harmonyAngleOffset Tetradic = [0, 60, 180, 240]
+harmonyAngleOffset Square = [0, 90, 180, 270]
+harmonyAngleOffset Monochromatic = [0, 0, 0, 0, 0]
+
+-- | Calculate a weighted saturation factor for a harmony type
+-- | Returns a weight from 0.85 to 1.0 based on the harmony's angular spread
+-- | Wider spreads (like complementary) get higher visual weight
+harmonySaturationWeight :: HarmonyType -> Number
+harmonySaturationWeight harmony =
+  let
+    -- Get the maximum angular spread for this harmony
+    offsets = harmonyAngleOffset harmony
+    maxOffset = findMaxOffset offsets 0
+    -- Normalize: 0° spread = 0.85, 180° spread = 1.0
+    weight = 0.85 + (intToNumber maxOffset / 180.0 * 0.15)
+  in
+    weight
+  where
+    findMaxOffset :: Array Int -> Int -> Int
+    findMaxOffset arr currentMax =
+      case Array.uncons arr of
+        Nothing -> currentMax
+        Just { head, tail } ->
+          let absVal = if head < 0 then negate head else head
+              newMax = if absVal > currentMax then absVal else currentMax
+          in findMaxOffset tail newMax
+    
+    intToNumber :: Int -> Number
+    intToNumber n = Hue.toNumber $ Hue.hue (if n > 359 then 359 else if n < 0 then 0 else n)
+
+-- | Get raw hue value from an HSL color for calculations
+-- | Useful for computing custom harmony relationships
+harmonyBaseHue :: HSL.HSL -> Int
+harmonyBaseHue color = Hue.unwrap $ HSL.hue color
+
+-- | Get raw saturation value from an HSL color
+-- | Useful for determining if harmony adjustments are needed
+harmonyBaseSaturation :: HSL.HSL -> Int
+harmonyBaseSaturation color = Sat.unwrap $ HSL.saturation color
+
+-- | Calculate angular distance between two hues in a harmony
+-- | Returns the absolute difference in degrees (0-180)
+harmonyAngularDistance :: Int -> Int -> Int
+harmonyAngularDistance hue1 hue2 =
+  let
+    diff = hue1 - hue2
+    absDiff = if diff < 0 then negate diff else diff
+  in
+    if absDiff > 180 then 360 - absDiff else absDiff
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // props

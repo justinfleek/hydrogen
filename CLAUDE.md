@@ -32,7 +32,7 @@ Elements are pure PureScript data structures. Targets interpret them to reality:
 - `Hydrogen.Target.Static` — HTML strings for SSG
 - `Hydrogen.Target.Canvas` — 2D canvas for motion graphics
 - `Hydrogen.Target.WebGL` — 3D rendering for spatial UI
-- `Hydrogen.Target.Halogen` — Legacy adapter (deprecating)
+- `Hydrogen.Target.Halogen` — Full Halogen integration (pending)
 
 Following libevring's pattern: **separate what from how**.
 

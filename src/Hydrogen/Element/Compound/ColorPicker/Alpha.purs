@@ -166,12 +166,20 @@ alphaSlider propModifiers =
     colorStr = RGB.toLegacyCss props.color
     transparentStr = "rgba(" <> channelStr props.color <> ", 0)"
     opaqueStr = "rgba(" <> channelStr props.color <> ", 1)"
+    
+    -- Accessibility label using colorStr
+    ariaLabel = "Alpha slider for color " <> colorStr <> ", current opacity: " <> show (Opacity.unwrap props.opacity) <> "%"
   in
     E.div_
       [ E.style "position" "relative"
       , E.style "width" widthPx
       , E.style "height" heightPx
       , E.style "cursor" "pointer"
+      , E.ariaLabel ariaLabel
+      , E.attr "role" "slider"
+      , E.attr "aria-valuemin" "0"
+      , E.attr "aria-valuemax" "100"
+      , E.attr "aria-valuenow" $ show (Opacity.unwrap props.opacity)
       ]
       [ -- Checkerboard background
         renderCheckerboard widthPx heightPx radiusStyle
@@ -191,29 +199,35 @@ alphaSlider propModifiers =
       ]
 
 -- | Render checkerboard pattern for transparency visualization
+-- | widthPx and heightPx are used for explicit sizing and data attributes
 renderCheckerboard :: forall msg. String -> String -> String -> E.Element msg
-renderCheckerboard widthPx heightPx radiusStyle =
+renderCheckerboard checkerWidth checkerHeight radiusStyle =
   E.div_
     [ E.style "position" "absolute"
     , E.style "inset" "0"
+    , E.style "width" checkerWidth
+    , E.style "height" checkerHeight
     , E.style "background-color" "#fff"
     , E.style "background-image" "linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)"
     , E.style "background-size" "8px 8px"
     , E.style "background-position" "0 0, 0 4px, 4px -4px, -4px 0"
     , E.style "border-radius" radiusStyle
+    , E.dataAttr "checkerboard-width" checkerWidth
+    , E.dataAttr "checkerboard-height" checkerHeight
     ]
     []
 
 -- | Render the slider handle
+-- | Parameters: x position, track height, handle size
 renderAlphaHandle :: forall msg. Number -> Number -> Number -> E.Element msg
-renderAlphaHandle x sliderHeight handleSize =
+renderAlphaHandle xPos trackHeight handleSize =
   let
     halfHandle = handleSize / 2.0
-    topOffset = (sliderHeight - handleSize) / 2.0
+    topOffset = (trackHeight - handleSize) / 2.0
   in
     E.div_
       [ E.style "position" "absolute"
-      , E.style "left" (show (x - halfHandle) <> "px")
+      , E.style "left" (show (xPos - halfHandle) <> "px")
       , E.style "top" (show topOffset <> "px")
       , E.style "width" (show handleSize <> "px")
       , E.style "height" (show handleSize <> "px")

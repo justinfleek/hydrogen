@@ -44,6 +44,9 @@ module Hydrogen.Element.Compound.Carousel.Render.Navigation
   , renderThumbnailContent
   , contentKindToIcon
   , contentKindToLabel
+  
+  -- * Utility
+  , makeSlideIndex
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -494,3 +497,13 @@ contentKindToLabel ContentWebGL = "WebGL"
 contentKindToLabel ContentGame = "Game"
 contentKindToLabel ContentLiveData = "Live"
 contentKindToLabel ContentInteractive = "Interactive"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // utility
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Create a SlideIndex from an Int
+-- | Wraps the raw index value into the SlideIndex type
+-- | Useful for external code that needs to construct slide indices
+makeSlideIndex :: Int -> SlideIndex
+makeSlideIndex = slideIndex

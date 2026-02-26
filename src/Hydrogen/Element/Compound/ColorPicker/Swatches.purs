@@ -55,6 +55,11 @@ module Hydrogen.Element.Compound.ColorPicker.Swatches
   , materialAccent
   , tailwindGrays
   , webSafeColors
+  
+  -- * Utility Functions
+  , swatchCount
+  , swatchColors
+  , averageOpacity
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -68,6 +73,8 @@ import Prelude
   , (<>)
   , ($)
   , (/)
+  , (+)
+  , (==)
   )
 
 import Data.Array (foldl, length, mapWithIndex)
@@ -217,7 +224,7 @@ swatchRow propModifiers =
 
 -- | Render a single swatch
 renderSwatch :: forall msg. SwatchGridProps msg -> Int -> SwatchData -> E.Element msg
-renderSwatch props idx swatchData =
+renderSwatch props swatchIndex swatchData =
   let
     sizePx = show (SwatchDim.swatchSizeValue props.swatchSize) <> "px"
     
@@ -237,6 +244,7 @@ renderSwatch props idx swatchData =
       [ E.style "position" "relative"
       , E.style "width" sizePx
       , E.style "height" sizePx
+      , E.dataAttr "swatch-index" $ show swatchIndex
       ]
       [ -- Checkerboard layer (for transparency)
         E.div_
@@ -361,3 +369,38 @@ webSafeColors =
   , swatch (RGB.rgba 0 128 128 100)
   , swatch (RGB.rgba 128 0 128 100)
   ]
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                          // utility functions
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Get the number of swatches in a palette
+-- | Useful for validation and layout calculations
+swatchCount :: Array SwatchData -> Int
+swatchCount palette = length palette
+
+-- | Extract just the colors from a swatch palette
+-- | Useful for color analysis or export
+swatchColors :: Array SwatchData -> Array RGB.RGBA
+swatchColors palette = map (\s -> s.color) palette
+
+-- | Calculate the average opacity across all swatches
+-- | Returns a value from 0.0 to 1.0
+-- | Useful for determining if a palette is mostly transparent
+averageOpacity :: Array SwatchData -> Number
+averageOpacity palette =
+  let
+    count = length palette
+  in
+    if count == 0
+      then 1.0
+      else
+        let
+          opacities = map (\s -> Opacity.toUnitInterval (RGB.alpha s.color)) palette
+          totalOpacity = foldl addNum 0.0 opacities
+        in
+          totalOpacity / Int.toNumber count
+  where
+    addNum :: Number -> Number -> Number
+    addNum a b = a + b
+

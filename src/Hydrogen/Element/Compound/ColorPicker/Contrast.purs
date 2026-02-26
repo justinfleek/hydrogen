@@ -55,7 +55,6 @@ import Prelude
 
 import Data.Array (foldl)
 import Data.Int (toNumber, floor) as Int
-import Data.Maybe (Maybe(Nothing, Just))
 import Data.Number (pow)
 
 import Hydrogen.Render.Element as E
@@ -89,6 +88,9 @@ instance showWCAGGrade :: Show WCAGGrade where
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- | Contrast checker properties
+-- | Note: msg parameter kept for consistency with other component prop types,
+-- | even though contrast checker has no event handlers currently
+type ContrastProps :: forall k. k -> Type
 type ContrastProps msg =
   { foreground :: RGB.RGB
   , background :: RGB.RGB
@@ -97,6 +99,7 @@ type ContrastProps msg =
   }
 
 -- | Property modifier
+type ContrastProp :: forall k. k -> Type
 type ContrastProp msg = ContrastProps msg -> ContrastProps msg
 
 -- | Default properties
@@ -213,7 +216,7 @@ contrastChecker propModifiers =
     -- Format ratio to 2 decimal places
     ratioStr = formatRatio ratio
     
-    -- Grade color
+    -- Grade color for visual indication
     gradeColor = case grade of
       AAA -> "#22c55e"
       AA -> "#84cc16"
@@ -232,12 +235,13 @@ contrastChecker propModifiers =
       [ -- Preview
         renderPreview props
         
-        -- Ratio display
+        -- Ratio display with grade color indicator
       , if props.showRatio
           then E.div_
             [ E.style "font-size" "24px"
             , E.style "font-weight" "600"
             , E.style "text-align" "center"
+            , E.style "color" gradeColor
             ]
             [ E.text (ratioStr <> ":1") ]
           else E.span_ [] []

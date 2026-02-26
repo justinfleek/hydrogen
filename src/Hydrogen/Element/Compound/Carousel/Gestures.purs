@@ -30,6 +30,11 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , noSwipeGesture
   , isSwipeActive
   , swipeProgress
+  , swipeDirection
+  , hasSwipeDirection
+  , isHorizontalSwipe
+  , isVerticalSwipe
+  , swipeToSlideDirection
   
   -- * Drag Gesture
   , DragGesture
@@ -37,6 +42,9 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , noDragGesture
   , isDragActive
   , dragOffset
+  , dragVelocity
+  , isDragFast
+  , dragMagnitude
   
   -- * Pinch Gesture
   , PinchGesture
@@ -44,12 +52,17 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , noPinchGesture
   , isPinchActive
   , pinchScale
+  , isPinchZoomIn
+  , isPinchZoomOut
   
   -- * Scroll Gesture
   , ScrollGesture
   , scrollGesture
   , noScrollGesture
   , scrollDelta
+  , scrollMagnitude
+  , isScrollHorizontal
+  , isScrollVertical
   
   -- * Retinal Tracking
   , RetinalState
@@ -59,6 +72,7 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , gazePosition
   , gazeDwellTime
   , isGazeFocused
+  , gazeProgress
   
   -- * Voice Command
   , VoiceCommand
@@ -75,11 +89,17 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , noVoiceState
   , isListening
   , lastCommand
+  , isHighConfidence
+  , voiceToSlideDirection
   
   -- * Combined Gesture State
   , GestureState
   , initialGestureState
   , isAnyGestureActive
+  , activeGestureCount
+  , dominantGesture
+  , compareGesturePriority
+  , GestureKind(..)
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -90,12 +110,23 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , Ordering
   , show
+  , compare
+  , not
+  , negate
+  , otherwise
   , (||)
   , (&&)
   , (>)
   , (>=)
+  , (<)
+  , (==)
   , (<>)
+  , (/)
+  , (+)
+  , (-)
+  , (*)
   , max
   , min
   )
@@ -163,6 +194,38 @@ isSwipeActive g = g.active
 swipeProgress :: SwipeGesture -> Number
 swipeProgress g = g.progress
 
+-- | Get swipe direction if present
+swipeDirection :: SwipeGesture -> Maybe SwipeDirection
+swipeDirection g = g.direction
+
+-- | Check if swipe has a determined direction
+hasSwipeDirection :: SwipeGesture -> Boolean
+hasSwipeDirection g = isJust g.direction
+
+-- | Check if swipe is horizontal (left or right)
+isHorizontalSwipe :: SwipeGesture -> Boolean
+isHorizontalSwipe g = case g.direction of
+  Just SwipeLeft -> true
+  Just SwipeRight -> true
+  _ -> false
+
+-- | Check if swipe is vertical (up or down)
+isVerticalSwipe :: SwipeGesture -> Boolean
+isVerticalSwipe g = case g.direction of
+  Just SwipeUp -> true
+  Just SwipeDown -> true
+  _ -> false
+
+-- | Convert swipe direction to slide navigation direction
+-- | Returns -1 for previous, 1 for next, 0 for no navigation
+swipeToSlideDirection :: SwipeGesture -> Int
+swipeToSlideDirection g = case g.direction of
+  Just SwipeLeft -> 1   -- Swipe left = go to next slide
+  Just SwipeRight -> -1 -- Swipe right = go to previous slide
+  Just SwipeUp -> 1     -- Swipe up = go to next (vertical carousel)
+  Just SwipeDown -> -1  -- Swipe down = go to previous (vertical)
+  Nothing -> 0
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // drag gesture
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -211,6 +274,39 @@ isDragActive g = g.active
 dragOffset :: DragGesture -> { x :: Number, y :: Number }
 dragOffset g = { x: g.offsetX, y: g.offsetY }
 
+-- | Get drag velocity as { x, y }
+dragVelocity :: DragGesture -> { x :: Number, y :: Number }
+dragVelocity g = { x: g.velocityX, y: g.velocityY }
+
+-- | Check if drag velocity exceeds threshold (for momentum/fling detection)
+-- | Threshold is in pixels per millisecond
+isDragFast :: Number -> DragGesture -> Boolean
+isDragFast threshold g =
+  let mag = dragMagnitude g
+  in mag > threshold
+
+-- | Get the magnitude of drag offset (distance from start)
+dragMagnitude :: DragGesture -> Number
+dragMagnitude g = 
+  let dx = g.offsetX
+      dy = g.offsetY
+  in sqrt (dx * dx + dy * dy)
+  where
+    -- Simple sqrt approximation for magnitude calculation
+    sqrt :: Number -> Number
+    sqrt n = if n > 0.0 then jsUnsafeSqrt n else 0.0
+    
+    -- FFI-free sqrt using Newton-Raphson (good enough for UI)
+    jsUnsafeSqrt :: Number -> Number
+    jsUnsafeSqrt x = 
+      let guess = x / 2.0
+          refine g' = (g' + x / g') / 2.0
+          r1 = refine guess
+          r2 = refine r1
+          r3 = refine r2
+          r4 = refine r3
+      in r4
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // pinch gesture
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -255,6 +351,14 @@ isPinchActive g = g.active
 pinchScale :: PinchGesture -> Number
 pinchScale g = g.scale
 
+-- | Check if pinch is zooming in (scale > 1.0)
+isPinchZoomIn :: PinchGesture -> Boolean
+isPinchZoomIn g = g.active && g.scale > 1.0
+
+-- | Check if pinch is zooming out (scale < 1.0)
+isPinchZoomOut :: PinchGesture -> Boolean
+isPinchZoomOut g = g.active && g.scale < 1.0
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // scroll gesture
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -291,6 +395,30 @@ noScrollGesture =
 -- | Get scroll delta as { x, y }
 scrollDelta :: ScrollGesture -> { x :: Number, y :: Number }
 scrollDelta g = { x: g.deltaX, y: g.deltaY }
+
+-- | Get total scroll magnitude
+scrollMagnitude :: ScrollGesture -> Number
+scrollMagnitude g =
+  let dx = absNum g.deltaX
+      dy = absNum g.deltaY
+  in max dx dy
+  where
+    absNum n = if n < 0.0 then negate n else n
+    negate n = 0.0 - n
+
+-- | Check if scroll is primarily horizontal
+isScrollHorizontal :: ScrollGesture -> Boolean
+isScrollHorizontal g = absNum g.deltaX > absNum g.deltaY
+  where
+    absNum n = if n < 0.0 then negate n else n
+    negate n = 0.0 - n
+
+-- | Check if scroll is primarily vertical
+isScrollVertical :: ScrollGesture -> Boolean
+isScrollVertical g = absNum g.deltaY > absNum g.deltaX
+  where
+    absNum n = if n < 0.0 then negate n else n
+    negate n = 0.0 - n
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // retinal tracking
@@ -348,6 +476,17 @@ gazeDwellTime s = s.dwellTime
 isGazeFocused :: RetinalState -> Boolean
 isGazeFocused s = 
   s.tracking && Temporal.unwrapMilliseconds s.dwellTime >= Temporal.unwrapMilliseconds s.focusThreshold
+
+-- | Get gaze progress toward focus (0.0 to 1.0)
+-- | Returns how close the gaze is to triggering an action
+gazeProgress :: RetinalState -> Number
+gazeProgress s =
+  if not s.tracking then 0.0
+  else 
+    let dwell = Temporal.unwrapMilliseconds s.dwellTime
+        threshold = Temporal.unwrapMilliseconds s.focusThreshold
+    in if threshold == 0.0 then 1.0
+       else min 1.0 (dwell / threshold)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // voice command
@@ -408,6 +547,23 @@ isListening s = s.listening
 lastCommand :: VoiceState -> Maybe VoiceCommand
 lastCommand s = s.command
 
+-- | Check if voice recognition confidence is high enough to act on
+-- | Uses 0.7 as threshold for reliable recognition
+isHighConfidence :: VoiceState -> Boolean
+isHighConfidence s = s.listening && s.confidence > 0.7
+
+-- | Convert voice command to slide navigation direction
+-- | Returns -1 for previous, 1 for next, 0 for no navigation
+voiceToSlideDirection :: VoiceCommand -> Int
+voiceToSlideDirection cmd = case cmd of
+  VoiceNext -> 1
+  VoicePrevious -> -1
+  VoiceFirst -> 0    -- Special case: handled separately
+  VoiceLast -> 0     -- Special case: handled separately  
+  VoiceGoTo _ -> 0   -- Special case: handled separately
+  VoiceStop -> 0
+  VoicePlay -> 0
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                      // combined gesture state
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -444,6 +600,69 @@ isAnyGestureActive state =
   || isPinchActive state.pinch
   || isRetinalTracking state.retinal
   || isListening state.voice
+
+-- | Count how many gesture types are currently active
+activeGestureCount :: GestureState -> Int
+activeGestureCount state =
+  boolToInt (isSwipeActive state.swipe)
+  + boolToInt (isDragActive state.drag)
+  + boolToInt (isPinchActive state.pinch)
+  + boolToInt (isRetinalTracking state.retinal)
+  + boolToInt (isListening state.voice)
+  where
+    boolToInt :: Boolean -> Int
+    boolToInt true = 1
+    boolToInt false = 0
+
+-- | Kind of gesture for priority/disambiguation
+data GestureKind
+  = GestureSwipe
+  | GestureDrag
+  | GesturePinch
+  | GestureScroll
+  | GestureRetinal
+  | GestureVoice
+  | GestureNone
+
+derive instance eqGestureKind :: Eq GestureKind
+derive instance ordGestureKind :: Ord GestureKind
+
+instance showGestureKind :: Show GestureKind where
+  show GestureSwipe = "swipe"
+  show GestureDrag = "drag"
+  show GesturePinch = "pinch"
+  show GestureScroll = "scroll"
+  show GestureRetinal = "retinal"
+  show GestureVoice = "voice"
+  show GestureNone = "none"
+
+-- | Get the dominant (highest priority) active gesture
+-- | Priority: Pinch > Swipe > Drag > Scroll > Retinal > Voice
+dominantGesture :: GestureState -> GestureKind
+dominantGesture state
+  | isPinchActive state.pinch = GesturePinch
+  | isSwipeActive state.swipe = GestureSwipe
+  | isDragActive state.drag = GestureDrag
+  | scrollMagnitude state.scroll > 0.0 = GestureScroll
+  | isRetinalTracking state.retinal = GestureRetinal
+  | isListening state.voice = GestureVoice
+  | otherwise = GestureNone
+
+-- | Compare two gesture kinds by priority
+-- | Returns Ordering (LT, EQ, GT) based on which gesture should take precedence
+-- | Higher priority gestures return GT when compared to lower priority ones
+compareGesturePriority :: GestureKind -> GestureKind -> Ordering
+compareGesturePriority a b = compare (gesturePriorityValue a) (gesturePriorityValue b)
+  where
+    -- Assign numeric priority (higher = more important)
+    gesturePriorityValue :: GestureKind -> Int
+    gesturePriorityValue GesturePinch = 6   -- Highest: zoom/scale operations
+    gesturePriorityValue GestureSwipe = 5   -- Navigation intent
+    gesturePriorityValue GestureDrag = 4    -- Direct manipulation
+    gesturePriorityValue GestureScroll = 3  -- Passive scrolling
+    gesturePriorityValue GestureRetinal = 2 -- Eye tracking (slower)
+    gesturePriorityValue GestureVoice = 1   -- Voice commands (highest latency)
+    gesturePriorityValue GestureNone = 0    -- No gesture
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                          // internal utilities

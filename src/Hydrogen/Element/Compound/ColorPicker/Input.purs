@@ -335,6 +335,7 @@ hexInput propModifiers =
           , E.attr "value" props.value
           , E.attr "maxlength" "6"
           , E.attr "placeholder" "000000"
+          , E.attr "aria-label" $ "Hex color value: #" <> props.value
           , E.style "width" widthPx
           , E.style "padding" "4px 8px"
           , E.style "font-size" fontSizePx

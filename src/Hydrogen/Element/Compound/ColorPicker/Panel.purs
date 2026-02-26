@@ -286,9 +286,16 @@ renderPanelHandle x y radius =
     , E.style "border" "2px solid #000"
     , E.style "box-shadow" "0 1px 3px rgba(0,0,0,0.3)"
     , E.style "pointer-events" "none"
+    -- Accessibility: indicate position as percentage
+    , E.attr "aria-label" "Color position indicator"
+    , E.dataAttr "position-x" (show x)
+    , E.dataAttr "position-y" (show y)
+    -- Computed size for external styling (diameter = radius * 2 + border)
+    , E.dataAttr "handle-diameter" (show (radius * 2.0 + 4.0))
     ]
     []
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // geometry
 -- ═══════════════════════════════════════════════════════════════════════════════
+

@@ -73,6 +73,23 @@ module Hydrogen.GPU.WebGPU.RayTracing
   , rayTMax
   , shadowRayEpsilon
   , maxBounces
+    -- Vector utilities
+  , vec3Normalize
+    -- Material defaults
+  , defaultMaterial
+    -- BRDF functions
+  , lambertianBRDF
+  , ggxDistribution
+  , schlickFresnel
+  , fresnel
+    -- Material utilities
+  , materialRoughness
+  , materialAlpha
+  , materialIOR
+  , makeUV
+  , extractUV
+  , makeBufferIndex
+  , extractBufferIndex
   ) where
 
 import Prelude
@@ -505,10 +522,13 @@ lambertianBRDF :: MaterialPoint -> Vec3
 lambertianBRDF mat = vec3Mul mat.baseColor (1.0 / 3.14159)
 
 -- | GGX/Trowbridge-Reitz normal distribution
--- | wh: half vector, n: surface normal, roughness: material roughness [0,1], alpha: roughness squared
-ggxDistribution :: Vec3 -> Vec3 -> Number -> Number -> Number
-ggxDistribution wh n roughness alpha =
+-- | wh: half vector, n: surface normal, roughnessValue: material roughness [0,1]
+-- | Note: alpha (roughness squared) is computed internally for correct distribution
+ggxDistribution :: Vec3 -> Vec3 -> Number -> Number
+ggxDistribution wh n roughnessValue =
   let nDotH = vec3Dot n wh
+      -- Alpha is roughness squared, clamped to avoid singularity at 0
+      alpha = max 0.001 (roughnessValue * roughnessValue)
       alpha2 = alpha * alpha
       denom = nDotH * nDotH * (alpha2 - 1.0) + 1.0
   in alpha2 / (3.14159 * denom * denom)
@@ -558,3 +578,35 @@ fresnel mat cosTheta =
       oneMinusCos5 = pow oneMinusCos 5.0
       oneMinusF0 = vec3Sub (vec3 1.0 1.0 1.0) f0
   in vec3Add f0 (vec3Mul oneMinusF0 oneMinusCos5)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // material // utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Extract roughness value from material
+materialRoughness :: MaterialPoint -> Number
+materialRoughness mat = unwrapRoughness mat.roughness
+
+-- | Extract alpha (opacity) value from material
+materialAlpha :: MaterialPoint -> Number
+materialAlpha mat = unwrapAlpha mat.alpha
+
+-- | Extract index of refraction from material
+materialIOR :: MaterialPoint -> Number
+materialIOR mat = unwrapIOR mat.ior
+
+-- | Create UV coordinate from a number (clamped to [0,1])
+makeUV :: Number -> UVCoord
+makeUV = uvCoord
+
+-- | Extract UV coordinate value
+extractUV :: UVCoord -> Number
+extractUV = unwrapUVCoord
+
+-- | Create buffer index with bounds checking
+makeBufferIndex :: Int -> BufferIndex
+makeBufferIndex = bufferIndex
+
+-- | Extract raw buffer index value
+extractBufferIndex :: BufferIndex -> Int
+extractBufferIndex = unwrapBufferIndex
