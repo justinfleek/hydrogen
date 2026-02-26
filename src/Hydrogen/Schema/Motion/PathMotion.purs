@@ -637,7 +637,7 @@ calculateBank t source maxBank smoothing =
     
     -- Scale by smoothing and max bank
     (Degrees maxB) = maxBank
-    bankAmount = clamp (negate maxB) maxB (normalizedDiff * smoothing * 0.5)
+    bankAmount = clampNumber (negate maxB) maxB (normalizedDiff * smoothing * 0.5)
   in
     Degrees bankAmount
 
@@ -652,8 +652,9 @@ clamp01 n
   | otherwise = n
 
 -- | Clamp to range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi n
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi n
   | n < lo = lo
   | n > hi = hi
   | otherwise = n

@@ -252,7 +252,7 @@ instance showFriction :: Show Friction where
 
 -- | Create a bounded friction (clamps to 0..1)
 mkFriction :: Number -> Friction
-mkFriction n = Friction (clamp 0.0 1.0 n)
+mkFriction n = Friction (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the friction value
 unwrapFriction :: Friction -> Number
@@ -306,7 +306,7 @@ instance showCompliance :: Show Compliance where
 
 -- | Create a bounded compliance (clamps to 0..1)
 mkCompliance :: Number -> Compliance
-mkCompliance n = Compliance (clamp 0.0 1.0 n)
+mkCompliance n = Compliance (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the compliance value
 unwrapCompliance :: Compliance -> Number
@@ -423,7 +423,7 @@ instance showSurfaceRoughness :: Show SurfaceRoughness where
 
 -- | Create a bounded roughness (clamps to 0..1)
 mkSurfaceRoughness :: Number -> SurfaceRoughness
-mkSurfaceRoughness n = SurfaceRoughness (clamp 0.0 1.0 n)
+mkSurfaceRoughness n = SurfaceRoughness (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the roughness value
 unwrapSurfaceRoughness :: SurfaceRoughness -> Number
@@ -477,7 +477,7 @@ instance showGrip :: Show Grip where
 
 -- | Create a bounded grip (clamps to 0..1)
 mkGrip :: Number -> Grip
-mkGrip n = Grip (clamp 0.0 1.0 n)
+mkGrip n = Grip (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the grip value
 unwrapGrip :: Grip -> Number
@@ -532,7 +532,7 @@ instance showPenetration :: Show Penetration where
 
 -- | Create a bounded penetration (clamps to 0..1)
 mkPenetration :: Number -> Penetration
-mkPenetration n = Penetration (clamp 0.0 1.0 n)
+mkPenetration n = Penetration (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the penetration value
 unwrapPenetration :: Penetration -> Number
@@ -570,6 +570,7 @@ isEmbedded (Penetration p) = p > 0.5
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)

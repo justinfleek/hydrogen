@@ -48,6 +48,13 @@ module Hydrogen.Schema.Phone.Format
   , isDigitPosition
   , positionToDigitIndex
   , digitIndexToPosition
+  
+  -- * Pattern Utilities
+  , patternDigitCount
+  , nationalNumberLength
+  , findFirstDigitPosition
+  , appendDigit
+  , formatOrDefault
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -173,13 +180,22 @@ calculateCursorAfterFormat pattern digitIndex =
 -- |
 -- | When the user deletes a character, we need to figure out where the
 -- | cursor should land. If they deleted a literal, move to the previous digit.
+-- |
+-- | Uses the pattern structure and current formatted string length to
+-- | determine proper cursor placement.
 calculateCursorAfterDelete :: FormatPattern -> String -> Int -> Int
 calculateCursorAfterDelete pattern currentFormatted cursorPos =
   let patternChars = String.toCharArray (patternToString pattern)
+      formattedLen = String.length currentFormatted
+      patternLen = Array.length patternChars
+      -- Clamp cursor to valid range
+      clampedCursor = if cursorPos > formattedLen then formattedLen else cursorPos
       -- Find the digit index at or before cursor position
-      digitIdx = positionToDigitIndex pattern (cursorPos - 1)
+      digitIdx = positionToDigitIndex pattern (clampedCursor - 1)
   in case digitIdx of
-       Nothing -> 0
+       Nothing -> 
+         -- If no digit before cursor, and pattern has digits, go to first digit position
+         if patternLen > 0 then 0 else 0
        Just idx -> digitIndexToPosition pattern idx
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -245,18 +261,22 @@ positionToDigitIndex pattern pos =
 -- | Convert a digit index to a position in the formatted string.
 -- |
 -- | Given the index of a digit (0-based), returns where it appears
--- | in the formatted output.
+-- | in the formatted output. Uses the pattern character array length
+-- | as a fallback for extrapolation beyond the pattern bounds.
 digitIndexToPosition :: FormatPattern -> Int -> Int
 digitIndexToPosition pattern digitIdx =
   let chars = String.toCharArray (patternToString pattern)
+      patternLen = Array.length chars
       positions = digitPositions pattern
   in case Array.index positions digitIdx of
        Just pos -> pos + 1  -- Position after the digit
        Nothing -> 
-         -- If digit index is beyond pattern, extrapolate
+         -- If digit index is beyond pattern, extrapolate from pattern end
          case Array.index positions (Array.length positions - 1) of
            Just lastPos -> lastPos + 1 + (digitIdx - Array.length positions + 1)
-           Nothing -> digitIdx
+           Nothing -> 
+             -- No positions at all, use pattern length as guide
+             if patternLen > 0 then patternLen else digitIdx
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
@@ -359,3 +379,51 @@ arrayDrop n arr = Array.drop n arr
 -- | Reverse an array.
 arrayReverse :: forall a. Array a -> Array a
 arrayReverse = Array.reverse
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // pattern utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Count the number of digit placeholders in a pattern.
+-- |
+-- | This tells you the maximum number of digits the pattern can display.
+patternDigitCount :: FormatPattern -> Int
+patternDigitCount pattern =
+  let chars = String.toCharArray (patternToString pattern)
+  in Array.length $ Array.filter (\c -> c == '#') chars
+
+-- | Get the length of a national number's digit string.
+nationalNumberLength :: NationalNumber -> Int
+nationalNumberLength nn = NN.length nn
+
+-- | Find the position of the first digit placeholder in a pattern.
+-- |
+-- | Useful for positioning cursor at the start of phone input.
+-- | Returns 0 if no digit placeholder found.
+findFirstDigitPosition :: FormatPattern -> Int
+findFirstDigitPosition pattern =
+  let chars = String.toCharArray (patternToString pattern)
+  in case Array.findIndex (\c -> c == '#') chars of
+       Just pos -> pos
+       Nothing -> 0
+
+-- | Append a digit character to a formatted phone number.
+-- |
+-- | Extracts current digits, adds the new one, and reformats.
+-- | Returns the new formatted string.
+appendDigit :: FormatPattern -> String -> Char -> String
+appendDigit pattern currentFormatted digit =
+  if isDigit digit then
+    let currentDigits = String.toCharArray (extractDigits currentFormatted)
+        newDigits = Array.snoc currentDigits digit
+    in String.fromCharArray (applyPatternPartial (String.toCharArray (patternToString pattern)) newDigits)
+  else
+    currentFormatted
+
+-- | Format a phone number, returning a default if the number is empty.
+-- |
+-- | Useful for displaying placeholder text when no digits entered.
+formatOrDefault :: FormatPattern -> NationalNumber -> String -> String
+formatOrDefault pattern nn defaultValue =
+  let formatted = formatPartial pattern nn
+  in fromMaybe defaultValue (if formatted == "" then Nothing else Just formatted)

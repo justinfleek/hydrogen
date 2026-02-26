@@ -357,7 +357,7 @@ apply inputFrame (TimeRemap tr) = case tr.mode of
   
   LoopRemap loopLen ->
     let normalizedFrame = inputFrame - loopLen * floorNum (inputFrame / loopLen)
-    in clamp 0.0 tr.originalDuration normalizedFrame
+    in clampNumber 0.0 tr.originalDuration normalizedFrame
   
   LinearRemap ->
     inputFrame * tr.speedFactor
@@ -703,8 +703,9 @@ clamp01 n
   | otherwise = n
 
 -- | Clamp to range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi n
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi n
   | n < lo = lo
   | n > hi = hi
   | otherwise = n

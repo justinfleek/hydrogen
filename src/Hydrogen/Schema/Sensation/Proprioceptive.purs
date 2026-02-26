@@ -291,7 +291,7 @@ instance showEffort :: Show Effort where
 
 -- | Create a bounded effort (clamps to 0..1)
 mkEffort :: Number -> Effort
-mkEffort n = Effort (clamp 0.0 1.0 n)
+mkEffort n = Effort (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the effort value
 unwrapEffort :: Effort -> Number
@@ -347,7 +347,7 @@ instance showFatigue :: Show Fatigue where
 
 -- | Create a bounded fatigue (clamps to 0..1)
 mkFatigue :: Number -> Fatigue
-mkFatigue n = Fatigue (clamp 0.0 1.0 n)
+mkFatigue n = Fatigue (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the fatigue value
 unwrapFatigue :: Fatigue -> Number
@@ -415,7 +415,7 @@ instance showStrain :: Show Strain where
 
 -- | Create a bounded strain (clamps to 0..1)
 mkStrain :: Number -> Strain
-mkStrain n = Strain (clamp 0.0 1.0 n)
+mkStrain n = Strain (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the strain value
 unwrapStrain :: Strain -> Number
@@ -498,9 +498,10 @@ dotOrientation a b = a.x * b.x + a.y * b.y + a.z * b.z
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)
 
 -- | Floor function
 floor :: Number -> Number

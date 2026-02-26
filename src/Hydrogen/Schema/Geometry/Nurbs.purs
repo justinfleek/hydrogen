@@ -354,7 +354,7 @@ nurbsPointAt u (NurbsCurve c) =
   let
     -- Clamp u to valid range
     range = nurbsParamRange c.knots c.degree
-    u' = clamp range.start range.end u
+    u' = clampNumber range.start range.end u
     
     -- Find knot span
     span = findKnotSpan u' c.knots c.degree
@@ -399,9 +399,9 @@ nurbsCurvatureAt u curve =
   let
     h = 0.0001
     range = nurbsParameterRange curve
-    u0 = clamp range.start range.end (u - h)
-    u1 = clamp range.start range.end u
-    u2 = clamp range.start range.end (u + h)
+    u0 = clampNumber range.start range.end (u - h)
+    u1 = clampNumber range.start range.end u
+    u2 = clampNumber range.start range.end (u + h)
     
     (Point2D p0) = nurbsPointAt u0 curve
     (Point2D p1) = nurbsPointAt u1 curve
@@ -655,7 +655,7 @@ mergeBounds a b =
 blendNurbsWeights :: Number -> NurbsCurve -> NurbsCurve -> Array Point2D
 blendNurbsWeights t (NurbsCurve c1) (NurbsCurve c2) =
   let
-    t' = clamp 0.0 1.0 t
+    t' = clampNumber 0.0 1.0 t
     mt = 1.0 - t'
     
     blend :: ControlPoint -> ControlPoint -> Point2D
@@ -924,8 +924,9 @@ initialBounds =
   }
 
 -- | Clamp value to range.
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi v
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi v
   | v < lo = lo
   | v > hi = hi
   | otherwise = v
