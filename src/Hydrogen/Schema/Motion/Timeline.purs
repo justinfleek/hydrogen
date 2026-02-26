@@ -315,7 +315,7 @@ globalToLocal globalFrame (TimelineLayer l) =
     relativeFrame = globalFrame - l.startFrame
     
     -- Clamp to layer duration
-    clampedFrame = clamp 0.0 (l.endFrame - l.startFrame) relativeFrame
+    clampedFrame = clampNumber 0.0 (l.endFrame - l.startFrame) relativeFrame
     
     -- Apply time remap if present
     remappedFrame = case l.timeRemap of
@@ -414,7 +414,7 @@ setTotalSeconds seconds tl = setTotalFrames (secondsToFrame seconds tl) tl
 
 -- | Clamp frame to timeline range.
 clampFrame :: Number -> Timeline -> Number
-clampFrame frame (Timeline t) = clamp 0.0 t.totalFrames frame
+clampFrame frame (Timeline t) = clampNumber 0.0 t.totalFrames frame
 
 -- | Wrap frame for looping playback.
 wrapFrame :: Number -> Timeline -> Number
@@ -626,8 +626,9 @@ clamp01 n
   | otherwise = n
 
 -- | Clamp to range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi n
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi n
   | n < lo = lo
   | n > hi = hi
   | otherwise = n

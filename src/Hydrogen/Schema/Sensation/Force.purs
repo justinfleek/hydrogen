@@ -253,7 +253,7 @@ instance showDrag :: Show Drag where
 
 -- | Create a bounded drag (clamps to 0..1)
 mkDrag :: Number -> Drag
-mkDrag n = Drag (clamp 0.0 1.0 n)
+mkDrag n = Drag (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the drag value
 unwrapDrag :: Drag -> Number
@@ -359,7 +359,7 @@ instance showImpactIntensity :: Show ImpactIntensity where
 
 -- | Create a bounded impact intensity (clamps to 0..1)
 mkImpactIntensity :: Number -> ImpactIntensity
-mkImpactIntensity n = ImpactIntensity (clamp 0.0 1.0 n)
+mkImpactIntensity n = ImpactIntensity (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the impact intensity value
 unwrapImpactIntensity :: ImpactIntensity -> Number
@@ -534,6 +534,7 @@ momentumNone = { x: 0.0, y: 0.0, z: 0.0 }
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)

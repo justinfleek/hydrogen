@@ -271,7 +271,7 @@ noConstraints =
 -- | Clamp pitch to avoid gimbal lock (typically ±85° or ±89°).
 clampPitch :: Number -> Number -> Gimbal -> Gimbal
 clampPitch minP maxP (Gimbal g) = Gimbal
-  { pitch: clamp minP maxP g.pitch
+  { pitch: clampNumber minP maxP g.pitch
   , yaw: g.yaw
   , roll: g.roll
   }
@@ -279,9 +279,9 @@ clampPitch minP maxP (Gimbal g) = Gimbal
 -- | Apply constraints to a gimbal.
 constrainGimbal :: GimbalConstraints -> Gimbal -> Gimbal
 constrainGimbal c (Gimbal g) = Gimbal
-  { pitch: clamp c.pitchMin c.pitchMax g.pitch
-  , yaw: clamp c.yawMin c.yawMax g.yaw
-  , roll: clamp c.rollMin c.rollMax g.roll
+  { pitch: clampNumber c.pitchMin c.pitchMax g.pitch
+  , yaw: clampNumber c.yawMin c.yawMax g.yaw
+  , roll: clampNumber c.rollMin c.rollMax g.roll
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -341,8 +341,9 @@ lerpAngle t a b =
   in normalizeAngle (a + t * shortDiff)
 
 -- | Clamp a value to [minVal, maxVal].
-clamp :: Number -> Number -> Number -> Number
-clamp minVal maxVal x
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber minVal maxVal x
   | x < minVal = minVal
   | x > maxVal = maxVal
   | x >= minVal && x <= maxVal = x

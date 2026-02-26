@@ -174,7 +174,7 @@ instance showProcessingLoad :: Show ProcessingLoad where
 
 -- | Create a bounded processing load (clamps to 0..1)
 mkProcessingLoad :: Number -> ProcessingLoad
-mkProcessingLoad n = ProcessingLoad (clamp 0.0 1.0 n)
+mkProcessingLoad n = ProcessingLoad (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the processing load value
 unwrapProcessingLoad :: ProcessingLoad -> Number
@@ -327,7 +327,7 @@ instance showUrgency :: Show Urgency where
 
 -- | Create a bounded urgency (clamps to 0..1)
 mkUrgency :: Number -> Urgency
-mkUrgency n = Urgency (clamp 0.0 1.0 n)
+mkUrgency n = Urgency (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the urgency value
 unwrapUrgency :: Urgency -> Number
@@ -385,7 +385,7 @@ instance showAnticipation :: Show Anticipation where
 
 -- | Create a bounded anticipation (clamps to 0..1)
 mkAnticipation :: Number -> Anticipation
-mkAnticipation n = Anticipation (clamp 0.0 1.0 n)
+mkAnticipation n = Anticipation (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the anticipation value
 unwrapAnticipation :: Anticipation -> Number
@@ -419,6 +419,7 @@ isAnticipating (Anticipation a) = a > 0.3
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)

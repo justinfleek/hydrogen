@@ -249,7 +249,7 @@ instance showAttentionOnMe :: Show AttentionOnMe where
 
 -- | Create a bounded attention level (clamps to 0..1)
 mkAttentionOnMe :: Number -> AttentionOnMe
-mkAttentionOnMe n = AttentionOnMe (clamp 0.0 1.0 n)
+mkAttentionOnMe n = AttentionOnMe (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the attention value
 unwrapAttentionOnMe :: AttentionOnMe -> Number
@@ -303,7 +303,7 @@ instance showTrustLevel :: Show TrustLevel where
 
 -- | Create a bounded trust level (clamps to 0..1)
 mkTrustLevel :: Number -> TrustLevel
-mkTrustLevel n = TrustLevel (clamp 0.0 1.0 n)
+mkTrustLevel n = TrustLevel (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the trust value
 unwrapTrustLevel :: TrustLevel -> Number
@@ -359,7 +359,7 @@ instance showThreatLevel :: Show ThreatLevel where
 
 -- | Create a bounded threat level (clamps to 0..1)
 mkThreatLevel :: Number -> ThreatLevel
-mkThreatLevel n = ThreatLevel (clamp 0.0 1.0 n)
+mkThreatLevel n = ThreatLevel (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the threat value
 unwrapThreatLevel :: ThreatLevel -> Number
@@ -417,7 +417,7 @@ instance showFamiliarity :: Show Familiarity where
 
 -- | Create a bounded familiarity (clamps to 0..1)
 mkFamiliarity :: Number -> Familiarity
-mkFamiliarity n = Familiarity (clamp 0.0 1.0 n)
+mkFamiliarity n = Familiarity (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the familiarity value
 unwrapFamiliarity :: Familiarity -> Number
@@ -455,6 +455,7 @@ isKnown (Familiarity f) = f > 0.4
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)

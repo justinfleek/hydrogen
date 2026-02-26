@@ -137,7 +137,7 @@ instance showAmbientLight :: Show AmbientLight where
 
 -- | Create a bounded ambient light (clamps to 0..1)
 mkAmbientLight :: Number -> AmbientLight
-mkAmbientLight n = AmbientLight (clamp 0.0 1.0 n)
+mkAmbientLight n = AmbientLight (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the ambient light value
 unwrapAmbientLight :: AmbientLight -> Number
@@ -191,7 +191,7 @@ instance showAmbientNoise :: Show AmbientNoise where
 
 -- | Create a bounded ambient noise (clamps to 0..1)
 mkAmbientNoise :: Number -> AmbientNoise
-mkAmbientNoise n = AmbientNoise (clamp 0.0 1.0 n)
+mkAmbientNoise n = AmbientNoise (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the ambient noise value
 unwrapAmbientNoise :: AmbientNoise -> Number
@@ -245,7 +245,7 @@ instance showCrowding :: Show Crowding where
 
 -- | Create a bounded crowding (clamps to 0..1)
 mkCrowding :: Number -> Crowding
-mkCrowding n = Crowding (clamp 0.0 1.0 n)
+mkCrowding n = Crowding (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the crowding value
 unwrapCrowding :: Crowding -> Number
@@ -301,7 +301,7 @@ instance showProximityToEdge :: Show ProximityToEdge where
 
 -- | Create a bounded proximity (clamps to 0..1)
 mkProximityToEdge :: Number -> ProximityToEdge
-mkProximityToEdge n = ProximityToEdge (clamp 0.0 1.0 n)
+mkProximityToEdge n = ProximityToEdge (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the proximity value
 unwrapProximityToEdge :: ProximityToEdge -> Number
@@ -357,7 +357,7 @@ instance showSpatialFreedom :: Show SpatialFreedom where
 
 -- | Create a bounded spatial freedom (clamps to 0..1)
 mkSpatialFreedom :: Number -> SpatialFreedom
-mkSpatialFreedom n = SpatialFreedom (clamp 0.0 1.0 n)
+mkSpatialFreedom n = SpatialFreedom (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the spatial freedom value
 unwrapSpatialFreedom :: SpatialFreedom -> Number
@@ -507,7 +507,7 @@ instance showAirQuality :: Show AirQuality where
 
 -- | Create a bounded air quality (clamps to 0..1)
 mkAirQuality :: Number -> AirQuality
-mkAirQuality n = AirQuality (clamp 0.0 1.0 n)
+mkAirQuality n = AirQuality (clampNumber 0.0 1.0 n)
 
 -- | Unwrap the air quality value
 unwrapAirQuality :: AirQuality -> Number
@@ -545,6 +545,7 @@ isAirHazardous (AirQuality q) = q < 0.2
 --                                                                   // utilities
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Clamp a number to a range
-clamp :: Number -> Number -> Number -> Number
-clamp lo hi x = max lo (min hi x)
+-- | Clamp a number to a range.
+-- | Named clampNumber to avoid shadowing Prelude.clamp
+clampNumber :: Number -> Number -> Number -> Number
+clampNumber lo hi x = max lo (min hi x)
