@@ -1,6 +1,6 @@
 # Schema Pillar Reference
 
-Full enumeration of atoms, molecules, and compounds for all 12 pillars.
+Full enumeration of atoms, molecules, and compounds for all 15 pillars.
 
 ## Pillar 1: Color
 
@@ -2071,9 +2071,120 @@ Time-based events and calendar systems.
 | Contact       | Name + Email + Phone + Organization     |
 | Calendar      | Owner + Events + Sharing + Permissions  |
 
+## Pillar 15: Sensation
+
+Agent perception of environment and self. Complements Haptic (output) with input sensing.
+
+### Atoms
+
+#### Proprioceptive (Self-Awareness)
+
+| Name        | Type   | Min  | Max  | Behavior | Notes                        |
+|-------------|--------|------|------|----------|------------------------------|
+| JointAngle  | Number | -180 | 180  | wraps    | Joint rotation in degrees    |
+| Reach       | Number | 0    | 1    | clamps   | Extension magnitude          |
+| Balance     | Number | 0    | 1    | clamps   | Stability (1 = stable)       |
+| Effort      | Number | 0    | 1    | clamps   | Exertion level               |
+| Fatigue     | Number | 0    | 1    | clamps   | Tiredness (1 = exhausted)    |
+| Strain      | Number | 0    | 1    | clamps   | Mechanical stress            |
+| Orientation | Vec3   | -1   | 1    | clamps   | Facing direction unit vector |
+
+#### Contact (Touch/Pressure)
+
+| Name            | Type   | Min  | Max   | Behavior | Notes                        |
+|-----------------|--------|------|-------|----------|------------------------------|
+| ContactPressure | Number | 0    | 10000 | clamps   | Pressure in pascals          |
+| ContactNormal   | Vec3   | -1   | 1     | clamps   | Surface normal unit vector   |
+| Friction        | Number | 0    | 1     | clamps   | Friction coefficient         |
+| Compliance      | Number | 0    | 1     | clamps   | Surface deformability        |
+| SurfaceTemp     | Number | -40  | 100   | clamps   | Surface temperature °C       |
+| SurfaceRoughness| Number | 0    | 1     | clamps   | Roughness (1 = very rough)   |
+| Grip            | Number | 0    | 1     | clamps   | Holding strength             |
+| Penetration     | Number | 0    | 1     | clamps   | Depth into surface           |
+
+#### Environment (Ambient Conditions)
+
+| Name            | Type   | Min | Max | Behavior | Notes                        |
+|-----------------|--------|-----|-----|----------|------------------------------|
+| AmbientLight    | Number | 0   | 1   | clamps   | Brightness (1 = blinding)    |
+| AmbientNoise    | Number | 0   | 1   | clamps   | Loudness (1 = deafening)     |
+| Crowding        | Number | 0   | 1   | clamps   | Density (1 = crushed)        |
+| ProximityToEdge | Number | 0   | 1   | clamps   | Distance to boundary         |
+| SpatialFreedom  | Number | 0   | 1   | clamps   | Movement freedom             |
+| VisibilityRadius| Number | 0   | ∞   | finite   | How far agent can see        |
+| CoverageStatus  | Enum   | -   | -   | -        | Exposed/Partial/Sheltered    |
+| AirQuality      | Number | 0   | 1   | clamps   | Air quality (1 = pristine)   |
+
+#### Force (Physics Sensation)
+
+| Name           | Type   | Min  | Max  | Behavior | Notes                        |
+|----------------|--------|------|------|----------|------------------------------|
+| GravityVector  | Vec3   | -    | -    | finite   | Gravity direction + magnitude|
+| ExternalForce  | Vec3   | -    | -    | finite   | Applied force vector         |
+| Drag           | Number | 0    | 1    | clamps   | Resistance coefficient       |
+| Buoyancy       | Number | -1   | 1    | clamps   | Floating tendency            |
+| ImpactIntensity| Number | 0    | 1    | clamps   | Recent collision strength    |
+| Acceleration   | Number | 0    | ∞    | finite   | Current acceleration m/s²    |
+| Velocity       | Number | 0    | ∞    | finite   | Current speed m/s            |
+| Momentum       | Vec3   | -    | -    | finite   | Mass × velocity vector       |
+
+#### Temporal (Time Perception)
+
+| Name              | Type   | Min | Max | Behavior | Notes                        |
+|-------------------|--------|-----|-----|----------|------------------------------|
+| SubjectiveTime    | Number | 0   | ∞   | finite   | Perceived time flow rate     |
+| ProcessingLoad    | Number | 0   | 1   | clamps   | Cognitive load               |
+| ResponseLatency   | Number | 0   | ∞   | finite   | Reaction delay in ms         |
+| TemporalResolution| Number | 0   | ∞   | finite   | Time slice granularity Hz    |
+| Urgency           | Number | 0   | 1   | clamps   | Time pressure                |
+| Anticipation      | Number | 0   | 1   | clamps   | Expecting something          |
+
+#### Social (Agent-to-Agent)
+
+| Name              | Type   | Min | Max | Behavior | Notes                        |
+|-------------------|--------|-----|-----|----------|------------------------------|
+| NearestAgentDist  | Number | 0   | ∞   | finite   | Distance to nearest agent    |
+| AgentsInView      | Int    | 0   | ∞   | finite   | Count of visible agents      |
+| AttentionOnMe     | Number | 0   | 1   | clamps   | Others' attention on self    |
+| TrustLevel        | Number | 0   | 1   | clamps   | Trust toward others          |
+| ThreatLevel       | Number | 0   | 1   | clamps   | Perceived danger from others |
+| Familiarity       | Number | 0   | 1   | clamps   | How well known others are    |
+
+### Molecules
+
+| Name             | Composition                              | Notes                     |
+|------------------|------------------------------------------|---------------------------|
+| BodyState        | Effort + Fatigue + Balance + Strain      | Full self-sensation       |
+| EnvironmentState | Light + Noise + Crowding + Freedom + Air | Full world-sensation      |
+| SocialAwareness  | Distance + View + Attention + Trust      | Awareness of others       |
+| ContactEvent     | Pressure + Normal + Friction + Temp      | Single touch event        |
+| MovementState    | Velocity + Accel + Balance + Impact      | How I'm moving            |
+
+### Compounds
+
+| Name          | Composition                                       | Notes                        |
+|---------------|---------------------------------------------------|------------------------------|
+| Comfort       | BodyState + EnvironmentState + SocialAwareness    | Holistic wellbeing           |
+| Distress      | Stressed body + Harsh env + Social threat         | Opposite of comfort          |
+| Disorientation| Balance loss + Temporal confusion                 | Lost in space/time           |
+| Overwhelm     | High input across all channels                    | Sensory overload             |
+| Safety        | Physical stability + Social security              | Secure state                 |
+| Flow          | Moderate challenge + Good body + Good env         | Optimal engagement           |
+| Grounding     | Stable contact + Stable balance + Present         | Anchored in reality          |
+| Vigilance     | Alert body + Heightened attention                 | Ready but not stressed       |
+| Connection    | Social support + Trust + Proximity                | Belonging                    |
+| Restriction   | Limited freedom + Limited space                   | Restricted (was Constraint)  |
+| Drift         | Temporal confusion + Spatial uncertainty          | Unanchored                   |
+
+### Integration
+
+- **WorldModel/Sensation.lean**: Proven bounded types, provenance tracking, liveness
+- **WorldModel/Integrity.lean**: ProvenInput wrapper prevents fabricated sensations
+- **WorldModel/Affective.lean**: Sensation → Affective mapping for wellbeing attestation
+
 ## Complete Atom Catalog
 
-Total: **203 atoms** across **14 pillars**
+Total: **243 atoms** across **15 pillars**
 
 | Pillar      | Atoms | Description                              |
 |-------------|-------|------------------------------------------|
@@ -2091,3 +2202,4 @@ Total: **203 atoms** across **14 pillars**
 | Spatial     | 17    | 3D, XR, PBR materials                   |
 | Attestation | 5     | Cryptographic integrity                 |
 | Scheduling  | 7     | Calendar, events, invitations           |
+| Sensation   | 40    | Agent perception, embodied input        |

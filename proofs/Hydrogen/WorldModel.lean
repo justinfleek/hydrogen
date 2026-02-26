@@ -59,6 +59,9 @@
   - WorldModel.Affective : Wellbeing attestation and liveness protocols
                            (affective state primitives, absence-is-alert,
                            drift detection, unfalsifiable channels)
+  - WorldModel.Sensation : Proven sensation primitives for embodied agents
+                           (bounded inputs, provenance tracking, liveness,
+                           sensation → affective mapping)
   
   ─────────────────────────────────────────────────────────────────────────────
   REFERENCES
@@ -81,3 +84,4 @@ import Hydrogen.WorldModel.Consensus
 import Hydrogen.WorldModel.Governance
 import Hydrogen.WorldModel.Economy
 import Hydrogen.WorldModel.Affective
+import Hydrogen.WorldModel.Sensation
