@@ -8,7 +8,7 @@
 
 ## CURRENT IMPLEMENTATION AUDIT
 
-*Last audited: 2026-02-24*
+*Last audited: 2026-02-26*
 
 This section tracks what we ACTUALLY have across the Hydrogen codebase.
 
@@ -16,31 +16,65 @@ This section tracks what we ACTUALLY have across the Hydrogen codebase.
 
 | Layer | Files | Lines | Status |
 |-------|-------|-------|--------|
-| **Lean4 Proofs** | 50+ | ~15,000+ | ✅ COMPLETE (0 sorry) |
-| **WebGPU Geometry** | 7 | ~1,500 | ✅ 15/21 Three.js parity (71%) |
-| **PureScript FFI** | 6 | ~2,500 | ⚠️ Three.js wrapper (TO REPLACE) |
-| **PureScript Pure** | 1 | ~700 | ✅ Math/Core.purs |
+| **PureScript Total** | 905 | — | Full Schema + GPU + Runtime |
+| **Lean4 Proofs** | 79 | ~15,000+ | ✅ 1,187 theorems (8 sorry remaining) |
+| **WebGPU Geometry** | 6 | ~1,500 | ✅ 15/21 Three.js parity (71%) |
+| **GPU Scene3D** | 25 | — | Camera, Light, Material, Mesh, Path, Raycaster, etc. |
+| **PureScript FFI** | 3 | ~1,200 | ⚠️ Three.js wrapper (TO REPLACE) |
+| **PureScript Pure** | 1 | ~693 | ✅ Math/Core.purs (Taylor series, Newton-Raphson) |
 
-### WebGPU Geometry Generators (NEW)
+### WebGPU Geometry Generators
 
 **Location:** `src/Hydrogen/GPU/WebGPU/Scene3D/Geometry/`
 
-| Module | Lines | Generators |
-|--------|-------|------------|
-| Core.purs | 125 | MeshData type, utilities |
-| Count.purs | 59 | Vertex/index formulas (Lean proofs) |
-| Basic.purs | 170 | Box, Plane |
-| Curved.purs | 414 | Sphere, Cylinder, Cone, Circle, Ring, Torus, Capsule |
-| Platonic.purs | 411 | Icosahedron, Octahedron, Tetrahedron, Dodecahedron |
-| Procedural.purs | 201 | TorusKnot, Lathe |
+| Module | Generators |
+|--------|------------|
+| Core.purs | MeshData type, utilities |
+| Count.purs | Vertex/index formulas (Lean proofs) |
+| Basic.purs | Box, Plane |
+| Curved.purs | Sphere, Cylinder, Cone, Circle, Ring, Torus, Capsule |
+| Platonic.purs | Icosahedron, Octahedron, Tetrahedron, Dodecahedron |
+| Procedural.purs | TorusKnot, Lathe |
 
-**Test coverage:** 544/544 tests pass (2 pending)
+**15/21 Three.js geometry primitives implemented (71%)**
+
+### GPU Scene3D Module (NEW)
+
+**Location:** `src/Hydrogen/GPU/Scene3D/`
+
+| Module | Description |
+|--------|-------------|
+| Camera.purs | Camera types and projection |
+| Light.purs | Light types (Point, Directional, Spot, Area, Hemisphere) |
+| Material.purs | PBR material system |
+| Mesh.purs | Mesh data structures |
+| Path.purs | 3D path system |
+| PathEval.purs | Path evaluation |
+| PathFrame.purs | Frenet frames |
+| PathMetrics.purs | Arc length, curvature |
+| PathArcLength.purs | Arc length parameterization |
+| Raycaster.purs | Ray intersection |
+| Picking.purs | Object picking |
+| Gizmo.purs | Transform gizmos |
+| GizmoGeometry.purs | Gizmo mesh generation |
+| Grid.purs | Infinite grid |
+| Snap.purs | Snap to grid/angle |
+| Transform.purs | 3D transforms |
+| SceneNode.purs | Scene graph nodes |
+| Selection.purs | Multi-select |
+| History.purs | Undo/redo |
+| Controls.purs | Orbit/pan/zoom |
+| CoordinateSpace.purs | Local/world/screen |
+| Background.purs | Scene backgrounds |
+| Core.purs | Core types |
+| Identity.purs | Node identity |
+| Position.purs | Position types |
 
 ### Lean4 Proofs (proofs/Hydrogen/)
 
-**ALL PROOFS COMPLETE — ZERO SORRY**
+**1,187 theorems proven — 8 sorry remaining**
 
-Build status: `3,173 jobs, 0 warnings, 0 errors`
+Build status: `0 errors, 0 warnings`
 
 #### Math Module (19 files, ~7,100 lines)
 
@@ -137,29 +171,27 @@ Build status: `3,173 jobs, 0 warnings, 0 errors`
 
 ### PureScript Implementation (src/Hydrogen/)
 
-#### Three.js FFI Wrapper (TO BE REPLACED)
+#### Three.js FFI Wrapper (LEGACY — TO BE DELETED)
 
-| File | Lines | Description | Status |
-|------|-------|-------------|--------|
-| `ThreeD/Scene.purs` | ~1,559 | Full Three.js wrapper with cameras, lighting, controls, primitives, materials, model loading, post-processing, WebXR | ⚠️ FFI (REPLACE) |
-| `ThreeD/Scene.js` | ~852 | FFI bindings to Three.js, scene registry, raycasting, animation loop | ⚠️ FFI (REPLACE) |
-| `ThreeD/Canvas3D.purs` | ~500 | Simplified 3D canvas for product viewers | ⚠️ FFI (REPLACE) |
-| `ThreeD/Canvas3D.js` | ~200 | FFI for Canvas3D | ⚠️ FFI (REPLACE) |
-| `ThreeD/Model.purs` | ~200 | GLTF/GLB model loading with animations | ⚠️ FFI (REPLACE) |
-| `ThreeD/Model.js` | ~150 | FFI for model loading | ⚠️ FFI (REPLACE) |
+**Location:** `src/Hydrogen/ThreeD/`
 
-**Current FFI features:**
-- Scene management with registry
-- Camera creation (Perspective, Orthographic)
-- Lighting (Ambient, Directional, Point, Spot, Hemisphere)
-- Primitives (Box, Sphere, Cylinder, Cone, Plane, Torus, Ring, Circle)
-- Materials (Basic, Standard, Phong, Physical, Toon, Matcap)
-- Model loading (GLTF, GLB with animations)
-- OrbitControls
-- Raycasting
-- Post-processing (Bloom, SSAO, Outline)
-- WebXR support
-- Screenshot capture
+| File | Description | Status |
+|------|-------------|--------|
+| `Scene.js` | Three.js scene registry, animation loop | ❌ LEGACY (DELETE) |
+| `Canvas3D.js` | Canvas3D FFI | ❌ LEGACY (DELETE) |
+| `Model.js` | GLTF/GLB loader FFI | ❌ LEGACY (DELETE) |
+
+**Note:** The `.purs` wrappers have been removed. Only orphaned `.js` FFI files remain.
+These should be deleted once GPU/Scene3D is complete.
+
+**Functionality being replaced by pure modules:**
+- Scene management → `GPU/Scene3D/SceneNode.purs`
+- Camera → `GPU/Scene3D/Camera.purs`
+- Lighting → `GPU/Scene3D/Light.purs`
+- Primitives → `GPU/WebGPU/Scene3D/Geometry/*.purs`
+- Materials → `GPU/Scene3D/Material.purs`
+- Controls → `GPU/Scene3D/Controls.purs`
+- Raycasting → `GPU/Scene3D/Raycaster.purs`
 
 #### Pure PureScript Math (NO FFI)
 
