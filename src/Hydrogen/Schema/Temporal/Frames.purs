@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                    // hydrogen // schema // temporal // frames
+--                                   // hydrogen // schema // temporal // frames
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Frames — Frame count atom for frame-based animation timing.

@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                           // hydrogen // schema // material // noisefrequency
+--                          // hydrogen // schema // material // noise-frequency
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | NoiseFrequency - spatial frequency for procedural noise.

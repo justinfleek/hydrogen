@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                           // hydrogen // schema // material // filtersaturation
+--                        // hydrogen // schema // material // filter-saturation
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | FilterSaturation - color saturation filter multiplier.

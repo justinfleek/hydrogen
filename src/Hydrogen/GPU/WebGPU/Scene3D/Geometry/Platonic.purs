@@ -1,6 +1,6 @@
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- Hydrogen.GPU.WebGPU.Scene3D.Geometry.Platonic
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--               // hydrogen // gpu // webgpu // scene3d // geometry // platonic
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 --
 -- Platonic solid generators: Icosahedron, Octahedron, Tetrahedron, Dodecahedron.
 -- With subdivision support for geodesic sphere approximations.

@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                  // hydrogen // schema // motion // timeline
+--                                   // hydrogen // schema // motion // timeline
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Timeline — Frame-based animation timing and layer coordination.
@@ -152,7 +152,7 @@ import Data.Maybe (Maybe(..))
 import Data.Number (floor)
 import Data.Int (toNumber) as Int
 
-import Hydrogen.Schema.Motion.TimeRemap (TimeRemap, identity, apply)
+import Hydrogen.Schema.Motion.TimeRemap (TimeRemap, identity, apply, applyInverse)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                        // types
@@ -328,17 +328,23 @@ globalToLocal globalFrame (TimelineLayer l) =
     localFrame
 
 -- | Convert local frame to global frame.
+-- |
+-- | This is the inverse of `globalToLocal`. For layers with time remapping,
+-- | this uses numerical inversion which may have small errors for complex
+-- | speed curves.
 localToGlobal :: Number -> TimelineLayer -> Number
 localToGlobal localFrame (TimelineLayer l) =
   let
     -- Remove in-point offset
     relativeLocal = localFrame - l.inPoint
     
-    -- TODO: Inverse time remap would go here (complex)
-    -- For now, assume linear
+    -- Apply inverse time remap if present
+    unremappedFrame = case l.timeRemap of
+      Nothing -> relativeLocal
+      Just remap -> applyInverse relativeLocal remap
     
     -- Add layer start
-    globalFrame = l.startFrame + relativeLocal
+    globalFrame = l.startFrame + unremappedFrame
   in
     globalFrame
 

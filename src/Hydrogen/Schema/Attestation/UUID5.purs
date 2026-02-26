@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                               // hydrogen // schema // attestation // uuid5
+--                                 // hydrogen // schema // attestation // uuid5
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Deterministic UUID generation using SHA-256.
@@ -36,6 +36,7 @@ module Hydrogen.Schema.Attestation.UUID5
   , uuid5
   , uuid5Bytes
   , uuid5FromHash
+  , fromString
   , toHex
   , toBytes
   , toString
@@ -77,9 +78,12 @@ import Prelude
   , ($)
   , (<>)
   , (-)
+  , (+)
+  , (*)
   , (<)
   , (>=)
   , (==)
+  , (&&)
   )
 
 import Data.Array (length, index, foldl, range, snoc, concat, slice) as Array
@@ -462,6 +466,57 @@ applyAt idx val arr =
     in Array.snoc acc v)
     []
     (Array.range 0 15)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                    // parsing
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Parse UUID5 from standard string format.
+-- |
+-- | Accepts format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (36 characters)
+-- | Also accepts format: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (32 characters)
+-- |
+-- | Returns nsElement (the nil-equivalent namespace) if parsing fails.
+-- | This is safe for deserialization since an invalid UUID will simply
+-- | not match any legitimate content-addressed ID.
+fromString :: String -> UUID5
+fromString str =
+  let
+    -- Remove dashes to get pure hex
+    chars = String.toCharArray str
+    hexChars = Array.foldl (\acc c -> 
+      if toCharCode c == 45 then acc  -- skip dash (ASCII 45)
+      else Array.snoc acc c) [] chars
+    
+    -- Parse pairs of hex chars into bytes
+    bytes = parseHexPairs hexChars 0 []
+  in
+    if Array.length bytes == 16
+    then UUID5 bytes
+    else nsElement  -- fallback to namespace if invalid
+
+-- | Parse pairs of hex characters into bytes
+parseHexPairs :: Array Char -> Int -> Array Int -> Array Int
+parseHexPairs chars idx acc =
+  if idx >= Array.length chars
+  then acc
+  else
+    let
+      c1 = fromMaybe '0' $ Array.index chars idx
+      c2 = fromMaybe '0' $ Array.index chars (idx + 1)
+      byte = hexCharToInt c1 * 16 + hexCharToInt c2
+    in
+      parseHexPairs chars (idx + 2) (Array.snoc acc byte)
+
+-- | Convert hex character to integer value
+hexCharToInt :: Char -> Int
+hexCharToInt c =
+  let code = toCharCode c
+  in
+    if code >= 48 && code < 58 then code - 48       -- '0'-'9'
+    else if code >= 65 && code < 71 then code - 55  -- 'A'-'F'
+    else if code >= 97 && code < 103 then code - 87 -- 'a'-'f'
+    else 0
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // output

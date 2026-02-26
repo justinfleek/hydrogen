@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                   // hydrogen // element // qrcode // encoding // reedsolomon // gf
+--             // hydrogen // element // qrcode // encoding // reedsolomon // gf
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Galois Field GF(2^8) — Finite field arithmetic for Reed-Solomon.

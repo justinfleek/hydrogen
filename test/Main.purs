@@ -30,6 +30,7 @@ import Test.Widget as Widget
 import Test.Scene3D as Scene3D
 import Test.WebGPU.Geometry as WebGPUGeometry
 import Test.Submodular.Property as SubmodularProperty
+import Test.GPU.Diffusion as GPUDiffusion
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -57,6 +58,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     WebGPUGeometry.geometryTests
   describe "FAA Submodular Allocation" do
     SubmodularProperty.spec
+  describe "GPU Diffusion" do
+    GPUDiffusion.diffusionPropertyTests
 
 -- =============================================================================
 --                                                              // format tests

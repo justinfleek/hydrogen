@@ -241,7 +241,7 @@ theorem latent_shape_nonempty (s : LatentShape) : 0 < s.totalElements := by
   have hc := s.channels.positive
   have hh := s.height.positive
   have hw := s.width.positive
-  omega
+  exact Nat.mul_pos (Nat.mul_pos (Nat.mul_pos hb hc) hh) hw
 
 /-- Common latent shapes for known architectures -/
 def sdxlLatentShape : LatentShape :=
@@ -289,7 +289,7 @@ def stepInRange (r : PercentRange) (currentStep totalSteps : ℕ)
 def PercentRange.full : PercentRange :=
   { startPercent := Unit01.zero
   , endPercent := Unit01.one
-  , ordered := by simp [Unit01.zero, Unit01.one]; norm_num }
+  , ordered := by simp only [Unit01.zero, Unit01.one]; norm_num }
 
 /-- Empty range: conditioning never applied (useful for unconditional) -/
 def PercentRange.empty : PercentRange :=

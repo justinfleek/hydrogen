@@ -61,6 +61,9 @@ module Hydrogen.Element.Compound.TreeView.Selection
   
   -- * Tree Traversal
   , subtreeNodes
+  , getParentNodeId
+  , isRootNode
+  , getParentNode
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -406,3 +409,27 @@ subtreeNodes tree node =
     children = childNodes nid tree
   in
     Array.cons node (Array.concatMap (subtreeNodes tree) children)
+
+-- | Get the parent node ID of a node, if it has one.
+-- |
+-- | Returns Nothing for root nodes.
+getParentNodeId :: TreeNode -> Maybe NodeId
+getParentNodeId node = 
+  case nodeParent node of
+    Nothing -> Nothing
+    Just pid -> Just pid
+
+-- | Check if a node is a root node (has no parent).
+-- |
+-- | Root nodes have no parent in the tree hierarchy.
+isRootNode :: TreeNode -> Boolean
+isRootNode node =
+  case nodeParent node of
+    Nothing -> true
+    Just _ -> false
+
+-- | Get the parent TreeNode from a NodeId.
+-- |
+-- | Returns Nothing if the node has no parent (is a root node).
+getParentNode :: NodeId -> Tree -> Maybe TreeNode
+getParentNode nid tree = parentNode nid tree
