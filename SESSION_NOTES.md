@@ -1,7 +1,7 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-26 (Session 5)
-**Build Status:** **PASSING** (0 errors, warnings only for leader module implicit re-exports)
+**Last Updated:** 2026-02-26 (Session 7 — Diffusion Primitives)
+**Build Status:** **PASSING** (0 errors, 0 warnings)
 
 ---
 
@@ -37,13 +37,14 @@ A thorough audit was completed comparing all implementations against `docs/SCHEM
 | 8. Reactive | 18 | **95%** | Complete |
 | 9. Gestural | 18+ | **95%** | Complete with Trigger subsystem |
 | 10. Haptic | 4 | **100%** | **COMPLETE** — Vibration, Audio, Event, Feedback |
-| 10b. Audio | 12 | **80%** | Synthesis, Effects, Analysis, Modulation, Spatial |
+| 10b. Audio | 24 | **95%** | Synthesis, Effects, Analysis, Modulation, Spatial + AudioEffect ADT + AVSync |
 | 11. Spatial | 39 | **90%** | Complete: XR, scene graph, materials, geometry, lights |
 | 12. Brand | 10 | **40%** | Missing tokens, themes, exports |
 | 13. Attestation | 6 | **80%** | Missing DID/VC/VP identity |
 | 14. Scheduling | 8 | **95%** | Complete |
 | 15. Sensation | 8 | **100%** | **COMPLETE** — All atoms, molecules, compounds + Lean proofs |
 | 16. Epistemic | 6 | N/A | Additional pillar (not in SCHEMA.md) |
+| 17. Accessibility | 7 | **100%** | **COMPLETE** — WAI-ARIA 1.2 roles, states, properties, landmarks |
 
 ### Critical Gaps (Priority Order)
 
@@ -78,6 +79,138 @@ A thorough audit was completed comparing all implementations against `docs/SCHEM
    - ✓ OpenType features (ligatures, numerals, fractions, stylistic, kerning)
    - ✓ Text decoration/emphasis
    - ✓ CJK features (ruby, vertical, traditional/simplified)
+
+---
+
+## Session 7 (2026-02-26) — Diffusion Primitives Implemented
+
+### GPU Diffusion Kernel Types (Council P0 Gap Closed)
+
+Per COUNCIL_REVIEW.md GPU Council specification: "DiffusionKernel ADT needed for AI image generation."
+
+**Created `src/Hydrogen/GPU/Diffusion.purs` (~840 lines):**
+
+| Type | Variants | Description |
+|------|----------|-------------|
+| `SchedulerType` | 16 variants | ComfyUI + res4lyf schedulers (normal, karras, exponential, beta57, etc.) |
+| `NoiseType` | 19 variants | Noise generators (gaussian, brownian, fractal family, pyramid, perlin, etc.) |
+| `NoiseMode` | 12 variants | Sigma scaling modes (hard, soft, lorentzian, sinusoidal, etc.) |
+| `GuideMode` | 9 variants | Guidance modes (flow, sync, lure, data, epsilon, pseudoimplicit, etc.) |
+| `ImplicitType` | 4 variants | Implicit solvers (rebound, retro-eta, bongmath, predictor-corrector) |
+| `DiffusionKernel` | 8 variants | Kernel ADT (Encode, Decode, Denoise, NoiseSchedule, LatentBlend, CFG, Sequence, Noop) |
+
+**Kernel Types:**
+- `EncodeKernel` — VAE image → latent (tiled support for large images)
+- `DecodeKernel` — VAE latent → image
+- `DenoiseKernel` — Single denoising step with full config
+- `NoiseScheduleKernel` — Sigma schedule generation
+- `LatentBlendKernel` — Inpainting/regional prompt blending
+- `CFGKernel` — Classifier-free guidance with rescale
+
+**Tensor/Conditioning Types:**
+- `LatentShape`, `LatentTensor` — Tensor metadata (shape, dtype, device, buffer index)
+- `TensorDtype` — float16, float32, bfloat16
+- `TensorDevice` — CPU, CUDA (by index), WebGPU
+- `Conditioning` — Text, Image, Composite, None
+- `TextConditioning` — CLIP/T5 embeddings with pooled optional
+- `ImageConditioning` — ControlNet, IP-Adapter, Reference, T2I-Adapter
+
+**Region Diffusion:**
+- `RegionDiffusionState` — Multi-region prompt support
+- `DiffusionRegion` — Mask + conditioning per region
+- `DiffusionBlendMode` — Linear, Softmax, Multiply, Feathered
+
+**Step Strategy:**
+- `StepStrategy` — Standard, Substep, Ancestral (with eta), SDE (with noise configs)
+- `SubstepConfig`, `SubstepMethod` — Euler, Heun, RK4, DPM-Solver
+
+**Configuration & Presets:**
+- `DiffusionConfig` — Complete sampling configuration
+- `defaultDiffusionConfig` — SDXL-optimized defaults
+- `eulerDiscretePreset` — Standard SDXL
+- `dpmPlusPlus2MPreset` — High quality with substeps
+- `flowMatchEulerPreset` — SD3/Flux flow matching
+- `res4lyfReboundPreset` — Beta57 + rebound implicit
+- `res4lyfPredictorCorrectorPreset` — Beta57 + predictor-corrector + SDE
+
+**RES4LYF Compatibility:**
+Types designed from direct analysis of res4lyf repository:
+- Scheduler names from `comfy.samplers.SCHEDULER_NAMES` + beta57
+- Noise types from `NOISE_GENERATOR_CLASSES` in `beta/noise_classes.py`
+- Noise modes from `NOISE_MODE_NAMES` in `beta/rk_noise_sampler_beta.py`
+- Guide modes from `GUIDE_MODE_NAMES_BETA_SIMPLE` in `beta/constants.py`
+- Implicit types from `IMPLICIT_TYPE_NAMES` in `beta/constants.py`
+
+**Build:** 0 errors, 0 warnings
+
+---
+
+## Session 6 (continued) — Audio Effect System Completed
+
+### AudioEffect ADT (Council Gap Closed)
+
+Per COUNCIL_REVIEW.md §3.6: "RenderEffect.purs is visual-only. No audio equivalent."
+
+**Created/Updated:**
+
+| File | Lines | Contents |
+|------|-------|----------|
+| `src/Hydrogen/Audio/AudioEffect.purs` | ~270 | Complete composable audio effect ADT |
+| `src/Hydrogen/Audio/AVSync.purs` | ~370 | Audio-visual synchronization primitives |
+| `src/Hydrogen/Schema/Audio/Effects.purs` | +90 | Added 12 new effect presets |
+
+**AudioEffect ADT:**
+- `EffectReverb`, `EffectDelay`, `EffectCompressor`, `EffectEQ`, `EffectDistortion`, `EffectGate`, `EffectLimiter`
+- `EffectSpatialize` — 3D positioning using Schema.Audio.Spatial atoms
+- Composition: `EffectSequence`, `EffectParallel`, `EffectConditional`, `EffectAnimated`, `EffectNone`
+- Presets: `vocalChain`, `drumBus`, `masterChain`, `ambientReverb`, `radioVoice`
+
+**New Effect Presets in Effects.purs:**
+- `gateDefault` — General purpose noise gate
+- `limiterDefault`, `limiterMaster` — Transparent and master bus limiting
+- `reverbAmbient` — Spacious atmospheric reverb
+- `compressorVocal`, `compressorDrums`, `compressorMaster` — Specialized compression
+- `eqPresence`, `eqDrumBus`, `eqMaster`, `eqTelephone` — EQ presets
+- `distortionSubtle` — Light saturation/warmth
+
+**AVSync.purs (New File):**
+- `SyncMode` — Immediate, OnVisible, OnProgress, OnMarker, Manual, None
+- `AudioCue` — Trigger with priority, offset, duration, interruptible flag
+- `AVElement` — Combined audio-visual element for synchronized rendering
+- `VoiceElement` — AI voice rendering (text + VoiceProfile + EmotionTag)
+- `EmotionTag` — 12 emotional colorings with intensity (Happy, Sad, Angry, etc.)
+- `LipSyncMode`, `LipSyncData`, `VisemeFrame` — Lip sync for AI avatars
+
+**Council Gaps Addressed:**
+- AudioEffect exists parallel to RenderEffect (visual ↔ audio parity)
+- AVElement type for synchronized audio-visual
+- VoiceElement type for AI voice synthesis
+
+---
+
+## Session 6 (2026-02-26) — Accessibility Pillar Implemented
+
+### Accessibility Schema (NEW PILLAR)
+
+Per COUNCIL_REVIEW.md P0 gap: "No ARIA atoms exist anywhere in the Schema."
+
+**Created `src/Hydrogen/Schema/Accessibility/`:**
+
+| File | Lines | Contents |
+|------|-------|----------|
+| `Role.purs` | ~200 | WidgetRole (20), CompositeRole (9), StructureRole (27), WindowRole (3) |
+| `State.purs` | ~210 | Tristate, AriaExpanded/Selected/Pressed/Checked/Disabled/Hidden/Invalid/Busy/Current/Grabbed |
+| `Property.purs` | ~200 | Relationship props, Widget props, Label props |
+| `LiveRegion.purs` | ~150 | Politeness, AriaLive/Atomic/Relevant + presets |
+| `Landmark.purs` | ~100 | 8 landmark roles + queries |
+| `Molecules.purs` | ~160 | DisclosureState, SelectionState, RangeState, TabState, DialogState |
+| `Accessibility.purs` | ~150 | Leader module with explicit re-exports |
+
+**Total:** ~1,170 lines of WAI-ARIA 1.2 primitives
+
+**Build:** 0 errors, 0 warnings from accessibility modules
+
+**Council Gap Addressed:** Web applications can now use Schema-level ARIA primitives instead of ad-hoc string attributes.
 
 ---
 

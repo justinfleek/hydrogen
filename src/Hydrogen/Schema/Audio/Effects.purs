@@ -27,6 +27,7 @@ module Hydrogen.Schema.Audio.Effects
   , reverbHall
   , reverbRoom
   , reverbPlate
+  , reverbAmbient
   
   -- * Delay
   , Delay
@@ -39,25 +40,36 @@ module Hydrogen.Schema.Audio.Effects
   , compressor
   , compressorGentle
   , compressorHard
+  , compressorVocal
+  , compressorDrums
+  , compressorMaster
   
   -- * EQ
   , EQBand
   , EQ
   , eqBand
   , eq3Band
+  , eqPresence
+  , eqDrumBus
+  , eqMaster
+  , eqTelephone
   
   -- * Distortion
   , DistortionType(..)
   , Distortion
   , distortion
+  , distortionSubtle
   
   -- * Gate
   , Gate
   , gate
+  , gateDefault
   
   -- * Limiter
   , Limiter
   , limiter
+  , limiterDefault
+  , limiterMaster
   ) where
 
 import Prelude
@@ -159,6 +171,18 @@ reverbPlate =
   , mix: Synth.mix 0.35
   , preDelayMs: 0.0
   , diffusion: 0.9
+  }
+
+-- | Ambient reverb preset — spacious, atmospheric.
+-- | Long decay, high diffusion for pads and cinematic textures.
+reverbAmbient :: Reverb
+reverbAmbient =
+  { algorithm: Hall
+  , roomSize: 1.0
+  , damping: 0.6
+  , mix: Synth.mix 0.5
+  , preDelayMs: 50.0
+  , diffusion: 0.95
   }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -273,6 +297,42 @@ compressorHard =
   , makeupDb: 6.0
   }
 
+-- | Vocal compressor preset — smooth, controlled dynamics.
+-- | Medium attack preserves transients, gentle ratio for transparency.
+compressorVocal :: Compressor
+compressorVocal =
+  { thresholdDb: (-18.0)
+  , ratio: 3.0
+  , attackMs: 15.0
+  , releaseMs: 150.0
+  , kneeDb: 8.0
+  , makeupDb: 4.0
+  }
+
+-- | Drum compressor preset — punchy, aggressive.
+-- | Fast attack catches transients, high ratio for punch.
+compressorDrums :: Compressor
+compressorDrums =
+  { thresholdDb: (-15.0)
+  , ratio: 6.0
+  , attackMs: 3.0
+  , releaseMs: 80.0
+  , kneeDb: 4.0
+  , makeupDb: 5.0
+  }
+
+-- | Master compressor preset — glue compression.
+-- | Very gentle, transparent bus compression.
+compressorMaster :: Compressor
+compressorMaster =
+  { thresholdDb: (-8.0)
+  , ratio: 1.5
+  , attackMs: 30.0
+  , releaseMs: 300.0
+  , kneeDb: 12.0
+  , makeupDb: 2.0
+  }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // eq molecule
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -314,6 +374,56 @@ eq3Band lowGain midGain highGain =
   , outputGainDb: 0.0
   }
 
+-- | Presence EQ preset — adds clarity and presence to vocals.
+-- | Boosts upper mids for intelligibility, slight air boost.
+eqPresence :: EQ
+eqPresence =
+  { bands:
+      [ eqBand 200.0 (-2.0) 0.8     -- Cut mud
+      , eqBand 3000.0 3.0 0.6       -- Presence boost
+      , eqBand 12000.0 2.0 0.5      -- Air/sparkle
+      ]
+  , outputGainDb: 0.0
+  }
+
+-- | Drum bus EQ preset — punchy low-end, controlled highs.
+eqDrumBus :: EQ
+eqDrumBus =
+  { bands:
+      [ eqBand 60.0 3.0 0.7         -- Sub weight
+      , eqBand 100.0 2.0 0.6        -- Punch
+      , eqBand 400.0 (-2.0) 0.5     -- Cut boxiness
+      , eqBand 4000.0 1.5 0.7       -- Attack definition
+      ]
+  , outputGainDb: 0.0
+  }
+
+-- | Master EQ preset — gentle final curve.
+-- | Subtle adjustments for cohesion.
+eqMaster :: EQ
+eqMaster =
+  { bands:
+      [ eqBand 30.0 1.0 0.5         -- Sub presence
+      , eqBand 250.0 (-1.0) 0.4     -- Clean up mud
+      , eqBand 3500.0 0.5 0.4       -- Slight presence
+      , eqBand 14000.0 1.0 0.5      -- Air
+      ]
+  , outputGainDb: 0.0
+  }
+
+-- | Telephone EQ preset — lo-fi bandpass filter.
+-- | Simulates narrow-band telephone/radio transmission.
+eqTelephone :: EQ
+eqTelephone =
+  { bands:
+      [ eqBand 80.0 (-15.0) 1.0     -- Cut lows
+      , eqBand 300.0 3.0 0.8        -- Boost low-mids
+      , eqBand 2500.0 4.0 0.6       -- Nasal presence
+      , eqBand 4000.0 (-12.0) 0.8   -- Cut highs
+      ]
+  , outputGainDb: (-3.0)
+  }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                         // distortion molecule
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -353,6 +463,16 @@ distortion dType drv mixAmount =
   , mix: Synth.mix mixAmount
   }
 
+-- | Subtle distortion preset — light saturation/warmth.
+-- | Adds harmonics without obvious distortion artifacts.
+distortionSubtle :: Distortion
+distortionSubtle =
+  { distType: Overdrive
+  , drive: Synth.drive 0.2
+  , tone: Synth.cutoff10k
+  , mix: Synth.mix 0.3
+  }
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // gate molecule
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -385,6 +505,16 @@ gate threshold attack hold release =
       | ms < 0.0 = 0.0
       | ms > 1000.0 = 1000.0
       | otherwise = ms
+
+-- | Default gate preset — general purpose noise gate.
+gateDefault :: Gate
+gateDefault =
+  { thresholdDb: (-40.0)
+  , attackMs: 1.0
+  , holdMs: 50.0
+  , releaseMs: 100.0
+  , rangeDb: (-80.0)
+  }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // limiter molecule
@@ -420,5 +550,24 @@ limiter threshold release ceiling =
       | c < (-6.0) = (-6.0)
       | c > 0.0 = 0.0
       | otherwise = c
+
+-- | Default limiter preset — transparent limiting.
+limiterDefault :: Limiter
+limiterDefault =
+  { thresholdDb: (-1.0)
+  , releaseMs: 100.0
+  , ceilingDb: (-0.3)
+  , lookaheadMs: 1.0
+  }
+
+-- | Master limiter preset — for final mix stage.
+-- | More aggressive with true peak limiting.
+limiterMaster :: Limiter
+limiterMaster =
+  { thresholdDb: (-3.0)
+  , releaseMs: 50.0
+  , ceilingDb: (-0.1)
+  , lookaheadMs: 3.0
+  }
 
 
