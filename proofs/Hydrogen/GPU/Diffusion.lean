@@ -51,6 +51,8 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
+set_option linter.unusedVariables false
+
 noncomputable section
 
 namespace Hydrogen.GPU.Diffusion

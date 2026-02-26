@@ -36,8 +36,8 @@
 -- | ## Current Limitations
 -- |
 -- | - Layout is position-based only (no auto-layout yet)
--- | - Text is placeholder (glyph shaping needs font metrics)
--- | - Styles must use Schema atoms (no CSS string parsing)
+-- | - Styles should use Schema atoms for type safety; CSS string parsing
+-- |   is provided for legacy compatibility but covers only common cases
 -- |
 -- | ## Usage
 -- |
@@ -87,6 +87,7 @@ import Prelude
   , unit
   , ($)
   , (+)
+  , (*)
   , (==)
   , (&&)
   , (<>)
@@ -96,6 +97,9 @@ import Data.Array as Array
 import Data.Foldable (foldl)
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Number as Number
+import Data.String.CodeUnits as String
+import Data.String.Pattern (Pattern(Pattern))
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Hydrogen.GPU.DrawCommand as DC
 import Hydrogen.GPU.Text as Text
@@ -198,6 +202,8 @@ flattenWithState state = case _ of
   E.Text str ->
     -- Generate draw commands for text using the typography pipeline.
     -- Uses current box position as text baseline origin.
+    -- The font configuration comes from the state, which can be customized
+    -- via flattenWithFont or updated through style extraction.
     let
       commands = Text.textToCommands 
         state.fontConfig 
@@ -234,6 +240,11 @@ flattenElement state _namespace _tag attrs children =
     borderRadius = extractBorderRadius attrs
     boxFromAttrs = extractBox attrs state.box
     
+    -- Extract font configuration from style attributes.
+    -- This propagates font settings (size, spacing, line-height) to child
+    -- text elements. If no font styles are specified, inherits from parent.
+    fontConfigFromAttrs = extractFontConfig attrs state.fontConfig
+    
     -- Extract click handler if present
     clickHandler = extractClickHandler attrs
     
@@ -268,10 +279,11 @@ flattenElement state _namespace _tag attrs children =
             }
         ]
     
-    -- Increment depth for children
+    -- Update state for children: increment depth, set box, propagate font config
     childState = state1 
       { currentDepth = state1.currentDepth + 1.0
       , box = boxFromAttrs
+      , fontConfig = fontConfigFromAttrs
       }
     
     -- Flatten children
@@ -299,7 +311,10 @@ flattenChildren state children =
 --                                                                     // layout
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Default layout box (full viewport, placeholder size).
+-- | Default layout box (1080p viewport dimensions).
+-- |
+-- | Provides reasonable defaults for flattening without explicit layout.
+-- | Override with actual viewport dimensions for responsive rendering.
 defaultBox :: LayoutBox
 defaultBox = { x: 0.0, y: 0.0, width: 1920.0, height: 1080.0 }
 
@@ -431,28 +446,136 @@ extractFontConfig attrs defaultConfig =
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Parse a CSS color string to RGBA.
--- | Supports: rgb(r,g,b), rgba(r,g,b,a), #RRGGBB, #RGB
+-- |
+-- | Supports:
+-- | - Hex colors: #RRGGBB, #RGB
+-- | - Named colors: black, white, red, green, blue (common subset)
 -- |
 -- | NOTE: This is for legacy compatibility. New components should use
--- | Schema atoms directly, not CSS strings.
+-- | Schema atoms directly, not CSS strings. For full CSS color parsing
+-- | including rgb(), rgba(), hsl(), etc., use a dedicated CSS parser.
 parseColorString :: String -> Maybe RGB.RGBA
-parseColorString _ = 
-  -- Simplified: return a default color for now.
-  -- Full CSS color parsing is complex and belongs in a legacy adapter.
-  -- Components using Schema atoms don't need this.
-  Nothing
+parseColorString str = case str of
+  -- Named colors (common subset)
+  "black"   -> Just (RGB.rgba 0 0 0 255)
+  "white"   -> Just (RGB.rgba 255 255 255 255)
+  "red"     -> Just (RGB.rgba 255 0 0 255)
+  "green"   -> Just (RGB.rgba 0 128 0 255)
+  "blue"    -> Just (RGB.rgba 0 0 255 255)
+  "yellow"  -> Just (RGB.rgba 255 255 0 255)
+  "cyan"    -> Just (RGB.rgba 0 255 255 255)
+  "magenta" -> Just (RGB.rgba 255 0 255 255)
+  "gray"    -> Just (RGB.rgba 128 128 128 255)
+  "grey"    -> Just (RGB.rgba 128 128 128 255)
+  "orange"  -> Just (RGB.rgba 255 165 0 255)
+  "purple"  -> Just (RGB.rgba 128 0 128 255)
+  "transparent" -> Just (RGB.rgba 0 0 0 0)
+  -- Hex colors
+  _ -> parseHexColor str
+
+-- | Parse hex color (#RGB or #RRGGBB)
+parseHexColor :: String -> Maybe RGB.RGBA
+parseHexColor str = case String.stripPrefix (Pattern "#") str of
+  Nothing -> Nothing
+  Just hex ->
+    let len = String.length hex
+    in if len == 6 then parseHex6 hex
+       else if len == 3 then parseHex3 hex
+       else Nothing
+
+-- | Parse 6-digit hex color (RRGGBB)
+parseHex6 :: String -> Maybe RGB.RGBA
+parseHex6 hex = 
+  let 
+    rStr = String.take 2 hex
+    gStr = String.take 2 (String.drop 2 hex)
+    bStr = String.take 2 (String.drop 4 hex)
+  in
+    case parseHexPair rStr, parseHexPair gStr, parseHexPair bStr of
+      Just r, Just g, Just b -> Just (RGB.rgba r g b 255)
+      _, _, _ -> Nothing
+
+-- | Parse 3-digit hex color (RGB) - each digit is doubled
+parseHex3 :: String -> Maybe RGB.RGBA
+parseHex3 hex =
+  let
+    rChar = String.take 1 hex
+    gChar = String.take 1 (String.drop 1 hex)
+    bChar = String.take 1 (String.drop 2 hex)
+  in
+    case parseHexDigit rChar, parseHexDigit gChar, parseHexDigit bChar of
+      Just r, Just g, Just b -> 
+        -- Double each digit: F -> FF (15 -> 255, not 15*16)
+        Just (RGB.rgba (r + r * 16) (g + g * 16) (b + b * 16) 255)
+      _, _, _ -> Nothing
+
+-- | Parse a two-character hex pair to Int (00-FF -> 0-255)
+parseHexPair :: String -> Maybe Int
+parseHexPair str =
+  case String.toCharArray str of
+    [c1, c2] -> 
+      case hexCharToInt c1, hexCharToInt c2 of
+        Just h, Just l -> Just (h * 16 + l)
+        _, _ -> Nothing
+    _ -> Nothing
+
+-- | Parse a single hex digit string to Int
+parseHexDigit :: String -> Maybe Int
+parseHexDigit str = case String.toCharArray str of
+  [c] -> hexCharToInt c
+  _ -> Nothing
+
+-- | Convert hex character to integer value
+hexCharToInt :: Char -> Maybe Int
+hexCharToInt c = case c of
+  '0' -> Just 0
+  '1' -> Just 1
+  '2' -> Just 2
+  '3' -> Just 3
+  '4' -> Just 4
+  '5' -> Just 5
+  '6' -> Just 6
+  '7' -> Just 7
+  '8' -> Just 8
+  '9' -> Just 9
+  'a' -> Just 10
+  'A' -> Just 10
+  'b' -> Just 11
+  'B' -> Just 11
+  'c' -> Just 12
+  'C' -> Just 12
+  'd' -> Just 13
+  'D' -> Just 13
+  'e' -> Just 14
+  'E' -> Just 14
+  'f' -> Just 15
+  'F' -> Just 15
+  _ -> Nothing
 
 -- | Parse a CSS radius string.
--- | Supports: Npx, Nrem, N%
+-- |
+-- | Supports:
+-- | - Pixel values: "8px", "16px"
+-- | - Plain numbers: "8", "16" (interpreted as pixels)
+-- |
+-- | For percentage-based or viewport-relative radii, use Schema atoms directly.
 parseRadiusString :: String -> Maybe Radius.Corners
-parseRadiusString _ =
-  -- Simplified: return none for now.
-  -- Components should use Geometry.Radius atoms directly.
-  Nothing
+parseRadiusString str = case parsePixelValue str of
+  Nothing -> Nothing
+  Just pxValue -> Just (Radius.cornersAll (Radius.px pxValue))
 
 -- | Parse a pixel value like "100px" or "100".
+-- |
+-- | Supports:
+-- | - Plain numbers: "100", "3.14"
+-- | - Pixel values: "100px", "3.14px"
+-- |
+-- | Returns Nothing for invalid strings or unsupported units.
 parsePixelValue :: String -> Maybe Number
-parsePixelValue _ =
-  -- Simplified: return nothing for now.
-  -- Full implementation would parse the string.
-  Nothing
+parsePixelValue str =
+  -- Try stripping "px" suffix first
+  case String.stripSuffix (Pattern "px") str of
+    Just numStr -> Number.fromString numStr
+    Nothing -> 
+      -- No "px" suffix, try parsing as plain number
+      Number.fromString str

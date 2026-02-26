@@ -859,7 +859,24 @@ data DisplayResponse
 | ~~**O(n) registry lookups**~~ | Real-Time Council | Bottleneck at 1000+ animations | P1 | **DONE** ✓ |
 | ~~**Variable timestep instability**~~ | Real-Time Council | Physics glitches | P1 | **DONE** ✓ |
 
-### Implementation Log (2026-02-26)
+### Implementation Log (2026-02-26, Session 9)
+
+**GPU Limitations Fixed — COMPLETE:**
+- `src/Hydrogen/GPU/EffectEvent.purs` — FocusTrigger implementation
+  - FocusTrigger ADT: FocusGained, FocusLost, FocusWithin, FocusVisible
+  - TriggerFocus constructor added to EffectTrigger
+  - onFocus preset uses proper TriggerFocus
+- `src/Hydrogen/GPU/Text.purs` — Unicode codepoint support
+  - Switched to Data.String.CodePoints.toCodePointArray
+  - Handles all Unicode including emoji and supplementary planes
+  - Full line breaking algorithm with word boundaries
+  - Text operations: truncateText, filterVisibleGlyphs, glyphsInBounds
+- `src/Hydrogen/GPU/Flatten.purs` — Text metrics integration
+  - Font config propagation to child text elements
+  - CSS parsers: parsePixelValue, parseColorString, parseRadiusString
+  - Hex color parsing (#RGB, #RRGGBB) + 12 named colors
+
+### Implementation Log (2026-02-26, Sessions 6-8)
 
 **AudioEffect System — COMPLETE:**
 - `src/Hydrogen/Audio/AudioEffect.purs` — Composable audio effect ADT
@@ -1069,19 +1086,30 @@ data architecture are excellent design decisions.
 - Fixed timestep spring physics (accumulator pattern, semi-implicit Euler)
 
 **Remaining work (P2 and below):**
-- GPU/Kernel/Video.purs — Video decode kernels
-- GPU/Kernel/Chart.purs — Waveform rendering
-- Schema/Temporal/Timecode.purs — SMPTE timecode
-- Input canonicalization and rollback
-- GPU/Resource.purs — Texture/buffer descriptors
-- GPU/Interpreter.purs — WebGPU execution
 
-**Recommendation:** Core infrastructure is complete. Focus on domain-specific
-kernels (video, charts) and runtime implementation. The "AI portal" capability
-is now architecturally unblocked.
+| Priority | Task | Description |
+|----------|------|-------------|
+| P2 | GPU/Resource.purs | TextureDescriptor, BufferDescriptor, PipelineCache |
+| P2 | GPU/Interpreter.purs | WGSL generation, WebGPU execution |
+| P2 | GPU/Kernel/Video.purs | YUV→RGB, LUT3D, scaling (Frame.io) |
+| P2 | GPU/Kernel/Chart.purs | Waveforms, sparklines, thresholds (medical) |
+| P2 | Schema/Temporal/Timecode.purs | SMPTE timecode, drop-frame, genlock |
+| P2 | Brand/Export/*.purs | CSS, JSON, Figma, Tailwind export formats |
+| P3 | Input canonicalization | Rollback/resimulation for network latency |
+| P3 | JSON codecs | EncodeJson/DecodeJson for Schema atoms |
+| P3 | WebGL runtime | Element → GPU command buffer |
+
+**Recommendation:** Core infrastructure is complete. All P0/P1 gaps are closed.
+Focus on:
+1. Domain-specific kernels (video, charts) for application-specific use cases
+2. Runtime implementation (GPU/Interpreter.purs) to execute kernels
+3. JSON serialization to enable persistence and network transmission
+
+The "AI portal" capability is now architecturally unblocked.
 
 ────────────────────────────────────────────────────────────────────────────────
 
                                                — The Council // 2026-02-26
+                                               — Session 9 update // 2026-02-26
 
 ────────────────────────────────────────────────────────────────────────────────

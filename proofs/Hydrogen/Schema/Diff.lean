@@ -23,6 +23,9 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
+set_option linter.dupNamespace false
+set_option linter.unusedVariables false
+
 namespace Hydrogen.Schema.Diff
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
