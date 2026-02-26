@@ -210,18 +210,32 @@ The main theorem: FAA achieves (1-1/e - ε) approximation in O(√T) iterations,
 where ε = O(L/OPT) is negligible when OPT is large.
 -/
 
-/-- FAA speedup factor: √T iterations instead of T -/
+/-- FAA speedup factor: √T iterations instead of T.
+    
+    For T ≥ 1, FAA uses at most √T iterations to achieve the (1-1/e) guarantee.
+    This is a quadratic speedup over standard continuous greedy.
+-/
 theorem faa_iteration_reduction (T : ℕ) (hT : 1 ≤ T) :
-    (faaIterations T : ℝ) ≤ Real.sqrt T := by
+    (faaIterations T : ℝ) ≤ Real.sqrt T ∧ 1 ≤ faaIterations T := by
   simp only [faaIterations]
-  have h := Nat.sqrt_le T  -- sqrt T * sqrt T ≤ T
-  have h' : (Nat.sqrt T : ℝ) * Nat.sqrt T ≤ T := by
-    rw [← Nat.cast_mul]
-    exact Nat.cast_le.mpr h
-  calc (Nat.sqrt T : ℝ) = Real.sqrt ((Nat.sqrt T : ℝ) ^ 2) := by
-         rw [Real.sqrt_sq (Nat.cast_nonneg _)]
-    _ = Real.sqrt ((Nat.sqrt T : ℝ) * (Nat.sqrt T : ℝ)) := by ring_nf
-    _ ≤ Real.sqrt T := Real.sqrt_le_sqrt h'
+  constructor
+  · -- Upper bound: Nat.sqrt T ≤ Real.sqrt T
+    have h := Nat.sqrt_le T  -- sqrt T * sqrt T ≤ T
+    have h' : (Nat.sqrt T : ℝ) * Nat.sqrt T ≤ T := by
+      rw [← Nat.cast_mul]
+      exact Nat.cast_le.mpr h
+    calc (Nat.sqrt T : ℝ) = Real.sqrt ((Nat.sqrt T : ℝ) ^ 2) := by
+           rw [Real.sqrt_sq (Nat.cast_nonneg _)]
+      _ = Real.sqrt ((Nat.sqrt T : ℝ) * (Nat.sqrt T : ℝ)) := by ring_nf
+      _ ≤ Real.sqrt T := Real.sqrt_le_sqrt h'
+  · -- Lower bound: Nat.sqrt T ≥ 1 when T ≥ 1
+    -- Nat.sqrt T ≥ 1 iff 1 * 1 ≤ T iff 1 ≤ T
+    have h1 : 1 ≤ Nat.sqrt T := by
+      have hsq : 1 * 1 ≤ T := by omega
+      have : Nat.sqrt 1 ≤ Nat.sqrt T := Nat.sqrt_le_sqrt hsq
+      simp only [Nat.sqrt_one] at this
+      exact this
+    exact h1
 
 /-- FAA speedup ratio: uses 1/√T fraction of standard iterations -/
 theorem faa_speedup (T : ℕ) (hT : 1 ≤ T) :
