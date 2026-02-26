@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                           // hydrogen // schema // color // hue
+--                                         // hydrogen // schema // color // hue
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Hue - position on the color wheel.
@@ -23,6 +23,33 @@ module Hydrogen.Schema.Color.Hue
   , complement
   , bounds
   , toNumber
+  -- Operations
+  , blend
+  , blendShortestPath
+  , lerp
+  , toRadians
+  , toDegrees
+  , distance
+  , shortestDistance
+  -- Predicates
+  , isWarm
+  , isCool
+  , isRed
+  , isOrange
+  , isYellow
+  , isGreen
+  , isCyan
+  , isBlue
+  , isMagenta
+  , colorCategory
+  -- Constants
+  , red
+  , orange
+  , yellow
+  , green
+  , cyan
+  , blue
+  , magenta
   ) where
 
 import Prelude
@@ -31,11 +58,24 @@ import Prelude
   , class Show
   , show
   , mod
+  , negate
+  , otherwise
   , (+)
+  , (-)
+  , (*)
+  , (/)
   , (<>)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (&&)
+  , (||)
   )
 
-import Data.Int (toNumber) as Int
+import Data.Int (toNumber, round) as Int
+import Data.Number (pi) as Number
+import Data.Ord (abs) as Ord
 import Hydrogen.Schema.Bounded as Bounded
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -83,6 +123,187 @@ rotate degrees' (Hue h) = hueWrap (h + degrees')
 -- | Get complementary hue (opposite on color wheel)
 complement :: Hue -> Hue
 complement = rotate 180
+
+-- | Blend two hues by simple linear interpolation
+-- |
+-- | WARNING: This takes the "long way" around the color wheel for large
+-- | differences. For perceptually correct blending, use `blendShortestPath`.
+-- | ```purescript
+-- | blend 0.5 (hue 10) (hue 350)  -- hue 180 (through green/cyan!)
+-- | ```
+blend :: Number -> Hue -> Hue -> Hue
+blend weight (Hue a) (Hue b) =
+  let w = Bounded.clampNumber 0.0 1.0 weight
+      result = Int.toNumber a * (1.0 - w) + Int.toNumber b * w
+  in hueWrap (Int.round result)
+
+-- | Blend two hues via shortest path around the color wheel
+-- |
+-- | This is perceptually correct for hue interpolation. It automatically
+-- | chooses the shorter arc between two hues:
+-- | ```purescript
+-- | blendShortestPath 0.5 (hue 10) (hue 350)  -- hue 0 (through red!)
+-- | blendShortestPath 0.5 red cyan            -- hue 90 (yellow-green)
+-- | ```
+blendShortestPath :: Number -> Hue -> Hue -> Hue
+blendShortestPath weight (Hue a) (Hue b) =
+  let w = Bounded.clampNumber 0.0 1.0 weight
+      diff = b - a
+      -- Choose shorter direction around the wheel
+      adjustedDiff = if diff > 180 then diff - 360
+                     else if diff < negate 180 then diff + 360
+                     else diff
+      result = Int.toNumber a + Int.toNumber adjustedDiff * w
+  in hueWrap (Int.round result)
+
+-- | Linear interpolation (standard lerp signature)
+-- |
+-- | Uses shortest path blending for perceptual correctness:
+-- | ```purescript
+-- | lerp red blue 0.5  -- Hue at 300° (magenta)
+-- | ```
+lerp :: Hue -> Hue -> Number -> Hue
+lerp from to t = blendShortestPath t from to
+
+-- | Convert hue to radians (0° = 0, 360° = 2π)
+-- |
+-- | Useful for trigonometric calculations in color math:
+-- | ```purescript
+-- | toRadians (hue 180)  -- π (approximately 3.14159)
+-- | toRadians red        -- 0.0
+-- | ```
+toRadians :: Hue -> Number
+toRadians (Hue h) = Int.toNumber h * Number.pi / 180.0
+
+-- | Convert hue to degrees as Number (for precision calculations)
+toDegrees :: Hue -> Number
+toDegrees (Hue h) = Int.toNumber h
+
+-- | Angular distance between two hues (always positive, can be > 180)
+-- |
+-- | Simple absolute difference, doesn't account for wraparound:
+-- | ```purescript
+-- | distance (hue 10) (hue 350)  -- 340
+-- | ```
+distance :: Hue -> Hue -> Int
+distance (Hue a) (Hue b) = Ord.abs (a - b)
+
+-- | Shortest angular distance between two hues (0-180)
+-- |
+-- | Accounts for wraparound - always returns the shorter arc:
+-- | ```purescript
+-- | shortestDistance (hue 10) (hue 350)  -- 20 (through red)
+-- | shortestDistance red cyan            -- 180
+-- | ```
+shortestDistance :: Hue -> Hue -> Int
+shortestDistance (Hue a) (Hue b) =
+  let diff = Ord.abs (a - b)
+  in if diff > 180 then 360 - diff else diff
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // predicates
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if hue is warm (red through yellow, 0-60° and 300-360°)
+-- |
+-- | Warm colors advance visually and feel energetic:
+-- | ```purescript
+-- | isWarm red      -- true (0°)
+-- | isWarm yellow   -- true (60°)
+-- | isWarm magenta  -- true (300°)
+-- | isWarm cyan     -- false (180°)
+-- | ```
+isWarm :: Hue -> Boolean
+isWarm (Hue h) = h <= 60 || h >= 300
+
+-- | Check if hue is cool (cyan through blue, 150-270°)
+-- |
+-- | Cool colors recede visually and feel calm:
+-- | ```purescript
+-- | isCool cyan  -- true (180°)
+-- | isCool blue  -- true (240°)
+-- | isCool red   -- false (0°)
+-- | ```
+isCool :: Hue -> Boolean
+isCool (Hue h) = h >= 150 && h <= 270
+
+-- | Check if hue is in the red range (330-30°, wrapping through 0)
+isRed :: Hue -> Boolean
+isRed (Hue h) = h >= 330 || h <= 30
+
+-- | Check if hue is in the orange range (30-60°)
+isOrange :: Hue -> Boolean
+isOrange (Hue h) = h >= 30 && h < 60
+
+-- | Check if hue is in the yellow range (60-90°)
+isYellow :: Hue -> Boolean
+isYellow (Hue h) = h >= 60 && h < 90
+
+-- | Check if hue is in the green range (90-150°)
+isGreen :: Hue -> Boolean
+isGreen (Hue h) = h >= 90 && h < 150
+
+-- | Check if hue is in the cyan range (150-210°)
+isCyan :: Hue -> Boolean
+isCyan (Hue h) = h >= 150 && h < 210
+
+-- | Check if hue is in the blue range (210-270°)
+isBlue :: Hue -> Boolean
+isBlue (Hue h) = h >= 210 && h < 270
+
+-- | Check if hue is in the magenta range (270-330°)
+isMagenta :: Hue -> Boolean
+isMagenta (Hue h) = h >= 270 && h < 330
+
+-- | Classify a hue into its primary color category
+-- |
+-- | Returns a human-readable color name for the hue's region:
+-- | ```purescript
+-- | colorCategory red     -- "red"
+-- | colorCategory (hue 45)  -- "orange"
+-- | colorCategory cyan    -- "cyan"
+-- | ```
+colorCategory :: Hue -> String
+colorCategory (Hue h)
+  | h >= 330 || h < 30  = "red"
+  | h >= 30 && h < 60   = "orange"
+  | h >= 60 && h < 90   = "yellow"
+  | h >= 90 && h < 150  = "green"
+  | h >= 150 && h < 210 = "cyan"
+  | h >= 210 && h < 270 = "blue"
+  | otherwise           = "magenta"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                   // constants
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Red (0°)
+red :: Hue
+red = Hue 0
+
+-- | Orange (30°)
+orange :: Hue
+orange = Hue 30
+
+-- | Yellow (60°)
+yellow :: Hue
+yellow = Hue 60
+
+-- | Green (120°)
+green :: Hue
+green = Hue 120
+
+-- | Cyan (180°)
+cyan :: Hue
+cyan = Hue 180
+
+-- | Blue (240°)
+blue :: Hue
+blue = Hue 240
+
+-- | Magenta (300°)
+magenta :: Hue
+magenta = Hue 300
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

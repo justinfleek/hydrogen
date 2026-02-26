@@ -1,6 +1,6 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-26 (Session 7 — Diffusion Primitives)
+**Last Updated:** 2026-02-26 (Session 8 — Council Gaps Complete)
 **Build Status:** **PASSING** (0 errors, 0 warnings)
 
 ---
@@ -39,7 +39,7 @@ A thorough audit was completed comparing all implementations against `docs/SCHEM
 | 10. Haptic | 4 | **100%** | **COMPLETE** — Vibration, Audio, Event, Feedback |
 | 10b. Audio | 24 | **95%** | Synthesis, Effects, Analysis, Modulation, Spatial + AudioEffect ADT + AVSync |
 | 11. Spatial | 39 | **90%** | Complete: XR, scene graph, materials, geometry, lights |
-| 12. Brand | 10 | **40%** | Missing tokens, themes, exports |
+| 12. Brand | 37 | **90%** | Tokens, themes, logo, voice complete. Missing: export formats |
 | 13. Attestation | 6 | **80%** | Missing DID/VC/VP identity |
 | 14. Scheduling | 8 | **95%** | Complete |
 | 15. Sensation | 8 | **100%** | **COMPLETE** — All atoms, molecules, compounds + Lean proofs |
@@ -48,17 +48,17 @@ A thorough audit was completed comparing all implementations against `docs/SCHEM
 
 ### Critical Gaps (Priority Order)
 
-1. **AUDIO (15%)** — Blocks audio/music workflows
-   - Missing: Synthesis (ADSR, oscillators, filters)
-   - Missing: Effects (reverb, delay, compressor, EQ)
-   - Missing: Analysis (FFT, metering, pitch detection)
-   - Missing: All molecules and compounds
+**ALL P0/P1 GAPS CLOSED** — See Council Review for details.
 
-2. **BRAND (40%)** — Blocks design system export
-   - Missing: Token scales (color, spacing, effects)
-   - Missing: Component tokens (button, input, card)
-   - Missing: Theme configuration (light/dark/contrast)
-   - Missing: Export formats (CSS, JSON, Figma, Tailwind)
+Remaining P2 gaps:
+
+1. **BRAND EXPORT FORMATS** — Design system export
+   - Missing: CSSExport, JSONExport, FigmaExport, TailwindExport, SCSSExport
+   - Core tokens/themes complete (37 files)
+
+2. **GPU KERNELS** — Domain-specific rendering
+   - Missing: Video.purs (YUV→RGB, LUT3D)
+   - Missing: Chart.purs (waveforms, trends)
 
 3. ~~**SPATIAL (50%)**~~ → **SPATIAL (85%)** — Session 2 progress
    - ✓ Camera types (CubemapCamera, VRCamera, CinematicCamera)
@@ -79,6 +79,53 @@ A thorough audit was completed comparing all implementations against `docs/SCHEM
    - ✓ OpenType features (ligatures, numerals, fractions, stylistic, kerning)
    - ✓ Text decoration/emphasis
    - ✓ CJK features (ruby, vertical, traditional/simplified)
+
+---
+
+## Session 8 (2026-02-26) — Council Review Gaps Complete
+
+### ALL P0/P1 COUNCIL GAPS NOW CLOSED
+
+This session completed the remaining critical gaps identified in the Council Review.
+
+**Created:**
+
+1. **SDF Text Rendering Kernels** (`src/Hydrogen/GPU/Kernel/Text.purs` ~1000 lines)
+   - TextKernel ADT: GlyphRasterize, TextLayout, SubpixelAA, CursorBlink, TextMask
+   - RasterizeMode: SDF, MSDF, MTSDF (multi-channel for sharp corners)
+   - SubpixelMode: None, RGB, BGR, VRGB, VBGR (ClearType-style LCD rendering)
+   - SubpixelFilter: Box, Linear, Gaussian
+   - CursorStyle: Block, Underline, Bar, Hollow (with blink)
+   - TextEffect: Outline, Shadow, Glow, Bevel
+   - Presets: ghosttyTerminalPipeline, ideEditorPipeline, uiLabelPipeline, gameHUDPipeline
+   - Unblocks: Ghostty-class terminal rendering
+
+2. **Fixed Timestep Spring Physics** (`src/Hydrogen/Motion/Spring.purs` extended)
+   - SpringInstance type with position/velocity/accumulator state
+   - `tickSpring` — Variable dt with internal accumulator
+   - `tickSpringFixed` — Process accumulated time in fixed steps
+   - `stepSpring` — Single physics step using semi-implicit Euler
+   - `criticalDamping`, `dampingRatio` — Damping analysis functions
+   - `isCriticallyDamped`, `isOverdamped`, `isUnderdamped` — Spring type predicates
+   - Fixes variable timestep instability at high stiffness (k > 1000)
+
+**Updated:**
+- `docs/INTERNAL/COUNCIL_REVIEW.md` — All gaps marked DONE with implementation details
+
+### Council Gap Status Summary
+
+| Gap | Priority | Status |
+|-----|----------|--------|
+| Diffusion primitives | P0 | **DONE** (Session 7) |
+| Distributed time sync | P0 | **DONE** (Session 7) |
+| AudioEffect system | P0 | **DONE** (Session 6) |
+| ARIA accessibility | P0 | **DONE** (Session 6) |
+| SDF text kernels | P1 | **DONE** (Session 8) |
+| DataValidity failure modes | P1 | **DONE** (Session 7) |
+| O(n) registry lookups | P1 | **DONE** (already uses Map) |
+| Variable timestep instability | P1 | **DONE** (Session 8) |
+
+**Build:** 0 errors, 0 warnings
 
 ---
 
@@ -473,10 +520,13 @@ Modified files:
 
 ## Next Steps (Recommended Order)
 
-1. **Audio Pillar (15%)** — Largest gap, ~50+ atoms/molecules/compounds needed
-2. **Brand Pillar (40%)** — Token scales, themes, export formats
-3. **Geometry Pillar (90%)** — Missing ArcMinute/ArcSecond, Mask compound
-4. **Spatial Pillar (90%)** — Remaining minor atoms if any
+**ALL P0/P1 COUNCIL GAPS CLOSED.** Remaining work is P2:
+
+1. **GPU/Kernel/Video.purs** — YUV→RGB, LUT3D, frame scaling (unblocks Frame.io)
+2. **GPU/Kernel/Chart.purs** — Waveforms, trends, threshold overlays (medical/audio)
+3. **Brand Export Formats** — CSSExport, JSONExport, FigmaExport, TailwindExport
+4. **GPU/Resource.purs** — TextureDescriptor, BufferDescriptor, PipelineCache
+5. **GPU/Interpreter.purs** — Execute ComputeKernel against WebGPU
 
 ---
 

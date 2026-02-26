@@ -21,10 +21,27 @@ module Hydrogen.Schema.Material.BlurRadius
   , unwrap
   , toNumber
   , bounds
+  -- Constants
   , none
   , subtle
   , moderate
   , heavy
+  , extreme
+  -- Operations
+  , blend
+  , lerp
+  , scale
+  , add
+  , subtract
+  , toLegacyCss
+  -- Predicates
+  , isSharp
+  , isSubtle
+  , isModerate
+  , isHeavy
+  , isExtreme
+  , atLeast
+  , lessThan
   ) where
 
 import Prelude
@@ -33,6 +50,15 @@ import Prelude
   , class Show
   , show
   , (<>)
+  , (+)
+  , (-)
+  , (*)
+  , (==)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (&&)
   )
 
 import Hydrogen.Schema.Bounded as Bounded
@@ -80,6 +106,135 @@ moderate = BlurRadius 25.0
 -- | Heavy blur (50px)
 heavy :: BlurRadius
 heavy = BlurRadius 50.0
+
+-- | Extreme blur (100px)
+extreme :: BlurRadius
+extreme = BlurRadius 100.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // operations
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Blend two blur radii with weight (0.0 = all first, 1.0 = all second)
+-- |
+-- | Linear interpolation for animated blur effects:
+-- | ```purescript
+-- | blend 0.5 none heavy  -- BlurRadius 25px (midpoint)
+-- | ```
+blend :: Number -> BlurRadius -> BlurRadius -> BlurRadius
+blend weight (BlurRadius a) (BlurRadius b) =
+  let w = Bounded.clampNumber 0.0 1.0 weight
+  in blurRadius (a * (1.0 - w) + b * w)
+
+-- | Linear interpolation (standard lerp signature)
+lerp :: BlurRadius -> BlurRadius -> Number -> BlurRadius
+lerp from to t = blend t from to
+
+-- | Scale blur radius by a factor
+-- |
+-- | Useful for resolution-aware adjustments:
+-- | ```purescript
+-- | scale 2.0 subtle  -- BlurRadius 20px
+-- | scale 0.5 heavy   -- BlurRadius 25px
+-- | ```
+scale :: Number -> BlurRadius -> BlurRadius
+scale factor (BlurRadius r) = blurRadius (r * factor)
+
+-- | Add to blur radius (clamped at 0)
+add :: Number -> BlurRadius -> BlurRadius
+add amount (BlurRadius r) = blurRadius (r + amount)
+
+-- | Subtract from blur radius (clamped at 0)
+subtract :: Number -> BlurRadius -> BlurRadius
+subtract amount (BlurRadius r) = blurRadius (r - amount)
+
+-- NOT an FFI boundary - pure string generation.
+-- | Convert to CSS blur() filter value
+-- |
+-- | For use in CSS filter property:
+-- | ```purescript
+-- | toLegacyCss subtle  -- "blur(10px)"
+-- | ```
+toLegacyCss :: BlurRadius -> String
+toLegacyCss (BlurRadius r) = "blur(" <> show r <> "px)"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // predicates
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if blur is sharp (no blur, radius = 0)
+-- |
+-- | Sharp elements have no Gaussian blur applied:
+-- | ```purescript
+-- | isSharp none    -- true
+-- | isSharp subtle  -- false
+-- | ```
+isSharp :: BlurRadius -> Boolean
+isSharp (BlurRadius r) = r == 0.0
+
+-- | Check if blur is subtle (0 < radius <= 15px)
+-- |
+-- | Subtle blur for soft shadows and gentle effects:
+-- | ```purescript
+-- | isSubtle subtle             -- true (10px)
+-- | isSubtle (blurRadius 5.0)   -- true
+-- | isSubtle none               -- false
+-- | ```
+isSubtle :: BlurRadius -> Boolean
+isSubtle (BlurRadius r) = r > 0.0 && r <= 15.0
+
+-- | Check if blur is moderate (15px < radius <= 35px)
+-- |
+-- | Moderate blur for backdrop effects and depth:
+-- | ```purescript
+-- | isModerate moderate         -- true (25px)
+-- | isModerate (blurRadius 30.0) -- true
+-- | isModerate subtle           -- false
+-- | ```
+isModerate :: BlurRadius -> Boolean
+isModerate (BlurRadius r) = r > 15.0 && r <= 35.0
+
+-- | Check if blur is heavy (35px < radius <= 75px)
+-- |
+-- | Heavy blur for strong frosted glass and emphasis effects:
+-- | ```purescript
+-- | isHeavy heavy              -- true (50px)
+-- | isHeavy (blurRadius 60.0)  -- true
+-- | isHeavy moderate           -- false
+-- | ```
+isHeavy :: BlurRadius -> Boolean
+isHeavy (BlurRadius r) = r > 35.0 && r <= 75.0
+
+-- | Check if blur is extreme (> 75px)
+-- |
+-- | Extreme blur for dramatic visual effects:
+-- | ```purescript
+-- | isExtreme extreme            -- true (100px)
+-- | isExtreme (blurRadius 150.0) -- true
+-- | isExtreme heavy              -- false
+-- | ```
+isExtreme :: BlurRadius -> Boolean
+isExtreme (BlurRadius r) = r > 75.0
+
+-- | Check if blur radius is at least a given value
+-- |
+-- | Useful for threshold checks in rendering pipelines:
+-- | ```purescript
+-- | atLeast 20.0 moderate  -- true (25px >= 20px)
+-- | atLeast 30.0 subtle    -- false (10px < 30px)
+-- | ```
+atLeast :: Number -> BlurRadius -> Boolean
+atLeast threshold (BlurRadius r) = r >= threshold
+
+-- | Check if blur radius is less than a given value
+-- |
+-- | Useful for performance optimizations (skip blur if negligible):
+-- | ```purescript
+-- | lessThan 5.0 (blurRadius 3.0)  -- true
+-- | lessThan 5.0 subtle            -- false (10px >= 5px)
+-- | ```
+lessThan :: Number -> BlurRadius -> Boolean
+lessThan threshold (BlurRadius r) = r < threshold
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

@@ -19,6 +19,7 @@
 module Hydrogen.Schema.Gestural.Gesture.Swipe
   ( -- * Swipe Direction
     SwipeDirection(SwipeUp, SwipeDown, SwipeLeft, SwipeRight)
+  , allSwipeDirections
   , isSwipeHorizontal
   , isSwipeVertical
   , oppositeSwipe
@@ -69,6 +70,10 @@ instance showSwipeDirection :: Show SwipeDirection where
   show SwipeDown = "down"
   show SwipeLeft = "left"
   show SwipeRight = "right"
+
+-- | All swipe directions for enumeration
+allSwipeDirections :: Array SwipeDirection
+allSwipeDirections = [ SwipeUp, SwipeDown, SwipeLeft, SwipeRight ]
 
 -- | Is swipe horizontal?
 isSwipeHorizontal :: SwipeDirection -> Boolean

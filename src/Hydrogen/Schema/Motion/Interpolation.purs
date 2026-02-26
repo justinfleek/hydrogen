@@ -33,6 +33,7 @@
 module Hydrogen.Schema.Motion.Interpolation
   ( -- * Full Interpolation Type
     FullInterpolationType(..)
+  , allFullInterpolationTypes
   , fullInterpolationTypeToString
   , fullInterpolationTypeFromString
   , isBaseInterpolation
@@ -107,6 +108,7 @@ module Hydrogen.Schema.Motion.Interpolation
   
   -- * Control Mode
   , ControlMode(..)
+  , allControlModes
   , controlModeToString
   , controlModeFromString
   
@@ -269,6 +271,44 @@ fullInterpolationTypeFromString "easeInBounce" = Just FITEaseInBounce
 fullInterpolationTypeFromString "easeOutBounce" = Just FITEaseOutBounce
 fullInterpolationTypeFromString "easeInOutBounce" = Just FITEaseInOutBounce
 fullInterpolationTypeFromString _ = Nothing
+
+-- | All interpolation types for enumeration
+allFullInterpolationTypes :: Array FullInterpolationType
+allFullInterpolationTypes =
+  [ FITLinear
+  , FITBezier
+  , FITHold
+  , FITEaseInSine
+  , FITEaseOutSine
+  , FITEaseInOutSine
+  , FITEaseInQuad
+  , FITEaseOutQuad
+  , FITEaseInOutQuad
+  , FITEaseInCubic
+  , FITEaseOutCubic
+  , FITEaseInOutCubic
+  , FITEaseInQuart
+  , FITEaseOutQuart
+  , FITEaseInOutQuart
+  , FITEaseInQuint
+  , FITEaseOutQuint
+  , FITEaseInOutQuint
+  , FITEaseInExpo
+  , FITEaseOutExpo
+  , FITEaseInOutExpo
+  , FITEaseInCirc
+  , FITEaseOutCirc
+  , FITEaseInOutCirc
+  , FITEaseInBack
+  , FITEaseOutBack
+  , FITEaseInOutBack
+  , FITEaseInElastic
+  , FITEaseOutElastic
+  , FITEaseInOutElastic
+  , FITEaseInBounce
+  , FITEaseOutBounce
+  , FITEaseInOutBounce
+  ]
 
 -- | Check if interpolation type is a base type (linear, bezier, hold).
 isBaseInterpolation :: FullInterpolationType -> Boolean
@@ -480,6 +520,10 @@ derive instance ordControlMode :: Ord ControlMode
 
 instance showControlMode :: Show ControlMode where
   show = controlModeToString
+
+-- | All control modes for enumeration
+allControlModes :: Array ControlMode
+allControlModes = [ CMSymmetric, CMSmooth, CMCorner ]
 
 -- | Convert control mode to string
 controlModeToString :: ControlMode -> String

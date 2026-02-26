@@ -101,6 +101,7 @@ module Hydrogen.Schema.Audio.Frequency
   
   -- * Note Names
   , NoteName(..)
+  , allNoteNames
   , midiToNoteName
   , midiToOctaveNumber
   , noteNameToString
@@ -580,6 +581,10 @@ derive instance ordNoteName :: Ord NoteName
 
 instance showNoteName :: Show NoteName where
   show n = noteNameToString n
+
+-- | All note names for enumeration (chromatic scale)
+allNoteNames :: Array NoteName
+allNoteNames = [ C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B ]
 
 -- | Convert note name to string representation
 noteNameToString :: NoteName -> String

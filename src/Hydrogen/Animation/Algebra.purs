@@ -1,12 +1,11 @@
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- Hydrogen.Animation.Algebra
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---
--- Pure animation algebra for typography and element animations.
--- All combinators are lawful (Semigroup, Monoid, Applicative).
--- Time is bounded. Transforms compose. Everything is deterministic.
---
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                           // hydrogen // animation // algebra
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Pure animation algebra for typography and element animations.
+-- |
+-- | All combinators are lawful (Semigroup, Monoid, Applicative).
+-- | Time is bounded. Transforms compose. Everything is deterministic.
 
 module Hydrogen.Animation.Algebra
   ( -- Time primitives

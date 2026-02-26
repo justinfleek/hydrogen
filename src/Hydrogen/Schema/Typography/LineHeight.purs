@@ -1,5 +1,5 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---                                 // hydrogen // schema // typography // lineheight
+--                             // hydrogen // schema // typography // lineheight
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | LineHeight - vertical rhythm and text leading.
@@ -30,9 +30,37 @@ module Hydrogen.Schema.Typography.LineHeight
   , normal
   , relaxed
   , loose
+  -- Operations
+  , blend
+  , lerp
+  , scale
+  , add
+  , subtract
+  , toNumber
+  -- Predicates
+  , isSolid
+  , isTight
+  , isNormal
+  , isRelaxed
+  , isLoose
+  , atLeast
+  , lessThan
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , (+)
+  , (-)
+  , (*)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (&&)
+  )
 
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Typography.FontSize (FontSize)
@@ -109,6 +137,120 @@ relaxed = LineHeight 1.75
 -- | room to breathe.
 loose :: LineHeight
 loose = LineHeight 2.0
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // operations
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Blend two line heights with weight (0.0 = all first, 1.0 = all second)
+-- |
+-- | Linear interpolation for animated typography:
+-- | ```purescript
+-- | blend 0.5 tight relaxed  -- LineHeight 1.5 (midpoint)
+-- | ```
+blend :: Number -> LineHeight -> LineHeight -> LineHeight
+blend weight (LineHeight a) (LineHeight b) =
+  let w = Bounded.clampNumber 0.0 1.0 weight
+  in lineHeight (a * (1.0 - w) + b * w)
+
+-- | Linear interpolation (standard lerp signature)
+lerp :: LineHeight -> LineHeight -> Number -> LineHeight
+lerp from to t = blend t from to
+
+-- | Scale line height by a factor
+-- |
+-- | Useful for responsive adjustments:
+-- | ```purescript
+-- | scale 1.2 normal  -- LineHeight 1.8
+-- | ```
+scale :: Number -> LineHeight -> LineHeight
+scale factor (LineHeight h) = lineHeight (h * factor)
+
+-- | Add to line height (clamped)
+add :: Number -> LineHeight -> LineHeight
+add amount (LineHeight h) = lineHeight (h + amount)
+
+-- | Subtract from line height (clamped)
+subtract :: Number -> LineHeight -> LineHeight
+subtract amount (LineHeight h) = lineHeight (h - amount)
+
+-- | Convert to Number for calculations
+toNumber :: LineHeight -> Number
+toNumber (LineHeight h) = h
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                  // predicates
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Check if line height is solid (no leading, ~1.0)
+-- |
+-- | Solid line heights should only be used for single-line display text:
+-- | ```purescript
+-- | isSolid solid  -- true
+-- | isSolid tight  -- false
+-- | ```
+isSolid :: LineHeight -> Boolean
+isSolid (LineHeight h) = h <= 1.1
+
+-- | Check if line height is tight (1.1-1.35)
+-- |
+-- | Tight leading for headings and compact text:
+-- | ```purescript
+-- | isTight tight  -- true (1.25)
+-- | isTight normal -- false (1.5)
+-- | ```
+isTight :: LineHeight -> Boolean
+isTight (LineHeight h) = h > 1.1 && h <= 1.35
+
+-- | Check if line height is normal (1.35-1.6)
+-- |
+-- | Standard leading for body text:
+-- | ```purescript
+-- | isNormal normal  -- true (1.5)
+-- | isNormal tight   -- false (1.25)
+-- | ```
+isNormal :: LineHeight -> Boolean
+isNormal (LineHeight h) = h > 1.35 && h <= 1.6
+
+-- | Check if line height is relaxed (1.6-1.9)
+-- |
+-- | Generous leading for long-form reading:
+-- | ```purescript
+-- | isRelaxed relaxed  -- true (1.75)
+-- | isRelaxed normal   -- false (1.5)
+-- | ```
+isRelaxed :: LineHeight -> Boolean
+isRelaxed (LineHeight h) = h > 1.6 && h <= 1.9
+
+-- | Check if line height is loose (> 1.9)
+-- |
+-- | Extra-generous leading for dramatic effect:
+-- | ```purescript
+-- | isLoose loose   -- true (2.0)
+-- | isLoose relaxed -- false (1.75)
+-- | ```
+isLoose :: LineHeight -> Boolean
+isLoose (LineHeight h) = h > 1.9
+
+-- | Check if line height is at least a given ratio
+-- |
+-- | Useful for accessibility checks (WCAG recommends >= 1.5 for body text):
+-- | ```purescript
+-- | atLeast 1.5 normal   -- true (1.5 >= 1.5)
+-- | atLeast 1.5 tight    -- false (1.25 < 1.5)
+-- | ```
+atLeast :: Number -> LineHeight -> Boolean
+atLeast threshold (LineHeight h) = h >= threshold
+
+-- | Check if line height is less than a given ratio
+-- |
+-- | Useful for detecting overly tight leading:
+-- | ```purescript
+-- | lessThan 1.2 solid   -- true (1.0 < 1.2)
+-- | lessThan 1.2 tight   -- false (1.25 >= 1.2)
+-- | ```
+lessThan :: Number -> LineHeight -> Boolean
+lessThan threshold (LineHeight h) = h < threshold
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // accessors

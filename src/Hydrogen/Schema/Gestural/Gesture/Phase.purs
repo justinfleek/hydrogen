@@ -18,6 +18,7 @@
 
 module Hydrogen.Schema.Gestural.Gesture.Phase
   ( GesturePhase(Possible, Began, Changed, Ended, Cancelled, Failed)
+  , allGesturePhases
   , isPossible
   , isBegan
   , isChanged
@@ -61,6 +62,14 @@ instance showGesturePhase :: Show GesturePhase where
   show Ended = "ended"
   show Cancelled = "cancelled"
   show Failed = "failed"
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                               // enumeration
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | All gesture phases for enumeration
+allGesturePhases :: Array GesturePhase
+allGesturePhases = [ Possible, Began, Changed, Ended, Cancelled, Failed ]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // predicates

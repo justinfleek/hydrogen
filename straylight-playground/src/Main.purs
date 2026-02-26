@@ -21,22 +21,30 @@ import Prelude
 
 import Data.Array (mapWithIndex, range)
 import Data.Int (toNumber) as Int
-import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console as Console
 
 import Hydrogen.Element.Pure as E
+import Hydrogen.Element.Pure
+  ( opacityFull
+  , clipNone
+  , maskNone
+  , lineHeightNormal
+  , letterSpacingNone
+  , degreesZero
+  )
 import Hydrogen.Schema.Color.Channel (unwrap) as Channel
 import Hydrogen.Schema.Color.Conversion (hslToRgb)
 import Hydrogen.Schema.Color.HSL as HSL
-import Hydrogen.Schema.Color.Opacity as Opacity
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Color.SRGB as SRGB
+import Hydrogen.Schema.Color.Opacity as Opacity
 import Hydrogen.Schema.Dimension.Device (px, addPx)
 import Hydrogen.Schema.Dimension.Vector.Vec2 (vec2)
 import Hydrogen.Schema.Typography.FontFamily as FontFamily
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
+import Hydrogen.Schema.Geometry.Position (Alignment(AlignStart, AlignCenter, AlignEnd))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // app // state
@@ -134,7 +142,10 @@ view state = E.Group
       [ renderSidebar state
       , renderContent state
       ]
-  , position: Nothing
+  , position: vec2 (px 0.0) (px 0.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -148,7 +159,10 @@ renderSidebar state = E.Group
       , sidebarTitle
       , pillarNav state
       ]
-  , position: Just (vec2 (px 0.0) (px 0.0))
+  , position: vec2 (px 0.0) (px 0.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 sidebarBackground :: E.Element Msg
@@ -158,8 +172,12 @@ sidebarBackground = E.Rectangle
   , fill: E.SolidWithAlpha
       (SRGB.srgb 20 20 25)
       (Opacity.opacity 80)
-  , cornerRadius: Nothing
-  , stroke: Nothing
+  , corners: E.Sharp
+  , stroke: E.NoStroke
+  , shadow: E.NoShadow
+  , filters: E.NoFilters
+  , opacity: opacityFull
+  , clipContent: false
   }
 
 sidebarTitle :: E.Element Msg
@@ -169,14 +187,23 @@ sidebarTitle = E.Text
   , fontFamily: FontFamily.fontFamily "Inter"
   , fontSize: FontSize.fontSize 24.0
   , fontWeight: FontWeight.fontWeight 700
-  , lineHeight: Nothing
+  , lineHeight: lineHeightNormal
+  , letterSpacing: letterSpacingNone
   , color: SRGB.srgb 255 255 255
+  , opacity: opacityFull
+  , maxWidth: px 0.0
+  , shadow: E.NoShadow
+  , horizontalAlign: AlignStart
+  , verticalAlign: AlignStart
   }
 
 pillarNav :: State -> E.Element Msg
 pillarNav state = E.Group
   { children: mapWithIndex (renderPillarButton state) allPillars
-  , position: Just (vec2 (px 0.0) (px 80.0))
+  , position: vec2 (px 0.0) (px 80.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderPillarButton :: State -> Int -> Pillar -> E.Element Msg
@@ -195,8 +222,12 @@ renderPillarButton state index pillar =
               { position: vec2 (px 12.0) yOffset
               , size: vec2 (px 256.0) (px 40.0)
               , fill: E.Solid bgColor
-              , cornerRadius: Nothing
-              , stroke: Nothing
+              , corners: E.Sharp
+              , stroke: E.NoStroke
+              , shadow: E.NoShadow
+              , filters: E.NoFilters
+              , opacity: opacityFull
+              , clipContent: false
               }
           , E.Text
               { content: pillarName pillar
@@ -204,11 +235,20 @@ renderPillarButton state index pillar =
               , fontFamily: FontFamily.fontFamily "Inter"
               , fontSize: FontSize.fontSize 14.0
               , fontWeight: FontWeight.fontWeight (if isSelected then 600 else 400)
-              , lineHeight: Nothing
+              , lineHeight: lineHeightNormal
+              , letterSpacing: letterSpacingNone
               , color: textColor
+              , opacity: opacityFull
+              , maxWidth: px 0.0
+              , shadow: E.NoShadow
+              , horizontalAlign: AlignStart
+              , verticalAlign: AlignStart
               }
           ]
-      , position: Nothing
+      , position: vec2 (px 0.0) (px 0.0)
+      , opacity: opacityFull
+      , clipPath: clipNone
+      , mask: maskNone
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -241,7 +281,10 @@ renderColorPillar = E.Group
       , pillarDescription "Color science, theory, and application. 47 atoms across HSL, RGB, CMYK, LAB, LCH, OKLAB, OKLCH, XYZ, YUV, and more."
       , hueSwatches
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- | Render 360 hue swatches from the Hue atom
@@ -255,7 +298,10 @@ renderColorPillar = E.Group
 hueSwatches :: E.Element Msg
 hueSwatches = E.Group
   { children: map renderHueSwatch (range 0 359)
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderHueSwatch :: Int -> E.Element Msg
@@ -280,8 +326,12 @@ renderHueSwatch hueValue =
       { position: vec2 xPos yPos
       , size: vec2 (px 30.0) (px 30.0)
       , fill: E.Solid srgbColor
-      , cornerRadius: Nothing
-      , stroke: Nothing
+      , corners: E.Sharp
+      , stroke: E.NoStroke
+      , shadow: E.NoShadow
+      , filters: E.NoFilters
+      , opacity: opacityFull
+      , clipContent: false
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -295,7 +345,10 @@ renderDimensionPillar = E.Group
       , pillarDescription "Measurement, spacing, and layout. SI units, device units, relative units, viewport units."
       , dimensionShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 dimensionShowcase :: E.Element Msg
@@ -310,7 +363,10 @@ dimensionShowcase = E.Group
       , renderDimensionBox 6 "96px" 96.0
       , renderDimensionBox 7 "128px" 128.0
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderDimensionBox :: Int -> String -> Number -> E.Element Msg
@@ -324,8 +380,12 @@ renderDimensionBox index label size =
               { position: vec2 (px 0.0) yPos
               , size: vec2 (px size) (px size)
               , fill: E.Solid (SRGB.srgb 59 130 246)
-              , cornerRadius: Nothing
-              , stroke: Nothing
+              , corners: E.Sharp
+              , stroke: E.NoStroke
+              , shadow: E.NoShadow
+              , filters: E.NoFilters
+              , opacity: opacityFull
+              , clipContent: false
               }
           , E.Text
               { content: label
@@ -333,11 +393,20 @@ renderDimensionBox index label size =
               , fontFamily: FontFamily.fontFamily "Inter"
               , fontSize: FontSize.fontSize 14.0
               , fontWeight: FontWeight.fontWeight 500
-              , lineHeight: Nothing
+              , lineHeight: lineHeightNormal
+              , letterSpacing: letterSpacingNone
               , color: SRGB.srgb 200 200 200
+              , opacity: opacityFull
+              , maxWidth: px 0.0
+              , shadow: E.NoShadow
+              , horizontalAlign: AlignStart
+              , verticalAlign: AlignStart
               }
           ]
-      , position: Nothing
+      , position: vec2 (px 0.0) (px 0.0)
+      , opacity: opacityFull
+      , clipPath: clipNone
+      , mask: maskNone
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -351,7 +420,10 @@ renderGeometryPillar = E.Group
       , pillarDescription "Shape, form, and spatial transformation. Points, lines, curves, polygons, transforms."
       , geometryShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 geometryShowcase :: E.Element Msg
@@ -361,24 +433,38 @@ geometryShowcase = E.Group
           { position: vec2 (px 0.0) (px 0.0)
           , size: vec2 (px 100.0) (px 100.0)
           , fill: E.Solid (SRGB.srgb 239 68 68)
-          , cornerRadius: Nothing
-          , stroke: Nothing
+          , corners: E.Sharp
+          , stroke: E.NoStroke
+          , shadow: E.NoShadow
+          , filters: E.NoFilters
+          , opacity: opacityFull
+          , clipContent: false
           }
       , E.Circle
           { center: vec2 (px 200.0) (px 50.0)
           , radius: px 50.0
           , fill: E.Solid (SRGB.srgb 34 197 94)
-          , stroke: Nothing
+          , stroke: E.NoStroke
+          , shadow: E.NoShadow
+          , filters: E.NoFilters
+          , opacity: opacityFull
           }
       , E.Rectangle
           { position: vec2 (px 300.0) (px 0.0)
           , size: vec2 (px 100.0) (px 100.0)
           , fill: E.Solid (SRGB.srgb 59 130 246)
-          , cornerRadius: Nothing
-          , stroke: Nothing
+          , corners: E.Sharp
+          , stroke: E.NoStroke
+          , shadow: E.NoShadow
+          , filters: E.NoFilters
+          , opacity: opacityFull
+          , clipContent: false
           }
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -392,7 +478,10 @@ renderTypographyPillar = E.Group
       , pillarDescription "Text rendering and typographic hierarchy. Font families, weights, sizes, line heights."
       , typographyShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 typographyShowcase :: E.Element Msg
@@ -407,7 +496,10 @@ typographyShowcase = E.Group
       , renderTypeSample 6 "Body Small" 14.0 400
       , renderTypeSample 7 "Caption" 12.0 400
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderTypeSample :: Int -> String -> Number -> Int -> E.Element Msg
@@ -421,8 +513,14 @@ renderTypeSample index label size weight =
       , fontFamily: FontFamily.fontFamily "Inter"
       , fontSize: FontSize.fontSize size
       , fontWeight: FontWeight.fontWeight weight
-      , lineHeight: Nothing
+      , lineHeight: lineHeightNormal
+      , letterSpacing: letterSpacingNone
       , color: SRGB.srgb 255 255 255
+      , opacity: opacityFull
+      , maxWidth: px 0.0
+      , shadow: E.NoShadow
+      , horizontalAlign: AlignStart
+      , verticalAlign: AlignStart
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -436,7 +534,10 @@ renderMaterialPillar = E.Group
       , pillarDescription "Surface appearance and texture. Blur, gradients, noise, borders, fills."
       , materialShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 materialShowcase :: E.Element Msg
@@ -446,18 +547,29 @@ materialShowcase = E.Group
           { position: vec2 (px 0.0) (px 0.0)
           , size: vec2 (px 150.0) (px 150.0)
           , fill: E.Solid (SRGB.srgb 100 100 120)
-          , cornerRadius: Nothing
-          , stroke: Nothing
+          , corners: E.Sharp
+          , stroke: E.NoStroke
+          , shadow: E.NoShadow
+          , filters: E.NoFilters
+          , opacity: opacityFull
+          , clipContent: false
           }
       , E.Rectangle
           { position: vec2 (px 170.0) (px 0.0)
           , size: vec2 (px 150.0) (px 150.0)
           , fill: E.SolidWithAlpha (SRGB.srgb 100 100 120) (Opacity.opacity 50)
-          , cornerRadius: Nothing
-          , stroke: Nothing
+          , corners: E.Sharp
+          , stroke: E.NoStroke
+          , shadow: E.NoShadow
+          , filters: E.NoFilters
+          , opacity: opacityFull
+          , clipContent: false
           }
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -471,7 +583,10 @@ renderElevationPillar = E.Group
       , pillarDescription "Depth, shadow, and visual hierarchy. Z-index, shadows, perspective, depth of field."
       , elevationShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 elevationShowcase :: E.Element Msg
@@ -483,7 +598,10 @@ elevationShowcase = E.Group
       , renderElevationCard 3 "Level 3" (SRGB.srgb 80 80 90)
       , renderElevationCard 4 "Level 4" (SRGB.srgb 90 90 100)
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderElevationCard :: Int -> String -> SRGB.SRGB -> E.Element Msg
@@ -497,8 +615,12 @@ renderElevationCard index label bgColor =
               { position: vec2 xPos (px 0.0)
               , size: vec2 (px 120.0) (px 120.0)
               , fill: E.Solid bgColor
-              , cornerRadius: Nothing
-              , stroke: Nothing
+              , corners: E.Sharp
+              , stroke: E.NoStroke
+              , shadow: E.NoShadow
+              , filters: E.NoFilters
+              , opacity: opacityFull
+              , clipContent: false
               }
           , E.Text
               { content: label
@@ -506,11 +628,20 @@ renderElevationCard index label bgColor =
               , fontFamily: FontFamily.fontFamily "Inter"
               , fontSize: FontSize.fontSize 12.0
               , fontWeight: FontWeight.fontWeight 500
-              , lineHeight: Nothing
+              , lineHeight: lineHeightNormal
+              , letterSpacing: letterSpacingNone
               , color: SRGB.srgb 200 200 200
+              , opacity: opacityFull
+              , maxWidth: px 0.0
+              , shadow: E.NoShadow
+              , horizontalAlign: AlignStart
+              , verticalAlign: AlignStart
               }
           ]
-      , position: Nothing
+      , position: vec2 (px 0.0) (px 0.0)
+      , opacity: opacityFull
+      , clipPath: clipNone
+      , mask: maskNone
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -524,7 +655,10 @@ renderTemporalPillar = E.Group
       , pillarDescription "Time, motion, and animation. Duration, easing, keyframes, spring physics."
       , temporalShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 temporalShowcase :: E.Element Msg
@@ -536,8 +670,14 @@ temporalShowcase = E.Group
           , fontFamily: FontFamily.fontFamily "Inter"
           , fontSize: FontSize.fontSize 16.0
           , fontWeight: FontWeight.fontWeight 400
-          , lineHeight: Nothing
+          , lineHeight: lineHeightNormal
+          , letterSpacing: letterSpacingNone
           , color: SRGB.srgb 180 180 180
+          , opacity: opacityFull
+          , maxWidth: px 0.0
+          , shadow: E.NoShadow
+          , horizontalAlign: AlignStart
+          , verticalAlign: AlignStart
           }
       , E.Text
           { content: "Spring physics: Mass, Stiffness, Damping"
@@ -545,11 +685,20 @@ temporalShowcase = E.Group
           , fontFamily: FontFamily.fontFamily "Inter"
           , fontSize: FontSize.fontSize 16.0
           , fontWeight: FontWeight.fontWeight 400
-          , lineHeight: Nothing
+          , lineHeight: lineHeightNormal
+          , letterSpacing: letterSpacingNone
           , color: SRGB.srgb 180 180 180
+          , opacity: opacityFull
+          , maxWidth: px 0.0
+          , shadow: E.NoShadow
+          , horizontalAlign: AlignStart
+          , verticalAlign: AlignStart
           }
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -563,7 +712,10 @@ renderReactivePillar = E.Group
       , pillarDescription "State and feedback. Enabled, visible, selected, loading, progress, validation."
       , reactiveShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 reactiveShowcase :: E.Element Msg
@@ -575,7 +727,10 @@ reactiveShowcase = E.Group
       , renderStateIndicator 3 "Error" (SRGB.srgb 239 68 68)
       , renderStateIndicator 4 "Success" (SRGB.srgb 34 197 94)
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderStateIndicator :: Int -> String -> SRGB.SRGB -> E.Element Msg
@@ -589,7 +744,10 @@ renderStateIndicator index label color =
               { center: vec2 (px 12.0) (addPx yPos (px 12.0))
               , radius: px 8.0
               , fill: E.Solid color
-              , stroke: Nothing
+              , stroke: E.NoStroke
+              , shadow: E.NoShadow
+              , filters: E.NoFilters
+              , opacity: opacityFull
               }
           , E.Text
               { content: label
@@ -597,11 +755,20 @@ renderStateIndicator index label color =
               , fontFamily: FontFamily.fontFamily "Inter"
               , fontSize: FontSize.fontSize 14.0
               , fontWeight: FontWeight.fontWeight 400
-              , lineHeight: Nothing
+              , lineHeight: lineHeightNormal
+              , letterSpacing: letterSpacingNone
               , color: SRGB.srgb 200 200 200
+              , opacity: opacityFull
+              , maxWidth: px 0.0
+              , shadow: E.NoShadow
+              , horizontalAlign: AlignStart
+              , verticalAlign: AlignStart
               }
           ]
-      , position: Nothing
+      , position: vec2 (px 0.0) (px 0.0)
+      , opacity: opacityFull
+      , clipPath: clipNone
+      , mask: maskNone
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -615,7 +782,10 @@ renderGesturalPillar = E.Group
       , pillarDescription "Touch, pointer, and gestures. Tap, swipe, pinch, rotate, pan, drag."
       , gesturalShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 gesturalShowcase :: E.Element Msg
@@ -630,7 +800,10 @@ gesturalShowcase = E.Group
       , renderGestureLabel 6 "Pan"
       , renderGestureLabel 7 "Drag"
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderGestureLabel :: Int -> String -> E.Element Msg
@@ -644,8 +817,14 @@ renderGestureLabel index label =
       , fontFamily: FontFamily.fontFamily "Inter"
       , fontSize: FontSize.fontSize 16.0
       , fontWeight: FontWeight.fontWeight 400
-      , lineHeight: Nothing
+      , lineHeight: lineHeightNormal
+      , letterSpacing: letterSpacingNone
       , color: SRGB.srgb 180 180 180
+      , opacity: opacityFull
+      , maxWidth: px 0.0
+      , shadow: E.NoShadow
+      , horizontalAlign: AlignStart
+      , verticalAlign: AlignStart
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -659,7 +838,10 @@ renderHapticPillar = E.Group
       , pillarDescription "Tactile feedback primitives. Impact, selection, notification, success, warning, error."
       , hapticShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 hapticShowcase :: E.Element Msg
@@ -673,7 +855,10 @@ hapticShowcase = E.Group
       , renderHapticType 5 "Warning"
       , renderHapticType 6 "Error"
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderHapticType :: Int -> String -> E.Element Msg
@@ -687,8 +872,14 @@ renderHapticType index label =
       , fontFamily: FontFamily.fontFamily "Inter"
       , fontSize: FontSize.fontSize 16.0
       , fontWeight: FontWeight.fontWeight 400
-      , lineHeight: Nothing
+      , lineHeight: lineHeightNormal
+      , letterSpacing: letterSpacingNone
       , color: SRGB.srgb 180 180 180
+      , opacity: opacityFull
+      , maxWidth: px 0.0
+      , shadow: E.NoShadow
+      , horizontalAlign: AlignStart
+      , verticalAlign: AlignStart
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -702,7 +893,10 @@ renderSpatialPillar = E.Group
       , pillarDescription "3D space, AR/VR primitives. Position3D, rotation, scale, PBR materials, lighting."
       , spatialShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 spatialShowcase :: E.Element Msg
@@ -717,7 +911,10 @@ spatialShowcase = E.Group
       , renderSpatialProperty 6 "Anisotropy"
       , renderSpatialProperty 7 "Clear Coat"
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 renderSpatialProperty :: Int -> String -> E.Element Msg
@@ -731,8 +928,14 @@ renderSpatialProperty index label =
       , fontFamily: FontFamily.fontFamily "Inter"
       , fontSize: FontSize.fontSize 16.0
       , fontWeight: FontWeight.fontWeight 400
-      , lineHeight: Nothing
+      , lineHeight: lineHeightNormal
+      , letterSpacing: letterSpacingNone
       , color: SRGB.srgb 180 180 180
+      , opacity: opacityFull
+      , maxWidth: px 0.0
+      , shadow: E.NoShadow
+      , horizontalAlign: AlignStart
+      , verticalAlign: AlignStart
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -746,7 +949,10 @@ renderBrandPillar = E.Group
       , pillarDescription "Identity composition layer. The 12th pillar that composes all others into cohesive brand identity."
       , brandShowcase
       ]
-  , position: Just (vec2 (px 320.0) (px 40.0))
+  , position: vec2 (px 320.0) (px 40.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 brandShowcase :: E.Element Msg
@@ -758,8 +964,14 @@ brandShowcase = E.Group
           , fontFamily: FontFamily.fontFamily "Inter"
           , fontSize: FontSize.fontSize 14.0
           , fontWeight: FontWeight.fontWeight 400
-          , lineHeight: Nothing
+          , lineHeight: lineHeightNormal
+          , letterSpacing: letterSpacingNone
           , color: SRGB.srgb 150 150 150
+          , opacity: opacityFull
+          , maxWidth: px 0.0
+          , shadow: E.NoShadow
+          , horizontalAlign: AlignStart
+          , verticalAlign: AlignStart
           }
       , E.Text
           { content: "When agents compose these atoms, they build deterministic brand identities."
@@ -767,11 +979,20 @@ brandShowcase = E.Group
           , fontFamily: FontFamily.fontFamily "Inter"
           , fontSize: FontSize.fontSize 16.0
           , fontWeight: FontWeight.fontWeight 500
-          , lineHeight: Nothing
+          , lineHeight: lineHeightNormal
+          , letterSpacing: letterSpacingNone
           , color: SRGB.srgb 200 200 200
+          , opacity: opacityFull
+          , maxWidth: px 0.0
+          , shadow: E.NoShadow
+          , horizontalAlign: AlignStart
+          , verticalAlign: AlignStart
           }
       ]
-  , position: Just (vec2 (px 0.0) (px 100.0))
+  , position: vec2 (px 0.0) (px 100.0)
+  , opacity: opacityFull
+  , clipPath: clipNone
+  , mask: maskNone
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -785,8 +1006,14 @@ pillarTitle title = E.Text
   , fontFamily: FontFamily.fontFamily "Inter"
   , fontSize: FontSize.fontSize 32.0
   , fontWeight: FontWeight.fontWeight 600
-  , lineHeight: Nothing
+  , lineHeight: lineHeightNormal
+  , letterSpacing: letterSpacingNone
   , color: SRGB.srgb 255 255 255
+  , opacity: opacityFull
+  , maxWidth: px 0.0
+  , shadow: E.NoShadow
+  , horizontalAlign: AlignStart
+  , verticalAlign: AlignStart
   }
 
 pillarDescription :: String -> E.Element Msg
@@ -796,8 +1023,14 @@ pillarDescription desc = E.Text
   , fontFamily: FontFamily.fontFamily "Inter"
   , fontSize: FontSize.fontSize 16.0
   , fontWeight: FontWeight.fontWeight 400
-  , lineHeight: Nothing
+  , lineHeight: lineHeightNormal
+  , letterSpacing: letterSpacingNone
   , color: SRGB.srgb 160 160 160
+  , opacity: opacityFull
+  , maxWidth: px 0.0
+  , shadow: E.NoShadow
+  , horizontalAlign: AlignStart
+  , verticalAlign: AlignStart
   }
 
 toNumber :: Int -> Number
