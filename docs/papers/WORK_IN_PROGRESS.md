@@ -59,7 +59,13 @@ This file tracks which papers are being converted to avoid duplication.
 | pathtracingSDFgrids.pdf | docs/research/PATHTRACING_SDF.md | - |
 | from-grunts-to-lexicons.pdf | docs/research/GRUNTS_TO_LEXICONS.md | - |
 
-## Available PDFs (Not Yet Started)
+- type-based-approaches-to-rounding-errors.pdf | clarity | 2026-02-26 | COMPLETE (TYPE_BASED_ROUNDING_ERROR_DISSERTATION.md)
+- TTMPaper.pdf | clarity | 2026-02-26 | COMPLETE (TTM_VIDEO_MOTION.md)
+- microscaling-fp4.pdf | clarity | 2026-02-26 | COMPLETE (MICROSCALING_FP4_QUANTIZATION.md)
+- quartet-native-fp4.pdf | clarity | 2026-02-26 | COMPLETE (QUARTET_FP4_TRAINING.md)
+- garmentstocode.pdf | clarity | 2026-02-26 | COMPLETE (DESIGN2GARMENTCODE.md)
+- prompt_guide.pdf | clarity | 2026-02-26 | SKIPPED (empty)
+- pixelawareaugoregressivegens.pdf | clarity | 2026-02-26 | COMPLETE (VA_PI_PIXEL_AWARE_AR.md)
 
 - deciding-not-to-decide.pdf | clarity | 2026-02-26 | COMPLETE
 - deepseek_dreammontage.pdf | clarity | 2026-02-26 | COMPLETE
@@ -68,10 +74,10 @@ This file tracks which papers are being converted to avoid duplication.
 - embroideryoneshot.pdf | clarity | 2026-02-26 | COMPLETE
 - fashionr2r.pdf | clarity | 2026-02-26 | COMPLETE
 - fire.pdf | clarity | 2026-02-26 | COMPLETE
-- knots.pdf
-- landauer.pdf
-- large-population-models.pdf
-- optimalclothmeshresolution.pdf
-- texturespaper.pdf
-- vecpotential.pdf
-- visual-theory-enables-proto-writing.pdf
+- knots.pdf | clarity | 2026-02-26 | COMPLETE
+- landauer.pdf | clarity | 2026-02-26 | COMPLETE
+- large-population-models.pdf | Other agent | 2026-02-26 |
+- optimalclothmeshresolution.pdf | clarity | 2026-02-26 | COMPLETE
+- texturespaper.pdf | clarity | 2026-02-26 | COMPLETE
+- vecpotential.pdf | clarity | 2026-02-26 | COMPLETE
+- visual-theory-enables-proto-writing.pdf | clarity | 2026-02-26 | COMPLETE

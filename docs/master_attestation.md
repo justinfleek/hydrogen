@@ -49,9 +49,10 @@ Chose "clarity" because:
 | DeepSeek-R1 (Reasoning) | 2026-02-26 |
 | Fire-X (Combustion Simulation) | 2026-02-26 |
 | DreaMontage (One-Shot Video) | 2026-02-26 |
-| Efficient Object Reconstruction | 2026-02-26 |
-| Embroidery LoRA | 2026-02-26 |
-| FashionR2R | 2026-02-26 |
+| Optimal Cloth Resolution | 2026-02-26 |
+| Material States Zero-Shot | 2026-02-26 |
+| Stream Function Fluid | 2026-02-26 |
+| Visual Theory of Mind (Proto-Writing) | 2026-02-26 |
 
 ---
 

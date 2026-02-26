@@ -212,7 +212,7 @@ be disjoint — a word can't be both preferred and prohibited.
 structure Term where
   value : String
   nonempty : value.length > 0
-  deriving Repr
+  deriving Repr, DecidableEq
 
 /-- Vocabulary configuration -/
 structure Vocabulary where
@@ -265,7 +265,7 @@ namespace BrandVoice
 /-- Default voice (casual, friendly, empty vocabulary) -/
 def default : BrandVoice := {
   tone := Tone.casual
-  traits := ⟨[Trait.friendly, Trait.approachable], by decide, by native_decide⟩
+  traits := ⟨[Trait.friendly, Trait.approachable], by decide, by rfl⟩
   vocabulary := Vocabulary.empty
 }
 
@@ -346,29 +346,35 @@ INVARIANTS (PROVEN)
      WHY: See above — prevents semantic paradox at scale
 -/
 
-/-- Two lists are disjoint if no element appears in both -/
-def List.Disjoint {α : Type*} (l1 l2 : List α) : Prop :=
-  ∀ x, x ∈ l1 → x ∉ l2
+/-! We use List.Disjoint from Batteries (defined in Batteries/Data/List/Basic.lean).
+    It's defined as: ∀ ⦃a⦄, a ∈ l₁ → a ∈ l₂ → False
+    
+    We provide a decidable check using List.all. -/
 
 /-- Decidable disjointness check for lists with DecidableEq -/
-def List.disjointBool {α : Type*} [DecidableEq α] (l1 l2 : List α) : Bool :=
+def disjointBool {α : Type*} [DecidableEq α] (l1 l2 : List α) : Bool :=
   l1.all (fun x => !l2.contains x)
 
-/-- The boolean disjoint check correctly reflects the Prop -/
-theorem List.disjointBool_iff_Disjoint {α : Type*} [DecidableEq α] 
-    (l1 l2 : List α) : l1.disjointBool l2 = true ↔ l1.Disjoint l2 := by
-  simp only [disjointBool, Disjoint, List.all_eq_true, Bool.not_eq_true', 
-             List.contains_eq_any_beq, List.any_eq_true, beq_iff_eq]
+/-- The boolean disjoint check correctly reflects List.Disjoint -/
+theorem disjointBool_iff_Disjoint {α : Type*} [DecidableEq α] 
+    (l1 l2 : List α) : disjointBool l1 l2 = true ↔ List.Disjoint l1 l2 := by
+  simp only [disjointBool, List.Disjoint]
   constructor
-  · intro h x hx hcontra
-    have := h x hx
-    simp only [Bool.not_eq_true, List.any_eq_true, beq_iff_eq] at this
-    exact this ⟨x, hcontra, rfl⟩
-  · intro h x hx
-    simp only [Bool.not_eq_true, List.any_eq_true, beq_iff_eq, not_exists, not_and]
-    intro y hy heq
+  · intro h x hx1 hx2
+    have := List.all_eq_true.mp h x hx1
+    simp only [Bool.not_eq_true', List.contains_eq_any_beq] at this
+    rw [List.any_eq_false] at this
+    have := this x hx2
+    simp at this
+  · intro h
+    apply List.all_eq_true.mpr
+    intro x hx1
+    simp only [Bool.not_eq_true', List.contains_eq_any_beq, List.any_eq_false]
+    intro y hy
+    intro heq
+    rw [beq_iff_eq] at heq
     subst heq
-    exact h x hx hy
+    exact h hx1 hy
 
 /-- A voice attribute with IS/NOT constraints.
 
@@ -404,9 +410,9 @@ namespace VoiceAttribute
 def make (name : String) (isTerms isNotTerms : List Term) : Option VoiceAttribute :=
   if h_name : name.length > 0 then
     if h_is : isTerms.length > 0 then
-      if h_disj : isTerms.disjointBool isNotTerms = true then
+      if h_disj : disjointBool isTerms isNotTerms = true then
         some ⟨name, isTerms, isNotTerms, h_name, h_is, 
-              (List.disjointBool_iff_Disjoint isTerms isNotTerms).mp h_disj⟩
+              (disjointBool_iff_Disjoint isTerms isNotTerms).mp h_disj⟩
       else none
     else none
   else none
@@ -421,7 +427,7 @@ theorem always_has_is_terms (va : VoiceAttribute) : va.isTerms.length > 0 :=
 
 /-- IS and IS NOT terms are always disjoint -/
 theorem is_not_disjoint (va : VoiceAttribute) (t : Term) : 
-    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+    t ∈ va.isTerms → t ∉ va.isNotTerms := fun h_in => va.disjoint h_in
 
 /-- Check if a term string is in the IS list -/
 def matchesTerm (va : VoiceAttribute) (s : String) : Bool :=
@@ -439,25 +445,25 @@ def violatesTerm (va : VoiceAttribute) (s : String) : Bool :=
     
     This is proven by construction — the disjoint field is a proof term. -/
 theorem match_implies_no_violation (va : VoiceAttribute) (t : Term) :
-    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+    t ∈ va.isTerms → t ∉ va.isNotTerms := fun h_in => va.disjoint h_in
 
 /-- Contrapositive: If a term is in IS NOT, it cannot be in IS -/
 theorem violation_implies_no_match (va : VoiceAttribute) (t : Term) :
     t ∈ va.isNotTerms → t ∉ va.isTerms := by
   intro h_in_not h_in_is
-  exact va.disjoint t h_in_is h_in_not
+  exact va.disjoint h_in_is h_in_not
 
 /-- A term can be in at most one of IS or IS NOT (exclusive) -/
 theorem exclusive_membership (va : VoiceAttribute) (t : Term) :
     ¬(t ∈ va.isTerms ∧ t ∈ va.isNotTerms) := by
   intro ⟨h_is, h_not⟩
-  exact va.disjoint t h_is h_not
+  exact va.disjoint h_is h_not
 
 /-- The disjointness is symmetric — works both directions -/
 theorem disjoint_symmetric (va : VoiceAttribute) :
     va.isNotTerms.Disjoint va.isTerms := by
   intro t h_in_not h_in_is
-  exact va.disjoint t h_in_is h_in_not
+  exact va.disjoint h_in_is h_in_not
 
 end VoiceAttribute
 
@@ -501,8 +507,8 @@ def findViolations (vc : VoiceConstraints) (term : String) : List String :=
 
 /-- All attributes maintain IS/NOT disjointness -/
 theorem all_attributes_disjoint (vc : VoiceConstraints) (va : VoiceAttribute) 
-    (h : va ∈ vc.attributes) (t : Term) :
-    t ∈ va.isTerms → t ∉ va.isNotTerms := va.disjoint t
+    (_ : va ∈ vc.attributes) (t : Term) :
+    t ∈ va.isTerms → t ∉ va.isNotTerms := fun h_in => va.disjoint h_in
 
 end VoiceConstraints
 
@@ -528,7 +534,7 @@ namespace BrandVoiceWithConstraints
 /-- Default voice with empty constraints -/
 def default : BrandVoiceWithConstraints := {
   tone := Tone.casual
-  traits := ⟨[Trait.friendly, Trait.approachable], by decide, by native_decide⟩
+  traits := ⟨[Trait.friendly, Trait.approachable], by decide, by rfl⟩
   vocabulary := Vocabulary.empty
   constraints := VoiceConstraints.empty
 }
