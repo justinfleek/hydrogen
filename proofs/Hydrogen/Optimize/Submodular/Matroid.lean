@@ -38,7 +38,7 @@ Satisfying:
          (augmentation property)
 -/
 
-variable {V : Type*} [DecidableEq V] [Fintype V]
+variable {V : Type*} [DecidableEq V]
 
 /-- A matroid is an independence system satisfying the augmentation property -/
 structure Matroid (V : Type*) [DecidableEq V] where
@@ -95,6 +95,9 @@ subset of any given set. It satisfies:
   3. r(A) + r(B) ≥ r(A ∪ B) + r(A ∩ B) (submodular)
 -/
 
+/-- Make independence decidable for any matroid -/
+instance (M : Matroid V) : DecidablePred M.isIndependent := M.decIndependent
+
 /-- The rank of a set is the size of its largest independent subset -/
 noncomputable def rank (M : Matroid V) (A : Finset V) : ℕ :=
   Finset.sup (A.powerset.filter M.isIndependent) Finset.card
@@ -113,15 +116,26 @@ theorem rank_mono (M : Matroid V) {A B : Finset V} (h : A ⊆ B) :
   simp only [rank]
   apply Finset.sup_le
   intro C hC
-  simp only [Finset.mem_filter, Finset.mem_powerset] at hC ⊢
+  rw [Finset.mem_filter, Finset.mem_powerset] at hC
   apply Finset.le_sup
-  simp only [Finset.mem_filter, Finset.mem_powerset]
+  rw [Finset.mem_filter, Finset.mem_powerset]
   exact ⟨Finset.Subset.trans hC.1 h, hC.2⟩
 
 /-- Rank of empty set is zero -/
 theorem rank_empty (M : Matroid V) : rank M ∅ = 0 := by
-  simp only [rank, Finset.powerset_empty, Finset.filter_singleton]
-  simp only [M.empty_indep, ↓reduceIte, Finset.sup_singleton, Finset.card_empty]
+  simp only [rank]
+  -- The powerset of ∅ is {∅}
+  rw [Finset.powerset_empty]
+  -- Filter {∅} by independence: ∅ is independent, so we get {∅}
+  have h : ({∅} : Finset (Finset V)).filter M.isIndependent = {∅} := by
+    ext S
+    simp only [Finset.mem_filter, Finset.mem_singleton]
+    constructor
+    · intro ⟨hS, _⟩; exact hS
+    · intro hS; exact ⟨hS, hS ▸ M.empty_indep⟩
+  rw [h]
+  -- sup of singleton {∅} under card is card ∅ = 0
+  simp only [Finset.sup_singleton, Finset.card_empty]
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SECTION 3: MATROID POLYTOPE
@@ -147,18 +161,17 @@ def inPolytope (M : Matroid V) (x : V → ℝ) : Prop :=
 theorem indicator_in_polytope (M : Matroid V) (A : Finset V) (hA : M.isIndependent A) :
     inPolytope M (fun v => if v ∈ A then 1 else 0) := by
   constructor
-  · intro v; split_ifs <;> linarith
+  · intro v; simp only []; split_ifs <;> linarith
   constructor
-  · intro v; split_ifs <;> linarith
+  · intro v; simp only []; split_ifs <;> linarith
   · intro S
     -- Sum over S of indicator equals |A ∩ S|
     have hsum : S.sum (fun v => if v ∈ A then (1 : ℝ) else 0) = (A ∩ S).card := by
-      rw [← Finset.sum_filter]
-      simp only [Finset.filter_mem_eq_inter]
-      simp only [Finset.sum_const_nat, Finset.card_eq_sum_ones]
-      simp only [Finset.inter_comm]
-      norm_cast
-      rfl
+      trans ((S.filter (· ∈ A)).card : ℝ)
+      · rw [← Finset.sum_filter]
+        simp only [Finset.sum_const, nsmul_eq_mul, mul_one]
+      · congr 1
+        rw [Finset.filter_mem_eq_inter, Finset.inter_comm]
     rw [hsum]
     -- Need: |A ∩ S| ≤ rank M S
     -- A ∩ S is independent (hereditary from A) and subset of S
@@ -166,10 +179,10 @@ theorem indicator_in_polytope (M : Matroid V) (A : Finset V) (hA : M.isIndepende
       apply M.hereditary A (A ∩ S) hA
       exact Finset.inter_subset_left
     -- So |A ∩ S| ≤ rank M S
-    simp only [rank]
+    unfold rank
     apply Nat.cast_le.mpr
     apply Finset.le_sup
-    simp only [Finset.mem_filter, Finset.mem_powerset]
+    rw [Finset.mem_filter, Finset.mem_powerset]
     exact ⟨Finset.inter_subset_right, hindep⟩
 
 /-- Zero vector is in the polytope -/
@@ -211,14 +224,114 @@ def uniformMatroid (V : Type*) [DecidableEq V] [Fintype V] (k : ℕ) : Matroid V
       omega
     obtain ⟨e, he⟩ := hne
     use e, he
-    simp only [Finset.card_union_of_disjoint (Finset.disjoint_singleton_right.mpr 
-      (Finset.not_mem_sdiff_of_mem_right (Finset.mem_sdiff.mp he).2).symm)]
-    simp only [Finset.card_singleton]
+    have he' := Finset.mem_sdiff.mp he
+    have hnotinA : e ∉ A := he'.2
+    have hdisj : Disjoint A {e} := Finset.disjoint_singleton_right.mpr hnotinA
+    rw [Finset.card_union_of_disjoint hdisj, Finset.card_singleton]
     omega
 
-/-- Partition matroid: elements partitioned into groups, ≤ k_i from group i -/
+-- Partition matroid: elements partitioned into groups, ≤ k_i from group i
 -- For GPU allocation: partition = different resource types (compute, memory, bandwidth)
 -- k_i = capacity of resource type i
+-- (Full definition deferred to avoid complexity)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION 5: GROUND SET THEOREMS (requires Fintype V)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+/-! ## Ground Set Theorems
+
+These theorems require `Fintype V` because they reason about the full ground set
+`Finset.univ : Finset V`. This is essential for:
+  1. Computing the matroid rank (rank of univ)
+  2. Proving all bases have the same cardinality
+  3. Reasoning about the full polytope
+-/
+
+section GroundSet
+
+variable [Fintype V]
+
+/-- The matroid rank is the rank of the full ground set -/
+noncomputable def matroidRank (M : Matroid V) : ℕ := rank M Finset.univ
+
+/-- Matroid rank is bounded by ground set size -/
+theorem matroidRank_le_card (M : Matroid V) : matroidRank M ≤ Fintype.card V := by
+  unfold matroidRank
+  calc rank M Finset.univ 
+      ≤ Finset.univ.card := rank_le_card M Finset.univ
+    _ = Fintype.card V := Finset.card_univ
+
+/-- Any set's rank is bounded by the matroid rank -/
+theorem rank_le_matroidRank (M : Matroid V) (A : Finset V) : 
+    rank M A ≤ matroidRank M := by
+  unfold matroidRank
+  exact rank_mono M (Finset.subset_univ A)
+
+/-- A basis is a maximal independent set -/
+def isBasis (M : Matroid V) (B : Finset V) : Prop :=
+  M.isIndependent B ∧ ∀ e ∉ B, ¬M.isIndependent (B ∪ {e})
+
+/-- A basis has cardinality equal to the matroid rank -/
+theorem basis_card_eq_matroidRank (M : Matroid V) (B : Finset V) (hB : isBasis M B) :
+    B.card = matroidRank M := by
+  unfold matroidRank
+  unfold rank
+  apply le_antisymm
+  -- B.card ≤ sup: B is independent and subset of univ
+  · apply Finset.le_sup
+    rw [Finset.mem_filter, Finset.mem_powerset]
+    exact ⟨Finset.subset_univ B, hB.1⟩
+  -- sup ≤ B.card: any independent set has card ≤ B.card (by indep_card_le_basis)
+  · apply Finset.sup_le
+    intro C hC
+    rw [Finset.mem_filter, Finset.mem_powerset] at hC
+    exact indep_card_le_basis C B hC.2 hB.1 hB.2
+
+/-- Any two bases have the same cardinality -/
+theorem bases_equicardinal (M : Matroid V) (B₁ B₂ : Finset V) 
+    (hB₁ : isBasis M B₁) (hB₂ : isBasis M B₂) : B₁.card = B₂.card := by
+  rw [basis_card_eq_matroidRank M B₁ hB₁, basis_card_eq_matroidRank M B₂ hB₂]
+
+/-- The uniform matroid has rank min(k, |V|) -/
+theorem uniformMatroid_rank (k : ℕ) : 
+    matroidRank (uniformMatroid V k) = min k (Fintype.card V) := by
+  unfold matroidRank rank uniformMatroid
+  simp only []
+  -- The largest independent set in univ has size min(k, |V|)
+  -- We need to show sup { |A| : A ⊆ univ, |A| ≤ k } = min k |V|
+  by_cases hk : k ≤ Fintype.card V
+  · -- Case k ≤ |V|: we can find a set of size k
+    rw [min_eq_left hk]
+    apply le_antisymm
+    · apply Finset.sup_le
+      intro A hA
+      rw [Finset.mem_filter] at hA
+      exact hA.2
+    · -- Need to show k ≤ sup, i.e., there exists A ⊆ univ with |A| = k
+      obtain ⟨A, _, hAcard⟩ := Finset.exists_subset_card_eq hk
+      rw [← hAcard]
+      apply Finset.le_sup
+      rw [Finset.mem_filter, Finset.mem_powerset]
+      exact ⟨Finset.subset_univ A, le_of_eq rfl⟩
+  · -- Case k > |V|: the full set has size |V|
+    push_neg at hk
+    rw [min_eq_right (le_of_lt hk)]
+    apply le_antisymm
+    · calc Finset.sup (Finset.univ.powerset.filter fun A => A.card ≤ k) Finset.card
+          ≤ Finset.univ.card := by
+            apply Finset.sup_le
+            intro A hA
+            rw [Finset.mem_filter, Finset.mem_powerset] at hA
+            exact Finset.card_le_card hA.1
+        _ = Fintype.card V := Finset.card_univ
+    · -- univ itself is independent (|univ| = |V| < k)
+      rw [← Finset.card_univ]
+      apply Finset.le_sup
+      rw [Finset.mem_filter, Finset.mem_powerset]
+      exact ⟨Finset.Subset.refl _, le_of_lt hk⟩
+
+end GroundSet
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- PURESCRIPT CODE GENERATION  

@@ -16,7 +16,7 @@
 
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Finset.Lattice
+import Mathlib.Data.Finset.Lattice.Basic
 import Mathlib.Tactic
 
 namespace Hydrogen.Optimize.Submodular
@@ -114,7 +114,7 @@ theorem lattice_implies_diminishing_returns {f : Finset V → ℝ}
     simp only [Finset.mem_union, Finset.mem_singleton]
     constructor
     · intro h
-      rcases h with hxA | hxe | hxB
+      rcases h with (hxA | hxe) | hxB
       · exact Or.inl (hAB hxA)
       · exact Or.inr hxe
       · exact Or.inl hxB
@@ -188,25 +188,28 @@ theorem coverage_submodular [Fintype V] (N : V → Finset V) :
   -- Use inclusion-exclusion: |X ∪ Y| + |X ∩ Y| = |X| + |Y|
   have h := Finset.card_union_add_card_inter (A.biUnion N) (B.biUnion N)
   -- biUnion distributes over union
-  have hunion : (A ∪ B).biUnion N = A.biUnion N ∪ B.biUnion N := Finset.biUnion_union A B N
+  have hunion : (A ∪ B).biUnion N = A.biUnion N ∪ B.biUnion N := Finset.union_biUnion
   -- biUnion over intersection is subset of intersection of biUnions
   have hinter : (A ∩ B).biUnion N ⊆ A.biUnion N ∩ B.biUnion N := by
     intro x hx
     simp only [Finset.mem_biUnion, Finset.mem_inter] at hx ⊢
-    obtain ⟨e, he, hxe⟩ := hx
-    constructor
-    · exact ⟨e, (Finset.mem_inter.mp he).1, hxe⟩
-    · exact ⟨e, (Finset.mem_inter.mp he).2, hxe⟩
+    obtain ⟨e, ⟨heA, heB⟩, hxe⟩ := hx
+    exact ⟨⟨e, heA, hxe⟩, ⟨e, heB, hxe⟩⟩
   rw [hunion]
   have hcard_inter : ((A ∩ B).biUnion N).card ≤ (A.biUnion N ∩ B.biUnion N).card :=
     Finset.card_le_card hinter
-  -- |A.biUnion N| + |B.biUnion N| = |union| + |inter of biUnions|
-  -- ≥ |union| + |biUnion of inter| by hinter
-  calc (A.biUnion N).card + (B.biUnion N).card 
-      = (A.biUnion N ∪ B.biUnion N).card + (A.biUnion N ∩ B.biUnion N).card := by omega
-    _ ≥ (A.biUnion N ∪ B.biUnion N).card + ((A ∩ B).biUnion N).card := by
-        apply add_le_add_left
-        exact_mod_cast hcard_inter
+  -- Cast inclusion-exclusion to ℝ
+  have h' : ((A.biUnion N).card : ℝ) + (B.biUnion N).card = 
+            ((A.biUnion N ∪ B.biUnion N).card : ℝ) + (A.biUnion N ∩ B.biUnion N).card := by
+    simp only [← Nat.cast_add]
+    exact congrArg Nat.cast h.symm
+  -- Cast the cardinality inequality to ℝ
+  have hcard_inter' : (((A ∩ B).biUnion N).card : ℝ) ≤ (A.biUnion N ∩ B.biUnion N).card :=
+    Nat.cast_le.mpr hcard_inter
+  calc ((A.biUnion N).card : ℝ) + (B.biUnion N).card 
+      = ((A.biUnion N ∪ B.biUnion N).card : ℝ) + (A.biUnion N ∩ B.biUnion N).card := h'
+    _ ≥ ((A.biUnion N ∪ B.biUnion N).card : ℝ) + ((A ∩ B).biUnion N).card := by
+        linarith
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SECTION 3: MULTILINEAR EXTENSION
@@ -244,8 +247,8 @@ def zero : FractionalSolution V where
 /-- Indicator solution for a set S -/
 def indicator [DecidableEq V] (S : Finset V) : FractionalSolution V where
   coords := fun v => if v ∈ S then 1 else 0
-  nonneg := fun v => by simp only []; split_ifs <;> linarith
-  le_one := fun v => by simp only []; split_ifs <;> linarith
+  nonneg := fun v => by split_ifs <;> linarith
+  le_one := fun v => by split_ifs <;> linarith
 
 end FractionalSolution
 
