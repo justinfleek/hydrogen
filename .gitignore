@@ -22,3 +22,7 @@ lake-manifest.json
 
 # PSCI modules cache
 .psci_modules/
+
+# Private vision documents
+the_why.md
+**/the_why.md

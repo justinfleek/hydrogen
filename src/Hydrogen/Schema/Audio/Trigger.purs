@@ -61,13 +61,13 @@ module Hydrogen.Schema.Audio.Trigger
   
   -- * Audio Trigger
   , AudioTrigger
-  , audioTrigger
-  , audioTriggerSimple
+  , audioTrigger        -- :: AudioSource -> TriggerEvent -> AudioBehavior -> Number -> Number -> Number -> AudioTrigger
+  , audioTriggerSimple  -- :: AudioSource -> TriggerEvent -> AudioTrigger
   
   -- * Presets
-  , hoverSound
-  , clickSound
-  , transitionSound
+  , hoverSound          -- :: String -> Number -> AudioTrigger
+  , clickSound          -- :: String -> Number -> AudioTrigger
+  , transitionSound     -- :: String -> Number -> Number -> AudioTrigger
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -78,6 +78,9 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , otherwise
+  , (<)
+  , (>)
   )
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -158,34 +161,133 @@ instance showAudioBehavior :: Show AudioBehavior where
 --                                                               // audio trigger
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Complete audio trigger configuration
-data AudioTrigger = AudioTriggerPlaceholder
+-- | Complete audio trigger configuration.
+-- | Combines source, event, behavior, volume, and timing.
+type AudioTrigger =
+  { source :: AudioSource
+  , event :: TriggerEvent
+  , behavior :: AudioBehavior
+  , volume :: Number           -- ^ 0.0 to 1.0 linear gain
+  , delayMs :: Number          -- ^ Delay before playing in ms
+  , fadeDurationMs :: Number   -- ^ Fade duration in ms (for FadeIn/FadeOut)
+  }
 
-derive instance eqAudioTrigger :: Eq AudioTrigger
+-- | Create a full audio trigger with all parameters.
+-- |
+-- | ## Parameters
+-- | - `source`: Audio file URL or inline data
+-- | - `event`: Which UI event triggers playback
+-- | - `behavior`: How the audio plays (once, loop, fade)
+-- | - `volume`: Playback volume (0.0 to 1.0)
+-- | - `delayMs`: Delay before playing (milliseconds)
+-- | - `fadeDurationMs`: Duration of fade in/out (milliseconds)
+audioTrigger
+  :: AudioSource
+  -> TriggerEvent
+  -> AudioBehavior
+  -> Number
+  -> Number
+  -> Number
+  -> AudioTrigger
+audioTrigger src evt bhv vol delay fade =
+  { source: src
+  , event: evt
+  , behavior: bhv
+  , volume: clampVolume vol
+  , delayMs: clampDelay delay
+  , fadeDurationMs: clampFade fade
+  }
+  where
+    clampVolume v
+      | v < 0.0 = 0.0
+      | v > 1.0 = 1.0
+      | otherwise = v
+    clampDelay d
+      | d < 0.0 = 0.0
+      | otherwise = d
+    clampFade f
+      | f < 0.0 = 0.0
+      | otherwise = f
 
-instance showAudioTrigger :: Show AudioTrigger where
-  show _ = "AudioTrigger"
-
--- | Create audio trigger (placeholder)
-audioTrigger :: AudioTrigger
-audioTrigger = AudioTriggerPlaceholder
-
--- | Simple audio trigger (placeholder)
-audioTriggerSimple :: AudioTrigger
-audioTriggerSimple = AudioTriggerPlaceholder
+-- | Create a simple audio trigger with sensible defaults.
+-- | Uses PlayOnce behavior, full volume, no delay, no fade.
+audioTriggerSimple :: AudioSource -> TriggerEvent -> AudioTrigger
+audioTriggerSimple src evt =
+  { source: src
+  , event: evt
+  , behavior: PlayOnce
+  , volume: 1.0
+  , delayMs: 0.0
+  , fadeDurationMs: 0.0
+  }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // presets
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Hover sound preset (placeholder)
-hoverSound :: AudioTrigger
-hoverSound = AudioTriggerPlaceholder
+-- | Create a hover sound preset.
+-- | Plays on hover enter with slight fade-in for smoothness.
+-- |
+-- | ## Parameters
+-- | - `url`: URL to the audio file
+-- | - `volume`: Playback volume (0.0 to 1.0)
+hoverSound :: String -> Number -> AudioTrigger
+hoverSound url vol =
+  { source: AudioUrl url
+  , event: OnHoverEnter
+  , behavior: FadeIn
+  , volume: clampVol vol
+  , delayMs: 0.0
+  , fadeDurationMs: 50.0
+  }
+  where
+    clampVol v
+      | v < 0.0 = 0.0
+      | v > 1.0 = 1.0
+      | otherwise = v
 
--- | Click sound preset (placeholder)
-clickSound :: AudioTrigger
-clickSound = AudioTriggerPlaceholder
+-- | Create a click sound preset.
+-- | Immediate playback on click, no fade.
+-- |
+-- | ## Parameters
+-- | - `url`: URL to the audio file
+-- | - `volume`: Playback volume (0.0 to 1.0)
+clickSound :: String -> Number -> AudioTrigger
+clickSound url vol =
+  { source: AudioUrl url
+  , event: OnClick
+  , behavior: PlayOnce
+  , volume: clampVol vol
+  , delayMs: 0.0
+  , fadeDurationMs: 0.0
+  }
+  where
+    clampVol v
+      | v < 0.0 = 0.0
+      | v > 1.0 = 1.0
+      | otherwise = v
 
--- | Transition sound preset (placeholder)
-transitionSound :: AudioTrigger
-transitionSound = AudioTriggerPlaceholder
+-- | Create a transition sound preset.
+-- | Plays on element enter with fade-in-out for smooth transitions.
+-- |
+-- | ## Parameters
+-- | - `url`: URL to the audio file
+-- | - `volume`: Playback volume (0.0 to 1.0)
+-- | - `fadeDurationMs`: Duration of fade in/out
+transitionSound :: String -> Number -> Number -> AudioTrigger
+transitionSound url vol fade =
+  { source: AudioUrl url
+  , event: OnEnter
+  , behavior: FadeInOut
+  , volume: clampVol vol
+  , delayMs: 0.0
+  , fadeDurationMs: clampFade fade
+  }
+  where
+    clampVol v
+      | v < 0.0 = 0.0
+      | v > 1.0 = 1.0
+      | otherwise = v
+    clampFade f
+      | f < 0.0 = 0.0
+      | otherwise = f

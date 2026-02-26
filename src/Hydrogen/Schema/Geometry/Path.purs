@@ -16,8 +16,12 @@ module Hydrogen.Schema.Geometry.Path
   , pathFromPoints
   , moveTo
   , lineTo
+  , hLineTo
+  , vLineTo
   , quadTo
+  , smoothQuadTo
   , cubicTo
+  , smoothCurveTo
   , arcTo
   , closePath
   
@@ -56,35 +60,21 @@ module Hydrogen.Schema.Geometry.Path
 
 import Prelude
   ( class Eq
-  , class Ord
   , class Show
-  , class Semigroup
-  , class Monoid
   , show
   , map
-  , pure
-  , bind
   , (+)
   , (-)
   , (*)
   , (/)
   , (<>)
-  , (<$>)
-  , (>>=)
-  , ($)
-  , (==)
-  , (/=)
   , (<)
   , (>)
   , (<=)
   , (>=)
-  , (&&)
-  , (||)
-  , not
   , negate
   , min
   , max
-  , otherwise
   )
 
 import Data.Array 
@@ -92,23 +82,12 @@ import Data.Array
   , cons
   , uncons
   , head
-  , tail
   , last
   , init
   , length
   , null
   , reverse
   , foldl
-  , foldr
-  , filter
-  , concatMap
-  , concat
-  , take
-  , drop
-  , index
-  , mapWithIndex
-  , zip
-  , zipWith
   ) as Array
 import Data.Maybe (Maybe(..))
 
@@ -130,7 +109,6 @@ import Hydrogen.Schema.Geometry.Bezier
   , cubicLength
   )
 import Data.Number (sqrt, sin, cos, pi)
-import Data.Number (floor) as Number
 import Data.Int (toNumber, floor) as Int
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -148,11 +126,21 @@ type ArcParams =
   }
 
 -- | SVG path command.
+-- |
+-- | Includes both absolute commands and shorthand variants:
+-- | - **HLineTo**: Horizontal line (only X coordinate needed)
+-- | - **VLineTo**: Vertical line (only Y coordinate needed)
+-- | - **SmoothCurveTo**: Smooth cubic bezier (first control point inferred)
+-- | - **SmoothQuadTo**: Smooth quadratic bezier (control point inferred)
 data PathCommand
   = MoveTo Point2D
   | LineTo Point2D
+  | HLineTo Number                     -- ^ Horizontal line to X coordinate
+  | VLineTo Number                     -- ^ Vertical line to Y coordinate
   | QuadTo Point2D Point2D
+  | SmoothQuadTo Point2D               -- ^ Control point inferred from previous
   | CubicTo Point2D Point2D Point2D
+  | SmoothCurveTo Point2D Point2D      -- ^ First control point inferred from previous
   | ArcTo ArcParams
   | ClosePath
 
@@ -161,8 +149,12 @@ derive instance eqPathCommand :: Eq PathCommand
 instance showPathCommand :: Show PathCommand where
   show (MoveTo p) = "(MoveTo " <> show p <> ")"
   show (LineTo p) = "(LineTo " <> show p <> ")"
+  show (HLineTo x) = "(HLineTo " <> show x <> ")"
+  show (VLineTo y) = "(VLineTo " <> show y <> ")"
   show (QuadTo c p) = "(QuadTo " <> show c <> " " <> show p <> ")"
+  show (SmoothQuadTo p) = "(SmoothQuadTo " <> show p <> ")"
   show (CubicTo c1 c2 p) = "(CubicTo " <> show c1 <> " " <> show c2 <> " " <> show p <> ")"
+  show (SmoothCurveTo c2 p) = "(SmoothCurveTo " <> show c2 <> " " <> show p <> ")"
   show (ArcTo params) = "(ArcTo rx:" <> show params.rx <> " ry:" <> show params.ry <> " end:" <> show params.end <> ")"
   show ClosePath = "ClosePath"
 
@@ -205,17 +197,49 @@ moveTo p (Path cmds) = Path (Array.snoc cmds (MoveTo p))
 lineTo :: Point2D -> Path -> Path
 lineTo p (Path cmds) = Path (Array.snoc cmds (LineTo p))
 
+-- | Add HLineTo command to path.
+-- |
+-- | Horizontal line to the specified X coordinate.
+-- | Y coordinate remains unchanged from current position.
+hLineTo :: Number -> Path -> Path
+hLineTo x (Path cmds) = Path (Array.snoc cmds (HLineTo x))
+
+-- | Add VLineTo command to path.
+-- |
+-- | Vertical line to the specified Y coordinate.
+-- | X coordinate remains unchanged from current position.
+vLineTo :: Number -> Path -> Path
+vLineTo y (Path cmds) = Path (Array.snoc cmds (VLineTo y))
+
 -- | Add QuadTo command to path.
 -- |
 -- | Parameters: control point, end point.
 quadTo :: Point2D -> Point2D -> Path -> Path
 quadTo control end (Path cmds) = Path (Array.snoc cmds (QuadTo control end))
 
+-- | Add SmoothQuadTo command to path.
+-- |
+-- | Smooth quadratic bezier where the control point is inferred as the
+-- | reflection of the previous command's control point.
+-- |
+-- | Parameter: end point.
+smoothQuadTo :: Point2D -> Path -> Path
+smoothQuadTo end (Path cmds) = Path (Array.snoc cmds (SmoothQuadTo end))
+
 -- | Add CubicTo command to path.
 -- |
 -- | Parameters: first control point, second control point, end point.
 cubicTo :: Point2D -> Point2D -> Point2D -> Path -> Path
 cubicTo c1 c2 end (Path cmds) = Path (Array.snoc cmds (CubicTo c1 c2 end))
+
+-- | Add SmoothCurveTo command to path.
+-- |
+-- | Smooth cubic bezier where the first control point is inferred as the
+-- | reflection of the previous command's second control point.
+-- |
+-- | Parameters: second control point, end point.
+smoothCurveTo :: Point2D -> Point2D -> Path -> Path
+smoothCurveTo c2 end (Path cmds) = Path (Array.snoc cmds (SmoothCurveTo c2 end))
 
 -- | Add ArcTo command to path.
 arcTo :: ArcParams -> Path -> Path
@@ -266,14 +290,22 @@ lastPoint :: Path -> Maybe Point2D
 lastPoint (Path cmds) = findLastPoint cmds
 
 -- | Find the last point from commands (helper).
+-- |
+-- | Note: HLineTo and VLineTo are partial coordinates — they cannot provide
+-- | a full Point2D without knowing the current position. In these cases,
+-- | we return Nothing (the point requires context to resolve).
 findLastPoint :: Array PathCommand -> Maybe Point2D
 findLastPoint cmds =
   case Array.last cmds of
     Nothing -> Nothing
     Just (MoveTo p) -> Just p
     Just (LineTo p) -> Just p
+    Just (HLineTo _) -> Nothing  -- Partial coordinate, needs context
+    Just (VLineTo _) -> Nothing  -- Partial coordinate, needs context
     Just (QuadTo _ p) -> Just p
+    Just (SmoothQuadTo p) -> Just p
     Just (CubicTo _ _ p) -> Just p
+    Just (SmoothCurveTo _ p) -> Just p
     Just (ArcTo params) -> Just params.end
     Just ClosePath ->
       -- ClosePath returns to first MoveTo — find it
@@ -302,13 +334,26 @@ commandToSvgString cmd = case cmd of
   LineTo p -> 
     "L " <> showNum (getX p) <> " " <> showNum (getY p)
   
+  HLineTo x ->
+    "H " <> showNum x
+  
+  VLineTo y ->
+    "V " <> showNum y
+  
   QuadTo control end -> 
     "Q " <> showNum (getX control) <> " " <> showNum (getY control) 
     <> " " <> showNum (getX end) <> " " <> showNum (getY end)
   
+  SmoothQuadTo end ->
+    "T " <> showNum (getX end) <> " " <> showNum (getY end)
+  
   CubicTo c1 c2 end -> 
     "C " <> showNum (getX c1) <> " " <> showNum (getY c1)
     <> " " <> showNum (getX c2) <> " " <> showNum (getY c2)
+    <> " " <> showNum (getX end) <> " " <> showNum (getY end)
+  
+  SmoothCurveTo c2 end ->
+    "S " <> showNum (getX c2) <> " " <> showNum (getY c2)
     <> " " <> showNum (getX end) <> " " <> showNum (getY end)
   
   ArcTo params ->
@@ -380,6 +425,26 @@ updateBounds acc cmd = case cmd of
     , currentPos: p
     }
   
+  HLineTo x ->
+    let newPos = point2D x (getY acc.currentPos)
+    in
+      { minX: min acc.minX x
+      , minY: acc.minY
+      , maxX: max acc.maxX x
+      , maxY: acc.maxY
+      , currentPos: newPos
+      }
+  
+  VLineTo y ->
+    let newPos = point2D (getX acc.currentPos) y
+    in
+      { minX: acc.minX
+      , minY: min acc.minY y
+      , maxX: acc.maxX
+      , maxY: max acc.maxY y
+      , currentPos: newPos
+      }
+  
   QuadTo control end ->
     let
       curve = quadBezier acc.currentPos control end
@@ -392,6 +457,16 @@ updateBounds acc cmd = case cmd of
       , currentPos: end
       }
   
+  SmoothQuadTo end ->
+    -- Smooth quad: control point inferred from previous
+    -- For bounds, we approximate by just including the endpoint
+    { minX: min acc.minX (getX end)
+    , minY: min acc.minY (getY end)
+    , maxX: max acc.maxX (getX end)
+    , maxY: max acc.maxY (getY end)
+    , currentPos: end
+    }
+  
   CubicTo c1 c2 end ->
     let
       curve = cubicBezier acc.currentPos c1 c2 end
@@ -403,6 +478,16 @@ updateBounds acc cmd = case cmd of
       , maxY: max acc.maxY box.maxY
       , currentPos: end
       }
+  
+  SmoothCurveTo c2 end ->
+    -- Smooth cubic: first control point inferred from previous
+    -- For bounds, we include control point c2 and endpoint
+    { minX: min (min acc.minX (getX c2)) (getX end)
+    , minY: min (min acc.minY (getY c2)) (getY end)
+    , maxX: max (max acc.maxX (getX c2)) (getX end)
+    , maxY: max (max acc.maxY (getY c2)) (getY end)
+    , currentPos: end
+    }
   
   ArcTo params ->
     -- Approximate arc bounds by sampling
@@ -467,16 +552,38 @@ accumulateLength acc cmd = case cmd of
     let len = distance acc.currentPos p
     in { total: acc.total + len, currentPos: p }
   
+  HLineTo x ->
+    let 
+      newPos = point2D x (getY acc.currentPos)
+      len = absNum (x - getX acc.currentPos)
+    in { total: acc.total + len, currentPos: newPos }
+  
+  VLineTo y ->
+    let 
+      newPos = point2D (getX acc.currentPos) y
+      len = absNum (y - getY acc.currentPos)
+    in { total: acc.total + len, currentPos: newPos }
+  
   QuadTo control end ->
     let 
       curve = quadBezier acc.currentPos control end
       len = quadLength curve
     in { total: acc.total + len, currentPos: end }
   
+  SmoothQuadTo end ->
+    -- Approximate smooth quad as line for length
+    let len = distance acc.currentPos end
+    in { total: acc.total + len, currentPos: end }
+  
   CubicTo c1 c2 end ->
     let
       curve = cubicBezier acc.currentPos c1 c2 end
       len = cubicLength curve
+    in { total: acc.total + len, currentPos: end }
+  
+  SmoothCurveTo _ end ->
+    -- Approximate smooth curve as line for length
+    let len = distance acc.currentPos end
     in { total: acc.total + len, currentPos: end }
   
   ArcTo params ->
@@ -532,6 +639,34 @@ stepToLength targetLen acc cmd =
           else
             { accumulated: newAcc, currentPos: p, found: Nothing }
       
+      HLineTo x ->
+        let 
+          newPos = point2D x (getY acc.currentPos)
+          segLen = absNum (x - getX acc.currentPos)
+          newAcc = acc.accumulated + segLen
+        in
+          if newAcc >= targetLen then
+            let 
+              t = (targetLen - acc.accumulated) / segLen
+              interpX = getX acc.currentPos + t * (x - getX acc.currentPos)
+            in { accumulated: newAcc, currentPos: newPos, found: Just (point2D interpX (getY acc.currentPos)) }
+          else
+            { accumulated: newAcc, currentPos: newPos, found: Nothing }
+      
+      VLineTo y ->
+        let 
+          newPos = point2D (getX acc.currentPos) y
+          segLen = absNum (y - getY acc.currentPos)
+          newAcc = acc.accumulated + segLen
+        in
+          if newAcc >= targetLen then
+            let 
+              t = (targetLen - acc.accumulated) / segLen
+              interpY = getY acc.currentPos + t * (y - getY acc.currentPos)
+            in { accumulated: newAcc, currentPos: newPos, found: Just (point2D (getX acc.currentPos) interpY) }
+          else
+            { accumulated: newAcc, currentPos: newPos, found: Nothing }
+      
       QuadTo control end ->
         let
           curve = quadBezier acc.currentPos control end
@@ -544,6 +679,21 @@ stepToLength targetLen acc cmd =
           else
             { accumulated: newAcc, currentPos: end, found: Nothing }
       
+      SmoothQuadTo end ->
+        -- Approximate as line
+        let 
+          segLen = distance acc.currentPos end
+          newAcc = acc.accumulated + segLen
+        in
+          if newAcc >= targetLen then
+            let 
+              t = (targetLen - acc.accumulated) / segLen
+              x = getX acc.currentPos + t * (getX end - getX acc.currentPos)
+              y = getY acc.currentPos + t * (getY end - getY acc.currentPos)
+            in { accumulated: newAcc, currentPos: end, found: Just (point2D x y) }
+          else
+            { accumulated: newAcc, currentPos: end, found: Nothing }
+      
       CubicTo c1 c2 end ->
         let
           curve = cubicBezier acc.currentPos c1 c2 end
@@ -553,6 +703,21 @@ stepToLength targetLen acc cmd =
           if newAcc >= targetLen then
             let t = (targetLen - acc.accumulated) / segLen
             in { accumulated: newAcc, currentPos: end, found: Just (cubicPointAt t curve) }
+          else
+            { accumulated: newAcc, currentPos: end, found: Nothing }
+      
+      SmoothCurveTo _ end ->
+        -- Approximate as line
+        let 
+          segLen = distance acc.currentPos end
+          newAcc = acc.accumulated + segLen
+        in
+          if newAcc >= targetLen then
+            let 
+              t = (targetLen - acc.accumulated) / segLen
+              x = getX acc.currentPos + t * (getX end - getX acc.currentPos)
+              y = getY acc.currentPos + t * (getY end - getY acc.currentPos)
+            in { accumulated: newAcc, currentPos: end, found: Just (point2D x y) }
           else
             { accumulated: newAcc, currentPos: end, found: Nothing }
       
@@ -611,6 +776,26 @@ stepToTangent targetLen acc cmd = case cmd of
       else
         { accumulated: newAcc, currentPos: p, tangent: tangent }
   
+  HLineTo x ->
+    let
+      newPos = point2D x (getY acc.currentPos)
+      segLen = absNum (x - getX acc.currentPos)
+      newAcc = acc.accumulated + segLen
+      -- Horizontal tangent: +X or -X depending on direction
+      tangent = if x > getX acc.currentPos then vec2 1.0 0.0 else vec2 (-1.0) 0.0
+    in
+      { accumulated: newAcc, currentPos: newPos, tangent: tangent }
+  
+  VLineTo y ->
+    let
+      newPos = point2D (getX acc.currentPos) y
+      segLen = absNum (y - getY acc.currentPos)
+      newAcc = acc.accumulated + segLen
+      -- Vertical tangent: +Y or -Y depending on direction
+      tangent = if y > getY acc.currentPos then vec2 0.0 1.0 else vec2 0.0 (-1.0)
+    in
+      { accumulated: newAcc, currentPos: newPos, tangent: tangent }
+  
   QuadTo control end ->
     let
       curve = quadBezier acc.currentPos control end
@@ -634,6 +819,30 @@ stepToTangent targetLen acc cmd = case cmd of
         in { accumulated: newAcc, currentPos: end, tangent: cubicTangentAt t curve }
       else
         { accumulated: newAcc, currentPos: end, tangent: cubicTangentAt 1.0 curve }
+  
+  SmoothQuadTo end ->
+    -- Approximate smooth quad as line for tangent
+    let
+      segLen = distance acc.currentPos end
+      newAcc = acc.accumulated + segLen
+      dx = getX end - getX acc.currentPos
+      dy = getY end - getY acc.currentPos
+      len = sqrt (dx * dx + dy * dy)
+      tangent = if len > 0.0 then vec2 (dx / len) (dy / len) else acc.tangent
+    in
+      { accumulated: newAcc, currentPos: end, tangent: tangent }
+  
+  SmoothCurveTo _ end ->
+    -- Approximate smooth curve as line for tangent
+    let
+      segLen = distance acc.currentPos end
+      newAcc = acc.accumulated + segLen
+      dx = getX end - getX acc.currentPos
+      dy = getY end - getY acc.currentPos
+      len = sqrt (dx * dx + dy * dy)
+      tangent = if len > 0.0 then vec2 (dx / len) (dy / len) else acc.tangent
+    in
+      { accumulated: newAcc, currentPos: end, tangent: tangent }
   
   ArcTo params ->
     let
@@ -663,16 +872,26 @@ distance p1 p2 =
     sqrt (dx * dx + dy * dy)
 
 -- | Approximate arc length by chord + sagitta method.
+-- |
+-- | Uses the average radius to estimate arc curvature correction.
 approximateArcLength :: Point2D -> ArcParams -> Number
 approximateArcLength start params =
-  -- Simple approximation: use chord length scaled by ellipse factor
+  -- Approximation: use chord length scaled by ellipse eccentricity factor
   let
     chord = distance start params.end
     avgRadius = (params.rx + params.ry) / 2.0
+    -- Eccentricity factor: how much the ellipse deviates from circle
+    eccentricityFactor = if avgRadius > 0.0 
+      then (params.rx + params.ry) / (2.0 * avgRadius)
+      else 1.0
+    -- Large arcs traverse more of the ellipse perimeter
+    arcFactor = if params.largeArc then 1.57 else 1.1
   in
-    -- For small arcs, chord ≈ arc length
-    -- For larger arcs, multiply by π/2 factor
-    if params.largeArc then chord * 1.57 else chord * 1.1
+    chord * arcFactor * eccentricityFactor
+
+-- | Absolute value of a number.
+absNum :: Number -> Number
+absNum n = if n < 0.0 then negate n else n
 
 -- | Large positive number (approximation of infinity).
 infinity :: Number
@@ -706,44 +925,65 @@ foldMax initial arr = Array.foldl max initial arr
 -- |
 -- | The path will traverse in the opposite direction.
 -- | ClosePath commands are preserved at the end.
+-- |
+-- | Note: The first command should be MoveTo, which determines the starting
+-- | point. When reversed, the last point becomes the new starting point.
 reversePath :: Path -> Path
 reversePath (Path cmds) =
   case Array.uncons cmds of
     Nothing -> emptyPath
-    Just { head: first, tail: rest } ->
+    Just { head: firstCmd, tail: restCmds } ->
       let
         -- Check if path is closed
         endsWithClose = case Array.last cmds of
           Just ClosePath -> true
           _ -> false
         
-        -- Remove ClosePath if present for reversal
+        -- Get starting point from first command (should be MoveTo)
+        startPoint = case firstCmd of
+          MoveTo p -> Just p
+          _ -> Nothing
+        
+        -- Remove ClosePath if present for reversal, and skip first MoveTo
         toReverse = if endsWithClose 
-          then case Array.init cmds of
+          then case Array.init restCmds of
             Just init' -> init'
             Nothing -> []
-          else cmds
+          else restCmds
         
-        -- Collect all points in order
+        -- Collect all points in order (excluding the MoveTo start)
         points = collectPoints toReverse
         
-        -- Reverse the points and rebuild path
-        reversedPoints = Array.reverse points
+        -- Add starting point to end if present
+        allPoints = case startPoint of
+          Just sp -> Array.snoc points sp
+          Nothing -> points
         
-        -- Build new path
+        -- Reverse the points and rebuild path
+        reversedPoints = Array.reverse allPoints
+        
+        -- Build new path from reversed points
         newPath = pathFromPoints reversedPoints
       in
         if endsWithClose then closePath newPath else newPath
 
 -- | Collect all points from commands in order.
+-- |
+-- | Note: HLineTo and VLineTo only provide partial coordinates, so they
+-- | cannot be included without knowing the current position context.
+-- | They are skipped in this simplified collection.
 collectPoints :: Array PathCommand -> Array Point2D
 collectPoints cmds = Array.foldl addPoint [] cmds
   where
     addPoint acc cmd = case cmd of
       MoveTo p -> Array.snoc acc p
       LineTo p -> Array.snoc acc p
+      HLineTo _ -> acc  -- Partial coordinate, skip
+      VLineTo _ -> acc  -- Partial coordinate, skip
       QuadTo _ p -> Array.snoc acc p
+      SmoothQuadTo p -> Array.snoc acc p
       CubicTo _ _ p -> Array.snoc acc p
+      SmoothCurveTo _ p -> Array.snoc acc p
       ArcTo params -> Array.snoc acc params.end
       ClosePath -> acc
 
@@ -756,8 +996,12 @@ translateCommand :: Number -> Number -> PathCommand -> PathCommand
 translateCommand dx dy cmd = case cmd of
   MoveTo p -> MoveTo (translatePoint dx dy p)
   LineTo p -> LineTo (translatePoint dx dy p)
+  HLineTo x -> HLineTo (x + dx)
+  VLineTo y -> VLineTo (y + dy)
   QuadTo c e -> QuadTo (translatePoint dx dy c) (translatePoint dx dy e)
+  SmoothQuadTo e -> SmoothQuadTo (translatePoint dx dy e)
   CubicTo c1 c2 e -> CubicTo (translatePoint dx dy c1) (translatePoint dx dy c2) (translatePoint dx dy e)
+  SmoothCurveTo c2 e -> SmoothCurveTo (translatePoint dx dy c2) (translatePoint dx dy e)
   ArcTo params -> ArcTo (params { end = translatePoint dx dy params.end })
   ClosePath -> ClosePath
 
@@ -774,8 +1018,12 @@ scaleCommand :: Number -> Number -> PathCommand -> PathCommand
 scaleCommand sx sy cmd = case cmd of
   MoveTo p -> MoveTo (scalePoint sx sy p)
   LineTo p -> LineTo (scalePoint sx sy p)
+  HLineTo x -> HLineTo (x * sx)
+  VLineTo y -> VLineTo (y * sy)
   QuadTo c e -> QuadTo (scalePoint sx sy c) (scalePoint sx sy e)
+  SmoothQuadTo e -> SmoothQuadTo (scalePoint sx sy e)
   CubicTo c1 c2 e -> CubicTo (scalePoint sx sy c1) (scalePoint sx sy c2) (scalePoint sx sy e)
+  SmoothCurveTo c2 e -> SmoothCurveTo (scalePoint sx sy c2) (scalePoint sx sy e)
   ArcTo params -> ArcTo (params 
     { rx = params.rx * sx
     , ry = params.ry * sy
@@ -798,12 +1046,19 @@ rotatePath angle (Path cmds) =
     Path (map (rotateCommand cosA sinA) cmds)
 
 -- | Rotate a single command.
+-- |
+-- | Note: HLineTo and VLineTo are converted to LineTo since rotation
+-- | changes their direction (they're no longer purely horizontal/vertical).
 rotateCommand :: Number -> Number -> PathCommand -> PathCommand
 rotateCommand cosA sinA cmd = case cmd of
   MoveTo p -> MoveTo (rotatePoint cosA sinA p)
   LineTo p -> LineTo (rotatePoint cosA sinA p)
+  HLineTo x -> LineTo (rotatePoint cosA sinA (point2D x 0.0))
+  VLineTo y -> LineTo (rotatePoint cosA sinA (point2D 0.0 y))
   QuadTo c e -> QuadTo (rotatePoint cosA sinA c) (rotatePoint cosA sinA e)
+  SmoothQuadTo e -> SmoothQuadTo (rotatePoint cosA sinA e)
   CubicTo c1 c2 e -> CubicTo (rotatePoint cosA sinA c1) (rotatePoint cosA sinA c2) (rotatePoint cosA sinA e)
+  SmoothCurveTo c2 e -> SmoothCurveTo (rotatePoint cosA sinA c2) (rotatePoint cosA sinA e)
   ArcTo params -> ArcTo (params { end = rotatePoint cosA sinA params.end })
   ClosePath -> ClosePath
 
@@ -855,6 +1110,14 @@ flattenStep tolerance acc cmd = case cmd of
   LineTo p ->
     { output: Array.snoc acc.output (LineTo p), currentPos: p }
   
+  HLineTo x ->
+    let newPos = point2D x (getY acc.currentPos)
+    in { output: Array.snoc acc.output (LineTo newPos), currentPos: newPos }
+  
+  VLineTo y ->
+    let newPos = point2D (getX acc.currentPos) y
+    in { output: Array.snoc acc.output (LineTo newPos), currentPos: newPos }
+  
   QuadTo control end ->
     let
       curve = quadBezier acc.currentPos control end
@@ -862,12 +1125,20 @@ flattenStep tolerance acc cmd = case cmd of
     in
       { output: acc.output <> segments, currentPos: end }
   
+  SmoothQuadTo end ->
+    -- Flatten smooth quad as line (control point inference not tracked)
+    { output: Array.snoc acc.output (LineTo end), currentPos: end }
+  
   CubicTo c1 c2 end ->
     let
       curve = cubicBezier acc.currentPos c1 c2 end
       segments = flattenCubicBezier tolerance curve
     in
       { output: acc.output <> segments, currentPos: end }
+  
+  SmoothCurveTo _ end ->
+    -- Flatten smooth curve as line (control point inference not tracked)
+    { output: Array.snoc acc.output (LineTo end), currentPos: end }
   
   ArcTo params ->
     let
@@ -901,11 +1172,21 @@ flattenCubicBezier tolerance curve =
     map LineTo points
 
 -- | Flatten arc to line segments.
+-- |
+-- | Uses tolerance to determine segment count — smaller tolerance means
+-- | more segments for higher accuracy.
 flattenArc :: Number -> Point2D -> ArcParams -> Array PathCommand
 flattenArc tolerance start params =
   let
-    -- Use more segments for larger arcs
-    numSegments = if params.largeArc then 16 else 8
+    -- Estimate arc length for segment calculation
+    arcLen = approximateArcLength start params
+    -- More segments for larger arcs and tighter tolerances
+    baseSegments = if params.largeArc then 16 else 8
+    -- Scale segments based on arc size and tolerance
+    toleranceSegments = if tolerance > 0.0 
+      then Int.floor (arcLen / tolerance)
+      else baseSegments
+    numSegments = max baseSegments toleranceSegments
     step = 1.0 / Int.toNumber numSegments
     points = map (\i -> arcPointAtT (Int.toNumber i * step) start params) (rangeInts 1 numSegments)
   in

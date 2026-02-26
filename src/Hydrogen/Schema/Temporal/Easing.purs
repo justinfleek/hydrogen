@@ -27,6 +27,7 @@ module Hydrogen.Schema.Temporal.Easing
   , cubicEasing
   , stepsEasing
   , springEasing
+  , proceduralEasing
   
   -- * Standard Presets
   , linear
@@ -35,11 +36,20 @@ module Hydrogen.Schema.Temporal.Easing
   , easeOut
   , easeInOut
   
+  -- * Elastic/Bounce Presets (procedural, cannot be CSS)
+  , easeInElastic
+  , easeOutElastic
+  , easeInOutElastic
+  , easeInBounce
+  , easeOutBounce
+  , easeInOutBounce
+  
   -- * Category Check
   , isLinear
   , isCubicBezier
   , isSteps
   , isSpring
+  , isProcedural
   
   -- * CSS Export
   , toLegacyCss
@@ -78,6 +88,16 @@ import Hydrogen.Schema.Temporal.SpringConfig
   ( SpringConfig
   ) as Spring
 
+import Hydrogen.Schema.Temporal.ProceduralEasing 
+  ( ProceduralEasing
+  , easeInElastic
+  , easeOutElastic
+  , easeInOutElastic
+  , easeInBounce
+  , easeOutBounce
+  , easeInOutBounce
+  ) as Procedural
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // easing
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -85,11 +105,15 @@ import Hydrogen.Schema.Temporal.SpringConfig
 -- | Unified easing function type
 -- |
 -- | Represents any timing function that can be used for animation.
+-- |
+-- | **Note:** The Procedural variant (Elastic/Bounce) cannot be converted to CSS.
+-- | These require runtime evaluation via WebGPU/JavaScript.
 data Easing
   = Linear
   | CubicBezier Bezier.CubicBezierEasing
   | Steps Step.Steps Step.StepPosition
   | Spring Spring.SpringConfig
+  | Procedural Procedural.ProceduralEasing
 
 derive instance eqEasing :: Eq Easing
 derive instance ordEasing :: Ord Easing
@@ -99,6 +123,7 @@ instance showEasing :: Show Easing where
   show (CubicBezier cb) = "(CubicBezier " <> show cb <> ")"
   show (Steps n pos) = "(Steps " <> show n <> " " <> show pos <> ")"
   show (Spring cfg) = "(Spring " <> show cfg <> ")"
+  show (Procedural pe) = "(Procedural " <> show pe <> ")"
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // smart constructors
@@ -119,6 +144,10 @@ stepsEasing = Steps
 -- | Create spring-based easing from configuration
 springEasing :: Spring.SpringConfig -> Easing
 springEasing = Spring
+
+-- | Create procedural easing (elastic/bounce)
+proceduralEasing :: Procedural.ProceduralEasing -> Easing
+proceduralEasing = Procedural
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // standard presets
@@ -148,6 +177,34 @@ easeInOut :: Easing
 easeInOut = CubicBezier Bezier.easeInOut
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+--                                                     // elastic / bounce presets
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Elastic ease-in (oscillation at start)
+easeInElastic :: Easing
+easeInElastic = Procedural Procedural.easeInElastic
+
+-- | Elastic ease-out (oscillation settling at end)
+easeOutElastic :: Easing
+easeOutElastic = Procedural Procedural.easeOutElastic
+
+-- | Elastic ease-in-out (oscillation at both ends)
+easeInOutElastic :: Easing
+easeInOutElastic = Procedural Procedural.easeInOutElastic
+
+-- | Bounce ease-in (bouncing at start)
+easeInBounce :: Easing
+easeInBounce = Procedural Procedural.easeInBounce
+
+-- | Bounce ease-out (bouncing landing at end)
+easeOutBounce :: Easing
+easeOutBounce = Procedural Procedural.easeOutBounce
+
+-- | Bounce ease-in-out (bouncing at both ends)
+easeInOutBounce :: Easing
+easeInOutBounce = Procedural Procedural.easeInOutBounce
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 --                                                               // category check
 -- ═══════════════════════════════════════════════════════════════════════════════
 
@@ -171,6 +228,11 @@ isSpring :: Easing -> Boolean
 isSpring (Spring _) = true
 isSpring _ = false
 
+-- | Check if easing is procedural (elastic/bounce)
+isProcedural :: Easing -> Boolean
+isProcedural (Procedural _) = true
+isProcedural _ = false
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // css export
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -187,6 +249,10 @@ toLegacyCss (CubicBezier cb) = Bezier.toLegacyCss cb
 toLegacyCss (Steps n pos) = 
   "steps(" <> show (Step.unwrapSteps n) <> ", " <> Step.stepPositionToString pos <> ")"
 toLegacyCss (Spring _) = 
-  -- Spring physics cannot be represented in CSS
+  -- Spring physics cannot be represented in legacy CSS
+  -- Fall back to ease-out as closest approximation
+  "ease-out"
+toLegacyCss (Procedural _) = 
+  -- Elastic/Bounce cannot be represented in legacy CSS
   -- Fall back to ease-out as closest approximation
   "ease-out"
