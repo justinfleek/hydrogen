@@ -3,11 +3,11 @@
 **Purpose**: Machine-readable algorithmic specifications extracted from research papers
 **Format**: AST-ready, graded monads, coeffect tracking  
 **Attestation**: clarity
-**Status**: 18 OF 44 COMPLETE ✓
+**Status**: 23 OF 44 COMPLETE ✓
 
 ---
 
-## COMPLETED ALGORITHMS (18)
+## COMPLETED ALGORITHMS (25)
 
 | ID | Paper | Domain | Key Algorithm | Status |
 |----|-------|---------|---------------|--------|
@@ -29,10 +29,15 @@
 | 16 | TYPE_BASED_ROUNDING | Rounding Analysis | NumFuzz, Bean, graded monads/comonads | ✓ READY |
 | 17 | PATHTRACING_SDF | SDF Rendering | Cubic solver, continuous normals, shadows | ✓ READY |
 | 18 | GEOMCLIPMAP | Terrain Rendering | Nested grids, toroidal access, morphing | ✓ READY |
+| 19 | CONSTRAINT_TRANSPORT | Video Generation | Thermodynamic precision, hyperbolic dynamics | ✓ READY |
+| 20 | DEEPSEEK_R1 | RL Reasoning | GRPO, reinforcement learning, chain-of-thought | ✓ READY |
+| 21 | GAIA2_WORLD_MODEL | Autonomous Driving | Latent diffusion, flow matching, multi-camera | ✓ READY |
+| 22 | PAN_WORLD_MODEL | World Model | GLP, causal Swin-DPM, long-horizon | ✓ READY |
+| 23 | QWEN25_OMNI | Multimodal Omni | Thinker-Talker, TMRoPE, streaming | ✓ READY |
 
 ---
 
-## REMAINING (26)
+## REMAINING (21)
 
 | Status | Count | Papers |
 |--------|-------|--------|
@@ -742,6 +747,1632 @@ data CoEffect
   | NeedsMaxBounces MaxBounces
   | NeedsVoxelSize VoxelSize
   | NeedsGPUCompute
+```
+
+---
+
+## GEOMCLIPMAP (Geometry Clipmaps Terrain Rendering)
+
+### Classification
+- **Domain**: Computer Graphics / Terrain Rendering
+- **Effect**: Render(Terrain), Update(Clipmap), Morph(Levels)
+- **Coeffect**: ViewDistance, GridSize, CompressionRatio
+
+### AST Schema
+```json
+{
+  "algorithm": "GeometryClipmaps",
+  "inputs": ["viewer_position", "terrain_data"],
+  "outputs": ["rendered_mesh", "clipmap_state"],
+  "parameters": {
+    "num_levels": 11,
+    "grid_size": 255,
+    "compression": 100
+  }
+}
+```
+
+### Key Formulas
+
+**(1) Grid Spacing per Level**
+```
+g_l = 2^(-l)
+```
+
+**(2) Clipmap Memory**
+```
+Memory = m × n² × 16 + m × (2n)² × 2  bytes
+```
+
+**(3) L-Shaped Update Region**
+```
+new_region = L-shaped area between old_clip and new_clip
+```
+
+**(4) Transition Morphing**
+```
+z_morphed = lerp(z_fine, z_coarse, t)
+where t = transition_factor(viewer_distance)
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: Initialize Geometry Clipmap
+
+def init_geometry_clipmap(terrain, num_levels=11, grid_size=255):
+    clipmap = []
+    for l in range(num_levels):
+        spacing = 2 ** (-l)
+        level = {
+            'vertices': zeros(grid_size, grid_size, 4),
+            'normals': zeros(2*grid_size, 2*grid_size, 2),
+            'clip_region': None,
+            'spacing': spacing
+        }
+        clipmap.append(level)
+    return clipmap
+
+
+# Algorithm 2: Toroidal Update
+
+def toroidal_access(array, x, y, n):
+    return array[x % n][y % n]
+
+
+def update_L_region(clip_level, old_clip, new_clip, terrain):
+    n = clip_level.shape[0]
+    spacing = clip_level['spacing']
+    
+    x_min = min(old_clip.x_min, new_clip.x_min)
+    x_max = max(old_clip.x_max, new_clip.x_max)
+    y_min = min(old_clip.y_min, new_clip.y_min)
+    y_max = max(old_clip.y_max, new_clip.y_max)
+    
+    if new_clip.x_min < old_clip.x_min:
+        for y in range(y_min, y_max):
+            for x in range(new_clip.x_min, old_clip.x_min):
+                wx, wy = world_from_grid(x, y, spacing, new_clip.center)
+                h = terrain.sample_height(wx, wy)
+                clip_level[x % n][y % n] = [wx, wy, h, h]
+    
+    if new_clip.x_max > old_clip.x_max:
+        for y in range(y_min, y_max):
+            for x in range(old_clip.x_max, new_clip.x_max):
+                wx, wy = world_from_grid(x, y, spacing, new_clip.center)
+                h = terrain.sample_height(wx, wy)
+                clip_level[x % n][y % n] = [wx, wy, h, h]
+    
+    if new_clip.y_min < old_clip.y_min:
+        for x in range(x_min, x_max):
+            for y in range(new_clip.y_min, old_clip.y_min):
+                wx, wy = world_from_grid(x, y, spacing, new_clip.center)
+                h = terrain.sample_height(wx, wy)
+                clip_level[x % n][y % n] = [wx, wy, h, h]
+    
+    if new_clip.y_max > old_clip.y_max:
+        for x in range(x_min, x_max):
+            for y in range(old_clip.y_max, new_clip.y_max):
+                wx, wy = world_from_grid(x, y, spacing, new_clip.center)
+                h = terrain.sample_height(wx, wy)
+                clip_level[x % n][y % n] = [wx, wy, h, h]
+
+
+# Algorithm 3: Compute Active Regions
+
+def compute_active_regions(clipmap, viewer_pos, grid_size):
+    active_regions = []
+    for l, level in enumerate(clipmap):
+        spacing = level['spacing']
+        half_size = grid_size * spacing / 2
+        active = {
+            'x_min': viewer_pos.x - half_size,
+            'x_max': viewer_pos.x + half_size,
+            'y_min': viewer_pos.y - half_size,
+            'y_max': viewer_pos.y + half_size
+        }
+        active_regions.append(active)
+    return active_regions
+
+
+# Algorithm 4: Update Clipmap Per Frame
+
+def update_geometry_clipmap(clipmap, viewer_pos, terrain, grid_size):
+    active_regions = compute_active_regions(clipmap, viewer_pos, grid_size)
+    for l, level in enumerate(clipmap):
+        new_clip = active_regions[l]
+        if level['clip_region'] is None:
+            level['clip_region'] = new_clip
+            fill_entire_level(level, terrain)
+        else:
+            old_clip = level['clip_region']
+            if (abs(new_clip.x_min - old_clip.x_min) > level['spacing'] or
+                abs(new_clip.y_min - old_clip.y_min) > level['spacing']):
+                update_L_region(level, old_clip, new_clip, terrain)
+                level['clip_region'] = new_clip
+    return clipmap
+
+
+# Algorithm 5: Transition Morphing
+
+def apply_morphing(vertex, viewer_distance, morph_start, morph_end):
+    if viewer_distance < morph_start:
+        return vertex.z_fine
+    elif viewer_distance > morph_end:
+        return vertex.z_coarse
+    else:
+        t = (viewer_distance - morph_start) / (morph_end - morph_start)
+        t = t * t * (3 - 2 * t)
+        return lerp(vertex.z_fine, vertex.z_coarse, t)
+
+
+# Algorithm 6: Render Clipmap Level
+
+def render_clipmap_level(level, viewer_pos, morph_start, morph_end):
+    vertices = level['vertices']
+    rendered = []
+    for i in range(vertices.shape[0]):
+        for j in range(vertices.shape[1]):
+            v = vertices[i][j]
+            dist = sqrt((v.x - viewer_pos.x)**2 + (v.y - viewer_pos.y)**2)
+            z = apply_morphing(v, dist, morph_start, morph_end)
+            rendered.append(Vertex(x=v.x, y=v.y, z=z))
+    return rendered
+
+
+# Algorithm 7: Normal Computation
+
+def compute_normals(clip_level, terrain):
+    n = clip_level.shape[0]
+    normals = zeros(2*n, 2*n, 2)
+    for i in range(2*n):
+        for j in range(2*n):
+            h_L = sample_height(i-1, j, terrain)
+            h_R = sample_height(i+1, j, terrain)
+            h_D = sample_height(i, j-1, terrain)
+            h_U = sample_height(i, j+1, terrain)
+            normals[i][j] = [(h_L - h_R) / 2, (h_D - h_U) / 2]
+    return normals
+
+
+# Algorithm 8: Compression
+
+def compress_clipmap(level):
+    return run_length_encode(level.vertices)
+
+
+def decompress_clipmap(compressed):
+    return run_length_decode(compressed)
+```
+
+### Performance Results
+
+| Metric | Value |
+|--------|-------|
+| Frame rate | 60 fps |
+| VRAM usage | ~17 MB |
+| Compression | 100:1 |
+| Error | < 1 pixel |
+
+### Bounded Types
+
+```purescript
+newtype NumLevels = NumLevels (BoundedInt 1 20)
+newtype GridSize = GridSize (BoundedInt 64 512)
+
+data ClipLevel = ClipLevel
+  { vertices :: Array4D Number
+  , normals :: Array2D Vec2
+  , clipRegion :: Rectangle
+  , spacing :: Number
+  }
+
+data GeometryClipmap = GeometryClipmap
+  { levels :: Array ClipLevel
+  , viewerPosition :: Vec2
+  }
+
+data Rectangle = Rectangle
+  { xMin :: Number, xMax :: Number
+  , yMin :: Number, yMax :: Number
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = RenderTerrain
+  | UpdateClipmap
+  | ComputeNormals
+  | MorphLevels
+
+data CoEffect
+  = NeedsNumLevels NumLevels
+  | NeedsGridSize GridSize
+  | NeedsVRAM Int
+```
+
+---
+
+## CONSTRAINT_TRANSPORT (Thermodynamic Video Generation)
+
+### Classification
+- **Domain**: Video Generation / Precision Management
+- **Effect**: Generate(Video), Manage(Precision), Preserve(Edges)
+- **Coeffect**: Entropy, Timestep, Precision
+
+### AST Schema
+```json
+{
+  "algorithm": "ConstraintTransport",
+  "inputs": ["video_latents", "timestep_schedule"],
+  "outputs": ["generated_video"],
+  "parameters": {
+    "precision_schedule": "entropy_matched",
+    "hyperbolic_correction": true
+  }
+}
+```
+
+### Key Formulas
+
+**(1) Parabolic vs Hyperbolic**
+```
+Parabolic: ∂ₜu = -Δu        (destroys wavefronts)
+Hyperbolic: ∂ₜu + v·∇u = 0  (preserves wavefronts)
+```
+
+**(2) Optimal Bit-Width**
+```
+b*(ε) = min{ b | E[D(φ(x), φ(Q_b(x)))] ≤ ε }
+```
+
+**(3) Wavefront Set**
+```
+WF(u) = {(x, ξ) | ξ ≠ 0 at singularities}
+```
+
+**(4) Entropy Estimation**
+```
+H(z_t) = -Σ p_i log p_i
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: Entropy-Based Precision Selection
+
+def select_precision(timestep, latent):
+    """
+    Entropy-matched precision scheduling.
+    
+    Phase       | t       | Entropy | Precision
+    -----------|---------|---------|----------
+    High-noise  | t > 0.8 | H < 4   | NVFP4
+    Semantic   | 0.4-0.8 | 4-8     | FP16
+    Refinement | t < 0.4 | H > 8   | FP8
+    """
+    H = estimate_entropy(latent)
+    
+    if H < 4:
+        return "NVFP4"
+    elif H < 8:
+        return "FP16"
+    else:
+        return "FP8"
+
+
+def estimate_entropy(latent, method="histogram"):
+    """
+    Approximate H(z_t) via histogram or KDE.
+    """
+    if method == "histogram":
+        hist = compute_histogram(latent, bins=256)
+        p = hist / hist.sum()
+        H = -np.sum(p * np.log(p + 1e-10))
+    else:
+        H = kde_entropy(latent)
+    
+    return H
+
+
+# Algorithm 2: Precision Schedule
+
+def precision_schedule(timesteps):
+    """
+    Generate precision for each timestep.
+    """
+    schedule = []
+    for t in timesteps:
+        if t > 0.8:
+            precision = "NVFP4"
+        elif t > 0.4:
+            precision = "FP16"
+        else:
+            precision = "FP8"
+        schedule.append(precision)
+    return schedule
+
+
+# Algorithm 3: Hyperbolic Constraint Transport
+
+def hyperbolic_correction(velocity_field, latent):
+    """
+    Apply hyperbolic dynamics to preserve edges.
+    
+    ∂ₜu + v·∇u = 0
+    
+    Counteracts diffusive blurring.
+    """
+    # Compute velocity field from motion
+    v = compute_motion_field(latent)
+    
+    # Advection step
+    corrected = advect(latent, v)
+    
+    return corrected
+
+
+def advect(field, velocity):
+    """
+    Semi-Lagrangian advection.
+    """
+    result = zeros_like(field)
+    
+    for i in range(field.shape[0]):
+        for j in range(field.shape[1]):
+            # Trace back
+            x_back = i - velocity[i, j, 0]
+            y_back = j - velocity[i, j, 1]
+            
+            # Bilinear interpolation
+            result[i, j] = bilinear_sample(field, x_back, y_back)
+    
+    return result
+
+
+# Algorithm 4: Constraint Transport Update
+
+def constraint_transport_update(latent_t, latent_t_plus_1, velocity, dt):
+    """
+    Constraint transport maintains divergence-free velocity.
+    
+    Key: Preserves singular structures (edges, textures)
+    while allowing smooth evolution.
+    """
+    # Predictor: hyperbolic step
+    latent_star = hyperbolic_correction(latent_t, velocity)
+    
+    # Corrector: diffusion for stability
+    latent_next = latent_star + dt * diffuse(latent_star)
+    
+    return latent_next
+
+
+# Algorithm 5: Gauge Transition
+
+def gauge_transition(latent, from_prec, to_prec):
+    """
+    Cost-free precision transition if injective on support.
+    
+    Key insight: gauge transitions are lossless
+    when signal is within quantization grid.
+    """
+    if is_injective(latent, from_prec):
+        # No information loss
+        return quantize(latent, to_prec)
+    else:
+        # Need careful transition
+        return careful_quantize(latent, from_prec, to_prec)
+
+
+# Algorithm 6: Video Generation with Constraint Transport
+
+def generate_video_constraint_transport(model, initial_frame, num_frames, 
+                                       use_constraint_transport=True):
+    """
+    Full video generation with thermodynamic precision.
+    """
+    latents = [model.encode(initial_frame)]
+    
+    for t in reversed(range(num_timesteps)):
+        # Select precision based on entropy
+        precision = select_precision(t, latents[-1])
+        
+        # Denoising step
+        latent = model.denoise_step(latents[-1], t, precision)
+        
+        # Apply hyperbolic correction if needed
+        if use_constraint_transport and t < 0.5:
+            velocity = compute_motion_field(latent)
+            latent = constraint_transport_update(latent, velocity)
+        
+        latents.append(latent)
+    
+    # Decode
+    video = model.decode(latents)
+    
+    return video
+```
+
+### Precision Schedule Results
+
+| Phase | Timestep | Entropy | Precision | Speedup |
+|-------|----------|---------|-----------|---------|
+| High-noise | t > 0.8 | < 4 bits | NVFP4 | 2× |
+| Semantic | 0.4-0.8 | 4-8 bits | FP16 | 1.5× |
+| Refinement | t < 0.8 | > 8 bits | FP8 | 1.2× |
+
+**Total: 1.8× speedup** over FP16 baseline
+
+### Bounded Types
+
+```purescript
+-- Precision types
+data Precision
+  = NVFP4
+  | FP8
+  | FP16
+  | BF16
+
+newtype Entropy = Entropy Number  -- bits
+newtype Timestep = Timestep Number  -- [0, 1]
+
+data EntropyPhase
+  = HighNoise    -- H < 4
+  | Semantic     -- 4 ≤ H < 8  
+  | Refinement   -- H ≥ 8
+
+-- Hyperbolic dynamics
+data VelocityField = VelocityField (Array2D Vec2)
+
+data ConstraintState = ConstraintState
+  { velocity :: VelocityField
+  , divergence :: Number
+  , latent :: Array
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = GenerateVideo
+  | ManagePrecision
+  | TransportConstraints
+  | PreserveEdges
+
+data CoEffect
+  = NeedsEntropy Entropy
+  | NeedsTimestep Timestep
+  | NeedsPrecision Precision
+  | NeedsHyperbolicDynamics
+```
+
+---
+
+## DEEPSEEK_R1 (Reinforcement Learning for Reasoning)
+
+### Classification
+- **Domain**: AI / Reinforcement Learning / Reasoning
+- **Effect**: Reason(ChainOfThought), Optimize(Policy), Compute(GRPO)
+- **Coeffect**: GroupSize, RewardScale,思考深度
+
+### AST Schema
+```json
+{
+  "algorithm": "DeepSeekR1",
+  "inputs": ["question", "policy_model", "reward_function"],
+  "outputs": ["reasoning_output", "policy_update"],
+  "parameters": {
+    "group_size": 16,
+    "clip_epsilon": 0.2,
+    "kl_beta": 0.1
+  }
+}
+```
+
+### Key Formulas
+
+**(1) GRPO Advantage**
+```
+A_i = (r_i - mean(r)) / std(r)
+```
+
+**(2) PPO Clipped Objective**
+```
+L = -min(ratio × A, clip(ratio, 1-ε, 1+ε) × A)
+```
+
+**(3) Reward**
+```
+R = R_accuracy + R_format + R_length
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: GRPO Objective
+
+def grpo_objective(policy, policy_ref, question, G=16):
+    """
+    GRPO: Group Relative Policy Optimization.
+    
+    Samples G outputs, computes relative advantage.
+    """
+    outputs = [policy.sample(question) for _ in range(G)]
+    
+    rewards = [get_reward(o) for o in outputs]
+    
+    mean_r = np.mean(rewards)
+    std_r = np.std(rewards) + 1e-8
+    advantages = [(r - mean_r) / std_r for r in rewards]
+    
+    loss = 0
+    for o, A in zip(outputs, advantages):
+        ratio = policy.log_prob(o) - policy_old.log_prob(o)
+        clipped = np.clip(ratio, 1-0.2, 1+0.2)
+        policy_loss = -min(ratio * A, clipped * A)
+        
+        kl = kl_divergence(policy, policy_ref, o)
+        loss += policy_loss + 0.1 * kl
+    
+    return loss / G
+
+
+# Algorithm 2: DeepSeek-R1-Zero Training
+
+def train_deepseek_r1(policy, questions, num_iterations):
+    """
+    Pure RL without supervised fine-tuning.
+    """
+    for iteration in range(num_iterations):
+        for q in questions:
+            outputs = [policy.sample(q) for _ in range(16)]
+            
+            rewards = [compute_reward(o) for o in outputs]
+            
+            advantages = normalize_within_group(rewards)
+            
+            loss = grpo_loss(policy, outputs, advantages)
+            
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+
+# Algorithm 3: Reward Computation
+
+def compute_reward(output, answer):
+    """
+    Rule-based rewards: accuracy + format + length penalty.
+    """
+    reward = 0
+    
+    # Accuracy reward
+    if extract_answer(output) == answer:
+        reward += 1.0
+    
+    # Format reward (has <thinking> tags)
+    if "<thinking>" in output and "</thinking>" in output:
+        reward += 0.1
+    
+    # Length penalty (prefer concise)
+    if len(output) > 2000:
+        reward -= 0.1
+    
+    return reward
+
+
+# Algorithm 4: Chain-of-Thought Extraction
+
+def extract_thinking(output):
+    """
+    Extract reasoning between <thinking> tags.
+    """
+    if "<thinking>" in output:
+        start = output.find("<thinking>")
+        end = output.find("</thinking>")
+        if end > start:
+            return output[start:end]
+    return ""
+
+
+# Algorithm 5: Group Relative Advantage
+
+def compute_grpo_advantages(rewards):
+    """
+    Normalize rewards within group.
+    """
+    mean_r = np.mean(rewards)
+    std_r = np.std(rewards) + 1e-8
+    
+    advantages = [(r - mean_r) / std_r for r in rewards]
+    
+    return advantages
+
+
+# Algorithm 6: AIME Evaluation
+
+def evaluate_reasoning(model, aime_questions):
+    """
+    Test on American Invitational Mathematics Examination.
+    """
+    correct = 0
+    
+    for q in aime_questions:
+        output = model.generate(q)
+        
+        if extract_answer(output) == q.answer:
+            correct += 1
+    
+    accuracy = correct / len(aime_questions)
+    
+    return accuracy
+```
+
+### Results
+
+| Model | AIME Accuracy |
+|-------|--------------|
+| DeepSeek-R1-Zero | 71% |
+| DeepSeek-R1 | 86% |
+| OpenAI o1 | 74.4% |
+
+### Bounded Types
+
+```purescript
+-- RL Types
+newtype GroupSize = GroupSize (BoundedInt 1 64)
+newtype ClipEpsilon = ClipEpsilon Number
+newtype KLBeta = KLBeta Number
+
+data Policy = Policy
+  { parameters :: Array Number
+  , log_probs :: Array Number
+  }
+
+data Reward = Reward
+  { accuracy :: Number
+  , format :: Number
+  , length :: Number
+  }
+
+newtype Advantage = Advantage Number
+
+data GRPOState = GRPOState
+  { outputs :: Array String
+  , rewards :: Array Reward
+  , advantages :: Array Advantage
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = SampleOutputs
+  = ComputeReward
+  | OptimizePolicy
+  | ExtractReasoning
+
+data CoEffect
+  = NeedsGroupSize GroupSize
+  | NeedsClipEpsilon ClipEpsilon
+  | NeedsKLBeta KLBeta
+  | NeedsRewardFunction
+```
+
+---
+
+## GAIA2_WORLD_MODEL (Controllable Multi-View Driving World Model)
+
+### Classification
+- **Domain**: Autonomous Driving / World Models / Video Generation
+- **Effect**: Generate(Video), Predict(Motion), Condition(Action)
+- **Coeffect**: CameraCount, Resolution, TemporalWindow
+
+### AST Schema
+```json
+{
+  "algorithm": "GAIA2",
+  "inputs": ["video_frames", "ego_actions", "agent_boxes", "metadata"],
+  "outputs": ["generated_video", "predicted_trajectory"],
+  "parameters": {
+    "model_params": "8.4B",
+    "spatial_compression": 32,
+    "temporal_compression": 8,
+    "latent_dim": 64
+  }
+}
+```
+
+### Key Formulas
+
+**(1) Symlog Transform**
+```
+symlog(y) = sign(y) × log(1 + s×|y|) / log(1 + s×|y_max|)
+```
+
+**(2) Flow Matching**
+```
+x_τ = τ × x + (1 - τ) × ε  where ε ~ N(0, I)
+v_target = x - ε
+```
+
+**(3) Latent Compression**
+```
+compression_ratio = (Tv×Hv×Wv×3)/(T×H×W×L) ≈ 400×
+```
+
+**(4) Bimodal Time Distribution**
+```
+τ ~ 0.8 × N(0.5, 1.4) + 0.2 × N(-3.0, 1.0)
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: Video Tokenizer Encoder
+
+def video_tokenizer_encoder(video, T=24):
+    """
+    Compress video to latent space.
+    
+    Spatial: 32× downsample
+    Temporal: 8× downsample
+    """
+    # Input: [B, T, 3, H, W]
+    x = conv3d_downsample(video, stride=(2, 8, 8))  # [B, T/8, 512, H/16, W/16]
+    x = conv3d_downsample(x, stride=(2, 2, 2))      # [B, T/16, 512, H/32, W/32]
+    
+    # Spatial transformer blocks
+    for _ in range(24):
+        x = spatial_transformer(x, heads=16)
+    
+    # Project to latent dimension
+    z = conv3d_final(x, stride=(1, 2, 2))  # [B, T/64, 64, H/64, W/64]
+    
+    # Sample from Gaussian
+    mu, sigma = split(z, dim=1)
+    z = mu + sigma * randn_like(sigma)
+    
+    return z  # [B, T_L, 64, H_L, W_L]
+
+
+# Algorithm 2: Video Tokenizer Decoder
+
+def video_tokenizer_decoder(latents):
+    """
+    Decode latents to video with temporal consistency.
+    """
+    x = linear_upsample(latents)  # [B, T, 512, H, W]
+    
+    # Space-time factorized transformers
+    for _ in range(16):
+        x = spacetime_transformer(x)
+    
+    x = conv3d_upsample(x, stride=(1, 2, 2))
+    
+    for _ in range(8):
+        x = spacetime_transformer(x)
+    
+    video = conv3d_upsample_final(x, stride=(2, 8, 8))  # [B, T, 3, H, W]
+    
+    return video
+
+
+# Algorithm 3: Flow Matching Training
+
+def flow_matching_train(model, video, context, actions):
+    """
+    Train world model with flow matching.
+    """
+    # Sample time from bimodal distribution
+    if random() < 0.8:
+        tau = np.random.normal(0.5, 1.4)
+    else:
+        tau = np.random.normal(-3.0, 1.0)
+    tau = np.clip(tau, 0.01, 0.99)
+    
+    # Sample noise
+    epsilon = torch.randn_like(video_latents)
+    
+    # Interpolate
+    x_tau = tau * video_latents + (1 - tau) * epsilon
+    
+    # Encode conditioning
+    ego_emb = encode_ego_action(actions)
+    agent_emb = encode_agents(agent_boxes, camera_params)
+    meta_emb = encode_metadata(weather, time, geography)
+    
+    # Predict velocity
+    v_pred = model(x_tau, tau, ego_emb, agent_emb, meta_emb)
+    
+    # Target velocity
+    v_target = video_latents - epsilon
+    
+    # Loss
+    loss = MSE(v_pred, v_target)
+    
+    return loss
+
+
+# Algorithm 4: Adaptive Layer Norm
+
+def adaptive_layer_norm(x, condition, time_emb):
+    """
+    Inject condition and time into layer normalization.
+    """
+    gamma = mlp(condition) + mlp(time_emb)
+    beta = mlp(condition) + mlp(time_emb)
+    
+    # norm(x) * (1 + gamma) + beta
+    return (x - mean(x)) / std(x) * (1 + gamma) + beta
+
+
+# Algorithm 5: Camera Geometry Encoding
+
+def encode_camera(intrinsics, extrinsics, distortion):
+    """
+    Encode camera parameters for multi-view consistency.
+    """
+    f_x, f_y, c_x, c_y = split(intrinsics, dim=-1)
+    intr_emb = mlp(normalize([f_x, f_y, c_x, c_y]))
+    
+    extr_emb = mlp(flatten(extrinsics))
+    dist_emb = mlp(distortion)
+    
+    return intr_emb + extr_emb + dist_emb
+
+
+# Algorithm 6: Dynamic Agent Conditioning
+
+def encode_agents(bounding_boxes_3d, camera_params):
+    """
+    Encode dynamic agents as conditioning features.
+    
+    Per box: location, dimensions, orientation, category
+    """
+    # Project 3D to 2D
+    boxes_2d = project_3d_to_2d(bounding_boxes_3d, camera_params)
+    boxes_norm = normalize(boxes_2d)
+    
+    # Embed each feature
+    features = mlp_per_feature(boxes_norm)
+    
+    return features  # Cross-attention keys/values
+
+
+# Algorithm 7: Symlog Transform
+
+def symlog(y, scale=1.0, y_max=1.0):
+    """
+    Symmetric logarithmic transform for unbounded inputs.
+    """
+    return np.sign(y) * np.log(1 + scale * np.abs(y)) / np.log(1 + scale * y_max)
+
+
+def symexp(y, scale=1.0, y_max=1.0):
+    """
+    Inverse of symlog.
+    """
+    return np.sign(y) * (np.exp(np.abs(y) * np.log(1 + scale * y_max)) - 1) / scale
+
+
+# Algorithm 8: Multi-Camera Generation
+
+def generate_multi_camera(model, context, actions, camera_configs):
+    """
+    Generate temporally consistent multi-camera video.
+    """
+    videos = []
+    
+    for camera in camera_configs:
+        # Encode camera geometry
+        cam_emb = encode_camera(camera.intrinsics, camera.extrinsics, camera.distortion)
+        
+        # Generate with shared conditioning
+        video = model.generate(
+            context=context,
+            actions=actions,
+            camera_condition=cam_emb
+        )
+        videos.append(video)
+    
+    return videos  # All cameras consistent
+
+
+# Algorithm 9: Context Rollout
+
+def context_rollout(model, observed_frames, future_actions, num_steps):
+    """
+    Continue from observed context into future.
+    """
+    latents = tokenizer.encode(observed_frames)
+    
+    for t in range(num_steps):
+        # Encode action
+        action_emb = encode_ego_action(future_actions[t])
+        
+        # Predict next latent
+        next_latent = model.predict(latents, action_emb)
+        latents.append(next_latent)
+    
+    # Decode
+    video = tokenizer.decode(latents)
+    
+    return video
+
+
+# Algorithm 10: Spatial Inpainting
+
+def spatial_inpaint(model, partial_scene, mask, actions):
+    """
+    Edit specific regions while keeping others consistent.
+    """
+    latent = tokenizer.encode(partial_scene)
+    
+    # Mask in latent space
+    latent_mask = F.interpolate(mask, size=latent.shape[2:])
+    
+    # Generate with mask
+    inpainted = model.generate(
+        latents=latent,
+        mask=latent_mask,
+        actions=actions
+    )
+    
+    return tokenizer.decode(inpainted)
+```
+
+### Architecture Summary
+
+| Component | Parameters | Specification |
+|-----------|------------|---------------|
+| Tokenizer Encoder | 85M | Space-time transformer |
+| Tokenizer Decoder | 200M | Asymmetric |
+| World Model | 8.4B | 22 blocks, 4096 dim |
+| Compression | 400× | 32× spatial, 8× temporal |
+
+### Generation Modes
+
+| Mode | Input | Output |
+|------|-------|--------|
+| From Scratch | Random noise | Novel scene |
+| Context Rollout | Past frames + actions | Predicted future |
+| Spatial Inpaint | Partial + mask + actions | Edited scene |
+
+### Bounded Types
+
+```purescript
+-- Video Latent
+newtype TemporalWindow = TemporalWindow (BoundedInt 1 256)
+newtype CameraCount = CameraCount (BoundedInt 1 12)
+newtype LatentDim = LatentDim (BoundedInt 32 128)
+
+data VideoLatent = VideoLatent
+  { temporal :: Array TemporalWindow
+  , spatial :: Array2D Vector
+  , cameras :: Array CameraCount
+  }
+
+-- Conditioning
+data EgoAction = EgoAction
+  { speed :: Number      -- m/s
+  , curvature :: Number  -- 1/m
+  }
+
+data AgentBox = AgentBox
+  { position :: Vec3
+  , dimensions :: Vec3
+  , orientation :: Vec3
+  , category :: AgentCategory
+  }
+
+data AgentCategory
+  = Vehicle | Pedestrian | Cyclist | Other
+
+data Metadata = Metadata
+  { weather :: WeatherCondition
+  , timeOfDay :: Hour
+  , geography :: Country
+  }
+
+data WeatherCondition = Sunny | Cloudy | Rainy | Foggy | Night
+
+-- World Model
+data WorldModelOutput = WorldModelOutput
+  { video :: VideoLatent
+  , trajectory :: Array Vec3
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = GenerateVideo
+  | PredictTrajectory
+  | EncodeAgents
+  | EncodeCamera
+
+data CoEffect
+  = NeedsCameraCount CameraCount
+  | NeedsTemporalWindow TemporalWindow
+  | NeedsResolution Resolution
+  | NeedsMultiAgentSimulation
+```
+
+---
+
+## PAN_WORLD_MODEL (General, Interactable, Long-Horizon World Model)
+
+### Classification
+- **Domain**: World Models / Video Generation / Long-Horizon Planning
+- **Effect**: Predict(World), Condition(Action), Generate(Video)
+- **Coeffect**: HorizonLength, LatentDimension, ActionSpace
+
+### AST Schema
+```json
+{
+  "algorithm": "PAN",
+  "inputs": ["observations", "actions", "history"],
+  "outputs": ["predicted_video", "world_state"],
+  "parameters": {
+    "encoder": "Qwen2.5-VL-7B",
+    "backbone": "Autoregressive LLM",
+    "decoder": "Wan2.1-T2V-14B"
+  }
+}
+```
+
+### Key Formulas
+
+**(1) GLP - Generative Latent Prediction**
+```
+Encoder: ŝ_t ~ p_h(· | o_t)
+Predictor: ŝ_{t+1} ~ p_f(· | ŝ_t, a_t)  
+Decoder: ô_{t+1} ~ p_g(· | ŝ_{t+1})
+```
+
+**(2) Joint Distribution**
+```
+p_PAN(o_{t+1} | o_t, a_t) = Σ_{ŝ_t, ŝ_{t+1}} p_h(ŝ_t | o_t) · p_f(ŝ_{t+1} | ŝ_t, a_t) · p_g(o_{t+1} | ŝ_{t+1})
+```
+
+**(3) Training Loss**
+```
+L_PAN = E[(o_t,a_t,o_{t+1})~D] [ disc(ô_{t+1}, o_{t+1}) ]
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: GLP Encoder
+
+def encode_observation(encoder, observation):
+    """
+    Map observation to latent representation.
+    """
+    latent = encoder(observation)  # Qwen2.5-VL-7B
+    return latent  # ŝ_t ~ p_h(· | o_t)
+
+
+# Algorithm 2: GLP Predictor (Autoregressive LLM)
+
+def predict_next_latent(predictor, current_latent, action):
+    """
+    Predict next world state in latent space.
+    """
+    # Encode action
+    action_emb = encode_action(action)  # Natural language
+    
+    # Autoregressive prediction
+    next_latent = predictor(
+        latent=current_latent,
+        action=action_emb
+    )
+    
+    return next_latent  # ŝ_{t+1} ~ p_f(· | ŝ_t, a_t)
+
+
+# Algorithm 3: GLP Decoder
+
+def decode_to_video(decoder, latent):
+    """
+    Reconstruct video from latent.
+    """
+    video = decoder(latent)  # Wan2.1-T2V-14B
+    return video  # ô_{t+1} ~ p_g(· | ŝ_{t+1})
+
+
+# Algorithm 4: Full PAN Generation
+
+def pan_generate(encoder, predictor, decoder, history, actions):
+    """
+    Generate future video conditioned on history and actions.
+    """
+    # Encode current observation
+    current_obs = history[-1]
+    latent = encode_observation(encoder, current_obs)
+    
+    for action in actions:
+        # Predict next latent
+        next_latent = predict_next_latent(predictor, latent, action)
+        
+        # Decode to video
+        video_frame = decode_to_video(decoder, next_latent)
+        
+        # Update latent for next step
+        latent = next_latent
+        
+        yield video_frame
+
+
+# Algorithm 5: Causal Swin-DPM (Long-Horizon)
+
+def causal_swin_dpm(decoder, latents, chunk_size=16):
+    """
+    Chunk-wise causal attention for long sequences.
+    
+    Key: Reduces error accumulation across chunks.
+    """
+    num_chunks = len(latents) // chunk_size
+    generated_chunks = []
+    
+    for i in range(num_chunks):
+        chunk_latents = latents[i*chunk_size:(i+1)*chunk_size]
+        
+        if i > 0:
+            # Add small noise to previous chunk output
+            prev_chunk = generated_chunks[-1]
+            noisy_prev = prev_chunk + small_noise()
+            
+            # Condition on slightly noised previous chunk
+            conditioning = noisy_prev
+        else:
+            conditioning = None
+        
+        # Generate chunk with causal attention
+        chunk_video = decoder.generate(
+            latents=chunk_latents,
+            conditioning=conditioning,
+            causal_mask=True
+        )
+        
+        generated_chunks.append(chunk_video)
+    
+    return concatenate(generated_chunks)
+
+
+# Algorithm 6: Long-Horizon Rollout
+
+def long_horizon_rollout(pan, initial_obs, num_steps, horizon=1000):
+    """
+    Generate long-horizon video with error correction.
+    """
+    history = [initial_obs]
+    latents = [pan.encode(initial_obs)]
+    
+    for t in range(num_steps):
+        # Get action (could be from policy or human)
+        action = get_action(t)
+        
+        # Predict next latent
+        next_latent = pan.predict(latents[-1], action)
+        
+        # Chunk-wise generation for long sequences
+        if t % chunk_size == 0:
+            video = causal_swin_dpm(pan.decoder, [next_latent])
+        else:
+            video = pan.decoder(next_latent)
+        
+        history.append(video)
+        latents.append(next_latent)
+        
+        # Periodically correct drift
+        if t % drift_correction_interval == 0:
+            latents[-1] = correct_drift(latents[-1], history[-1])
+    
+    return history
+```
+
+### Architecture Components
+
+| Component | Model | Purpose |
+|-----------|-------|---------|
+| Vision Encoder | Qwen2.5-VL-7B | Encode observations → latents |
+| World Model | Autoregressive LLM | Predict latent dynamics |
+| Video Decoder | Wan2.1-T2V-14B | Reconstruct video from latents |
+
+### GLP Formula Summary
+
+```
+Encoder:    ŝ_t = h(o_t)           # Observation → latent
+Predictor: ŝ_{t+1} = f(ŝ_t, a_t)  # Latent dynamics
+Decoder:   ô_{t+1} = g(ŝ_{t+1})    # Latent → video
+```
+
+### Error Reduction Strategies
+
+1. **Chunk-wise Generation** - Process in chunks not frames
+2. **Causal Attention** - Mask future frames during generation
+3. ** conditioning** - Use previous chunk with small noise
+4. **Drift Correction** - Periodically realign with ground truth
+
+### Bounded Types
+
+```purescript
+-- World Model Types
+newtype HorizonLength = HorizonLength (BoundedInt 1 10000)
+newtype LatentDim = LatentDim (BoundedInt 32 512)
+
+data WorldState = WorldState
+  { latent :: Tensor
+  , history :: Array Tensor
+  }
+
+data WorldAction
+  = NaturalLanguageAction Text
+  | AgentAction Action
+  | NoAction
+
+data GLPElement = GLPElement
+  { encoder :: VisionEncoder
+  , predictor :: LatentPredictor
+  , decoder :: VideoDecoder
+  }
+
+-- Simulation
+data SimulationStep = SimulationStep
+  { state :: WorldState
+  , action :: WorldAction
+  , observation :: Video
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = EncodeObservation
+  = PredictLatent
+  | DecodeVideo
+  | ChunkGeneration
+  | CorrectDrift
+
+data CoEffect
+  = NeedsHorizon HorizonLength
+  | NeedsLatentDim LatentDim
+  | NeedsActionSpace ActionSpace
+  | NeedsLongTermConsistency
+```
+
+---
+
+## QWEN25_OMNI (Thinker-Talker Multimodal Architecture)
+
+### Classification
+- **Domain**: Multimodal AI / Speech Generation / Vision-Language-Audio
+- **Effect**: Understand(Multimodal), Generate(Text), Generate(Speech)
+- **Coeffect**: ModalityCount, Latency, StreamQuality
+
+### AST Schema
+```json
+{
+  "algorithm": "Qwen25Omni",
+  "inputs": ["text", "images", "audio", "video"],
+  "outputs": ["text_response", "speech_stream"],
+  "parameters": {
+    "thinker": "Transformer LLM backbone",
+    "talker": "Dual-track autoregressive",
+    "vision_encoder": "ViT-675M",
+    "audio_encoder": "Whisper-large-v3 init"
+  }
+}
+```
+
+### Key Formulas
+
+**(1) Thinker-Talker Architecture**
+```
+Thinker: Transformer decoder → multimodal understanding → representations
+Talker: Dual-track autoregressive → streaming speech tokens
+```
+
+**(2) TMRoPE (Time-aligned Multimodal RoPE)**
+```
+Text:   identical position IDs (1D)
+Audio:  1 temporal ID = 40ms
+Images: constant temporal ID, distinct height/width
+Video:  temporal ID increments per frame
+```
+
+**(3) Block-wise Streaming**
+```
+Audio:  block attention of 2 seconds
+Vision: merges 2×2 tokens, patch size 14
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: Thinker (Multimodal Understanding)
+
+def thinker_forward(thinker, text, images, audio, video):
+    """
+    Thinker: Transformer decoder for multimodal understanding.
+    """
+    # Encode each modality
+    text_tokens = tokenize(text)
+    image_tokens = vision_encoder(images)  # ViT
+    audio_tokens = audio_encoder(audio)   # Whisper
+    video_tokens = video_encoder(video)
+    
+    # Apply TMRoPE position embeddings
+    text_pos = position_ids(text_tokens)
+    image_pos = image_position_ids(images)  # constant temporal
+    audio_pos = audio_position_ids(audio)   # 40ms per ID
+    video_pos = video_position_ids(video)  # dynamic per frame
+    
+    # Concatenate with position embeddings
+    multimodal_input = concat(
+        embed(text_tokens, text_pos),
+        embed(image_tokens, image_pos),
+        embed(audio_tokens, audio_pos),
+        embed(video_tokens, video_pos)
+    )
+    
+    # Thinker processing
+    representations = thinker(multimodal_input)
+    
+    # Extract text representation for Talker
+    text_repr = representations[-len(text_tokens):]
+    
+    return representations, text_repr
+
+
+# Algorithm 2: Talker (Streaming Speech Generation)
+
+def talker_generate(talker, text_repr, max_tokens=1000):
+    """
+    Talker: Dual-track autoregressive for streaming speech.
+    """
+    speech_tokens = []
+    
+    for i in range(max_tokens):
+        # Dual-track prediction
+        logits = talker(speech_tokens, text_repr)
+        
+        # Sample next token
+        next_token = sample(logits)
+        
+        if next_token == EOS:
+            break
+            
+        speech_tokens.append(next_token)
+        
+        # Stream output
+        if i % chunk_size == 0:
+            yield decode_speech_chunk(speech_tokens)
+    
+    return speech_tokens
+
+
+# Algorithm 3: TMRoPE Position Encoding
+
+def tmrope_position_ids(inputs, modality):
+    """
+    Time-aligned Multimodal RoPE for each modality.
+    """
+    if modality == "text":
+        # 1D position IDs
+        return torch.arange(len(inputs))
+    
+    elif modality == "audio":
+        # 1 temporal ID = 40ms
+        duration_ms = len(inputs) * 40
+        return torch.arange(0, duration_ms, 40)
+    
+    elif modality == "image":
+        # Constant temporal, distinct height/width
+        H, W = inputs.shape[1], inputs.shape[2]
+        temporal = torch.zeros(H, W)
+        h_pos = torch.arange(H).unsqueeze(1).expand(H, W)
+        w_pos = torch.arange(W).unsqueeze(0).expand(H, W)
+        return temporal, h_pos, w_pos
+    
+    elif modality == "video":
+        # Temporal ID increments per frame
+        T = len(inputs)
+        return torch.arange(T).unsqueeze(-1).expand(T, -1)
+
+
+# Algorithm 4: Block-wise Streaming
+
+def block_wise_attention(encoder, input_modality, block_size=2.0):
+    """
+    Modified attention for streaming.
+    
+    Audio: 2-second blocks
+    Vision: 2×2 token merging
+    """
+    if input_modality == "audio":
+        # Process in 2-second blocks
+        num_blocks = len(input) // (sample_rate * block_size)
+        
+        for i in range(num_blocks):
+            block = input[i*block_size:(i+1)*block_size]
+            
+            # Block attention within chunk
+            block_output = encoder(block)
+            
+            yield block_output
+    
+    elif input_modality == "vision":
+        # Merge 2×2 tokens, patch size 14
+        merged = merge_tokens(input, kernel=2)
+        output = encoder(merged)
+        yield output
+
+
+# Algorithm 5: Sliding Window DiT for Speech
+
+def sliding_window_dit(dit, mel_spectrogram, lookback=2, lookahead=1):
+    """
+    Flow-Matching DiT with restricted receptive field.
+    """
+    num_blocks = len(mel_spectrogram) // block_size
+    
+    generated = []
+    
+    for i in range(num_blocks):
+        # Get context windows
+        ctx_lookback = generated[-lookback:] if lookback > 0 else []
+        ctx_lookahead = mel_spectrogram[i:i+lookahead]
+        
+        # Generate with restricted attention
+        mel_chunk = dit.generate(
+            context=ctx_lookback + ctx_lookahead,
+            lookback=lookback,
+            lookahead=lookahead
+        )
+        
+        generated.append(mel_chunk)
+    
+    return generated
+
+
+# Algorithm 6: End-to-End Streaming
+
+def omni_stream(omni, input_modalities, max_speech_tokens=1000):
+    """
+    Full streaming pipeline: Thinker → Talker
+    """
+    # Thinker: understand multimodal input
+    representations, text_repr = omni.thinker(input_modalities)
+    
+    # Stream speech while generating
+    for chunk in omni.talker.stream_generate(text_repr, max_speech_tokens):
+        # Decode mel to waveform
+        waveform = omni.bigvgan.decode(chunk)
+        
+        # Yield streaming audio
+        yield waveform
+
+
+# Algorithm 7: Video-Audio Time Interleaving
+
+def interleave_video_audio(video_frames, audio_samples):
+    """
+    Time-interleaving for video with audio.
+    2-second chunks, visual first, then audio.
+    """
+    chunk_duration = 2.0  # seconds
+    
+    interleaved = []
+    
+    num_chunks = min(len(video_frames), len(audio_samples)) // chunk_duration
+    
+    for i in range(num_chunks):
+        # Visual first
+        v_start = int(i * chunk_duration * video_fps)
+        v_end = int((i+1) * chunk_duration * video_fps)
+        interleaved.append(('video', video_frames[v_start:v_end]))
+        
+        # Then audio
+        a_start = int(i * chunk_duration * audio_sr)
+        a_end = int((i+1) * chunk_duration * audio_sr)
+        interleaved.append(('audio', audio_samples[a_start:a_end]))
+    
+    return interleaved
+```
+
+### Architecture Components
+
+| Component | Model | Purpose |
+|-----------|-------|---------|
+| Thinker | Transformer LLM | Multimodal understanding |
+| Talker | Dual-track AR | Streaming speech |
+| Vision Encoder | ViT-675M | Image/video → tokens |
+| Audio Encoder | Whisper-large-v3 | Audio → tokens |
+| DiT | Flow-Matching | Mel-spectrogram generation |
+| BigVGAN | Modified | Waveform decoding |
+
+### Training Stages
+
+| Stage | Focus | Data |
+|-------|-------|------|
+| 1 | Encoders only | Image-text, audio-text |
+| 2 | Full multimodal | 800B img + 300B audio + 100B video |
+| 3 | Long sequences | 32k tokens |
+
+### Bounded Types
+
+```purescript
+-- Modality Types
+data Modality
+  = Text
+  | Image
+  | Audio
+  | Video
+
+newtype ModalityCount = ModalityCount (BoundedInt 1 4)
+
+-- Position Embeddings  
+data PositionEncoding
+  = TextPosition (Array Int)
+  | AudioPosition { temporal :: Int, ms_per_id :: Int }
+  | ImagePosition { temporal :: Int, height :: Int, width :: Int }
+  | VideoPosition { frame :: Int, height :: Int, width :: Int }
+
+-- Thinker-Talker
+data ThinkerState = ThinkerState
+  { representations :: Tensor
+  , text_repr :: Tensor
+  }
+
+data TalkerState = TalkerState
+  { speech_tokens :: Array Int
+  , mel_chunks :: Array MelSpectrogram
+  }
+
+-- Streaming
+data StreamChunk = StreamChunk
+  { audio :: Waveform
+  , text :: Text
+  , timestamp :: Int
+  }
+```
+
+### Grade Tracking
+
+```purescript
+data Effect
+  = UnderstandMultimodal
+  = GenerateText
+  | GenerateSpeech
+  | StreamAudio
+
+data CoEffect
+  = NeedsModalityCount ModalityCount
+  | NeedsLatency Latency
+  | NeedsStreamQuality Quality
+  | NeedsBlockSize Number
 ```
 
 ---
@@ -2809,10 +4440,224 @@ elements = detector(screenshot)
 tree = parser(elements)
 ```
 
-**(B) Action Prediction**
+**(B) Navigation Graph Exposure**
 ```
-action = policy(screen_state, task)
+nav_graph = getNavigationGraph()
+tools = getLocalTools() ⊕ getGlobalTools()
 ```
+
+**(C) Voice Command Processing**
+```
+(action, new_state) = voiceCommand(audio, llm, viewState)
+```
+
+**(D) Tool Execution**
+```
+(result, updated_state) = executeTool(tool, current_state)
+```
+
+**(E) MCP Tool Schema**
+```
+mcp_tools = map(ViewModel.tools, toolSchema)
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm: MCP-Based GUI Agent
+
+def build_mcp_tools(viewmodel):
+    """
+    Expose ViewModel tools via Model Context Protocol.
+    
+    Args:
+        viewmodel: Current view state and available actions
+        
+    Returns:
+        MCP-compatible tool definitions
+    """
+    local_tools = viewmodel.getLocalTools()    # Current view actions
+    global_tools = viewmodel.getGlobalTools()   # App-wide actions
+    nav_graph = viewmodel.getNavigationGraph()
+    
+    return {
+        "tools": combine(local_tools, global_tools),
+        "navigation": nav_graph,
+        "context": viewmodel.getContext()
+    }
+
+
+def process_voice_command(audio, llm, viewmodel):
+    """
+    Process voice input to GUI action.
+    
+    Architecture:
+    1. Audio input (STT or direct)
+    2. LLM interprets intent
+    3. Map to available tools
+    4. Execute action
+    5. Return new view state
+    
+    Args:
+        audio: Voice input
+        llm: Language model for intent inference
+        viewmodel: Current application state
+        
+    Returns:
+        (executed_action, new_viewstate)
+    """
+    # Get available tools for current view
+    available_tools = viewmodel.getLocalTools()
+    global_tools = viewmodel.getGlobalTools()
+    all_tools = available_tools + global_tools
+    
+    # Intent inference with tool context
+    intent = llm.infer_intent(
+        audio_input=audio,
+        available_tools=all_tools,
+        navigation_graph=viewmodel.getNavigationGraph()
+    )
+    
+    # Map intent to tool call
+    if intent.tool_name in all_tools:
+        result = viewmodel.executeTool(
+            intent.tool_name,
+            intent.parameters
+        )
+        return (intent.tool_name, result.newState)
+    
+    # Fallback: navigation intent
+    if intent.type == "navigation":
+        new_view = viewmodel.navigateTo(intent.target)
+        return (f"navigate:{intent.target}", new_view)
+    
+    # Repair: clarification needed
+    return ("CLARIFY", viewmodel.requestClarification(intent))
+
+
+def detect_gui_elements(screenshot):
+    """
+    Detect and parse UI elements from screenshot.
+    
+    Used by computer use agents (CUA) to understand
+    interface state.
+    
+    Args:
+        screenshot: Current screen capture
+        
+    Returns:
+        Element tree with spatial relationships
+    """
+    # Element detection via vision model
+    raw_elements = vision_model.detect(screenshot)
+    
+    # Parse into hierarchical structure
+    element_tree = parser.build_tree(raw_elements)
+    
+    # Add spatial relationships
+    element_tree = spatial.add_relationships(element_tree)
+    
+    # Extract text content via OCR
+    element_tree = ocr.annotate_text(element_tree)
+    
+    return element_tree
+
+
+def predict_action(screen_state, task_goal, policy_model):
+    """
+    Predict next GUI action to accomplish task.
+    
+    Core of computer use agents - given current screen
+    and user goal, predict optimal action sequence.
+    
+    Args:
+        screen_state: Current GUI snapshot + element tree
+        task_goal: User's expressed goal
+        policy_model: Action prediction model
+        
+    Returns:
+        Predicted action (click, type, scroll, etc.)
+    """
+    # Encode screen state
+    screen_encoding = encoder.encode(screen_state)
+    
+    # Encode task
+    task_encoding = encoder.encode_task(task_goal)
+    
+    # Get available actions
+    available_actions = screen_state.available_actions
+    
+    # Score each action
+    action_scores = policy_model.score_actions(
+        screen_encoding,
+        task_encoding,
+        available_actions
+    )
+    
+    # Select best action
+    best_action = argmax(action_scores)
+    
+    return best_action
+
+
+def voice_gui_alignment(spoken_input, visual_interface):
+    """
+    Align spoken commands with visible GUI elements.
+    
+    Critical for multimodal interaction - ensuring
+    speech maps correctly to UI elements.
+    
+    Args:
+        spoken_input: User's spoken request
+        visual_interface: Current visible elements
+        
+    Returns:
+        Aligned action with confidence score
+    """
+    # Parse spoken input
+    parsed = speech_parser.parse(spoken_input)
+    
+    # Find matching elements
+    candidates = []
+    for element in visual_interface:
+        similarity = string_similarity(parsed.text, element.accessibility_label)
+        if similarity > THRESHOLD:
+            candidates.append((element, similarity))
+    
+    # Rank by similarity + position
+    ranked = sorted(candidates, key=lambda e: e[1], reverse=True)
+    
+    if ranked and ranked[0][1] > 0.8:
+        return Action(
+            target=ranked[0].element,
+            confidence=ranked[0][1],
+            type="direct"
+        )
+    
+    # Fallback: semantic matching
+    semantic_matches = semantic_search(parsed.meaning, visual_interface)
+    
+    if semantic_matches:
+        return Action(
+            target=semantic_matches[0].element,
+            confidence=semantic_matches[0].score,
+            type="semantic"
+        )
+    
+    # Cannot resolve - request clarification
+    return Action(type="clarify", options=visual_interface)
+```
+
+### Agentic System Relevance
+
+| Component | Swarm Scale Relevance |
+|-----------|----------------------|
+| MCP Tool Exposure | Agents expose capabilities via standardized protocol |
+| Element Detection | Agents perceive GUI state deterministically |
+| Voice Alignment | Multimodal input interpretation for diverse agents |
+| Navigation Graph | Structured environment understanding |
 
 ---
 
@@ -3776,32 +5621,637 @@ data CoEffect
 Each algorithm entry:
 
 ```
-## [PAPER_NAME]
+## SPATIA_VIDEO_MEMORY (Video Generation with Spatial Memory)
+
 ### Classification
-- Domain: 
-- Effect:
-- Coeffect:
+- **Domain**: Video Generation / Spatial Memory / 3D Vision
+- **Effect**: Generate(Video), Update(Memory), Control(Camera)
+- **Coeffect**: PointCloudDensity, ReferenceFrames, TemporalContext
 
 ### AST Schema
 ```json
 {
-  "algorithm": "",
-  "inputs": [],
-  "outputs": [],
-  "parameters": {},
-  "formulas": [],
-  "pseudocode": []
+  "algorithm": "Spatia",
+  "inputs": ["initial_image", "text_instruction", "camera_path", "preceding_frames"],
+  "outputs": ["generated_video_clips"],
+  "parameters": {
+    "backbone": "Wan2.2_5B",
+    "controlnet_blocks": 8,
+    "lora_rank": 64,
+    "max_reference_frames": 7,
+    "point_cloud_cube_side": 0.01,
+    "window_size": 4,
+    "compression_ratio": 4
+  }
 }
 ```
 
-### Formulas
-- Each formula numbered
-- LaTeX format
+### Key Formulas
 
-### Pseudocode
-- Imperative style
-- Type annotations
+**(1) Flow Matching Loss**
+```
+L = E_{t,x₀,X_T}[||v_t - u_t||²]
+```
+where t ~ logit-normal, x_t = (1-t)x₀ + tX_T
 
-### Implementation Notes
+**(2) 3D IoU for Reference Retrieval**
+```
+s(T_i, C_j) = 3DIoU(S_T_i, register(S_C_j, S_T_i))
+```
+
+**(3) Action Grouping for Temporal Compression**
+```
+For i-th feature: actions ∈ [a_{r×(i-w+1)}, ..., a_{r×i}]
+```
+Where r = compression ratio, w = window size.
+
+**(4) Point Cloud Projection**
+```
+X_S = encoder(project(point_cloud, camera_pose))
+```
+
+**(5) Dynamic-Static Disentanglement**
+```
+Static: S_static = update_pointcloud(frame, exclude_masks)
+Dynamic: V_dynamic = generate(frame, S_static, text)
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: Spatial Memory Initialization
+
+def init_spatial_memory(initial_image):
+    """
+    Initialize 3D scene point cloud from initial image.
+    
+    Uses MapAnything for universal metric 3D reconstruction.
+    
+    Args:
+        initial_image: User-provided first frame
+        
+    Returns:
+        Scene point cloud for spatial memory
+    """
+    # Estimate 3D structure
+    point_cloud = MapAnything.reconstruct(initial_image)
+    
+    # Segment dynamic entities (for later disentanglement)
+    dynamic_masks = SAM2.segment_all(initial_image)
+    
+    # Store in spatial memory
+    memory = SpatialMemory(
+        point_cloud=point_cloud,
+        dynamic_masks=dynamic_masks,
+        camera_poses=[initial_camera_pose]
+    )
+    
+    return memory
+
+
+def update_spatial_memory(memory, generated_frames):
+    """
+    Update spatial memory with newly generated frames.
+    
+    Iteratively refine point cloud using visual SLAM.
+    
+    Args:
+        memory: Current spatial memory state
+        generated_frames: Newly generated video frames
+        
+    Returns:
+        Updated spatial memory
+    """
+    # Extract dynamic masks (to exclude from point cloud)
+    static_mask = memory.get_static_mask()
+    
+    # Update point cloud using MapAnything
+    new_point_cloud = MapAnything.update(
+        memory.point_cloud,
+        generated_frames,
+        exclude_mask=static_mask
+    )
+    
+    # Update camera poses
+    new_poses = visual_slam.estimate(generated_frames)
+    
+    return SpatialMemory(
+        point_cloud=new_point_cloud,
+        dynamic_masks=memory.dynamic_masks,
+        camera_poses=memory.camera_poses + new_poses
+    )
+
+
+def retrieve_reference_frames(target_frames, candidate_frames, 
+                              target_point_clouds, candidate_point_clouds,
+                              threshold=0.3, max_refs=7):
+    """
+    Reference Frame Retrieval based on 3D spatial overlap.
+    
+    Key innovation: select frames with maximum spatial overlap
+    for consistency guidance.
+    
+    Args:
+        target_frames: Frames to generate
+        candidate_frames: Candidate reference frames
+        target_point_clouds: Scene point clouds for targets
+        candidate_point_clouds: Scene point clouds for candidates
+        threshold: Minimum 3D IoU to consider
+        max_refs: Maximum reference frames to retrieve
+        
+    Returns:
+        Retrieved reference frames
+    """
+    retrieved = []
+    
+    for target_frame in target_frames:
+        S_target = target_point_clouds[target_frame]
+        best_candidate = None
+        best_score = 0
+        
+        for candidate_frame in candidate_frames:
+            S_candidate = candidate_point_clouds[candidate_frame]
+            
+            # Register candidate to target coordinate frame
+            S_registered = register_point_clouds(S_candidate, S_target)
+            
+            # Compute 3D IoU
+            score = compute_3d_iou(S_target, S_registered)
+            
+            if score > threshold and score > best_score:
+                best_score = score
+                best_candidate = candidate_frame
+        
+        if best_candidate:
+            retrieved.append(best_candidate)
+    
+    # Limit to max_refs
+    return retrieved[:max_refs]
+
+
+def generate_video_clip(memory, text_instruction, camera_path, 
+                       preceding_frames, reference_frames):
+    """
+    Generate video clip conditioned on spatial memory.
+    
+    Core generation algorithm combining:
+    - Scene projection from point cloud
+    - Text conditioning
+    - Temporal context from preceding frames
+    - Reference frames for consistency
+    
+    Args:
+        memory: Current spatial memory
+        text_instruction: User's text prompt
+        camera_path: Desired camera trajectory
+        preceding_frames: Previous generated frames
+        reference_frames: Retrieved reference frames
+        
+    Returns:
+        Generated video clip
+    """
+    # Encode inputs
+    X_T = video_encoder.encode(target_frames)
+    X_P = video_encoder.encode(preceding_frames)
+    X_R = video_encoder.encode(reference_frames)
+    
+    # Render point cloud projection along camera path
+    projections = []
+    for pose in camera_path:
+        projection = render_point_cloud(memory.point_cloud, pose)
+        projections.append(projection)
+    X_S = video_encoder.encode(projections)
+    
+    # Encode text
+    X_text = text_encoder.encode(text_instruction)
+    
+    # Diffusion process with all conditioning
+    for block in range(num_blocks):
+        # ControlNet: scene projection conditioning
+        controlnet_out = controlnet_blocks[block](X_S)
+        
+        # Main block: self-attention + cross-attention
+        main_out = main_blocks[block](X_T, X_P, X_R)
+        
+        # Add controlnet residual
+        output = main_out + controlnet_out
+        
+        # Cross-attention to text
+        output = cross_attention(output, X_text)
+        
+        X_T = output
+    
+    # Decode to video
+    video = decoder.decode(X_T)
+    
+    return video
+
+
+def dynamic_static_disentangle(initial_image, memory):
+    """
+    Separate static scene from dynamic entities.
+    
+    Process:
+    1. Segment dynamic entities with SAM2
+    2. Exclude dynamic regions from point cloud updates
+    3. Generate dynamic content while keeping static scene fixed
+    
+    Args:
+        initial_image: Starting frame
+        memory: Current spatial memory
+        
+    Returns:
+        Static regions mask, dynamic regions mask
+    """
+    # Segment dynamic entities
+    dynamic_masks = SAM2.track(initial_image)
+    
+    # Create static mask (inverse of dynamic)
+    static_mask = invert_masks(dynamic_masks)
+    
+    # Update memory to exclude dynamic regions
+    memory_static = memory.with_mask(static_mask)
+    
+    return static_mask, dynamic_masks, memory_static
+
+
+def closed_loop_consistency_check(initial_image, final_frame, memory):
+    """
+    Test spatial memory effectiveness via closed-loop generation.
+    
+    Camera trajectory returns to initial viewpoint.
+    Compare final frame to initial image.
+    
+    Args:
+        initial_image: Starting frame
+        final_frame: Frame when camera returns
+        memory: Final spatial memory state
+        
+    Returns:
+        Consistency metrics: PSNR, SSIM, LPIPS
+    """
+    # Compute metrics
+    psnr = compute_psnr(initial_image, final_frame)
+    ssim = compute_ssim(initial_image, final_frame)
+    lpips = compute_lpips(initial_image, final_frame)
+    
+    # Check visual match
+    match_accuracy = compute_match_accuracy(initial_image, final_frame)
+    
+    return {
+        "psnr": psnr,
+        "ssim": ssim,
+        "lpips": lpips,
+        "match_accuracy": match_accuracy
+    }
+
+
+def render_point_cloud_projection(point_cloud, camera_pose):
+    """
+    Render point cloud from specific camera viewpoint.
+    
+    Used as conditioning signal for camera-controllable
+    video generation.
+    
+    Args:
+        point_cloud: 3D scene point cloud
+        camera_pose: Camera position and orientation
+        
+    Returns:
+        2D projection image
+    """
+    # Project 3D points to 2D image plane
+    points_2d = project_to_image(point_cloud.points, camera_pose)
+    
+    # Rasterize with depth
+    depth_buffer = create_depth_buffer(points_2d, point_cloud.depth)
+    
+    # Color with point colors
+    color_buffer = rasterize_points(points_2d, point_cloud.colors, depth_buffer)
+    
+    return color_buffer
+```
+
+### Agentic System Relevance
+
+| Component | Swarm Scale Relevance |
+|-----------|----------------------|
+| Spatial Memory | Agents maintain persistent scene understanding |
+| Dynamic-Static Disentangle | Separate environment state from actors |
+| Reference Retrieval | Find relevant prior context efficiently |
+| Closed-Loop Consistency | Verify action effects match expectations |
+
+---
+
+## COSYVOICE2_TTS (Streaming Speech Synthesis)
+
+### Classification
+- **Domain**: Speech Synthesis / Audio Generation / Streaming AI
+- **Effect**: Generate(Speech), Tokenize(Audio), Match(Flow)
+- **Coeffect**: Latency, SpeakerIdentity, Prosody
+
+### AST Schema
+```json
+{
+  "algorithm": "CosyVoice2",
+  "inputs": ["text", "reference_audio", "speaker_prompt"],
+  "outputs": ["speech_waveform"],
+  "parameters": {
+    "lm_backbone": "Qwen2.5-0.5B",
+    "fsq_levels": 10,
+    "token_rate_hz": 25,
+    "mel_rate_hz": 50,
+    "lookahead_conv_p": 4,
+    "streaming_chunk_m": 15,
+    "first_packet_latency_ms": 150
+  }
+}
+```
+
+### Key Formulas
+
+**(1) Finite Scalar Quantization (FSQ)**
+```
+H_quantized = ROUND(ProjDown(H))
+Token_Index = Σ_{j=0}^{D-1} ĥ_j × (2K + 1)^j
+```
+Where K = quantization level, D = dimension.
+
+**(2) Optimal Transport Flow Matching**
+```
+φ_t(X_0, X_1) = (1 - t)X_0 + tX_1
+```
+t ∈ [0, 1] is flow time.
+
+**(3) Chunk-Aware Causal Generation**
+```
+For chunk i: generate M tokens with lookahead P=4
+Upsample: 25 Hz (tokens) → 50 Hz (Mel)
+```
+
+**(4) Sequence Construction**
+```
+Non-streaming: [S, text, T, speech, E]
+Streaming: [S, text_1...text_N, speech_1...speech_M] × k
+```
+
+---
+
+### Core Algorithms
+
+```python
+# Algorithm 1: FSQ Speech Tokenization
+
+def fsq_encode(speech_signal):
+    """
+    Finite Scalar Quantization for speech tokens.
+    
+    Replaces VQ with differentiable quantization.
+    
+    Args:
+        speech_signal: Raw audio waveform
+        
+    Returns:
+        Discrete token indices at 25 Hz
+    """
+    # Encode to latent space
+    H = encoder(speech_signal)  # (T, D)
+    
+    # Project down to low-rank space
+    H_low = proj_down(H)  # (T, D_low)
+    
+    # Quantize to discrete levels
+    H_quantized = round(H_low)  # Values in [-K, K]
+    
+    # Compute token indices
+    token_indices = []
+    for t in range(H_quantized.shape[0]):
+        idx = 0
+        for j in range(H_quantized.shape[1]):
+            level = int(H_quantized[t, j])
+            idx += (level + K) * (2 * K + 1) ** j
+        token_indices.append(idx)
+    
+    # Reconstruct for loss computation
+    H_reconstructed = proj_up(H_quantized)
+    
+    return token_indices, H_reconstructed
+
+
+def fsq_decode(token_indices):
+    """
+    Decode FSQ tokens back to latent features.
+    
+    Args:
+        token_indices: Discrete token indices
+        
+    Returns:
+        Reconstructed latent features
+    """
+    D = quant_dim
+    K = quantization_levels
+    
+    # Decode indices to quantized values
+    H_quantized = []
+    for idx in token_indices:
+        h_row = []
+        remaining = idx
+        for j in range(D):
+            level = remaining % (2 * K + 1)
+            h_row.append(level - K)
+            remaining //= (2 * K + 1)
+        H_quantized.append(h_row)
+    
+    H_quantized = tensor(H_quantized)
+    
+    # Project up
+    H_reconstructed = proj_up(H_quantized)
+    
+    return H_reconstructed
+
+
+# Algorithm 2: Text-Speech Language Model
+
+def generate_speech_tokens(text, speaker_prompt, lm_model, 
+                          streaming=False, max_tokens=500):
+    """
+    Generate speech tokens from text using LLM backbone.
+    
+    Unified model for both streaming and non-streaming.
+    
+    Args:
+        text: Input text string
+        speaker_prompt: Reference audio for voice cloning
+        lm_model: Qwen2.5-0.5B based LM
+        streaming: Whether to use streaming mode
+        max_tokens: Maximum tokens to generate
+        
+    Returns:
+        Generated speech token sequence
+    """
+    # Tokenize text
+    text_tokens = tokenizer.encode(text)
+    
+    # Extract speaker features from prompt
+    speaker_features = speaker_encoder(speaker_prompt)
+    
+    if streaming:
+        # Streaming mode: interleaved text/speech
+        N = 5  # Text chunk size
+        M = 15  # Speech chunk size
+        
+        tokens = [START_TOKEN]
+        for text_chunk in chunk(text_tokens, N):
+            # Append text tokens
+            tokens.extend(text_chunk)
+            
+            # Generate M speech tokens
+            for _ in range(M):
+                next_token = lm_model.predict(
+                    tokens,
+                    speaker_features=speaker_features
+                )
+                tokens.append(next_token)
+                
+                if next_token == END_TOKEN:
+                    break
+    else:
+        # Non-streaming: full sequence
+        tokens = [START_TOKEN] + text_tokens + [TEXT_END]
+        while len(tokens) < max_tokens:
+            next_token = lm_model.predict(
+                tokens,
+                speaker_features=speaker_features
+            )
+            tokens.append(next_token)
+            if next_token == END_TOKEN:
+                break
+    
+    return tokens
+
+
+# Algorithm 3: Chunk-Aware Causal Flow Matching
+
+class ChunkAwareFlowMatching:
+    """
+    Causal flow matching for streaming speech synthesis.
+    
+    Key features:
+    - Lookahead convolution (P=4) for context
+    - Chunk-based generation (M tokens at a time)
+    - Upsampling: 25 Hz → 50 Hz
+    """
+    
+    def __init__(self, model, lookahead_p=4):
+        self.model = model
+        self.lookahead_p = lookahead_p
+        self.buffer = None
+    
+    def generate_chunk(self, tokens, flow_steps=10):
+        """
+        Generate a chunk of mel spectrogram.
+        
+        Args:
+            tokens: Speech tokens
+            flow_steps: Number of flow matching steps
+            
+        Returns:
+            Mel spectrogram chunk (at 50 Hz)
+        """
+        # Embed tokens
+        token_embeds = self.model.embedding(tokens)
+        
+        # Add causal lookahead convolution
+        # Pad right with P-1 zeros for future context
+        padded = F.pad(token_embeds, (0, self.lookahead_p))
+        causal_embeds = causal_conv1d(padded)
+        
+        # Flow matching denoising
+        x_t = torch.randn_like(target_mel)  # Start from noise
+        
+        for t in torch.linspace(0, 1, flow_steps):
+            # Predict velocity
+            velocity = self.model(x_t, causal_embeds, t)
+            
+            # Update (OT flow: xt = (1-t)x0 + t*x1)
+            x_t = x_t + velocity * (1 / flow_steps)
+        
+        # Upsample: 25 Hz → 50 Hz
+        mel_upsampled = F.interpolate(
+            x_t, 
+            scale_factor=2, 
+            mode='linear',
+            align_corners=False
+        )
+        
+        return mel_upsampled
+
+
+# Algorithm 4: Streaming Synthesis Pipeline
+
+def streaming_tts(text_stream, audio_context, cosyvoice_model):
+    """
+    Full streaming TTS pipeline.
+    
+    First packet: 150ms latency
+    Subsequent: Real-time with buffer
+    
+    Args:
+        text_stream: Iterator of text chunks
+        audio_context: Speaker reference audio
+        cosyvoice_model: Full CosyVoice2 model
+        
+    Returns:
+        Stream of audio packets
+    """
+    # Initialize
+    lm_model = cosyvoice_model.lm
+    flow_model = cosyvoice_model.flow
+    vocoder = cosyvoice_model.vocoder
+    
+    # Process first chunk (higher latency for context)
+    first_text = next(text_stream)
+    tokens = generate_speech_tokens(
+        first_text, 
+        audio_context, 
+        lm_model,
+        streaming=True
+    )
+    
+    # Generate first mel chunk
+    mel = flow_model.generate_chunk(tokens[:50])  # First ~1 second
+    audio = vocoder.generate(mel)
+    
+    yield audio  # First packet: ~150ms
+    
+    # Stream remaining
+    for text_chunk in text_stream:
+        tokens = generate_speech_tokens(
+            text_chunk,
+            audio_context,
+            lm_model,
+            streaming=True
+        )
+        
+        mel = flow_model.generate_chunk(tokens)
+        audio = vocoder.generate(mel)
+        
+        yield audio
+```
+
+### Agentic System Relevance
+
+| Component | Swarm Scale Relevance |
+|-----------|----------------------|
+| FSQ Tokenization | Efficient audio encoding for agent communication |
+| Streaming Synthesis | Real-time voice for agent interaction |
+| Unified LM | Single model handles all TTS modes |
+| Speaker Cloning | Agents can adopt consistent voices |
+
+---
+
+## [PAPER_NAME]
 - Bounds
 - Constraints
