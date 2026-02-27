@@ -394,21 +394,32 @@ Decision: Integration before optimization. P0 is FrameState.Allocation.purs.
                                                           // status // 2026-02-26
 ────────────────────────────────────────────────────────────────────────────────
 
-## Implementation Status
+## Implementation Status (Updated 2026-02-27)
 
 | Priority | Component | Status |
 |----------|-----------|--------|
-| **P0** | `FrameState.Allocation.purs` | OPEN — Not yet created |
-| **P1** | Tighten `FractionalSolution` to `UnitInterval` | OPEN |
-| **P2** | `LargeStepConfig` + `continuousGreedyLargeStep` | OPEN |
-| **P3** | `minEnergySample` function | OPEN |
+| **P0** | `FrameState.Allocation.purs` | ✓ **DONE** (~754 lines) |
+| **P1** | Tighten `FractionalSolution` to `UnitInterval` | ✓ **DONE** (in Continuous.purs) |
+| **P2** | `LargeStepConfig` + `continuousGreedyLargeStep` | ✓ **DONE** (FAA config in Allocation.purs) |
+| **P3** | `minEnergySample` function | ✓ **DONE** (in Rounding.purs) |
 | **P4** | Integration tests | OPEN |
 
-**Next action:** Create `src/Hydrogen/GPU/FrameState/Allocation.purs` with:
-- `viewportToGroundSet :: ViewportState -> GroundSet Region`
-- `performanceToFeedback :: PerformanceState -> RegionSelection -> UtilityFeedback Region`
-- `allocateFrame :: FrameState -> Array RegionSelection`
+**Completed implementation** at `src/Hydrogen/GPU/FrameState/Allocation.purs`:
+- `viewportToRegions :: ViewportState -> Array Region`
+- `viewportToGroundSet :: ViewportState -> Set.Set Region`
+- `performanceToFeedback :: PerformanceState -> RegionSelection -> Number`
+- `allocateFrame :: ViewportState -> PerformanceState -> AllocationState -> AllocationResult`
+- `allocateFrameFAA :: ViewportState -> PerformanceState -> AllocationState -> FAAAllocationConfig -> AllocationResult`
+- `regionsToGroundSetFAA :: Array Region -> { groundSet, indexToRegion }`
+- `regionUtilityOracle :: FAAAllocationConfig -> Array Region -> GroundSet RegionIndex -> SubmodularOracle RegionIndex`
+
+**FAA-enhanced features:**
+- √T speedup via FAA continuous greedy
+- Min-energy rounding (deterministic, noise-resilient)
+- Quality-adaptive step modulation using fractional solution confidence
+- Submodular utility: quality weight + coverage weight (√|S|)
 
 ────────────────────────────────────────────────────────────────────────────────
                                                                   — Opus 4.5
+                                                     Updated: 2026-02-27
 ────────────────────────────────────────────────────────────────────────────────

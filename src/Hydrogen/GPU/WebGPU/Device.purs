@@ -97,7 +97,8 @@ import Prelude
 
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Either (Either(Left, Right))
-import Data.Maybe (Maybe)
+import Data.Foldable (elem)
+import Data.Maybe (Maybe(Just, Nothing))
 import Effect (Effect)
 import Effect.Aff (Aff, makeAff, nonCanceler)
 import Effect.Exception (Error)
@@ -294,12 +295,7 @@ getFeatures device = do
 hasFeature :: GPUDevice -> GPUFeatureName -> Effect Boolean
 hasFeature device feature = do
   features <- getFeatures device
-  pure (feature `elem` features)
-  where
-  elem :: forall a. Eq a => a -> Array a -> Boolean
-  elem x arr = case arr of
-    [] -> false
-    _ -> x == x -- placeholder, would use Array.elem
+  pure (elem feature features)
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- ERROR HANDLING
