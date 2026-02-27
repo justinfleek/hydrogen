@@ -83,6 +83,8 @@ module Hydrogen.Schema.Diff
   , applyMaybeDiff
   , applyStringOps
   , applyStringOp
+  , applyArrayDiff
+  , applyArrayOp
   
   -- * Unwrap Functions
   , unwrapNumberDelta
@@ -121,7 +123,7 @@ import Prelude
   , (<<<)
   )
 
-import Data.Array (length, index, foldl, snoc, zipWith) as Array
+import Data.Array (length, index, foldl, snoc, zipWith, take, drop, insertAt, deleteAt, modifyAt) as Array
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.String.CodeUnits (length, toCharArray, fromCharArray) as String
 
@@ -262,6 +264,56 @@ class Eq a <= Diffable a where
   apply :: Diff a -> a -> a
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // diffable instances
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Diffable instance for Number.
+-- |
+-- | Uses additive delta: new = old + delta
+-- | This is the most efficient representation for numeric changes.
+instance diffableNumber :: Diffable Number where
+  diff old new
+    | old == new = NoChange
+    | otherwise = Delta (new - old)
+  apply NoChange n = n
+  apply (Replace _ new) _ = new
+  apply (Delta delta) n = n + delta
+
+-- | Diffable instance for Int.
+-- |
+-- | Uses additive delta: new = old + delta
+instance diffableInt :: Diffable Int where
+  diff old new
+    | old == new = NoChange
+    | otherwise = Delta (new - old)
+  apply NoChange n = n
+  apply (Replace _ new) _ = new
+  apply (Delta delta) n = n + delta
+
+-- | Diffable instance for Boolean.
+-- |
+-- | Uses Replace since there are only two states.
+instance diffableBoolean :: Diffable Boolean where
+  diff old new
+    | old == new = NoChange
+    | otherwise = Replace old new
+  apply NoChange b = b
+  apply (Replace _ new) _ = new
+  apply (Delta new) _ = new
+
+-- | Diffable instance for String.
+-- |
+-- | Uses Replace for simplicity. A more sophisticated implementation
+-- | could use edit distance algorithms for patch-based diffs.
+instance diffableString :: Diffable String where
+  diff old new
+    | old == new = NoChange
+    | otherwise = Replace old new
+  apply NoChange s = s
+  apply (Replace _ new) _ = new
+  apply (Delta new) _ = new
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // primitive diffs
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -397,6 +449,51 @@ applyMaybeDiff :: forall a. Diff (Maybe a) -> Maybe a -> Maybe a
 applyMaybeDiff NoChange m = m
 applyMaybeDiff (Replace _ new) _ = new
 applyMaybeDiff (Delta new) _ = new
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // array diff apply
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Apply an array diff to an array.
+-- |
+-- | For `ArrayReplace`, returns the new array directly.
+-- | For `ArrayPatch`, applies operations in sequence.
+-- |
+-- | ## Example
+-- |
+-- | ```purescript
+-- | let original = [1, 2, 3, 4, 5]
+-- | let patch = ArrayPatch [Delete 2, Insert 0 99]
+-- | applyArrayDiff patch original  -- [99, 1, 2, 4, 5]
+-- | ```
+applyArrayDiff :: forall a. Diffable a => ArrayDiff a -> Array a -> Array a
+applyArrayDiff (ArrayReplace newArray) _ = newArray
+applyArrayDiff (ArrayPatch ops) arr = Array.foldl applyArrayOp arr ops
+
+-- | Apply a single array operation.
+-- |
+-- | Operations:
+-- | - `Insert idx value` — Insert value at index, shifting elements right
+-- | - `Delete idx` — Remove element at index, shifting elements left
+-- | - `Move from to` — Move element from one index to another
+-- | - `Update idx diff` — Apply diff to element at index
+applyArrayOp :: forall a. Diffable a => Array a -> ArrayOp a -> Array a
+applyArrayOp arr (Insert idx value) =
+  fromMaybe arr (Array.insertAt idx value arr)
+
+applyArrayOp arr (Delete idx) =
+  fromMaybe arr (Array.deleteAt idx arr)
+
+applyArrayOp arr (Move fromIdx toIdx) =
+  case Array.index arr fromIdx of
+    Nothing -> arr
+    Just value ->
+      let afterDelete = fromMaybe arr (Array.deleteAt fromIdx arr)
+          adjustedTo = if fromIdx < toIdx then toIdx - 1 else toIdx
+      in fromMaybe afterDelete (Array.insertAt adjustedTo value afterDelete)
+
+applyArrayOp arr (Update idx elementDiff) =
+  fromMaybe arr (Array.modifyAt idx (apply elementDiff) arr)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // diff statistics
