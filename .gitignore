@@ -17,6 +17,9 @@ node_modules/
 .lake/
 lake-manifest.json
 
+# Rust
+runtime/target/
+
 # Large brand assets (PDFs belong in COMPASS, not Hydrogen)
 *.pdf
 

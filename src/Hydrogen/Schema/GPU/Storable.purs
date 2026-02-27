@@ -98,6 +98,9 @@ import Hydrogen.Schema.Dimension.Vector.Vec2 as Vec2
 import Hydrogen.Schema.Dimension.Vector.Vec3 as Vec3
 import Hydrogen.Schema.Dimension.Vector.Vec4 as Vec4
 import Hydrogen.Schema.Dimension.Point2D as Point2D
+import Hydrogen.Schema.Color.SRGB as SRGB
+import Hydrogen.Schema.Color.Channel as Channel
+import Hydrogen.Schema.Color.Opacity as Opacity
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // alignment
@@ -373,3 +376,70 @@ instance gpuStorablePoint2D :: GPUStorable Point2D.Point2D where
     xv <- bytesToNumber (ByteArray (Array.take 4 arr))
     yv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
     pure (Point2D.point2D xv yv)
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // color instances
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | SRGB serializes as vec3<f32> with values in [0,1].
+-- |
+-- | GPU representation: vec3<f32> (12 bytes, 16-byte aligned)
+-- | WGSL type: vec3<f32>
+-- |
+-- | Channel values (0-255) are normalized to [0,1] for GPU:
+-- | - 0 → 0.0
+-- | - 255 → 1.0
+-- |
+-- | IMPORTANT: vec3 requires 16-byte alignment in WebGPU despite being
+-- | only 12 bytes. This is a WebGPU spec requirement.
+instance gpuStorableSRGB :: GPUStorable SRGB.SRGB where
+  byteSize _ = 12
+  alignment _ = align16
+  toBytes color =
+    let r = Int.toNumber (Channel.unwrap (SRGB.red color)) / 255.0
+        g = Int.toNumber (Channel.unwrap (SRGB.green color)) / 255.0
+        b = Int.toNumber (Channel.unwrap (SRGB.blue color)) / 255.0
+        ByteArray rb = numberToBytes r
+        ByteArray gb = numberToBytes g
+        ByteArray bb = numberToBytes b
+    in ByteArray (rb <> gb <> bb)
+  fromBytes (ByteArray arr) = do
+    rv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    gv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    bv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 8 arr)))
+    let ri = Int.round (rv * 255.0)
+        gi = Int.round (gv * 255.0)
+        bi = Int.round (bv * 255.0)
+    pure (SRGB.srgb ri gi bi)
+
+-- | SRGBA serializes as vec4<f32> with values in [0,1].
+-- |
+-- | GPU representation: vec4<f32> (16 bytes, 16-byte aligned)
+-- | WGSL type: vec4<f32>
+-- |
+-- | Channel values (0-255) and opacity (0-100) are normalized to [0,1]:
+-- | - Red/Green/Blue: 0-255 → 0.0-1.0
+-- | - Alpha (opacity): 0-100 → 0.0-1.0
+instance gpuStorableSRGBA :: GPUStorable SRGB.SRGBA where
+  byteSize _ = 16
+  alignment _ = align16
+  toBytes color =
+    let rec = SRGB.srgbaToRecord color
+        r = Int.toNumber (Channel.unwrap rec.r) / 255.0
+        g = Int.toNumber (Channel.unwrap rec.g) / 255.0
+        b = Int.toNumber (Channel.unwrap rec.b) / 255.0
+        a = Int.toNumber (Opacity.unwrap rec.a) / 100.0
+        ByteArray rb = numberToBytes r
+        ByteArray gb = numberToBytes g
+        ByteArray bb = numberToBytes b
+        ByteArray ab = numberToBytes a
+    in ByteArray (rb <> gb <> bb <> ab)
+  fromBytes (ByteArray arr) = do
+    rv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    gv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    bv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 8 arr)))
+    av <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 12 arr)))
+    let ri = Int.round (rv * 255.0)
+        gi = Int.round (gv * 255.0)
+        bi = Int.round (bv * 255.0)
+    pure (SRGB.srgba ri gi bi av)
