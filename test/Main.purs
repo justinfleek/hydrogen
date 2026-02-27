@@ -34,6 +34,7 @@ import Test.GPU.Diffusion as GPUDiffusion
 import Test.Schema.Property as SchemaProperty
 import Test.Sensation.Property as SensationProperty
 import Test.Cache.Property as CacheProperty
+import Test.Element.Property as ElementProperty
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -69,6 +70,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     SensationProperty.sensationPropertyTests
   describe "Cache Property Tests" do
     CacheProperty.cachePropertyTests
+  describe "Element Property Tests" do
+    ElementProperty.elementPropertyTests
 
 -- =============================================================================
 --                                                              // format tests
