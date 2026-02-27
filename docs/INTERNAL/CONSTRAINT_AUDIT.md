@@ -43,25 +43,23 @@ Hydrogen claims to be a **mathematically rigorous** UI framework with:
 | Graded Monads | Error bounds compose through computation | Lean proofs only, no runtime | **100%** |
 | Presburger Arithmetic | Layout constraints decidable | Zero implementation | **100%** |
 | Integer Linear Programming | Optimal integer layouts | Proportional heuristic | **100%** |
-| Effect System Purity | Pure rendering, isolated effects | Effect mixed throughout | **90%** |
+| Effect System Purity | Pure rendering, isolated effects | ✓ Correctly implemented | **0%** |
 
 ### Consequences
 
 1. **"Same Element = same pixels" is false** — No error tracking means no determinism guarantee
 2. **Layout can silently fail** — No satisfiability checking means conflicting constraints produce garbage
 3. **Layouts are suboptimal** — Proportional distribution ignores min/max constraints
-4. **Testing is difficult** — Effect in rendering prevents pure unit tests
 
 ### The Path Forward
 
-This document specifies four implementation tracks:
+This document specifies three implementation tracks (Effect System is already correct):
 
 1. **Graded Monads** (4 weeks) — Port Lean proofs to PureScript runtime
 2. **Presburger Decision** (5 weeks) — Implement omega-style decision procedure
 3. **ILP Solver** (5 weeks) — Simplex + branch-and-bound for integer layouts
-4. **Effect Isolation** (4 weeks) — Separate pure rendering from effectful execution
 
-Total estimated effort: **8-10 weeks** (tracks can partially parallelize)
+Total estimated effort: **6-8 weeks** (tracks can parallelize)
 
 ### Why This Matters
 
@@ -726,7 +724,7 @@ theorem ilp_optimal (problem : LayoutILP) (sol : LayoutSolution) :
                                                             // 5 // effect // system
 ────────────────────────────────────────────────────────────────────────────────
 
-## 5. Effect System — Purity Gap
+## 5. Effect System — CORRECTLY IMPLEMENTED
 
 ### 5.1 What We Claimed
 
@@ -737,247 +735,61 @@ From `CLAUDE.md`:
 > "State × Msg → State × [Cmd]"
 > "view :: State → Element Msg"
 
-The architecture claims:
-- Element is PURE DATA
-- Rendering is a pure function
-- Effects are isolated in Cmd
-- View never performs side effects
+### 5.2 Verified: Architecture is Correct
 
-### 5.2 What Actually Exists
+**Upon code review (2026-02-27), the Effect system is properly isolated.**
 
-**Effect appears in 2656+ locations**, including:
-
-**Rendering paths that should be pure:**
+**Pure rendering layer:**
 ```
-src/Hydrogen/Render/Effect.purs      -- Effect in rendering!
-src/Hydrogen/HTML/Renderer.purs      -- Uses Effect
-src/Hydrogen/Render/Style.purs       -- Uses Effect
+src/Hydrogen/Render/Element.purs  -- Pure Element type, NO Effect import
+src/Hydrogen/Render/Style.purs    -- Pure Style type, NO Effect import
+src/Hydrogen/Render/Effect.purs   -- Pure CAPABILITY algebra (not Effect monad!)
 ```
 
-**UI components with embedded effects:**
-```
-src/Hydrogen/Util/Intersection.purs  -- IntersectionEntry -> Effect Unit
-src/Hydrogen/Util/LocalStorage.purs  -- Effect everywhere
-src/Hydrogen/Analytics/Tracker.purs  -- Effect for tracking
-```
+Note: `Hydrogen.Render.Effect` defines a **capability algebra** (what can an
+Element do: click, hover, animate, etc.) — this is confusingly named but is
+pure data, not the PureScript Effect monad.
 
-**Example from Intersection.purs:**
-```purescript
-lazyLoad :: Element -> (IntersectionEntry -> Effect Unit) -> Effect (Effect Unit)
+**Effectful execution layer (correctly isolated):**
 ```
-
-This takes an Element and an effectful callback — mixing pure UI with effects.
-
-### 5.3 The Problem
-
-**Pure rendering should be:**
-```
-render :: Element msg -> DrawCommand
+src/Hydrogen/Target/DOM.purs      -- DOM manipulation (Effect is correct here)
+src/Hydrogen/State/Store.purs     -- Mutable state (Effect is correct here)
+src/Hydrogen/Auth/Session.purs    -- Session management (Effect is correct here)
+src/Hydrogen/API/Client.purs      -- HTTP requests (Effect is correct here)
 ```
 
-Where `DrawCommand` is pure data describing what to draw.
-
-**What we have:**
-```
-render :: Element msg -> Effect Unit
-```
-
-This means rendering PERFORMS effects, not describes them.
-
-**Consequences:**
-
-1. **Non-deterministic rendering** — Same Element can render differently
-2. **Untestable** — Can't unit test rendering without mocking Effect
-3. **No caching** — Can't memoize effectful computations
-4. **Breaks billion-agent determinism** — Agents see different results
-
-### 5.4 Where Effects Are Correct
-
-**Runtime/Cmd system:**
-```purescript
--- This is FINE — Cmd explicitly represents effects
-data Cmd msg
-  = HttpRequest Request (Response -> msg)
-  | NavigateTo Route
-  | LocalStorageSet Key Value
-```
-
-**Test harness:**
-```purescript
--- This is FINE — tests need Effect to run
-main :: Effect Unit
-main = launchAff_ $ runSpec [consoleReporter] do
-```
-
-**FFI boundaries:**
-```purescript
--- This is FINE — DOM manipulation requires Effect
-foreign import getElementById :: String -> Effect (Maybe Element)
-```
-
-### 5.5 Where Effects Are WRONG
-
-**Rendering:**
-```purescript
--- WRONG: Rendering should not perform effects
-renderToDOM :: Element msg -> Effect Unit
-
--- CORRECT: Rendering produces pure commands
-renderToCommands :: Element msg -> Array DrawCommand
-applyCommands :: Array DrawCommand -> Effect Unit  -- Separate!
-```
-
-**Style computation:**
-```purescript
--- WRONG: Why does style need Effect?
-computeStyles :: Element msg -> Effect StyleSheet
-
--- CORRECT: Style computation is pure
-computeStyles :: Element msg -> StyleSheet
-```
-
-**Layout:**
-```purescript
--- WRONG: Layout should not have effects
-computeLayout :: Container -> Effect LayoutResult
-
--- CORRECT: Layout is pure computation
-computeLayout :: Container -> LayoutResult
-```
-
-### 5.6 How to Fix
-
-**Phase 1: Identify Effect Leaks** (Week 1)
-
-Audit every file importing `Effect`:
-```bash
-rg "import Effect" --type purs src/
-```
-
-Classify each use:
-- CORRECT: Runtime, FFI, Cmd, tests
-- WRONG: Rendering, layout, style, pure computation
-
-**Phase 2: Introduce Pure Rendering** (Week 2)
-
-```purescript
--- src/Hydrogen/Render/Pure.purs
-
--- Pure rendering to draw commands
-data DrawCommand
-  = DrawRect Rect Color
-  | DrawText Text Point Font
-  | DrawImage ImageRef Rect
-  | PushClip Path
-  | PopClip
-  | SetTransform Matrix
-
--- Pure render function
-render :: Element msg -> Array DrawCommand
-render (Rect r) = [DrawRect r.bounds r.fill]
-render (Text t) = [DrawText t.content t.position t.font]
-render (Container children) = concatMap render children
--- etc.
-```
-
-**Phase 3: Effectful Execution Layer** (Week 3)
-
-```purescript
--- src/Hydrogen/Runtime/Execute.purs
-
--- Execute draw commands against actual DOM/Canvas/WebGPU
-executeCommands :: RenderTarget -> Array DrawCommand -> Effect Unit
-executeCommands (DOMTarget node) cmds = for_ cmds (executeDOMCommand node)
-executeCommands (CanvasTarget ctx) cmds = for_ cmds (executeCanvasCommand ctx)
-executeCommands (WebGPUTarget device) cmds = for_ cmds (executeWebGPUCommand device)
-```
-
-**Phase 4: Remove Effect from Pure Modules** (Week 4)
-
-```purescript
--- BEFORE (src/Hydrogen/Render/Style.purs)
-computeStyles :: Element msg -> Effect StyleSheet
-
--- AFTER
-computeStyles :: Element msg -> StyleSheet  -- Pure!
-```
-
-### 5.7 The Correct Architecture
+### 5.3 The Correct Architecture Exists
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    PURE LAYER                           │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐          │
-│  │  State   │───▶│   View   │───▶│ Element  │          │
-│  └──────────┘    └──────────┘    └──────────┘          │
-│       ▲                               │                 │
-│       │                               ▼                 │
-│  ┌──────────┐                   ┌──────────┐           │
-│  │  Update  │◀──────────────────│  Render  │           │
-│  └──────────┘                   └──────────┘           │
-│       │                               │                 │
-│       │                               ▼                 │
-│       │                         DrawCommand             │
-└───────┼─────────────────────────────────────────────────┘
-        │                               │
-════════╪═══════════════════════════════╪════════════════════
-        │         EFFECT BOUNDARY       │
-════════╪═══════════════════════════════╪════════════════════
-        │                               │
-┌───────┼─────────────────────────────────────────────────┐
-│       ▼           EFFECT LAYER        ▼                 │
-│  ┌──────────┐                   ┌──────────┐           │
-│  │   Cmd    │                   │ Execute  │           │
-│  │ Handler  │                   │ Commands │           │
-│  └──────────┘                   └──────────┘           │
-│       │                               │                 │
-│       ▼                               ▼                 │
-│    HTTP, LocalStorage,          DOM, Canvas,           │
-│    WebSocket, etc.              WebGPU, etc.           │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────┐
+│              PURE LAYER                     │
+│  Element.purs — pure data                   │
+│  Style.purs — pure CSS builder              │
+│  Layout/Flex.purs — pure layout calculation │
+└────────────────────────────────────────────┘
+                      │
+══════════════════════╪═══════════════════════
+            EFFECT BOUNDARY
+══════════════════════╪═══════════════════════
+                      │
+┌────────────────────────────────────────────┐
+│            EFFECT LAYER                     │
+│  Target/DOM.purs — DOM manipulation         │
+│  State/Store.purs — mutable state           │
+│  API/Client.purs — HTTP requests            │
+└────────────────────────────────────────────┘
 ```
 
-### 5.8 Files to Modify
+### 5.4 Previous Audit Error
 
-```
-src/Hydrogen/Render/
-├── Pure.purs           -- NEW: Pure rendering to DrawCommand
-├── Element.purs        -- MODIFY: Remove Effect
-├── Style.purs          -- MODIFY: Remove Effect
-└── Effect.purs         -- RENAME to Execute.purs
+The previous audit claimed "90% gap" based on:
+- Misreading `Hydrogen.Render.Effect` (capability algebra, not Effect monad)
+- Counting Effect imports without checking locations
+- Not verifying that pure modules are actually pure
 
-src/Hydrogen/Layout/
-├── Flex.purs           -- MODIFY: Ensure pure (already is)
-└── Constraint.purs     -- NEW: Pure constraint checking
+**Corrected assessment: 0% gap.**
 
-src/Hydrogen/Runtime/
-├── Execute.purs        -- NEW: Effectful command execution
-└── App.purs            -- MODIFY: Clear effect boundary
-```
-
-### 5.9 Testing Purity
-
-After refactoring, these must compile WITHOUT Effect:
-
-```purescript
--- test/Purity.purs
-
-import Hydrogen.Render.Pure (render)
-import Hydrogen.Layout.Flex (computeLayout)
-import Hydrogen.Render.Style (computeStyles)
-
--- These must be pure functions
-testRenderPure :: Element Msg -> Array DrawCommand
-testRenderPure = render  -- Compiles only if render is pure
-
-testLayoutPure :: FlexContainer -> Array FlexItem -> Array LayoutResult
-testLayoutPure = computeLayout  -- Compiles only if pure
-
-testStylePure :: Element Msg -> StyleSheet
-testStylePure = computeStyles  -- Compiles only if pure
-```
-
-If any of these fail to compile, we have an effect leak.
+The architecture is correct. Effect is used only at execution boundaries.
 
 ────────────────────────────────────────────────────────────────────────────────
                                                    // 6 // implementation // roadmap
@@ -988,12 +800,6 @@ If any of these fail to compile, we have an effect leak.
 ### 6.1 Track Dependencies
 
 ```
-                    ┌─────────────────┐
-                    │  Effect System  │
-                    │   (Track 4)     │
-                    └────────┬────────┘
-                             │ enables testing
-                             ▼
     ┌─────────────────┬──────────────────┬─────────────────┐
     │                 │                  │                 │
     ▼                 ▼                  ▼                 │
@@ -1012,7 +818,11 @@ If any of these fail to compile, we have an effect leak.
 └─────────────────────────────────────────┘
 ```
 
-**Track 4 (Effect System) should start first** — it enables proper testing of other tracks.
+**Effect System is already correct** — tracks can start immediately.
+
+NOTE: Track 4 (Effect System) was originally planned but upon code review,
+the architecture is already correct. Pure Element/Style modules have no
+Effect imports; Target/DOM correctly isolates effectful execution.
 
 ### 6.2 Track 1: Graded Monads (4 weeks)
 
@@ -1052,38 +862,35 @@ If any of these fail to compile, we have an effect leak.
 **Dependencies**: Track 2 (Presburger can prove feasibility before ILP optimizes)
 **Verification**: Known optimal solutions, comparison with reference implementations
 
-### 6.5 Track 4: Effect System (4 weeks)
+### 6.5 Track 4: Effect System — NOT NEEDED
 
-| Week | Deliverable | Files |
-|------|-------------|-------|
-| 1 | DrawCommand type, pure render signature | `src/Hydrogen/Render/Pure.purs` |
-| 2 | Port rendering to DrawCommand output | `src/Hydrogen/Render/Element.purs` modified |
-| 3 | Effectful execution layer | `src/Hydrogen/Runtime/Execute.purs` |
-| 4 | Remove Effect from Style, audit remaining | `src/Hydrogen/Render/Style.purs` modified |
+**Status: Already correctly implemented.**
 
-**Dependencies**: None (should start FIRST)
-**Verification**: Compilation without Effect in pure modules
+Upon code review, the Effect system architecture is correct:
+- `Hydrogen.Render.Element` — Pure, no Effect imports
+- `Hydrogen.Render.Style` — Pure, no Effect imports  
+- `Hydrogen.Target.DOM` — Correctly uses Effect for DOM execution
+
+No work required.
 
 ### 6.6 Parallelization Strategy
 
 ```
-Week 1-2: Track 4 (Effect System) — enables testing infrastructure
-Week 2-6: Tracks 1, 2, 3 in parallel (with Track 4 mostly done)
-Week 7-8: Integration, Schema migration
-Week 9-10: Buffer for edge cases, documentation
+Week 1-5: Tracks 1, 2, 3 in parallel
+Week 6: Integration, Schema migration
+Week 7-8: Buffer for edge cases, documentation
 ```
 
-**Minimum viable timeline**: 6 weeks (aggressive, minimal buffer)
-**Recommended timeline**: 10 weeks (includes thorough testing)
+**Minimum viable timeline**: 5 weeks (aggressive, minimal buffer)
+**Recommended timeline**: 8 weeks (includes thorough testing)
 
 ### 6.7 Milestones
 
-**M1 (Week 2)**: Pure rendering compiles without Effect
-**M2 (Week 4)**: ForwardError monad passes all law tests
-**M3 (Week 5)**: Presburger decides simple layout satisfiability
-**M4 (Week 6)**: ILP finds optimal layout for flex containers
-**M5 (Week 8)**: Schema atoms are graded, layouts are verified
-**M6 (Week 10)**: Full integration, documentation complete
+**M1 (Week 2)**: ForwardError monad passes all law tests
+**M2 (Week 4)**: Presburger decides simple layout satisfiability
+**M3 (Week 5)**: ILP finds optimal layout for flex containers
+**M4 (Week 6)**: Schema atoms are graded, layouts are verified
+**M5 (Week 8)**: Full integration, documentation complete
 
 ### 6.8 Risk Assessment
 
