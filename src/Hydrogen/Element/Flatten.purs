@@ -63,15 +63,18 @@ import Prelude
 
 import Data.Array (concatMap) as Array
 import Data.Array as Data.Array
+import Data.Int (floor, toNumber)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (Tuple(Tuple))
 
 -- Element.Core: the correct Element type
 import Hydrogen.Element.Core
-  ( Element(Rectangle, Ellipse, Path, Group, Transform, Empty)
+  ( Element(Rectangle, Ellipse, Path, Text, Group, Transform, Empty)
   , RectangleSpec
   , EllipseSpec
   , PathSpec
+  , TextSpec
+  , GlyphSpec
   , GroupSpec
   , TransformSpec
   , StrokeSpec
@@ -93,6 +96,9 @@ import Hydrogen.Schema.Geometry.Shape
 import Hydrogen.Schema.Material.Fill (Fill(FillSolid, FillNone, FillGradient, FillPattern, FillNoise))
 import Hydrogen.Schema.Dimension.Stroke (StrokeWidth)
 import Hydrogen.Schema.Dimension.Stroke as Stroke
+import Hydrogen.Schema.Typography.GlyphGeometry as Glyph
+import Hydrogen.Schema.Temporal.Progress as Progress
+import Hydrogen.Schema.Geometry.Transform as Transform
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -168,6 +174,9 @@ flattenWithState state element = case element of
   Path spec ->
     flattenPath state spec
   
+  Text spec ->
+    flattenText state spec
+  
   Group spec ->
     flattenGroup state spec
   
@@ -220,6 +229,131 @@ flattenRectangle state spec =
     { commands: [fillCmd] <> strokeCmds
     , state: newState
     }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // text // flattening
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Flatten a Text element to DrawPath commands.
+-- |
+-- | Each glyph in the TextSpec becomes one or more DrawPath commands:
+-- | - One for the fill
+-- | - One for the stroke (if present)
+-- |
+-- | Glyph transforms are applied to the path commands.
+-- | Progress value is used for opacity modulation (for reveal animations).
+flattenText :: forall msg. FlattenState -> TextSpec -> FlattenResult msg
+flattenText state spec =
+  flattenGlyphs state spec.opacity spec.glyphs
+
+-- | Flatten array of glyphs, threading state through
+flattenGlyphs 
+  :: forall msg
+   . FlattenState 
+  -> Opacity.Opacity  -- Overall text opacity
+  -> Array GlyphSpec 
+  -> FlattenResult msg
+flattenGlyphs state _textOpacity glyphs =
+  Data.Array.foldl flattenGlyphAccum { commands: [], state: state } glyphs
+  where
+    flattenGlyphAccum 
+      :: FlattenResult msg 
+      -> GlyphSpec 
+      -> FlattenResult msg
+    flattenGlyphAccum acc glyph =
+      let result = flattenGlyph acc.state glyph
+      in { commands: acc.commands <> result.commands
+         , state: result.state
+         }
+
+-- | Flatten a single glyph to DrawPath commands.
+-- |
+-- | Converts the GlyphPath (3D bezier contours) to 2D path segments,
+-- | applies the glyph's transform, and creates fill/stroke commands.
+flattenGlyph :: forall msg. FlattenState -> GlyphSpec -> FlattenResult msg
+flattenGlyph state glyph =
+  let
+    -- Convert 3D glyph contours to 2D path segments
+    segments = glyphPathToSegments glyph.glyph
+    
+    -- Apply progress to opacity (0 = invisible, 1 = full opacity)
+    progressMod = Progress.unwrapProgress glyph.progress
+    modifiedOpacity = Opacity.opacity 
+      (floor (toNumber (Opacity.unwrap glyph.opacity) * progressMod))
+    
+    fillColor = fillToRGBA glyph.fill modifiedOpacity
+    
+    -- Base path params
+    pathParams = DC.pathParams segments
+    
+    -- Apply glyph transform to path params
+    -- Transform2D contains translate, rotate, scale, skew, origin
+    transformedParams = applyTransformToPathParams glyph.transform pathParams
+    
+    pathParamsWithFill = transformedParams
+      { fill = Just fillColor
+      , depth = state.depth
+      }
+    
+    -- Add stroke if present
+    strokeCmds = case glyph.stroke of
+      Nothing -> []
+      Just strokeSpec ->
+        let
+          strokeColor = fillToRGBA strokeSpec.fill strokeSpec.opacity
+          strokeWidth = strokeWidthToPixel strokeSpec.width
+          strokeParams = transformedParams
+            { stroke = Just strokeColor
+            , strokeWidth = strokeWidth
+            , depth = state.depth + 0.5
+            }
+        in [DC.DrawPath strokeParams]
+    
+    newState = state { depth = state.depth + 1.0 }
+  in
+    { commands: [DC.DrawPath pathParamsWithFill] <> strokeCmds
+    , state: newState
+    }
+
+-- | Convert GlyphPath (3D contours) to flat array of PathSegments.
+-- |
+-- | Discards Z coordinate since DrawCommand is 2D.
+-- | Multiple contours are flattened into a single path array.
+glyphPathToSegments :: Glyph.GlyphPath -> Array DC.PathSegment
+glyphPathToSegments glyphPath =
+  Array.concatMap contourToSegments glyphPath.contours
+
+-- | Convert a single Contour to PathSegments
+contourToSegments :: Glyph.Contour -> Array DC.PathSegment
+contourToSegments contour =
+  Array.concatMap pathCommand3DToSegments contour.commands
+
+-- | Convert a 3D PathCommand to 2D PathSegment(s)
+-- |
+-- | Z coordinates are discarded for 2D rendering.
+pathCommand3DToSegments :: Glyph.PathCommand3D -> Array DC.PathSegment
+pathCommand3DToSegments = case _ of
+  Glyph.MoveTo3D pt ->
+    [DC.MoveTo { x: pt.x, y: pt.y }]
+  Glyph.LineTo3D pt ->
+    [DC.LineTo { x: pt.x, y: pt.y }]
+  Glyph.QuadraticTo3D ctrl end ->
+    [DC.QuadraticTo { x: ctrl.x, y: ctrl.y } { x: end.x, y: end.y }]
+  Glyph.CubicTo3D c1 c2 end ->
+    [DC.CubicTo { x: c1.x, y: c1.y } { x: c2.x, y: c2.y } { x: end.x, y: end.y }]
+  Glyph.ClosePath3D ->
+    [DC.ClosePath]
+
+-- | Apply Transform2D to PathParams
+-- |
+-- | Currently a no-op since PathParams doesn't have transform fields.
+-- | The glyph transform should be baked into the path segments themselves
+-- | via transformPathSegments (to be implemented) or applied at runtime.
+-- |
+-- | For now, glyph positions come from the transform's translate component
+-- | which should be encoded in the GlyphPath geometry at layout time.
+applyTransformToPathParams :: forall msg. Transform.Transform2D -> DC.PathParams msg -> DC.PathParams msg
+applyTransformToPathParams _transform params = params
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                   // composition // flattening
