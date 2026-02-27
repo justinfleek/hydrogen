@@ -51,7 +51,7 @@ module Hydrogen.Schema.GPU.Storable
   , align16
   
   -- * Byte Operations
-  , ByteArray
+  , ByteArray(ByteArray)
   , emptyBytes
   , concatBytes
   , bytesLength
@@ -69,6 +69,8 @@ import Prelude
   , class Ord
   , class Show
   , class Semiring
+  , bind
+  , pure
   , show
   , ($)
   , (+)
@@ -90,6 +92,12 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.Array as Array
 import Data.Int (toNumber) as Int
 import Data.Int as Int
+
+import Hydrogen.Schema.Bounded as Bounded
+import Hydrogen.Schema.Dimension.Vector.Vec2 as Vec2
+import Hydrogen.Schema.Dimension.Vector.Vec3 as Vec3
+import Hydrogen.Schema.Dimension.Vector.Vec4 as Vec4
+import Hydrogen.Schema.Dimension.Point2D as Point2D
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // alignment
@@ -276,3 +284,92 @@ instance gpuStorableBoolean :: GPUStorable Boolean where
   alignment _ = align4
   toBytes = boolToBytes
   fromBytes = bytesToBool
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // schema atom instances
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | UnitInterval serializes as a single f32.
+-- |
+-- | GPU representation: f32 (4 bytes)
+-- | WGSL type: f32
+instance gpuStorableUnitInterval :: GPUStorable Bounded.UnitInterval where
+  byteSize _ = 4
+  alignment _ = align4
+  toBytes ui = numberToBytes (Bounded.unwrapUnit ui)
+  fromBytes bytes = do
+    n <- bytesToNumber bytes
+    pure (Bounded.clampUnit n)
+
+-- | Vec2 Number serializes as vec2<f32>.
+-- |
+-- | GPU representation: vec2<f32> (8 bytes, 8-byte aligned)
+-- | WGSL type: vec2<f32>
+instance gpuStorableVec2Number :: GPUStorable (Vec2.Vec2 Number) where
+  byteSize _ = 8
+  alignment _ = align8
+  toBytes v =
+    let ByteArray xb = numberToBytes (Vec2.getX2 v)
+        ByteArray yb = numberToBytes (Vec2.getY2 v)
+    in ByteArray (xb <> yb)
+  fromBytes (ByteArray arr) = do
+    xv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    yv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    pure (Vec2.vec2 xv yv)
+
+-- | Vec3 Number serializes as vec3<f32>.
+-- |
+-- | GPU representation: vec3<f32> (12 bytes, 16-byte aligned)
+-- | WGSL type: vec3<f32>
+-- |
+-- | IMPORTANT: vec3 requires 16-byte alignment in WebGPU despite being
+-- | only 12 bytes. This is a WebGPU spec requirement.
+instance gpuStorableVec3Number :: GPUStorable (Vec3.Vec3 Number) where
+  byteSize _ = 12
+  alignment _ = align16
+  toBytes v =
+    let ByteArray xb = numberToBytes (Vec3.getX3 v)
+        ByteArray yb = numberToBytes (Vec3.getY3 v)
+        ByteArray zb = numberToBytes (Vec3.getZ3 v)
+    in ByteArray (xb <> yb <> zb)
+  fromBytes (ByteArray arr) = do
+    xv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    yv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    zv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 8 arr)))
+    pure (Vec3.vec3 xv yv zv)
+
+-- | Vec4 Number serializes as vec4<f32>.
+-- |
+-- | GPU representation: vec4<f32> (16 bytes, 16-byte aligned)
+-- | WGSL type: vec4<f32>
+instance gpuStorableVec4Number :: GPUStorable (Vec4.Vec4 Number) where
+  byteSize _ = 16
+  alignment _ = align16
+  toBytes v =
+    let ByteArray xb = numberToBytes (Vec4.getX4 v)
+        ByteArray yb = numberToBytes (Vec4.getY4 v)
+        ByteArray zb = numberToBytes (Vec4.getZ4 v)
+        ByteArray wb = numberToBytes (Vec4.getW4 v)
+    in ByteArray (xb <> yb <> zb <> wb)
+  fromBytes (ByteArray arr) = do
+    xv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    yv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    zv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 8 arr)))
+    wv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 12 arr)))
+    pure (Vec4.vec4 xv yv zv wv)
+
+-- | Point2D serializes as vec2<f32>.
+-- |
+-- | GPU representation: vec2<f32> (8 bytes, 8-byte aligned)
+-- | WGSL type: vec2<f32>
+instance gpuStorablePoint2D :: GPUStorable Point2D.Point2D where
+  byteSize _ = 8
+  alignment _ = align8
+  toBytes pt =
+    let ByteArray xb = numberToBytes (Point2D.x pt)
+        ByteArray yb = numberToBytes (Point2D.y pt)
+    in ByteArray (xb <> yb)
+  fromBytes (ByteArray arr) = do
+    xv <- bytesToNumber (ByteArray (Array.take 4 arr))
+    yv <- bytesToNumber (ByteArray (Array.take 4 (Array.drop 4 arr)))
+    pure (Point2D.point2D xv yv)
