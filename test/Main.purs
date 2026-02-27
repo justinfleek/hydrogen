@@ -33,6 +33,7 @@ import Test.Submodular.Property as SubmodularProperty
 import Test.GPU.Diffusion as GPUDiffusion
 import Test.Schema.Property as SchemaProperty
 import Test.Sensation.Property as SensationProperty
+import Test.Cache.Property as CacheProperty
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -66,6 +67,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
     SchemaProperty.schemaPropertyTests
   describe "Sensation → Rights" do
     SensationProperty.sensationPropertyTests
+  describe "Cache Property Tests" do
+    CacheProperty.cachePropertyTests
 
 -- =============================================================================
 --                                                              // format tests

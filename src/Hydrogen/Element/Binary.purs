@@ -52,6 +52,7 @@ module Hydrogen.Element.Binary
       , TagRectangle
       , TagEllipse
       , TagPath
+      , TagText
       , TagGroup
       , TagTransform
       )
@@ -112,10 +113,12 @@ import Data.Tuple (Tuple(Tuple))
 
 -- Element types
 import Hydrogen.Element.Core
-  ( Element(Rectangle, Ellipse, Path, Group, Transform, Empty)
+  ( Element(Rectangle, Ellipse, Path, Text, Group, Transform, Empty)
   , RectangleSpec
   , EllipseSpec
   , PathSpec
+  , TextSpec
+  , GlyphSpec
   , GroupSpec
   , TransformSpec
   , StrokeSpec
@@ -133,6 +136,8 @@ import Hydrogen.Schema.Geometry.Shape as Shape
 import Hydrogen.Schema.Geometry.Stroke as GeomStroke
 import Hydrogen.Schema.Geometry.Transform as Transform
 import Hydrogen.Schema.Material.Fill as Fill
+import Hydrogen.Schema.Temporal.Progress as Progress
+import Hydrogen.Schema.Typography.GlyphGeometry as Glyph
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -161,6 +166,7 @@ data ElementTag
   | TagRectangle
   | TagEllipse
   | TagPath
+  | TagText
   | TagGroup
   | TagTransform
 
@@ -172,6 +178,7 @@ instance showElementTag :: Show ElementTag where
   show TagRectangle = "TagRectangle"
   show TagEllipse = "TagEllipse"
   show TagPath = "TagPath"
+  show TagText = "TagText"
   show TagGroup = "TagGroup"
   show TagTransform = "TagTransform"
 
@@ -197,16 +204,18 @@ tagToInt TagEmpty = 0
 tagToInt TagRectangle = 1
 tagToInt TagEllipse = 2
 tagToInt TagPath = 3
-tagToInt TagGroup = 4
-tagToInt TagTransform = 5
+tagToInt TagText = 4
+tagToInt TagGroup = 5
+tagToInt TagTransform = 6
 
 intToTag :: Int -> Maybe ElementTag
 intToTag 0 = Just TagEmpty
 intToTag 1 = Just TagRectangle
 intToTag 2 = Just TagEllipse
 intToTag 3 = Just TagPath
-intToTag 4 = Just TagGroup
-intToTag 5 = Just TagTransform
+intToTag 4 = Just TagText
+intToTag 5 = Just TagGroup
+intToTag 6 = Just TagTransform
 intToTag _ = Nothing
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -353,6 +362,10 @@ serializeElement (Group spec) =
 serializeElement (Transform spec) =
   concatBytes (writeU8 (tagToInt TagTransform)) $
   serializeTransformSpec spec
+
+serializeElement (Text spec) =
+  concatBytes (writeU8 (tagToInt TagText)) $
+  serializeTextSpec spec
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // rectangle serialization
@@ -540,6 +553,128 @@ serializeTransform2D (Transform.Transform2D t) =
     writeF32 orig.y
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // text serialization
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Serialize TextSpec
+-- |
+-- | Layout:
+-- |   glyphCount (u32) + glyphs (variable) + opacity (f32)
+serializeTextSpec :: TextSpec -> Bytes
+serializeTextSpec spec =
+  let glyphCount = writeU32 (Array.length spec.glyphs)
+      glyphBytes = serializeGlyphArray spec.glyphs
+  in concatBytes glyphCount $
+     concatBytes glyphBytes $
+     serializeOpacity spec.opacity
+
+-- | Serialize array of GlyphSpec
+serializeGlyphArray :: Array GlyphSpec -> Bytes
+serializeGlyphArray glyphs =
+  Array.foldl (\acc g -> concatBytes acc (serializeGlyph g)) emptyBytes glyphs
+
+-- | Serialize single GlyphSpec
+-- |
+-- | Layout:
+-- |   glyphPath (variable) + transform2D (36) + fill (variable) + 
+-- |   maybeStroke (variable) + opacity (4) + progress (4)
+serializeGlyph :: GlyphSpec -> Bytes
+serializeGlyph spec =
+  concatBytes (serializeGlyphPath spec.glyph) $
+  concatBytes (serializeTransform2D spec.transform) $
+  concatBytes (serializeFill spec.fill) $
+  concatBytes (serializeMaybeStroke spec.stroke) $
+  concatBytes (serializeOpacity spec.opacity) $
+  serializeProgress spec.progress
+
+-- | Serialize Progress (4 bytes as f32)
+serializeProgress :: Progress.Progress -> Bytes
+serializeProgress p = writeF32 (Progress.unwrapProgress p)
+
+-- | Serialize GlyphPath
+-- |
+-- | Layout:
+-- |   contourCount (u32) + contours (variable) + bounds (24) +
+-- |   advanceWidth (4) + leftSideBearing (4)
+serializeGlyphPath :: Glyph.GlyphPath -> Bytes
+serializeGlyphPath gp =
+  let contourCount = writeU32 (Array.length gp.contours)
+      contourBytes = serializeContours gp.contours
+  in concatBytes contourCount $
+     concatBytes contourBytes $
+     concatBytes (serializeGlyphBounds gp.bounds) $
+     concatBytes (writeF32 (unwrapPixel gp.advanceWidth)) $
+     writeF32 (unwrapPixel gp.leftSideBearing)
+
+-- | Serialize array of Contours
+serializeContours :: Array Glyph.Contour -> Bytes
+serializeContours contours =
+  Array.foldl (\acc c -> concatBytes acc (serializeContour c)) emptyBytes contours
+
+-- | Serialize single Contour
+-- |
+-- | Layout:
+-- |   winding (u8) + commandCount (u32) + commands (variable)
+serializeContour :: Glyph.Contour -> Bytes
+serializeContour c =
+  let windingByte = case c.winding of
+        Glyph.WindingClockwise -> writeU8 0
+        Glyph.WindingCounterClockwise -> writeU8 1
+      commandCount = writeU32 (Array.length c.commands)
+      commandBytes = serializePathCommands3D c.commands
+  in concatBytes windingByte $
+     concatBytes commandCount $
+     commandBytes
+
+-- | Serialize array of 3D path commands
+serializePathCommands3D :: Array Glyph.PathCommand3D -> Bytes
+serializePathCommands3D cmds =
+  Array.foldl (\acc cmd -> concatBytes acc (serializePathCommand3D cmd)) emptyBytes cmds
+
+-- | Serialize single 3D path command
+-- |
+-- | Tags:
+-- |   0 = MoveTo3D (12 bytes: x, y, z)
+-- |   1 = LineTo3D (12 bytes)
+-- |   2 = QuadraticTo3D (24 bytes: control + end)
+-- |   3 = CubicTo3D (36 bytes: c1 + c2 + end)
+-- |   4 = ClosePath3D (0 bytes)
+serializePathCommand3D :: Glyph.PathCommand3D -> Bytes
+serializePathCommand3D = case _ of
+  Glyph.MoveTo3D p ->
+    concatBytes (writeU8 0) (serializeControlPoint3D p)
+  Glyph.LineTo3D p ->
+    concatBytes (writeU8 1) (serializeControlPoint3D p)
+  Glyph.QuadraticTo3D c1 end ->
+    concatBytes (writeU8 2) $
+    concatBytes (serializeControlPoint3D c1) $
+    serializeControlPoint3D end
+  Glyph.CubicTo3D c1 c2 end ->
+    concatBytes (writeU8 3) $
+    concatBytes (serializeControlPoint3D c1) $
+    concatBytes (serializeControlPoint3D c2) $
+    serializeControlPoint3D end
+  Glyph.ClosePath3D ->
+    writeU8 4
+
+-- | Serialize ControlPoint3D (12 bytes: x, y, z as f32)
+serializeControlPoint3D :: Glyph.ControlPoint3D -> Bytes
+serializeControlPoint3D pt =
+  concatBytes (writeF32 (unwrapPixel pt.x)) $
+  concatBytes (writeF32 (unwrapPixel pt.y)) $
+  writeF32 (unwrapPixel pt.z)
+
+-- | Serialize GlyphBounds (24 bytes: 6 × f32)
+serializeGlyphBounds :: Glyph.GlyphBounds -> Bytes
+serializeGlyphBounds b =
+  concatBytes (writeF32 (unwrapPixel b.minX)) $
+  concatBytes (writeF32 (unwrapPixel b.maxX)) $
+  concatBytes (writeF32 (unwrapPixel b.minY)) $
+  concatBytes (writeF32 (unwrapPixel b.maxY)) $
+  concatBytes (writeF32 (unwrapPixel b.minZ)) $
+  writeF32 (unwrapPixel b.maxZ)
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // fill serialization
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -653,6 +788,8 @@ deserializeElementAt arr offset = do
       deserializeEllipse arr (offset + 1)
     TagPath -> 
       deserializePath arr (offset + 1)
+    TagText ->
+      deserializeText arr (offset + 1)
     TagGroup -> 
       deserializeGroup arr (offset + 1)
     TagTransform -> 
@@ -901,6 +1038,224 @@ deserializeArcParams arr offset = do
         }
   
   Just { value: params, bytesRead: 14 }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // text deserialization
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Deserialize Text at offset
+deserializeText :: Array Int -> Int -> Maybe (DeserializeResult Element)
+deserializeText arr offset = do
+  -- Glyph count (4 bytes)
+  glyphCount <- readU32 arr offset
+  
+  -- Glyphs (variable)
+  glyphsResult <- deserializeGlyphs arr (offset + 4) glyphCount
+  let glyphsEnd = offset + 4 + glyphsResult.bytesRead
+  
+  -- Opacity (4 bytes)
+  opacity <- deserializeOpacity arr glyphsEnd
+  
+  let spec =
+        { glyphs: glyphsResult.value
+        , opacity: opacity
+        }
+  
+  Just { value: Text spec, bytesRead: glyphsEnd + 4 - offset }
+
+-- | Deserialize array of GlyphSpec
+deserializeGlyphs :: Array Int -> Int -> Int -> Maybe (DeserializeResult (Array GlyphSpec))
+deserializeGlyphs arr offset count =
+  deserializeGlyphsLoop arr offset count []
+
+-- | Helper loop for glyph deserialization
+deserializeGlyphsLoop 
+  :: Array Int 
+  -> Int 
+  -> Int 
+  -> Array GlyphSpec 
+  -> Maybe (DeserializeResult (Array GlyphSpec))
+deserializeGlyphsLoop arr offset remaining acc =
+  if remaining == 0
+    then Just { value: acc, bytesRead: 0 }
+    else do
+      glyphResult <- deserializeGlyph arr offset
+      let newOffset = offset + glyphResult.bytesRead
+      restResult <- deserializeGlyphsLoop arr newOffset (remaining - 1) (Array.snoc acc glyphResult.value)
+      pure { value: restResult.value, bytesRead: glyphResult.bytesRead + restResult.bytesRead }
+
+-- | Deserialize single GlyphSpec
+deserializeGlyph :: Array Int -> Int -> Maybe (DeserializeResult GlyphSpec)
+deserializeGlyph arr offset = do
+  -- GlyphPath (variable)
+  glyphPathResult <- deserializeGlyphPath arr offset
+  let glyphPathEnd = offset + glyphPathResult.bytesRead
+  
+  -- Transform2D (36 bytes)
+  transform <- deserializeTransform2D arr glyphPathEnd
+  let transformEnd = glyphPathEnd + 36
+  
+  -- Fill (variable)
+  fillResult <- deserializeFillAt arr transformEnd
+  let fillEnd = transformEnd + fillResult.bytesRead
+  
+  -- Maybe Stroke (variable)
+  strokeResult <- deserializeMaybeStroke arr fillEnd
+  let strokeEnd = fillEnd + strokeResult.bytesRead
+  
+  -- Opacity (4 bytes)
+  opacity <- deserializeOpacity arr strokeEnd
+  let opacityEnd = strokeEnd + 4
+  
+  -- Progress (4 bytes)
+  progressVal <- readF32 arr opacityEnd
+  
+  let spec =
+        { glyph: glyphPathResult.value
+        , transform: transform
+        , fill: fillResult.value
+        , stroke: strokeResult.value
+        , opacity: opacity
+        , progress: Progress.progress progressVal
+        }
+  
+  Just { value: spec, bytesRead: opacityEnd + 4 - offset }
+
+-- | Deserialize GlyphPath
+deserializeGlyphPath :: Array Int -> Int -> Maybe (DeserializeResult Glyph.GlyphPath)
+deserializeGlyphPath arr offset = do
+  -- Contour count (4 bytes)
+  contourCount <- readU32 arr offset
+  
+  -- Contours (variable)
+  contoursResult <- deserializeContours arr (offset + 4) contourCount
+  let contoursEnd = offset + 4 + contoursResult.bytesRead
+  
+  -- Bounds (24 bytes)
+  bounds <- deserializeGlyphBounds arr contoursEnd
+  let boundsEnd = contoursEnd + 24
+  
+  -- Advance width (4 bytes)
+  advanceWidth <- readF32 arr boundsEnd
+  
+  -- Left side bearing (4 bytes)
+  leftSideBearing <- readF32 arr (boundsEnd + 4)
+  
+  let gp =
+        { contours: contoursResult.value
+        , bounds: bounds
+        , advanceWidth: Device.Pixel advanceWidth
+        , leftSideBearing: Device.Pixel leftSideBearing
+        }
+  
+  Just { value: gp, bytesRead: boundsEnd + 8 - offset }
+
+-- | Deserialize array of Contours
+deserializeContours :: Array Int -> Int -> Int -> Maybe (DeserializeResult (Array Glyph.Contour))
+deserializeContours arr offset count =
+  deserializeContoursLoop arr offset count []
+
+-- | Helper loop for contour deserialization
+deserializeContoursLoop 
+  :: Array Int 
+  -> Int 
+  -> Int 
+  -> Array Glyph.Contour 
+  -> Maybe (DeserializeResult (Array Glyph.Contour))
+deserializeContoursLoop arr offset remaining acc =
+  if remaining == 0
+    then Just { value: acc, bytesRead: 0 }
+    else do
+      contourResult <- deserializeContour arr offset
+      let newOffset = offset + contourResult.bytesRead
+      restResult <- deserializeContoursLoop arr newOffset (remaining - 1) (Array.snoc acc contourResult.value)
+      pure { value: restResult.value, bytesRead: contourResult.bytesRead + restResult.bytesRead }
+
+-- | Deserialize single Contour
+deserializeContour :: Array Int -> Int -> Maybe (DeserializeResult Glyph.Contour)
+deserializeContour arr offset = do
+  -- Winding (1 byte)
+  windingByte <- readU8 arr offset
+  let winding = if windingByte == 0 
+        then Glyph.WindingClockwise 
+        else Glyph.WindingCounterClockwise
+  
+  -- Command count (4 bytes)
+  commandCount <- readU32 arr (offset + 1)
+  
+  -- Commands (variable)
+  commandsResult <- deserializePathCommands3D arr (offset + 5) commandCount
+  
+  let c = { commands: commandsResult.value, winding: winding }
+  
+  Just { value: c, bytesRead: 5 + commandsResult.bytesRead }
+
+-- | Deserialize array of 3D path commands
+deserializePathCommands3D :: Array Int -> Int -> Int -> Maybe (DeserializeResult (Array Glyph.PathCommand3D))
+deserializePathCommands3D arr offset count =
+  deserializePathCommands3DLoop arr offset count []
+
+-- | Helper loop for 3D path command deserialization
+deserializePathCommands3DLoop 
+  :: Array Int 
+  -> Int 
+  -> Int 
+  -> Array Glyph.PathCommand3D 
+  -> Maybe (DeserializeResult (Array Glyph.PathCommand3D))
+deserializePathCommands3DLoop arr offset remaining acc =
+  if remaining == 0
+    then Just { value: acc, bytesRead: 0 }
+    else do
+      cmdResult <- deserializePathCommand3D arr offset
+      let newOffset = offset + cmdResult.bytesRead
+      restResult <- deserializePathCommands3DLoop arr newOffset (remaining - 1) (Array.snoc acc cmdResult.value)
+      pure { value: restResult.value, bytesRead: cmdResult.bytesRead + restResult.bytesRead }
+
+-- | Deserialize single 3D path command
+deserializePathCommand3D :: Array Int -> Int -> Maybe (DeserializeResult Glyph.PathCommand3D)
+deserializePathCommand3D arr offset = do
+  tag <- readU8 arr offset
+  case tag of
+    0 -> do  -- MoveTo3D
+      pt <- deserializeControlPoint3D arr (offset + 1)
+      pure { value: Glyph.MoveTo3D pt, bytesRead: 13 }
+    1 -> do  -- LineTo3D
+      pt <- deserializeControlPoint3D arr (offset + 1)
+      pure { value: Glyph.LineTo3D pt, bytesRead: 13 }
+    2 -> do  -- QuadraticTo3D
+      c1 <- deserializeControlPoint3D arr (offset + 1)
+      end <- deserializeControlPoint3D arr (offset + 13)
+      pure { value: Glyph.QuadraticTo3D c1 end, bytesRead: 25 }
+    3 -> do  -- CubicTo3D
+      c1 <- deserializeControlPoint3D arr (offset + 1)
+      c2 <- deserializeControlPoint3D arr (offset + 13)
+      end <- deserializeControlPoint3D arr (offset + 25)
+      pure { value: Glyph.CubicTo3D c1 c2 end, bytesRead: 37 }
+    4 ->     -- ClosePath3D
+      pure { value: Glyph.ClosePath3D, bytesRead: 1 }
+    _ -> Nothing
+
+-- | Deserialize ControlPoint3D (12 bytes)
+deserializeControlPoint3D :: Array Int -> Int -> Maybe Glyph.ControlPoint3D
+deserializeControlPoint3D arr offset = do
+  x <- readF32 arr offset
+  y <- readF32 arr (offset + 4)
+  z <- readF32 arr (offset + 8)
+  pure (Glyph.controlPoint3D (Device.Pixel x) (Device.Pixel y) (Device.Pixel z))
+
+-- | Deserialize GlyphBounds (24 bytes)
+deserializeGlyphBounds :: Array Int -> Int -> Maybe Glyph.GlyphBounds
+deserializeGlyphBounds arr offset = do
+  minX <- readF32 arr offset
+  maxX <- readF32 arr (offset + 4)
+  minY <- readF32 arr (offset + 8)
+  maxY <- readF32 arr (offset + 12)
+  minZ <- readF32 arr (offset + 16)
+  maxZ <- readF32 arr (offset + 20)
+  pure (Glyph.glyphBounds 
+    (Device.Pixel minX) (Device.Pixel maxX)
+    (Device.Pixel minY) (Device.Pixel maxY)
+    (Device.Pixel minZ) (Device.Pixel maxZ))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // group deserialization

@@ -72,6 +72,8 @@ module Hydrogen.Element.Core
   , RectangleSpec
   , EllipseSpec
   , PathSpec
+  , TextSpec
+  , GlyphSpec
   , GroupSpec
   , TransformSpec
   , StrokeSpec
@@ -80,6 +82,7 @@ module Hydrogen.Element.Core
   , rectangle
   , ellipse
   , path
+  , text
   , group
   , transform
   , empty
@@ -143,6 +146,12 @@ import Hydrogen.Schema.Dimension.Stroke
 
 -- Schema atoms: Color
 import Hydrogen.Schema.Color.Opacity (Opacity, opacity)
+
+-- Schema atoms: Typography
+import Hydrogen.Schema.Typography.GlyphGeometry (GlyphPath)
+
+-- Schema atoms: Temporal
+import Hydrogen.Schema.Temporal.Progress (Progress)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // stroke // spec
@@ -254,6 +263,57 @@ type PathSpec =
   , opacity :: Opacity            -- ^ Overall element opacity
   }
 
+-- | Specification for a single glyph with full material/temporal stack.
+-- |
+-- | Each glyph is a complete renderable unit that can be individually
+-- | styled and animated. This enables:
+-- | - Per-character color (gradient text, rainbow effects)
+-- | - Per-character animation (wave, bounce, typewriter reveal)
+-- | - Per-character transforms (rotation, scale for emphasis)
+-- | - Diffusion/morphing effects via temporal progress
+-- |
+-- | The glyph path comes from font data (SDF or bezier).
+-- | All other fields are bounded Schema atoms.
+type GlyphSpec =
+  { glyph :: GlyphPath            -- ^ Vector path data (beziers, SDF)
+  , transform :: Transform2D      -- ^ Position, rotation, scale for this glyph
+  , fill :: Fill                  -- ^ Glyph fill (solid, gradient, pattern, noise)
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Per-glyph opacity (for fade effects)
+  , progress :: Progress          -- ^ Animation progress [0,1] for temporal effects
+  }
+
+-- | Specification for text elements.
+-- |
+-- | Text is an array of glyphs, each with independent styling.
+-- | This is the GPU-native representation — no layout logic here,
+-- | layout is performed BEFORE Element construction.
+-- |
+-- | ## Design
+-- |
+-- | Unlike legacy text rendering where all characters share one style,
+-- | Element.Core text treats each glyph as a first-class shape with:
+-- | - Independent fill (gradient per character, noise textures)
+-- | - Independent stroke (outlined text effects)
+-- | - Independent transform (per-character animation)
+-- | - Independent progress (staggered reveals, diffusion)
+-- |
+-- | ## Animation
+-- |
+-- | The `progress` field on each glyph enables temporal effects:
+-- | - 0.0 = start state (invisible, morphed, displaced)
+-- | - 1.0 = end state (fully rendered)
+-- | - Intermediate values for diffusion, reveal, morph animations
+-- |
+-- | ## Path Animation
+-- |
+-- | Glyphs can follow paths by encoding path position in transform.
+-- | The runtime interprets transform + progress to compute final position.
+type TextSpec =
+  { glyphs :: Array GlyphSpec     -- ^ Individual glyphs with per-glyph styling
+  , opacity :: Opacity            -- ^ Overall text opacity (multiplied with per-glyph)
+  }
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // composition // specs
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -293,6 +353,7 @@ type TransformSpec =
 -- | - `Rectangle` — Axis-aligned rectangles with optional corner radius
 -- | - `Ellipse` — Ellipses and circles
 -- | - `Path` — Arbitrary vector paths (beziers, lines, arcs)
+-- | - `Text` — Pre-laid-out text with positioned glyphs
 -- |
 -- | **Composition**:
 -- | - `Group` — Combine multiple elements
@@ -318,6 +379,7 @@ data Element
   = Rectangle RectangleSpec
   | Ellipse EllipseSpec
   | Path PathSpec
+  | Text TextSpec
   | Group GroupSpec
   | Transform TransformSpec
   | Empty
@@ -330,6 +392,7 @@ instance showElement :: Show Element where
   show (Rectangle _) = "(Element Rectangle)"
   show (Ellipse _) = "(Element Ellipse)"
   show (Path _) = "(Element Path)"
+  show (Text _) = "(Element Text)"
   show (Group g) = "(Element Group [" <> show (Array.length g.children) <> " children])"
   show (Transform _) = "(Element Transform)"
   show Empty = "(Element Empty)"
@@ -349,6 +412,7 @@ instance eqElement :: Eq Element where
   eq (Rectangle r1) (Rectangle r2) = eqRectangleSpec r1 r2
   eq (Ellipse e1) (Ellipse e2) = eqEllipseSpec e1 e2
   eq (Path p1) (Path p2) = eqPathSpec p1 p2
+  eq (Text t1) (Text t2) = eqTextSpec t1 t2
   eq (Group g1) (Group g2) = eqGroupSpec g1 g2
   eq (Transform t1) (Transform t2) = eqTransformSpec t1 t2
   eq _ _ = false
@@ -376,6 +440,39 @@ eqPathSpec p1 p2 =
   p1.fill == p2.fill &&
   p1.stroke == p2.stroke &&
   p1.opacity == p2.opacity
+
+-- | Compare GlyphSpec for equality
+eqGlyphSpec :: GlyphSpec -> GlyphSpec -> Boolean
+eqGlyphSpec g1 g2 =
+  g1.glyph == g2.glyph &&
+  g1.transform == g2.transform &&
+  g1.fill == g2.fill &&
+  g1.stroke == g2.stroke &&
+  g1.opacity == g2.opacity &&
+  g1.progress == g2.progress
+
+-- | Compare arrays of GlyphSpec for equality
+eqArrayGlyphSpec :: Array GlyphSpec -> Array GlyphSpec -> Boolean
+eqArrayGlyphSpec a1 a2 =
+  Array.length a1 == Array.length a2 &&
+  eqArrayGlyphSpecHelper a1 a2 0
+
+-- | Helper for GlyphSpec array comparison (index-based)
+eqArrayGlyphSpecHelper :: Array GlyphSpec -> Array GlyphSpec -> Int -> Boolean
+eqArrayGlyphSpecHelper a1 a2 idx =
+  if idx == Array.length a1
+    then true
+    else case Array.index a1 idx of
+      Nothing -> true  -- Should never happen if lengths match
+      Just g1 -> case Array.index a2 idx of
+        Nothing -> false
+        Just g2 -> eqGlyphSpec g1 g2 && eqArrayGlyphSpecHelper a1 a2 (idx + 1)
+
+-- | Compare TextSpec for equality
+eqTextSpec :: TextSpec -> TextSpec -> Boolean
+eqTextSpec t1 t2 =
+  t1.opacity == t2.opacity &&
+  eqArrayGlyphSpec t1.glyphs t2.glyphs
 
 -- | Compare GroupSpec for equality
 eqGroupSpec :: GroupSpec -> GroupSpec -> Boolean
@@ -434,6 +531,13 @@ ellipse = Ellipse
 -- | Create a path element.
 path :: PathSpec -> Element
 path = Path
+
+-- | Create a text element.
+-- |
+-- | Text is rendered from a pre-laid-out TextBlock. Use the typography
+-- | layout functions to create the TextBlock, then wrap it here.
+text :: TextSpec -> Element
+text = Text
 
 -- | Create a group of elements.
 group :: Array Element -> Element
