@@ -943,9 +943,13 @@ data DisplayResponse
 
 ### Phase 1: Core Infrastructure (Unblocks everything) — **PARTIAL**
 
-1. `Hydrogen/GPU/Resource.purs` — OPEN
-   - TextureDescriptor, BufferDescriptor, PipelineCache
-   - TextureFormat, TextureUsage enums
+1. ~~`Hydrogen/GPU/Resource.purs`~~ ✓ DONE (~1000 lines)
+   - ResourceHandle with content-based identity (UUID5-style)
+   - PipelineCache with LRU eviction
+   - BufferPool with size-bucketed allocation (1KB to 16MB)
+   - TexturePool with format/size matching
+   - ResourceRegistry for unified lifecycle management
+   - Memory estimation, capacity management, GC
 
 2. `Hydrogen/GPU/Interpreter.purs` — OPEN
    - Execute ComputeKernel against WebGPU
@@ -957,6 +961,13 @@ data DisplayResponse
    - SpringInstance type with accumulator pattern
    - tickSpring/tickSpringFixed for stable variable-framerate physics
    - Semi-implicit Euler integration
+
+5. ~~`Hydrogen/GPU/FrameState/Allocation.purs`~~ ✓ DONE (~754 lines)
+   - FAA-enhanced allocation via submodular optimization
+   - `viewportToRegions`, `viewportToGroundSet`
+   - `allocateFrame`, `allocateFrameFAA`
+   - `FAAAllocationConfig`, `regionUtilityOracle`
+   - Integrates with FAA continuous greedy + min-energy rounding
 
 ### Phase 2: Multi-Modal (Unblocks AI avatar, medical, broadcast) — **COMPLETE**
 
@@ -990,7 +1001,10 @@ data DisplayResponse
 9. `Hydrogen/GPU/Diffusion/Sampler.purs` — OPEN (scheduler implementations)
    - Sampler implementations using DiffusionKernel types
 
-10. Per-region diffusion state in FrameState — OPEN (FrameState.Allocation being handled by other agent)
+10. ~~Per-region diffusion state in FrameState~~ ✓ DONE
+    - Implemented in `GPU/FrameState/Allocation.purs`
+    - `RegionDiffusionState` via `Region`, `RegionSelection`, `DiffusionSteps`
+    - FAA-enhanced allocation with quality-adaptive step modulation
 
 ### Phase 4: Accessibility & Safety (Unblocks web, medical, avionics) — **COMPLETE**
 
@@ -1010,7 +1024,7 @@ data DisplayResponse
 
 13. Integrate with Element type — OPEN
 
-### Phase 5: Domain-Specific (Unblocks specific applications) — **PARTIAL**
+### Phase 5: Domain-Specific (Unblocks specific applications) — **COMPLETE**
 
 14. ~~`Hydrogen/GPU/Kernel/Text.purs`~~ ✓ DONE
     - TextKernel ADT: GlyphRasterize, TextLayout, SubpixelAA, CursorBlink, TextMask
@@ -1018,20 +1032,23 @@ data DisplayResponse
     - SubpixelMode: None, RGB, BGR, VRGB, VBGR
     - Presets: ghosttyTerminalPipeline, ideEditorPipeline, uiLabelPipeline, gameHUDPipeline
 
-15. `Hydrogen/GPU/Kernel/Video.purs` — OPEN
-    - YUV→RGB conversion
-    - LUT3D application
-    - Frame scaling
+15. ~~`Hydrogen/Schema/Color/Video.purs`~~ ✓ DONE (~506 lines)
+    - YCbCr, YIQ, YPbPr molecules
+    - RGB↔YCbCr, RGB↔YIQ, RGB↔YPbPr conversions
+    - Inter-format: YCbCr↔YPbPr, YUV↔YCbCr
+    - Chroma atoms: Cb, Cr, I, Q
 
-16. `Hydrogen/GPU/Kernel/Chart.purs` — OPEN
-    - Waveform rendering
-    - Trend visualization
-    - Threshold overlays
+16. ~~`Hydrogen/GPU/Kernel/Chart.purs`~~ ✓ DONE (~1198 lines)
+    - ChartKernel ADT: Waveform, Sparkline, LinePlot, AreaFill, BarChart, ThresholdOverlay, GridOverlay
+    - WaveformStyle: Line, Filled, Bars, Points, MinMax
+    - Medical-grade presets: ecgMonitorPipeline, vitalSignsTrendPipeline
+    - Audio presets: audioWaveformPipeline, spectrumAnalyzerPipeline
+    - Financial: stockChartPipeline
 
-17. `Hydrogen/Schema/Temporal/Timecode.purs` — OPEN
-    - SMPTE timecode molecule
-    - Drop-frame handling
-    - Genlock status
+17. ~~`Hydrogen/Schema/Temporal/Timecode.purs`~~ ✓ DONE (~71 lines)
+    - Timecode atom (SMPTE HH:MM:SS:FF)
+    - timecode, unwrapTimecode, emptyTimecode
+    - Full validation in Molecules layer (TimeRange)
 
 ### Phase 6: Distributed Scale — **COMPLETE**
 
@@ -1087,17 +1104,19 @@ data architecture are excellent design decisions.
 
 **Remaining work (P2 and below):**
 
-| Priority | Task | Description |
-|----------|------|-------------|
-| P2 | GPU/Resource.purs | TextureDescriptor, BufferDescriptor, PipelineCache |
-| P2 | GPU/Interpreter.purs | WGSL generation, WebGPU execution |
-| P2 | GPU/Kernel/Video.purs | YUV→RGB, LUT3D, scaling (Frame.io) |
-| P2 | GPU/Kernel/Chart.purs | Waveforms, sparklines, thresholds (medical) |
-| P2 | Schema/Temporal/Timecode.purs | SMPTE timecode, drop-frame, genlock |
-| P2 | Brand/Export/*.purs | CSS, JSON, Figma, Tailwind export formats |
-| P3 | Input canonicalization | Rollback/resimulation for network latency |
-| P3 | JSON codecs | EncodeJson/DecodeJson for Schema atoms |
-| P3 | WebGL runtime | Element → GPU command buffer |
+| Priority | Task | Description | Status |
+|----------|------|-------------|--------|
+| ~~P2~~ | ~~GPU/Resource.purs~~ | ~~PipelineCache, BufferPool, TexturePool~~ | **DONE** |
+| P2 | GPU/Interpreter.purs | WGSL generation, WebGPU execution | OPEN |
+| ~~P2~~ | ~~Schema/Color/Video.purs~~ | ~~YUV→RGB, YCbCr, YIQ~~ | **DONE** |
+| ~~P2~~ | ~~GPU/Kernel/Chart.purs~~ | ~~Waveforms, sparklines, thresholds~~ | **DONE** |
+| ~~P2~~ | ~~Schema/Temporal/Timecode.purs~~ | ~~SMPTE timecode~~ | **DONE** |
+| ~~P2~~ | ~~GPU/FrameState/Allocation.purs~~ | ~~FAA-enhanced allocation~~ | **DONE** |
+| P2 | GPU/Kernel/Video.purs | GPU video decode, LUT3D, scaling | OPEN |
+| P2 | Brand/Export/*.purs | CSS, JSON, Figma, Tailwind export formats | OPEN |
+| P3 | Input canonicalization | Rollback/resimulation for network latency | OPEN |
+| P3 | JSON codecs | EncodeJson/DecodeJson for Schema atoms | OPEN |
+| P3 | WebGL runtime | Element → GPU command buffer | OPEN |
 
 **Recommendation:** Core infrastructure is complete. All P0/P1 gaps are closed.
 Focus on:

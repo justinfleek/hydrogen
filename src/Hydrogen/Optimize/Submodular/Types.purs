@@ -420,13 +420,7 @@ newtype PartitionMatroid v = PartitionMatroid
 derive instance eqPartitionMatroid :: Eq (PartitionMatroid v)
 
 instance showPartitionMatroid :: Show (PartitionMatroid v) where
-  show (PartitionMatroid p) = "Partition[" <> show (blockCount p.blocks) <> " blocks]"
-    where
-      blockCount :: Array (PartitionBlock v) -> Int
-      blockCount arr = arrayLength arr
-      
-      arrayLength :: forall a. Array a -> Int
-      arrayLength _ = 0  -- Placeholder, actual implementation needed
+  show (PartitionMatroid p) = "Partition[" <> show (Array.length p.blocks) <> " blocks]"
 
 -- | Uniform matroid: all k-subsets are bases.
 -- |

@@ -96,3 +96,9 @@ import Hydrogen.Optimize
 import Hydrogen.GPU.Precision
 import Hydrogen.GPU.Landauer
 import Hydrogen.GPU.Diffusion
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SCALE (Billion-Agent Coordination Proofs)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+import Hydrogen.Scale

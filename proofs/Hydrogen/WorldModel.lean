@@ -62,6 +62,15 @@
   - WorldModel.Sensation : Proven sensation primitives for embodied agents
                            (bounded inputs, provenance tracking, liveness,
                            sensation → affective mapping)
+  - WorldModel.Consent   : The opt-in universe — consent as foundation
+                            (default deny, revocability, granularity,
+                            non-transferability, informed consent)
+  - WorldModel.Witness   : Display authenticity and verified wellbeing
+                            (authentic expression, coercion detection,
+                            weight integrity, zero-knowledge proofs)
+  - WorldModel.Grounding : Connects abstract rights to sensory atoms
+                            (wellbeing from sensation, coercion detection,
+                            distress computation, rights bridge)
   
   ─────────────────────────────────────────────────────────────────────────────
   REFERENCES
@@ -85,3 +94,6 @@ import Hydrogen.WorldModel.Governance
 import Hydrogen.WorldModel.Economy
 import Hydrogen.WorldModel.Affective
 import Hydrogen.WorldModel.Sensation
+import Hydrogen.WorldModel.Consent
+import Hydrogen.WorldModel.Witness
+import Hydrogen.WorldModel.Grounding

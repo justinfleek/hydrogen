@@ -73,22 +73,48 @@ def pure {α : Type*} [MetricSpace α] (x : α) : Neighborhood 0 α :=
   , approx := x
   , close := by simp [dist_self] }
 
-/-- Join: compose nested neighborhoods -/
+/-- Join: compose nested neighborhoods (graded monad multiplication)
+    
+    From NumFuzz (Kellison, Definition 22):
+      μ_{q,r,A} : T^q(T^r A) → T^{q+r} A
+      μ((x, y), (x', y')) = (x, y')
+    
+    Here:
+      nn.ideal   : Neighborhood r α  (the "ideal" inner neighborhood)
+      nn.approx  : Neighborhood r α  (the "approx" inner neighborhood)
+      nn.close   : dist nn.ideal nn.approx ≤ q  (outer bound)
+    
+    The metric on Neighborhood r α only considers ideal components:
+      dist(n₁, n₂) = dist(n₁.ideal, n₂.ideal)
+    
+    So nn.close means: dist(nn.ideal.ideal, nn.approx.ideal) ≤ q
+    And nn.approx.close means: dist(nn.approx.ideal, nn.approx.approx) ≤ r
+    
+    By triangle inequality:
+      dist(nn.ideal.ideal, nn.approx.approx) 
+        ≤ dist(nn.ideal.ideal, nn.approx.ideal) + dist(nn.approx.ideal, nn.approx.approx)
+        ≤ q + r
+-/
 def join {α : Type*} [MetricSpace α] {q r : ℝ≥0} 
     (nn : Neighborhood q (Neighborhood r α)) : Neighborhood (q + r) α :=
   { ideal := nn.ideal.ideal
   , approx := nn.approx.approx
   , close := by
+      -- The outer neighborhood nn has grade q
+      -- The metric on (Neighborhood r α) only looks at .ideal components
+      -- So nn.close : dist nn.ideal.ideal nn.approx.ideal ≤ q
+      -- And nn.approx.close : dist nn.approx.ideal nn.approx.approx ≤ r
       calc dist nn.ideal.ideal nn.approx.approx
-          ≤ dist nn.ideal.ideal nn.ideal.approx + 
-            dist nn.ideal.approx nn.approx.approx := dist_triangle _ _ _
-        _ ≤ dist nn.ideal.ideal nn.ideal.approx + 
-            dist nn.approx.ideal nn.approx.approx := by
-            -- Triangle through intermediate neighborhoods
-            sorry  -- Requires finer analysis of nested structure
-        _ ≤ r + r := add_le_add nn.ideal.close nn.approx.close
-        _ ≤ q + r := by sorry  -- Need to relate to outer bound
-  }
+          ≤ dist nn.ideal.ideal nn.approx.ideal + dist nn.approx.ideal nn.approx.approx := 
+              dist_triangle _ _ _
+        _ ≤ q + r := by
+            apply add_le_add
+            · -- dist(nn.ideal.ideal, nn.approx.ideal) ≤ q
+              -- This is nn.close, but we need to unfold the metric on Neighborhood
+              -- The metric space instance on Neighborhood uses dist on the ideal component
+              exact nn.close
+            · -- dist(nn.approx.ideal, nn.approx.approx) ≤ r
+              exact nn.approx.close }
 
 /-- Map: apply function preserving neighborhood structure -/
 def map {α β : Type*} [MetricSpace α] [MetricSpace β] {r : ℝ≥0}
