@@ -1,6 +1,6 @@
 # Hydrogen Session Notes
 
-**Last Updated:** 2026-02-27 (Session 9 — Full Audit)
+**Last Updated:** 2026-02-27 (Session 10 — Graded Monads & Layout Constraints)
 **Build Status:** **PASSING** (0 errors, 0 warnings)
 
 ---
@@ -208,6 +208,62 @@ At billion-agent scale:
 | reset.lean | docs/INTERNAL/ | AI safety vévé |
 | THE_WHY.md | docs/INTERNAL/ | Origin story |
 | SCHEMA.md | docs/ | Complete pillar reference |
+
+---
+
+## Session 10 Progress (2026-02-27)
+
+### Completed: Sensitivity Comonad
+
+Ported the `!_s` coeffect tracking from GradedMonad.lean:
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `Schema/Numeric/Sensitivity.purs` | 141 | Function sensitivity tracking |
+| `Schema/Numeric/Primitives.purs` | 62 | Lifting, division with error |
+| `Schema/Numeric.purs` | +20 | Updated re-exports |
+
+**Key insight:** ForwardError tracks what errors ARE. Sensitivity tracks what functions DO to errors. Together, agents can prove error bounds through composition.
+
+### Completed: Layout Constraint Encoding
+
+Ported Presburger.lean constraint types to PureScript:
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `Layout/Constraint.purs` | 168 | LinTerm, Rel, LinConstraint, Formula |
+| `Layout/Encode.purs` | 153 | Layout → constraint translation |
+
+**Key insight:** Layouts can now be expressed as pure constraint formulas. Agents can prove a layout is possible or impossible before wasting compute.
+
+### Remaining Work (Next Session)
+
+**High Priority:**
+- `Layout/Verify.purs` — Satisfiability checking (decision procedure)
+- `Layout/ILP/Problem.purs` — ILP problem types
+- `Layout/ILP/Simplex.purs` — LP relaxation solver
+- `Layout/ILP/BranchBound.purs` — Integer solution finder
+
+**Medium Priority:**
+- `Layout/ILP/Formulate.purs` — Layout → ILP translation
+- `Schema/Numeric/BackwardError.purs` — D^r comonad (Bean paper)
+- Integrate Constraint/Encode with existing Flex.purs
+
+**Low Priority:**
+- Add constraint evaluation (Valuation → Bool)
+
+### Architecture Note
+
+The graded monad system now has three layers:
+1. **Grade** — Non-negative error bounds
+2. **ForwardError** — Values with tracked error
+3. **Sensitivity** — Functions with tracked amplification
+
+Layout constraints have two layers:
+1. **Constraint** — Pure constraint algebra (LinTerm, Formula)
+2. **Encode** — Layout specs → constraints
+
+Missing: **Verify** (decision procedure) and **ILP** (optimization).
 
 ────────────────────────────────────────────────────────────────────────────────
 

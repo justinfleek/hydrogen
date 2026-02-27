@@ -49,6 +49,10 @@ module Hydrogen.Schema.Numeric
     module Hydrogen.Schema.Numeric.Grade
     -- * Re-exports from ForwardError
   , module Hydrogen.Schema.Numeric.ForwardError
+    -- * Re-exports from Sensitivity
+  , module Hydrogen.Schema.Numeric.Sensitivity
+    -- * Re-exports from Primitives
+  , module Hydrogen.Schema.Numeric.Primitives
   ) where
 
 import Hydrogen.Schema.Numeric.Grade
@@ -83,4 +87,24 @@ import Hydrogen.Schema.Numeric.ForwardError
   , mulReal
   , mapWithGrade
   , errorMagnitude
+  )
+
+import Hydrogen.Schema.Numeric.Sensitivity
+  ( Sensitive
+  , sensitive
+  , identity
+  , compose
+  , applySensitive
+  , scale
+  , negate
+  , constant
+  , getSensitivity
+  , isContraction
+  , isExpansion
+  , isIsometry
+  )
+
+import Hydrogen.Schema.Numeric.Primitives
+  ( liftNumber
+  , divReal
   )
