@@ -2,10 +2,10 @@
 --                         // hydrogen // schema // motion // effects // stylize
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Stylize effect enums for motion graphics.
+-- | Stylize Effects — Effect types for visual styling.
 -- |
--- | Defines scanlines direction, RGB split blend modes, pixel sort options,
--- | halftone color modes, dither methods, and color channel selections.
+-- | Includes enums for various stylize effects plus complete property
+-- | records for Drop Shadow, Bevel/Emboss, Glow effects.
 
 module Hydrogen.Schema.Motion.Effects.Stylize
   ( -- * Scanlines Direction
@@ -14,62 +14,110 @@ module Hydrogen.Schema.Motion.Effects.Stylize
   , scanlinesDirectionToString
   , scanlinesDirectionFromString
   
-    -- * RGB Split Blend Mode
+  -- * RGB Split Blend Mode
   , RGBSplitBlendMode(..)
   , allRGBSplitBlendModes
   , rgbSplitBlendModeToString
   , rgbSplitBlendModeFromString
   
-    -- * Pixel Sort Direction
+  -- * Pixel Sort Direction
   , PixelSortDirection(..)
   , allPixelSortDirections
   , pixelSortDirectionToString
   , pixelSortDirectionFromString
   
-    -- * Sort By Criterion
+  -- * Sort By Criterion
   , SortByCriterion(..)
   , allSortByCriteria
   , sortByCriterionToString
   , sortByCriterionFromString
   
-    -- * Halftone Color Mode
+  -- * Halftone Color Mode
   , HalftoneColorMode(..)
   , allHalftoneColorModes
   , halftoneColorModeToString
   , halftoneColorModeFromString
   
-    -- * Dither Method
+  -- * Dither Method
   , DitherMethod(..)
   , allDitherMethods
   , ditherMethodToString
   , ditherMethodFromString
   
-    -- * Dither Matrix Size
+  -- * Dither Matrix Size
   , DitherMatrixSize(..)
   , allDitherMatrixSizes
   , ditherMatrixSizeToString
   , ditherMatrixSizeFromString
   
-    -- * Effect Color Channel
+  -- * Effect Color Channel
   , EffectColorChannel(..)
   , allEffectColorChannels
   , effectColorChannelToString
   , effectColorChannelFromString
   
-    -- * HSL Channel
+  -- * HSL Channel
   , HSLChannel(..)
   , allHSLChannels
   , hslChannelToString
   , hslChannelFromString
+  
+  -- * Drop Shadow Effect
+  , DropShadowEffect(..)
+  , defaultDropShadow
+  , mkDropShadow
+  , isDropShadowVisible
+  
+  -- * Bevel/Emboss Effect
+  , BevelEmbossEffect(..)
+  , BevelStyle(..)
+  , BevelDirection(..)
+  , HighlightMode(..)
+  , ShadowMode(..)
+  , bevelStyleToString
+  , bevelStyleFromString
+  , defaultBevelEmboss
+  , mkBevelEmboss
+  
+  -- * Stroke Effect
+  , StrokeEffect(..)
+  , StrokePosition(..)
+  , strokePositionToString
+  , strokePositionFromString
+  , defaultStroke
+  , mkStroke
   ) where
 
 import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , class Semigroup
+  , show
+  , (<>)
+  , (&&)
+  , (||)
+  , not
+  , (==)
+  , (/=)
+  , (<)
+  , (<=)
+  , (>)
+  , (>=)
+  , (+)
+  , (-)
+  , (*)
+  , (/)
+  , negate
+  , otherwise
+  , compare
+  , map
+  , pure
+  , bind
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
+import Hydrogen.Schema.Bounded (clampNumber)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // scanlines // direction
@@ -391,3 +439,236 @@ hslChannelFromString "cyans" = Just HSLCyans
 hslChannelFromString "blues" = Just HSLBlues
 hslChannelFromString "magentas" = Just HSLMagentas
 hslChannelFromString _ = Nothing
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // drop // shadow
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Drop Shadow effect — adds shadow behind layer.
+-- |
+-- | Properties match After Effects Drop Shadow:
+-- | - direction: Angle of shadow (0° = right, 90° = down)
+-- | - distance: How far shadow extends in pixels
+-- | - softness: Blur amount of shadow
+-- | - opacity: Shadow transparency
+-- | - color: Shadow color (RGB 0-1)
+type DropShadowEffect =
+  { shadowColor :: { r :: Number, g :: Number, b :: Number }  -- ^ Shadow color
+  , opacity :: Number            -- ^ Shadow opacity (0-100%)
+  , direction :: Number          -- ^ Shadow direction in degrees (0-360)
+  , distance :: Number           -- ^ Distance in pixels (0-30000)
+  , softness :: Number           -- ^ Blur softness in pixels (0-1000)
+  , shadowOnly :: Boolean        -- ^ Render only the shadow
+  }
+
+defaultDropShadow :: DropShadowEffect
+defaultDropShadow =
+  { shadowColor: { r: 0.0, g: 0.0, b: 0.0 }
+  , opacity: 75.0
+  , direction: 135.0
+  , distance: 5.0
+  , softness: 5.0
+  , shadowOnly: false
+  }
+
+mkDropShadow :: Number -> Number -> Number -> Number -> DropShadowEffect
+mkDropShadow direction distance softness opacity =
+  { shadowColor: { r: 0.0, g: 0.0, b: 0.0 }
+  , opacity: clampNumber 0.0 100.0 opacity
+  , direction: wrapAngle direction
+  , distance: clampNumber 0.0 30000.0 distance
+  , softness: clampNumber 0.0 1000.0 softness
+  , shadowOnly: false
+  }
+
+isDropShadowVisible :: DropShadowEffect -> Boolean
+isDropShadowVisible effect =
+  effect.opacity > 0.0 && (effect.distance > 0.0 || effect.softness > 0.0)
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // bevel // style
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Bevel style for Bevel and Emboss effect.
+data BevelStyle
+  = BevelOuter        -- ^ Bevel on outside edge
+  | BevelInner        -- ^ Bevel on inside edge
+  | BevelEmboss       -- ^ Full emboss effect
+  | BevelPillowEmboss -- ^ Pillow emboss
+  | BevelStrokeEmboss -- ^ Emboss on stroke
+
+derive instance eqBevelStyle :: Eq BevelStyle
+derive instance ordBevelStyle :: Ord BevelStyle
+
+instance showBevelStyle :: Show BevelStyle where
+  show BevelOuter = "Outer Bevel"
+  show BevelInner = "Inner Bevel"
+  show BevelEmboss = "Emboss"
+  show BevelPillowEmboss = "Pillow Emboss"
+  show BevelStrokeEmboss = "Stroke Emboss"
+
+bevelStyleToString :: BevelStyle -> String
+bevelStyleToString = show
+
+bevelStyleFromString :: String -> Maybe BevelStyle
+bevelStyleFromString "Outer Bevel" = Just BevelOuter
+bevelStyleFromString "Inner Bevel" = Just BevelInner
+bevelStyleFromString "Emboss" = Just BevelEmboss
+bevelStyleFromString "Pillow Emboss" = Just BevelPillowEmboss
+bevelStyleFromString "Stroke Emboss" = Just BevelStrokeEmboss
+bevelStyleFromString _ = Nothing
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // bevel // emboss
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Bevel and Emboss effect — adds 3D depth to edges.
+type BevelEmbossEffect =
+  { style :: BevelStyle          -- ^ Type of bevel
+  , depth :: Number              -- ^ Depth of bevel (1-1000%)
+  , direction :: BevelDirection  -- ^ Up or Down
+  , size :: Number               -- ^ Size in pixels (0-250)
+  , soften :: Number             -- ^ Softness in pixels (0-16)
+  , lightAngle :: Number         -- ^ Light source angle (0-360°)
+  , lightAltitude :: Number      -- ^ Light altitude (0-90°)
+  , highlightMode :: HighlightMode  -- ^ Highlight blend mode
+  , highlightColor :: { r :: Number, g :: Number, b :: Number }
+  , highlightOpacity :: Number   -- ^ Highlight opacity (0-100%)
+  , shadowMode :: ShadowMode     -- ^ Shadow blend mode
+  , shadowColor :: { r :: Number, g :: Number, b :: Number }
+  , shadowOpacity :: Number      -- ^ Shadow opacity (0-100%)
+  }
+
+-- | Bevel direction.
+data BevelDirection
+  = BevelUp    -- ^ Light from above
+  | BevelDown  -- ^ Light from below
+
+derive instance eqBevelDirection :: Eq BevelDirection
+derive instance ordBevelDirection :: Ord BevelDirection
+
+instance showBevelDirection :: Show BevelDirection where
+  show BevelUp = "Up"
+  show BevelDown = "Down"
+
+-- | Highlight blend mode.
+data HighlightMode
+  = HMScreen
+  | HMAdd
+  | HMNormal
+
+derive instance eqHighlightMode :: Eq HighlightMode
+derive instance ordHighlightMode :: Ord HighlightMode
+
+instance showHighlightMode :: Show HighlightMode where
+  show HMScreen = "Screen"
+  show HMAdd = "Add"
+  show HMNormal = "Normal"
+
+-- | Shadow blend mode.
+data ShadowMode
+  = SMMultiply
+  | SMDarken
+  | SMNormal
+
+derive instance eqShadowMode :: Eq ShadowMode
+derive instance ordShadowMode :: Ord ShadowMode
+
+instance showShadowMode :: Show ShadowMode where
+  show SMMultiply = "Multiply"
+  show SMDarken = "Darken"
+  show SMNormal = "Normal"
+
+defaultBevelEmboss :: BevelEmbossEffect
+defaultBevelEmboss =
+  { style: BevelInner
+  , depth: 100.0
+  , direction: BevelUp
+  , size: 5.0
+  , soften: 0.0
+  , lightAngle: 120.0
+  , lightAltitude: 30.0
+  , highlightMode: HMScreen
+  , highlightColor: { r: 1.0, g: 1.0, b: 1.0 }
+  , highlightOpacity: 75.0
+  , shadowMode: SMMultiply
+  , shadowColor: { r: 0.0, g: 0.0, b: 0.0 }
+  , shadowOpacity: 75.0
+  }
+
+mkBevelEmboss :: BevelStyle -> Number -> Number -> BevelEmbossEffect
+mkBevelEmboss style depth size =
+  defaultBevelEmboss
+    { style = style
+    , depth = clampNumber 1.0 1000.0 depth
+    , size = clampNumber 0.0 250.0 size
+    }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // stroke // effect
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Stroke position relative to edge.
+data StrokePosition
+  = StrokeOutside  -- ^ Outside layer edge
+  | StrokeInside   -- ^ Inside layer edge
+  | StrokeCenter   -- ^ Centered on edge
+
+derive instance eqStrokePosition :: Eq StrokePosition
+derive instance ordStrokePosition :: Ord StrokePosition
+
+instance showStrokePosition :: Show StrokePosition where
+  show StrokeOutside = "Outside"
+  show StrokeInside = "Inside"
+  show StrokeCenter = "Center"
+
+strokePositionToString :: StrokePosition -> String
+strokePositionToString = show
+
+strokePositionFromString :: String -> Maybe StrokePosition
+strokePositionFromString "Outside" = Just StrokeOutside
+strokePositionFromString "Inside" = Just StrokeInside
+strokePositionFromString "Center" = Just StrokeCenter
+strokePositionFromString _ = Nothing
+
+-- | Stroke effect — adds outline around layer.
+type StrokeEffect =
+  { color :: { r :: Number, g :: Number, b :: Number }  -- ^ Stroke color
+  , size :: Number               -- ^ Stroke width in pixels (0-250)
+  , position :: StrokePosition   -- ^ Stroke position
+  , opacity :: Number            -- ^ Stroke opacity (0-100%)
+  }
+
+defaultStroke :: StrokeEffect
+defaultStroke =
+  { color: { r: 0.0, g: 0.0, b: 0.0 }
+  , size: 3.0
+  , position: StrokeOutside
+  , opacity: 100.0
+  }
+
+mkStroke :: Number -> Number -> Number -> Number -> Number -> StrokePosition -> StrokeEffect
+mkStroke r g b size opacity position =
+  { color: 
+      { r: clampNumber 0.0 1.0 r
+      , g: clampNumber 0.0 1.0 g
+      , b: clampNumber 0.0 1.0 b
+      }
+  , size: clampNumber 0.0 250.0 size
+  , position: position
+  , opacity: clampNumber 0.0 100.0 opacity
+  }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // internal
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Wrap angle to 0-360 range.
+wrapAngle :: Number -> Number
+wrapAngle angle =
+  let normalized = angle - 360.0 * floorNum (angle / 360.0)
+  in if normalized < 0.0 then normalized + 360.0 else normalized
+
+-- | Floor for positive numbers.
+floorNum :: Number -> Number
+floorNum x = x - (x - (x - 0.5))
