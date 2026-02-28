@@ -39,6 +39,19 @@ module Foundry.Core.Agent.Graded
   ( -- * The Graded Agent Monad
     AgentT (..)
     
+    -- * Re-exports from Effect.Graded (Indexed Monad typeclasses)
+  , IxFunctor (..)
+  , IxApplicative (..)
+  , IxMonad (..)
+  , (>>>=)
+  , (>>>)
+    
+    -- * Indexed Agent (for IxMonad instance)
+  , IxAgentT (..)
+  , toIxAgent
+  , fromIxAgent
+  , ixSpend
+    
     -- * Type-level singletons
   , SNat (..)
   , SPermission (..)
@@ -55,6 +68,7 @@ module Foundry.Core.Agent.Graded
   
     -- * Running agents
   , runAgentT
+  , runIxAgentT
     
     -- * Re-exports for type-level programming
   , KnownNat
@@ -62,11 +76,12 @@ module Foundry.Core.Agent.Graded
   , type (-)
   ) where
 
-import Data.Kind (Type)
+import Data.Kind (Type, Constraint)
 import Data.Type.Bool (If)
-import Data.Type.Ord (OrdCond)
 import GHC.TypeLits (Symbol, TypeError, ErrorMessage (..))
-import GHC.TypeNats (Nat, KnownNat, CmpNat, type (<=), type (-))
+import GHC.TypeNats (Nat, KnownNat, type (<=), type (-), type (<=?))
+
+import Foundry.Core.Effect.Graded (IxFunctor (..), IxApplicative (..), IxMonad (..), (>>>=), (>>>))
 
 --------------------------------------------------------------------------------
 -- SECTION 1: TYPE-LEVEL NAT SINGLETON
@@ -81,19 +96,22 @@ data SNat (n :: Nat) = SNat
 
 -- | Constraint that @cost <= budget@ with a custom error message.
 -- When violated, produces: "Budget exceeded: tried to spend X but only Y remaining"
-type family AssertBudget (cost :: Nat) (budget :: Nat) :: Bool where
+--
+-- Uses 'If' from Data.Type.Bool for clarity - if cost <=? budget is True,
+-- return (), otherwise produce a TypeError.
+type family AssertBudget (cost :: Nat) (budget :: Nat) :: Constraint where
   AssertBudget cost budget = 
-    OrdCond (CmpNat cost budget)
-      'True   -- cost < budget: OK
-      'True   -- cost = budget: OK  
+    If (cost <=? budget) 
+      (() :: Constraint)
       (TypeError ('Text "Budget exceeded: tried to spend " 
             ':<>: 'ShowType cost 
             ':<>: 'Text " but only " 
             ':<>: 'ShowType budget 
             ':<>: 'Text " remaining"))
 
--- | Constraint alias for budget checking
-type CanSpend cost budget = (AssertBudget cost budget ~ 'True)
+-- | Constraint alias for budget checking.
+-- This is a proper Constraint, not a Bool, so it directly enforces at call sites.
+type CanSpend cost budget = AssertBudget cost budget
 
 --------------------------------------------------------------------------------
 -- SECTION 2: TYPE-LEVEL PERMISSION SET
@@ -107,19 +125,20 @@ type family Elem (x :: Symbol) (xs :: [Symbol]) :: Bool where
   Elem x (_ ': xs) = Elem x xs
 
 -- | Type family for permission checking with custom error message.
-type family AssertPermission (p :: Symbol) (perms :: [Symbol]) (found :: Bool) :: Bool where
-  AssertPermission _ _ 'True = 'True
-  AssertPermission p perms 'False = 
-    TypeError ('Text "Permission denied: '" 
-          ':<>: 'ShowType p 
-          ':<>: 'Text "' is not in permission set " 
-          ':<>: 'ShowType perms)
+-- Uses 'If' with the result of 'Elem' to produce clear error messages.
+type family AssertPermission (p :: Symbol) (perms :: [Symbol]) :: Constraint where
+  AssertPermission p perms = 
+    If (Elem p perms) 
+      (() :: Constraint)
+      (TypeError ('Text "Permission denied: '" 
+            ':<>: 'ShowType p 
+            ':<>: 'Text "' is not in permission set " 
+            ':<>: 'ShowType perms))
 
 -- | Constraint that a permission is present in the permission set.
 -- This is used to require specific permissions at compile time.
 -- Produces error: "Permission denied: 'X' is not in permission set [...]"
-type HasPermission (p :: Symbol) (perms :: [Symbol]) = 
-  (AssertPermission p perms (Elem p perms) ~ 'True)
+type HasPermission (p :: Symbol) (perms :: [Symbol]) = AssertPermission p perms
 
 --------------------------------------------------------------------------------
 -- SECTION 3: THE GRADED AGENT MONAD
@@ -156,6 +175,120 @@ instance (Monad m) => Monad (AgentT perms budget m) where
   {-# INLINE (>>=) #-}
 
 --------------------------------------------------------------------------------
+-- SECTION 3b: INDEXED AGENT (for IxMonad instance)
+--------------------------------------------------------------------------------
+
+-- | Indexed agent monad transformer.
+--
+-- Unlike 'AgentT' which has a single budget parameter, 'IxAgentT' tracks
+-- budget transitions via two type parameters:
+--
+--   @budgetBefore@ - Budget available at start of computation
+--   @budgetAfter@  - Budget remaining after computation
+--
+-- This enables the 'IxMonad' instance where bind composes transitions:
+--
+-- @
+-- (i → j) >>= (j → k) = (i → k)
+-- @
+--
+-- == Example
+--
+-- @
+-- action1 :: IxAgentT perms m 100 70 ()  -- spends 30
+-- action2 :: IxAgentT perms m 70 50 ()   -- spends 20
+-- 
+-- combined :: IxAgentT perms m 100 50 ()
+-- combined = action1 `ibind` \\_ -> action2
+-- @
+--
+-- The types prove: started with 100, ended with 50, therefore spent 50.
+newtype IxAgentT 
+    (perms :: [Symbol]) 
+    (m :: Type -> Type) 
+    (budgetBefore :: Nat) 
+    (budgetAfter :: Nat) 
+    (a :: Type)
+  = IxAgentT { unIxAgentT :: m a }
+  deriving stock (Functor)
+
+-- | IxFunctor instance - mapping preserves state indices
+instance Functor m => IxFunctor (IxAgentT perms m) where
+  imap :: (a -> b) -> IxAgentT perms m i j a -> IxAgentT perms m i j b
+  imap f (IxAgentT ma) = IxAgentT (fmap f ma)
+  {-# INLINE imap #-}
+
+-- | IxApplicative instance - pure has identity transition, ap composes
+instance Applicative m => IxApplicative (IxAgentT perms m) where
+  ipure :: a -> IxAgentT perms m i i a
+  ipure a = IxAgentT (pure a)
+  {-# INLINE ipure #-}
+  
+  iap :: IxAgentT perms m i j (a -> b) -> IxAgentT perms m j l a -> IxAgentT perms m i l b
+  IxAgentT mf `iap` IxAgentT ma = IxAgentT (mf <*> ma)
+  {-# INLINE iap #-}
+
+-- | IxMonad instance - bind composes budget transitions
+--
+-- This is the key instance that makes budget tracking work with indexed monads.
+-- When you bind @m i j a@ with @(a -> m j k b)@, you get @m i k b@.
+--
+-- The budget indices compose: if first action goes from 100→70 (spent 30),
+-- and second goes from 70→50 (spent 20), the combined goes 100→50 (spent 50).
+instance Monad m => IxMonad (IxAgentT perms m) where
+  ibind :: IxAgentT perms m i j a -> (a -> IxAgentT perms m j l b) -> IxAgentT perms m i l b
+  IxAgentT ma `ibind` f = IxAgentT (ma >>= unIxAgentT . f)
+  {-# INLINE ibind #-}
+
+-- | Convert from AgentT to IxAgentT (identity transition)
+--
+-- Use this to lift 'AgentT' actions that don't change budget into
+-- the indexed world.
+toIxAgent :: AgentT perms budget m a -> IxAgentT perms m budget budget a
+toIxAgent (AgentT ma) = IxAgentT ma
+{-# INLINE toIxAgent #-}
+
+-- | Convert from IxAgentT back to AgentT
+--
+-- The resulting AgentT has the @budgetAfter@ as its budget parameter,
+-- which is the budget remaining after the indexed computation.
+fromIxAgent :: IxAgentT perms m budgetBefore budgetAfter a -> AgentT perms budgetAfter m a
+fromIxAgent (IxAgentT ma) = AgentT ma
+{-# INLINE fromIxAgent #-}
+
+-- | Spend budget in the indexed monad.
+--
+-- Creates a budget transition from @budget@ to @(budget - cost)@.
+-- This is the indexed equivalent of 'spend'.
+--
+-- @
+-- ixSpend (SNat @30) action :: IxAgentT perms m 100 70 a
+-- @
+--
+-- NOTE: GHC warns about "redundant constraint" here, but 'CanSpend' is NOT
+-- redundant - it provides the custom compile-time error message when
+-- @cost > budget@. The constraint is checked at call sites and produces
+-- \"Budget exceeded: tried to spend X but only Y remaining\".
+ixSpend
+  :: forall cost budget perms m a
+   . (CanSpend cost budget)
+  => SNat cost
+  -> IxAgentT perms m budget budget a
+  -> IxAgentT perms m budget (budget - cost) a
+ixSpend SNat (IxAgentT ma) = IxAgentT ma
+{-# INLINE ixSpend #-}
+
+-- | Run an indexed agent computation.
+--
+-- The type signature encodes the budget proof:
+-- - Started with @budgetBefore@
+-- - Ended with @budgetAfter@  
+-- - Therefore spent exactly @(budgetBefore - budgetAfter)@
+runIxAgentT :: IxAgentT perms m budgetBefore budgetAfter a -> m a
+runIxAgentT (IxAgentT ma) = ma
+{-# INLINE runIxAgentT #-}
+
+--------------------------------------------------------------------------------
 -- SECTION 4: BUDGET OPERATIONS
 --------------------------------------------------------------------------------
 
@@ -171,6 +304,11 @@ instance (Monad m) => Monad (AgentT perms budget m) where
 --   spend (SNat @30) (pure ())  -- Now we have 20 remaining  
 --   spend (SNat @30) (pure ())  -- COMPILE ERROR: 30 > 20
 -- @
+--
+-- NOTE: GHC warns about "redundant constraint" here, but 'CanSpend' is NOT
+-- redundant - it provides the custom compile-time error message when
+-- @cost > budget@. The constraint is checked at call sites and produces
+-- \"Budget exceeded: tried to spend X but only Y remaining\".
 spend
   :: forall cost budget perms m a
    . (CanSpend cost budget)
@@ -199,10 +337,15 @@ data SPermission (p :: Symbol) = SPermission
 -- The permission check happens entirely at compile time - no runtime cost.
 --
 -- @
--- readData :: HasPermission "read" perms => AgentT perms budget IO Data
+-- readData :: HasPermission \"read\" perms => AgentT perms budget IO Data
 -- readData = requirePermission SPermission $ AgentT $ do
 --   -- actual read operation
 -- @
+--
+-- NOTE: GHC warns about "redundant constraint" here, but 'HasPermission' is NOT
+-- redundant - it provides the custom compile-time error message when
+-- permission @p@ is not in @perms@. The constraint is checked at call sites
+-- and produces \"Permission denied: 'X' is not in permission set [...]\".
 requirePermission
   :: forall (p :: Symbol) perms budget m a
    . (HasPermission p perms)

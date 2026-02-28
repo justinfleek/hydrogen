@@ -68,6 +68,7 @@ import Data.Vector qualified as V
 import GHC.Generics (Generic)
 
 -- Brand component imports
+import Foundry.Core.Brand.AudioVoice (AudioVoice)
 import Foundry.Core.Brand.Customer (CustomerSegment)
 import Foundry.Core.Brand.Editorial (MasterStyleList)
 import Foundry.Core.Brand.Gradient (GradientSpecification)
@@ -80,6 +81,7 @@ import Foundry.Core.Brand.Material (MaterialSystem)
 import Foundry.Core.Brand.Overview (BrandOverview)
 import Foundry.Core.Brand.Palette (BrandPalette (..))
 import Foundry.Core.Brand.Provenance (Provenance)
+import Foundry.Core.Brand.SonicIdentity (SonicIdentity)
 import Foundry.Core.Brand.Spacing (SpacingScale)
 import Foundry.Core.Brand.Strategy (StrategicLayer)
 import Foundry.Core.Brand.Tagline (TaglineSet)
@@ -189,6 +191,17 @@ data CompleteBrand = CompleteBrand
     -- ^ Patterns, textures, logo-derived motifs (optional)
     
     -- ════════════════════════════════════════════════════════════════════════
+    -- AUDIO LAYER - Voice & Sonic Identity
+    -- ════════════════════════════════════════════════════════════════════════
+    
+  , cbAudioVoice :: !(Maybe AudioVoice)
+    -- ^ TTS voice specification (CosyVoice parameters)
+    -- Reference audio, emotion mapping, vocal character, pronunciation
+  , cbSonicIdentity :: !(Maybe SonicIdentity)
+    -- ^ Music generation specification (ACE-Step parameters)
+    -- Tempo, mood palette, instrumentation, production style
+    
+    -- ════════════════════════════════════════════════════════════════════════
     -- METADATA
     -- ════════════════════════════════════════════════════════════════════════
     
@@ -223,6 +236,8 @@ mkCompleteBrand
   -> Maybe ThemeSet
   -> Maybe UISpecification
   -> Maybe GraphicElementsSpecification
+  -> Maybe AudioVoice
+  -> Maybe SonicIdentity
   -> Provenance
   -> CompleteBrand
 mkCompleteBrand = CompleteBrand
@@ -233,13 +248,15 @@ mkCompleteBrand = CompleteBrand
 
 -- | Lightweight summary of a brand for quick reference
 data BrandSummary = BrandSummary
-  { bsId           :: !BrandId
-  , bsName         :: !BrandName
-  , bsDomain       :: !Domain
-  , bsColorCount   :: !Int
-  , bsFontCount    :: !Int
-  , bsHasLogo      :: !Bool
-  , bsHasThemes    :: !Bool
+  { bsId             :: !BrandId
+  , bsName           :: !BrandName
+  , bsDomain         :: !Domain
+  , bsColorCount     :: !Int
+  , bsFontCount      :: !Int
+  , bsHasLogo        :: !Bool
+  , bsHasThemes      :: !Bool
+  , bsHasAudioVoice  :: !Bool
+  , bsHasSonicId     :: !Bool
   , bsComponentCount :: !Int
   }
   deriving stock (Eq, Show, Generic)
@@ -253,6 +270,8 @@ instance ToJSON BrandSummary where
     , "fontCount"      .= bsFontCount
     , "hasLogo"        .= bsHasLogo
     , "hasThemes"      .= bsHasThemes
+    , "hasAudioVoice"  .= bsHasAudioVoice
+    , "hasSonicId"     .= bsHasSonicId
     , "componentCount" .= bsComponentCount
     ]
 
@@ -266,6 +285,12 @@ summarizeBrand cb = BrandSummary
   , bsFontCount = 2  -- heading + body families
   , bsHasLogo = True  -- Logo is required
   , bsHasThemes = case cbThemes cb of
+      Just _ -> True
+      Nothing -> False
+  , bsHasAudioVoice = case cbAudioVoice cb of
+      Just _ -> True
+      Nothing -> False
+  , bsHasSonicId = case cbSonicIdentity cb of
       Just _ -> True
       Nothing -> False
   , bsComponentCount = countComponents cb
@@ -284,6 +309,8 @@ summarizeBrand cb = BrandSummary
       + maybe 0 (const 1) (cbThemes brand)
       + maybe 0 (const 1) (cbUIElements brand)
       + maybe 0 (const 1) (cbGraphicElements brand)
+      + maybe 0 (const 1) (cbAudioVoice brand)
+      + maybe 0 (const 1) (cbSonicIdentity brand)
 
 --------------------------------------------------------------------------------
 -- Validation

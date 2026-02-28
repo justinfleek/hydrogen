@@ -68,6 +68,9 @@ library
     Foundry.Core.Brand.Typography
     Foundry.Core.Brand.Spacing
     Foundry.Core.Brand.Voice
+    Foundry.Core.Brand.AudioVoice
+    Foundry.Core.Brand.SonicIdentity
+    Foundry.Core.Brand.VideoExtraction
     Foundry.Core.Brand.Strategy
     Foundry.Core.Brand.Tagline
     Foundry.Core.Brand.Editorial
@@ -117,6 +120,10 @@ library
     Foundry.Core.Evring.Sigil
     Foundry.Core.Evring.Trace
     Foundry.Core.Evring.Zmtp
+    -- Scrape: Trusted browser-based brand extraction
+    Foundry.Core.Scrape.Job
+    Foundry.Core.Scrape.Worker
+    Foundry.Core.Scrape.Protocol
     -- NOTE: Wai modules require io_uring (Linux kernel >= 5.1)
     -- Enable when io-uring package is available:
     -- Foundry.Core.Evring.Wai

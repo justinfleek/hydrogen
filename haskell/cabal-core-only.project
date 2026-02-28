@@ -1,0 +1,4 @@
+packages:
+  foundry-core/
+optimization: 2
+tests: True

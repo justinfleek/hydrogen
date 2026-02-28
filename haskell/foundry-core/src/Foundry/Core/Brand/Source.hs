@@ -69,6 +69,7 @@ module Foundry.Core.Brand.Source
   , promoteToManual
   ) where
 
+import Data.Aeson (ToJSON (..), FromJSON (..), (.=), (.:), (.:?), object, withObject)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import GHC.Generics (Generic)
@@ -373,3 +374,142 @@ sourceDescription = \case
   LLMCompleted meta -> "llm:" <> lmModel meta
   Manual meta -> "manual:" <> mmSource meta
   Default meta -> "default:" <> dmReason meta
+
+--------------------------------------------------------------------------------
+-- JSON Instances
+--------------------------------------------------------------------------------
+
+-- | JSON encoding for ScrapedMeta
+instance ToJSON ScrapedMeta where
+  toJSON meta = object
+    [ "selector"   .= smSelector meta
+    , "property"   .= smProperty meta
+    , "rawValue"   .= smRawValue meta
+    , "confidence" .= smConfidence meta
+    , "timestamp"  .= smTimestamp meta
+    ]
+
+instance FromJSON ScrapedMeta where
+  parseJSON = withObject "ScrapedMeta" $ \v -> ScrapedMeta
+    <$> v .: "selector"
+    <*> v .: "property"
+    <*> v .: "rawValue"
+    <*> v .: "confidence"
+    <*> v .: "timestamp"
+
+-- | JSON encoding for InferredMeta
+instance ToJSON InferredMeta where
+  toJSON meta = object
+    [ "method"     .= imMethod meta
+    , "inputs"     .= imInputs meta
+    , "confidence" .= imConfidence meta
+    , "timestamp"  .= imTimestamp meta
+    ]
+
+instance FromJSON InferredMeta where
+  parseJSON = withObject "InferredMeta" $ \v -> InferredMeta
+    <$> v .: "method"
+    <*> v .: "inputs"
+    <*> v .: "confidence"
+    <*> v .: "timestamp"
+
+-- | JSON encoding for LLMMeta
+instance ToJSON LLMMeta where
+  toJSON meta = object
+    [ "model"       .= lmModel meta
+    , "promptHash"  .= lmPromptHash meta
+    , "inputFields" .= lmInputFields meta
+    , "confidence"  .= lmConfidence meta
+    , "needsReview" .= lmNeedsReview meta
+    , "timestamp"   .= lmTimestamp meta
+    ]
+
+instance FromJSON LLMMeta where
+  parseJSON = withObject "LLMMeta" $ \v -> LLMMeta
+    <$> v .: "model"
+    <*> v .: "promptHash"
+    <*> v .: "inputFields"
+    <*> v .: "confidence"
+    <*> v .: "needsReview"
+    <*> v .: "timestamp"
+
+-- | JSON encoding for ManualMeta
+instance ToJSON ManualMeta where
+  toJSON meta = object
+    [ "source"    .= mmSource meta
+    , "reviewer"  .= mmReviewer meta
+    , "notes"     .= mmNotes meta
+    , "timestamp" .= mmTimestamp meta
+    ]
+
+instance FromJSON ManualMeta where
+  parseJSON = withObject "ManualMeta" $ \v -> ManualMeta
+    <$> v .: "source"
+    <*> v .:? "reviewer"
+    <*> v .:? "notes"
+    <*> v .: "timestamp"
+
+-- | JSON encoding for DefaultMeta
+instance ToJSON DefaultMeta where
+  toJSON meta = object
+    [ "reason"     .= dmReason meta
+    , "suggestion" .= dmSuggestion meta
+    , "timestamp"  .= dmTimestamp meta
+    ]
+
+instance FromJSON DefaultMeta where
+  parseJSON = withObject "DefaultMeta" $ \v -> DefaultMeta
+    <$> v .: "reason"
+    <*> v .:? "suggestion"
+    <*> v .: "timestamp"
+
+-- | JSON encoding for Source
+--
+-- Uses tagged encoding: { "type": "scraped", "meta": {...} }
+instance ToJSON Source where
+  toJSON src = case src of
+    Scraped meta -> object
+      [ "type" .= ("scraped" :: Text)
+      , "meta" .= meta
+      ]
+    Inferred meta -> object
+      [ "type" .= ("inferred" :: Text)
+      , "meta" .= meta
+      ]
+    LLMCompleted meta -> object
+      [ "type" .= ("llmCompleted" :: Text)
+      , "meta" .= meta
+      ]
+    Manual meta -> object
+      [ "type" .= ("manual" :: Text)
+      , "meta" .= meta
+      ]
+    Default meta -> object
+      [ "type" .= ("default" :: Text)
+      , "meta" .= meta
+      ]
+
+instance FromJSON Source where
+  parseJSON = withObject "Source" $ \v -> do
+    typ <- v .: "type"
+    case (typ :: Text) of
+      "scraped"      -> Scraped      <$> v .: "meta"
+      "inferred"     -> Inferred     <$> v .: "meta"
+      "llmCompleted" -> LLMCompleted <$> v .: "meta"
+      "manual"       -> Manual       <$> v .: "meta"
+      "default"      -> Default      <$> v .: "meta"
+      other          -> fail $ "Unknown Source type: " <> show other
+
+-- | JSON encoding for Sourced
+--
+-- Embeds source alongside value: { "value": ..., "source": {...} }
+instance ToJSON a => ToJSON (Sourced a) where
+  toJSON s = object
+    [ "value"  .= sourcedValue s
+    , "source" .= sourcedSource s
+    ]
+
+instance FromJSON a => FromJSON (Sourced a) where
+  parseJSON = withObject "Sourced" $ \v -> Sourced
+    <$> v .: "value"
+    <*> v .: "source"

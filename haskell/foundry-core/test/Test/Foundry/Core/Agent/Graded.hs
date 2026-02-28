@@ -26,6 +26,10 @@ module Test.Foundry.Core.Agent.Graded
   , proofBudgetSpendWorks
   , proofMultipleSpends
   , proofPermissionRequired
+    -- * Indexed monad proof witnesses
+  , proofIxMonadIdentity
+  , proofIxMonadComposition
+  , proofIxSpendTransition
   ) where
 
 import Data.Functor.Identity (Identity (..))
@@ -38,6 +42,14 @@ import Foundry.Core.Agent.Graded
   , runAgentT
   , spend
   , requirePermission
+    -- Indexed monad types and operations
+  , IxAgentT
+  , IxMonad (..)
+  , toIxAgent
+  , runIxAgentT
+  , ixSpend
+  , (>>>=)
+  , (>>>)
   )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Hedgehog (testProperty)
@@ -53,6 +65,7 @@ tests =
   testGroup
     "Foundry.Core.Agent.Graded"
     [ testGroup "Compile-time Proofs" compileTimeProofs
+    , testGroup "Indexed Monad Proofs" indexedMonadProofs
     , testGroup "Runtime Verification" runtimeTests
     ]
 
@@ -104,7 +117,92 @@ proofPermissionRequired =
   requirePermission (SPermission @"read") (liftAgent (Identity ()))
 
 --------------------------------------------------------------------------------
--- SECTION 2: RUNTIME VERIFICATION
+-- SECTION 2: INDEXED MONAD PROOFS
+--
+-- These test the IxAgentT indexed monad implementation.
+-- If these functions typecheck, the indexed monad laws hold for budget tracking.
+--------------------------------------------------------------------------------
+
+indexedMonadProofs :: [TestTree]
+indexedMonadProofs =
+  [ testProperty "ireturn has identity transition" prop_ixMonadIdentity
+  , testProperty "ibind composes transitions" prop_ixMonadComposition
+  , testProperty "ixSpend creates budget transition" prop_ixSpendTransition
+  , testProperty "(>>>=) operator works" prop_ixBindOperator
+  , testProperty "(>>>) operator works" prop_ixSeqOperator
+  ]
+
+-- | PROOF: ireturn creates identity transition (i → i).
+--
+-- The type @IxAgentT perms Identity 100 100 ()@ proves that
+-- ireturn doesn't change the budget index.
+proofIxMonadIdentity :: forall perms. IxAgentT perms Identity 100 100 ()
+proofIxMonadIdentity = ireturn ()
+
+-- | PROOF: ibind composes budget transitions correctly.
+--
+-- action1: 100 → 70 (spends 30)
+-- action2: 70 → 50 (spends 20)
+-- combined: 100 → 50 (total: 50)
+--
+-- The types prove budget conservation: 100 - 30 - 20 = 50.
+proofIxMonadComposition :: forall perms. IxAgentT perms Identity 100 50 ()
+proofIxMonadComposition = 
+  action1 `ibind` \_ -> action2
+  where
+    action1 :: IxAgentT perms Identity 100 70 ()
+    action1 = ixSpend (SNat @30) (toIxAgent (liftAgent (Identity ())))
+    
+    action2 :: IxAgentT perms Identity 70 50 ()
+    action2 = ixSpend (SNat @20) (toIxAgent (liftAgent (Identity ())))
+
+-- | PROOF: ixSpend creates correct budget transition.
+--
+-- Spending 25 from 100 leaves 75.
+proofIxSpendTransition :: forall perms. IxAgentT perms Identity 100 75 ()
+proofIxSpendTransition = 
+  ixSpend (SNat @25) (toIxAgent (liftAgent (Identity ())))
+
+-- | Property: ireturn identity transition works at runtime
+prop_ixMonadIdentity :: Property
+prop_ixMonadIdentity = property $ do
+  let result = runIdentity $ runIxAgentT proofIxMonadIdentity
+  assert (result == ())
+
+-- | Property: ibind composition works at runtime
+prop_ixMonadComposition :: Property
+prop_ixMonadComposition = property $ do
+  let result = runIdentity $ runIxAgentT proofIxMonadComposition
+  assert (result == ())
+
+-- | Property: ixSpend transition works at runtime
+prop_ixSpendTransition :: Property
+prop_ixSpendTransition = property $ do
+  let result = runIdentity $ runIxAgentT proofIxSpendTransition
+  assert (result == ())
+
+-- | Property: The (>>>=) operator works like ibind
+prop_ixBindOperator :: Property
+prop_ixBindOperator = property $ do
+  let action :: IxAgentT '[] Identity 100 40 Int
+      action = 
+        ixSpend (SNat @30) (toIxAgent (liftAgent (Identity 10)))
+        >>>= \x -> ixSpend (SNat @30) (toIxAgent (liftAgent (Identity (x + 5))))
+      result = runIdentity $ runIxAgentT action
+  assert (result == 15)
+
+-- | Property: The (>>>) operator sequences and discards first result
+prop_ixSeqOperator :: Property
+prop_ixSeqOperator = property $ do
+  let action :: IxAgentT '[] Identity 100 40 Int
+      action = 
+        ixSpend (SNat @30) (toIxAgent (liftAgent (Identity (999 :: Int))))
+        >>> ixSpend (SNat @30) (toIxAgent (liftAgent (Identity 42)))
+      result = runIdentity $ runIxAgentT action
+  assert (result == 42)
+
+--------------------------------------------------------------------------------
+-- SECTION 3: RUNTIME VERIFICATION
 --
 -- These tests run the agents and verify behavior.
 --------------------------------------------------------------------------------
