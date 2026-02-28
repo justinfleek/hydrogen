@@ -11,6 +11,8 @@
 -- | import Hydrogen.UI.Core (cls, row, column)
 -- | import Hydrogen.UI.Loading (loadingState, spinnerMd)
 -- | import Hydrogen.UI.Error (errorState, emptyState)
+-- | import Hydrogen.UI.Dialog as Dialog
+-- | import Hydrogen.UI.Tabs as Tabs
 -- | import Hydrogen.Data.Format (formatBytes, formatDuration)
 -- | import Hydrogen.Data.RemoteData (RemoteData(..))
 -- | import Hydrogen.Query as Q
@@ -23,6 +25,11 @@
 -- | - **Hydrogen.UI.Core** - Layout and class utilities
 -- | - **Hydrogen.UI.Loading** - Loading states and skeletons
 -- | - **Hydrogen.UI.Error** - Error and empty states
+-- | - **Hydrogen.UI.Dialog** - Accessible modal dialog with focus trapping
+-- | - **Hydrogen.UI.Tabs** - Accessible tabs with keyboard navigation
+-- | - **Hydrogen.UI.FocusTrap** - Focus management utilities
+-- | - **Hydrogen.UI.AriaHider** - Screen reader isolation utilities
+-- | - **Hydrogen.UI.Id** - Unique ID generation for accessibility
 -- | - **Hydrogen.Data.Format** - Number/byte/duration formatting
 -- | - **Hydrogen.Data.RemoteData** - RemoteData type for async state (lawful Monad)
 -- | - **Hydrogen.SSG** - Static site generation
@@ -34,6 +41,9 @@ module Hydrogen
   , module Hydrogen.UI.Core
   , module Hydrogen.UI.Loading
   , module Hydrogen.UI.Error
+  , module Hydrogen.UI.FocusTrap
+  , module Hydrogen.UI.AriaHider
+  , module Hydrogen.UI.Id
   , module Hydrogen.Data.Format
   , module Hydrogen.Data.RemoteData
   , module Hydrogen.SSG
@@ -45,6 +55,9 @@ import Hydrogen.API.Client (ApiConfig, defaultConfig, withAuth, withLogging, get
 import Hydrogen.UI.Core (classes, cls, svgCls, flex, row, column, box, container, section, svgNS)
 import Hydrogen.UI.Loading (spinner, spinnerSm, spinnerMd, spinnerLg, loadingState, loadingInline, loadingCard, loadingCardLarge, skeletonText, skeletonRow)
 import Hydrogen.UI.Error (errorState, errorCard, errorBadge, errorInline, emptyState)
+import Hydrogen.UI.FocusTrap (FocusScope, createFocusScope, destroyFocusScope, trapFocus, releaseFocus, handleTabKey, focusFirst, focusLast, getTabbableElements)
+import Hydrogen.UI.AriaHider (AriaHiderState, hideOthers, restoreOthers)
+import Hydrogen.UI.Id (IdGenerator, createIdGenerator, nextId, useId)
 import Hydrogen.Data.Format (formatBytes, formatBytesCompact, parseBytes, kb, mb, gb, tb, formatNum, formatNumCompact, formatPercent, formatCount, formatDuration, formatDurationCompact, formatDurationMs, percentage, rate, ratio)
 import Hydrogen.Data.RemoteData (RemoteData(..), fromEither, fromMaybe, toEither, toMaybe, fold, withDefault, isNotAsked, isLoading, isFailure, isSuccess, mapError, map2, map3, map4, sequence, traverse)
 import Hydrogen.SSG (DocConfig, defaultDocConfig, PageMeta, renderPage, renderDocument, pageMetaFromRoute, renderRouteStatic, metaTags, ogTags, twitterTags)

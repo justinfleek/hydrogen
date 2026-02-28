@@ -41,6 +41,10 @@ package:
     - web-dom
     - web-html
     - web-events
+    - web-uievents
+    # FFI support
+    - aff-promise
+    - nullable
   test:
     main: Test.Main
     dependencies:
