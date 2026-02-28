@@ -80,6 +80,8 @@ module Hydrogen.Schema.Motion.Layer
   , layerPreserveTransparency
   , layerFrameBlending
   , layerTimeRemapEnabled
+  , layerCollapseTransformations
+  , layerAutoOrient
   
   -- * Predicates
   , isLayerVisible
@@ -93,26 +95,43 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , class Semigroup
+  , class Monoid
   , ($)
+  , (#)
+  , (<<<)
+  , (>>>)
+  , (<>)
   , (&&)
   , (||)
+  , not
   , (==)
   , (/=)
-  , (>)
-  , (>=)
   , (<)
   , (<=)
+  , (>)
+  , (>=)
+  , compare
+  , min
+  , max
   , (+)
   , (-)
   , (*)
-  , (<>)
-  , max
-  , min
+  , (/)
+  , negate
   , otherwise
   , show
+  , map
+  , pure
+  , bind
+  , identity
+  , const
+  , flip
+  , apply
   )
 
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Ord (abs)
 import Data.String (length) as String
 import Data.String.CodeUnits (toCharArray) as String
 import Data.Array (index, length) as Array
@@ -121,6 +140,7 @@ import Hydrogen.Schema.Motion.Composition
   ( BlendMode(..)
   , TrackMatteMode(..)
   )
+import Hydrogen.Schema.Motion.Camera3D.Enums (AutoOrientMode(..))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // layer // id
@@ -411,6 +431,8 @@ newtype LayerBase = LayerBase
   , preserveTransparency :: Boolean
   , frameBlending :: Boolean
   , timeRemapEnabled :: Boolean
+  , collapseTransformations :: Boolean  -- ^ Collapse transformations / Continuously rasterize
+  , autoOrient :: AutoOrientMode        -- ^ Auto-orientation mode for layer
   }
 
 derive instance eqLayerBase :: Eq LayerBase
@@ -452,6 +474,8 @@ defaultLayerBase id name lt = LayerBase
   , preserveTransparency: false
   , frameBlending: false
   , timeRemapEnabled: false
+  , collapseTransformations: false
+  , autoOrient: AOMOff
   }
 
 -- | Smart constructor for LayerBase with validation.
@@ -496,6 +520,8 @@ mkLayerBase id name lt (Frames start) (Frames end)
       , preserveTransparency: false
       , frameBlending: false
       , timeRemapEnabled: false
+      , collapseTransformations: false
+      , autoOrient: AOMOff
       }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -613,6 +639,23 @@ layerFrameBlending (LayerBase l) = l.frameBlending
 -- | Get time remap enabled state.
 layerTimeRemapEnabled :: LayerBase -> Boolean
 layerTimeRemapEnabled (LayerBase l) = l.timeRemapEnabled
+
+-- | Get collapse transformations state.
+-- |
+-- | When enabled on a pre-comp layer, renders at composition resolution
+-- | instead of pre-comp resolution. When enabled on a vector layer (shape,
+-- | text), continuously rasterizes at current scale.
+layerCollapseTransformations :: LayerBase -> Boolean
+layerCollapseTransformations (LayerBase l) = l.collapseTransformations
+
+-- | Get auto-orient mode.
+-- |
+-- | Controls automatic layer orientation:
+-- | - Off: No auto-orientation
+-- | - Along Path: Layer orients along motion path tangent
+-- | - Towards POI: Layer always faces point of interest
+layerAutoOrient :: LayerBase -> AutoOrientMode
+layerAutoOrient (LayerBase l) = l.autoOrient
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // predicates

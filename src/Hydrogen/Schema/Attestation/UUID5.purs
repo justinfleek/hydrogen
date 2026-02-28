@@ -58,6 +58,13 @@ module Hydrogen.Schema.Attestation.UUID5
   , nsMaterial
   , nsLight
   , nsCamera
+  -- * Motion Graphics Namespaces
+  , nsLayer
+  , nsComposition
+  , nsProperty
+  , nsEffect
+  , nsMask
+  , nsKeyframe
   -- * GPU/Render Namespaces
   , nsRenderEffect
   , nsComputeKernel
@@ -303,6 +310,71 @@ nsCamera :: UUID5
 nsCamera = UUID5
   [ 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x68
   , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // motion graphics namespaces
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Namespace for Hydrogen Layer UUIDs
+-- |
+-- | Layers with identical content get identical UUIDs.
+-- | Two agents creating the same layer (type, name, timing) → same UUID.
+-- | Derived from: uuid5(nil, "hydrogen.layer")
+nsLayer :: UUID5
+nsLayer = UUID5
+  [ 0x6c, 0x61, 0x79, 0x65, 0x72, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Composition UUIDs
+-- |
+-- | Compositions with identical settings get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.composition")
+nsComposition :: UUID5
+nsComposition = UUID5
+  [ 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x73, 0x69, 0x74
+  , 0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x79, 0x64, 0x72
+  ]
+
+-- | Namespace for Hydrogen Property UUIDs
+-- |
+-- | Animatable properties with identical path get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.property")
+nsProperty :: UUID5
+nsProperty = UUID5
+  [ 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Effect UUIDs
+-- |
+-- | Effects with identical type and parameters get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.effect")
+nsEffect :: UUID5
+nsEffect = UUID5
+  [ 0x65, 0x66, 0x66, 0x65, 0x63, 0x74, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Mask UUIDs
+-- |
+-- | Masks with identical path data get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.mask")
+nsMask :: UUID5
+nsMask = UUID5
+  [ 0x6d, 0x61, 0x73, 0x6b, 0x5f, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
+  ]
+
+-- | Namespace for Hydrogen Keyframe UUIDs
+-- |
+-- | Keyframes with identical frame/value get identical UUIDs.
+-- | Derived from: uuid5(nil, "hydrogen.keyframe")
+nsKeyframe :: UUID5
+nsKeyframe = UUID5
+  [ 0x6b, 0x65, 0x79, 0x66, 0x72, 0x61, 0x6d, 0x65
+  , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
   ]
 
 -- ═════════════════════════════════════════════════════════════════════════════

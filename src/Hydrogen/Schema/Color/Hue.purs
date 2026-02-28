@@ -15,7 +15,8 @@
 -- | Hue is cyclic - values outside 0-359 wrap around.
 
 module Hydrogen.Schema.Color.Hue
-  ( Hue
+  ( -- * Hue (0-359)
+    Hue
   , hue
   , hueWrap
   , unwrap
@@ -50,6 +51,16 @@ module Hydrogen.Schema.Color.Hue
   , cyan
   , blue
   , magenta
+  
+  -- * HueShift (-180 to 180, wraps)
+  , HueShift
+  , hueShift
+  , hueShiftWrap
+  , unwrapHueShift
+  , hueShiftBounds
+  , applyHueShift
+  , noHueShift
+  , negateHueShift
   ) where
 
 import Prelude
@@ -320,3 +331,73 @@ toNumber (Hue h) = Int.toNumber h
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
 bounds = Bounded.intBounds 0 359 "hue" "Color wheel position in degrees"
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // hue shift // ±180
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Hue shift - adjustment to a hue value.
+-- |
+-- | Measured in degrees from -180 to 180:
+-- | - **-180°**: Shift to complement (same as +180)
+-- | - **0°**: No change
+-- | - **+180°**: Shift to complement
+-- |
+-- | Used in color correction effects like Hue/Saturation adjustment.
+-- | Values wrap: +200° becomes -160° (equivalent rotation).
+newtype HueShift = HueShift Number
+
+derive instance eqHueShift :: Eq HueShift
+derive instance ordHueShift :: Ord HueShift
+
+instance showHueShift :: Show HueShift where
+  show (HueShift h) = show h <> "°"
+
+-- | Create HueShift, wrapping to -180 to 180 range.
+-- |
+-- | This ensures values always represent the shortest path:
+-- | - `hueShift 200` = `hueShift (-160)`
+-- | - `hueShift (-270)` = `hueShift 90`
+hueShift :: Number -> HueShift
+hueShift n = HueShift (wrapHueShift n)
+
+-- | Create HueShift with explicit wrapping (alias)
+hueShiftWrap :: Number -> HueShift
+hueShiftWrap = hueShift
+
+-- | Extract the raw Number value (-180 to 180)
+unwrapHueShift :: HueShift -> Number
+unwrapHueShift (HueShift h) = h
+
+-- | Apply hue shift to a Hue, returning rotated Hue.
+applyHueShift :: HueShift -> Hue -> Hue
+applyHueShift (HueShift shift) h = rotate (Int.round shift) h
+
+-- | No change (0°)
+noHueShift :: HueShift
+noHueShift = HueShift 0.0
+
+-- | Negate a hue shift
+negateHueShift :: HueShift -> HueShift
+negateHueShift (HueShift h) = HueShift (negate h)
+
+-- | Bounds documentation for HueShift
+hueShiftBounds :: Bounded.NumberBounds
+hueShiftBounds = Bounded.numberBounds (-180.0) 180.0 "hueShift" 
+  "Hue adjustment in degrees (-180 to 180)"
+
+-- | Wrap value to -180 to 180 range.
+-- |
+-- | Ensures values represent shortest rotation path.
+wrapHueShift :: Number -> Number
+wrapHueShift n =
+  let 
+    -- Normalize to 0-360 first
+    normalized = n - 360.0 * floor' (n / 360.0)
+    -- Then shift to -180 to 180
+  in if normalized > 180.0 
+     then normalized - 360.0 
+     else normalized
+  where
+  floor' :: Number -> Number
+  floor' x = Int.toNumber (Int.round (x - 0.5))

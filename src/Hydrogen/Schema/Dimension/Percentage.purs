@@ -27,6 +27,23 @@ module Hydrogen.Schema.Dimension.Percentage
   , toPercent
   , percentOf
   
+  -- * SignedPercent (-100 to 100)
+  , SignedPercent(SignedPercent)
+  , signedPercent
+  , unwrapSignedPercent
+  , signedPercentBounds
+  , negateSignedPercent
+  , zeroSignedPercent
+  
+  -- * IntensityPercent (0-400)
+  -- For AE light intensity (allows overbright)
+  , IntensityPercent(IntensityPercent)
+  , intensityPercent
+  , unwrapIntensityPercent
+  , intensityPercentBounds
+  , fullIntensity
+  , doubleIntensity
+  
   -- * Ratio (0.0-1.0)
   , Ratio(Ratio)
   , ratio
@@ -36,6 +53,14 @@ module Hydrogen.Schema.Dimension.Percentage
   , half
   , quarter
   , full
+  
+  -- * SignedRatio (-1.0 to 1.0)
+  , SignedRatio(SignedRatio)
+  , signedRatio
+  , unwrapSignedRatio
+  , signedRatioBounds
+  , negateSignedRatio
+  , zeroSignedRatio
   
   -- * Proportion (unbounded)
     -- For aspect ratios like 16:9, 4:3
@@ -60,6 +85,7 @@ import Prelude
   , class Ord
   , class Show
   , show
+  , negate
   , (*)
   , (/)
   , (<>)
@@ -106,6 +132,90 @@ percentOf :: Percent -> Number -> Number
 percentOf p v = v * (unwrapPercent p / 100.0)
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // signed percent // ±100
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Signed percentage value - -100 to 100.
+-- |
+-- | Used for adjustments that can go positive or negative:
+-- | - Saturation adjustment (-100 = full desaturation, +100 = double saturation)
+-- | - Lightness adjustment (-100 = full darken, +100 = full lighten)
+-- | - Contrast adjustment
+-- | - Exposure adjustment
+-- |
+-- | Automatically clamped to -100 to 100 range.
+newtype SignedPercent = SignedPercent Number
+
+derive instance eqSignedPercent :: Eq SignedPercent
+derive instance ordSignedPercent :: Ord SignedPercent
+
+instance showSignedPercent :: Show SignedPercent where
+  show (SignedPercent v) = show v <> "%"
+
+-- | Create SignedPercent from Number (clamped -100 to 100)
+signedPercent :: Number -> SignedPercent
+signedPercent = SignedPercent <<< Math.clamp (-100.0) 100.0
+
+-- | Unwrap SignedPercent to raw Number
+unwrapSignedPercent :: SignedPercent -> Number
+unwrapSignedPercent (SignedPercent v) = v
+
+-- | Negate a signed percent
+negateSignedPercent :: SignedPercent -> SignedPercent
+negateSignedPercent (SignedPercent v) = SignedPercent (negate v)
+
+-- | Zero adjustment (no change)
+zeroSignedPercent :: SignedPercent
+zeroSignedPercent = SignedPercent 0.0
+
+-- | Bounds for SignedPercent
+signedPercentBounds :: Bounded.NumberBounds
+signedPercentBounds = Bounded.numberBounds (-100.0) 100.0 "signedPercent" 
+  "Signed percentage adjustment (-100 to 100)"
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // intensity percent // 0 to 400
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Intensity percentage - 0 to 400.
+-- |
+-- | Used for light intensity in After Effects where values can exceed 100%:
+-- | - 0%: No light (off)
+-- | - 100%: Normal intensity
+-- | - 200%: Double intensity (overbright)
+-- | - 400%: Maximum intensity
+-- |
+-- | Automatically clamped to 0-400 range.
+newtype IntensityPercent = IntensityPercent Number
+
+derive instance eqIntensityPercent :: Eq IntensityPercent
+derive instance ordIntensityPercent :: Ord IntensityPercent
+
+instance showIntensityPercent :: Show IntensityPercent where
+  show (IntensityPercent v) = show v <> "%"
+
+-- | Create IntensityPercent from Number (clamped 0-400)
+intensityPercent :: Number -> IntensityPercent
+intensityPercent = IntensityPercent <<< Math.clamp 0.0 400.0
+
+-- | Unwrap IntensityPercent to raw Number
+unwrapIntensityPercent :: IntensityPercent -> Number
+unwrapIntensityPercent (IntensityPercent v) = v
+
+-- | Full intensity (100%)
+fullIntensity :: IntensityPercent
+fullIntensity = IntensityPercent 100.0
+
+-- | Double intensity (200%)
+doubleIntensity :: IntensityPercent
+doubleIntensity = IntensityPercent 200.0
+
+-- | Bounds for IntensityPercent
+intensityPercentBounds :: Bounded.NumberBounds
+intensityPercentBounds = Bounded.numberBounds 0.0 400.0 "intensityPercent"
+  "Intensity percentage (0-400%, allows overbright)"
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // ratio // 0 1
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -148,6 +258,47 @@ quarter = Ratio 0.25
 -- | Full (1.0)
 full :: Ratio
 full = Ratio 1.0
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // signed ratio // ±1.0
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Signed normalized ratio - -1.0 to 1.0.
+-- |
+-- | Used for adjustments that can go positive or negative:
+-- | - Color wheel offsets
+-- | - Balance adjustments
+-- | - Normalized deltas
+-- |
+-- | Automatically clamped to -1.0 to 1.0 range.
+newtype SignedRatio = SignedRatio Number
+
+derive instance eqSignedRatio :: Eq SignedRatio
+derive instance ordSignedRatio :: Ord SignedRatio
+
+instance showSignedRatio :: Show SignedRatio where
+  show (SignedRatio v) = show v
+
+-- | Create SignedRatio from Number (clamped -1.0 to 1.0)
+signedRatio :: Number -> SignedRatio
+signedRatio = SignedRatio <<< Math.clamp (-1.0) 1.0
+
+-- | Unwrap SignedRatio to raw Number
+unwrapSignedRatio :: SignedRatio -> Number
+unwrapSignedRatio (SignedRatio v) = v
+
+-- | Negate a signed ratio
+negateSignedRatio :: SignedRatio -> SignedRatio
+negateSignedRatio (SignedRatio v) = SignedRatio (negate v)
+
+-- | Zero adjustment (no change)
+zeroSignedRatio :: SignedRatio
+zeroSignedRatio = SignedRatio 0.0
+
+-- | Bounds for SignedRatio
+signedRatioBounds :: Bounded.NumberBounds
+signedRatioBounds = Bounded.numberBounds (-1.0) 1.0 "signedRatio"
+  "Signed normalized ratio (-1.0 to 1.0)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // proportion // unbounded
