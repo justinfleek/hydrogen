@@ -1,6 +1,6 @@
 # Schema Pillar Reference
 
-**1,021 PureScript files across 38 pillars.**
+**1,100 PureScript files across 38 pillars.**
 
 Full enumeration of atoms, molecules, and compounds for all design system primitives.
 
@@ -31,7 +31,7 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | [Attestation](./13-attestation.md) | 12 | Cryptographic integrity, UUID5, signatures | ✓ |
 | [Audio](./10b-audio.md) | 44 | Synthesis, effects, MIDI, spatial audio | ✓ |
 | [Brand](./12-brand.md) | 37 | Design tokens, theme composition | — |
-| [Brush](./32-brush.md) | 5 | Brush tips for drawing applications | ✓ |
+| [Brush](./32-brush.md) | 68 | Brush tips, presets, blend modes, erasers | ✓ |
 | [Color](./01-color.md) | 58 | sRGB, P3, LAB, OKLCH, ACES, CDL, LUTs, CVD | ✓ |
 | [Compute](./29-compute.md) | 4 | ML compute graphs, DAG operations | ✓ |
 | [Dimension](./02-dimension.md) | 47 | SI units (yocto→quetta), device units, spacing | ✓ |
@@ -148,12 +148,12 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | Element | 5 | Core UI primitives |
 | Accessibility | 6 | A11y |
 
-### Storage & Media (3 pillars, 14 files)
+### Storage & Media (3 pillars, 77 files)
 
 | Pillar | Files | Purpose |
 |--------|------:|---------|
 | Media | 5 | Audio/video/image |
-| Brush | 5 | Drawing tools |
+| Brush | 68 | Drawing tools |
 | Storage | 4 | Persistence |
 
 ### Utility (1 pillar, 1 file)
@@ -172,7 +172,7 @@ src/Hydrogen/Schema/
 ├── Attestation/     (12)     ├── Graph/        (19)      ├── Reactive/      (48)
 ├── Audio/           (44)     ├── Haptic/        (4)      ├── Scheduling/     (8)
 ├── Brand/           (37)     ├── Identity/      (1)      ├── Sensation/     (13)
-├── Brush/            (5)     ├── Media/         (5)      ├── Spatial/       (64)
+├── Brush/           (68)     ├── Media/         (5)      ├── Spatial/       (64)
 ├── Color/           (58)     ├── Motion/      (169)      ├── Storage/        (4)
 ├── Compute/          (4)     ├── Navigation/    (2)      ├── Surface/       (43)
 ├── Dimension/       (47)     ├── Network/      (21)      ├── Temporal/      (39)
