@@ -247,3 +247,129 @@ newtype Granulation = Granulation Number -- 0-100%, clamps
 newtype Diffusion = Diffusion Number    -- 0-100%, clamps
 ```
 
+
+### 2. WetMedia/Config.purs (COMPLETE)
+
+Configuration records:
+
+```purescript
+type WetMediaConfig =
+  { mediaType :: WetMediaType
+  , wetness :: Wetness
+  , viscosity :: Viscosity
+  , dilution :: Dilution
+  , pigmentLoad :: PigmentLoad
+  , bleedRate :: BleedRate
+  , dryingRate :: DryingRate
+  }
+
+type WatercolorConfig =
+  { wetness :: Wetness
+  , edgeBleed :: BleedRate
+  , granulation :: Granulation
+  , diffusion :: Diffusion
+  , backruns :: Boolean
+  , paperAbsorption :: Wetness
+  , tiltAngle :: Number           -- From Brush/Tilt
+  , tiltDirection :: Number       -- From Brush/Tilt
+  }
+
+type OilPaintConfig =
+  { thickness :: Viscosity
+  , oilAmount :: Wetness
+  , bristleTrails :: Boolean
+  , colorMixing :: Dilution
+  , loadDepletion :: Boolean
+  , paintRopiness :: Viscosity
+  }
+```
+
+### 3. WetMedia/Dynamics.purs (COMPLETE)
+
+Integration with physics systems:
+
+```purescript
+-- Convert device tilt to gravity direction for paint flow
+tiltToGravity :: Number -> Number -> GravityDirection
+
+-- Calculate paint flow velocity based on:
+-- - Current wetness
+-- - Surface viscosity  
+-- - Gravity direction (from device tilt)
+calculateFlowVelocity :: Wetness -> Viscosity -> GravityDirection -> Number -> FlowVelocity
+
+-- Apply drying over time using exponential decay
+applyDrying :: Wetness -> DryingRate -> Number -> Wetness
+
+-- Calculate effective drag for physics system
+effectiveDrag :: Wetness -> Viscosity -> Number
+```
+
+
+════════════════════════════════════════════════════════════════════════════════
+                                                      // app // architecture
+════════════════════════════════════════════════════════════════════════════════
+
+## Runtime Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              DEVICE SENSORS                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Accelerometer (pitch/roll) ──► TiltX, TiltY ──► GravityDirection           │
+│  Gyroscope (heading) ──────────► Azimuth ──────► Flow direction             │
+│  Stylus (pressure/tilt) ──────► Pressure, Altitude ──► Brush dynamics       │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              PHYSICS LAYER                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  GravityDirection + Viscosity + Friction ──► Paint flow velocity            │
+│  SpringForce (settling) ────────────────► Paint pooling at edges            │
+│  DragForce (viscosity) ─────────────────► Flow resistance                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            SIMULATION LAYER                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  WetMediaConfig ────► calculateFlowVelocity() ──► Paint movement            │
+│  DryingRate × Time ──► applyDrying() ───────────► Reduced wetness           │
+│  Pigment particles ──► Physics step ────────────► Updated positions         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             RENDER LAYER                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Pigment grid ────────────────► WebGL texture ──► Display                   │
+│  Edge detection ──────────────► Highlight pooling areas                     │
+│  Granulation noise ───────────► Texture in pigment settling                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## User Experience
+
+1. **Paint a watercolor stroke** — wet pigment appears on canvas
+2. **Tilt phone left** — paint slides left, pools at edge
+3. **Tilt phone forward** — paint flows down, creates runs
+4. **Hold steady** — paint settles, granulation appears
+5. **Wait** — paint dries, wetness decreases, flow stops
+6. **Paint into wet area** — colors blend (wet-in-wet)
+7. **Paint onto dry area** — crisp edges (wet-on-dry)
+
+## Implementation Status
+
+| Module | Files | Lines | Status |
+|--------|-------|-------|--------|
+| WetMedia/Types.purs | 1 | 230 | Complete |
+| WetMedia/Atoms.purs | 1 | 527 | Complete |
+| WetMedia/Config.purs | 1 | 343 | Complete |
+| WetMedia/Dynamics.purs | 1 | 347 | Complete |
+| WetMedia.purs (leader) | 1 | 177 | Complete |
+| **Total** | **5** | **1,624** | **Complete** |
+
+────────────────────────────────────────────────────────────────────────────────
+                                                                     — 2026-03-01
+────────────────────────────────────────────────────────────────────────────────
