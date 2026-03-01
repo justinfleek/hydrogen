@@ -170,5 +170,5 @@ fromSeconds fps secs
 -- | Min: 0
 -- | Max: unbounded (represented as maxBound Int)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 2147483647 "frames" 
+bounds = Bounded.intBounds 0 2147483647 Bounded.Clamps "frames" 
   "Frame count (0 or greater, no practical upper bound)"

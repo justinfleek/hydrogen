@@ -4,16 +4,21 @@
 
 -- | IOR - Index of Refraction for transparent materials.
 -- |
--- | Range: 1.0 to 3.0 (clamps)
+-- | Range: 1.0 to 4.0 (clamps) - matches Blender Principled BSDF
 -- | - **1.0**: No refraction (vacuum, air ≈ 1.0003)
 -- | - **1.33**: Water
 -- | - **1.5**: Glass (common soda-lime)
 -- | - **1.52**: Acrylic
--- | - **2.4**: Diamond
--- | - **3.0**: High-index materials
+-- | - **2.42**: Diamond
+-- | - **3.48**: Silicon
+-- | - **4.0**: Germanium (IR wavelengths)
 -- |
 -- | Controls how much light bends when entering/exiting a transparent surface.
 -- | Used for glass, water, crystals, lenses. Critical for ray tracing.
+-- |
+-- | Note: For complete material database with ~100 materials, see
+-- | `Hydrogen.Schema.Physical.Optical.IOR` which provides categorized
+-- | materials (gases, liquids, glasses, gemstones, metals, semiconductors).
 
 module Hydrogen.Schema.Spatial.IOR
   ( IOR
@@ -83,9 +88,12 @@ instance showIOR :: Show IOR where
 --                                                               // constructors
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Create an IOR value, clamping to 1.0-3.0
+-- | Create an IOR value, clamping to 1.0-4.0
+-- | 
+-- | Matches Blender Principled BSDF range (1.0-4.0).
+-- | Most materials: 1.0-2.5, semiconductors: 3.0-4.0
 ior :: Number -> IOR
-ior n = IOR (Bounded.clampNumber 1.0 3.0 n)
+ior n = IOR (Bounded.clampNumber 1.0 4.0 n)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // constants
@@ -129,7 +137,7 @@ toNumber (IOR i) = i
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 1.0 3.0 "ior" "Index of refraction for transparent materials"
+bounds = Bounded.numberBounds 1.0 4.0 Bounded.Clamps "ior" "Index of refraction. 1.0=vacuum, 2.42=diamond, 4.0=germanium (IR)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

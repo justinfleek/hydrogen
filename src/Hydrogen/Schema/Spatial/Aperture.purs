@@ -66,8 +66,8 @@ unwrapAperture (Aperture f) = f
 
 -- | Bounds documentation
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.5 128.0 "Aperture"
-  "Camera f-stop (0.5-128)"
+bounds = Bounded.numberBounds 0.95 22.0 Bounded.Clamps "Aperture"
+  "Camera f-stop (0.95-22)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // common values

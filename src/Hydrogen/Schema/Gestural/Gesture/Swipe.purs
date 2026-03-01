@@ -138,7 +138,7 @@ unwrapSwipeThreshold (SwipeVelocityThreshold v) = v
 -- | Default: 0.5 px/ms (500 px/s)
 -- | Range allows for both slow deliberate swipes and fast flicks.
 swipeVelocityThresholdBounds :: Bounded.NumberBounds
-swipeVelocityThresholdBounds = Bounded.numberBounds 0.1 5.0 "SwipeVelocityThreshold"
+swipeVelocityThresholdBounds = Bounded.numberBounds 0.1 5.0 Bounded.Clamps "SwipeVelocityThreshold"
   "Minimum velocity threshold for swipe recognition in pixels per millisecond"
 
 -- ═════════════════════════════════════════════════════════════════════════════

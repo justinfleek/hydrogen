@@ -393,4 +393,4 @@ isWholeNumber n =
 
 -- | Bounds documentation for Spacing values
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds (-10000.0) 10000.0 "spacing" "Layout spacing value with unit"
+bounds = Bounded.numberBounds (-10000.0) 10000.0 Bounded.Clamps "spacing" "Layout spacing value with unit"

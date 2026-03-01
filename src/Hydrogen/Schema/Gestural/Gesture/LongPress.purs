@@ -82,7 +82,7 @@ unwrapLongPressThreshold (LongPressThreshold ms) = ms
 -- | - Android: 400ms
 -- | - Web: configurable, typically 500ms
 longPressThresholdBounds :: Bounded.NumberBounds
-longPressThresholdBounds = Bounded.numberBounds 100.0 2000.0 "LongPressThreshold"
+longPressThresholdBounds = Bounded.numberBounds 100.0 2000.0 Bounded.Clamps "LongPressThreshold"
   "Minimum duration threshold for long press in milliseconds"
 
 -- ═════════════════════════════════════════════════════════════════════════════

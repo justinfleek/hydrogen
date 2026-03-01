@@ -283,7 +283,7 @@ instance showBokehRadius :: Show BokehRadius where
 
 -- | Bounds for bokeh radius.
 bokehRadiusBounds :: Bounded.NumberBounds
-bokehRadiusBounds = Bounded.numberBounds 0.0 100.0 "BokehRadius" "Depth of field blur radius"
+bokehRadiusBounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "BokehRadius" "Depth of field blur radius"
 
 -- | Construct a bokeh radius.
 bokehRadius :: Number -> BokehRadius

@@ -105,7 +105,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Schema.Bounded (NumberBounds, numberBounds)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // stroke style
@@ -317,8 +317,8 @@ instance showMiterLimit :: Show MiterLimit where
   show (MiterLimit n) = "(MiterLimit " <> show n <> ")"
 
 -- | Miter limit bounds documentation
-miterLimitBounds :: NumberBounds
-miterLimitBounds = numberBounds 1.0 100.0 "miter-limit" 
+miterLimitBounds :: Bounded.NumberBounds
+miterLimitBounds = Bounded.numberBounds 1.0 100.0 Bounded.Clamps "miter-limit" 
   "Ratio of miter length to stroke width. Higher = sharper corners allowed."
 
 -- | Create a miter limit, clamping to valid range [1.0, 100.0]

@@ -271,4 +271,4 @@ toLegacyCss (LineHeight h) = show h
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.5 5.0 "lineHeight" "Line height as unitless ratio"
+bounds = Bounded.numberBounds 0.5 5.0 Bounded.Clamps "lineHeight" "Line height as unitless ratio"

@@ -104,4 +104,4 @@ toUnitInterval (Magenta m) = Int.toNumber m / 100.0
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "magenta" "Magenta ink percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "magenta" "Magenta ink percentage"

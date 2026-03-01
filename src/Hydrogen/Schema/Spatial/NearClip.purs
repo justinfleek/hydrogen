@@ -44,5 +44,5 @@ unwrapNearClip :: NearClip -> Number
 unwrapNearClip (NearClip n) = n
 
 nearClipBounds :: Bounded.NumberBounds
-nearClipBounds = Bounded.numberBounds 0.001 100000.0 "NearClip"
-  "Near clipping plane distance (> 0.001)"
+nearClipBounds = Bounded.numberBounds 0.001 1000.0 Bounded.Clamps "NearClip"
+  "Near clipping plane distance (0.001 to 1000)"

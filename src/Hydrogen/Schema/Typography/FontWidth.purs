@@ -169,4 +169,4 @@ lerp t (FontWidth a) (FontWidth b) =
 -- | Min: 50 (ultra-condensed)
 -- | Max: 200 (ultra-expanded)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 50 200 "fontWidth" "Font stretch percentage (50-200)"
+bounds = Bounded.intBounds 50 200 Bounded.Clamps "fontWidth" "Font stretch percentage (50-200)"

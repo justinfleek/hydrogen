@@ -81,4 +81,4 @@ toNumber (Transmission t) = t
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "transmission" "PBR light transmission (glass, water transparency)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "transmission" "PBR light transmission (glass, water transparency)"

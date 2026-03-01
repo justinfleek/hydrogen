@@ -211,5 +211,5 @@ toNumber = unwrap
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "animationPhase" 
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "animationPhase" 
   "Normalized animation progress from 0.0 (start) to 1.0 (complete)"

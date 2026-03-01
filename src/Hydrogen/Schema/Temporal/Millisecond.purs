@@ -107,4 +107,4 @@ padZero3 n
 -- | Min: 0
 -- | Max: 999
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 999 "millisecond" "Millisecond within second (0-999)"
+bounds = Bounded.intBounds 0 999 Bounded.Clamps "millisecond" "Millisecond within second (0-999)"

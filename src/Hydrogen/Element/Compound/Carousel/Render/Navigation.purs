@@ -464,10 +464,6 @@ renderPlaceholderThumbnail slideData' =
           [ E.text labelText ]
       ]
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                              // content icons
--- ═════════════════════════════════════════════════════════════════════════════
-
 -- | Get icon character for content kind
 contentKindToIcon :: ContentKind -> String
 contentKindToIcon ContentImage = "\x1F5BC"
@@ -498,12 +494,6 @@ contentKindToLabel ContentGame = "Game"
 contentKindToLabel ContentLiveData = "Live"
 contentKindToLabel ContentInteractive = "Interactive"
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // utility
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Create a SlideIndex from an Int
--- | Wraps the raw index value into the SlideIndex type
--- | Useful for external code that needs to construct slide indices
+-- | Create a SlideIndex from an Int (wraps raw index into SlideIndex type)
 makeSlideIndex :: Int -> SlideIndex
 makeSlideIndex = slideIndex

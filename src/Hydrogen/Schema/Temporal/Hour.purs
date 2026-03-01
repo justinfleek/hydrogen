@@ -125,4 +125,4 @@ padZero n
 -- | Min: 0 (midnight)
 -- | Max: 23 (11 PM)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 23 "hour" "Hour of day (0-23)"
+bounds = Bounded.intBounds 0 23 Bounded.Clamps "hour" "Hour of day (0-23)"

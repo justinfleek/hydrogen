@@ -93,7 +93,7 @@ instance showDP :: Show DP where
 
 -- | Bounds for DP values.
 dpBounds :: Bounded.NumberBounds
-dpBounds = Bounded.numberBounds 0.0 10000.0 "DP" "Density-independent pixels"
+dpBounds = Bounded.numberBounds 0.0 10000.0 Bounded.Clamps "DP" "Density-independent pixels"
 
 -- | Construct a bounded DP value.
 dp :: Number -> DP
@@ -123,7 +123,7 @@ instance showSP :: Show SP where
 
 -- | Bounds for SP values.
 spBounds :: Bounded.NumberBounds
-spBounds = Bounded.numberBounds 0.0 1000.0 "SP" "Scale-independent pixels"
+spBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "SP" "Scale-independent pixels"
 
 -- | Construct a bounded SP value.
 sp :: Number -> SP

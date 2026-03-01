@@ -340,39 +340,38 @@ blendPan ratio (Pan a) (Pan b) =
 -- | Min: -1.0 (full left)
 -- | Max: 1.0 (full right)
 panBounds :: Bounded.NumberBounds
-panBounds = Bounded.numberBounds (-1.0) 1.0 "pan" "Stereo pan (-1 L, 0 C, 1 R)"
+panBounds = Bounded.numberBounds (-1.0) 1.0 Bounded.Clamps "pan" "Stereo pan (-1 L, 0 C, 1 R)"
 
 -- | Bounds for Balance
 -- |
 -- | Min: -100.0 (full left)
 -- | Max: 100.0 (full right)
 balanceBounds :: Bounded.NumberBounds
-balanceBounds = Bounded.numberBounds (-100.0) 100.0 "balance" "Stereo balance in percent (-100 to 100)"
+balanceBounds = Bounded.numberBounds (-100.0) 100.0 Bounded.Clamps "balance" "Stereo balance in percent (-100 to 100)"
 
 -- | Bounds for StereoWidth
 -- |
 -- | Min: 0.0 (mono)
 -- | Max: 2.0 (extra wide)
 stereoWidthBounds :: Bounded.NumberBounds
-stereoWidthBounds = Bounded.numberBounds 0.0 2.0 "stereoWidth" "Stereo width factor (0-2)"
+stereoWidthBounds = Bounded.numberBounds 0.0 2.0 Bounded.Clamps "stereoWidth" "Stereo width factor (0-2)"
 
 -- | Bounds for Azimuth
 -- |
 -- | Min: -180.0 (behind/left)
 -- | Max: 180.0 (behind/right)
 azimuthBounds :: Bounded.NumberBounds
-azimuthBounds = Bounded.numberBounds (-180.0) 180.0 "azimuth" "Horizontal angle in degrees (wraps)"
+azimuthBounds = Bounded.numberBounds (-180.0) 180.0 Bounded.Clamps "azimuth" "Horizontal angle in degrees (wraps)"
 
 -- | Bounds for Elevation
 -- |
 -- | Min: -90.0 (below)
 -- | Max: 90.0 (above)
 elevationBounds :: Bounded.NumberBounds
-elevationBounds = Bounded.numberBounds (-90.0) 90.0 "elevation" "Vertical angle in degrees (-90 to 90)"
+elevationBounds = Bounded.numberBounds (-90.0) 90.0 Bounded.Clamps "elevation" "Vertical angle in degrees (-90 to 90)"
 
 -- | Bounds for AudioDistance
 -- |
--- | Min: 0.0 (at listener)
--- | Max: unbounded (finite)
+-- | Typical practical range: 0-100m. Even 100m is very far for most audio.
 audioDistanceBounds :: Bounded.NumberBounds
-audioDistanceBounds = Bounded.numberBounds 0.0 10000.0 "audioDistance" "Distance from listener in meters (0+)"
+audioDistanceBounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "audioDistance" "Distance from listener in meters (0-100)"

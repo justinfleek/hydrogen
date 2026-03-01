@@ -184,7 +184,7 @@ instance showTempo :: Show Tempo where
 
 -- | Bounds for tempo.
 tempoBounds :: Bounded.NumberBounds
-tempoBounds = Bounded.numberBounds 20.0 400.0 "Tempo" "Beats per minute"
+tempoBounds = Bounded.numberBounds 20.0 400.0 Bounded.Clamps "Tempo" "Beats per minute"
 
 -- | Construct a bounded tempo.
 tempo :: Number -> Tempo

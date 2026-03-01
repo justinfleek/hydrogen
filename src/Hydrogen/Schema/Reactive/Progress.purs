@@ -87,7 +87,7 @@ isComplete (Progress p) = p >= 1.0
 
 -- | Bounds documentation
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "progress" "Progress from 0.0 to 1.0"
+bounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "progress" "Progress percentage (0-100%)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // specialized progress

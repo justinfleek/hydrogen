@@ -347,7 +347,7 @@ adaptiveImageQuality ns
 -- | - 0ms: Theoretical perfect latency (impossible, but valid floor)
 -- | - 30000ms: 30 seconds — connection is effectively dead beyond this
 rttBounds :: Bounded.NumberBounds
-rttBounds = Bounded.numberBounds 0.0 30000.0 "RoundTripTime"
+rttBounds = Bounded.numberBounds 0.0 30000.0 Bounded.Clamps "RoundTripTime"
   "Network round-trip latency in milliseconds (0-30s)"
 
 -- | Bounds for Downlink [0, 10000] Mbps
@@ -355,5 +355,5 @@ rttBounds = Bounded.numberBounds 0.0 30000.0 "RoundTripTime"
 -- | - 0 Mbps: No bandwidth (offline)
 -- | - 10000 Mbps: 10 Gbps — beyond current consumer technology
 downlinkBounds :: Bounded.NumberBounds
-downlinkBounds = Bounded.numberBounds 0.0 10000.0 "Downlink"
+downlinkBounds = Bounded.numberBounds 0.0 10000.0 Bounded.Clamps "Downlink"
   "Download bandwidth in megabits per second (0-10 Gbps)"

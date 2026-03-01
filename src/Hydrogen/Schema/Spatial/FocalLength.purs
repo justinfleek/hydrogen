@@ -71,5 +71,5 @@ unwrapFocalLength (FocalLength f) = f
 
 -- | Bounds for FocalLength
 focalLengthBounds :: Bounded.NumberBounds
-focalLengthBounds = Bounded.numberBounds 1.0 5000.0 "focalLength"
-  "Lens focal length in millimeters"
+focalLengthBounds = Bounded.numberBounds 8.0 600.0 Bounded.Clamps "focalLength"
+  "Lens focal length in millimeters (8-600)"

@@ -19,8 +19,11 @@
 -- | humans and AI agents consuming the schema.
 
 module Hydrogen.Schema.Bounded
-  ( -- * Bounds Documentation
-    Bounds
+  ( -- * Bounds Behavior
+    BoundsBehavior(Clamps, Wraps, Finite)
+  
+  -- * Bounds Documentation
+  , Bounds
   , IntBounds
   , NumberBounds
   , bounds
@@ -32,6 +35,10 @@ module Hydrogen.Schema.Bounded
   , clampNumber
   , clampNumberMin
   , clampNumberMax
+  
+  -- * Wrapping Functions
+  , wrapInt
+  , wrapNumber
   
   -- * Finite Number Handling
   , ensureFinite
@@ -70,6 +77,7 @@ import Prelude
   , otherwise
   , not
   , negate
+  , mod
   , (+)
   , (-)
   , (*)
@@ -84,6 +92,42 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Number (floor) as Number
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // bounds // behavior
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | How a bounded value behaves at its limits.
+-- |
+-- | ## Behaviors
+-- |
+-- | - `Clamps`: Values outside bounds are clamped to min/max.
+-- |   Example: percent 150 → 100, percent -10 → 0
+-- |
+-- | - `Wraps`: Values wrap around using modular arithmetic.
+-- |   Example: degrees 370 → 10, degrees -10 → 350
+-- |
+-- | - `Finite`: Values must be within bounds; out-of-bounds is invalid.
+-- |   Used when clamping/wrapping would lose semantic meaning.
+-- |   Example: array index must be valid, no "clamping" to last element
+-- |
+-- | ## At Billion-Agent Scale
+-- |
+-- | Agents MUST know the behavior to correctly handle edge cases.
+-- | Without this, an agent cannot know if 361° should become 1° or 359°.
+data BoundsBehavior
+  = Clamps   -- ^ Values outside bounds are clamped to min/max
+  | Wraps    -- ^ Values wrap around (modular arithmetic)
+  | Finite   -- ^ Values must be within bounds; out-of-bounds is invalid
+
+derive instance eqBoundsBehavior :: Eq BoundsBehavior
+derive instance ordBoundsBehavior :: Ord BoundsBehavior
+
+instance showBoundsBehavior :: Show BoundsBehavior where
+  show Clamps = "Clamps"
+  show Wraps = "Wraps"
+  show Finite = "Finite"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // bounds documentation
@@ -96,9 +140,18 @@ import Data.Maybe (Maybe(Just, Nothing))
 -- | - JSON schema generation
 -- | - Documentation
 -- | - Agent understanding
+-- |
+-- | ## Fields
+-- |
+-- | - `min`: Minimum valid value (inclusive)
+-- | - `max`: Maximum valid value (inclusive for Clamps/Finite, exclusive for Wraps)
+-- | - `behavior`: How values outside bounds are handled
+-- | - `name`: Short identifier for UI labels
+-- | - `description`: Human-readable description for tooltips
 type Bounds a =
   { min :: a
   , max :: a
+  , behavior :: BoundsBehavior
   , name :: String
   , description :: String
   }
@@ -109,21 +162,22 @@ type IntBounds = Bounds Int
 -- | Number bounds
 type NumberBounds = Bounds Number
 
--- | Create bounds documentation
-bounds :: forall a. a -> a -> String -> String -> Bounds a
-bounds min' max' name' desc =
+-- | Create bounds documentation with explicit behavior.
+bounds :: forall a. a -> a -> BoundsBehavior -> String -> String -> Bounds a
+bounds min' max' behavior' name' desc =
   { min: min'
   , max: max'
+  , behavior: behavior'
   , name: name'
   , description: desc
   }
 
--- | Create integer bounds
-intBounds :: Int -> Int -> String -> String -> IntBounds
+-- | Create integer bounds with explicit behavior.
+intBounds :: Int -> Int -> BoundsBehavior -> String -> String -> IntBounds
 intBounds = bounds
 
--- | Create number bounds
-numberBounds :: Number -> Number -> String -> String -> NumberBounds
+-- | Create number bounds with explicit behavior.
+numberBounds :: Number -> Number -> BoundsBehavior -> String -> String -> NumberBounds
 numberBounds = bounds
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -155,6 +209,53 @@ clampNumberMax :: Number -> Number -> Number
 clampNumberMax maxVal n
   | n > maxVal = maxVal
   | otherwise = n
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                   // wrapping
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Wrap an integer to bounds using modular arithmetic.
+-- |
+-- | The range is [min, max), meaning max wraps to min.
+-- |
+-- | ```purescript
+-- | wrapInt 0 360 370   -- 10
+-- | wrapInt 0 360 (-10) -- 350
+-- | wrapInt 0 360 360   -- 0
+-- | ```
+-- |
+-- | ## Mathematical Definition
+-- |
+-- | wrapInt min max n = min + ((n - min) `mod` (max - min))
+-- |
+-- | This handles negative values correctly via PureScript's mod behavior.
+wrapInt :: Int -> Int -> Int -> Int
+wrapInt minVal maxVal n =
+  let
+    range = maxVal - minVal
+    offset = n - minVal
+    wrapped = mod ((mod offset range) + range) range
+  in
+    minVal + wrapped
+
+-- | Wrap a number to bounds using modular arithmetic.
+-- |
+-- | The range is [min, max), meaning max wraps to min.
+-- |
+-- | ```purescript
+-- | wrapNumber 0.0 360.0 370.0   -- 10.0
+-- | wrapNumber 0.0 360.0 (-10.0) -- 350.0
+-- | wrapNumber 0.0 1.0 1.5       -- 0.5
+-- | ```
+wrapNumber :: Number -> Number -> Number -> Number
+wrapNumber minVal maxVal n =
+  let
+    range = maxVal - minVal
+    offset = n - minVal
+    -- Use floor-based modulo for Numbers
+    wrapped = offset - range * Number.floor (offset / range)
+  in
+    minVal + wrapped
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // validation
@@ -195,27 +296,36 @@ ensureFinite n fallback
 --                                                              // common bounds
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Percentage bounds (0-100)
+-- | Percentage bounds (0-100), clamps at limits.
+-- |
+-- | 150% becomes 100%, -10% becomes 0%.
 percent :: IntBounds
-percent = intBounds 0 100 "percent" "Integer percentage from 0 to 100"
+percent = intBounds 0 100 Clamps "percent" "Integer percentage from 0 to 100"
 
--- | Unit interval bounds (0.0-1.0)
+-- | Unit interval bounds (0.0-1.0), clamps at limits.
+-- |
+-- | 1.5 becomes 1.0, -0.5 becomes 0.0.
 unit :: NumberBounds
-unit = numberBounds 0.0 1.0 "unit" "Normalized value from 0.0 to 1.0"
+unit = numberBounds 0.0 1.0 Clamps "unit" "Normalized value from 0.0 to 1.0"
 
--- | Byte bounds (0-255)
+-- | Byte bounds (0-255), clamps at limits.
+-- |
+-- | 300 becomes 255, -10 becomes 0.
 byte :: IntBounds
-byte = intBounds 0 255 "byte" "8-bit unsigned integer from 0 to 255"
+byte = intBounds 0 255 Clamps "byte" "8-bit unsigned integer from 0 to 255"
 
--- | Degree bounds (0-359)
--- | Note: 360 wraps to 0, so valid range is 0-359
+-- | Degree bounds (0-360), WRAPS at limits.
+-- |
+-- | 370° becomes 10°, -10° becomes 350°.
+-- | Range is [0, 360) — 360 wraps to 0.
 degrees :: IntBounds
-degrees = intBounds 0 359 "degrees" "Angle in degrees from 0 to 359"
+degrees = intBounds 0 360 Wraps "degrees" "Angle in degrees, wraps at 360"
 
--- | Normalized bounds (0.0-1.0)
--- | Alias for unit, more descriptive in some contexts
+-- | Normalized bounds (0.0-1.0), clamps at limits.
+-- |
+-- | Alias for unit, more descriptive in some contexts.
 normalized :: NumberBounds
-normalized = numberBounds 0.0 1.0 "normalized" "Normalized value from 0.0 to 1.0"
+normalized = numberBounds 0.0 1.0 Clamps "normalized" "Normalized value from 0.0 to 1.0"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // unit // interval

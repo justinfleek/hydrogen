@@ -123,6 +123,8 @@ toNumber (Lightness l) = Int.toNumber l
 toUnitInterval :: Lightness -> Number
 toUnitInterval (Lightness l) = Int.toNumber l / 100.0
 
--- | Bounds documentation for this type
+-- | Bounds documentation for this type.
+-- |
+-- | Lightness CLAMPS at limits — 150% becomes 100%, -10% becomes 0%.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "lightness" "Light/dark level as percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "lightness" "Light/dark level as percentage (clamps)"

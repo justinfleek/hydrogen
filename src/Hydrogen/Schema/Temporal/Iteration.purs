@@ -75,5 +75,5 @@ iterationToInt = unwrapIteration
 
 -- | Bounds for Iteration
 iterationBounds :: Bounded.IntBounds
-iterationBounds = Bounded.intBounds 0 2147483647 "iteration"
+iterationBounds = Bounded.intBounds 0 2147483647 Bounded.Clamps "iteration"
   "Animation iteration count (non-negative integer)"

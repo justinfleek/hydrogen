@@ -283,4 +283,4 @@ marginToLegacyCss m =
 -- | Min: 0.0 (no spacing)
 -- | Max: 1000.0 (practical limit for UI spacing)
 spacingValueBounds :: Bounded.NumberBounds
-spacingValueBounds = Bounded.numberBounds 0.0 1000.0 "spacingValue" "Spacing in pixels (0-1000)"
+spacingValueBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "spacingValue" "Spacing in pixels (0-1000)"

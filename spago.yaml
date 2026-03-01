@@ -1,6 +1,7 @@
 package:
   name: hydrogen
-  description: "PureScript/Halogen web framework - type-safe routing, API clients, SSG, UI primitives"
+  description: "PureScript/Halogen web framework - type-safe routing, API clients,
+    SSG, UI primitives"
   publish:
     version: 0.1.0
     license: MIT
@@ -9,38 +10,46 @@ package:
       githubRepo: hydrogen
   dependencies:
     # Core
-    - prelude
-    - effect
     - aff
-    - console
-    - maybe
-    - either
-    - arrays
-    - strings
-    - integers
-    - numbers
-    - foldable-traversable
-    - transformers
-    - refs
-    - tuples
-    - ordered-collections
-    - datetime
-    - now
-    - newtype
     # HTTP
     - affjax
     - affjax-web
     - argonaut
     - argonaut-codecs
     - argonaut-core
-    - http-methods
+    - arraybuffer-types
+    - arrays
+    - bifunctors
+    - console
+    - control
+    - datetime
+    - effect
+    - either
+    - enums
+    - exceptions
+    - foldable-traversable
+    - foreign
+    - foreign-object
     # Halogen
     - halogen
     - halogen-vdom
+    - http-methods
+    - integers
+    - lists
+    - maybe
+    - media-types
+    - newtype
+    - now
+    - numbers
+    - ordered-collections
+    - prelude
+    - refs
+    - strings
+    - tuples
     # Web APIs
     - web-dom
-    - web-html
     - web-events
+    - web-html
     - web-uievents
     # FFI support
     - aff-promise
@@ -48,13 +57,11 @@ package:
   test:
     main: Test.Main
     dependencies:
-      - spec
-      - spec-node
-      - spec-quickcheck
-      - quickcheck
-      - quickcheck-laws
       - gen
+      - quickcheck
+      - spec
+      - spec-quickcheck
 
 workspace:
-  package_set:
+  packageSet:
     registry: 73.2.0

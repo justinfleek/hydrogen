@@ -147,5 +147,5 @@ fromMilliseconds ms = nanosecond (ms * 1000000)
 -- | Min: 0
 -- | Max: 999999999 (one second minus one nanosecond)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 999999999 "nanosecond" 
+bounds = Bounded.intBounds 0 999999999 Bounded.Clamps "nanosecond" 
   "Nanosecond duration (0 to 999999999, one second = 1 billion ns)"

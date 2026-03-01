@@ -249,4 +249,4 @@ zoom400 = ZoomLevel 4.0
 -- | Min: 0.01 (1%)
 -- | Max: 100.0 (10000%)
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.01 100.0 "zoomLevel" "Timeline zoom scale (0.01-100.0)"
+bounds = Bounded.numberBounds 0.01 100.0 Bounded.Clamps "zoomLevel" "Timeline zoom scale (0.01-100.0)"

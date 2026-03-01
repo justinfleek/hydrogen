@@ -98,7 +98,7 @@ import Prelude
   , (<>)
   )
 
-import Hydrogen.Schema.Bounded (NumberBounds, numberBounds, IntBounds, intBounds)
+import Hydrogen.Schema.Bounded (NumberBounds, numberBounds, IntBounds, intBounds, BoundsBehavior(Clamps))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                  // unit // interval // types
@@ -129,7 +129,7 @@ unwrapMetallic (Metallic m) = m
 
 -- | Bounds documentation
 metallicBounds :: NumberBounds
-metallicBounds = numberBounds 0.0 1.0 "metallic" "PBR metallic factor (0=dielectric, 1=metal)"
+metallicBounds = numberBounds 0.0 1.0 Clamps "metallic" "PBR metallic factor (0=dielectric, 1=metal)"
 
 -- | Roughness factor [0,1]
 -- |
@@ -156,7 +156,7 @@ unwrapRoughness (Roughness r) = r
 
 -- | Bounds documentation
 roughnessBounds :: NumberBounds
-roughnessBounds = numberBounds 0.0 1.0 "roughness" "PBR roughness factor (0=smooth, 1=rough)"
+roughnessBounds = numberBounds 0.0 1.0 Clamps "roughness" "PBR roughness factor (0=smooth, 1=rough)"
 
 -- | Alpha/opacity factor [0,1]
 -- |
@@ -182,7 +182,7 @@ unwrapAlpha (Alpha a) = a
 
 -- | Bounds documentation
 alphaBounds :: NumberBounds
-alphaBounds = numberBounds 0.0 1.0 "alpha" "Opacity factor (0=transparent, 1=opaque)"
+alphaBounds = numberBounds 0.0 1.0 Clamps "alpha" "Opacity factor (0=transparent, 1=opaque)"
 
 -- | UV texture coordinate [0,1]
 -- |
@@ -209,7 +209,7 @@ unwrapUVCoord (UVCoord u) = u
 
 -- | Bounds documentation
 uvCoordBounds :: NumberBounds
-uvCoordBounds = numberBounds 0.0 1.0 "uvCoord" "Texture coordinate in [0,1]"
+uvCoordBounds = numberBounds 0.0 1.0 Clamps "uvCoord" "Texture coordinate in [0,1]"
 
 -- | Normalized color channel [0,1]
 -- |
@@ -235,7 +235,7 @@ unwrapNormalizedChannel (NormalizedChannel c) = c
 
 -- | Bounds documentation
 normalizedChannelBounds :: NumberBounds
-normalizedChannelBounds = numberBounds 0.0 1.0 "normalizedChannel" "Linear color channel in [0,1]"
+normalizedChannelBounds = numberBounds 0.0 1.0 Clamps "normalizedChannel" "Linear color channel in [0,1]"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // positive // numbers
@@ -265,7 +265,7 @@ unwrapIntensity (Intensity i) = i
 
 -- | Bounds documentation (upper bound is practical maximum)
 intensityBounds :: NumberBounds
-intensityBounds = numberBounds 0.0 100000.0 "intensity" "Light intensity in candelas [0,∞)"
+intensityBounds = numberBounds 0.0 100000.0 Clamps "intensity" "Light intensity in candelas [0,∞)"
 
 -- | Radius [0,∞)
 -- |
@@ -291,7 +291,7 @@ unwrapRadius (Radius r) = r
 
 -- | Bounds documentation
 radiusBounds :: NumberBounds
-radiusBounds = numberBounds 0.0 10000.0 "radius" "Radius in world units [0,∞)"
+radiusBounds = numberBounds 0.0 10000.0 Clamps "radius" "Radius in world units [0,∞)"
 
 -- | Distance [0,∞)
 -- |
@@ -317,7 +317,7 @@ unwrapDistance (Distance d) = d
 
 -- | Bounds documentation
 distanceBounds :: NumberBounds
-distanceBounds = numberBounds 0.0 10000.0 "distance" "Distance in world units [0,∞)"
+distanceBounds = numberBounds 0.0 10000.0 Clamps "distance" "Distance in world units [0,∞)"
 
 -- | Index of Refraction [1,∞)
 -- |
@@ -346,7 +346,7 @@ unwrapIOR (IOR i) = i
 
 -- | Bounds documentation
 iorBounds :: NumberBounds
-iorBounds = numberBounds 1.0 10.0 "ior" "Index of refraction [1,∞)"
+iorBounds = numberBounds 1.0 10.0 Clamps "ior" "Index of refraction [1,∞)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // angles
@@ -378,7 +378,7 @@ unwrapConeAngle (ConeAngle a) = a
 
 -- | Bounds documentation
 coneAngleBounds :: NumberBounds
-coneAngleBounds = numberBounds 0.0 3.14159 "coneAngle" "Cone angle in radians [0, π]"
+coneAngleBounds = numberBounds 0.0 3.14159 Clamps "coneAngle" "Cone angle in radians [0, π]"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // dimensions
@@ -407,7 +407,7 @@ unwrapPixelDimension (PixelDimension d) = d
 
 -- | Bounds documentation
 pixelDimensionBounds :: IntBounds
-pixelDimensionBounds = intBounds 1 16384 "pixelDimension" "Dimension in pixels [1, 16384]"
+pixelDimensionBounds = intBounds 1 16384 Clamps "pixelDimension" "Dimension in pixels [1, 16384]"
 
 -- | Tile count [1, ∞)
 -- |
@@ -432,7 +432,7 @@ unwrapTileCount (TileCount t) = t
 
 -- | Bounds documentation
 tileCountBounds :: IntBounds
-tileCountBounds = intBounds 1 1024 "tileCount" "Tile count [1, 1024]"
+tileCountBounds = intBounds 1 1024 Clamps "tileCount" "Tile count [1, 1024]"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // indices
@@ -462,7 +462,7 @@ unwrapBufferIndex (BufferIndex i) = i
 
 -- | Bounds documentation
 bufferIndexBounds :: IntBounds
-bufferIndexBounds = intBounds 0 2147483647 "bufferIndex" "Buffer index [0, max_int]"
+bufferIndexBounds = intBounds 0 2147483647 Clamps "bufferIndex" "Buffer index [0, max_int]"
 
 -- | Bounce count [0, ∞)
 -- |
@@ -487,4 +487,4 @@ unwrapBounceCount (BounceCount b) = b
 
 -- | Bounds documentation
 bounceCountBounds :: IntBounds
-bounceCountBounds = intBounds 0 128 "bounceCount" "Ray bounce count [0, 128]"
+bounceCountBounds = intBounds 0 128 Clamps "bounceCount" "Ray bounce count [0, 128]"

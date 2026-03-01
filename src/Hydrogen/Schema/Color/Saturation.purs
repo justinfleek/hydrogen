@@ -214,6 +214,8 @@ toNumber (Saturation s) = Int.toNumber s
 toUnitInterval :: Saturation -> Number
 toUnitInterval (Saturation s) = Int.toNumber s / 100.0
 
--- | Bounds documentation for this type
+-- | Bounds documentation for this type.
+-- |
+-- | Saturation CLAMPS at limits — 150% becomes 100%, -10% becomes 0%.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "saturation" "Color intensity as percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "saturation" "Color intensity as percentage (clamps)"

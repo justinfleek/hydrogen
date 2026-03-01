@@ -43,5 +43,5 @@ unwrapShadowStrength :: ShadowStrength -> Number
 unwrapShadowStrength (ShadowStrength n) = n
 
 shadowStrengthBounds :: Bounded.NumberBounds
-shadowStrengthBounds = Bounded.numberBounds 0.0 1.0 "ShadowStrength"
+shadowStrengthBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "ShadowStrength"
   "Shadow opacity (0.0 to 1.0)"

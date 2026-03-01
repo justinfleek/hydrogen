@@ -102,6 +102,7 @@ import Data.String.CodeUnits as String
 import Data.String.Pattern (Pattern(Pattern))
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Hydrogen.GPU.DrawCommand as DC
+import Hydrogen.GPU.Coordinates as Coord
 import Hydrogen.GPU.Text as Text
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as RGB
@@ -267,13 +268,13 @@ flattenElement state _namespace _tag attrs children =
       Nothing -> []
       Just color ->
         [ DC.drawRect
-            { x: Device.px boxFromAttrs.x
-            , y: Device.px boxFromAttrs.y
-            , width: Device.px boxFromAttrs.width
-            , height: Device.px boxFromAttrs.height
+            { x: Coord.screenX boxFromAttrs.x
+            , y: Coord.screenY boxFromAttrs.y
+            , width: Coord.pixelWidth boxFromAttrs.width
+            , height: Coord.pixelHeight boxFromAttrs.height
             , fill: color
             , cornerRadius: borderRadius
-            , depth: state1.currentDepth
+            , depth: Coord.depthValue state1.currentDepth
             , pickId: pickResult.pickId
             , onClick: clickHandler
             }

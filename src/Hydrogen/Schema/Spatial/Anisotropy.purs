@@ -86,4 +86,4 @@ toNumber (Anisotropy a) = a
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds (-1.0) 1.0 "anisotropy" "PBR directional reflection (brushed metal, hair, silk)"
+bounds = Bounded.numberBounds (-1.0) 1.0 Bounded.Clamps "anisotropy" "PBR directional reflection (brushed metal, hair, silk)"

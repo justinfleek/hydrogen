@@ -135,5 +135,5 @@ stepPositionToString JumpBoth = "jump-both"
 
 -- | Bounds for Steps
 stepsBounds :: Bounded.IntBounds
-stepsBounds = Bounded.intBounds 1 1000 "steps"
+stepsBounds = Bounded.intBounds 1 1000 Bounded.Clamps "steps"
   "Number of discrete steps (1 minimum, practical max around 100)"

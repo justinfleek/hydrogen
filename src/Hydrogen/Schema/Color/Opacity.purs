@@ -260,6 +260,8 @@ toChannel (Opacity o) = Int.round (Int.toNumber o * 255.0 / 100.0)
 --                                                                   // metadata
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Bounds documentation for this type
+-- | Bounds documentation for this type.
+-- |
+-- | Opacity CLAMPS at limits — 150% becomes 100%, -10% becomes 0%.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "opacity" "Alpha transparency as percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "opacity" "Alpha transparency as percentage (clamps)"

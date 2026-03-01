@@ -238,25 +238,25 @@ multiplyGain (LinearGain a) (LinearGain b) = linearGain (a * b)
 -- | Min: -120.0 (effective silence)
 -- | Max: 0.0 (unity)
 decibelBounds :: Bounded.NumberBounds
-decibelBounds = Bounded.numberBounds (-120.0) 0.0 "decibel" "Relative amplitude in dB (-120 to 0)"
+decibelBounds = Bounded.numberBounds (-120.0) 0.0 Bounded.Clamps "decibel" "Relative amplitude in dB (-120 to 0)"
 
 -- | Bounds for DecibelFS
 -- |
--- | Min: -60.0
--- | Max: 0.0 (digital full scale)
+-- | Professional audio typically uses -60 to +12 dB. Ableton uses -24 to +24 for input gain.
+-- | We use -60 to +12 as a practical range for most mixing.
 decibelFSBounds :: Bounded.NumberBounds
-decibelFSBounds = Bounded.numberBounds (-60.0) 0.0 "decibelFS" "Amplitude relative to full scale (-60 to 0)"
+decibelFSBounds = Bounded.numberBounds (-60.0) 12.0 Bounded.Clamps "decibelFS" "Amplitude in dB (-60 to +12)"
 
 -- | Bounds for LinearGain
 -- |
 -- | Min: 0.0 (silence)
 -- | Max: 1.0 (unity)
 linearGainBounds :: Bounded.NumberBounds
-linearGainBounds = Bounded.numberBounds 0.0 1.0 "linearGain" "Linear amplitude multiplier (0-1)"
+linearGainBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "linearGain" "Linear amplitude multiplier (0-1)"
 
 -- | Bounds for Percent
 -- |
 -- | Min: 0.0
 -- | Max: 100.0
 percentBounds :: Bounded.NumberBounds
-percentBounds = Bounded.numberBounds 0.0 100.0 "percent" "Percentage value (0-100)"
+percentBounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "percent" "Percentage value (0-100)"

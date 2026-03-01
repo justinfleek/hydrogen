@@ -107,6 +107,8 @@ toNumber (Channel c) = Int.toNumber c
 toUnitInterval :: Channel -> Number
 toUnitInterval (Channel c) = Int.toNumber c / 255.0
 
--- | Bounds documentation for this type
+-- | Bounds documentation for this type.
+-- |
+-- | Channel CLAMPS at limits — 300 becomes 255, -10 becomes 0.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 255 "channel" "8-bit color channel intensity"
+bounds = Bounded.intBounds 0 255 Bounded.Clamps "channel" "8-bit color channel intensity (clamps)"

@@ -68,6 +68,7 @@ import Data.Tuple (Tuple(Tuple))
 
 import Hydrogen.Schema.Typography.GlyphGeometry as GG
 import Hydrogen.GPU.DrawCommand as DC
+import Hydrogen.GPU.Coordinates as Coord
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // glyphpath conversion
@@ -93,7 +94,7 @@ glyphPathToDrawCommand glyphId fontId glyph =
   , contours: map contourToContourData glyph.contours
   , bounds: glyphBoundsToBoundingBox3D glyph.bounds
   , advanceWidth: glyph.advanceWidth
-  , depth: 0.0
+  , depth: Coord.depthValueNear
   , pickId: Nothing
   , onClick: Nothing
   }

@@ -147,5 +147,5 @@ fromMilliseconds ms = microsecond (ms * 1000)
 -- | Min: 0
 -- | Max: 999999 (one second minus one microsecond)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 999999 "microsecond" 
+bounds = Bounded.intBounds 0 999999 Bounded.Clamps "microsecond" 
   "Microsecond duration (0 to 999999, one second = 1 million us)"

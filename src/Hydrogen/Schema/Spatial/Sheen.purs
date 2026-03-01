@@ -81,4 +81,4 @@ toNumber (Sheen s) = s
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "sheen" "PBR fabric sheen (velvet, silk, satin)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "sheen" "PBR fabric sheen (velvet, silk, satin)"

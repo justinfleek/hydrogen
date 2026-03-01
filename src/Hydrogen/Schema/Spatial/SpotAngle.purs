@@ -44,5 +44,5 @@ unwrapSpotAngle :: SpotAngle -> Number
 unwrapSpotAngle (SpotAngle n) = n
 
 spotAngleBounds :: Bounded.NumberBounds
-spotAngleBounds = Bounded.numberBounds 0.0 180.0 "SpotAngle"
+spotAngleBounds = Bounded.numberBounds 0.0 180.0 Bounded.Clamps "SpotAngle"
   "Spotlight cone angle in degrees (0-180)"

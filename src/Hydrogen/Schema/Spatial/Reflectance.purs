@@ -87,4 +87,4 @@ toNumber (Reflectance r) = r
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "reflectance" "PBR dielectric reflectance (F0 for non-metals)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "reflectance" "PBR dielectric reflectance (F0 for non-metals)"

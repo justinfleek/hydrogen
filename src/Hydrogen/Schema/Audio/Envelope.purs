@@ -328,34 +328,34 @@ scaleAdsrTimes factor env =
 -- | Bounds for AttackTime
 -- |
 -- | Min: 0.0 seconds (instant)
--- | Max: 10.0 seconds (slow swell)
+-- | Max: 2.0 seconds (slow swell)
 attackTimeBounds :: Bounded.NumberBounds
-attackTimeBounds = Bounded.numberBounds 0.0 10.0 "attackTime" "Attack time in seconds (0-10)"
+attackTimeBounds = Bounded.numberBounds 0.0 2.0 Bounded.Clamps "attackTime" "Attack time in seconds (0-2)"
 
 -- | Bounds for DecayTime
 -- |
 -- | Min: 0.0 seconds
 -- | Max: 10.0 seconds
 decayTimeBounds :: Bounded.NumberBounds
-decayTimeBounds = Bounded.numberBounds 0.0 10.0 "decayTime" "Decay time in seconds (0-10)"
+decayTimeBounds = Bounded.numberBounds 0.0 10.0 Bounded.Clamps "decayTime" "Decay time in seconds (0-10)"
 
 -- | Bounds for SustainLevel
 -- |
 -- | Min: 0.0 (silence)
 -- | Max: 1.0 (full level)
 sustainLevelBounds :: Bounded.NumberBounds
-sustainLevelBounds = Bounded.numberBounds 0.0 1.0 "sustainLevel" "Sustain level (0-1)"
+sustainLevelBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "sustainLevel" "Sustain level (0-1)"
 
 -- | Bounds for ReleaseTime
 -- |
 -- | Min: 0.0 seconds
 -- | Max: 30.0 seconds (long reverb-like release)
 releaseTimeBounds :: Bounded.NumberBounds
-releaseTimeBounds = Bounded.numberBounds 0.0 30.0 "releaseTime" "Release time in seconds (0-30)"
+releaseTimeBounds = Bounded.numberBounds 0.0 30.0 Bounded.Clamps "releaseTime" "Release time in seconds (0-30)"
 
 -- | Bounds for HoldTime
 -- |
 -- | Min: 0.0 seconds
 -- | Max: 10.0 seconds
 holdTimeBounds :: Bounded.NumberBounds
-holdTimeBounds = Bounded.numberBounds 0.0 10.0 "holdTime" "Hold time in seconds (0-10)"
+holdTimeBounds = Bounded.numberBounds 0.0 10.0 Bounded.Clamps "holdTime" "Hold time in seconds (0-10)"

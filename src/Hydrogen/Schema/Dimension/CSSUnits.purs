@@ -203,7 +203,7 @@ instance showGradian :: Show Gradian where
 
 -- | Bounds for gradian (wraps at 400).
 gradianBounds :: Bounded.NumberBounds
-gradianBounds = Bounded.numberBounds 0.0 400.0 "Gradian" "Angle in gradians (wraps at 400)"
+gradianBounds = Bounded.numberBounds 0.0 400.0 Bounded.Clamps "Gradian" "Angle in gradians (wraps at 400)"
 
 -- | Construct a gradian value (wraps).
 gradian :: Number -> Gradian
@@ -240,7 +240,7 @@ instance showTurn :: Show Turn where
 
 -- | Bounds for turn (wraps at 1.0).
 turnBounds :: Bounded.NumberBounds
-turnBounds = Bounded.numberBounds 0.0 1.0 "Turn" "Angle in turns (wraps at 1.0)"
+turnBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "Turn" "Angle in turns (wraps at 1.0)"
 
 -- | Construct a turn value (wraps).
 turn :: Number -> Turn

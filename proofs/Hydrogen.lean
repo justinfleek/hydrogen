@@ -35,6 +35,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Color.Hue
+import Hydrogen.Schema.Color.HSL
 import Hydrogen.Schema.Color.Conversions
 import Hydrogen.Schema.Color.OnoSendai
 import Hydrogen.Schema.Diff

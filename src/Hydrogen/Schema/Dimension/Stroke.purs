@@ -134,7 +134,7 @@ import Prelude
 
 import Data.Array (length, intercalate, concatMap, foldl)
 import Data.Number (isFinite) as Number
-import Hydrogen.Schema.Bounded (NumberBounds, numberBounds)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // stroke width
@@ -157,8 +157,8 @@ instance showStrokeWidth :: Show StrokeWidth where
   show (StrokeWidth n) = show n <> "px"
 
 -- | Stroke width bounds documentation
-strokeWidthBounds :: NumberBounds
-strokeWidthBounds = numberBounds 0.0 64.0 "stroke-width"
+strokeWidthBounds :: Bounded.NumberBounds
+strokeWidthBounds = Bounded.numberBounds 0.0 64.0 Bounded.Clamps "stroke-width"
   "Stroke thickness in pixels. 0 = no stroke, max 64px for decorative use."
 
 -- | Create a stroke width, clamping to valid range [0, 64]
@@ -236,8 +236,8 @@ instance showDashLength :: Show DashLength where
   show (DashLength n) = show n <> "px"
 
 -- | Dash length bounds documentation
-dashLengthBounds :: NumberBounds
-dashLengthBounds = numberBounds 0.0 1000.0 "dash-length"
+dashLengthBounds :: Bounded.NumberBounds
+dashLengthBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "dash-length"
   "Length of a dash segment in pixels for stroke-dasharray."
 
 -- | Create a dash length, clamping to valid range [0, 1000]
@@ -276,8 +276,8 @@ instance showDashGap :: Show DashGap where
   show (DashGap n) = show n <> "px"
 
 -- | Dash gap bounds documentation
-dashGapBounds :: NumberBounds
-dashGapBounds = numberBounds 0.0 1000.0 "dash-gap"
+dashGapBounds :: Bounded.NumberBounds
+dashGapBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "dash-gap"
   "Length of gap between dashes in pixels for stroke-dasharray."
 
 -- | Create a dash gap, clamping to valid range [0, 1000]
@@ -375,8 +375,8 @@ instance showOutlineOffset :: Show OutlineOffset where
   show (OutlineOffset n) = show n <> "px"
 
 -- | Outline offset bounds documentation
-outlineOffsetBounds :: NumberBounds
-outlineOffsetBounds = numberBounds (-32.0) 32.0 "outline-offset"
+outlineOffsetBounds :: Bounded.NumberBounds
+outlineOffsetBounds = Bounded.numberBounds (-32.0) 32.0 Bounded.Clamps "outline-offset"
   "Distance of outline from element edge. Negative = inset, positive = outset."
 
 -- | Create an outline offset, clamping to valid range [-32, 32]

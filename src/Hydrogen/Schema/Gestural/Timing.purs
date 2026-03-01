@@ -119,9 +119,9 @@ resetClickCount = singleClick
 -- | Bounds for ClickCount
 -- |
 -- | Min: 1 (at least one click to register)
--- | Max: unbounded (practical limit ~10 for UI purposes)
+-- | Max: 10 (practical limit for multi-click)
 clickCountBounds :: Bounded.IntBounds
-clickCountBounds = Bounded.intBounds 1 100 "clickCount" "Consecutive click count (1+)"
+clickCountBounds = Bounded.intBounds 1 10 Bounded.Clamps "clickCount" "Consecutive click count (1-10)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // hold duration
@@ -178,9 +178,9 @@ isLongHold (HoldDuration ms) = ms >= 500.0
 -- | Bounds for HoldDuration
 -- |
 -- | Min: 0 (instant)
--- | Max: unbounded (practical limit ~30000ms for UI)
+-- | Max: 5000ms (5 seconds max for UI)
 holdDurationBounds :: Bounded.NumberBounds
-holdDurationBounds = Bounded.numberBounds 0.0 30000.0 "holdDuration" "Hold duration in milliseconds"
+holdDurationBounds = Bounded.numberBounds 0.0 5000.0 Bounded.Clamps "holdDuration" "Hold duration in milliseconds (0-5000)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // tap interval
@@ -228,9 +228,9 @@ isWithinInterval elapsed (TapInterval maxInterval) = elapsed <= maxInterval
 -- | Bounds for TapInterval
 -- |
 -- | Min: 0 (no multi-tap detection)
--- | Max: 10000ms (practical upper limit)
+-- | Max: 1000ms (typical multi-tap timeout)
 tapIntervalBounds :: Bounded.NumberBounds
-tapIntervalBounds = Bounded.numberBounds 0.0 10000.0 "tapInterval" "Maximum ms between taps for multi-tap"
+tapIntervalBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "tapInterval" "Maximum ms between taps for multi-tap"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // timing state molecule

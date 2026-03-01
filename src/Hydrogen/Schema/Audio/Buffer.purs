@@ -145,7 +145,7 @@ instance showSampleRate :: Show SampleRate where
 
 -- | Bounds for sample rate.
 sampleRateBounds :: Bounded.IntBounds
-sampleRateBounds = Bounded.intBounds 8000 192000 "SampleRate" "Audio sample rate (Hz)"
+sampleRateBounds = Bounded.intBounds 8000 192000 Bounded.Clamps "SampleRate" "Audio sample rate (Hz)"
 
 -- | Construct a bounded sample rate.
 sampleRate :: Int -> SampleRate
@@ -195,7 +195,7 @@ instance showBitDepth :: Show BitDepth where
 
 -- | Bounds for bit depth.
 bitDepthBounds :: Bounded.IntBounds
-bitDepthBounds = Bounded.intBounds 8 32 "BitDepth" "Bits per sample"
+bitDepthBounds = Bounded.intBounds 8 32 Bounded.Clamps "BitDepth" "Bits per sample (8, 16, 24, 32)"
 
 -- | Construct a bounded bit depth.
 bitDepth :: Int -> BitDepth
@@ -237,7 +237,7 @@ instance showChannelCount :: Show ChannelCount where
 
 -- | Bounds for channel count.
 channelCountBounds :: Bounded.IntBounds
-channelCountBounds = Bounded.intBounds 1 8 "ChannelCount" "Audio channels (1-8)"
+channelCountBounds = Bounded.intBounds 1 8 Bounded.Clamps "ChannelCount" "Audio channels (1-8)"
 
 -- | Construct a bounded channel count.
 channelCount :: Int -> ChannelCount

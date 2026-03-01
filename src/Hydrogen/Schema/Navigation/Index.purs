@@ -108,7 +108,7 @@ import Prelude
   )
 
 import Data.Int (toNumber)
-import Hydrogen.Schema.Bounded (IntBounds, intBounds, clampInt)
+import Hydrogen.Schema.Bounded (IntBounds, intBounds, clampInt, BoundsBehavior(Clamps)) as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // boundary behavior
@@ -157,15 +157,15 @@ instance showCount :: Show Count where
 
 -- | Create a count value (clamps to [0, 10000])
 count :: Int -> Count
-count n = Count (clampInt 0 10000 n)
+count n = Count (Bounded.clampInt 0 10000 n)
 
 -- | Extract raw count value
 unwrapCount :: Count -> Int
 unwrapCount (Count n) = n
 
 -- | Bounds for Count
-countBounds :: IntBounds
-countBounds = intBounds 0 10000 "count" "Number of items in sequence (0-10000)"
+countBounds :: Bounded.IntBounds
+countBounds = Bounded.intBounds 0 10000 Bounded.Clamps "count" "Number of items in sequence (0-10000)"
 
 -- | Is the sequence empty?
 isEmpty :: Count -> Boolean
@@ -196,7 +196,7 @@ instance showIndex :: Show Index where
 -- | Note: This does not guarantee the index is valid for a given sequence.
 -- | Use `indexedPosition` to create a validated position.
 index :: Int -> Index
-index n = Index (clampInt 0 9999 n)
+index n = Index (Bounded.clampInt 0 9999 n)
 
 -- | Create an index without bounds checking
 -- |
@@ -209,8 +209,8 @@ unwrapIndex :: Index -> Int
 unwrapIndex (Index n) = n
 
 -- | Bounds for Index
-indexBounds :: IntBounds
-indexBounds = intBounds 0 9999 "index" "Zero-based position in sequence (0-9999)"
+indexBounds :: Bounded.IntBounds
+indexBounds = Bounded.intBounds 0 9999 Bounded.Clamps "index" "Zero-based position in sequence (0-9999)"
 
 -- | Is this index 0?
 isFirst :: Index -> Boolean
@@ -245,12 +245,12 @@ type IndexedPosition =
 indexedPosition :: Int -> Int -> BoundaryBehavior -> IndexedPosition
 indexedPosition idx cnt bhv =
   let
-    validCount = clampInt 0 10000 cnt
+    validCount = Bounded.clampInt 0 10000 cnt
     validIndex = 
       if validCount == 0 
         then 0
         else case bhv of
-          Clamp -> clampInt 0 (validCount - 1) idx
+          Clamp -> Bounded.clampInt 0 (validCount - 1) idx
           Wrap -> wrapIndex idx validCount
   in
     { index: Index validIndex

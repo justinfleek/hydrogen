@@ -123,4 +123,4 @@ toUnitInterval (Key k) = Int.toNumber k / 100.0
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "key" "Black (Key) ink percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "key" "Black (Key) ink percentage"

@@ -104,7 +104,7 @@ toNumber (Metallic m) = m
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "metallic" "PBR metallic factor (dielectric to metal)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "metallic" "PBR metallic factor (dielectric to metal)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

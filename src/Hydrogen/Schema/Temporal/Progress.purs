@@ -84,5 +84,5 @@ end = Progress 1.0
 
 -- | Bounds for Progress
 progressBounds :: Bounded.NumberBounds
-progressBounds = Bounded.numberBounds 0.0 1.0 "progress"
+progressBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "progress"
   "Normalized progress value (0.0 to 1.0)"

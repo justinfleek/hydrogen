@@ -454,5 +454,5 @@ dimExprToString (DimAdd a b) = "(" <> dimExprToString a <> " + " <> dimExprToStr
 -- | - Maximum 2^30: Practical memory limit for a single dimension
 -- |   (A 1B element dimension × 4 bytes = 4GB for one axis alone)
 dimBounds :: Bounded.IntBounds
-dimBounds = Bounded.intBounds 1 1073741824 "Dim"
+dimBounds = Bounded.intBounds 1 1073741824 Bounded.Clamps "Dim"
   "Tensor dimension size, strictly positive with practical memory ceiling"

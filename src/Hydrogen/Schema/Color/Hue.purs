@@ -328,9 +328,12 @@ unwrap (Hue h) = h
 toNumber :: Hue -> Number
 toNumber (Hue h) = Int.toNumber h
 
--- | Bounds documentation for this type
+-- | Bounds documentation for this type.
+-- |
+-- | Hue WRAPS at 360° — this is a color wheel, not a linear scale.
+-- | 370° becomes 10°, -30° becomes 330°.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 359 "hue" "Color wheel position in degrees"
+bounds = Bounded.intBounds 0 360 Bounded.Wraps "hue" "Color wheel position in degrees (wraps)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // hue shift // ±180
@@ -381,10 +384,13 @@ noHueShift = HueShift 0.0
 negateHueShift :: HueShift -> HueShift
 negateHueShift (HueShift h) = HueShift (negate h)
 
--- | Bounds documentation for HueShift
+-- | Bounds documentation for HueShift.
+-- |
+-- | HueShift WRAPS to represent shortest rotation path.
+-- | +200° becomes -160°, -270° becomes +90°.
 hueShiftBounds :: Bounded.NumberBounds
-hueShiftBounds = Bounded.numberBounds (-180.0) 180.0 "hueShift" 
-  "Hue adjustment in degrees (-180 to 180)"
+hueShiftBounds = Bounded.numberBounds (-180.0) 180.0 Bounded.Wraps "hueShift" 
+  "Hue adjustment in degrees (-180 to 180, wraps)"
 
 -- | Wrap value to -180 to 180 range.
 -- |

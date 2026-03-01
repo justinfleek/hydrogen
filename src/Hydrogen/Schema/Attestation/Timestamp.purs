@@ -50,6 +50,7 @@ import Prelude
   , class Show
   , show
   , otherwise
+  , negate
   , (<>)
   , (+)
   , (-)
@@ -286,10 +287,11 @@ padZero4 n
 --                                                                     // bounds
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Bounds for Timestamp [0, 253402300800000] ms
+-- | Bounds for Timestamp [-10000000000000, 253402300799999] ms
 -- |
+-- | - 10000000000000: ~300,000 BCE (dinosaurs, early humans)
 -- | - 0: Unix epoch (1970-01-01T00:00:00Z)
--- | - 253402300800000: Year 10000 — far future ceiling
+-- | - 253402300799999: Year 9999 - practical future ceiling
 timestampBounds :: Bounded.NumberBounds
-timestampBounds = Bounded.numberBounds 0.0 253402300800000.0 "Timestamp"
-  "UTC timestamp in milliseconds since Unix epoch (1970 to year 10000)"
+timestampBounds = Bounded.numberBounds (-10000000000000.0) 253402300799999.0 Bounded.Clamps "Timestamp"
+  "UTC timestamp in ms (-300000 BCE to year 9999)"

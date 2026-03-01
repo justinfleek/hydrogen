@@ -195,20 +195,20 @@ unwrapCubicY2 (CubicY2 y) = y
 
 -- | Bounds for CubicX1
 cubicX1Bounds :: Bounded.NumberBounds
-cubicX1Bounds = Bounded.numberBounds 0.0 1.0 "cubicX1"
+cubicX1Bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "cubicX1"
   "First bezier control point X coordinate (0-1 for valid timing)"
 
 -- | Bounds for CubicX2
 cubicX2Bounds :: Bounded.NumberBounds
-cubicX2Bounds = Bounded.numberBounds 0.0 1.0 "cubicX2"
+cubicX2Bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "cubicX2"
   "Second bezier control point X coordinate (0-1 for valid timing)"
 
 -- | Bounds for CubicY1 (practical limits, not strict)
 cubicY1Bounds :: Bounded.NumberBounds
-cubicY1Bounds = Bounded.numberBounds (-5.0) 5.0 "cubicY1"
+cubicY1Bounds = Bounded.numberBounds (-5.0) 5.0 Bounded.Clamps "cubicY1"
   "First bezier control point Y coordinate (unbounded, typical -2 to 2)"
 
 -- | Bounds for CubicY2 (practical limits, not strict)
 cubicY2Bounds :: Bounded.NumberBounds
-cubicY2Bounds = Bounded.numberBounds (-5.0) 5.0 "cubicY2"
+cubicY2Bounds = Bounded.numberBounds (-5.0) 5.0 Bounded.Clamps "cubicY2"
   "Second bezier control point Y coordinate (unbounded, typical -2 to 2)"

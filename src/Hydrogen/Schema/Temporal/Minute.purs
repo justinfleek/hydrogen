@@ -103,4 +103,4 @@ padZero n
 -- | Min: 0
 -- | Max: 59
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 59 "minute" "Minute within hour (0-59)"
+bounds = Bounded.intBounds 0 59 Bounded.Clamps "minute" "Minute within hour (0-59)"

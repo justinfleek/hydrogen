@@ -335,46 +335,46 @@ dbToResonance (ResonanceDb db) = Resonance (db / 30.0)
 -- | Min: 20.0 Hz (lower limit of hearing)
 -- | Max: 20000.0 Hz (upper limit of hearing)
 cutoffFreqBounds :: Bounded.NumberBounds
-cutoffFreqBounds = Bounded.numberBounds 20.0 20000.0 "cutoffFreq" "Filter cutoff frequency in Hz (20-20000)"
+cutoffFreqBounds = Bounded.numberBounds 20.0 20000.0 Bounded.Clamps "cutoffFreq" "Filter cutoff frequency in Hz (20-20000)"
 
 -- | Bounds for Resonance
 -- |
 -- | Min: 0.0 (flat)
 -- | Max: 1.0 (self-oscillation threshold)
 resonanceBounds :: Bounded.NumberBounds
-resonanceBounds = Bounded.numberBounds 0.0 1.0 "resonance" "Filter resonance (0-1)"
+resonanceBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "resonance" "Filter resonance (0-1)"
 
 -- | Bounds for ResonanceDb
 -- |
 -- | Min: 0.0 dB (flat)
 -- | Max: 30.0 dB (high resonance)
 resonanceDbBounds :: Bounded.NumberBounds
-resonanceDbBounds = Bounded.numberBounds 0.0 30.0 "resonanceDb" "Filter resonance in dB (0-30)"
+resonanceDbBounds = Bounded.numberBounds 0.0 30.0 Bounded.Clamps "resonanceDb" "Filter resonance in dB (0-30)"
 
 -- | Bounds for Drive
 -- |
 -- | Min: 0.0 (clean)
 -- | Max: 10.0 (heavy distortion)
 driveBounds :: Bounded.NumberBounds
-driveBounds = Bounded.numberBounds 0.0 10.0 "drive" "Saturation/drive amount (0-10)"
+driveBounds = Bounded.numberBounds 0.0 10.0 Bounded.Clamps "drive" "Saturation/drive amount (0-10)"
 
 -- | Bounds for Mix
 -- |
 -- | Min: 0.0 (dry)
 -- | Max: 1.0 (wet)
 mixBounds :: Bounded.NumberBounds
-mixBounds = Bounded.numberBounds 0.0 1.0 "mix" "Wet/dry mix (0-1)"
+mixBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "mix" "Wet/dry mix (0-1)"
 
 -- | Bounds for Feedback
 -- |
 -- | Min: 0.0 (no feedback)
 -- | Max: 1.0 (maximum stable feedback)
 feedbackBounds :: Bounded.NumberBounds
-feedbackBounds = Bounded.numberBounds 0.0 1.0 "feedback" "Feedback amount (0-1)"
+feedbackBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "feedback" "Feedback amount (0-1)"
 
 -- | Bounds for DecayTime
 -- |
 -- | Min: 0.0 seconds
--- | Max: 60.0 seconds
+-- | Max: 10.0 seconds (long reverb-like decay)
 decayTimeBounds :: Bounded.NumberBounds
-decayTimeBounds = Bounded.numberBounds 0.0 60.0 "decayTime" "Decay time in seconds (0-60)"
+decayTimeBounds = Bounded.numberBounds 0.0 10.0 Bounded.Clamps "decayTime" "Decay time in seconds (0-10)"

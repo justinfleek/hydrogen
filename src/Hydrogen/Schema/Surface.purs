@@ -1,0 +1,88 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                              // hydrogen // schema // surface
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Surface pillar — 2D surface effects, fills, filters, and procedural textures.
+-- |
+-- | ## Import Pattern
+-- |
+-- | Import submodules directly with qualified names:
+-- |
+-- | ```purescript
+-- | import Hydrogen.Schema.Surface.Fill as Fill
+-- | import Hydrogen.Schema.Surface.Surface as Surface
+-- | import Hydrogen.Schema.Surface.GlassEffect as Glass
+-- |
+-- | cardFill :: Fill.Fill
+-- | cardFill = Fill.solid (SRGB { r: 255, g: 255, b: 255 })
+-- |
+-- | glassSurface :: Glass.GlassEffect
+-- | glassSurface = Glass.frosted { blur: 20.0, opacity: 0.8 }
+-- | ```
+-- |
+-- | ## Submodules
+-- |
+-- | ### Core
+-- | - `Hydrogen.Schema.Surface.Fill` — Solid, gradient, and pattern fills
+-- | - `Hydrogen.Schema.Surface.Surface` — Surface material definitions
+-- |
+-- | ### Border
+-- | - `Hydrogen.Schema.Surface.BorderAll` — All-sides border shorthand
+-- | - `Hydrogen.Schema.Surface.BorderImage` — Image-based borders
+-- | - `Hydrogen.Schema.Surface.BorderSide` — Per-side border definitions
+-- | - `Hydrogen.Schema.Surface.BorderWidth` — Border width values
+-- |
+-- | ### Dashed Lines
+-- | - `Hydrogen.Schema.Surface.DashGap` — Gap between dashes
+-- | - `Hydrogen.Schema.Surface.DashLength` — Length of dashes
+-- | - `Hydrogen.Schema.Surface.DashOffset` — Dash pattern offset
+-- |
+-- | ### Blur
+-- | - `Hydrogen.Schema.Surface.BlurRadius` — Blur radius values
+-- | - `Hydrogen.Schema.Surface.BlurSigma` — Gaussian blur sigma
+-- |
+-- | ### Effects
+-- | - `Hydrogen.Schema.Surface.GlassEffect` — Glassmorphism effects
+-- | - `Hydrogen.Schema.Surface.Neumorphism` — Soft UI / neumorphic shadows
+-- | - `Hydrogen.Schema.Surface.Duotone` — Two-tone color effects
+-- |
+-- | ### Filters
+-- | - `Hydrogen.Schema.Surface.FilterBrightness` — Brightness adjustment
+-- | - `Hydrogen.Schema.Surface.FilterChain` — Composable filter chains
+-- | - `Hydrogen.Schema.Surface.FilterContrast` — Contrast adjustment
+-- | - `Hydrogen.Schema.Surface.FilterExposure` — Exposure adjustment
+-- | - `Hydrogen.Schema.Surface.FilterFade` — Fade/wash effect
+-- | - `Hydrogen.Schema.Surface.FilterGrain` — Film grain effect
+-- | - `Hydrogen.Schema.Surface.FilterGrayscale` — Grayscale conversion
+-- | - `Hydrogen.Schema.Surface.FilterHighlights` — Highlight adjustment
+-- | - `Hydrogen.Schema.Surface.FilterHueRotate` — Hue rotation
+-- | - `Hydrogen.Schema.Surface.FilterInvert` — Color inversion
+-- | - `Hydrogen.Schema.Surface.FilterSaturation` — Saturation adjustment
+-- | - `Hydrogen.Schema.Surface.FilterSepia` — Sepia tone effect
+-- | - `Hydrogen.Schema.Surface.FilterShadows` — Shadow adjustment
+-- | - `Hydrogen.Schema.Surface.FilterSharpen` — Sharpening filter
+-- | - `Hydrogen.Schema.Surface.FilterTemperature` — Color temperature
+-- | - `Hydrogen.Schema.Surface.FilterTint` — Color tint overlay
+-- | - `Hydrogen.Schema.Surface.FilterVignette` — Vignette effect
+-- |
+-- | ### Procedural Noise
+-- | - `Hydrogen.Schema.Surface.FBM` — Fractal Brownian Motion
+-- | - `Hydrogen.Schema.Surface.PerlinNoise` — Classic Perlin noise
+-- | - `Hydrogen.Schema.Surface.SimplexNoise` — Simplex noise
+-- | - `Hydrogen.Schema.Surface.WorleyNoise` — Cellular/Worley noise
+-- | - `Hydrogen.Schema.Surface.NoiseAmplitude` — Noise amplitude parameter
+-- | - `Hydrogen.Schema.Surface.NoiseFrequency` — Noise frequency parameter
+-- | - `Hydrogen.Schema.Surface.NoiseLacunarity` — Lacunarity for FBM
+-- | - `Hydrogen.Schema.Surface.NoiseOctaves` — Octave count for FBM
+-- | - `Hydrogen.Schema.Surface.NoisePersistence` — Persistence for FBM
+-- | - `Hydrogen.Schema.Surface.NoiseSeed` — Deterministic noise seed
+-- |
+-- | This module exists as documentation. Import submodules directly.
+
+module Hydrogen.Schema.Surface
+  ( module Hydrogen.Schema.Surface
+  ) where
+
+-- | Material pillar version for compatibility checks.
+materialVersion :: String
+materialVersion = "0.1.0"

@@ -120,7 +120,7 @@ import Prelude
   )
 
 import Data.Int (ceil, toNumber)
-import Hydrogen.Schema.Bounded (IntBounds, intBounds, clampInt)
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Dimension.Device (Pixel, px)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -142,7 +142,7 @@ instance showItemsVisible :: Show ItemsVisible where
 
 -- | Create items visible (clamps to [1, 20])
 itemsVisible :: Int -> ItemsVisible
-itemsVisible n = ItemsVisible (clampInt 1 20 n)
+itemsVisible n = ItemsVisible (Bounded.clampInt 1 20 n)
 
 -- | Extract raw value
 unwrapItemsVisible :: ItemsVisible -> Int
@@ -161,8 +161,8 @@ tripleItem :: ItemsVisible
 tripleItem = ItemsVisible 3
 
 -- | Bounds for ItemsVisible
-itemsVisibleBounds :: IntBounds
-itemsVisibleBounds = intBounds 1 20 "itemsVisible" "Items visible at once (1-20)"
+itemsVisibleBounds :: Bounded.IntBounds
+itemsVisibleBounds = Bounded.intBounds 1 20 Bounded.Clamps "itemsVisible" "Items visible at once (1-20)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // items to scroll
@@ -182,7 +182,7 @@ instance showItemsToScroll :: Show ItemsToScroll where
 
 -- | Create items to scroll (clamps to [1, 20])
 itemsToScroll :: Int -> ItemsToScroll
-itemsToScroll n = ItemsToScroll (clampInt 1 20 n)
+itemsToScroll n = ItemsToScroll (Bounded.clampInt 1 20 n)
 
 -- | Extract raw value
 unwrapItemsToScroll :: ItemsToScroll -> Int
@@ -199,8 +199,8 @@ scrollAll :: ItemsVisible -> ItemsToScroll
 scrollAll (ItemsVisible n) = ItemsToScroll n
 
 -- | Bounds for ItemsToScroll
-itemsToScrollBounds :: IntBounds
-itemsToScrollBounds = intBounds 1 20 "itemsToScroll" "Items to advance per action (1-20)"
+itemsToScrollBounds :: Bounded.IntBounds
+itemsToScrollBounds = Bounded.intBounds 1 20 Bounded.Clamps "itemsToScroll" "Items to advance per action (1-20)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // item gap
@@ -249,7 +249,7 @@ viewportState :: Int -> Int -> ItemsVisible -> ItemsToScroll -> ItemGap -> Viewp
 viewportState pos cnt vis scr gp =
   let
     maxPos = if cnt <= unwrapItemsVisible vis then 0 else cnt - unwrapItemsVisible vis
-    clampedPos = clampInt 0 maxPos pos
+    clampedPos = Bounded.clampInt 0 maxPos pos
   in
     { position: clampedPos
     , count: cnt
@@ -307,7 +307,7 @@ instance showPageSize :: Show PageSize where
 
 -- | Create page size (clamps to [1, 500])
 pageSize :: Int -> PageSize
-pageSize n = PageSize (clampInt 1 500 n)
+pageSize n = PageSize (Bounded.clampInt 1 500 n)
 
 -- | Extract raw value
 unwrapPageSize :: PageSize -> Int
@@ -330,8 +330,8 @@ pageSize100 :: PageSize
 pageSize100 = PageSize 100
 
 -- | Bounds for PageSize
-pageSizeBounds :: IntBounds
-pageSizeBounds = intBounds 1 500 "pageSize" "Items per page (1-500)"
+pageSizeBounds :: Bounded.IntBounds
+pageSizeBounds = Bounded.intBounds 1 500 Bounded.Clamps "pageSize" "Items per page (1-500)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // page number
@@ -350,7 +350,7 @@ instance showPageNumber :: Show PageNumber where
 
 -- | Create page number (clamps to [1, 100000])
 pageNumber :: Int -> PageNumber
-pageNumber n = PageNumber (clampInt 1 100000 n)
+pageNumber n = PageNumber (Bounded.clampInt 1 100000 n)
 
 -- | Extract raw value
 unwrapPageNumber :: PageNumber -> Int
@@ -361,8 +361,8 @@ firstPage :: PageNumber
 firstPage = PageNumber 1
 
 -- | Bounds for PageNumber
-pageNumberBounds :: IntBounds
-pageNumberBounds = intBounds 1 100000 "pageNumber" "Page number (1-100000)"
+pageNumberBounds :: Bounded.IntBounds
+pageNumberBounds = Bounded.intBounds 1 100000 Bounded.Clamps "pageNumber" "Page number (1-100000)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // total items
@@ -388,8 +388,8 @@ unwrapTotalItems :: TotalItems -> Int
 unwrapTotalItems (TotalItems n) = n
 
 -- | Bounds for TotalItems (practical upper limit)
-totalItemsBounds :: IntBounds
-totalItemsBounds = intBounds 0 2147483647 "totalItems" "Total items in dataset (0-MAX_INT)"
+totalItemsBounds :: Bounded.IntBounds
+totalItemsBounds = Bounded.intBounds 0 2147483647 Bounded.Clamps "totalItems" "Total items in dataset (0-MAX_INT)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // page state
@@ -407,9 +407,9 @@ pageState :: Int -> Int -> Int -> PageState
 pageState pg sz tot =
   let
     validTotal = if tot < 0 then 0 else tot
-    validSize = clampInt 1 500 sz
+    validSize = Bounded.clampInt 1 500 sz
     maxPage = calcTotalPages validTotal validSize
-    validPage = clampInt 1 (if maxPage == 0 then 1 else maxPage) pg
+    validPage = Bounded.clampInt 1 (if maxPage == 0 then 1 else maxPage) pg
   in
     { page: PageNumber validPage
     , size: PageSize validSize

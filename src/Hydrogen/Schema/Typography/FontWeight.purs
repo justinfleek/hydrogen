@@ -168,4 +168,4 @@ toLegacyCss (FontWeight w) = show w
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 1 1000 "fontWeight" "Font stroke thickness (1-1000)"
+bounds = Bounded.intBounds 1 1000 Bounded.Clamps "fontWeight" "Font stroke thickness (1-1000)"

@@ -30,7 +30,7 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 
-import Hydrogen.Schema.Material.Fill (Fill, fillSolid) as Fill
+import Hydrogen.Schema.Surface.Fill (Fill, fillSolid) as Fill
 import Hydrogen.Schema.Elevation.Shadow (LayeredShadow, noShadow) as Shadow
 import Hydrogen.Schema.Color.RGB (RGB, rgb) as Color
 

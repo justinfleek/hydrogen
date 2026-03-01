@@ -104,4 +104,4 @@ toUnitInterval (Yellow y) = Int.toNumber y / 100.0
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "yellow" "Yellow ink percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "yellow" "Yellow ink percentage"

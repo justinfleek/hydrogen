@@ -330,16 +330,16 @@ unwrapGradians (Gradians n) = n
 
 -- | Bounds for normalized Radians [0, 2π)
 radiansBounds :: Bounded.NumberBounds
-radiansBounds = Bounded.numberBounds 0.0 Math.tau "radians" "Angle in radians (0 to 2π)"
+radiansBounds = Bounded.numberBounds 0.0 Math.tau Bounded.Clamps "radians" "Angle in radians (0 to 2π)"
 
 -- | Bounds for normalized Degrees [0, 360)
 degreesBounds :: Bounded.NumberBounds
-degreesBounds = Bounded.numberBounds 0.0 360.0 "degrees" "Angle in degrees (0-360)"
+degreesBounds = Bounded.numberBounds 0.0 360.0 Bounded.Clamps "degrees" "Angle in degrees (0-360)"
 
 -- | Bounds for normalized Turns [0, 1)
 turnsBounds :: Bounded.NumberBounds
-turnsBounds = Bounded.numberBounds 0.0 1.0 "turns" "Angle in turns (0-1)"
+turnsBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "turns" "Angle in turns (0-1)"
 
 -- | Bounds for normalized Gradians [0, 400)
 gradiansBounds :: Bounded.NumberBounds
-gradiansBounds = Bounded.numberBounds 0.0 400.0 "gradians" "Angle in gradians (0-400)"
+gradiansBounds = Bounded.numberBounds 0.0 400.0 Bounded.Clamps "gradians" "Angle in gradians (0-400)"

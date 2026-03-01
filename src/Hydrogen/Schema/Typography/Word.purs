@@ -346,4 +346,4 @@ adjustBaseline y w = w { baseline = y }
 -- | Min: -100.0 (tight kerning)
 -- | Max: 500.0 (extreme spacing)
 letterSpacingPxBounds :: Bounded.NumberBounds
-letterSpacingPxBounds = Bounded.numberBounds (-100.0) 500.0 "letterSpacingPx" "Letter spacing in pixels"
+letterSpacingPxBounds = Bounded.numberBounds (-100.0) 500.0 Bounded.Clamps "letterSpacingPx" "Letter spacing in pixels"

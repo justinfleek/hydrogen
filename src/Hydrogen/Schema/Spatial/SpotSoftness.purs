@@ -43,5 +43,5 @@ unwrapSpotSoftness :: SpotSoftness -> Number
 unwrapSpotSoftness (SpotSoftness n) = n
 
 spotSoftnessBounds :: Bounded.NumberBounds
-spotSoftnessBounds = Bounded.numberBounds 0.0 1.0 "SpotSoftness"
+spotSoftnessBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "SpotSoftness"
   "Spotlight penumbra softness (0.0 hard to 1.0 soft)"

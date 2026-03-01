@@ -35,6 +35,14 @@
 -- | ```lean
 -- | theorem roundtrip : ∀ x, deserialize (serialize x) = x
 -- | ```
+-- |
+-- | ## Architecture Note
+-- |
+-- | This module exceeds the standard 500-line limit due to PureScript's orphan
+-- | instance rules. Typeclass instances must be defined in either the module
+-- | that defines the typeclass OR the module that defines the type. Since we're
+-- | providing GPUStorable instances for many types across the codebase, they
+-- | must all live here with the typeclass definition.
 
 module Hydrogen.Schema.GPU.Storable
   ( -- * GPUStorable Typeclass

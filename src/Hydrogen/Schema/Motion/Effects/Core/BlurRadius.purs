@@ -73,7 +73,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Schema.Bounded (NumberBounds, numberBounds, clampNumber)
+import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Attestation.UUID5 (UUID5, uuid5, nsEffect)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -98,13 +98,13 @@ instance showBlurRadius :: Show BlurRadius where
 --                                                                    // bounds
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Blur radius bounds: 0.0 to 1000.0 pixels.
+-- | Blur radius bounds: 0.0 to 250.0 pixels.
 -- |
--- | 1000px is the maximum practical blur - beyond this, the image is
--- | essentially a single color averaged from the entire source.
-blurRadiusBounds :: NumberBounds
-blurRadiusBounds = numberBounds 0.0 1000.0 "blur_radius" 
-  "Blur radius in pixels, 0.0 = no blur, 1000.0 = maximum practical blur"
+-- | 250px matches Photoshop's maximum blur radius.
+-- | Beyond this, the image is essentially solid color.
+blurRadiusBounds :: Bounded.NumberBounds
+blurRadiusBounds = Bounded.numberBounds 0.0 250.0 Bounded.Clamps "blur_radius" 
+  "Blur radius in pixels, 0.0 = no blur, 250.0 = maximum"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -130,7 +130,7 @@ blurRadiusUnsafe = BlurRadius
 -- | Values below 0.0 become 0.0, values above 1000.0 become 1000.0.
 -- | This always succeeds.
 clampBlurRadius :: Number -> BlurRadius
-clampBlurRadius n = BlurRadius (clampNumber 0.0 1000.0 n)
+clampBlurRadius n = BlurRadius (Bounded.clampNumber 0.0 1000.0 n)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors
@@ -178,7 +178,7 @@ addBlurRadius (BlurRadius a) (BlurRadius b) = clampBlurRadius (a + b)
 -- | t is clamped to [0,1] internally.
 lerpBlurRadius :: Number -> BlurRadius -> BlurRadius -> BlurRadius
 lerpBlurRadius t (BlurRadius a) (BlurRadius b) =
-  let t' = clampNumber 0.0 1.0 t
+  let t' = Bounded.clampNumber 0.0 1.0 t
   in BlurRadius (a + t' * (b - a))
 
 -- ═════════════════════════════════════════════════════════════════════════════

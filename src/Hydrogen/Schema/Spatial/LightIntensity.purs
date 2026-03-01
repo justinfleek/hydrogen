@@ -42,5 +42,5 @@ unwrapLightIntensity :: LightIntensity -> Number
 unwrapLightIntensity (LightIntensity n) = n
 
 lightIntensityBounds :: Bounded.NumberBounds
-lightIntensityBounds = Bounded.numberBounds 0.0 1000000.0 "LightIntensity"
-  "Light intensity value (non-negative)"
+lightIntensityBounds = Bounded.numberBounds 0.0 10000.0 Bounded.Clamps "LightIntensity"
+  "Light intensity in nits (0-10000)"

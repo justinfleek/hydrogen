@@ -122,18 +122,63 @@ determinant (Matrix4 m) =
   in
     b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
 
--- | Invert matrix
+-- | Invert matrix using cofactor expansion
+-- | Returns Nothing if the matrix is singular (determinant ≈ 0)
 invert :: Matrix4 -> Maybe Matrix4
-invert m@(Matrix4 r) =
+invert (Matrix4 m) =
   let
-    det = determinant m
+    -- Compute 2x2 determinants for the first two rows
+    b00 = m.m00 * m.m11 - m.m01 * m.m10
+    b01 = m.m00 * m.m12 - m.m02 * m.m10
+    b02 = m.m00 * m.m13 - m.m03 * m.m10
+    b03 = m.m01 * m.m12 - m.m02 * m.m11
+    b04 = m.m01 * m.m13 - m.m03 * m.m11
+    b05 = m.m02 * m.m13 - m.m03 * m.m12
+    
+    -- Compute 2x2 determinants for the last two rows
+    b06 = m.m20 * m.m31 - m.m21 * m.m30
+    b07 = m.m20 * m.m32 - m.m22 * m.m30
+    b08 = m.m20 * m.m33 - m.m23 * m.m30
+    b09 = m.m21 * m.m32 - m.m22 * m.m31
+    b10 = m.m21 * m.m33 - m.m23 * m.m31
+    b11 = m.m22 * m.m33 - m.m23 * m.m32
+    
+    -- Compute determinant
+    det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
   in
     if abs det < 0.000001
       then Nothing
       else
-        -- Full inversion implementation omitted for brevity, generally huge.
-        -- Placeholder for now:
-        Nothing 
+        let
+          invDet = 1.0 / det
+          
+          -- Compute adjugate matrix elements and multiply by 1/det
+          n00 = (m.m11 * b11 - m.m12 * b10 + m.m13 * b09) * invDet
+          n01 = (m.m02 * b10 - m.m01 * b11 - m.m03 * b09) * invDet
+          n02 = (m.m31 * b05 - m.m32 * b04 + m.m33 * b03) * invDet
+          n03 = (m.m22 * b04 - m.m21 * b05 - m.m23 * b03) * invDet
+          
+          n10 = (m.m12 * b08 - m.m10 * b11 - m.m13 * b07) * invDet
+          n11 = (m.m00 * b11 - m.m02 * b08 + m.m03 * b07) * invDet
+          n12 = (m.m32 * b02 - m.m30 * b05 - m.m33 * b01) * invDet
+          n13 = (m.m20 * b05 - m.m22 * b02 + m.m23 * b01) * invDet
+          
+          n20 = (m.m10 * b10 - m.m11 * b08 + m.m13 * b06) * invDet
+          n21 = (m.m01 * b08 - m.m00 * b10 - m.m03 * b06) * invDet
+          n22 = (m.m30 * b04 - m.m31 * b02 + m.m33 * b00) * invDet
+          n23 = (m.m21 * b02 - m.m20 * b04 - m.m23 * b00) * invDet
+          
+          n30 = (m.m11 * b07 - m.m10 * b09 - m.m12 * b06) * invDet
+          n31 = (m.m00 * b09 - m.m01 * b07 + m.m02 * b06) * invDet
+          n32 = (m.m31 * b01 - m.m30 * b03 - m.m32 * b00) * invDet
+          n33 = (m.m20 * b03 - m.m21 * b01 + m.m22 * b00) * invDet
+        in
+          Just (Matrix4
+            { m00: n00, m01: n01, m02: n02, m03: n03
+            , m10: n10, m11: n11, m12: n12, m13: n13
+            , m20: n20, m21: n21, m22: n22, m23: n23
+            , m30: n30, m31: n31, m32: n32, m33: n33
+            })
 
 -- | Multiply matrices (A * B)
 multiply :: Matrix4 -> Matrix4 -> Matrix4

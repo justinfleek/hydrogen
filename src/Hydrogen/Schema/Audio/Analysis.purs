@@ -330,39 +330,39 @@ meteringStandardName PhaseMeter = "Phase"
 -- | Min: 0.0 (silence)
 -- | Max: 1.0 (full scale)
 rmsLevelBounds :: Bounded.NumberBounds
-rmsLevelBounds = Bounded.numberBounds 0.0 1.0 "rmsLevel" "RMS amplitude (0-1)"
+rmsLevelBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "rmsLevel" "RMS amplitude (0-1)"
 
 -- | Bounds for PeakLevel
 -- |
--- | Min: 0.0 (silence)
+-- |.0 (sil Min: 0ence)
 -- | Max: 1.0 (full scale)
 peakLevelBounds :: Bounded.NumberBounds
-peakLevelBounds = Bounded.numberBounds 0.0 1.0 "peakLevel" "Peak amplitude (0-1)"
+peakLevelBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "peakLevel" "Peak amplitude (0-1)"
 
 -- | Bounds for CrestFactor
 -- |
 -- | Min: 0.0 dB (square wave)
 -- | Max: 40.0 dB (very dynamic)
 crestFactorBounds :: Bounded.NumberBounds
-crestFactorBounds = Bounded.numberBounds 0.0 40.0 "crestFactor" "Peak/RMS ratio in dB (0-40)"
+crestFactorBounds = Bounded.numberBounds 0.0 40.0 Bounded.Clamps "crestFactor" "Peak/RMS ratio in dB (0-40)"
 
 -- | Bounds for FFTBin
 -- |
 -- | Min: 0.0 (no energy)
 -- | Max: 1.0 (normalized max)
 fftBinBounds :: Bounded.NumberBounds
-fftBinBounds = Bounded.numberBounds 0.0 1.0 "fftBin" "Normalized FFT bin magnitude (0-1)"
+fftBinBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "fftBin" "Normalized FFT bin magnitude (0-1)"
 
 -- | Bounds for SpectralCentroid
 -- |
 -- | Min: 0.0 Hz
 -- | Max: 22050.0 Hz (Nyquist at 44.1kHz)
 spectralCentroidBounds :: Bounded.NumberBounds
-spectralCentroidBounds = Bounded.numberBounds 0.0 22050.0 "spectralCentroid" "Spectral centroid in Hz (0-22050)"
+spectralCentroidBounds = Bounded.numberBounds 0.0 22050.0 Bounded.Clamps "spectralCentroid" "Spectral centroid in Hz (0-22050)"
 
 -- | Bounds for ZeroCrossing
 -- |
 -- | Min: 0
 -- | Max: unbounded (finite)
 zeroCrossingBounds :: Bounded.IntBounds
-zeroCrossingBounds = Bounded.intBounds 0 1000000 "zeroCrossing" "Zero crossing count (0+)"
+zeroCrossingBounds = Bounded.intBounds 0 1000000 Bounded.Clamps "zeroCrossing" "Zero crossing count (0+)"

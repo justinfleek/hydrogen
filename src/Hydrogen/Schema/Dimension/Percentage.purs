@@ -170,7 +170,7 @@ zeroSignedPercent = SignedPercent 0.0
 
 -- | Bounds for SignedPercent
 signedPercentBounds :: Bounded.NumberBounds
-signedPercentBounds = Bounded.numberBounds (-100.0) 100.0 "signedPercent" 
+signedPercentBounds = Bounded.numberBounds (-100.0) 100.0 Bounded.Clamps "signedPercent" 
   "Signed percentage adjustment (-100 to 100)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -212,8 +212,8 @@ doubleIntensity = IntensityPercent 200.0
 
 -- | Bounds for IntensityPercent
 intensityPercentBounds :: Bounded.NumberBounds
-intensityPercentBounds = Bounded.numberBounds 0.0 400.0 "intensityPercent"
-  "Intensity percentage (0-400%, allows overbright)"
+intensityPercentBounds = Bounded.numberBounds 1.0 100.0 Bounded.Clamps "intensityPercent"
+  "Intensity percentage (1-100%, typical use)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // ratio // 0 1
@@ -297,7 +297,7 @@ zeroSignedRatio = SignedRatio 0.0
 
 -- | Bounds for SignedRatio
 signedRatioBounds :: Bounded.NumberBounds
-signedRatioBounds = Bounded.numberBounds (-1.0) 1.0 "signedRatio"
+signedRatioBounds = Bounded.numberBounds (-1.0) 1.0 Bounded.Clamps "signedRatio"
   "Signed normalized ratio (-1.0 to 1.0)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -363,11 +363,11 @@ aspect3x4 = Proportion (3.0 / 4.0)
 -- | Min: 0.0
 -- | Max: 100.0
 percentBounds :: Bounded.NumberBounds
-percentBounds = Bounded.numberBounds 0.0 100.0 "percent" "Percentage value (0-100)"
+percentBounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "percent" "Percentage value (0-100)"
 
 -- | Bounds for Ratio
 -- |
 -- | Min: 0.0
 -- | Max: 1.0
 ratioBounds :: Bounded.NumberBounds
-ratioBounds = Bounded.numberBounds 0.0 1.0 "ratio" "Normalized ratio (0-1)"
+ratioBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "ratio" "Normalized ratio (0-1)"

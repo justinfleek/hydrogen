@@ -638,4 +638,4 @@ readingSpeedFast = ReadingSpeed 1.5
 -- | Min: 0.25 (quarter speed)
 -- | Max: 4.0 (quadruple speed)
 readingSpeedBounds :: Bounded.NumberBounds
-readingSpeedBounds = Bounded.numberBounds 0.25 4.0 "readingSpeed" "TTS/screen reader rate multiplier (0.25-4.0)"
+readingSpeedBounds = Bounded.numberBounds 0.25 4.0 Bounded.Clamps "readingSpeed" "TTS/screen reader rate multiplier (0.25-4.0)"

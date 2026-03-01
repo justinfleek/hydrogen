@@ -326,13 +326,13 @@ scale3DToLegacyCss (Scale3D s) =
 
 -- | Bounds for Scale3D components.
 -- |
--- | Scale values are bounded -10.0 to 10.0 to prevent:
+-- | Scale values are bounded -5.0 to 5.0 to prevent:
 -- | - Extreme distortion that breaks layouts
--- | - Negative scales beyond mirroring (meaningful up to -1.0)
+-- | - Negative scales for mirroring (-1 = inverted)
 -- | - Values that cause GPU precision issues
 scale3DBounds :: Bounded.NumberBounds
-scale3DBounds = Bounded.numberBounds (-10.0) 10.0 "Scale3D"
-  "3D scale factor per axis, allowing inversion via negative values"
+scale3DBounds = Bounded.numberBounds (-5.0) 5.0 Bounded.Clamps "Scale3D"
+  "3D scale factor per axis (-5 to 5)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // perspective
@@ -381,7 +381,7 @@ perspectiveToLegacyCss (Perspective p) =
 -- | - Dramatic effects: 200-500px
 -- | - Note: perspectiveNone (0.0) is a special case meaning "no perspective"
 perspectiveBounds :: Bounded.NumberBounds
-perspectiveBounds = Bounded.numberBounds 1.0 10000.0 "Perspective"
+perspectiveBounds = Bounded.numberBounds 1.0 5000.0 Bounded.Clamps "Perspective"
   "Perspective depth in pixels controlling 3D foreshortening"
 
 -- ═════════════════════════════════════════════════════════════════════════════

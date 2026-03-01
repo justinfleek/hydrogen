@@ -269,18 +269,18 @@ rateVeryFast = ModRate 20.0
 -- | Min: 0.0 (no modulation)
 -- | Max: 1.0 (full modulation)
 modDepthBounds :: Bounded.NumberBounds
-modDepthBounds = Bounded.numberBounds 0.0 1.0 "modDepth" "Modulation depth (0-1)"
+modDepthBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "modDepth" "Modulation depth (0-1)"
 
 -- | Bounds for ModRate
 -- |
 -- | Min: 0.0 Hz (static)
 -- | Max: 50.0 Hz (audio rate threshold)
 modRateBounds :: Bounded.NumberBounds
-modRateBounds = Bounded.numberBounds 0.0 50.0 "modRate" "Modulation rate in Hz (0-50)"
+modRateBounds = Bounded.numberBounds 0.0 50.0 Bounded.Clamps "modRate" "Modulation rate in Hz (0-50)"
 
 -- | Bounds for LFOPhase
 -- |
 -- | Min: 0.0 degrees
 -- | Max: 360.0 degrees (wraps)
 lfoPhaseBounds :: Bounded.NumberBounds
-lfoPhaseBounds = Bounded.numberBounds 0.0 360.0 "lfoPhase" "LFO phase offset in degrees (0-360)"
+lfoPhaseBounds = Bounded.numberBounds 0.0 360.0 Bounded.Clamps "lfoPhase" "LFO phase offset in degrees (0-360)"

@@ -181,5 +181,5 @@ gaming120 = FPS 120.0
 -- | Min: 0.01 (one frame per 100 seconds)
 -- | Max: practical limit around 1000 fps for most displays
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.01 1000.0 "fps" 
+bounds = Bounded.numberBounds 0.01 1000.0 Bounded.Clamps "fps" 
   "Frames per second (0.01 minimum, practical max ~1000)"

@@ -52,7 +52,7 @@ unwrapFOV (FOV f) = f
 
 -- | Bounds
 fovBounds :: Bounded.NumberBounds
-fovBounds = Bounded.numberBounds 1.0 179.0 "FOV"
+fovBounds = Bounded.numberBounds 1.0 179.0 Bounded.Clamps "FOV"
   "Vertical field of view in degrees (1.0 to 179.0)"
 
 -- | Standard FOV (60 degrees)

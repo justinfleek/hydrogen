@@ -199,4 +199,4 @@ toNumber = unwrap
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 100000.0 "luminance" "Light emission intensity in nits (cd/m²)"
+bounds = Bounded.numberBounds 0.0 100000.0 Bounded.Clamps "luminance" "Light emission intensity in nits (cd/m²)"

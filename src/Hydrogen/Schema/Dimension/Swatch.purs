@@ -95,7 +95,7 @@ import Prelude
   , (&&)
   )
 
-import Hydrogen.Schema.Bounded (NumberBounds, numberBounds)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // swatch size
@@ -117,8 +117,8 @@ instance showSwatchSize :: Show SwatchSize where
   show (SwatchSize n) = show n <> "px"
 
 -- | Swatch size bounds documentation
-swatchSizeBounds :: NumberBounds
-swatchSizeBounds = numberBounds 8.0 128.0 "swatch-size"
+swatchSizeBounds :: Bounded.NumberBounds
+swatchSizeBounds = Bounded.numberBounds 8.0 128.0 Bounded.Clamps "swatch-size"
   "Size of a color swatch in pixels. Min 8px for touch targets, max 128px."
 
 -- | Create a swatch size, clamping to valid range [8, 128]
@@ -197,8 +197,8 @@ instance showCheckerboardSize :: Show CheckerboardSize where
   show (CheckerboardSize n) = show n <> "px"
 
 -- | Checkerboard size bounds documentation
-checkerboardSizeBounds :: NumberBounds
-checkerboardSizeBounds = numberBounds 2.0 32.0 "checkerboard-size"
+checkerboardSizeBounds :: Bounded.NumberBounds
+checkerboardSizeBounds = Bounded.numberBounds 2.0 32.0 Bounded.Clamps "checkerboard-size"
   "Size of checkerboard cells for transparency indication. 2-32px."
 
 -- | Create a checkerboard size, clamping to valid range [2, 32]

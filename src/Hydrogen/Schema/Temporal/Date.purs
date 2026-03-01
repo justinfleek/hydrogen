@@ -125,7 +125,7 @@ instance showYear :: Show Year where
 
 -- | Bounds for year.
 yearBounds :: Bounded.IntBounds
-yearBounds = Bounded.intBounds 1 9999 "Year" "Calendar year (1-9999 CE)"
+yearBounds = Bounded.intBounds 1 9999 Bounded.Clamps "Year" "Calendar year (1-9999 CE)"
 
 -- | Construct a bounded year.
 year :: Int -> Year
@@ -150,7 +150,7 @@ instance showMonth :: Show Month where
 
 -- | Bounds for month.
 monthBounds :: Bounded.IntBounds
-monthBounds = Bounded.intBounds 1 12 "Month" "Calendar month (1-12)"
+monthBounds = Bounded.intBounds 1 12 Bounded.Clamps "Month" "Calendar month (1-12)"
 
 -- | Construct a bounded month.
 month :: Int -> Month
@@ -251,7 +251,7 @@ instance showDay :: Show Day where
 
 -- | Bounds for day.
 dayBounds :: Bounded.IntBounds
-dayBounds = Bounded.intBounds 1 31 "Day" "Day of month (1-31)"
+dayBounds = Bounded.intBounds 1 31 Bounded.Clamps "Day" "Day of month (1-31)"
 
 -- | Construct a bounded day.
 day :: Int -> Day
@@ -276,7 +276,7 @@ instance showWeekOfYear :: Show WeekOfYear where
 
 -- | Bounds for week of year.
 weekBounds :: Bounded.IntBounds
-weekBounds = Bounded.intBounds 1 53 "WeekOfYear" "ISO week number (1-53)"
+weekBounds = Bounded.intBounds 1 53 Bounded.Clamps "WeekOfYear" "ISO week number (1-53)"
 
 -- | Construct a bounded week.
 weekOfYear :: Int -> WeekOfYear

@@ -162,4 +162,4 @@ add (Grade a) (Grade b) = grade (a + b)
 -- | Min: -200 (lightest)
 -- | Max: 200 (boldest)
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds (-200) 200 "grade" "Variable font grade axis (-200 to 200)"
+bounds = Bounded.intBounds (-200) 200 Bounded.Clamps "grade" "Variable font grade axis (-200 to 200)"

@@ -502,18 +502,18 @@ toRotateCss d = "rotate(" <> toLegacyCss d <> ")"
 -- | Min: 0.0
 -- | Max: 360.0 (exclusive, wraps to 0)
 degreesBounds :: Bounded.NumberBounds
-degreesBounds = Bounded.numberBounds 0.0 360.0 "degrees" "Angle in degrees (0-360, cyclic)"
+degreesBounds = Bounded.numberBounds 0.0 360.0 Bounded.Clamps "degrees" "Angle in degrees (0-360, cyclic)"
 
 -- | Bounds for Radians (cyclic: values normalize to this range)
 -- |
 -- | Min: 0.0
 -- | Max: 2π (exclusive, wraps to 0)
 radiansBounds :: Bounded.NumberBounds
-radiansBounds = Bounded.numberBounds 0.0 (2.0 * pi) "radians" "Angle in radians (0-2π, cyclic)"
+radiansBounds = Bounded.numberBounds 0.0 (2.0 * pi) Bounded.Clamps "radians" "Angle in radians (0-2π, cyclic)"
 
 -- | Bounds for Turns (cyclic: values normalize to this range)
 -- |
 -- | Min: 0.0
 -- | Max: 1.0 (exclusive, wraps to 0)
 turnsBounds :: Bounded.NumberBounds
-turnsBounds = Bounded.numberBounds 0.0 1.0 "turns" "Angle in turns (0-1, cyclic)"
+turnsBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "turns" "Angle in turns (0-1, cyclic)"

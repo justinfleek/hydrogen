@@ -422,7 +422,7 @@ computeRotation tps
 -- | Min: 0 (no touches)
 -- | Max: 10 (practical multi-touch limit)
 touchCountBounds :: Bounded.IntBounds
-touchCountBounds = Bounded.intBounds 0 10 "touchCount" "Number of active touches (0-10)"
+touchCountBounds = Bounded.intBounds 0 10 Bounded.Clamps "touchCount" "Number of active touches (0-10)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // multi-finger gestures

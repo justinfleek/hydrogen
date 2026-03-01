@@ -43,5 +43,5 @@ unwrapExposure :: Exposure -> Number
 unwrapExposure (Exposure n) = n
 
 exposureBounds :: Bounded.NumberBounds
-exposureBounds = Bounded.numberBounds (-10.0) 10.0 "Exposure"
-  "Exposure compensation in EV stops (-10 to +10)"
+exposureBounds = Bounded.numberBounds (-5.0) 5.0 Bounded.Clamps "Exposure"
+  "Exposure compensation in EV stops (-5 to +5)"

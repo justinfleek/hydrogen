@@ -81,4 +81,4 @@ toNumber (ClearCoat c) = c
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "clearCoat" "PBR clear coat layer intensity (automotive paint effect)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "clearCoat" "PBR clear coat layer intensity (automotive paint effect)"

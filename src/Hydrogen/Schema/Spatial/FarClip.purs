@@ -45,5 +45,5 @@ unwrapFarClip :: FarClip -> Number
 unwrapFarClip (FarClip n) = n
 
 farClipBounds :: Bounded.NumberBounds
-farClipBounds = Bounded.numberBounds 0.1 1000000.0 "FarClip"
-  "Far clipping plane distance (> 0.1)"
+farClipBounds = Bounded.numberBounds 0.1 10000.0 Bounded.Clamps "FarClip"
+  "Far clipping plane distance (0.1 to 10000)"

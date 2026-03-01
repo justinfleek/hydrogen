@@ -9,15 +9,31 @@
 -- |
 -- | ## Dependencies
 -- | - Prelude (Eq, Ord, Show, Semiring, Ring)
+-- | - Data.Generic.Rep (Generic)
 -- |
 -- | ## Dependents
 -- | - Gestural.Touch (uses PointerPosition, Pressure)
 -- | - Gestural.Gesture (uses PointerState)
+-- | - Gestural.Event (uses MouseButton, PointerPosition, PointerState)
+-- | - GPU.FrameState (re-exports MouseButton for mouse state)
 -- | - Component.* (interactive components)
 
 module Hydrogen.Schema.Gestural.Pointer
-  ( -- * Pointer Device Type
-    PointerType(PointerMouse, PointerTouch, PointerPen, PointerUnknown)
+  ( -- * Mouse Button
+    MouseButton(MouseLeft, MouseMiddle, MouseRight, MouseBack, MouseForward)
+  , allMouseButtons
+  , isMouseLeft
+  , isMouseMiddle
+  , isMouseRight
+  , isMouseBack
+  , isMouseForward
+  , isPrimaryButton
+  , isSecondaryButton
+  , isAuxiliaryButton
+  , mouseButtonToInt
+  , mouseButtonFromInt
+    -- * Pointer Device Type
+  , PointerType(PointerMouse, PointerTouch, PointerPen, PointerUnknown)
   , isMouse
   , isTouch
   , isPen
@@ -76,11 +92,114 @@ module Hydrogen.Schema.Gestural.Pointer
   , twistBounds
   ) where
 
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Show.Generic (genericShow)
 
 import Hydrogen.Schema.Bounded as Bounded
 
 import Prelude
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // mouse // button
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Mouse button identifiers per W3C UIEvents specification
+-- |
+-- | Maps to the `button` property of MouseEvent:
+-- | - 0: Main button (usually left)
+-- | - 1: Auxiliary button (usually middle/wheel)
+-- | - 2: Secondary button (usually right)
+-- | - 3: Fourth button (typically browser back)
+-- | - 4: Fifth button (typically browser forward)
+-- |
+-- | This is the authoritative source of MouseButton - GPU.FrameState imports from here.
+data MouseButton
+  = MouseLeft      -- ^ Main button (usually left click)
+  | MouseMiddle    -- ^ Auxiliary button (usually wheel/middle click)
+  | MouseRight     -- ^ Secondary button (usually right click)
+  | MouseBack      -- ^ Fourth button (browser back)
+  | MouseForward   -- ^ Fifth button (browser forward)
+
+derive instance eqMouseButton :: Eq MouseButton
+derive instance ordMouseButton :: Ord MouseButton
+derive instance genericMouseButton :: Generic MouseButton _
+
+instance showMouseButton :: Show MouseButton where
+  show = genericShow
+
+-- | All mouse buttons for enumeration
+allMouseButtons :: Array MouseButton
+allMouseButtons = [ MouseLeft, MouseMiddle, MouseRight, MouseBack, MouseForward ]
+
+-- | Is this the left (primary) button?
+isMouseLeft :: MouseButton -> Boolean
+isMouseLeft MouseLeft = true
+isMouseLeft _ = false
+
+-- | Is this the middle button?
+isMouseMiddle :: MouseButton -> Boolean
+isMouseMiddle MouseMiddle = true
+isMouseMiddle _ = false
+
+-- | Is this the right button?
+isMouseRight :: MouseButton -> Boolean
+isMouseRight MouseRight = true
+isMouseRight _ = false
+
+-- | Is this the back button?
+isMouseBack :: MouseButton -> Boolean
+isMouseBack MouseBack = true
+isMouseBack _ = false
+
+-- | Is this the forward button?
+isMouseForward :: MouseButton -> Boolean
+isMouseForward MouseForward = true
+isMouseForward _ = false
+
+-- | Is this a primary button (left)?
+-- |
+-- | Primary is the main action button, typically left.
+isPrimaryButton :: MouseButton -> Boolean
+isPrimaryButton = isMouseLeft
+
+-- | Is this a secondary button (right)?
+-- |
+-- | Secondary is the context menu button, typically right.
+isSecondaryButton :: MouseButton -> Boolean
+isSecondaryButton = isMouseRight
+
+-- | Is this an auxiliary button (middle)?
+-- |
+-- | Auxiliary is the middle/wheel button.
+isAuxiliaryButton :: MouseButton -> Boolean
+isAuxiliaryButton = isMouseMiddle
+
+-- | Convert mouse button to W3C button index
+-- |
+-- | Per W3C UIEvents:
+-- | - 0: Main (left)
+-- | - 1: Auxiliary (middle)
+-- | - 2: Secondary (right)
+-- | - 3: Fourth (back)
+-- | - 4: Fifth (forward)
+mouseButtonToInt :: MouseButton -> Int
+mouseButtonToInt MouseLeft = 0
+mouseButtonToInt MouseMiddle = 1
+mouseButtonToInt MouseRight = 2
+mouseButtonToInt MouseBack = 3
+mouseButtonToInt MouseForward = 4
+
+-- | Convert W3C button index to MouseButton
+-- |
+-- | Returns Nothing for unknown button indices.
+mouseButtonFromInt :: Int -> Maybe MouseButton
+mouseButtonFromInt 0 = Just MouseLeft
+mouseButtonFromInt 1 = Just MouseMiddle
+mouseButtonFromInt 2 = Just MouseRight
+mouseButtonFromInt 3 = Just MouseBack
+mouseButtonFromInt 4 = Just MouseForward
+mouseButtonFromInt _ = Nothing
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // pointer device type
@@ -451,25 +570,25 @@ penPointerState id pos pres tx ty tw =
 -- | Min: 0.0 (no pressure/hovering)
 -- | Max: 1.0 (maximum pressure)
 pressureBounds :: Bounded.NumberBounds
-pressureBounds = Bounded.numberBounds 0.0 1.0 "pressure" "Pointer pressure (0-1)"
+pressureBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "pressure" "Pointer pressure (0-1)"
 
 -- | Bounds for TiltX
 -- |
 -- | Min: -90.0 (tilted fully left)
 -- | Max: 90.0 (tilted fully right)
 tiltXBounds :: Bounded.NumberBounds
-tiltXBounds = Bounded.numberBounds (-90.0) 90.0 "tiltX" "Pen tilt X in degrees (-90 to 90)"
+tiltXBounds = Bounded.numberBounds (-90.0) 90.0 Bounded.Clamps "tiltX" "Pen tilt X in degrees (-90 to 90)"
 
 -- | Bounds for TiltY
 -- |
 -- | Min: -90.0 (tilted fully away)
 -- | Max: 90.0 (tilted fully toward)
 tiltYBounds :: Bounded.NumberBounds
-tiltYBounds = Bounded.numberBounds (-90.0) 90.0 "tiltY" "Pen tilt Y in degrees (-90 to 90)"
+tiltYBounds = Bounded.numberBounds (-90.0) 90.0 Bounded.Clamps "tiltY" "Pen tilt Y in degrees (-90 to 90)"
 
 -- | Bounds for Twist
 -- |
 -- | Min: 0.0
 -- | Max: 359.0 (cyclic rotation)
 twistBounds :: Bounded.NumberBounds
-twistBounds = Bounded.numberBounds 0.0 359.0 "twist" "Pen twist in degrees (0-359)"
+twistBounds = Bounded.numberBounds 0.0 359.0 Bounded.Clamps "twist" "Pen twist in degrees (0-359)"

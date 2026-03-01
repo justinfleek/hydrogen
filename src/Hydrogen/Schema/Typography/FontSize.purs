@@ -269,4 +269,4 @@ toLegacyCss (FontSize s) = show s <> "px"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 1.0 1000.0 "fontSize" "Font size in CSS pixels"
+bounds = Bounded.numberBounds 1.0 1000.0 Bounded.Clamps "fontSize" "Font size in CSS pixels"

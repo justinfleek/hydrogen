@@ -116,7 +116,7 @@ toNumber (Roughness r) = r
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "roughness" "PBR surface roughness (smooth to diffuse)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "roughness" "PBR surface roughness (smooth to diffuse)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

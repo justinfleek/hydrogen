@@ -103,7 +103,7 @@ isTripleTap (TapCount n) = n == 3
 -- | - 2: Double tap
 -- | - 3: Triple tap (select paragraph in text)
 tapCountBounds :: Bounded.IntBounds
-tapCountBounds = Bounded.intBounds 1 3 "TapCount"
+tapCountBounds = Bounded.intBounds 1 3 Bounded.Clamps "TapCount"
   "Number of taps in a multi-tap gesture (1=single, 2=double, 3=triple)"
 
 -- ═════════════════════════════════════════════════════════════════════════════

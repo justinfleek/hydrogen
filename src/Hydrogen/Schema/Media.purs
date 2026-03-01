@@ -1,0 +1,105 @@
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--                                              // hydrogen // schema // media
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+-- | Media pillar — Video, Audio, Image, Upload, and Gallery state management.
+-- |
+-- | ## Design Philosophy
+-- |
+-- | Media playback and manipulation are modeled as pure state + commands.
+-- | No JavaScript APIs (HTMLMediaElement, Canvas, File API) leak into
+-- | these modules. The runtime interprets commands against actual browser
+-- | APIs, enabling:
+-- |
+-- | - Deterministic testing of media UIs
+-- | - Server-side rendering of media player state
+-- | - Agent composition of media interfaces
+-- | - Reproducible behavior across platforms
+-- |
+-- | ## Submodules
+-- |
+-- | ### Video Playback
+-- | - `Hydrogen.Schema.Media.Video` — Video playback state and commands
+-- |   - Volume (0.0-1.0), PlaybackRate (0.25-4.0), Seconds
+-- |   - VideoState, VideoCommand, BufferedRange
+-- |   - Fullscreen, mute, seek, play/pause
+-- |
+-- | ### Audio Playback
+-- | - `Hydrogen.Schema.Media.Audio` — Audio playback state and commands
+-- |   - Re-exports shared types from Video
+-- |   - AudioState, AudioCommand, AudioTrack
+-- |   - Playlist management, playback modes
+-- |
+-- | ### Image Manipulation
+-- | - `Hydrogen.Schema.Media.Image` — Image editing state
+-- |   - CropArea, CropState, FlipState
+-- |   - Rotation (0-360 degrees), ScaleFactor (0.1-10.0)
+-- |   - Zoom, rotate, flip, crop operations
+-- |
+-- | ### File Upload
+-- | - `Hydrogen.Schema.Media.Upload` — File upload state
+-- |   - FileEntry, UploadState, UploadProgress
+-- |   - Validation, configuration, error handling
+-- |   - Multi-file upload with progress tracking
+-- |
+-- | ### Gallery/Lightbox
+-- | - `Hydrogen.Schema.Media.Gallery` — Gallery state
+-- |   - MediaItem (images, videos), GalleryState
+-- |   - Navigation, slideshow, thumbnails
+-- |   - Fullscreen lightbox mode
+-- |
+-- | ## Bounded Types
+-- |
+-- | All media types use bounded primitives:
+-- | - Volume: clamped [0.0, 1.0]
+-- | - PlaybackRate: clamped [0.25, 4.0]
+-- | - Rotation: wrapping [0, 360)
+-- | - ScaleFactor: clamped [0.1, 10.0]
+-- | - Progress: clamped [0.0, 1.0]
+-- |
+-- | ## Usage
+-- |
+-- | ```purescript
+-- | import Hydrogen.Schema.Media.Video as Video
+-- | import Hydrogen.Schema.Media.Audio as Audio
+-- | import Hydrogen.Schema.Media.Image as Image
+-- | import Hydrogen.Schema.Media.Upload as Upload
+-- | import Hydrogen.Schema.Media.Gallery as Gallery
+-- |
+-- | -- Video player state
+-- | videoState = Video.initialVideoState (Video.seconds 120.0)
+-- | videoState' = Video.applyCommand Video.Play videoState
+-- |
+-- | -- Audio player with playlist
+-- | playlist = Audio.addTrack track1 (Audio.emptyPlaylist "My Playlist")
+-- | playlistState = Audio.initialPlaylistState playlist
+-- |
+-- | -- Image crop state
+-- | cropState = Image.initialCropState 1920.0 1080.0
+-- | cropState' = Image.applyImageCommand Image.RotateCW cropState
+-- |
+-- | -- File upload
+-- | uploadState = Upload.addFile fileEntry Upload.initialUploadState
+-- |
+-- | -- Gallery
+-- | gallery = Gallery.galleryFromItems [item1, item2, item3]
+-- | gallery' = Gallery.applyGalleryCommand Gallery.Next gallery
+-- | ```
+-- |
+-- | ## At Billion-Agent Scale
+-- |
+-- | These primitives enable deterministic media interfaces:
+-- | - Same VideoState = same player UI across all agents
+-- | - Same CropState = same image transform, always
+-- | - Same GalleryState = same gallery display
+-- |
+-- | No JavaScript API variability. No browser differences.
+-- | Pure data describing media state.
+
+module Hydrogen.Schema.Media
+  ( module Hydrogen.Schema.Media
+  ) where
+
+-- | Media pillar version for compatibility checks.
+mediaVersion :: String
+mediaVersion = "0.1.0"

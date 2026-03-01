@@ -58,12 +58,12 @@ infinite = LightRange 0.0
 -- | Bounds documentation for LightRange.
 -- |
 -- | Light range is non-negative. 0.0 represents infinite range.
--- | Maximum is bounded at 10000.0 meters for practical purposes.
+-- | Maximum is bounded at 1000.0 meters for practical purposes.
 lightRangeBounds :: Bounded.NumberBounds
-lightRangeBounds = Bounded.numberBounds 0.0 10000.0 "LightRange" "Light attenuation distance in meters"
+lightRangeBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "LightRange" "Light attenuation distance in meters (0-1000)"
 
 -- | Clamp a number to valid light range bounds.
 -- |
 -- | Ensures the value is non-negative.
 clampLightRange :: Number -> LightRange
-clampLightRange n = LightRange (Bounded.clampNumber 0.0 10000.0 n)
+clampLightRange n = LightRange (Bounded.clampNumber 0.0 1000.0 n)

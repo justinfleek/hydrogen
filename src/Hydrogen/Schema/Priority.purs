@@ -114,7 +114,7 @@ import Prelude
 import Data.Array (length, index, foldl, snoc, filter, sortBy, head, uncons) as Array
 import Data.Maybe (Maybe(Just, Nothing))
 
-import Hydrogen.Schema.Bounded (clampInt, IntBounds, intBounds) as Bounded
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // semantic priority
@@ -201,7 +201,7 @@ unwrapNumericPriority (NumericPriority n) = n
 
 -- | Bounds documentation for NumericPriority
 numericPriorityBounds :: Bounded.IntBounds
-numericPriorityBounds = Bounded.intBounds 0 1000 "NumericPriority" "Fine-grained priority level"
+numericPriorityBounds = Bounded.intBounds 0 1000 Bounded.Clamps "NumericPriority" "Fine-grained priority level (0-1000)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // prioritized wrapper

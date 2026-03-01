@@ -607,7 +607,7 @@ formattedDuration ms = show ms.progress.duration
 -- | - 0.25x: Quarter speed (slowest practical slow-motion)
 -- | - 4.0x: Quadruple speed (fastest practical fast-forward)
 playbackRateBounds :: Bounded.NumberBounds
-playbackRateBounds = Bounded.numberBounds 0.25 4.0 "PlaybackRate"
+playbackRateBounds = Bounded.numberBounds 0.25 4.0 Bounded.Clamps "PlaybackRate"
   "Playback speed multiplier (0.25x slow-motion to 4.0x fast-forward)"
 
 -- | Bounds for VolumeLevel [0.0, 1.0]
@@ -615,13 +615,13 @@ playbackRateBounds = Bounded.numberBounds 0.25 4.0 "PlaybackRate"
 -- | - 0.0: Muted (silent)
 -- | - 1.0: Full volume
 volumeLevelBounds :: Bounded.NumberBounds
-volumeLevelBounds = Bounded.numberBounds 0.0 1.0 "VolumeLevel"
+volumeLevelBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "VolumeLevel"
   "Audio volume level as unit interval (0=muted, 1=full)"
 
--- | Bounds for TimePosition [0.0, 604800.0] seconds
+-- | Bounds for TimePosition [0.0, 3600.0] seconds
 -- |
 -- | - 0.0: Start of media
--- | - 604800.0: 7 days (maximum practical media duration)
+-- | - 3600.0: 1 hour max (reasonable for most media)
 timePositionBounds :: Bounded.NumberBounds
-timePositionBounds = Bounded.numberBounds 0.0 604800.0 "TimePosition"
-  "Playback position in seconds (0 to 7 days maximum)"
+timePositionBounds = Bounded.numberBounds 0.0 3600.0 Bounded.Clamps "TimePosition"
+  "Playback position in seconds (0 to 1 hour)"

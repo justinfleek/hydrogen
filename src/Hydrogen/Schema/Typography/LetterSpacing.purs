@@ -269,4 +269,4 @@ toLegacyCss ls = show (toEm ls) <> "em"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds (-500) 1000 "letterSpacing" "Letter spacing in per mille"
+bounds = Bounded.intBounds (-500) 1000 Bounded.Clamps "letterSpacing" "Letter spacing in per mille"

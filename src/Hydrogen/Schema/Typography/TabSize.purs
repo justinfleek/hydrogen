@@ -143,4 +143,4 @@ maxValue = 32
 
 -- | Bounds documentation for this type.
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds minValue maxValue "tabSize" "Tab width in character units"
+bounds = Bounded.intBounds minValue maxValue Bounded.Clamps "tabSize" "Tab width in character units"

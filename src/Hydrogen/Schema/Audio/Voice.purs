@@ -593,60 +593,60 @@ voiceProfileDefault =
 -- | Min: 50.0 Hz (very low bass)
 -- | Max: 500.0 Hz (very high soprano/synthetic)
 voicePitchBounds :: Bounded.NumberBounds
-voicePitchBounds = Bounded.numberBounds 50.0 500.0 "voicePitch" "Voice fundamental frequency in Hz (50-500)"
+voicePitchBounds = Bounded.numberBounds 50.0 500.0 Bounded.Clamps "voicePitch" "Voice fundamental frequency in Hz (50-500)"
 
 -- | Bounds for SpeechRate
 -- |
 -- | Min: 0.25 (quarter speed)
 -- | Max: 4.0 (quadruple speed)
 speechRateBounds :: Bounded.NumberBounds
-speechRateBounds = Bounded.numberBounds 0.25 4.0 "speechRate" "Speech rate multiplier (0.25-4.0)"
+speechRateBounds = Bounded.numberBounds 0.25 4.0 Bounded.Clamps "speechRate" "Speech rate multiplier (0.25-4.0)"
 
 -- | Bounds for Breathiness
 -- |
 -- | Min: 0.0 (clear)
 -- | Max: 1.0 (very breathy)
 breathinessBounds :: Bounded.NumberBounds
-breathinessBounds = Bounded.numberBounds 0.0 1.0 "breathiness" "Voice breathiness (0-1)"
+breathinessBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "breathiness" "Voice breathiness (0-1)"
 
 -- | Bounds for Roughness
 -- |
 -- | Min: 0.0 (smooth)
 -- | Max: 1.0 (very rough)
 roughnessBounds :: Bounded.NumberBounds
-roughnessBounds = Bounded.numberBounds 0.0 1.0 "roughness" "Voice roughness (0-1)"
+roughnessBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "roughness" "Voice roughness (0-1)"
 
 -- | Bounds for Nasality
 -- |
 -- | Min: 0.0 (oral)
 -- | Max: 1.0 (very nasal)
 nasalityBounds :: Bounded.NumberBounds
-nasalityBounds = Bounded.numberBounds 0.0 1.0 "nasality" "Voice nasality (0-1)"
+nasalityBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "nasality" "Voice nasality (0-1)"
 
 -- | Bounds for Strain
 -- |
 -- | Min: 0.0 (relaxed)
 -- | Max: 1.0 (very strained)
 strainBounds :: Bounded.NumberBounds
-strainBounds = Bounded.numberBounds 0.0 1.0 "strain" "Voice strain (0-1)"
+strainBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "strain" "Voice strain (0-1)"
 
 -- | Bounds for PitchVariation
 -- |
 -- | Min: 0.0 (monotone)
 -- | Max: 1.0 (highly varied)
 pitchVariationBounds :: Bounded.NumberBounds
-pitchVariationBounds = Bounded.numberBounds 0.0 1.0 "pitchVariation" "Pitch variation/range (0-1)"
+pitchVariationBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "pitchVariation" "Pitch variation/range (0-1)"
 
 -- | Bounds for Emphasis
 -- |
 -- | Min: 0.0 (flat)
 -- | Max: 1.0 (highly emphatic)
 emphasisBounds :: Bounded.NumberBounds
-emphasisBounds = Bounded.numberBounds 0.0 1.0 "emphasis" "Stress emphasis (0-1)"
+emphasisBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "emphasis" "Stress emphasis (0-1)"
 
 -- | Bounds for Pause
 -- |
 -- | Min: 0.0 (no pauses)
 -- | Max: 3.0 (triple length pauses)
 pauseBounds :: Bounded.NumberBounds
-pauseBounds = Bounded.numberBounds 0.0 3.0 "pause" "Pause duration multiplier (0-3)"
+pauseBounds = Bounded.numberBounds 0.0 3.0 Bounded.Clamps "pause" "Pause duration multiplier (0-3)"

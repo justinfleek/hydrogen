@@ -86,4 +86,4 @@ toNumber (ClearCoatRoughness r) = r
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "clearCoatRoughness" "PBR clear coat surface roughness (independent of base)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "clearCoatRoughness" "PBR clear coat surface roughness (independent of base)"

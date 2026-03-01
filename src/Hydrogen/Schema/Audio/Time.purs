@@ -284,34 +284,34 @@ multiplyBeats factor (BeatTime beats) = beatTime (beats * factor)
 -- | Bounds for BeatTime
 -- |
 -- | Min: 0.0
--- | Max: unbounded (finite)
+-- | Max: 1000 beats (~8 minutes at 120 BPM)
 beatTimeBounds :: Bounded.NumberBounds
-beatTimeBounds = Bounded.numberBounds 0.0 10000.0 "beatTime" "Time in musical beats (0+)"
+beatTimeBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "beatTime" "Time in musical beats (0-1000)"
 
 -- | Bounds for BarTime
 -- |
 -- | Min: 0.0
--- | Max: unbounded (finite)
+-- | Max: 100 bars
 barTimeBounds :: Bounded.NumberBounds
-barTimeBounds = Bounded.numberBounds 0.0 1000.0 "barTime" "Time in musical bars (0+)"
+barTimeBounds = Bounded.numberBounds 0.0 100.0 Bounded.Clamps "barTime" "Time in musical bars (0-100)"
 
 -- | Bounds for SampleCount
 -- |
 -- | Min: 0
 -- | Max: unbounded (finite)
 sampleCountBounds :: Bounded.IntBounds
-sampleCountBounds = Bounded.intBounds 0 2147483647 "sampleCount" "Audio sample count (0+)"
+sampleCountBounds = Bounded.intBounds 0 2147483647 Bounded.Clamps "sampleCount" "Audio sample count (0+)"
 
 -- | Bounds for LatencyMs
 -- |
 -- | Min: 0.0
 -- | Max: 1000.0 (1 second max practical latency)
 latencyMsBounds :: Bounded.NumberBounds
-latencyMsBounds = Bounded.numberBounds 0.0 1000.0 "latencyMs" "Audio latency in milliseconds (0-1000)"
+latencyMsBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "latencyMs" "Audio latency in milliseconds (0-1000)"
 
 -- | Bounds for BPM
 -- |
 -- | Min: 20.0 (very slow)
 -- | Max: 300.0 (very fast)
 bpmBounds :: Bounded.NumberBounds
-bpmBounds = Bounded.numberBounds 20.0 300.0 "bpm" "Beats per minute (20-300)"
+bpmBounds = Bounded.numberBounds 20.0 300.0 Bounded.Clamps "bpm" "Beats per minute (20-300)"

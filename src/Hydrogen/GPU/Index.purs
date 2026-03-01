@@ -120,7 +120,7 @@ unwrapGlyphId (GlyphId n) = n
 
 -- | Bounds documentation for GlyphId.
 glyphIdBounds :: Bounded.IntBounds
-glyphIdBounds = Bounded.intBounds 0 maxU32 "glyphId" 
+glyphIdBounds = Bounded.intBounds 0 maxU32 Bounded.Clamps "glyphId" 
   "Index into glyph path data registry (u32)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -151,7 +151,7 @@ unwrapFontId (FontId n) = n
 
 -- | Bounds documentation for FontId.
 fontIdBounds :: Bounded.IntBounds
-fontIdBounds = Bounded.intBounds 0 maxU32 "fontId"
+fontIdBounds = Bounded.intBounds 0 maxU32 Bounded.Clamps "fontId"
   "Index into font registry (u32, upgraded from u16 for billion-agent scale)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -181,7 +181,7 @@ unwrapPathDataId (PathDataId n) = n
 
 -- | Bounds documentation for PathDataId.
 pathDataIdBounds :: Bounded.IntBounds
-pathDataIdBounds = Bounded.intBounds 0 maxU32 "pathDataId"
+pathDataIdBounds = Bounded.intBounds 0 maxU32 Bounded.Clamps "pathDataId"
   "Index into shared path data registry for instancing (u32)"
 
 -- ═════════════════════════════════════════════════════════════════════════════

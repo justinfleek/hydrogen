@@ -1,6 +1,21 @@
 # Schema Pillar Reference
 
-Full enumeration of atoms, molecules, and compounds for all 15 pillars.
+Full enumeration of atoms, molecules, and compounds for all 17 pillars.
+
+## Architecture
+
+PureScript defines WHAT exists — types, bounds, composition rules.
+Haskell executes HOW it renders — compositor loop, IO, GPU commands.
+The serialization boundary is CBOR.
+
+## Bounded Types
+
+All atoms have explicit bounds with behavior:
+- **clamps**: Values outside bounds are clamped to min/max
+- **wraps**: Values wrap around (modular arithmetic)
+- **finite**: Values must be valid finite numbers
+
+No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by construction. System F-omega.
 
 ## Pillar 1: Color
 
@@ -111,6 +126,30 @@ Color science, theory, and application.
 |---------|--------|-----|-----|----------|------------------------------|
 | Opacity | Number | 0.0 | 1.0 | clamps   | Alpha transparency           |
 
+#### HDR and Professional
+
+| Name      | Type   | Min  | Max    | Behavior | Notes                        |
+|-----------|--------|------|--------|----------|------------------------------|
+| Luminance | Number | 0    | 100000 | clamps   | HDR luminance in nits        |
+| HueShift  | Number | -180 | 180    | wraps    | Hue rotation offset          |
+
+#### Color Grading (ASC CDL)
+
+| Name      | Type   | Min  | Max  | Behavior | Notes                        |
+|-----------|--------|------|------|----------|------------------------------|
+| Slope     | Number | 0    | 4    | clamps   | CDL slope (multiply)         |
+| Offset    | Number | -1   | 1    | clamps   | CDL offset (add)             |
+| Power     | Number | 0.1  | 4    | clamps   | CDL power (gamma)            |
+| CDLSat    | Number | 0    | 4    | clamps   | CDL saturation               |
+
+#### Lift/Gamma/Gain
+
+| Name      | Type   | Min  | Max  | Behavior | Notes                        |
+|-----------|--------|------|------|----------|------------------------------|
+| Lift      | Number | -1   | 1    | clamps   | Shadow adjustment            |
+| Gamma     | Number | 0.1  | 4    | clamps   | Midtone adjustment           |
+| Gain      | Number | 0    | 4    | clamps   | Highlight adjustment         |
+
 ### Molecules
 
 #### Device/Gamut Spaces
@@ -218,11 +257,33 @@ Color science, theory, and application.
 | CDL         | ASC Color Decision List (SOP + Sat)      |
 | Curves      | RGB/Luminance curve adjustment           |
 | LiftGammaGain| Three-way color correction              |
-| Gradient    | Color stops for gradients                |
+| Gradient    | Linear/radial/conic/mesh gradients       |
+
+#### Color Vision Deficiency (Accessibility)
+
+| Name        | Description                              |
+|-------------|------------------------------------------|
+| CVDProtanopia | Red-blind simulation                   |
+| CVDDeuteranopia| Green-blind simulation                |
+| CVDTritanopia | Blue-blind simulation                  |
+| CVDProtanomaly| Red-weak simulation                    |
+| CVDDeuteranomaly| Green-weak simulation                |
+| CVDTritanomaly| Blue-weak simulation                   |
+| CVDAchromatopsia| Total color blindness                |
+| CVDBlueConeMono| Blue cone monochromacy                |
+| AccessibilityReport| WCAG contrast + CVD analysis       |
 
 ## Pillar 2: Dimension
 
 Measurement, spacing, and layout.
+
+### Implementation Notes
+
+**Bounds Enforcement Gap**: The current implementation of Viewport and Container
+units (Vw, Vh, Vmin, Vmax, Dvw, Dvh, Svw, Svh, Lvw, Lvh, Cqw, Cqh, Cqi, Cqb,
+Cqmin, Cqmax) accept raw `Number` without smart constructors that enforce
+`min: 0`. Semantically, negative percentages of viewport/container dimensions
+are invalid. Future work should add bounded constructors that clamp at 0.
 
 ### Atoms
 
@@ -241,30 +302,30 @@ Measurement, spacing, and layout.
 Complete SI prefix system. Base unit determines the quantity type.
 
 | Prefix   | Symbol | Factor      | Implemented | Notes                           |
-|----------|--------|-------------|------------|--------------------------------|
-| quetta   | Q      | 10^30      | TODO       | Largest SI prefix (2022)       |
-| ronna    | R      | 10^27      | TODO       | Second largest (2022)          |
-| yotta    | Y      | 10^24      | TODO       | Largest (pre-2022)            |
-| zetta    | Z      | 10^21      | TODO       |                                |
-| exa      | E      | 10^18      | TODO       |                                |
-| peta     | P      | 10^15      | TODO       |                                |
-| tera     | T      | 10^12      | TODO       |                                |
-| giga     | G      | 10^9       | TODO       |                                |
-| mega     | M      | 10^6       | TODO       |                                |
-| kilo     | k      | 10^3       | TODO       |                                |
-| hecto    | h      | 10^2       | TODO       | Rarely used                    |
-| deca     | da     | 10^1       | TODO       | Rarely used                    |
-| (base)   | -      | 1          | ✓ Meter   | SI base unit                  |
-| deci     | d      | 10^-1      | TODO       |                                |
-| centi    | c      | 10^-2      | ✓ cm      |                                |
-| milli    | m      | 10^-3      | ✓ mm      |                                |
-| micro    | µ      | 10^-6      | ✓ µm      |                                |
-| nano     | n      | 10^-9      | ✓ nm      |                                |
-| pico     | p      | 10^-12     | TODO       | Atomic scale                   |
-| femto    | f      | 10^-15     | TODO       | Nuclear scale                  |
-| atto     | a      | 10^-18     | TODO       | Subatomic                     |
-| zepto    | z      | 10^-21     | TODO       |                                |
-| yocto    | y      | 10^-24     | TODO       | Smallest SI prefix             |
+|----------|--------|-------------|-------------|--------------------------------|
+| quetta   | Q      | 10^30       | ✓           | Largest SI prefix (2022)       |
+| ronna    | R      | 10^27       | ✓           | Second largest (2022)          |
+| yotta    | Y      | 10^24       | ✓           | Largest (pre-2022)             |
+| zetta    | Z      | 10^21       | ✓           |                                |
+| exa      | E      | 10^18       | ✓           |                                |
+| peta     | P      | 10^15       | ✓           |                                |
+| tera     | T      | 10^12       | ✓           |                                |
+| giga     | G      | 10^9        | ✓           |                                |
+| mega     | M      | 10^6        | ✓           |                                |
+| kilo     | k      | 10^3        | ✓           |                                |
+| hecto    | h      | 10^2        | ✓           | Rarely used                    |
+| deca     | da     | 10^1        | ✓           | Rarely used                    |
+| (base)   | -      | 1           | ✓ Meter     | SI base unit                   |
+| deci     | d      | 10^-1       | ✓           |                                |
+| centi    | c      | 10^-2       | ✓ cm        |                                |
+| milli    | m      | 10^-3       | ✓ mm        |                                |
+| micro    | µ      | 10^-6       | ✓ µm        |                                |
+| nano     | n      | 10^-9       | ✓ nm        |                                |
+| pico     | p      | 10^-12      | ✓           | Atomic scale                   |
+| femto    | f      | 10^-15      | ✓           | Nuclear scale                  |
+| atto     | a      | 10^-18      | -           | Subatomic (not implemented)    |
+| zepto    | z      | 10^-21      | -           | (not implemented)              |
+| yocto    | y      | 10^-24      | -           | Smallest SI prefix             |
 
 #### Physical Units (SI Base)
 
@@ -521,7 +582,40 @@ Shape, form, and spatial transformation.
 | BSpline       | Control points + Degree           |
 | NurbsCurve    | Control points + Weights + Knots  |
 
-#### Transforms
+#### Splines (Full Implementation)
+
+| Name              | Composition                              | Notes                    |
+|-------------------|------------------------------------------|--------------------------|
+| CatmullRomSpline  | Points + Tension + Closed                | Interpolating spline     |
+| BSpline           | Points + Closed                          | Approximating spline     |
+
+Spline submodules provide:
+- Segment counting and extraction
+- Point and tangent evaluation at parameter t
+- Conversion to Bezier curves
+- Arc length and bounding box computation
+- Sampling (points and tangents)
+- Subspline extraction (head, tail, range)
+- Arc length parameterization
+
+#### NURBS (Full Implementation)
+
+Non-Uniform Rational B-Splines for professional curve modeling:
+
+| Name          | Composition                              | Notes                    |
+|---------------|------------------------------------------|--------------------------|
+| ControlPoint  | Position (Point2D) + Weight (Number)     | Weighted control point   |
+| KnotVector    | Array of Number                          | Non-uniform knot spacing |
+| NurbsCurve    | ControlPoints + Knots + Degree           | Complete NURBS curve     |
+
+NURBS capabilities:
+- Exact conic sections (circles, ellipses, arcs)
+- Point, tangent, normal, curvature evaluation
+- Knot insertion and degree elevation
+- Conversion to Bezier segments
+- Arc length and bounding box
+
+#### 2D Transforms
 
 | Name          | Composition                       |
 |---------------|-----------------------------------|
@@ -531,6 +625,73 @@ Shape, form, and spatial transformation.
 | Rotate2D      | Angle + optional Origin           |
 | Scale2D       | X factor + Y factor + Origin      |
 | Skew2D        | X angle + Y angle                 |
+
+#### 3D Transforms
+
+| Name          | Composition                              | Notes                    |
+|---------------|------------------------------------------|--------------------------|
+| Matrix4       | 16 Numbers (4x4 column-major)            | 3D affine + projection   |
+| Quaternion    | x, y, z, w (Number)                      | 3D rotation              |
+| Vector3D      | x, y, z (Number)                         | 3D direction/position    |
+| Vector4D      | x, y, z, w (Number)                      | Homogeneous coordinates  |
+
+Matrix4 operations:
+- Identity, zero, transpose
+- Determinant, invert
+- Multiply, translate, scale
+- makePerspective, makeOrthographic
+
+Quaternion operations:
+- fromAxisAngle, fromEuler, toEuler
+- Normalize, conjugate, invert
+- Hamilton product (multiply)
+- Spherical linear interpolation (slerp)
+- rotateVector
+
+#### Symmetry
+
+Geometric symmetry primitives for design systems:
+
+| Name               | Type   | Notes                              |
+|--------------------|--------|------------------------------------|
+| ReflectionAxis     | ADT    | Horizontal, vertical, diagonal     |
+| RotationalSymmetry | ADT    | N-fold rotation about center       |
+| DihedralSymmetry   | ADT    | Rotation + reflection combined     |
+| TranslationalSymmetry | ADT | Periodic repetition               |
+| GlideReflection    | ADT    | Reflection + translation           |
+| SymmetryGroup      | ADT    | Combined symmetry specification    |
+| Chirality          | ADT    | Chiral / Achiral                   |
+| PointGroup         | ADT    | 2D point group classification      |
+| WallpaperGroup     | ADT    | 17 crystallographic groups         |
+
+Symmetry operations:
+- Identity, reflect, rotate, translate, glide
+- Compose and inverse operations
+- Point group and wallpaper group classification
+
+#### Wallpaper Groups (17 Crystallographic Groups)
+
+Complete implementation of 2D crystallographic groups for pattern generation:
+
+| IUC Symbol | Number | Lattice      | Notes                    |
+|------------|--------|--------------|--------------------------|
+| p1         | 1      | Oblique      | Translation only         |
+| p2         | 2      | Oblique      | 180° rotation            |
+| pm         | 3      | Rectangular  | Parallel mirrors         |
+| pg         | 4      | Rectangular  | Parallel glides          |
+| cm         | 5      | Rhombic      | Mirror + glide           |
+| pmm        | 6      | Rectangular  | Perpendicular mirrors    |
+| pmg        | 7      | Rectangular  | Mirror + perpendicular glide |
+| pgg        | 8      | Rectangular  | Perpendicular glides     |
+| cmm        | 9      | Rhombic      | Two mirrors + rotation   |
+| p4         | 10     | Square       | 90° rotation             |
+| p4m        | 11     | Square       | Square + diagonal mirrors|
+| p4g        | 12     | Square       | Square + diagonal glides |
+| p3         | 13     | Hexagonal    | 120° rotation            |
+| p3m1       | 14     | Hexagonal    | 3-fold + mirrors through centers |
+| p31m       | 15     | Hexagonal    | 3-fold + mirrors between centers |
+| p6         | 16     | Hexagonal    | 60° rotation             |
+| p6m        | 17     | Hexagonal    | 6-fold + mirrors         |
 
 ### Compounds
 
@@ -543,6 +704,8 @@ Shape, form, and spatial transformation.
 | Mask          | Alpha mask for compositing               |
 | Pattern       | Repeating shape/image fill               |
 | Gradient      | Linear/radial/conic with stops           |
+| NurbsSurface  | 2D NURBS for surface modeling            |
+| SymmetricShape| Shape + SymmetryGroup                    |
 
 ## Pillar 4: Typography
 
@@ -2357,24 +2520,208 @@ Agent perception of environment and self. Complements Haptic (output) with input
 - **WorldModel/Integrity.lean**: ProvenInput wrapper prevents fabricated sensations
 - **WorldModel/Affective.lean**: Sensation → Affective mapping for wellbeing attestation
 
+## Pillar 16: Physics
+
+Force, collision, and physical simulation primitives for UI animation.
+
+### Atoms
+
+#### Force Components
+
+| Name              | Type   | Min    | Max    | Behavior | Notes                     |
+|-------------------|--------|--------|--------|----------|---------------------------|
+| ForceComponent    | Number | -10000 | 10000  | clamps   | Force vector component    |
+| Gravity           | Number | 0      | 1000   | clamps   | Gravitational magnitude   |
+| Stiffness         | Number | 0      | 10000  | clamps   | Spring constant k         |
+| RestLength        | Number | 0      | 10000  | clamps   | Spring natural length     |
+| PointForceStrength| Number | -10000 | 10000  | clamps   | Attract (+) / Repel (-)   |
+| FalloffExponent   | Number | 0      | 4      | clamps   | Distance falloff power    |
+| MinDistance       | Number | 1      | 1      | fixed    | Prevents infinite force   |
+| DragCoefficient   | Number | 0      | 100    | clamps   | Linear drag coefficient   |
+| StaticFriction    | Number | 0      | 2      | clamps   | Static friction coeff     |
+| KineticFriction   | Number | 0      | 2      | clamps   | Kinetic friction coeff    |
+| DampingCoefficient| Number | 0      | 1000   | clamps   | Viscous damping           |
+
+#### Collision Parameters
+
+| Name              | Type   | Min    | Max    | Behavior | Notes                     |
+|-------------------|--------|--------|--------|----------|---------------------------|
+| Radius            | Number | 0      | 100000 | clamps   | Bounding volume radius    |
+| PenetrationDepth  | Number | 0      | 10000  | clamps   | Overlap depth             |
+| Restitution       | Number | 0      | 1      | clamps   | Bounce coefficient        |
+| Friction          | Number | 0      | 2      | clamps   | Response friction         |
+| CollisionLayer    | Int    | 0      | max    | finite   | Bit flag layer            |
+| CollisionMask     | Int    | 0      | max    | finite   | Layer filter mask         |
+
+### Molecules
+
+#### Forces
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Force2D       | ForceComponent x + ForceComponent y      |
+| GravityForce  | Magnitude + Direction (Force2D)          |
+| SpringForce   | Stiffness + RestLength                   |
+| PointForce    | Strength + Falloff + MinDistance         |
+| DragForce     | DragCoefficient                          |
+| FrictionForce | StaticCoeff + KineticCoeff               |
+| DampingForce  | DampingCoefficient                       |
+| ForceField    | EmptyField / UniformField / CompositeField |
+
+#### Collision Volumes
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Point2D       | x + y                                    |
+| AABB          | minX + minY + maxX + maxY                |
+| BoundingCircle| center (Point2D) + radius                |
+| BoundingCapsule| pointA + pointB + radius                |
+| OBB           | center + halfWidth + halfHeight + rotation |
+| Contact       | point + normal + depth                   |
+
+### Compounds
+
+#### Response Types
+
+| Name              | Description                              |
+|-------------------|------------------------------------------|
+| ResponseNone      | No collision response                    |
+| ResponseBounce    | Elastic bounce                           |
+| ResponseSlide     | Slide along surface                      |
+| ResponseStick     | Attach to surface                        |
+| ResponseCustom    | Custom response function                 |
+
+#### Collision States
+
+| Name              | Description                              |
+|-------------------|------------------------------------------|
+| NotColliding      | No contact                               |
+| Colliding         | Active collision                         |
+| Separating        | Moving apart                             |
+| Resting           | Stable contact                           |
+| Sliding           | Moving along surface                     |
+| Rolling           | Rotating contact                         |
+
+## Pillar 17: Layout
+
+Constraint-based layout, flexbox, and grid systems.
+
+### Atoms
+
+#### Flex Properties
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| FlexGrow      | Number | 0    | 10   | clamps   | Growth factor             |
+| FlexShrink    | Number | 0    | 10   | clamps   | Shrink factor             |
+| FlexBasis     | Number | 0    | none | finite   | Initial size              |
+| Gap           | Number | 0    | none | finite   | Spacing between items     |
+
+#### Grid Properties
+
+| Name          | Type   | Min  | Max  | Behavior | Notes                     |
+|---------------|--------|------|------|----------|---------------------------|
+| GridColumns   | Int    | 1    | 24   | clamps   | Number of columns         |
+| GridRows      | Int    | 1    | 24   | clamps   | Number of rows            |
+| ColSpan       | Int    | 1    | 24   | clamps   | Column span               |
+| RowSpan       | Int    | 1    | 24   | clamps   | Row span                  |
+
+#### Spacing Values
+
+| Name          | Type   | Min  | Max   | Behavior | Notes                     |
+|---------------|--------|------|-------|----------|---------------------------|
+| SpacingValue  | Number | 0    | 1000  | clamps   | Spacing in pixels         |
+
+### Molecules
+
+#### Spacing
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| Padding       | top + right + bottom + left              |
+| Margin        | top + right + bottom + left              |
+| Inset         | top + right + bottom + left              |
+| InsetXY       | horizontal + vertical                    |
+
+#### Flex Container
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| FlexContainer | width + height + direction + justify + align + gap + padding |
+| FlexItem      | minWidth + minHeight + maxWidth + maxHeight + basis + grow + shrink |
+| LayoutResult  | x + y + width + height                   |
+
+#### Grid Container
+
+| Name          | Composition                              |
+|---------------|------------------------------------------|
+| GridProps     | columns + rows + gap + alignment         |
+| GridItemProps | colSpan + rowSpan + colStart + colEnd    |
+
+### Compounds
+
+#### Stack Layouts
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| vstack        | Vertical stack (column flexbox)          |
+| hstack        | Horizontal stack (row flexbox)           |
+| zstack        | Z-axis layers (absolute positioning)     |
+| center        | Centered content container               |
+| spacer        | Flexible space element                   |
+
+#### Grid Layouts
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| grid          | CSS Grid container                       |
+| gridItem      | CSS Grid item                            |
+| containerGrid | Container query grid                     |
+
+#### Container Types
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| container     | Max-width container                      |
+| fluidContainer| Full-width container                     |
+| prose         | Reading-optimized (65ch)                 |
+| section       | Full-width with vertical spacing         |
+
+#### Graph Layouts (14 algorithms)
+
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| TreeLayout    | Hierarchical tree                        |
+| RadialLayout  | Concentric circles                       |
+| ForceLayout   | Force-directed graph                     |
+| TreemapLayout | Nested rectangles                        |
+| DendrogramLayout | Branch length tree                    |
+| OrgChartLayout| Organizational hierarchy                 |
+| MindMapLayout | Central node radiating                   |
+| IndentedList  | File explorer style                      |
+
 ## Complete Atom Catalog
 
-Total: **243 atoms** across **15 pillars**
+Total: **280+ atoms** across **17 pillars**
 
 | Pillar      | Atoms | Description                              |
 |-------------|-------|------------------------------------------|
-| Color       | 40    | Color science, theory, application       |
+| Color       | 40+   | Color science, theory, application       |
 | Dimension   | 54    | Measurement, spacing, layout             |
-| Geometry    | 4     | Shape, form, spatial transformation     |
+| Geometry    | 15+   | Shape, form, spatial transformation      |
 | Typography  | 19    | Text rendering, typographic hierarchy    |
 | Material    | 38    | Surface appearance, texture              |
-| Elevation   | 2     | Depth, shadow, visual hierarchy         |
-| Temporal    | 7     | Time units and calendar                 |
-| Motion      | 6     | Animation, transitions, easing           |
-| Reactive    | 14    | State, feedback, interaction            |
-| Gestural    | 7     | Input patterns, pointers, gestures      |
-| Haptic      | 4     | Tactile and sensory feedback            |
-| Spatial     | 17    | 3D, XR, PBR materials                   |
-| Attestation | 5     | Cryptographic integrity                 |
-| Scheduling  | 7     | Calendar, events, invitations           |
-| Sensation   | 40    | Agent perception, embodied input        |
+| Elevation   | 12    | Depth, shadow, visual hierarchy          |
+| Temporal    | 30+   | Time, animation, easing                  |
+| Reactive    | 16+   | State, feedback, interaction             |
+| Gestural    | 25+   | Input patterns, pointers, gestures       |
+| Haptic      | 6     | Tactile and sensory feedback             |
+| Audio       | 30+   | Audio synthesis, processing              |
+| Voice       | 20+   | Speech synthesis, recognition            |
+| Spatial     | 30+   | 3D, XR, PBR materials                    |
+| Brand       | 10    | Design tokens, theming                   |
+| Attestation | 5     | Cryptographic integrity                  |
+| Scheduling  | 7     | Calendar, events, invitations            |
+| Sensation   | 40    | Agent perception, embodied input         |
+| Physics     | 17    | Force, collision, simulation             |
+| Layout      | 12    | Flexbox, grid, constraints               |

@@ -339,30 +339,30 @@ unwrapRestSpeed (RestSpeed s) = s
 
 -- | Bounds for Mass
 massBounds :: Bounded.NumberBounds
-massBounds = Bounded.numberBounds 0.01 1000.0 "mass" 
+massBounds = Bounded.numberBounds 0.01 1000.0 Bounded.Clamps "mass" 
   "Spring mass (0.01 minimum, typical range 0.1-10)"
 
 -- | Bounds for Stiffness
 stiffnessBounds :: Bounded.NumberBounds
-stiffnessBounds = Bounded.numberBounds 0.01 10000.0 "stiffness"
+stiffnessBounds = Bounded.numberBounds 0.01 10000.0 Bounded.Clamps "stiffness"
   "Spring stiffness constant k (0.01 minimum, typical range 100-500)"
 
 -- | Bounds for Damping
 dampingBounds :: Bounded.NumberBounds
-dampingBounds = Bounded.numberBounds 0.0 1000.0 "damping"
+dampingBounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "damping"
   "Spring damping coefficient c (0 = no damping, typical range 10-50)"
 
 -- | Bounds for Velocity
 velocityBounds :: Bounded.NumberBounds
-velocityBounds = Bounded.numberBounds (-10000.0) 10000.0 "velocity"
+velocityBounds = Bounded.numberBounds (-10000.0) 10000.0 Bounded.Clamps "velocity"
   "Initial velocity (unbounded in principle, practical range -1000 to 1000)"
 
 -- | Bounds for RestDelta
 restDeltaBounds :: Bounded.NumberBounds
-restDeltaBounds = Bounded.numberBounds 0.0001 100.0 "restDelta"
+restDeltaBounds = Bounded.numberBounds 0.0001 100.0 Bounded.Clamps "restDelta"
   "Rest displacement threshold (smaller = more precision)"
 
 -- | Bounds for RestSpeed
 restSpeedBounds :: Bounded.NumberBounds
-restSpeedBounds = Bounded.numberBounds 0.0001 100.0 "restSpeed"
+restSpeedBounds = Bounded.numberBounds 0.0001 100.0 Bounded.Clamps "restSpeed"
   "Rest velocity threshold (smaller = more precision)"

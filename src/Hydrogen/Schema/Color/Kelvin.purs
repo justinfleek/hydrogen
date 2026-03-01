@@ -172,7 +172,7 @@ toNumber (Kelvin k) = Int.toNumber k
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 1000 40000 "kelvin" "Color temperature in degrees Kelvin"
+bounds = Bounded.intBounds 1000 40000 Bounded.Clamps "kelvin" "Color temperature in degrees Kelvin"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // conversion

@@ -86,4 +86,4 @@ toNumber (Subsurface s) = s
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1.0 "subsurface" "PBR subsurface scattering (skin, wax, marble)"
+bounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps "subsurface" "PBR subsurface scattering (skin, wax, marble)"

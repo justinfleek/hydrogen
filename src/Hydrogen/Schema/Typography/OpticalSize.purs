@@ -166,4 +166,4 @@ matchFontSize pixels =
 -- | Max: 1440 (144pt)
 -- | Special: 0 represents "auto"
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 1440 "opticalSize" "Optical size axis (0=auto, or 60-1440 tenths of pt)"
+bounds = Bounded.intBounds 0 1440 Bounded.Clamps "opticalSize" "Optical size axis (0=auto, or 60-1440 tenths of pt)"

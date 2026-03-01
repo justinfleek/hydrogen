@@ -104,4 +104,4 @@ toUnitInterval (Cyan c) = Int.toNumber c / 100.0
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds
-bounds = Bounded.intBounds 0 100 "cyan" "Cyan ink percentage"
+bounds = Bounded.intBounds 0 100 Bounded.Clamps "cyan" "Cyan ink percentage"

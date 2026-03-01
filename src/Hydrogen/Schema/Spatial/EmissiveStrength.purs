@@ -86,7 +86,6 @@ toNumber (EmissiveStrength e) = e
 
 -- | Bounds documentation for this type
 -- |
--- | Note: No practical upper bound, but we specify 1000.0 as a reasonable maximum
--- | for documentation and UI purposes. HDR values commonly go up to 100 or so.
+-- | HDR typically goes up to 1000-4000 nits for peak highlights.
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 1000.0 "emissiveStrength" "Self-illumination intensity"
+bounds = Bounded.numberBounds 0.0 1000.0 Bounded.Clamps "emissiveStrength" "Self-illumination intensity (0-1000)"
