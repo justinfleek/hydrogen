@@ -1,8 +1,8 @@
 # Schema Pillar Reference
 
-**1004 PureScript files across 136 directories.**
+**1,021 PureScript files across 38 pillars.**
 
-Full enumeration of atoms, molecules, and compounds for all pillars.
+Full enumeration of atoms, molecules, and compounds for all design system primitives.
 
 ## Architecture
 
@@ -17,159 +17,180 @@ All atoms have explicit bounds with behavior:
 - **wraps**: Values wrap around (modular arithmetic)
 - **finite**: Values must be valid finite numbers
 
-No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by construction. System F-omega.
+No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by construction.
+
+---
 
 ## Pillar Index
 
-### Core Rendering (Pillars 1-7)
+38 pillars organized alphabetically with file counts and documentation status.
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 1 | [Color](./01-color.md) | 58+ | Color science, theory, ACES, CDL, CVD simulation |
-| 2 | [Dimension](./02-dimension.md) | 35+ | Measurement, units, spacing, layout |
-| 3 | [Geometry](./03-geometry.md) | 49+ | Shape, form, NURBS, Splines, Symmetry, Quaternion |
-| 4 | [Typography](./04-typography.md) | 35+ | Text rendering, OpenType, hierarchy |
-| 5 | [Material](./05-material.md) | 40+ | Surface appearance, texture, gradients |
-| 6 | [Elevation](./06-elevation.md) | 12+ | Depth, shadow, visual hierarchy |
-| 7 | [Temporal](./07-temporal.md) | 39+ | Time, animation, easing, spring physics |
+| Pillar | Files | Description | Docs |
+|--------|------:|-------------|:----:|
+| [Accessibility](./35-accessibility.md) | 6 | WAI-ARIA 1.2 roles, states, live regions | — |
+| [Attestation](./13-attestation.md) | 12 | Cryptographic integrity, UUID5, signatures | ✓ |
+| [Audio](./10b-audio.md) | 44 | Synthesis, effects, MIDI, spatial audio | — |
+| [Brand](./12-brand.md) | 37 | Design tokens, theme composition | — |
+| [Brush](./32-brush.md) | 5 | Brush tips for drawing applications | — |
+| [Color](./01-color.md) | 58 | sRGB, P3, LAB, OKLCH, ACES, CDL, LUTs, CVD | ✓ |
+| [Compute](./29-compute.md) | 4 | Computational graph, operations | — |
+| [Dimension](./02-dimension.md) | 47 | SI units (yocto→quetta), device units, spacing | ✓ |
+| [Element](./element.md) | 5 | Core UI element primitives | — |
+| [Elevation](./06-elevation.md) | 10 | Shadows, z-index, depth, parallax | ✓ |
+| [Engineering](./19-engineering.md) | 9 | CAD/blueprint, GD&T, tolerances, sections | — |
+| [Epistemic](./22-epistemic.md) | 6 | Affect, alignment, coherence, confidence | — |
+| [Game](./21-game.md) | 27 | Entity systems, chess, poker, dice, betting | — |
+| [Geometry](./03-geometry.md) | 91 | Shapes, NURBS, B-splines, quaternions, symmetry | ✓ |
+| [Gestural](./09-gestural.md) | 31 | Touch, pointer, gestures, keyboard, vim keys | — |
+| [GPU](./30-gpu.md) | 8 | Landauer limits, storable types | — |
+| [Graph](./31-graph.md) | 19 | Layout algorithms, node content, viewport | — |
+| [Haptic](./10-haptic.md) | 4 | Vibration patterns, tactile feedback | ✓ |
+| [Identity](./identity.md) | 1 | Temporal identity tracking | — |
+| [Media](./25-media.md) | 5 | Audio, video, image, gallery, upload | — |
+| [Motion](./05-motion.md) | 169 | Animation, effects, layers, expressions, Lottie | ✓ |
+| [Navigation](./33-navigation.md) | 2 | Pagination, index, routing | ✓ |
+| [Network](./23-network.md) | 21 | HTTP, WebSocket, SSE, service workers | — |
+| [Numeric](./numeric.md) | 4 | Numeric type utilities, bounds | — |
+| [Phone](./27-phone.md) | 25 | Country codes, validation, formatting | — |
+| [Physical](./20-physical.md) | 33 | Optical/IOR, mechanical, thermal, fluid properties | — |
+| [Physics](./16-physics.md) | 16 | Forces, collision, cloth, rigid body simulation | — |
+| [Reactive](./08-reactive.md) | 48 | States, validation, focus, interaction feedback | — |
+| [Scheduling](./14-scheduling.md) | 8 | Calendar, events, invitations | — |
+| [Sensation](./15-sensation.md) | 13 | Proprioceptive, environmental, social awareness | — |
+| [Spatial](./11-spatial.md) | 64 | 3D primitives, PBR materials, XR, scene graphs | ✓ |
+| [Storage](./24-storage.md) | 4 | Clipboard, IndexedDB, local/session storage | — |
+| [Surface](./05-surface.md) | 43 | Gradients, noise (Perlin, Worley), textures | — |
+| [Temporal](./07-temporal.md) | 39 | Easing (30+ functions), spring physics, keyframes | — |
+| [Tensor](./28-tensor.md) | 8 | DType, shape, layout, dimensions | — |
+| [Text](./26-text.md) | 16 | Rich text, code, selection, commands | — |
+| [Typography](./04-typography.md) | 36 | OpenType features, metrics, type scales | ✓ |
+| [Weather](./18-weather.md) | 18 | Atmosphere, precipitation, wind, Beaufort scale | — |
 
-### Interaction (Pillars 8-10)
+**Documented**: 10 pillars (Color, Dimension, Geometry, Typography, Motion, Elevation, Haptic, Spatial, Attestation, Navigation)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 8 | [Reactive](./08-reactive.md) | 16+ | State, feedback, interaction |
-| 9 | [Gestural](./09-gestural.md) | 25+ | Input patterns, pointers, gestures, keyboard |
-| 10 | [Haptic](./10-haptic.md) | 6+ | Tactile and sensory feedback |
-| 10b | [Audio](./10b-audio.md) | 30+ | Audio synthesis, processing |
-| 10c | [Voice](./10c-voice.md) | 20+ | Speech synthesis, recognition |
+**Pending**: 28 pillars
 
-### Spatial & 3D (Pillar 11)
+---
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 11 | [Spatial](./11-spatial.md) | 51+ | 3D, XR, PBR materials |
+## Pillar Categories
 
-### Theming (Pillar 12)
+### Visual Foundation (5 pillars, 289 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 12 | [Brand](./12-brand.md) | 37+ | Design tokens, theming |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Color | 58 | Color science and theory |
+| Dimension | 47 | Measurement and layout |
+| Geometry | 91 | Shape and form |
+| Typography | 36 | Text rendering |
+| Surface | 43 | Gradients and textures |
+| Elevation | 10 | Depth and shadow |
 
-### Verification (Pillar 13)
+### Motion & Animation (2 pillars, 208 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 13 | [Attestation](./13-attestation.md) | 5+ | Cryptographic integrity, UUIDs |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Motion | 169 | Professional motion graphics |
+| Temporal | 39 | Time, easing, springs |
 
-### Time (Pillar 14)
+### Interaction (4 pillars, 87 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 14 | [Scheduling](./14-scheduling.md) | 7+ | Calendar, events, invitations |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Reactive | 48 | State and validation |
+| Gestural | 31 | Input handling |
+| Haptic | 4 | Tactile feedback |
+| Navigation | 2 | Routing and pagination |
 
-### Agent Sensing (Pillar 15)
+### Sensory (2 pillars, 57 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 15 | [Sensation](./15-sensation.md) | 40+ | Agent perception, embodied input |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Audio | 44 | Sound synthesis |
+| Sensation | 13 | Agent perception |
 
-### Simulation (Pillars 16-17)
+### 3D & Spatial (2 pillars, 80 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 16 | [Physics](./16-physics.md) | 17+ | Force, collision, simulation |
-| 17 | [Layout](./17-layout.md) | 20+ | Flexbox, grid, ILP constraint solver |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Spatial | 64 | 3D, XR, PBR |
+| Physics | 16 | Simulation |
 
-### Environment (Pillar 18) - NEW
+### Data & Compute (5 pillars, 43 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 18 | [Weather](./18-weather.md) | 15+ | Atmosphere, precipitation, wind, Beaufort scale |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Graph | 19 | Layout algorithms |
+| Tensor | 8 | ML tensor types |
+| GPU | 8 | GPU computation |
+| Compute | 4 | Computational graphs |
+| Numeric | 4 | Numeric utilities |
 
-### Domain-Specific (Pillars 19+) - NEW
+### Domain-Specific (7 pillars, 119 files)
 
-| # | Pillar | Files | Description |
-|---|--------|-------|-------------|
-| 19 | [Engineering](./19-engineering.md) | 20+ | CAD/Blueprint, GD&T, tolerances, sections |
-| 20 | [Physical](./20-physical.md) | 30+ | Optical/IOR, Mechanical/Density, Thermal, Fluid |
-| 21 | [Game](./21-game.md) | 19+ | Entity, World, Chess, Poker, Dice, Betting |
-| 22 | [Epistemic](./22-epistemic.md) | 6+ | Affect, Alignment, Coherence, Confidence |
-| 23 | [Network](./23-network.md) | 6+ | HTTP, WebSocket, SSE, ServiceWorker |
-| 24 | [Storage](./24-storage.md) | 4+ | Clipboard, IndexedDB, Local, Session |
-| 25 | [Media](./25-media.md) | 5+ | Audio, Video, Image, Gallery, Upload |
-| 26 | [Text](./26-text.md) | 6+ | RichText, Code, Selection, Commands |
-| 27 | [Phone](./27-phone.md) | 10+ | Country codes, validation, formatting |
-| 28 | [Tensor](./28-tensor.md) | 5+ | DType, Shape, Layout, Dimension |
-| 29 | [Compute](./29-compute.md) | 2+ | Graph, Operation |
-| 30 | [GPU](./30-gpu.md) | 3+ | Landauer, Storable |
-| 31 | [Graph](./31-graph.md) | 10+ | Layout algorithms, NodeContent, Viewport |
-| 32 | [Brush](./32-brush.md) | 2+ | Brush tips for drawing |
-| 33 | [Navigation](./33-navigation.md) | 2+ | Pagination, Index |
-| 34 | [Motion](./34-motion.md) | N/A | Animation orchestration |
-| 35 | [Accessibility](./35-accessibility.md) | N/A | A11y primitives |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Phone | 25 | Telephony |
+| Game | 27 | Gaming primitives |
+| Weather | 18 | Environment |
+| Text | 16 | Rich text editing |
+| Engineering | 9 | CAD/blueprint |
+| Scheduling | 8 | Calendar |
+| Epistemic | 6 | Agent reasoning |
 
-### Utility Modules
+### Infrastructure (6 pillars, 84 files)
 
-| Module | Description |
-|--------|-------------|
-| Bounded.purs | Core bounded type infrastructure |
-| Numeric.purs | Numeric type utilities |
-| Group.purs | Algebraic group structures |
-| Priority.purs | Priority queue primitives |
-| Diff.purs | Diffing utilities |
-| Identity.purs | Identity tracking |
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Brand | 37 | Design tokens |
+| Physical | 33 | Material properties |
+| Network | 21 | Communication |
+| Attestation | 12 | Cryptographic integrity |
+| Element | 5 | Core UI primitives |
+| Accessibility | 6 | A11y |
 
-## Source Implementation
+### Storage & Media (3 pillars, 14 files)
+
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Media | 5 | Audio/video/image |
+| Brush | 5 | Drawing tools |
+| Storage | 4 | Persistence |
+
+### Utility (1 pillar, 1 file)
+
+| Pillar | Files | Purpose |
+|--------|------:|---------|
+| Identity | 1 | Temporal identity |
+
+---
+
+## Source Structure
 
 ```
 src/Hydrogen/Schema/
-├── Bounded.purs              # Core bounded type infrastructure
-├── Color/                    # 58 files - color science
-├── Dimension/                # 35 files - measurement
-├── Geometry/                 # 49 files (NURBS/, Spline/, Symmetry/)
-├── Typography/               # 35 files (OpenType/)
-├── Material/                 # 40+ files
-├── Elevation/                # Shadow, depth
-├── Temporal/                 # 39+ files - animation, easing
-├── Reactive/                 # State management
-├── Gestural/                 # Input handling (Keyboard/, Gesture/)
-├── Haptic/                   # Tactile feedback
-├── Audio/                    # Audio synthesis
-├── Spatial/                  # 3D rendering (51 files)
-├── Brand/                    # Design tokens (37 files)
-├── Physics/                  # Force, collision (15 files)
-├── Weather/                  # Atmosphere/, Precipitation/, Wind/
-├── Engineering/              # Tolerance/, Dimension/, Section/, Drawing
-├── Physical/                 # Optical/, Mechanical/, Thermal/, Fluid/
-├── Game/                     # Entity, World, Chess/, Templates/
-├── Epistemic/                # Affect, Alignment, Coherence
-├── Network/                  # HTTP/, WebSocket/
-├── Storage/                  # Clipboard, IndexedDB, Local, Session
-├── Media/                    # Audio, Video, Image, Gallery
-├── Text/                     # RichText/, Code/
-├── Phone/                    # Country, Format, Validate
-├── Tensor/                   # DType/, Shape, Layout
-├── Compute/                  # Graph, Operation
-├── GPU/                      # Landauer/
-├── Graph/                    # Layout/, NodeContent/, Viewport/
-├── Brush/                    # Tip/
-├── Navigation/               # Pagination, Index
-├── Motion/                   # Animation
-├── Accessibility/            # A11y
-├── Scheduling/               # Calendar
-├── Sensation/                # Agent sensing
-├── Attestation/              # Cryptographic integrity
-└── Identity/                 # Temporal identity
+├── Accessibility/    (6)     ├── GPU/           (8)      ├── Physics/       (16)
+├── Attestation/     (12)     ├── Graph/        (19)      ├── Reactive/      (48)
+├── Audio/           (44)     ├── Haptic/        (4)      ├── Scheduling/     (8)
+├── Brand/           (37)     ├── Identity/      (1)      ├── Sensation/     (13)
+├── Brush/            (5)     ├── Media/         (5)      ├── Spatial/       (64)
+├── Color/           (58)     ├── Motion/      (169)      ├── Storage/        (4)
+├── Compute/          (4)     ├── Navigation/    (2)      ├── Surface/       (43)
+├── Dimension/       (47)     ├── Network/      (21)      ├── Temporal/      (39)
+├── Element/          (5)     ├── Numeric/       (4)      ├── Tensor/         (8)
+├── Elevation/       (10)     ├── Phone/        (25)      ├── Text/          (16)
+├── Engineering/      (9)     ├── Physical/     (33)      ├── Typography/    (36)
+├── Epistemic/        (6)                                 ├── Weather/       (18)
+├── Game/            (27)
+├── Geometry/        (91)
+├── Gestural/        (31)
+└── Bounded.purs           # Core bounded type infrastructure
 ```
 
-## Total Atom Count
-
-**1000+ atoms** across **35+ pillars**
-
-(Previous documentation listed 280+ atoms across 17 pillars — severely undercounted)
+---
 
 ## Cross-References
 
-- `docs/INTERNAL/design-ontology.md` — Bounded type specification
-- `docs/CONTINUITY_VISION.md` — Project philosophy  
+- `docs/SCHEMA.md` — High-level schema overview
+- `docs/design-ontology.md` — Bounded type specification
+- `docs/CONTINUITY_VISION.md` — Project philosophy
 - `CLAUDE.md` — Development standards

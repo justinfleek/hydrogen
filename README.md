@@ -16,8 +16,8 @@ UI as data, not framework-specific code. Pure PureScript describing interfaces t
 | | |
 |---|---|
 | **Build** | 0 errors, 0 warnings |
-| **Schema** | 516 files across 17 pillars |
-| **Proofs** | 80 Lean files, ~1100 theorems, **0 sorry** |
+| **Schema** | 1,021 files across 38 pillars |
+| **Proofs** | 102 Lean files, 1,420 theorems, **0 sorry** |
 
 ---
 
@@ -58,27 +58,48 @@ Same Element, multiple outputs. **Separate what from how.**
 
 ## Design System Ontology
 
-17 pillars of bounded, type-safe design primitives:
+38 pillars of bounded, type-safe design primitives:
 
-| Pillar | Atoms |
-|--------|-------|
-| **Color** | sRGB, P3, LAB, OKLCH, camera log curves, LUTs, CDL |
-| **Dimension** | SI units (yocto→quetta), device units, typography units |
-| **Geometry** | Shapes, curves (Bezier, NURBS, B-spline), transforms |
-| **Typography** | OpenType features, metrics, type scales, font stacks |
-| **Material** | Gradients, noise (Perlin, Worley), blur, surfaces |
-| **Elevation** | Shadows, z-index, depth of field, parallax |
-| **Temporal** | Easing (30 functions), spring physics, keyframes |
-| **Reactive** | States (loading, error, success), validation, focus |
-| **Gestural** | Touch, pointer, multi-touch, drag/drop, vim keys |
-| **Haptic** | Vibration patterns, iOS system feedback |
-| **Audio** | Synthesis, effects, analysis, spatial audio |
+| Pillar | Description |
+|--------|-------------|
+| **Color** | sRGB, P3, LAB, OKLCH, ACES, CDL, LUTs, CVD simulation |
+| **Dimension** | SI units (yocto→quetta), device units, spacing |
+| **Geometry** | Shapes, NURBS, B-splines, quaternions, symmetry |
+| **Typography** | OpenType features, metrics, type scales |
+| **Surface** | Gradients, noise (Perlin, Worley), textures |
+| **Elevation** | Shadows, z-index, depth, parallax |
+| **Temporal** | Easing (30+ functions), spring physics, keyframes |
+| **Motion** | Animation, effects, layers, expressions, Lottie |
+| **Reactive** | States, validation, focus, interaction feedback |
+| **Gestural** | Touch, pointer, gestures, keyboard, vim keys |
+| **Haptic** | Vibration patterns, tactile feedback |
+| **Audio** | Synthesis, effects, MIDI, spatial audio |
 | **Spatial** | 3D primitives, PBR materials, XR, scene graphs |
 | **Accessibility** | WAI-ARIA 1.2 roles, states, live regions |
 | **Sensation** | Proprioceptive, environmental, social awareness |
-| **Scheduling** | Time-based primitives |
-| **Epistemic** | Model-level phenomenology |
-| **Brand** | Token composition, theme configuration |
+| **Physics** | Forces, collision, cloth, rigid body simulation |
+| **Weather** | Atmosphere, precipitation, wind, Beaufort scale |
+| **Engineering** | CAD/blueprint, GD&T, tolerances, sections |
+| **Physical** | Optical/IOR, mechanical, thermal, fluid properties |
+| **Game** | Entity systems, chess, poker, dice, betting |
+| **Epistemic** | Affect, alignment, coherence, confidence |
+| **Network** | HTTP, WebSocket, SSE, service workers |
+| **Storage** | Clipboard, IndexedDB, local/session storage |
+| **Media** | Audio, video, image, gallery, upload |
+| **Text** | Rich text, code, selection, commands |
+| **Phone** | Country codes, validation, formatting |
+| **Tensor** | DType, shape, layout, dimensions |
+| **Compute** | Graph, operations |
+| **GPU** | Landauer limits, storable types |
+| **Graph** | Layout algorithms, node content, viewport |
+| **Brush** | Brush tips for drawing applications |
+| **Navigation** | Pagination, index, routing |
+| **Brand** | Design tokens, theme composition |
+| **Scheduling** | Calendar, events, invitations |
+| **Attestation** | Cryptographic integrity, UUID5 |
+| **Identity** | Temporal identity tracking |
+| **Numeric** | Numeric type utilities, bounds |
+| **Element** | Core UI element primitives |
 
 Atoms compose into molecules. Molecules compose into compounds. Compounds compose into brands.
 
@@ -102,7 +123,7 @@ theorem continuous_greedy_guarantee (F : Set V → ℝ) (k : ℕ) :
   F(solution) ≥ (1 - 1/e) * F(optimal)
 ```
 
-**80 proof files. ~1100 theorems. 0 sorry.**
+**102 proof files. 1,420 theorems. 0 sorry.**
 
 The type system encodes invariants. The proofs verify properties. Invalid states don't compile.
 
@@ -145,7 +166,7 @@ let dashboard = ado
 | Module | Purpose |
 |--------|---------|
 | `Hydrogen.Render.Element` | Pure data UI elements |
-| `Hydrogen.Schema.*` | 516 design system atoms |
+| `Hydrogen.Schema.*` | 1,021 design system atoms |
 | `Hydrogen.Query` | Data fetching, caching, deduplication |
 | `Hydrogen.Data.RemoteData` | Lawful Monad for async state |
 | `Hydrogen.Router` | Type-safe ADT routing |
