@@ -20,7 +20,13 @@
 module Hydrogen.Layout.ILP.Formulate
   ( -- * Formulation
     formulateLayout
-  , LayoutObjective(..)
+  , LayoutObjective
+      ( MinimizeWaste
+      , MaximizeContent
+      , BalanceSizes
+      , MinimizeTotalWidth
+      , MinimizeMaxWidth
+      )
   , VarMap
   
     -- * Solving

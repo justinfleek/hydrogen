@@ -1,14 +1,14 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---         // hydrogen // schema // motion // aftereffects // propertyvalue // text
+--         // hydrogen // schema // motion // professional // propertyvalue // text
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Text Property Values — Text document and justification types for AE.
+-- | Text Property Values — Text document and justification types for motion graphics.
 -- |
--- | This module defines ParagraphJustification and TextDocumentValue exactly
--- | as they exist in AE's scripting API. TextDocumentValue is the complete
+-- | This module defines ParagraphJustification and TextDocumentValue for
+-- | professional motion graphics interchange. TextDocumentValue is the complete
 -- | type for the "Source Text" property.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Text
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Text
   ( -- * Justification
     ParagraphJustification(..)
   , paragraphJustificationToInt
@@ -45,7 +45,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Color 
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Color 
   ( ColorValue
   , colorValueRGB
   )

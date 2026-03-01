@@ -10,7 +10,14 @@
 module Hydrogen.Composition.Effect.Distort
   ( DisplacementSpec
   , WarpSpec
-  , WarpType(..)
+  , WarpType
+      ( WarpArc
+      , WarpBulge
+      , WarpFlag
+      , WarpWave
+      , WarpFish
+      , WarpInflate
+      )
   , BulgeSpec
   , RippleSpec
   , TwirlSpec

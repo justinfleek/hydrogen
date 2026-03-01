@@ -21,7 +21,12 @@
 module Hydrogen.Optimize.Submodular.Types.Config
   ( SamplingRate(SamplingRate)
   , StepSize(StepSize)
-  , PiPage(..)
+  , PiPage
+      ( DeterministicPipage
+      , RandomizedPipage
+      , ContiguousPipage
+      , SwapPipage
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

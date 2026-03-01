@@ -45,8 +45,8 @@ module Hydrogen.Tour.Update
     update
   , UpdateResult
     -- * Commands
-  , TourCmd(..)
-  , AnalyticsEvent(..)
+  , TourCmd(ScrollToStep, ResolveTarget, PersistCompletion, PersistDismissal, PersistSnooze, EmitAnalytics, FocusStep, RestoreFocus, ScheduleResume)
+  , AnalyticsEvent(AnalyticsTourStarted, AnalyticsTourCompleted, AnalyticsTourSkipped, AnalyticsTourDismissed, AnalyticsStepViewed, AnalyticsStepCompleted, AnalyticsTourSnoozed)
     -- * Helpers
   , findStepByIdIndex
   ) where

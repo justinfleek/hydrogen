@@ -55,17 +55,17 @@ module Hydrogen.Tour.Navigation
   ) where
 
 import Hydrogen.Tour.Navigation.Progress
-  ( DotSize(..)
+  ( DotSize(DotSmall, DotMedium, DotLarge)
   , DotsConfig
-  , FractionFormat(..)
+  , FractionFormat(FractionOfFormat, FractionSlashFormat, FractionDashFormat)
   , ProgressBarElement
   , ProgressConfig
   , ProgressDotsElement
   , ProgressFractionElement
   , ProgressStepperElement
-  , ProgressStyle(..)
-  , ProgressVariant(..)
-  , StepperOrientation(..)
+  , ProgressStyle(ProgressDots, ProgressBar, ProgressFraction, ProgressStepper, ProgressNone)
+  , ProgressVariant(VariantDefault, VariantMinimal, VariantProminent, VariantBrand)
+  , StepperOrientation(Horizontal, Vertical)
   , defaultProgressConfig
   , progressBar
   , progressDots
@@ -77,11 +77,11 @@ import Hydrogen.Tour.Navigation.Progress
 
 import Hydrogen.Tour.Navigation.Buttons
   ( ButtonConfig
-  , ButtonIcon(..)
-  , ButtonLayout(..)
-  , ButtonPosition(..)
-  , ButtonSize(..)
-  , ButtonStyle(..)
+  , ButtonIcon(IconArrowLeft, IconArrowRight, IconCheck, IconX, IconSkip, IconCustom)
+  , ButtonLayout(LayoutSpaceBetween, LayoutEnd, LayoutStacked)
+  , ButtonPosition(PositionStart, PositionCenter, PositionEnd)
+  , ButtonSize(ButtonSmall, ButtonMedium, ButtonLarge)
+  , ButtonStyle(ButtonPrimary, ButtonSecondary, ButtonGhost, ButtonDestructive, ButtonOutline)
   , NavigationButtonsConfig
   , NavigationElement
   , completeButton
@@ -94,9 +94,9 @@ import Hydrogen.Tour.Navigation.Buttons
   ) as Buttons
 
 import Hydrogen.Tour.Navigation.Keyboard
-  ( KeyAction(..)
+  ( KeyAction(KeyNext, KeyPrev, KeyDismiss, KeyComplete, KeyGoToStep)
   , KeyBinding
-  , KeyModifier(..)
+  , KeyModifier(ModCtrl, ModShift, ModAlt, ModMeta)
   , KeyboardConfig
   , defaultKeyBindings
   , defaultKeyboardConfig
@@ -107,23 +107,23 @@ import Hydrogen.Tour.Navigation.Keyboard
 
 import Hydrogen.Tour.Navigation.Gestures
   ( SwipeConfig
-  , SwipeDirection(..)
+  , SwipeDirection(SwipeLeft, SwipeRight, SwipeUp, SwipeDown)
   , defaultSwipeConfig
   , swipeEnabled
   ) as Gestures
 
 import Hydrogen.Tour.Navigation.CloseButton
   ( CloseButtonConfig
-  , CloseButtonPosition(..)
-  , CloseButtonStyle(..)
+  , CloseButtonPosition(CloseTopRight, CloseTopLeft, CloseInHeader)
+  , CloseButtonStyle(CloseIcon, CloseText, CloseIconWithLabel)
   , defaultCloseConfig
   ) as CloseButton
 
 import Hydrogen.Tour.Navigation.Accessibility
   ( A11yConfig
   , FocusTrapConfig
-  , InitialFocus(..)
-  , LiveRegion(..)
+  , InitialFocus(FocusFirstTabbable, FocusContainer, FocusPrimaryButton, FocusNone)
+  , LiveRegion(LiveOff, LivePolite, LiveAssertive)
   , defaultA11yConfig
   , focusTrapConfig
   , screenReaderAnnouncement

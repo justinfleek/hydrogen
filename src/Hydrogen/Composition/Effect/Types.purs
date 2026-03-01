@@ -8,8 +8,48 @@
 -- | All effect spec types are imported from their respective category modules.
 
 module Hydrogen.Composition.Effect.Types
-  ( Effect(..)
-  , EffectCategory(..)
+  ( Effect
+      ( EffectGaussianBlur
+      , EffectDirectionalBlur
+      , EffectRadialBlur
+      , EffectBoxBlur
+      , EffectSharpen
+      , EffectBrightnessContrast
+      , EffectHueSaturation
+      , EffectLevels
+      , EffectCurves
+      , EffectColorBalance
+      , EffectTint
+      , EffectVignette
+      , EffectExposure
+      , EffectDisplacement
+      , EffectWarp
+      , EffectBulge
+      , EffectRipple
+      , EffectTwirl
+      , EffectGlow
+      , EffectDropShadow
+      , EffectInnerShadow
+      , EffectEmboss
+      , EffectEdgeDetect
+      , EffectPosterize
+      , EffectNoiseOverlay
+      , EffectGrain
+      , EffectRGBSplit
+      , EffectScanlines
+      , EffectVHS
+      , EffectGlitch
+      , EffectPixelate
+      , EffectHalftone
+      )
+  , EffectCategory
+      ( CategoryBlur
+      , CategoryColor
+      , CategoryDistort
+      , CategoryStylize
+      , CategoryNoise
+      , CategoryTime
+      )
   , effectCategory
   , effectLabel
   , categoryLabel

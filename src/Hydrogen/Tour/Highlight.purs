@@ -41,8 +41,8 @@ module Hydrogen.Tour.Highlight
   ( -- * Overlay Configuration
     OverlayConfig
   , defaultOverlay
-  , OverlayColor(..)
-  , OverlayOpacity(..)
+  , OverlayColor(OverlayBlack, OverlayGray, OverlayBlue, OverlayPurple, OverlayGreen, OverlayCustom)
+  , OverlayOpacity(Opacity25, Opacity50, Opacity60, Opacity75, Opacity80, Opacity90)
   , overlayColorToCss
   , overlayOpacityToNumber
     -- * Overlay Builders
@@ -55,7 +55,7 @@ module Hydrogen.Tour.Highlight
     -- * Spotlight Configuration
   , SpotlightConfig
   , defaultSpotlight
-  , SpotlightShape(..)
+  , SpotlightShape(ShapeRect, ShapeCircle, ShapeRounded, ShapePill, ShapeInset)
   , spotlightShapeToCss
     -- * Spotlight Builders
   , spotlight
@@ -64,7 +64,7 @@ module Hydrogen.Tour.Highlight
   , roundedSpotlight
   , pillSpotlight
     -- * Highlight Styles
-  , HighlightStyle(..)
+  , HighlightStyle(Glow, Pulse, Ring, GradientBorder, Combined)
   , HighlightGlow
   , HighlightPulse
   , HighlightRing
@@ -74,7 +74,7 @@ module Hydrogen.Tour.Highlight
   , defaultRing
     -- * Cutout Generation
   , CutoutPath
-  , PathCommand(..)
+  , PathCommand(MoveTo, LineTo, ArcTo, QuadraticTo, Close)
   , generateRectCutout
   , generateCircleCutout
   , generateRoundedCutout
@@ -84,9 +84,9 @@ module Hydrogen.Tour.Highlight
   , PulseConfig
   , defaultPulseConfig
   , pulseAnimation
-  , PulseStyle(..)
+  , PulseStyle(PulseScale, PulseOpacity, PulseGlow, PulseRing)
     -- * Interaction Modes
-  , InteractionMode(..)
+  , InteractionMode(BlockAll, AllowClick, AllowOnTarget, DismissOnClick)
   , pointerEventsFromMode
   ) where
 

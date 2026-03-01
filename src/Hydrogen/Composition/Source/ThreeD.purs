@@ -9,29 +9,73 @@
 module Hydrogen.Composition.Source.ThreeD
   ( -- * Model
     ModelSpec
-  , ModelFormat(..)
+  , ModelFormat
+      ( FormatGLTF
+      , FormatGLB
+      , FormatOBJ
+      , FormatFBX
+      , FormatUSD
+      , FormatDAE
+      )
   , model
   
   -- * Point Cloud
   , PointCloudSpec
-  , PointCloudFormat(..)
-  , PointCloudColoring(..)
+  , PointCloudFormat
+      ( FormatPLY
+      , FormatPCD
+      , FormatLAS
+      , FormatLAZ
+      , FormatXYZ
+      )
+  , PointCloudColoring
+      ( ColoringRGB
+      , ColoringHeight
+      , ColoringIntensity
+      , ColoringNormal
+      , ColoringSolid
+      )
   , pointCloud
   
   -- * Camera
   , CameraSpec
-  , CameraType(..)
+  , CameraType
+      ( CameraOneNode
+      , CameraTwoNode
+      )
   , camera
   
   -- * Light
   , LightSpec
-  , LightType(..)
+  , LightType
+      ( LightPoint
+      , LightSpot
+      , LightDirectional
+      , LightAmbient
+      , LightArea
+      )
   , light
   
   -- * Particle System
   , ParticleSystemSpec
-  , EmitterShape(..)
-  , ParticleForce(..)
+  , EmitterShape
+      ( EmitPoint
+      , EmitLine
+      , EmitCircle
+      , EmitBox
+      , EmitSphere
+      , EmitCone
+      , EmitMesh
+      , EmitDepthMap
+      , EmitMask
+      )
+  , ParticleForce
+      ( ForceGravity
+      , ForceWind
+      , ForceTurbulence
+      , ForceVortex
+      , ForceAttractor
+      )
   , particleSystem
   ) where
 

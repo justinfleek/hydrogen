@@ -14,8 +14,8 @@ module Hydrogen.Tour.Navigation.Keyboard
   , defaultKeyboardConfig
     -- * Key Bindings
   , KeyBinding
-  , KeyAction(..)
-  , KeyModifier(..)
+  , KeyAction(KeyNext, KeyPrev, KeyDismiss, KeyComplete, KeyGoToStep)
+  , KeyModifier(ModCtrl, ModShift, ModAlt, ModMeta)
   , defaultKeyBindings
     -- * Configuration Builders
   , withArrowNav

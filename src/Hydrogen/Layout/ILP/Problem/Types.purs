@@ -17,16 +17,26 @@
 
 module Hydrogen.Layout.ILP.Problem.Types
   ( -- * Optimization Sense
-    Sense(..)
+    Sense
+      ( Minimize
+      , Maximize
+      )
   
     -- * Variable Types
-  , VarType(..)
+  , VarType
+      ( Continuous
+      , Integer
+      )
   , VarId
   , VarSpec
   , defaultUpperBound
   
     -- * Constraints
-  , ConstraintSense(..)
+  , ConstraintSense
+      ( Le
+      , Eq
+      , Ge
+      )
   , ConstraintRow
   
     -- * Problem
@@ -34,7 +44,13 @@ module Hydrogen.Layout.ILP.Problem.Types
   , emptyProblem
   
     -- * Solution
-  , SolveStatus(..)
+  , SolveStatus
+      ( Optimal
+      , Feasible
+      , Infeasible
+      , Unbounded
+      , NotSolved
+      )
   , Solution
   , emptySolution
   ) where

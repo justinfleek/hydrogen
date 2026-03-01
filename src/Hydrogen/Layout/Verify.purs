@@ -29,7 +29,11 @@
 
 module Hydrogen.Layout.Verify
   ( -- * Verification Result
-    VerifyResult(..)
+    VerifyResult
+      ( Sat
+      , Unsat
+      , Unknown
+      )
   , Witness
     
     -- * Satisfiability Checking

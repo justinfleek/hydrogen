@@ -172,13 +172,13 @@ All 5 are in `proofs/Hydrogen/Scale/HierarchicalAggregation.lean`:
 | 3.3 | GPUStorable roundtrip proof | **OPEN** |
 | 4 | Connect Lean proofs to PureScript bounded types | **OPEN** |
 
-### 3D_INTERACTION_COUNCIL.md (Cinema4D Parity)
+### 3D_INTERACTION_COUNCIL.md (3D Software Parity)
 
 **Complete:**
 - Controls, Picking, Gizmo, Selection, Snap
 - Path system (Path, PathEval, PathFrame, PathArcLength, PathMetrics)
 
-**Remaining for C4D Parity:**
+**Remaining for 3D Software Parity:**
 
 | Tier | Feature | Complexity | Status |
 |------|---------|------------|--------|
@@ -350,8 +350,8 @@ All 5 are in `proofs/Hydrogen/Scale/HierarchicalAggregation.lean`:
 | AI Avatar Window | UNBLOCKED | — |
 | Accessible Web Apps | UNBLOCKED | — |
 | Frame.io | PARTIAL | GPU/Kernel/Video.purs |
-| Cinema4D/After Effects | PARTIAL | 3D compositing kernels |
-| Ableton | PARTIAL | Waveform rendering (exists in Chart.purs) |
+| Professional 3D/motion graphics | PARTIAL | 3D compositing kernels |
+| DAW | PARTIAL | Waveform rendering (exists in Chart.purs) |
 
 ---
 

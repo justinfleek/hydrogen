@@ -345,7 +345,7 @@ Motion graphics-specific input controls.
 
 ### 2.1 ScrubableNumber
 
-**Purpose**: Drag-to-scrub numeric input (After Effects style)
+**Purpose**: Drag-to-scrub numeric input (professional motion graphics style)
 
 **Features**:
 - Click to edit as text

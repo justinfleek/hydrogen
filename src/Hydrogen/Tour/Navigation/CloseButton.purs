@@ -12,8 +12,8 @@ module Hydrogen.Tour.Navigation.CloseButton
   ( -- * Close Button Configuration
     CloseButtonConfig
   , defaultCloseConfig
-  , CloseButtonPosition(..)
-  , CloseButtonStyle(..)
+  , CloseButtonPosition(CloseTopRight, CloseTopLeft, CloseInHeader)
+  , CloseButtonStyle(CloseIcon, CloseText, CloseIconWithLabel)
   ) where
 
 import Prelude (class Eq, class Show)

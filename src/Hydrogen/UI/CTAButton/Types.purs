@@ -14,31 +14,102 @@
 
 module Hydrogen.UI.CTAButton.Types
   ( -- * Variants
-    CTAVariant(..)
+    CTAVariant
+      ( Primary
+      , Secondary
+      , Tertiary
+      , Destructive
+      , Success
+      , Warning
+      , Info
+      , Outline
+      , Ghost
+      , Link
+      )
   
   -- * Sizes
-  , CTASize(..)
+  , CTASize
+      ( Xs
+      , Sm
+      , Md
+      , Lg
+      , Xl
+      , Full
+      )
   
   -- * Shapes
-  , CTAShape(..)
+  , CTAShape
+      ( Pill
+      , Rounded
+      , Square
+      , Circle
+      , Blob
+      )
   
   -- * Icon Position
-  , IconPosition(..)
+  , IconPosition
+      ( IconLeft
+      , IconRight
+      , IconTop
+      , IconBottom
+      )
   
   -- * Icon Types
-  , CTAIcon(..)
+  , CTAIcon
+      ( ArrowRight
+      , ArrowLeft
+      , ArrowUp
+      , ArrowDown
+      , Plus
+      , Check
+      , X
+      , Menu
+      , Search
+      , Cart
+      , User
+      , Lock
+      , Globe
+      , ChevronDown
+      , ChevronUp
+      , NoIcon
+      )
   
   -- * Animations
-  , CTAAnimation(..)
+  , CTAAnimation
+      ( NoAnimation
+      , Pulse
+      , Bounce
+      , Shake
+      , Glow
+      , Spin
+      , FadeIn
+      , SlideIn
+      , Ripple
+      )
   
   -- * Glow Intensity
-  , CTAGlowIntensity(..)
+  , CTAGlowIntensity
+      ( Subtle
+      , Moderate
+      , Intense
+      , Extreme
+      )
   
   -- * Border Styles
-  , CTABorderStyle(..)
+  , CTABorderStyle
+      ( Solid
+      , Dashed
+      , Dotted
+      , Double
+      , NoBorder
+      )
   
   -- * HTML Button Types
-  , CTAButtonType(..)
+  , CTAButtonType
+      ( Button
+      , Submit
+      , Reset
+      )
   ) where
 
 import Prelude

@@ -12,10 +12,10 @@
 module Hydrogen.Tour.Navigation.Buttons
   ( -- * Button Configuration
     ButtonConfig
-  , ButtonStyle(..)
-  , ButtonSize(..)
-  , ButtonPosition(..)
-  , ButtonIcon(..)
+  , ButtonStyle(ButtonPrimary, ButtonSecondary, ButtonGhost, ButtonDestructive, ButtonOutline)
+  , ButtonSize(ButtonSmall, ButtonMedium, ButtonLarge)
+  , ButtonPosition(PositionStart, PositionCenter, PositionEnd)
+  , ButtonIcon(IconArrowLeft, IconArrowRight, IconCheck, IconX, IconSkip, IconCustom)
   , defaultButtonConfig
     -- * Button Builders
   , nextButton
@@ -25,7 +25,7 @@ module Hydrogen.Tour.Navigation.Buttons
   , customButton
     -- * Navigation Buttons
   , NavigationButtonsConfig
-  , ButtonLayout(..)
+  , ButtonLayout(LayoutSpaceBetween, LayoutEnd, LayoutStacked)
   , NavigationElement
   , navigationButtons
   ) where

@@ -16,10 +16,20 @@
 
 module Hydrogen.Composition.Cache.Types
   ( -- * Cache Tiers
-    CacheTier(..)
+    CacheTier
+      ( TierL0
+      , TierL1
+      , TierL2
+      )
     
   -- * Cache Tags
-  , CacheTag(..)
+  , CacheTag
+      ( TagBrand
+      , TagComposition
+      , TagNode
+      , TagTrigger
+      , TagCustom
+      )
   
   -- * Entry Types
   , EntryMetadata

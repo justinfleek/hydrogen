@@ -7,8 +7,15 @@
 -- | Toggle buttons for binary choices.
 module Hydrogen.UI.Toggle
   ( toggle
-  , ToggleVariant(..)
-  , ToggleSize(..)
+  , ToggleVariant
+      ( Default
+      , Outline
+      )
+  , ToggleSize
+      ( Sm
+      , Md
+      , Lg
+      )
   , variant
   , size
   , pressed

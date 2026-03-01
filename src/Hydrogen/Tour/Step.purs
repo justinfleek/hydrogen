@@ -51,8 +51,8 @@ module Hydrogen.Tour.Step
   , noScroll
     -- * Button Configuration
   , Button
-  , ButtonAction(..)
-  , ButtonVariant(..)
+  , ButtonAction(ActionNext, ActionPrev, ActionSkip, ActionComplete, ActionGoTo, ActionCustom)
+  , ButtonVariant(Primary, Secondary, Text)
   , button
   , nextButton
   , prevButton
@@ -68,7 +68,7 @@ module Hydrogen.Tour.Step
   , ScrollConfig
   , defaultScroll
   , scrollBehavior
-  , ScrollBehavior(..)
+  , ScrollBehavior(Smooth, Instant)
   ) where
 
 import Prelude

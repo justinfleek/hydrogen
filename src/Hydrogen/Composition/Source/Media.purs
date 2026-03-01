@@ -9,7 +9,12 @@
 module Hydrogen.Composition.Source.Media
   ( -- * Image
     ImageSpec
-  , ImageFit(..)
+  , ImageFit
+      ( FitCover
+      , FitContain
+      , FitFill
+      , FitNone
+      )
   , image
   
   -- * Video
@@ -18,7 +23,14 @@ module Hydrogen.Composition.Source.Media
   
   -- * Audio
   , AudioSpec
-  , AudioVisualization(..)
+  , AudioVisualization
+      ( AudioWaveform
+      , AudioSpectrum
+      , AudioCircular
+      , AudioMirror
+      , AudioBars
+      , AudioParticles
+      )
   , audio
   
   -- * SVG
@@ -27,10 +39,20 @@ module Hydrogen.Composition.Source.Media
   
   -- * Depth/Normal Maps
   , DepthSpec
-  , DepthVisualization(..)
+  , DepthVisualization
+      ( DepthGrayscale
+      , DepthColormap
+      , DepthContour
+      , DepthMesh
+      )
   , depth
   , NormalSpec
-  , NormalVisualization(..)
+  , NormalVisualization
+      ( NormalRGB
+      , NormalHemisphere
+      , NormalArrows
+      , NormalLit
+      )
   , normal
   ) where
 

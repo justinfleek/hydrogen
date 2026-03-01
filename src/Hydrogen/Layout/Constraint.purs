@@ -18,7 +18,13 @@ module Hydrogen.Layout.Constraint
   , linAdd
   , linNeg
   , linSub
-  , Rel(..)
+  , Rel
+      ( RelEq
+      , RelLe
+      , RelLt
+      , RelGe
+      , RelGt
+      )
   , LinConstraint
   , leZero
   , eqZero
@@ -26,7 +32,14 @@ module Hydrogen.Layout.Constraint
   , le
   , eq
   , ge
-  , Formula(..)
+  , Formula
+      ( Atom
+      , And
+      , Or
+      , Not
+      , Tt
+      , Ff
+      )
   , conj
   ) where
 

@@ -26,7 +26,14 @@ module Hydrogen.Layout.ILP.BranchBound
   ( -- * Solver
     solveILP
   , solveILPWithConfig
-  , BranchResult(..)
+  , BranchResult
+      ( BranchOptimal
+      , BranchFeasible
+      , BranchInfeasible
+      , BranchMaxNodes
+      , BranchMaxDepth
+      , BranchUnbounded
+      )
   
     -- * Configuration
   , BranchConfig

@@ -17,12 +17,12 @@
 -- | cannot be represented.
 module Hydrogen.Tour.Types
   ( -- * Identifiers
-    TourId(..)
+    TourId(TourId)
   , mkTourId
-  , StepId(..)
+  , StepId(StepId)
   , mkStepId
     -- * Target Selection
-  , Target(..)
+  , Target(BySelector, ByTestId, ByRole, NoTarget)
   , Selector
   , mkSelector
   , unsafeSelector
@@ -31,20 +31,56 @@ module Hydrogen.Tour.Types
   , mkTestId
   , runTestId
     -- * ARIA Roles
-  , AriaRole(..)
+  , AriaRole
+      ( RoleButton
+      , RoleLink
+      , RoleTextbox
+      , RoleCheckbox
+      , RoleRadio
+      , RoleCombobox
+      , RoleListbox
+      , RoleOption
+      , RoleSwitch
+      , RoleSlider
+      , RoleSpinbutton
+      , RoleSearchbox
+      , RoleDialog
+      , RoleAlertdialog
+      , RoleMenu
+      , RoleMenubar
+      , RoleMenuitem
+      , RoleTab
+      , RoleTablist
+      , RoleTabpanel
+      , RoleTreeitem
+      , RoleNavigation
+      , RoleMain
+      , RoleRegion
+      , RoleBanner
+      , RoleContentinfo
+      , RoleForm
+      , RoleSearch
+      , RoleComplementary
+      , RoleImg
+      , RoleArticle
+      , RoleCell
+      , RoleRow
+      , RoleTable
+      , RoleGrid
+      )
   , ariaRoleString
     -- * Placement
-  , Side(..)
-  , Alignment(..)
+  , Side(Top, Right, Bottom, Left)
+  , Alignment(Start, Center, End)
   , Placement
   , mkPlacement
   , defaultPlacement
   , oppositeSide
     -- * Dimensions
-  , Pixel(..)
-  , Milliseconds(..)
+  , Pixel(Pixel)
+  , Milliseconds(Milliseconds)
     -- * Tour Phase
-  , TourPhase(..)
+  , TourPhase(TourInactive, TourActive, TourPaused, TourCompleted, TourSkipped, TourDismissed)
   , isActive
   , isPaused
   , isTerminal

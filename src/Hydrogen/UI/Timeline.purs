@@ -13,7 +13,13 @@ module Hydrogen.UI.Timeline
   , timelineTitle
   , timelineDescription
   , timelineTime
-  , TimelineDotVariant(..)
+  , TimelineDotVariant
+      ( Default
+      , Success
+      , Warning
+      , Danger
+      , Info
+      )
   , dotVariant
   ) where
 

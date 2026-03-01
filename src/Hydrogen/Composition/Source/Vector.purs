@@ -9,12 +9,22 @@
 module Hydrogen.Composition.Source.Vector
   ( -- * Spline
     SplineSpec
-  , SplineFill(..)
+  , SplineFill
+      ( SplineSolid
+      , SplineGradient
+      , SplineNone
+      )
   , spline
   
   -- * Shape
   , ShapeSpec
-  , ShapeGenerator(..)
+  , ShapeGenerator
+      ( ShapeRectangle
+      , ShapeEllipse
+      , ShapeStar
+      , ShapePolygon
+      , ShapePath
+      )
   , shapeRect
   , shapeEllipse
   , shapeStar
@@ -26,8 +36,22 @@ module Hydrogen.Composition.Source.Vector
   
   -- * Text
   , TextSpec
-  , TextAnimator(..)
-  , TextRangeSelector(..)
+  , TextAnimator
+      ( AnimatorTypewriter
+      , AnimatorFadeUp
+      , AnimatorFadeDown
+      , AnimatorBounce
+      , AnimatorWave
+      , AnimatorScale
+      , AnimatorRotate
+      , AnimatorBlur
+      , AnimatorCustom
+      )
+  , TextRangeSelector
+      ( RangePercent
+      , RangeIndex
+      , RangeExpression
+      )
   , text
   ) where
 

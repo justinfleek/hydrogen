@@ -12,7 +12,7 @@ module Hydrogen.Tour.Navigation.Gestures
   ( -- * Swipe Configuration
     SwipeConfig
   , defaultSwipeConfig
-  , SwipeDirection(..)
+  , SwipeDirection(SwipeLeft, SwipeRight, SwipeUp, SwipeDown)
   , swipeEnabled
   ) where
 

@@ -12,13 +12,13 @@
 module Hydrogen.Tour.Navigation.Accessibility
   ( -- * Accessibility Configuration
     A11yConfig
-  , LiveRegion(..)
+  , LiveRegion(LiveOff, LivePolite, LiveAssertive)
   , defaultA11yConfig
     -- * Screen Reader
   , screenReaderAnnouncement
     -- * Focus Trap
   , FocusTrapConfig
-  , InitialFocus(..)
+  , InitialFocus(FocusFirstTabbable, FocusContainer, FocusPrimaryButton, FocusNone)
   , focusTrapConfig
   ) where
 

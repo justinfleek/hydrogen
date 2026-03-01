@@ -29,18 +29,18 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Queries
   , turbulentDisplaceEffectName
   , twirlEffectName
   , waveWarpEffectName
-  , ccBendItEffectName
-  , ccBlobbylizeEffectName
-  , ccFloMotionEffectName
-  , ccGriddlerEffectName
-  , ccLensEffectName
-  , ccPageTurnEffectName
-  , ccPowerPinEffectName
-  , ccRipplePulseEffectName
-  , ccSlantEffectName
-  , ccSmearEffectName
-  , ccSplitEffectName
-  , ccTilerEffectName
+  , bendItEffectName
+  , blobbylizeEffectName
+  , floMotionEffectName
+  , griddlerEffectName
+  , lensDistortionEffectName
+  , pageTurnEffectName
+  , powerPinEffectName
+  , ripplePulseEffectName
+  , slantEffectName
+  , smearEffectName
+  , splitEffectName
+  , tilerEffectName
   
   -- * Effect Descriptions
   , describeWarp
@@ -114,19 +114,19 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Transform
   , PolarCoordinatesEffect
   , TransformEffect
   )
-import Hydrogen.Schema.Motion.Effects.Distortion.CC
-  ( CCBendItEffect
-  , CCBlobbylizeEffect
-  , CCFloMotionEffect
-  , CCGriddlerEffect
-  , CCLensEffect
-  , CCPageTurnEffect
-  , CCPowerPinEffect
-  , CCRipplePulseEffect
-  , CCSlantEffect
-  , CCSmearEffect
-  , CCSplitEffect
-  , CCTilerEffect
+import Hydrogen.Schema.Motion.Effects.Distortion.Extended
+  ( BendItEffect
+  , BlobbylizeEffect
+  , FloMotionEffect
+  , GriddlerEffect
+  , LensDistortionEffect
+  , PageTurnEffect
+  , PowerPinEffect
+  , RipplePulseEffect
+  , SlantEffect
+  , SmearEffect
+  , SplitEffect
+  , TilerEffect
   )
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -181,41 +181,41 @@ twirlEffectName _ = "Twirl"
 waveWarpEffectName :: WaveWarpEffect -> String
 waveWarpEffectName _ = "Wave Warp"
 
-ccBendItEffectName :: CCBendItEffect -> String
-ccBendItEffectName _ = "CC Bend It"
+bendItEffectName :: BendItEffect -> String
+bendItEffectName _ = "Bend It"
 
-ccBlobbylizeEffectName :: CCBlobbylizeEffect -> String
-ccBlobbylizeEffectName _ = "CC Blobbylize"
+blobbylizeEffectName :: BlobbylizeEffect -> String
+blobbylizeEffectName _ = "Blobbylize"
 
-ccFloMotionEffectName :: CCFloMotionEffect -> String
-ccFloMotionEffectName _ = "CC Flo Motion"
+floMotionEffectName :: FloMotionEffect -> String
+floMotionEffectName _ = "Flo Motion"
 
-ccGriddlerEffectName :: CCGriddlerEffect -> String
-ccGriddlerEffectName _ = "CC Griddler"
+griddlerEffectName :: GriddlerEffect -> String
+griddlerEffectName _ = "Griddler"
 
-ccLensEffectName :: CCLensEffect -> String
-ccLensEffectName _ = "CC Lens"
+lensDistortionEffectName :: LensDistortionEffect -> String
+lensDistortionEffectName _ = "Lens Distortion"
 
-ccPageTurnEffectName :: CCPageTurnEffect -> String
-ccPageTurnEffectName _ = "CC Page Turn"
+pageTurnEffectName :: PageTurnEffect -> String
+pageTurnEffectName _ = "Page Turn"
 
-ccPowerPinEffectName :: CCPowerPinEffect -> String
-ccPowerPinEffectName _ = "CC Power Pin"
+powerPinEffectName :: PowerPinEffect -> String
+powerPinEffectName _ = "Power Pin"
 
-ccRipplePulseEffectName :: CCRipplePulseEffect -> String
-ccRipplePulseEffectName _ = "CC Ripple Pulse"
+ripplePulseEffectName :: RipplePulseEffect -> String
+ripplePulseEffectName _ = "Ripple Pulse"
 
-ccSlantEffectName :: CCSlantEffect -> String
-ccSlantEffectName _ = "CC Slant"
+slantEffectName :: SlantEffect -> String
+slantEffectName _ = "Slant"
 
-ccSmearEffectName :: CCSmearEffect -> String
-ccSmearEffectName _ = "CC Smear"
+smearEffectName :: SmearEffect -> String
+smearEffectName _ = "Smear"
 
-ccSplitEffectName :: CCSplitEffect -> String
-ccSplitEffectName _ = "CC Split"
+splitEffectName :: SplitEffect -> String
+splitEffectName _ = "Split"
 
-ccTilerEffectName :: CCTilerEffect -> String
-ccTilerEffectName _ = "CC Tiler"
+tilerEffectName :: TilerEffect -> String
+tilerEffectName _ = "Tiler"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // effect // descriptions

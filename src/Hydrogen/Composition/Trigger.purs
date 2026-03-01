@@ -22,21 +22,98 @@
 
 module Hydrogen.Composition.Trigger
   ( -- * Core Types
-    Trigger(..)
-  , TriggerEvent(..)
-  , TriggerAction(..)
-  , TriggerCondition(..)
+    Trigger
+  , TriggerEvent
+      ( OnHoverStart
+      , OnHoverEnd
+      , OnClick
+      , OnDoubleClick
+      , OnRightClick
+      , OnFocusIn
+      , OnFocusOut
+      , OnKeyDown
+      , OnKeyUp
+      , OnScroll
+      , OnScrollStart
+      , OnScrollEnd
+      , OnDragStart
+      , OnDragEnd
+      , OnDrop
+      , OnPinch
+      , OnRotate
+      , OnDataChange
+      , OnDataLoad
+      , OnDataError
+      , OnAnimationStart
+      , OnAnimationEnd
+      , OnAnimationIteration
+      , OnTimer
+      , OnInterval
+      , OnViewportResize
+      , OnOrientationChange
+      , OnThemeChange
+      , OnVisibilityChange
+      , OnOnline
+      , OnOffline
+      )
+  , TriggerAction
+      ( ActionAnimate
+      , ActionSetProperty
+      , ActionToggleClass
+      , ActionEmit
+      , ActionNavigate
+      , ActionExecute
+      , ActionSequence
+      , ActionParallel
+      )
+  , TriggerCondition
+      ( ConditionAlways
+      , ConditionProperty
+      , ConditionData
+      , ConditionViewport
+      , ConditionAnd
+      , ConditionOr
+      , ConditionNot
+      )
   
   -- * Events
-  , EventType(..)
+  , EventType
+      ( EventUser
+      , EventData
+      , EventTime
+      , EventSystem
+      )
   , eventType
   
   -- * Actions
-  , PropertyChange(..)
-  , AnimationTarget(..)
+  , PropertyChange
+  , AnimationTarget
+      ( TargetOpacity
+      , TargetPositionX
+      , TargetPositionY
+      , TargetScale
+      , TargetScaleX
+      , TargetScaleY
+      , TargetRotation
+      , TargetBlur
+      , TargetShadowOffset
+      , TargetShadowBlur
+      , TargetShadowOpacity
+      , TargetCustom
+      )
   
   -- * Conditions
-  , Comparator(..)
+  , Comparator
+      ( CompEq
+      , CompNeq
+      , CompLt
+      , CompLte
+      , CompGt
+      , CompGte
+      , CompContains
+      , CompStartsWith
+      , CompEndsWith
+      )
   , evaluate
   , conditionAnd
   , conditionOr

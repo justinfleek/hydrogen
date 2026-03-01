@@ -89,7 +89,7 @@ The contract: "I will express within these pixels."
 | Spring config | `Temporal.SpringConfig` | Physics-based animation |
 | Play state | `Temporal.PlayState` | Running, paused, finished |
 | Triggers | `Motion.Transition` | On hover, press, data change, visibility |
-| Lottie ref | `Motion.Lottie` | After Effects animation playback |
+| Lottie ref | `Motion.Lottie` | Motion graphics animation playback |
 
 ### Input — What the Button Receives
 

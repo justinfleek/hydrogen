@@ -28,10 +28,10 @@ on a screen.
 
 Not "most UIs." Not "web applications." **Anything.**
 
-- Ableton's waveform editor
-- After Effects' compositing timeline
-- Cinema 4D's 3D viewport
-- Photoshop's layer stack
+- DAW waveform editor
+- Professional compositing timeline
+- Professional 3D viewport
+- Raster editor layer stack
 - Figma's vector canvas
 - TouchDesigner's node graph
 - Hospital dashboards with real-time vitals
@@ -97,7 +97,7 @@ For each category, we identify:
 - **Interaction primitives** — How users manipulate the domain
 - **Temporal primitives** — How the domain relates to time
 
-### Category 1: Vector Graphics (Illustrator, Figma)
+### Category 1: Vector Graphics (Vector Editors)
 
 **Data primitives:**
 - Path: Array of bezier segments (move, line, curve, close)
@@ -131,7 +131,7 @@ For each category, we identify:
 - ✅ Typography pillar: text rendering
 - ⚠️ Need: mesh gradients, advanced pathfinder operations
 
-### Category 2: Raster Graphics (Photoshop)
+### Category 2: Raster Graphics (Image Editors)
 
 **Data primitives:**
 - Bitmap: 2D array of pixels (width × height × channels)
@@ -166,7 +166,7 @@ For each category, we identify:
 - ⚠️ Need: Blend modes as first-class types
 - ⚠️ Need: Brush dynamics (pressure, tilt, velocity)
 
-### Category 3: Motion Graphics (After Effects, LATTICE)
+### Category 3: Motion Graphics (Layer Compositing, LATTICE)
 
 **Data primitives:**
 - Composition: Timeline with layers and duration
@@ -203,7 +203,7 @@ For each category, we identify:
 - ⚠️ Need: Time remapping
 - ⚠️ Need: Precomp/nested composition model
 
-### Category 4: 3D Graphics (Cinema 4D, Blender)
+### Category 4: 3D Graphics (3D Modeling Software)
 
 **Data primitives:**
 - Mesh: Vertices, edges, faces (or triangles)
@@ -241,7 +241,7 @@ For each category, we identify:
 - ⚠️ Need: Camera projection matrices
 - ⚠️ Need: Bone/rig system
 
-### Category 5: Audio Visualization (Ableton, TouchDesigner)
+### Category 5: Audio Visualization (DAWs, TouchDesigner)
 
 **Data primitives:**
 - Waveform: Array of amplitude samples over time
@@ -443,10 +443,10 @@ to what's needed.
 
 | Gap | Category Need | Proposed Pillar/Extension |
 |-----|---------------|---------------------------|
-| Bitmap/Raster | Photoshop, video | Pillar 15: Raster |
-| Mesh/3D geometry | Cinema 4D, Blender | Extend: Spatial |
-| Shader/expressions | TouchDesigner, AE | Pillar 16: Procedural |
-| Blend modes | Photoshop, compositing | Extend: Material |
+| Bitmap/Raster | Image editors, video | Pillar 15: Raster |
+| Mesh/3D geometry | 3D modeling software | Extend: Spatial |
+| Shader/expressions | TouchDesigner, motion graphics | Pillar 16: Procedural |
+| Blend modes | Image editors, compositing | Extend: Material |
 | Data binding | Dashboards, apps | Extend: Reactive |
 | Particles | TouchDesigner, games | Pillar 17: Particle |
 | SDF | Raymarching, procedural | Extend: Geometry |
@@ -456,7 +456,7 @@ to what's needed.
 | Convolution kernels | Image processing | Extend: Raster |
 | MIDI | Audio tools | Extend: Audio |
 | Physics | Games, simulations | Extend: Motion |
-| Node graphs | TouchDesigner, Houdini | Meta: Composition |
+| Node graphs | TouchDesigner, 3D procedural | Meta: Composition |
 
 **Severity levels:**
 
@@ -731,7 +731,7 @@ data LayoutAlgorithm
 |----------|---------------|
 | Web apps | Flexbox, Grid, Absolute |
 | Figma | Constraints + Auto-layout |
-| After Effects | Absolute + Parenting |
+| Layer compositing | Absolute + Parenting |
 | 3D apps | World space (no 2D layout) |
 | Games | Custom (physics-based) |
 | Dashboards | Grid + responsive |
@@ -1255,7 +1255,7 @@ Scale (for time → pixels), Axis (timeline ruler)
 
 **Verdict:** Buildable with Schema + MIDI extension + Audio routing extension.
 
-### After Effects Clone: Minimum Schema
+### Motion Graphics Clone: Minimum Schema
 
 **Core views:**
 - Composition panel (preview)
@@ -1585,8 +1585,8 @@ class Serializable a where
 **The test for universality:**
 
 When you add an atom, ask:
-- Can Ableton use this? 
-- Can After Effects use this?
+- Can a DAW use this? 
+- Can professional motion graphics use this?
 - Can a hospital dashboard use this?
 - Can a game use this?
 

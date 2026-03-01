@@ -1,14 +1,14 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---       // hydrogen // schema // motion // aftereffects // propertyvalue // vectors
+--       // hydrogen // schema // motion // professional // propertyvalue // vectors
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Vector Property Values — 2D and 3D vector types for AE properties.
+-- | Vector Property Values — 2D and 3D vector types for motion graphics properties.
 -- |
 -- | This module defines spatial and non-spatial 2D/3D vector types. The
 -- | distinction between spatial and non-spatial matters for keyframe
 -- | interpolation: spatial values have motion path tangents.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Vectors
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Vectors
   ( -- * Spatial 3D Value
     Spatial3D
   , spatial3D

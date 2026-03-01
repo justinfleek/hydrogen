@@ -52,16 +52,16 @@ module Hydrogen.Layout.ILP.Problem
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Layout.ILP.Problem.Types
-  ( Sense(..)
-  , VarType(..)
+  ( Sense(Minimize, Maximize)
+  , VarType(Continuous, Integer)
   , VarId
   , VarSpec
   , defaultUpperBound
-  , ConstraintSense(..)
+  , ConstraintSense(Le, Eq, Ge)
   , ConstraintRow
   , ILPProblem
   , emptyProblem
-  , SolveStatus(..)
+  , SolveStatus(Optimal, Feasible, Infeasible, Unbounded, NotSolved)
   , Solution
   , emptySolution
   )

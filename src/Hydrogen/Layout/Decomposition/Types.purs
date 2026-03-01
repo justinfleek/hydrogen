@@ -18,7 +18,17 @@ module Hydrogen.Layout.Decomposition.Types
   , ViewportId
   
   -- * Constraint Types
-  , ConstraintType(..)
+  , ConstraintType
+      ( GapConstraint
+      , AlignStart
+      , AlignCenter
+      , AlignEnd
+      , RelativeSize
+      , MinSpacing
+      , MaxSpacing
+      , EqualWidth
+      , AspectRatio
+      )
   , constraintPriority
   
   -- * Constraint Edge

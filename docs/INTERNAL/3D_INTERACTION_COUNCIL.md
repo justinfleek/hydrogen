@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Cinema4D-level 3D interaction foundation is now **complete**. All originally planned phases have been implemented as pure PureScript state machines with zero FFI in the interaction logic.
+The professional 3D-level 3D interaction foundation is now **complete**. All originally planned phases have been implemented as pure PureScript state machines with zero FFI in the interaction logic.
 
 ---
 
@@ -53,7 +53,7 @@ User Input → DOM Event → Minimal FFI → Pure Msg → Pure Update → Pure S
 
 ---
 
-## What's Left for Full C4D Parity
+## What's Left for Full 3D Parity
 
 ### Tier 1: Core Infrastructure (Next Priority)
 

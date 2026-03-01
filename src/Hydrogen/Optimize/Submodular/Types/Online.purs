@@ -27,7 +27,7 @@ module Hydrogen.Optimize.Submodular.Types.Online
   , CumulativeGradient(CumulativeGradient)
   , DualVariable(DualVariable)
   , RegretBound(RegretBound)
-  , OnlineGrade(..)
+  , OnlineGrade(OnlineGrade)
   , OnlineLearn
   ) where
 

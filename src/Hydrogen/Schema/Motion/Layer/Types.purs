@@ -19,7 +19,7 @@
 -- | - **Audio**: Waveform, Spectrogram, MIDI — audio visualization
 -- | - **Data**: CSV, JSON, GeoJSON — structured data
 -- | - **Annotation**: Marker, Subtitle, Comment — metadata
--- | - **Tracking**: Tracker, Mocha, Stabilizer — motion analysis
+-- | - **Tracking**: Tracker, PlanarTracking, Stabilizer — motion analysis
 -- | - **Utility**: Reference, Grid, Guide, Mask — helpers
 -- | - **Color Grading**: HDR, LUT, Gradient — color processing
 -- |
@@ -151,7 +151,7 @@ data LayerType
   
   -- Tracking & Motion layers  
   | LTTracker         -- ^ Motion tracking data
-  | LTMocha           -- ^ Mocha planar tracking
+  | LTPlanarTracking  -- ^ Planar tracking (surface/perspective tracking)
   | LTStabilizer      -- ^ Stabilization reference
   
   -- Compositing utility layers
@@ -229,7 +229,7 @@ layerTypeToString LTAnnotation = "annotation"
 layerTypeToString LTComment = "comment"
 -- Tracking & Motion
 layerTypeToString LTTracker = "tracker"
-layerTypeToString LTMocha = "mocha"
+layerTypeToString LTPlanarTracking = "planartracking"
 layerTypeToString LTStabilizer = "stabilizer"
 -- Compositing utility
 layerTypeToString LTReference = "reference"
@@ -296,7 +296,7 @@ layerTypeFromString "annotation" = Just LTAnnotation
 layerTypeFromString "comment" = Just LTComment
 -- Tracking & Motion
 layerTypeFromString "tracker" = Just LTTracker
-layerTypeFromString "mocha" = Just LTMocha
+layerTypeFromString "planartracking" = Just LTPlanarTracking
 layerTypeFromString "stabilizer" = Just LTStabilizer
 -- Compositing utility
 layerTypeFromString "reference" = Just LTReference
@@ -376,7 +376,7 @@ isLayerTypeAnnotation _ = false
 -- | Check if layer type is tracking/motion data.
 isLayerTypeTracking :: LayerType -> Boolean
 isLayerTypeTracking LTTracker = true
-isLayerTypeTracking LTMocha = true
+isLayerTypeTracking LTPlanarTracking = true
 isLayerTypeTracking LTStabilizer = true
 isLayerTypeTracking LTPose = true
 isLayerTypeTracking _ = false

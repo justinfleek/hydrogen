@@ -40,8 +40,18 @@
 -- | ```
 module Hydrogen.Tour.Target
   ( -- * Extended Target ADT
-    TargetSpec(..)
-  , TargetPriority(..)
+    TargetSpec
+      ( SingleSelector
+      , SingleTestId
+      , SingleRole
+      , SingleRef
+      , ViewportTarget
+      , MultiSelector
+      , MultiTestId
+      , MultiRole
+      , FallbackTarget
+      )
+  , TargetPriority(FirstMatch, LastMatch, NearestToCenter, LargestElement, SmallestElement, HighestZIndex)
   , TargetFallback
     -- * Target Builders
   , bySelector
@@ -63,8 +73,8 @@ module Hydrogen.Tour.Target
   , rectContains
   , rectIntersects
     -- * Resolution State
-  , ResolutionState(..)
-  , ResolutionError(..)
+  , ResolutionState(Unresolved, Pending, Resolved, ResolvedMulti, Failed)
+  , ResolutionError(NotFound, ElementHidden, ElementOutsideViewport, MultipleMatches, InvalidSelector, RefNotRegistered, Timeout)
   , isResolved
   , isUnresolved
   , isPending
@@ -76,13 +86,13 @@ module Hydrogen.Tour.Target
   , withChildList
   , shouldReobserve
     -- * Viewport Awareness
-  , ViewportPosition(..)
+  , ViewportPosition(InViewport, AboveViewport, BelowViewport, LeftOfViewport, RightOfViewport, PartiallyVisible)
   , isInViewport
   , isPartiallyVisible
   , needsScroll
   , scrollDirection
     -- * Multi-Target
-  , MultiTargetLayout(..)
+  , MultiTargetLayout(BoundingBox, Individual, Convex, Connected)
   , computeMultiTargetRect
   , multiTargetBounds
   ) where

@@ -917,8 +917,8 @@ data DisplayResponse
 |-------------|--------|---------------|
 | **Frame.io** | 🟡 Partial | Video decode kernels, LUT3D |
 | **Ghostty** | 🟢 Unblocked | SDF text rendering **DONE** |
-| **Cinema4D/After Effects** | 🟡 Partial | 3D compositing, expressions |
-| **Ableton** | 🟡 Partial | Waveforms (AudioEffect now exists) |
+| **Professional 3D/motion graphics** | 🟡 Partial | 3D compositing, expressions |
+| **DAW** | 🟡 Partial | Waveforms (AudioEffect now exists) |
 | **Hospital Dashboard** | 🟢 Unblocked | DataValidity **DONE**, AudioEffect **DONE** |
 | **Fighter Jet HUD** | 🟢 Unblocked | DataValidity **DONE** |
 | **AI Avatar Window** | 🟢 Unblocked | Diffusion **DONE**, voice/emotion **DONE** |

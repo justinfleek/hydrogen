@@ -19,7 +19,10 @@
 
 module Hydrogen.Layout.Decomposition.Analysis
   ( -- * Independence Checking
-    DecompositionResult(..)
+    DecompositionResult
+      ( Decomposable
+      , NotDecomposable
+      )
   , checkDecomposable
   , isDecomposable
   , interViewportEdges

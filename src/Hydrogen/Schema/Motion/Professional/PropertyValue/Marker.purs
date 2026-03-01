@@ -1,14 +1,14 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---       // hydrogen // schema // motion // aftereffects // propertyvalue // marker
+--       // hydrogen // schema // motion // professional // propertyvalue // marker
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Marker Property Value — Composition and layer markers for AE.
+-- | Marker Property Value — Composition and layer markers for motion graphics.
 -- |
--- | This module defines the MarkerValue type exactly as it exists in AE's
--- | scripting API. Markers can contain comments, chapter info, URLs, and
+-- | This module defines the MarkerValue type for professional motion graphics
+-- | interchange. Markers can contain comments, chapter info, URLs, and
 -- | cue point data for video encoding.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Marker
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Marker
   ( MarkerValue
   , markerValue
   , markerComment

@@ -24,18 +24,18 @@
 -- | - **Turbulent Displace**: Fractal-based displacement
 -- | - **Twirl**: Rotational distortion
 -- | - **Wave Warp**: Sine wave distortion
--- | - **CC Bend It**: Bend layer around axis
--- | - **CC Blobbylize**: Organic blob distortion
--- | - **CC Flo Motion**: Flow-based motion blur
--- | - **CC Griddler**: Grid-based distortion
--- | - **CC Lens**: Lens distortion
--- | - **CC Page Turn**: Page turn effect
--- | - **CC Power Pin**: Advanced corner pin
--- | - **CC Ripple Pulse**: Expanding ripple
--- | - **CC Slant**: Perspective slant
--- | - **CC Smear**: Directional smear
--- | - **CC Split**: Split/duplicate effect
--- | - **CC Tiler**: Tiling effect
+-- | - **Bend It**: Bend layer around axis
+-- | - **Blobbylize**: Organic blob distortion
+-- | - **Flo Motion**: Flow-based motion blur
+-- | - **Griddler**: Grid-based distortion
+-- | - **Lens Distortion**: Lens distortion effect
+-- | - **Page Turn**: Page turn effect
+-- | - **Power Pin**: Advanced corner pin
+-- | - **Ripple Pulse**: Expanding ripple
+-- | - **Slant**: Perspective slant
+-- | - **Smear**: Directional smear
+-- | - **Split**: Split/duplicate effect
+-- | - **Tiler**: Tiling effect
 -- |
 -- | ## Module Structure
 -- |
@@ -44,7 +44,7 @@
 -- | - `Distortion.Warp`: Warp, Bezier, Bulge, Twirl, Wave effects
 -- | - `Distortion.Displacement`: Displacement Map, Turbulent Displace
 -- | - `Distortion.Transform`: Corner Pin, Mirror, Offset, Polar, etc.
--- | - `Distortion.CC`: All CC* effects
+-- | - `Distortion.Extended`: Extended distortion effects
 -- | - `Distortion.Queries`: Query/utility functions
 -- |
 -- | ## Bounded Properties
@@ -64,8 +64,8 @@ module Hydrogen.Schema.Motion.Effects.Distortion
     -- * Re-exports from Transform
   , module Hydrogen.Schema.Motion.Effects.Distortion.Transform
   
-    -- * Re-exports from CC
-  , module Hydrogen.Schema.Motion.Effects.Distortion.CC
+    -- * Re-exports from Extended
+  , module Hydrogen.Schema.Motion.Effects.Distortion.Extended
   
     -- * Re-exports from Queries
   , module Hydrogen.Schema.Motion.Effects.Distortion.Queries
@@ -157,33 +157,33 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Transform
   , polarTypeToString
   )
 
-import Hydrogen.Schema.Motion.Effects.Distortion.CC
-  ( CCBendItEffect
-  , defaultCCBendIt
-  , CCBlobbylizeEffect
-  , defaultCCBlobbylize
-  , CCFloMotionEffect
-  , defaultCCFloMotion
-  , CCGriddlerEffect
-  , defaultCCGriddler
-  , CCLensEffect
-  , defaultCCLens
-  , CCPageTurnEffect
-  , defaultCCPageTurn
-  , CCPowerPinEffect
-  , defaultCCPowerPin
-  , CCRipplePulseEffect
-  , defaultCCRipplePulse
-  , CCSlantEffect
-  , defaultCCSlant
-  , CCSmearEffect
-  , defaultCCSmear
-  , CCSplitEffect
-  , CCSplitDirection(..)
-  , defaultCCSplit
-  , CCTilerEffect
-  , defaultCCTiler
-  , ccSplitDirectionToString
+import Hydrogen.Schema.Motion.Effects.Distortion.Extended
+  ( BendItEffect
+  , defaultBendIt
+  , BlobbylizeEffect
+  , defaultBlobbylize
+  , FloMotionEffect
+  , defaultFloMotion
+  , GriddlerEffect
+  , defaultGriddler
+  , LensDistortionEffect
+  , defaultLensDistortion
+  , PageTurnEffect
+  , defaultPageTurn
+  , PowerPinEffect
+  , defaultPowerPin
+  , RipplePulseEffect
+  , defaultRipplePulse
+  , SlantEffect
+  , defaultSlant
+  , SmearEffect
+  , defaultSmear
+  , SplitEffect
+  , SplitDirection(..)
+  , defaultSplit
+  , TilerEffect
+  , defaultTiler
+  , splitDirectionToString
   )
 
 import Hydrogen.Schema.Motion.Effects.Distortion.Queries
@@ -203,18 +203,18 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Queries
   , turbulentDisplaceEffectName
   , twirlEffectName
   , waveWarpEffectName
-  , ccBendItEffectName
-  , ccBlobbylizeEffectName
-  , ccFloMotionEffectName
-  , ccGriddlerEffectName
-  , ccLensEffectName
-  , ccPageTurnEffectName
-  , ccPowerPinEffectName
-  , ccRipplePulseEffectName
-  , ccSlantEffectName
-  , ccSmearEffectName
-  , ccSplitEffectName
-  , ccTilerEffectName
+  , bendItEffectName
+  , blobbylizeEffectName
+  , floMotionEffectName
+  , griddlerEffectName
+  , lensDistortionEffectName
+  , pageTurnEffectName
+  , powerPinEffectName
+  , ripplePulseEffectName
+  , slantEffectName
+  , smearEffectName
+  , splitEffectName
+  , tilerEffectName
   , describeWarp
   , describeDisplacementMap
   , describeBulge

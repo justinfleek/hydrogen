@@ -9,32 +9,79 @@
 module Hydrogen.Composition.Source.Generative
   ( -- * Procedural
     ProceduralSpec
-  , ShaderRef(..)
+  , ShaderRef(ShaderRef)
   , procedural
   
   -- * Noise
   , NoiseSpec
-  , NoiseType(..)
+  , NoiseType
+      ( NoisePerlin
+      , NoiseSimplex
+      , NoiseWorley
+      , NoiseFBM
+      , NoiseVoronoi
+      , NoiseTurbulence
+      , NoiseRidged
+      )
   , noise
   
   -- * Diffusion
   , DiffusionSpec
-  , Sampler(..)
-  , Scheduler(..)
-  , ModelRef(..)
-  , PromptEmbedding(..)
+  , Sampler
+      ( SamplerEuler
+      , SamplerEulerA
+      , SamplerHeun
+      , SamplerDPMPP2M
+      , SamplerDPMPP2MA
+      , SamplerDPMPPSDE
+      , SamplerDPMPP3M
+      , SamplerDDIM
+      , SamplerUniPC
+      , SamplerLCM
+      )
+  , Scheduler
+      ( SchedulerNormal
+      , SchedulerKarras
+      , SchedulerExponential
+      , SchedulerSGMUniform
+      , SchedulerSimple
+      , SchedulerDDIMUniform
+      , SchedulerBeta
+      )
+  , ModelRef(ModelRef)
+  , PromptEmbedding(PromptEmbedding)
   , DiffusionSize
   , diffusionSize
   , diffusion
   
   -- * ControlNet
   , ControlNetSpec
-  , ControlNetType(..)
+  , ControlNetType
+      ( ControlCanny
+      , ControlDepth
+      , ControlNormal
+      , ControlPose
+      , ControlSegmentation
+      , ControlLineArt
+      , ControlSoftEdge
+      , ControlScribble
+      , ControlTile
+      , ControlInpaint
+      )
   , controlNet
   
   -- * Generated Maps
   , GeneratedMapSpec
-  , GeneratedMapType(..)
+  , GeneratedMapType
+      ( GenDepth
+      , GenNormal
+      , GenEdge
+      , GenPose
+      , GenSegment
+      , GenLineArt
+      , GenSoftEdge
+      , GenSalient
+      )
   , generatedMap
   ) where
 

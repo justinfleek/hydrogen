@@ -1,13 +1,13 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---        // hydrogen // schema // motion // aftereffects // propertyvalue // shape
+--        // hydrogen // schema // motion // professional // propertyvalue // shape
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Shape Property Value — Bezier path data for AE shape layers.
+-- | Shape Property Value — Bezier path data for motion graphics shape layers.
 -- |
--- | This module defines the ShapeValue type exactly as it exists in AE's
--- | scripting API. Shape paths consist of vertices and relative tangent handles.
+-- | This module defines the ShapeValue type for professional motion graphics
+-- | interchange. Shape paths consist of vertices and relative tangent handles.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Shape
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Shape
   ( ShapeValue
   , shapeValue
   , shapeVertices

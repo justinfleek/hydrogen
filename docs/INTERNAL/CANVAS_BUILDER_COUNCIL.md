@@ -36,7 +36,7 @@ Deep adversarial analysis of Hydrogen's primitives stack for building
 | Gestural | 30 | Complete | Pointer, Touch, Gestures, Keyboard, DragDrop |
 | Haptic | 4 | Complete | Vibration, Audio, Patterns, Feedback |
 | Spatial | 46 | Complete | Camera, Lights, PBR materials, Scene graph |
-| Motion | 65 | Complete | AE-level effects, Composition, Layers, Keyframes |
+| Motion | 65 | Complete | Professional-level effects, Composition, Layers, Keyframes |
 | Audio | 28 | Complete | Synthesis, MIDI, Arrangement, Effects |
 | GPU | 2 | Core | GPUStorable typeclass |
 | Brand | 37 | Complete | Identity, Palette, Typography, Logo system, Tokens |
@@ -67,7 +67,7 @@ Deep adversarial analysis of Hydrogen's primitives stack for building
 **Canvas = Device Display**. A universal rendering surface where:
 
 1. **Same brand schema** renders correctly on phone, tablet, desktop, TV, billboard
-2. **Every visual element** is a composable layer with full AE-level controls
+2. **Every visual element** is a composable layer with full professional-level controls
 3. **Steady state = cheap** (static gradients, text don't burn GPU)
 4. **Dynamic regions = smart** (only animated pixels get computed)
 5. **Interactions are SICK** (shake to etch-a-sketch, particle explosions, etc.)
@@ -89,7 +89,7 @@ User opens Canvas Builder
   │     ├─ Effects: Blur, Glow, Shadow, Noise, Filter chain...
   │     └─ 3D: Camera, Light, PBR object...
   │
-  ├─→ [Layer Panel] — After Effects-style layer stack
+  ├─→ [Layer Panel] — Professional motion graphics-style layer stack
   │     ├─ Drag to reorder (z-index)
   │     ├─ Each layer has: visibility, lock, solo, blend mode
   │     ├─ Expand layer → Property groups (Transform, Fill, Stroke...)
@@ -386,7 +386,7 @@ But:
 | Haptic FFI | FFI/Haptic | No tactile feedback | 1 day |
 | Device motion FFI | FFI/DeviceMotion | No shake/tilt | 1 day |
 | Dirty region tracking | GPU/Render | Performance | 3 days |
-| Layer panel compound | Compound/Motion/Layer | No AE-style layers | 3 days |
+| Layer panel compound | Compound/Motion/Layer | No motion graphics-style layers | 3 days |
 | Properties panel | Compound/Motion/Panel | No property inspector | 3 days |
 
 ## 4.3 MEDIUM-PRIORITY GAPS (Missing Delight)
@@ -449,7 +449,7 @@ data HapticSurface
 
 ## 5.2 LAYER SYSTEM SPEC
 
-After Effects-style layer stack with full compositing.
+Professional motion graphics-style layer stack with full compositing.
 
 ```purescript
 type Layer =
@@ -516,7 +516,7 @@ Right-click menu showing ALL available primitives, organized by category.
 ├─ Media
 │   ├─ Image          (with filters)
 │   ├─ Video          (with controls)
-│   ├─ Lottie         (After Effects animation)
+│   ├─ Lottie         (motion graphics animation)
 │   ├─ Audio Visualizer (waveform, spectrum)
 │   └─ QR Code        (dynamic generation)
 │

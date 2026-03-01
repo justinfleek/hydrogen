@@ -1,15 +1,15 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---              // hydrogen // schema // motion // aftereffects // propertyvalue
+--              // hydrogen // schema // motion // professional // propertyvalue
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | After Effects Property Values — Complete AE property value type system.
+-- | Professional Motion Graphics Property Values — Complete property value type system.
 -- |
--- | Every animatable property in After Effects has a value type. This module
--- | re-exports ALL value types exactly as they exist in AE's scripting API.
+-- | Every animatable property in motion graphics has a value type. This module
+-- | re-exports ALL value types for professional motion graphics interchange.
 -- |
--- | ## AE Property Value Types
+-- | ## Property Value Types
 -- |
--- | From Adobe's ExtendScript documentation:
+-- | Standard motion graphics property value types:
 -- |
 -- | | PropertyValueType | Description | Example Properties |
 -- | |-------------------|-------------|--------------------|
@@ -37,7 +37,7 @@
 -- | - **Marker**: MarkerValue
 -- | - **Text**: ParagraphJustification, TextDocumentValue
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue
+module Hydrogen.Schema.Motion.Professional.PropertyValue
   ( module Types
   , module Vectors
   , module Scalars
@@ -47,10 +47,10 @@ module Hydrogen.Schema.Motion.AfterEffects.PropertyValue
   , module Text
   ) where
 
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Types as Types
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Vectors as Vectors
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Scalars as Scalars
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Color as Color
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Shape as Shape
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Marker as Marker
-import Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Text as Text
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Types as Types
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Vectors as Vectors
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Scalars as Scalars
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Color as Color
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Shape as Shape
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Marker as Marker
+import Hydrogen.Schema.Motion.Professional.PropertyValue.Text as Text

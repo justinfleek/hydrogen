@@ -31,16 +31,33 @@
 
 module Hydrogen.Composition.Node
   ( -- * Core Types
-    Node(..)
-  , NodeId(..)
+    Node
+      ( NodeLayer
+      , NodeGroup
+      , NodeEmpty
+      )
+  , NodeId(NodeId)
   , Layer
   
   -- * Matte (Mask)
-  , Matte(..)
-  , MatteMode(..)
+  , Matte
+      ( MatteNone
+      , MatteLayer
+      , MatteShape
+      , MatteFeathered
+      )
+  , MatteMode
+      ( MatteAlpha
+      , MatteAlphaInverted
+      , MatteLuma
+      , MatteLumaInverted
+      )
   
   -- * Transform
-  , Transform(..)
+  , Transform
+      ( Transform2DOnly
+      , Transform3D
+      )
   
   -- * Constructors
   , layer

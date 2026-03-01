@@ -9,12 +9,27 @@
 module Hydrogen.Composition.Source.Interactive
   ( -- * Widget
     WidgetSpec
-  , WidgetRef(..)
+  , WidgetRef(WidgetRef)
   , widget
   
   -- * Form
   , FormSpec
-  , FormField(..)
+  , FormField
+      ( FieldText
+      , FieldNumber
+      , FieldEmail
+      , FieldPassword
+      , FieldTextarea
+      , FieldSelect
+      , FieldCheckbox
+      , FieldRadio
+      , FieldSlider
+      , FieldDate
+      , FieldTime
+      , FieldDatetime
+      , FieldFile
+      , FieldColor
+      )
   , form
   
   -- * Canvas

@@ -23,7 +23,13 @@
 -- | - Prelude (Eq, Show)
 
 module Hydrogen.Optimize.Submodular.Types.Approximation
-  ( ApproxRatio(..)
+  ( ApproxRatio
+      ( ExactRatio
+      , MonotoneMatroidRatio
+      , NonMonotoneMatroidRatio
+      , HalfRatio
+      , CustomRatio
+      )
   , AlphaRegret(AlphaRegret)
   , MonotoneOPT
   , NonMonotoneOPT

@@ -1,13 +1,13 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---         // hydrogen // schema // motion // aftereffects // propertyvalue // types
+--         // hydrogen // schema // motion // professional // propertyvalue // types
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Property Value Type Enum — Core type classification for AE property values.
+-- | Property Value Type Enum — Core type classification for motion graphics property values.
 -- |
--- | Every animatable property in After Effects has a value type. This module
--- | defines the PropertyValueType enum exactly as it exists in AE's scripting API.
+-- | Every animatable property in motion graphics has a value type. This module
+-- | defines the PropertyValueType enum for professional motion graphics interchange.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Types
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Types
   ( PropertyValueType(..)
   , propertyValueTypeToString
   , propertyValueTypeFromString

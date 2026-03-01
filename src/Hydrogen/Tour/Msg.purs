@@ -35,26 +35,26 @@
 -- | ```
 module Hydrogen.Tour.Msg
   ( -- * Tour Messages
-    TourMsg(..)
+    TourMsg(Lifecycle, Navigation, Target, Animation, Interaction, CustomAction)
     -- * Lifecycle Messages
-  , LifecycleMsg(..)
+  , LifecycleMsg(StartTour, StartTourAt, PauseTour, ResumeTour, CompleteTour, SkipTour, DismissTour, SnoozeTour, RestartTour, ResetTour)
     -- * Navigation Messages
-  , NavigationMsg(..)
+  , NavigationMsg(NextStep, PrevStep, GoToStep, GoToStepById, FirstStep, LastStep, JumpForward, JumpBackward)
     -- * Target Messages
-  , TargetMsg(..)
+  , TargetMsg(ResolveTarget, TargetResolved, TargetNotFound, TargetMoved, TargetRemoved, TargetVisible, TargetHidden, RefreshTarget)
     -- * Animation Messages
-  , AnimationMsg(..)
+  , AnimationMsg(EnterAnimationStart, EnterAnimationComplete, ExitAnimationStart, ExitAnimationComplete, MorphAnimationStart, MorphAnimationComplete, PulseAnimationCycle)
     -- * Interaction Messages
-  , InteractionMsg(..)
-  , SwipeDir(..)
+  , InteractionMsg(ClickedNext, ClickedPrev, ClickedSkip, ClickedClose, ClickedComplete, ClickedOverlay, ClickedProgressDot, PressedKey, SwipedDirection, FocusedTooltip, BlurredTooltip, HoveredTarget, UnhoveredTarget)
+  , SwipeDir(SwipedLeft, SwipedRight, SwipedUp, SwipedDown)
     -- * Dismiss Reasons
-  , DismissReason(..)
+  , DismissReason(ReasonClickedClose, ReasonPressedEscape, ReasonClickedOverlay, ReasonClickedSkip, ReasonNavigatedAway, ReasonSessionTimeout, ReasonExternalAction, ReasonConditionUnmet)
     -- * Snooze Duration
-  , SnoozeDuration(..)
+  , SnoozeDuration(SnoozeOneHour, SnoozeFourHours, SnoozeOneDay, SnoozeOneWeek, SnoozeCustom)
   , snoozeToMs
     -- * Event Metadata
   , EventMeta
-  , EventSource(..)
+  , EventSource(SourceUser, SourceKeyboard, SourceTimer, SourceExternal, SourceInternal)
   , withTimestamp
   , withSource
     -- * Message Helpers
@@ -64,7 +64,7 @@ module Hydrogen.Tour.Msg
   , isAnimationMsg
   , isInteractionMsg
   , msgCategory
-  , MsgCategory(..)
+  , MsgCategory(CategoryLifecycle, CategoryNavigation, CategoryTarget, CategoryAnimation, CategoryInteraction, CategoryCustom)
   ) where
 
 import Prelude

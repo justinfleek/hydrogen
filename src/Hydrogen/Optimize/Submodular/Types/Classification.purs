@@ -23,8 +23,15 @@
 -- | - Prelude (Eq, Ord, Show)
 
 module Hydrogen.Optimize.Submodular.Types.Classification
-  ( Monotonicity(..)
-  , Curvature(..)
+  ( Monotonicity
+      ( Monotone
+      , NonMonotone
+      )
+  , Curvature
+      ( CurvatureUnknown
+      , CurvatureBounded
+      , CurvatureExact
+      )
   , CurvatureWitness(CurvatureWitness)
   ) where
 

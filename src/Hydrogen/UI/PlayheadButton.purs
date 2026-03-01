@@ -52,10 +52,21 @@ module Hydrogen.UI.PlayheadButton
 
   -- * Playback State
   , playbackState
-  , PlaybackState(..)
+  , PlaybackState
+      ( Playing
+      , Paused
+      , Stopped
+      , Buffering
+      , Seeking
+      , Loading
+      )
 
   -- * Time Format
-  , TimeFormat(..)
+  , TimeFormat
+      ( Compact
+      , Full
+      , Seconds
+      )
 
   -- * Progress & Position
   , progress
@@ -82,10 +93,23 @@ module Hydrogen.UI.PlayheadButton
   , sizePixels
 
   -- * Sizes
-  , PlayheadSize(..)
+  , PlayheadSize
+      ( Xs
+      , Sm
+      , Md
+      , Lg
+      , Xl
+      , Pixel
+      )
 
   -- * Variants
-  , PlayheadVariant(..)
+  , PlayheadVariant
+      ( Default
+      , Minimal
+      , Filled
+      , Outlined
+      , Ghost
+      )
   ) where
 
 import Prelude

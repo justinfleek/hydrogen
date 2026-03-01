@@ -9,7 +9,12 @@
 
 module Hydrogen.Composition.Effect.Noise
   ( NoiseOverlaySpec
-  , NoiseBlendMode(..)
+  , NoiseBlendMode
+      ( NoiseAdd
+      , NoiseMultiply
+      , NoiseScreen
+      , NoiseOverlay
+      )
   , GrainSpec
   ) where
 

@@ -14,8 +14,55 @@
 
 module Hydrogen.Composition.Source
   ( -- * Core Source Type
-    Source(..)
-  , SourceCategory(..)
+    Source
+      ( SourceImage
+      , SourceVideo
+      , SourceAudio
+      , SourceSVG
+      , SourceDepth
+      , SourceNormal
+      , SourceSpline
+      , SourceShape
+      , SourcePath
+      , SourceText
+      , SourceModel
+      , SourcePointCloud
+      , SourceCamera
+      , SourceLight
+      , SourceParticles
+      , SourceProcedural
+      , SourceNoise
+      , SourceDiffusion
+      , SourceGenerated
+      , SourceChart
+      , SourceTable
+      , SourceGraph
+      , SourceMap
+      , SourceMetric
+      , SourceTimeline
+      , SourceHeatmap
+      , SourceTree
+      , SourceSankey
+      , SourceFunnel
+      , SourceWidget
+      , SourceForm
+      , SourceCanvas
+      , SourceTerminal
+      , SourceCode
+      , SourceMarkdown
+      , SourceBrowser
+      , SourcePDF
+      , SourceElement
+      )
+  , SourceCategory
+      ( CategoryMedia
+      , CategoryVector
+      , CategoryThreeD
+      , CategoryGenerative
+      , CategoryData
+      , CategoryInteractive
+      , CategoryElement
+      )
   , sourceCategory
   
   -- * Re-exports
@@ -52,61 +99,135 @@ import Hydrogen.Composition.Source.Interactive as Interactive
 
 -- Re-exports
 import Hydrogen.Composition.Source.Media 
-  ( ImageSpec, ImageFit(..), image
-  , VideoSpec, video
-  , AudioSpec, AudioVisualization(..), audio
-  , SVGSpec, svg
-  , DepthSpec, DepthVisualization(..), depth
-  , NormalSpec, NormalVisualization(..), normal
+  ( ImageSpec
+  , ImageFit(FitCover, FitContain, FitFill, FitNone)
+  , image
+  , VideoSpec
+  , video
+  , AudioSpec
+  , AudioVisualization(AudioWaveform, AudioSpectrum, AudioCircular, AudioMirror, AudioBars, AudioParticles)
+  , audio
+  , SVGSpec
+  , svg
+  , DepthSpec
+  , DepthVisualization(DepthGrayscale, DepthColormap, DepthContour, DepthMesh)
+  , depth
+  , NormalSpec
+  , NormalVisualization(NormalRGB, NormalHemisphere, NormalArrows, NormalLit)
+  , normal
   ) as ReExportMedia
 
 import Hydrogen.Composition.Source.Vector
-  ( SplineSpec, SplineFill(..), spline
-  , ShapeSpec, ShapeGenerator(..), shapeRect, shapeEllipse, shapeStar, shapePolygon
-  , PathSpec, path
-  , TextSpec, TextAnimator(..), TextRangeSelector(..), text
+  ( SplineSpec
+  , SplineFill(SplineSolid, SplineGradient, SplineNone)
+  , spline
+  , ShapeSpec
+  , ShapeGenerator(ShapeRectangle, ShapeEllipse, ShapeStar, ShapePolygon, ShapePath)
+  , shapeRect
+  , shapeEllipse
+  , shapeStar
+  , shapePolygon
+  , PathSpec
+  , path
+  , TextSpec
+  , TextAnimator(AnimatorTypewriter, AnimatorFadeUp, AnimatorFadeDown, AnimatorBounce, AnimatorWave, AnimatorScale, AnimatorRotate, AnimatorBlur, AnimatorCustom)
+  , TextRangeSelector(RangePercent, RangeIndex, RangeExpression)
+  , text
   ) as ReExportVector
 
 import Hydrogen.Composition.Source.ThreeD
-  ( ModelSpec, ModelFormat(..), model
-  , PointCloudSpec, PointCloudFormat(..), PointCloudColoring(..), pointCloud
-  , CameraSpec, CameraType(..), camera
-  , LightSpec, LightType(..), light
-  , ParticleSystemSpec, EmitterShape(..), ParticleForce(..), particleSystem
+  ( ModelSpec
+  , ModelFormat(FormatGLTF, FormatGLB, FormatOBJ, FormatFBX, FormatUSD, FormatDAE)
+  , model
+  , PointCloudSpec
+  , PointCloudFormat(FormatPLY, FormatPCD, FormatLAS, FormatLAZ, FormatXYZ)
+  , PointCloudColoring(ColoringRGB, ColoringHeight, ColoringIntensity, ColoringNormal, ColoringSolid)
+  , pointCloud
+  , CameraSpec
+  , CameraType(CameraOneNode, CameraTwoNode)
+  , camera
+  , LightSpec
+  , LightType(LightPoint, LightSpot, LightDirectional, LightAmbient, LightArea)
+  , light
+  , ParticleSystemSpec
+  , EmitterShape(EmitPoint, EmitLine, EmitCircle, EmitBox, EmitSphere, EmitCone, EmitMesh, EmitDepthMap, EmitMask)
+  , ParticleForce(ForceGravity, ForceWind, ForceTurbulence, ForceVortex, ForceAttractor)
+  , particleSystem
   ) as ReExportThreeD
 
 import Hydrogen.Composition.Source.Generative
-  ( ProceduralSpec, ShaderRef(..), procedural
-  , NoiseSpec, NoiseType(..), noise
-  , DiffusionSpec, Sampler(..), Scheduler(..), ModelRef(..), PromptEmbedding(..)
-  , DiffusionSize, diffusionSize, diffusion
-  , ControlNetSpec, ControlNetType(..), controlNet
-  , GeneratedMapSpec, GeneratedMapType(..), generatedMap
+  ( ProceduralSpec
+  , ShaderRef(ShaderRef)
+  , procedural
+  , NoiseSpec
+  , NoiseType(NoisePerlin, NoiseSimplex, NoiseWorley, NoiseFBM, NoiseVoronoi, NoiseTurbulence, NoiseRidged)
+  , noise
+  , DiffusionSpec
+  , Sampler(SamplerEuler, SamplerEulerA, SamplerHeun, SamplerDPMPP2M, SamplerDPMPP2MA, SamplerDPMPPSDE, SamplerDPMPP3M, SamplerDDIM, SamplerUniPC, SamplerLCM)
+  , Scheduler(SchedulerNormal, SchedulerKarras, SchedulerExponential, SchedulerSGMUniform, SchedulerSimple, SchedulerDDIMUniform, SchedulerBeta)
+  , ModelRef(ModelRef)
+  , PromptEmbedding(PromptEmbedding)
+  , DiffusionSize
+  , diffusionSize
+  , diffusion
+  , ControlNetSpec
+  , ControlNetType(ControlCanny, ControlDepth, ControlNormal, ControlPose, ControlSegmentation, ControlLineArt, ControlSoftEdge, ControlScribble, ControlTile, ControlInpaint)
+  , controlNet
+  , GeneratedMapSpec
+  , GeneratedMapType(GenDepth, GenNormal, GenEdge, GenPose, GenSegment, GenLineArt, GenSoftEdge, GenSalient)
+  , generatedMap
   ) as ReExportGenerative
 
 import Hydrogen.Composition.Source.Data
-  ( QueryRef(..), DataRef(..)
-  , ChartSpec, ChartType(..), chart
-  , TableSpec, table
-  , GraphSpec, GraphLayout(..), graph
-  , MapSpec, MapStyle(..), geoMap
-  , MetricSpec, MetricStyle(..), metric
-  , TimelineSpec, timeline
-  , HeatmapSpec, HeatmapColorScale(..), heatmap
-  , TreeSpec, TreeLayout(..), tree
-  , SankeySpec, sankey
-  , FunnelSpec, funnel
+  ( QueryRef(QueryRef)
+  , DataRef(DataRef)
+  , ChartSpec
+  , ChartType(ChartLine, ChartArea, ChartBar, ChartColumn, ChartPie, ChartDonut, ChartScatter, ChartBubble, ChartRadar, ChartPolar, ChartCandlestick, ChartWaterfall, ChartBox, ChartViolin)
+  , chart
+  , TableSpec
+  , table
+  , GraphSpec
+  , GraphLayout(GraphForce, GraphHierarchy, GraphRadial, GraphCircular, GraphGrid, GraphSpectral)
+  , graph
+  , MapSpec
+  , MapStyle(MapStreet, MapSatellite, MapTerrain, MapDark, MapLight, MapOutdoors, MapNavigation)
+  , geoMap
+  , MetricSpec
+  , MetricStyle(MetricNumber, MetricGauge, MetricProgress, MetricSparkline, MetricDelta, MetricComparison)
+  , metric
+  , TimelineSpec
+  , timeline
+  , HeatmapSpec
+  , HeatmapColorScale(ScaleViridis, ScalePlasma, ScaleInferno, ScaleMagma, ScaleCividis, ScaleTurbo, ScaleBlueRed, ScaleGreenYellow)
+  , heatmap
+  , TreeSpec
+  , TreeLayout(TreeVertical, TreeHorizontal, TreeRadialTree, TreeMindmap, TreeDendrogram, TreeTreemap, TreeSunburst)
+  , tree
+  , SankeySpec
+  , sankey
+  , FunnelSpec
+  , funnel
   ) as ReExportData
 
 import Hydrogen.Composition.Source.Interactive
-  ( WidgetSpec, WidgetRef(..), widget
-  , FormSpec, FormField(..), form
-  , CanvasSpec, canvas
-  , TerminalSpec, terminal
-  , CodeEditorSpec, code
-  , MarkdownSpec, markdown
-  , BrowserSpec, browser
-  , PDFSpec, pdf
+  ( WidgetSpec
+  , WidgetRef(WidgetRef)
+  , widget
+  , FormSpec
+  , FormField(FieldText, FieldNumber, FieldEmail, FieldPassword, FieldTextarea, FieldSelect, FieldCheckbox, FieldRadio, FieldSlider, FieldDate, FieldTime, FieldDatetime, FieldFile, FieldColor)
+  , form
+  , CanvasSpec
+  , canvas
+  , TerminalSpec
+  , terminal
+  , CodeEditorSpec
+  , code
+  , MarkdownSpec
+  , markdown
+  , BrowserSpec
+  , browser
+  , PDFSpec
+  , pdf
   ) as ReExportInteractive
 
 -- ═══════════════════════════════════════════════════════════════════════════════

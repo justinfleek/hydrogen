@@ -8,12 +8,27 @@
 
 module Hydrogen.Composition.Source.Data
   ( -- * Data Binding
-    QueryRef(..)
-  , DataRef(..)
+    QueryRef(QueryRef)
+  , DataRef(DataRef)
   
   -- * Chart
   , ChartSpec
-  , ChartType(..)
+  , ChartType
+      ( ChartLine
+      , ChartArea
+      , ChartBar
+      , ChartColumn
+      , ChartPie
+      , ChartDonut
+      , ChartScatter
+      , ChartBubble
+      , ChartRadar
+      , ChartPolar
+      , ChartCandlestick
+      , ChartWaterfall
+      , ChartBox
+      , ChartViolin
+      )
   , chart
   
   -- * Table
@@ -22,17 +37,39 @@ module Hydrogen.Composition.Source.Data
   
   -- * Graph (Network)
   , GraphSpec
-  , GraphLayout(..)
+  , GraphLayout
+      ( GraphForce
+      , GraphHierarchy
+      , GraphRadial
+      , GraphCircular
+      , GraphGrid
+      , GraphSpectral
+      )
   , graph
   
   -- * Map (Geographic)
   , MapSpec
-  , MapStyle(..)
+  , MapStyle
+      ( MapStreet
+      , MapSatellite
+      , MapTerrain
+      , MapDark
+      , MapLight
+      , MapOutdoors
+      , MapNavigation
+      )
   , geoMap
   
   -- * Metric (Single Value)
   , MetricSpec
-  , MetricStyle(..)
+  , MetricStyle
+      ( MetricNumber
+      , MetricGauge
+      , MetricProgress
+      , MetricSparkline
+      , MetricDelta
+      , MetricComparison
+      )
   , metric
   
   -- * Timeline
@@ -41,12 +78,29 @@ module Hydrogen.Composition.Source.Data
   
   -- * Heatmap
   , HeatmapSpec
-  , HeatmapColorScale(..)
+  , HeatmapColorScale
+      ( ScaleViridis
+      , ScalePlasma
+      , ScaleInferno
+      , ScaleMagma
+      , ScaleCividis
+      , ScaleTurbo
+      , ScaleBlueRed
+      , ScaleGreenYellow
+      )
   , heatmap
   
   -- * Tree
   , TreeSpec
-  , TreeLayout(..)
+  , TreeLayout
+      ( TreeVertical
+      , TreeHorizontal
+      , TreeRadialTree
+      , TreeMindmap
+      , TreeDendrogram
+      , TreeTreemap
+      , TreeSunburst
+      )
   , tree
   
   -- * Sankey

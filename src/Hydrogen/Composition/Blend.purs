@@ -17,13 +17,71 @@
 
 module Hydrogen.Composition.Blend
   ( -- * Blend Mode
-    BlendMode(..)
-  , BlendCategory(..)
+    BlendMode
+      ( BlendNormal
+      , BlendDissolve
+      , BlendDarken
+      , BlendMultiply
+      , BlendColorBurn
+      , BlendLinearBurn
+      , BlendDarkerColor
+      , BlendLighten
+      , BlendScreen
+      , BlendColorDodge
+      , BlendLinearDodge
+      , BlendLighterColor
+      , BlendAdd
+      , BlendOverlay
+      , BlendSoftLight
+      , BlendHardLight
+      , BlendVividLight
+      , BlendLinearLight
+      , BlendPinLight
+      , BlendHardMix
+      , BlendDifference
+      , BlendExclusion
+      , BlendSubtract
+      , BlendDivide
+      , BlendHue
+      , BlendSaturation
+      , BlendColor
+      , BlendLuminosity
+      , BlendStencilAlpha
+      , BlendStencilLuma
+      , BlendSilhouetteAlpha
+      , BlendSilhouetteLuma
+      , BlendAlphaAdd
+      , BlendLuminescentPremul
+      , BlendPassThrough
+      , BlendBehind
+      )
+  , BlendCategory
+      ( CategoryNormal
+      , CategoryDarken
+      , CategoryLighten
+      , CategoryContrast
+      , CategoryInversion
+      , CategoryComponent
+      , CategoryUtility
+      )
   , blendCategory
   , defaultBlendMode
   
   -- * Composite Operation
-  , CompositeOp(..)
+  , CompositeOp
+      ( CompSourceOver
+      , CompSourceIn
+      , CompSourceOut
+      , CompSourceAtop
+      , CompDestOver
+      , CompDestIn
+      , CompDestOut
+      , CompDestAtop
+      , CompClear
+      , CompCopy
+      , CompXor
+      , CompLighter
+      )
   , defaultCompositeOp
   
   -- * Blend Helpers

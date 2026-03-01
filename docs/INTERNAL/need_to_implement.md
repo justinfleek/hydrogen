@@ -432,7 +432,7 @@ This survey identifies **190+ papers** across all 20 research domains relevant t
 
 ## 16. Color science and perceptual rendering with formal guarantees
 
-- **"A Perceptual Color Space for Image Processing (Oklab)"** — bottosson.github.io/posts/oklab — Perceptual color space predicting lightness, chroma, and hue. Uses IPT structure optimized against CAM16-UCS. Adopted by **CSS, Photoshop**, and numerous libraries.
+- **"A Perceptual Color Space for Image Processing (Oklab)"** — bottosson.github.io/posts/oklab — Perceptual color space predicting lightness, chroma, and hue. Uses IPT structure optimized against CAM16-UCS. Adopted by **CSS, major image editors**, and numerous libraries.
 
 - **"The CIECAM02 Color Appearance Model"** — IS&T Color Imaging Conference, 2002 — Defines CIECAM02 with CAT02 chromatic adaptation and correlates for brightness, lightness, colorfulness, chroma, saturation, and hue. De facto standard until CAM16.
 

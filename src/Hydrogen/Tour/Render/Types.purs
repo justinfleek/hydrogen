@@ -10,14 +10,14 @@
 
 module Hydrogen.Tour.Render.Types
   ( -- * Click Behavior
-    ClickBehavior(..)
+    ClickBehavior(AdvanceOnClick, CloseOnClick, BlockClick)
     -- * Configuration Records
   , OverlayConfig
   , SpotlightConfig
   , TooltipConfig
   , NavigationConfig
     -- * Progress Style
-  , ProgressStyle(..)
+  , ProgressStyle(ProgressDots, ProgressBar, ProgressFraction, ProgressHidden)
   ) where
 
 import Prelude

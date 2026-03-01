@@ -7,7 +7,7 @@
 The Layer system provides the complete infrastructure for compositing visual 
 elements in motion graphics. This includes:
 
-- **56 distinct layer types** matching professional tools (After Effects, LATTICE)
+- **56 distinct layer types** matching professional motion graphics tools (LATTICE)
 - **26 content constructors** for fully-typed layer content
 - **UUID5-based deterministic references** for all layers, properties, effects, masks
 - **Layer stack management** with ordered compositing and relationships
@@ -153,7 +153,7 @@ functional categories. No strings, no arbitrary values — a bounded vocabulary.
 ### Tracking & Motion Layers (3 types)
 ```purescript
 | LTTracker    -- Motion tracking data
-| LTMocha      -- Mocha planar tracking
+| LTPlanarTracking -- Planar tracking
 | LTStabilizer -- Stabilization reference
 ```
 
@@ -178,7 +178,7 @@ isLayerTypeVector     :: LayerType -> Boolean  -- Shape, SVG, Lottie, Rive, etc.
 isLayerTypeAudio      :: LayerType -> Boolean  -- Audio, Waveform, Spectrogram, MIDI
 isLayerTypeData       :: LayerType -> Boolean  -- CSV, JSON, GeoJSON, Data
 isLayerTypeAnnotation :: LayerType -> Boolean  -- Marker, Subtitle, Annotation, Comment
-isLayerTypeTracking   :: LayerType -> Boolean  -- Tracker, Mocha, Stabilizer, Pose
+isLayerTypeTracking   :: LayerType -> Boolean  -- Tracker, PlanarTracking, Stabilizer, Pose
 isLayerTypeUtility    :: LayerType -> Boolean  -- Reference, Grid, Guide, Mask, etc.
 isLayerTypeColorGrading :: LayerType -> Boolean  -- HDR, LUT, Gradient, Adjustment
 isLayerTypeComposition  :: LayerType -> Boolean  -- PreComp, Group, NestedComp
@@ -455,6 +455,152 @@ isContent3D        :: LayerContent -> Boolean  -- Camera, Light, Model, etc.
 isContentGenerated :: LayerContent -> Boolean  -- AI-generated content
 ```
 
+## Full Layer
+
+**Source**: `Layer/Full.purs` (272 lines)
+
+The `Layer` type combines `LayerBase` (common properties) with `LayerContent` 
+(type-specific data) into a complete, validated layer representation.
+
+### Layer Newtype
+
+```purescript
+newtype Layer = Layer
+  { base :: LayerBase
+  , content :: LayerContent
+  }
+```
+
+**Instances:** `Eq`, `Show`
+
+### Smart Constructors
+
+```purescript
+mkLayer :: LayerBase -> LayerContent -> Maybe Layer
+-- Returns Nothing if content type doesn't match LayerType in base
+-- Validates: layerType base == contentToLayerType content
+
+mkLayerUnchecked :: LayerBase -> LayerContent -> Layer
+-- No validation — use when you've already verified types match
+```
+
+**Why validation matters:**
+
+At billion-agent scale, invalid layer configurations (e.g., an Image layer with 
+Text content) would propagate silently and cause rendering failures. The smart 
+constructor catches these at construction time.
+
+### Accessors
+
+```purescript
+layerBase :: Layer -> LayerBase
+-- Extract base properties
+
+layerContent :: Layer -> LayerContent
+-- Extract type-specific content
+```
+
+### Validation
+
+```purescript
+layerContentMatchesType :: LayerBase -> LayerContent -> Boolean
+-- Check if content type matches layer type
+-- Uses: layerType base == contentToLayerType content
+
+isLayerValid :: Layer -> Boolean
+-- Verify a layer's content matches its base type
+-- Always true for layers created with mkLayer
+```
+
+### Transformations
+
+```purescript
+mapLayerBase :: (LayerBase -> LayerBase) -> Layer -> Layer
+-- Apply transformation to base properties
+
+mapLayerContent :: (LayerContent -> LayerContent) -> Layer -> Layer
+-- Apply transformation to content
+
+setLayerContent :: LayerContent -> Layer -> Maybe Layer
+-- Replace content (validates type match, returns Nothing if mismatch)
+
+updateLayerBase :: (LayerBase -> LayerBase) -> Layer -> Layer
+-- Alias for mapLayerBase
+```
+
+### Predicates (delegating to base)
+
+```purescript
+fullLayerVisible :: Layer -> Boolean
+-- layerVisible base && layerEnabled base
+
+fullLayerLocked :: Layer -> Boolean
+-- layerLocked base
+
+fullLayerIs3D :: Layer -> Boolean
+-- layerIs3D base
+
+fullLayerIsGenerated :: Layer -> Boolean
+-- isContentGenerated content
+
+fullLayerType :: Layer -> LayerType
+-- layerType base
+```
+
+### Layer Type Queries
+
+```purescript
+isImageLayer :: Layer -> Boolean
+-- fullLayerType == LTImage
+
+isVideoLayer :: Layer -> Boolean
+-- fullLayerType == LTVideo
+
+isTextLayer :: Layer -> Boolean
+-- fullLayerType == LTText
+
+isShapeLayer :: Layer -> Boolean
+-- fullLayerType == LTShape
+
+isSolidLayer :: Layer -> Boolean
+-- fullLayerType == LTSolid
+
+isGeneratedLayer :: Layer -> Boolean
+-- fullLayerType == LTGenerated
+```
+
+### Content Extraction
+
+Type-safe extraction of specific content types:
+
+```purescript
+extractImageContent :: Layer -> Maybe ImageContent
+-- Returns Just content if LCImage, Nothing otherwise
+
+extractVideoContent :: Layer -> Maybe VideoContent
+-- Returns Just content if LCVideo, Nothing otherwise
+
+extractTextContent :: Layer -> Maybe TextContent
+-- Returns Just content if LCText, Nothing otherwise
+
+extractGeneratedContent :: Layer -> Maybe GeneratedContent
+-- Returns Just content if LCGenerated, Nothing otherwise
+```
+
+**Usage Pattern:**
+
+```purescript
+import Hydrogen.Schema.Motion.Layer.Full as Full
+
+-- Safe content extraction with pattern matching
+processLayer :: Full.Layer -> String
+processLayer layer = case Full.extractImageContent layer of
+  Just img -> "Image: " <> show img.width <> "x" <> show img.height
+  Nothing -> case Full.extractTextContent layer of
+    Just txt -> "Text layer"
+    Nothing -> "Other layer type: " <> show (Full.fullLayerType layer)
+```
+
 ## Layer Operations
 
 **Source**: `Layer/Operations.purs` (414 lines)
@@ -687,7 +833,7 @@ trackMatteLinkMode   :: TrackMatteLink -> TrackMatteMode
 **Source**: `LayerReference/ClippingGroup.purs` (95 lines)
 
 Clipping groups constrain multiple layers to the alpha of a base layer 
-(like Photoshop clipping masks or After Effects clipping groups).
+(like raster editor clipping masks or motion graphics clipping groups).
 
 ```purescript
 newtype ClippingGroup = ClippingGroup

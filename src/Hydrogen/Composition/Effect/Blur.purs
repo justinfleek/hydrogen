@@ -11,7 +11,10 @@ module Hydrogen.Composition.Effect.Blur
   ( GaussianBlurSpec
   , DirectionalBlurSpec
   , RadialBlurSpec
-  , RadialBlurType(..)
+  , RadialBlurType
+      ( RadialSpin
+      , RadialZoom
+      )
   , BoxBlurSpec
   , SharpenSpec
   ) where

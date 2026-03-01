@@ -1,13 +1,13 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---        // hydrogen // schema // motion // aftereffects // propertyvalue // color
+--        // hydrogen // schema // motion // professional // propertyvalue // color
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Color Property Value — RGBA color type for AE properties.
+-- | Color Property Value — RGBA color type for motion graphics properties.
 -- |
--- | AE uses 0-1 floating point for colors internally. This module defines
+-- | Motion graphics tools use 0-1 floating point for colors internally. This module defines
 -- | the ColorValue type used for Fill Color, Stroke Color, etc.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Color
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Color
   ( ColorValue
   , colorValue
   , colorValueRGB

@@ -210,6 +210,7 @@ expressionTypeFromString :: String -> Maybe ExpressionType
 expressionTypeFromString "wiggle" = Just ETWiggle
 expressionTypeFromString "time" = Just ETTime
 expressionTypeFromString "loop" = Just ETLoop
+expressionTypeFromString "linear" = Just ETLinear
 expressionTypeFromString "hold" = Just ETHold
 expressionTypeFromString "smooth" = Just ETSmooth
 expressionTypeFromString "thisProperty" = Just ETThisProperty
@@ -224,6 +225,7 @@ expressionTypeFromString "modulo" = Just ETModulo
 expressionTypeFromString "length" = Just ETLength
 expressionTypeFromString "normalize" = Just ETNormalize
 expressionTypeFromString "distance" = Just ETDistance
+expressionTypeFromString "clamp" = Just ETClamp
 expressionTypeFromString "lerp" = Just ETLerp
 expressionTypeFromString "noise" = Just ETNoise
 expressionTypeFromString "simplexNoise" = Just ETSimplexNoise

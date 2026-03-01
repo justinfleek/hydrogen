@@ -13,7 +13,12 @@ module Hydrogen.Composition.Effect.Stylize
   , InnerShadowSpec
   , EmbossSpec
   , EdgeDetectSpec
-  , EdgeDetectType(..)
+  , EdgeDetectType
+      ( EdgeCanny
+      , EdgeSobel
+      , EdgePrewitt
+      , EdgeLaplacian
+      )
   , PosterizeSpec
   ) where
 

@@ -11,17 +11,17 @@
 -- | - Full steppers with labels
 module Hydrogen.Tour.Navigation.Progress
   ( -- * Progress Styles
-    ProgressStyle(..)
-  , ProgressVariant(..)
+    ProgressStyle(ProgressDots, ProgressBar, ProgressFraction, ProgressStepper, ProgressNone)
+  , ProgressVariant(VariantDefault, VariantMinimal, VariantProminent, VariantBrand)
   , ProgressConfig
   , defaultProgressConfig
     -- * Dot Configuration
   , DotsConfig
-  , DotSize(..)
+  , DotSize(DotSmall, DotMedium, DotLarge)
     -- * Fraction Configuration
-  , FractionFormat(..)
+  , FractionFormat(FractionOfFormat, FractionSlashFormat, FractionDashFormat)
     -- * Stepper Configuration
-  , StepperOrientation(..)
+  , StepperOrientation(Horizontal, Vertical)
     -- * Element Descriptions
   , ProgressDotsElement
   , ProgressBarElement

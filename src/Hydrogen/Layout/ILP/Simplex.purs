@@ -28,7 +28,12 @@ module Hydrogen.Layout.ILP.Simplex
   , initTableau
   
     -- * Solving
-  , SimplexResult(..)
+  , SimplexResult
+      ( SimplexOptimal
+      , SimplexUnbounded
+      , SimplexInfeasible
+      , SimplexMaxIter
+      )
   , solveSimplex
   , solveLP
   

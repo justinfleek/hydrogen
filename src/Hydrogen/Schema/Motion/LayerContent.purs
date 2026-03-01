@@ -40,6 +40,14 @@ module Hydrogen.Schema.Motion.LayerContent
   , isContentMedia
   , isContent3D
   , isContentGenerated
+  , sameContentType
+  , differentContentType
+  
+  -- * Content Validation
+  , isValidImageDimensions
+  , isValidVideoContent
+  , isValidSolidColor
+  , isValidGeneratedParams
   
   -- * Media Content
   , ImageContent(..)
@@ -740,3 +748,44 @@ isContent3D _ = false
 isContentGenerated :: LayerContent -> Boolean
 isContentGenerated (LCGenerated _) = true
 isContentGenerated _ = false
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // content // comparison
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Check if two layer contents are the same type (but not necessarily equal).
+sameContentType :: LayerContent -> LayerContent -> Boolean
+sameContentType a b = contentToLayerType a == contentToLayerType b
+
+-- | Check if two layer contents are different types.
+differentContentType :: LayerContent -> LayerContent -> Boolean
+differentContentType a b = contentToLayerType a /= contentToLayerType b
+
+-- | Check if image content has valid dimensions (both width and height >= 1).
+isValidImageDimensions :: ImageContent -> Boolean
+isValidImageDimensions (ImageContent c) = c.width >= 1 && c.height >= 1
+
+-- | Check if video content has valid parameters.
+isValidVideoContent :: VideoContent -> Boolean
+isValidVideoContent (VideoContent c) = 
+  c.width >= 1 && 
+  c.height >= 1 && 
+  c.frameRate >= 0.001 &&
+  c.totalFrames >= 1
+
+-- | Check if solid content has valid color values.
+isValidSolidColor :: SolidContent -> Boolean
+isValidSolidColor (SolidContent c) =
+  c.red >= 0 && c.red <= 255 &&
+  c.green >= 0 && c.green <= 255 &&
+  c.blue >= 0 && c.blue <= 255 &&
+  c.alpha >= 0.0 && c.alpha <= 1.0
+
+-- | Check if generated content has reasonable inference parameters.
+isValidGeneratedParams :: GeneratedContent -> Boolean
+isValidGeneratedParams (GeneratedContent c) =
+  c.width >= 64 && 
+  c.height >= 64 &&
+  c.steps >= 1 &&
+  c.guidanceScale >= 0.0 &&
+  c.strength >= 0.0 && c.strength <= 1.0

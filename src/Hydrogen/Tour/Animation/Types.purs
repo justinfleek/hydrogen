@@ -10,22 +10,42 @@
 
 module Hydrogen.Tour.Animation.Types
   ( -- * Easing Types
-    EasingCurve(..)
-  , EasingPreset(..)
+    EasingCurve(Preset, CubicBezier)
+  , EasingPreset
+      ( EaseLinear
+      , EaseIn
+      , EaseOut
+      , EaseInOut
+      , EaseInQuad
+      , EaseOutQuad
+      , EaseInOutQuad
+      , EaseInCubic
+      , EaseOutCubic
+      , EaseInOutCubic
+      , EaseInQuart
+      , EaseOutQuart
+      , EaseInOutQuart
+      , EaseInExpo
+      , EaseOutExpo
+      , EaseInOutExpo
+      , EaseInBack
+      , EaseOutBack
+      , EaseInOutBack
+      )
     -- * Spring Types
   , SpringConfig
-  , SpringPreset(..)
+  , SpringPreset(SpringDefault, SpringSnappy, SpringGentle, SpringBouncy, SpringStiff)
     -- * Morph Types
   , MorphConfig
-  , MorphTarget(..)
+  , MorphTarget(MorphToRect, MorphToCircle, MorphToViewport, MorphHidden)
     -- * Animation Types
-  , TourAnimation(..)
-  , AnimationDirection(..)
-  , AnimationFill(..)
-  , AnimationPlayState(..)
-  , AnimationComposition(..)
+  , TourAnimation(AnimFade, AnimSlide, AnimScale, AnimSpring, AnimComposite)
+  , AnimationDirection(Normal, Reverse, Alternate, AlternateReverse)
+  , AnimationFill(FillNone, FillForwards, FillBackwards, FillBoth)
+  , AnimationPlayState(Playing, Paused)
+  , AnimationComposition(Sequence, Parallel, Stagger)
     -- * Reduced Motion Types
-  , ReducedMotionStrategy(..)
+  , ReducedMotionStrategy(InstantTransition, FadeOnly, SlowerAnimation, PreserveAnimation)
   ) where
 
 import Prelude

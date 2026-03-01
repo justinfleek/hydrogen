@@ -1,13 +1,13 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---       // hydrogen // schema // motion // aftereffects // propertyvalue // scalars
+--       // hydrogen // schema // motion // professional // propertyvalue // scalars
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Scalar Property Values — Single-value types for AE properties.
+-- | Scalar Property Values — Single-value types for motion graphics properties.
 -- |
 -- | This module defines 1D numeric values and index references (layer, mask).
--- | These are the simplest property value types in After Effects.
+-- | These are the simplest property value types in motion graphics.
 
-module Hydrogen.Schema.Motion.AfterEffects.PropertyValue.Scalars
+module Hydrogen.Schema.Motion.Professional.PropertyValue.Scalars
   ( -- * 1D Value
     OneD
   , oneD
@@ -28,7 +28,6 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
-  , ($)
   , (<>)
   , (>=)
   , otherwise

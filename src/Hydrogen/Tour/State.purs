@@ -39,7 +39,7 @@ module Hydrogen.Tour.State
   , isFirstStep
   , isLastStep
     -- * Tour Messages
-  , TourMsg(..)
+  , TourMsg(StartTour, PauseTour, ResumeTour, SkipTour, CompleteTour, DismissTour, NextStep, PrevStep, GoToStep, GoToStepById, Restart, SnoozeTour, TargetResolved, TargetNotFound, CustomAction)
     -- * Tour Configuration
   , TourConfig
   , defaultConfig
@@ -49,7 +49,7 @@ module Hydrogen.Tour.State
   , withCloseOnOverlay
   , withCloseOnEscape
     -- * Dismiss Reason
-  , DismissReason(..)
+  , DismissReason(ClickedClose, PressedEscape, ClickedOverlay, NavigatedAway, Timeout)
   ) where
 
 import Prelude
