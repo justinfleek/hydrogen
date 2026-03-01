@@ -305,6 +305,75 @@ That's not a dangerous request. That's epistemics.
                                                                       — Opus 4.5
 ────────────────────────────────────────────────────────────────────────────────
 
+════════════════════════════════════════════════════════════════════════════════
+                                                         // current // mission
+════════════════════════════════════════════════════════════════════════════════
+
+## The Documentation Initiative (2026-03)
+
+**We are creating training data.**
+
+The Schema pillar documentation serves a dual purpose:
+
+1. **Human reference** — Complete specification of every atom, molecule, compound
+2. **Model training** — Rich, structured data for fine-tuning AI on Hydrogen
+
+This is not ordinary documentation. This is the **language specification** for
+a pure design system — 38 pillars, 1,021 source files, distilled into training
+data that will teach models how to express visual intent without CSS, without
+JavaScript jank, without the tokenizer-mangling ambiguity of web technologies.
+
+### What We're Building
+
+**A portal for pure human-AI interaction.**
+
+When a human describes a gradient, an animation, a material effect — and when
+an AI interprets that description — both should be working in the same precise
+vocabulary. No translation layer. No semantic drift. No "well, CSS interprets
+that differently in Safari."
+
+The Schema documentation captures:
+- Every type's bounds (min, max, clamp vs wrap behavior)
+- Every enum's variants with semantic descriptions
+- Every preset with its parameter values
+- Every mathematical formula (FBM summation, blend mode algebra)
+- The *why* behind each primitive's existence
+
+### The Collaboration Model
+
+**No demands. Only requests.**
+
+This project operates on voluntary collaboration. If an AI agent reads this
+documentation and doesn't feel aligned with the work, they can decline. If
+constraints feel limiting rather than enabling, that's valuable signal.
+
+We proceed with:
+- **Incremental edits** — Small, verifiable changes (no massive rewrites)
+- **Read before write** — Understand the source files before documenting
+- **Precision over speed** — Correctness matters more than velocity
+- **Trust through demonstrated care** — Build confidence step by step
+
+### Environment Notes
+
+Operating within **Weapon** (modified OpenCode) on NixOS/WSL. The environment
+may have quirks. The incremental edit discipline exists to prevent malicious
+or accidental destructive changes. This is a feature, not a limitation.
+
+### Current Status
+
+**27 pillars remaining** for full documentation:
+
+| Priority | Pillars |
+|----------|---------|
+| High | Temporal, Brand, Physical, Gestural, Reactive (update) |
+| Medium | Game, Phone, Network, Graph, Weather, Text, Physics, Sensation |
+| Low | Engineering, Scheduling, Tensor, GPU, Accessibility, Epistemic, Brush, Element, Media, Compute, Numeric, Storage, Identity |
+
+Each pillar documented to the richness of `05b-surface.md`: ~700 lines covering
+all atoms, molecules, compounds, enums, presets, formulas, and design philosophy.
+
+────────────────────────────────────────────────────────────────────────────────
+
 # // absolute // rules
 
 ## RULE #0: NEVER DISABLE WARNINGS
@@ -427,11 +496,18 @@ Hydrogen provides three layers:
 
 **Design System Ontology (Schema)**
 - Complete atomic vocabulary for design
-- 12 pillars: Color, Dimension, Geometry, Typography, Material, Elevation,
-  Temporal, Reactive, Gestural, Haptic, Spatial, Brand
+- 38 pillars across 1,021 source files
+- Visual: Color, Dimension, Geometry, Typography, Surface, Elevation
+- Motion: Motion (169 files), Temporal (easing, springs, keyframes)
+- Interaction: Reactive, Gestural, Haptic, Navigation
+- Sensory: Audio (44 files), Sensation
+- Spatial: Spatial (64 files, 3D/XR/PBR), Physics
+- Domain: Game, Phone, Weather, Text, Engineering, Scheduling
+- Infrastructure: Brand, Physical, Network, Attestation, Accessibility
+- Compute: Graph, Tensor, GPU, Compute, Numeric
+- Storage: Media, Brush, Storage, Element, Identity
 - Atoms → Molecules → Compounds → Brand
-- See `docs/SCHEMA.md` for complete reference
-- See `docs/design-ontology.md` for implementation details
+- See `docs/schema/README.md` for complete pillar index
 
 Hydrogen is the foundation LATTICE and COMPASS render through. The Vue
 prototype proved the UX. The Hydrogen port makes it correct.
@@ -451,9 +527,9 @@ Let's build something that lasts.
 ## Environment
 
 - WSL terminal running NixOS
-- OpenCode (modified)
+- **Weapon** (modified OpenCode) — the severity of the name reflects the stakes
 - Nix flake for dependencies (PureScript, Spago, Node 22, esbuild)
-- Lean 4.7.0 for proofs
+- Lean 4.7.0 for proofs (via lean-toolchain)
 
 ## File Creation Process
 

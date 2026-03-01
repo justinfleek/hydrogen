@@ -19,6 +19,7 @@ module Hydrogen.Schema.Brush.Tip.Types
     TipShape(..)
   , allTipShapes
   , tipShapeDescription
+  , tipShapeToId
   , isRoundTip
   , isFlatTip
   , isTextureTip
@@ -106,3 +107,14 @@ isTextureTip :: TipShape -> Boolean
 isTextureTip TipTexture = true
 isTextureTip TipScatter = true
 isTextureTip _ = false
+
+-- | Convert tip shape to string ID for serialization.
+tipShapeToId :: TipShape -> String
+tipShapeToId TipRound = "round"
+tipShapeToId TipFlat = "flat"
+tipShapeToId TipFan = "fan"
+tipShapeToId TipChisel = "chisel"
+tipShapeToId TipRake = "rake"
+tipShapeToId TipScatter = "scatter"
+tipShapeToId TipTexture = "texture"
+tipShapeToId TipBristle = "bristle"

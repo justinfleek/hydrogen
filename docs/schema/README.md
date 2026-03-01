@@ -29,11 +29,11 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 |--------|------:|-------------|:----:|
 | [Accessibility](./35-accessibility.md) | 6 | WAI-ARIA 1.2 roles, states, live regions | — |
 | [Attestation](./13-attestation.md) | 12 | Cryptographic integrity, UUID5, signatures | ✓ |
-| [Audio](./10b-audio.md) | 44 | Synthesis, effects, MIDI, spatial audio | — |
+| [Audio](./10b-audio.md) | 44 | Synthesis, effects, MIDI, spatial audio | ✓ |
 | [Brand](./12-brand.md) | 37 | Design tokens, theme composition | — |
-| [Brush](./32-brush.md) | 5 | Brush tips for drawing applications | — |
+| [Brush](./32-brush.md) | 5 | Brush tips for drawing applications | ✓ |
 | [Color](./01-color.md) | 58 | sRGB, P3, LAB, OKLCH, ACES, CDL, LUTs, CVD | ✓ |
-| [Compute](./29-compute.md) | 4 | Computational graph, operations | — |
+| [Compute](./29-compute.md) | 4 | ML compute graphs, DAG operations | ✓ |
 | [Dimension](./02-dimension.md) | 47 | SI units (yocto→quetta), device units, spacing | ✓ |
 | [Element](./element.md) | 5 | Core UI element primitives | — |
 | [Elevation](./06-elevation.md) | 10 | Shadows, z-index, depth, parallax | ✓ |
@@ -45,12 +45,12 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | [GPU](./30-gpu.md) | 8 | Landauer limits, storable types | — |
 | [Graph](./31-graph.md) | 19 | Layout algorithms, node content, viewport | — |
 | [Haptic](./10-haptic.md) | 4 | Vibration patterns, tactile feedback | ✓ |
-| [Identity](./identity.md) | 1 | Temporal identity tracking | — |
+| [Identity](./34-identity.md) | 1 | Temporal identity tracking | ✓ |
 | [Media](./25-media.md) | 5 | Audio, video, image, gallery, upload | — |
 | [Motion](./05-motion.md) | 169 | Animation, effects, layers, expressions, Lottie | ✓ |
 | [Navigation](./33-navigation.md) | 2 | Pagination, index, routing | ✓ |
 | [Network](./23-network.md) | 21 | HTTP, WebSocket, SSE, service workers | — |
-| [Numeric](./numeric.md) | 4 | Numeric type utilities, bounds | — |
+| [Numeric](./36-numeric.md) | 4 | Forward error tracking, graded monads | ✓ |
 | [Phone](./27-phone.md) | 25 | Country codes, validation, formatting | — |
 | [Physical](./20-physical.md) | 33 | Optical/IOR, mechanical, thermal, fluid properties | — |
 | [Physics](./16-physics.md) | 16 | Forces, collision, cloth, rigid body simulation | — |
@@ -58,17 +58,17 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | [Scheduling](./14-scheduling.md) | 8 | Calendar, events, invitations | — |
 | [Sensation](./15-sensation.md) | 13 | Proprioceptive, environmental, social awareness | — |
 | [Spatial](./11-spatial.md) | 64 | 3D primitives, PBR materials, XR, scene graphs | ✓ |
-| [Storage](./24-storage.md) | 4 | Clipboard, IndexedDB, local/session storage | — |
-| [Surface](./05-surface.md) | 43 | Gradients, noise (Perlin, Worley), textures | — |
-| [Temporal](./07-temporal.md) | 39 | Easing (30+ functions), spring physics, keyframes | — |
+| [Storage](./24-storage.md) | 4 | Clipboard, IndexedDB, local/session storage | ✓ |
+| [Surface](./05b-surface.md) | 43 | Gradients, noise (Perlin, Worley), textures | ✓ |
+| [Temporal](./07-temporal.md) | 39 | Easing (30+ functions), spring physics, keyframes | ✓ |
 | [Tensor](./28-tensor.md) | 8 | DType, shape, layout, dimensions | — |
 | [Text](./26-text.md) | 16 | Rich text, code, selection, commands | — |
 | [Typography](./04-typography.md) | 36 | OpenType features, metrics, type scales | ✓ |
 | [Weather](./18-weather.md) | 18 | Atmosphere, precipitation, wind, Beaufort scale | — |
 
-**Documented**: 10 pillars (Color, Dimension, Geometry, Typography, Motion, Elevation, Haptic, Spatial, Attestation, Navigation)
+**Documented**: 19 pillars (Color, Dimension, Geometry, Typography, Motion, Surface, Temporal, Elevation, Haptic, Spatial, Attestation, Navigation, Audio, Reactive, Identity, Storage, Numeric, Compute, Brush)
 
-**Pending**: 28 pillars
+**Pending**: 19 pillars
 
 ---
 
