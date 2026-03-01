@@ -2,26 +2,35 @@
 //                                                     // hydrogen // analytics
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// Utilities
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Timing APIs
+// Date.now() is the only source of real-time in the browser
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Current timestamp in milliseconds
+// | This is the browser's wall-clock time - cannot be pure
 export const now = () => Date.now();
 
-export const traverseImpl = (f) => (arr) => () => {
-  const results = [];
-  for (let i = 0; i < arr.length; i++) {
-    results.push(f(arr[i])());
-  }
-  return results;
-};
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Session/Random ID Generation
+// Math.random() provides entropy from the browser's RNG
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// Session management
-
+// | BROWSER BOUNDARY: Generate unique session identifier
+// | Uses Math.random() for entropy + Date.now() for uniqueness
 export const generateSessionId = () => {
   return "sess_" + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Timer APIs
+// setInterval/clearInterval manage browser event loop timing
+// ═══════════════════════════════════════════════════════════════════════════════
+
 let flushIntervalId = null;
 
+// | BROWSER BOUNDARY: Set up periodic flush using setInterval
+// | Manages browser timer state
 export const setupFlushInterval = (tracker) => (interval) => () => {
   if (flushIntervalId) {
     clearInterval(flushIntervalId);
@@ -41,13 +50,19 @@ export const setupFlushInterval = (tracker) => (interval) => () => {
   }, interval);
 };
 
-// Privacy
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Privacy/Navigator APIs
+// navigator.doNotTrack is a browser-only privacy signal
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Check browser Do Not Track setting
+// | Accesses navigator global
 export const getDoNotTrack = () => {
   if (typeof navigator === "undefined") return false;
   return navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || window.doNotTrack === "1";
 };
 
+// | BROWSER BOUNDARY: Persist opt-out preference to localStorage
 export const persistOptOut = (optedOut) => () => {
   try {
     if (typeof localStorage === "undefined") return;
@@ -61,26 +76,38 @@ export const persistOptOut = (optedOut) => () => {
   }
 };
 
-// Console provider logging
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Console APIs
+// console.log is browser I/O
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Log analytics event to console
 export const logAnalytics = (eventType) => (data) => () => {
   console.log(`[Analytics] ${eventType}:`, Object.fromEntries(Object.entries(data)));
 };
 
+// | BROWSER BOUNDARY: Log identify event to console
 export const logIdentify = (userId) => () => {
   console.log(`[Analytics] Identify: ${userId}`);
 };
 
+// | BROWSER BOUNDARY: Log user properties to console
 export const logUserProps = (props) => () => {
   console.log(`[Analytics] User Properties:`, Object.fromEntries(Object.entries(props)));
 };
 
+// | BROWSER BOUNDARY: Log reset event to console
 export const logReset = () => {
   console.log(`[Analytics] Reset user identity`);
 };
 
-// Google Analytics 4
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Google Analytics 4
+// Loads external script, accesses DOM, uses global gtag
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Initialize Google Analytics 4 provider
+// | Injects script tag, accesses DOM, creates global gtag
 export const initGoogleAnalytics = (measurementId) => () => {
   // Load GA4 script if not already loaded
   if (typeof gtag === "undefined") {
@@ -127,8 +154,13 @@ export const initGoogleAnalytics = (measurementId) => () => {
   };
 };
 
-// Plausible Analytics
+// ══════════════════════════════════════════════════════════════════��════════════
+// BROWSER BOUNDARY: Plausible Analytics
+// Loads external script, accesses DOM
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Initialize Plausible Analytics provider
+// | Injects script tag, accesses DOM
 export const initPlausible = (domain) => () => {
   // Load Plausible script if not already loaded
   if (!document.querySelector('script[data-domain="' + domain + '"]')) {
@@ -157,8 +189,13 @@ export const initPlausible = (domain) => () => {
   };
 };
 
-// Mixpanel
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Mixpanel
+// Loads external script, accesses DOM, uses global mixpanel
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Initialize Mixpanel provider
+// | Injects script tag, accesses DOM, creates global mixpanel
 export const initMixpanel = (token) => () => {
   // Load Mixpanel script if not already loaded
   if (typeof window.mixpanel === "undefined") {
@@ -238,8 +275,13 @@ export const initMixpanel = (token) => () => {
   };
 };
 
-// Core Web Vitals
+// ═══════════════════════════════════════════════════════════════════════════════
+// BROWSER BOUNDARY: Performance Observer APIs
+// PerformanceObserver is browser-only for Core Web Vitals
+// ═══════════════════════════════════════════════════════════════════════════════
 
+// | BROWSER BOUNDARY: Observe Core Web Vitals metrics
+// | Uses PerformanceObserver API - browser-only
 export const observeWebVitals = (callback) => () => {
   const observers = [];
 

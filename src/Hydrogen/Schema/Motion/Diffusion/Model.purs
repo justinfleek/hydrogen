@@ -42,6 +42,14 @@
 -- | This module mirrors `Lattice.Export` from the Haskell backend, ensuring
 -- | type-level compatibility for serialization between PureScript UI and
 -- | Haskell generation backend.
+-- |
+-- | ## Architecture Note
+-- |
+-- | This module exceeds the standard 500-line limit due to schema coherence.
+-- | The unified DiffusionModel type wraps all 5 model categories (Image, Video,
+-- | 3D, Edit, Motion), requiring their enums to be co-located. The parser
+-- | `diffusionModelFromString` dispatches to category-specific parsers that
+-- | must be defined in the same module.
 
 module Hydrogen.Schema.Motion.Diffusion.Model
   ( -- * Image Generation Models

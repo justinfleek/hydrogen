@@ -48,7 +48,7 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Array (index, length, concat, foldl, filter)
+import Data.Array (index, length, concat, foldl, filter, drop)
 
 import Hydrogen.Schema.Game.Chess.Types
   ( Square
@@ -369,13 +369,4 @@ filterMapHelper f arr acc = case index arr 0 of
 
 -- | Drop first element of array.
 dropFirst :: forall a. Array a -> Array a
-dropFirst arr = case length arr of
-  0 -> []
-  _ -> dropFirstImpl arr
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                       // ffi
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | FFI: Drop first element.
-foreign import dropFirstImpl :: forall a. Array a -> Array a
+dropFirst = drop 1

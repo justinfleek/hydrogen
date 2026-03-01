@@ -53,12 +53,14 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
+  , map
   , show
   , (<>)
   , (<=)
   )
 
 import Data.Array (length) as Array
+import Data.String.CodeUnits (length) as String
 import Hydrogen.Schema.Bounded (clampInt)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -144,10 +146,7 @@ isSecure :: WebSocketURL -> Boolean
 isSecure (WebSocketURL u) = startsWith "wss://" u
   where
   startsWith :: String -> String -> Boolean
-  startsWith prefix s = stringLength prefix <= stringLength s
-
--- | Get the length of a string.
-foreign import stringLength :: String -> Int
+  startsWith prefix s = String.length prefix <= String.length s
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // protocols
@@ -213,10 +212,7 @@ bytesFromArray :: Array Int -> Bytes
 bytesFromArray arr = Bytes (clampBytes arr)
   where
   clampBytes :: Array Int -> Array Int
-  clampBytes = mapArray (clampInt 0 255)
-
--- | Map a function over an array.
-foreign import mapArray :: forall a b. (a -> b) -> Array a -> Array b
+  clampBytes = map (clampInt 0 255)
 
 -- | Extract the byte array.
 unwrapBytes :: Bytes -> Array Int

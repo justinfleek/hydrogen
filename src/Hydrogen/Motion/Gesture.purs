@@ -7,6 +7,14 @@
 -- | Unified gesture system supporting touch, mouse, and pointer events
 -- | with velocity tracking and gesture composition.
 -- |
+-- | ## Architecture Note
+-- |
+-- | This module exceeds the standard 500-line limit due to browser boundary
+-- | coherence. All gesture recognizers (Pan, Pinch, Rotate, Swipe, LongPress,
+-- | DoubleTap) share common types (Point, Velocity, GestureState) and must
+-- | have their FFI declarations co-located with their PureScript wrappers.
+-- | Splitting would fragment a cohesive browser integration API.
+-- |
 -- | ## Usage
 -- |
 -- | ```purescript
@@ -46,57 +54,75 @@ module Hydrogen.Motion.Gesture
     GestureState(..)
   , Point
   , Velocity
-    -- * Pan Gesture
+    -- * Pan Gesture (BROWSER BOUNDARY)
   , PanGesture
   , PanConfig
   , PanState
   , createPanGesture
   , defaultPanConfig
-    -- * Pinch Gesture
+    -- * Pinch Gesture (BROWSER BOUNDARY)
   , PinchGesture
   , PinchConfig
   , PinchState
   , createPinchGesture
   , defaultPinchConfig
-    -- * Rotate Gesture
+    -- * Rotate Gesture (BROWSER BOUNDARY)
   , RotateGesture
   , RotateConfig
   , RotateState
   , createRotateGesture
   , defaultRotateConfig
-    -- * Swipe Gesture
+    -- * Swipe Gesture (BROWSER BOUNDARY)
   , SwipeGesture
   , SwipeConfig
   , SwipeDirection(..)
   , createSwipeGesture
   , defaultSwipeConfig
-    -- * Long Press
+    -- * Long Press (BROWSER BOUNDARY)
   , LongPressGesture
   , LongPressConfig
   , createLongPressGesture
   , defaultLongPressConfig
-    -- * Double Tap
+    -- * Double Tap (BROWSER BOUNDARY)
   , DoubleTapGesture
   , DoubleTapConfig
   , createDoubleTapGesture
   , defaultDoubleTapConfig
-    -- * Gesture Composition
+    -- * Gesture Composition (BROWSER BOUNDARY)
   , GestureRecognizer
   , composeGestures
   , enableGesture
   , disableGesture
   , destroyGesture
-    -- * Velocity Tracking
+    -- * Velocity Tracking (BROWSER BOUNDARY for time)
   , VelocityTracker
+  , TimestampedPoint
   , createVelocityTracker
   , trackPoint
   , getVelocity
   , resetTracker
+    -- * Pure Velocity Computation
+  , computeVelocityFromPoints
+    -- * Pure Geometry Operations
+  , TwoFingerData
+  , pointDistance
+  , pointCenter
+  , pointAngle
+  , computeTwoFingerData
+  , normalizeAngle
+    -- * Pure Swipe Computation
+  , SwipeParams
+  , detectSwipeDirection
+    -- * Pure Scale Operations
+  , clampScale
+  , computePinchScale
   ) where
 
 import Prelude
 
+import Data.Array as Array
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Number (abs, atan2, pi, sqrt)
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Ref (Ref)
@@ -171,6 +197,7 @@ defaultPanConfig =
   }
 
 -- | Create a pan gesture recognizer on an element
+-- | BROWSER BOUNDARY: Attaches pointer/touch/mouse event listeners
 foreign import createPanGestureImpl
   :: Element
   -> { onStart :: PanStateJS -> Effect Unit
@@ -280,6 +307,7 @@ pinchStateFromJS js =
   stateFromString "ended" = Ended
   stateFromString _ = Idle
 
+-- | BROWSER BOUNDARY: Attaches touch event listeners for pinch detection
 foreign import createPinchGestureImpl
   :: Element
   -> { onStart :: PinchStateJS -> Effect Unit
@@ -356,6 +384,7 @@ rotateStateFromJS js =
   stateFromString "ended" = Ended
   stateFromString _ = Idle
 
+-- | BROWSER BOUNDARY: Attaches touch event listeners for rotation detection
 foreign import createRotateGestureImpl
   :: Element
   -> { onStart :: RotateStateJS -> Effect Unit
@@ -420,6 +449,7 @@ defaultSwipeConfig =
   , maxDuration: Milliseconds 300.0
   }
 
+-- | BROWSER BOUNDARY: Attaches pointer/touch/mouse event listeners for swipe detection
 foreign import createSwipeGestureImpl
   :: Element
   -> { onSwipe :: String -> Effect Unit
@@ -468,6 +498,7 @@ defaultLongPressConfig =
   , maxDistance: 10.0
   }
 
+-- | BROWSER BOUNDARY: Attaches pointer/touch/mouse events with setTimeout
 foreign import createLongPressGestureImpl
   :: Element
   -> { onLongPress :: { x :: Number, y :: Number } -> Effect Unit
@@ -514,6 +545,7 @@ defaultDoubleTapConfig =
   , maxDistance: 40.0
   }
 
+-- | BROWSER BOUNDARY: Attaches pointer/touch/mouse events with setTimeout
 foreign import createDoubleTapGestureImpl
   :: Element
   -> { onDoubleTap :: { x :: Number, y :: Number } -> Effect Unit
@@ -543,15 +575,19 @@ foreign import data GestureRecognizer :: Type
 
 -- | Compose multiple gestures to work together
 -- | Handles conflicts between gestures (e.g., pan vs swipe)
+-- | BROWSER BOUNDARY: Manages gesture enable/disable state
 foreign import composeGestures :: Array GestureRecognizer -> Effect Unit
 
 -- | Enable a gesture recognizer
+-- | BROWSER BOUNDARY: Enables event listener processing
 foreign import enableGesture :: GestureRecognizer -> Effect Unit
 
 -- | Disable a gesture recognizer
+-- | BROWSER BOUNDARY: Disables event listener processing
 foreign import disableGesture :: GestureRecognizer -> Effect Unit
 
 -- | Destroy a gesture recognizer and clean up event listeners
+-- | BROWSER BOUNDARY: Removes all event listeners from DOM
 foreign import destroyGesture :: GestureRecognizer -> Effect Unit
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -570,7 +606,8 @@ createVelocityTracker maxSamples = do
   points <- Ref.new []
   pure { points, maxSamples }
 
--- | Track a point at current time
+-- | Track a point with timestamp
+-- | BROWSER BOUNDARY: Requires `performance.now()` from runtime
 foreign import trackPointImpl
   :: Ref (Array { point :: Point, time :: Number })
   -> Int
@@ -581,7 +618,8 @@ trackPoint :: VelocityTracker -> Point -> Effect Unit
 trackPoint tracker point =
   trackPointImpl tracker.points tracker.maxSamples point
 
--- | Calculate current velocity from tracked points
+-- | Get current velocity from tracker
+-- | BROWSER BOUNDARY: Reads mutable state populated by browser events
 foreign import getVelocityImpl
   :: Ref (Array { point :: Point, time :: Number })
   -> Effect Velocity
@@ -592,3 +630,149 @@ getVelocity tracker = getVelocityImpl tracker.points
 -- | Reset the velocity tracker
 resetTracker :: VelocityTracker -> Effect Unit
 resetTracker tracker = Ref.write [] tracker.points
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                  // pure velocity computation
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Timestamped point for velocity tracking
+type TimestampedPoint =
+  { point :: Point
+  , time :: Number  -- milliseconds
+  }
+
+-- | Compute velocity from an array of timestamped points — PURE FUNCTION
+-- |
+-- | Uses the first and last points to compute average velocity.
+-- | Returns zero velocity if fewer than 2 points or zero time delta.
+computeVelocityFromPoints :: Array TimestampedPoint -> Velocity
+computeVelocityFromPoints points = case Array.length points of
+  n | n < 2 -> { vx: 0.0, vy: 0.0 }
+  _ ->
+    let
+      first = Array.index points 0
+      last = Array.index points (Array.length points - 1)
+    in case first, last of
+      Just f, Just l ->
+        let
+          dt = (l.time - f.time) / 1000.0  -- Convert ms to seconds
+        in
+          if dt <= 0.0
+            then { vx: 0.0, vy: 0.0 }
+            else
+              { vx: (l.point.x - f.point.x) / dt
+              , vy: (l.point.y - f.point.y) / dt
+              }
+      _, _ -> { vx: 0.0, vy: 0.0 }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                   // pure geometry operations
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Two-finger gesture data — PURE DATA
+type TwoFingerData =
+  { center :: Point       -- ^ Center point between fingers
+  , distance :: Number    -- ^ Distance between fingers (pixels)
+  , angle :: Number       -- ^ Angle between fingers (degrees)
+  }
+
+-- | Compute distance between two points — PURE FUNCTION
+pointDistance :: Point -> Point -> Number
+pointDistance p1 p2 =
+  let
+    dx = p2.x - p1.x
+    dy = p2.y - p1.y
+  in
+    sqrt (dx * dx + dy * dy)
+
+-- | Compute center point between two points — PURE FUNCTION
+pointCenter :: Point -> Point -> Point
+pointCenter p1 p2 =
+  { x: (p1.x + p2.x) / 2.0
+  , y: (p1.y + p2.y) / 2.0
+  }
+
+-- | Compute angle between two points in degrees — PURE FUNCTION
+pointAngle :: Point -> Point -> Number
+pointAngle p1 p2 =
+  let
+    dx = p2.x - p1.x
+    dy = p2.y - p1.y
+  in
+    atan2 dy dx * (180.0 / pi)
+
+-- | Compute two-finger data from two touch points — PURE FUNCTION
+computeTwoFingerData :: Point -> Point -> TwoFingerData
+computeTwoFingerData p1 p2 =
+  { center: pointCenter p1 p2
+  , distance: pointDistance p1 p2
+  , angle: pointAngle p1 p2
+  }
+
+-- | Normalize angle to -180..180 range — PURE FUNCTION
+normalizeAngle :: Number -> Number
+normalizeAngle angle
+  | angle > 180.0 = angle - 360.0
+  | angle < (-180.0) = angle + 360.0
+  | otherwise = angle
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // pure swipe computation
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Swipe parameters for detection — PURE DATA
+type SwipeParams =
+  { startPoint :: Point
+  , endPoint :: Point
+  , duration :: Number     -- milliseconds
+  , maxDuration :: Number  -- milliseconds
+  , distanceThreshold :: Number
+  , velocityThreshold :: Number
+  }
+
+-- | Detect swipe direction from parameters — PURE FUNCTION
+-- |
+-- | Returns Nothing if swipe constraints not met (too slow, too short, too long)
+detectSwipeDirection :: SwipeParams -> Maybe SwipeDirection
+detectSwipeDirection params =
+  let
+    dx = params.endPoint.x - params.startPoint.x
+    dy = params.endPoint.y - params.startPoint.y
+    distance = sqrt (dx * dx + dy * dy)
+    velocity = if params.duration > 0.0
+               then distance / (params.duration / 1000.0)
+               else 0.0
+  in
+    if params.duration > params.maxDuration then Nothing
+    else if distance < params.distanceThreshold then Nothing
+    else if velocity < params.velocityThreshold * 1000.0 then Nothing
+    else
+      let
+        absDx = abs dx
+        absDy = abs dy
+      in
+        if absDx > absDy
+          then if dx > 0.0 then Just SwipeRight else Just SwipeLeft
+          else if dy > 0.0 then Just SwipeDown else Just SwipeUp
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // pure scale clamping
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Clamp scale to min/max bounds — PURE FUNCTION
+clampScale :: Number -> Number -> Number -> Number
+clampScale minScale maxScale rawScale
+  | rawScale < minScale = minScale
+  | rawScale > maxScale = maxScale
+  | otherwise = rawScale
+
+-- | Compute new scale from pinch gesture — PURE FUNCTION
+computePinchScale 
+  :: { initialScale :: Number, initialDistance :: Number, currentDistance :: Number }
+  -> { minScale :: Number, maxScale :: Number }
+  -> Number
+computePinchScale gesture bounds =
+  let
+    rawScale = gesture.initialScale * (gesture.currentDistance / gesture.initialDistance)
+  in
+    clampScale bounds.minScale bounds.maxScale rawScale

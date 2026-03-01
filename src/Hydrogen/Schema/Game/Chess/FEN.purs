@@ -31,11 +31,14 @@ import Prelude
   , (>)
   , (+)
   , (<>)
-  , ($)
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Array (index, length, replicate)
+import Data.Array (index, length, replicate, drop)
+import Data.String (split, contains) as Str
+import Data.String.Pattern (Pattern(Pattern))
+import Data.String.CodeUnits (toCharArray, singleton) as StrCU
+import Data.Int (fromString) as Int
 
 import Hydrogen.Schema.Game.Chess.Types
   ( Square
@@ -220,11 +223,11 @@ fenToEnPassant s = case algebraicToSquare s of
 
 -- | Split string into array of single-character strings.
 stringToChars :: String -> Array String
-stringToChars s = splitStringImpl "" s
+stringToChars s = map StrCU.singleton (StrCU.toCharArray s)
 
 -- | Split string by delimiter.
 splitString :: String -> String -> Array String
-splitString delim s = splitStringImpl delim s
+splitString delim s = Str.split (Pattern delim) s
 
 -- | Split FEN string by spaces.
 splitFEN :: String -> Array String
@@ -232,7 +235,7 @@ splitFEN = splitString " "
 
 -- | Parse integer safely.
 parseIntSafe :: String -> Maybe Int
-parseIntSafe s = parseIntImpl s
+parseIntSafe = Int.fromString
 
 -- | Reverse an array.
 reverseArray :: forall a. Array a -> Array a
@@ -245,9 +248,7 @@ reverseHelper arr acc = case index arr 0 of
 
 -- | Drop first element of array.
 dropFirst :: forall a. Array a -> Array a
-dropFirst arr = case length arr of
-  0 -> []
-  _ -> dropFirstImpl arr
+dropFirst = drop 1
 
 -- | Join array with separator.
 joinWith :: String -> Array String -> String
@@ -262,7 +263,7 @@ joinHelper sep arr acc = case index arr 0 of
 
 -- | Check if string contains character.
 containsChar :: String -> String -> Boolean
-containsChar char str = containsCharImpl char str
+containsChar char str = Str.contains (Pattern char) str
 
 -- | Traverse array with Maybe.
 traverseMaybe :: forall a b. (a -> Maybe b) -> Array a -> Maybe (Array b)
@@ -275,18 +276,4 @@ traverseHelper f arr acc = case index arr 0 of
     Just y -> traverseHelper f (dropFirst arr) (acc <> [y])
     Nothing -> Nothing
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                       // ffi
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | FFI: Split string by delimiter.
-foreign import splitStringImpl :: String -> String -> Array String
-
--- | FFI: Parse integer.
-foreign import parseIntImpl :: String -> Maybe Int
-
--- | FFI: Drop first element.
-foreign import dropFirstImpl :: forall a. Array a -> Array a
-
--- | FFI: Check if string contains character.
-foreign import containsCharImpl :: String -> String -> Boolean

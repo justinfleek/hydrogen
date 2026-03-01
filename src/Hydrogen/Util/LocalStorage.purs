@@ -58,8 +58,11 @@ module Hydrogen.Util.LocalStorage
 import Prelude hiding (void)
 
 import Data.Argonaut (class DecodeJson, class EncodeJson, decodeJson, encodeJson, parseJson, stringify)
+import Data.Array (filter) as Array
 import Data.Either (hush)
 import Data.Maybe (Maybe(Just, Nothing), isJust)
+import Data.Traversable (traverse) as Traversable
+import Data.String (take, length) as String
 import Effect (Effect)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -81,23 +84,33 @@ type Namespaced =
 --                                                                       // FFI
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import getItemImpl :: String -> Effect (Maybe String)
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import setItemImpl :: String -> String -> Effect Unit
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import removeItemImpl :: String -> Effect Unit
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import clearImpl :: Effect Unit
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import keysImpl :: Effect (Array String)
 
+-- BROWSER BOUNDARY: localStorage is a Web Storage API for persistent key-value storage.
 foreign import lengthImpl :: Effect Int
 
+-- BROWSER BOUNDARY: window.addEventListener("storage") is Web API for
+-- cross-tab storage change notifications.
 foreign import onChangeImpl 
   :: String 
   -> (Maybe String -> Effect Unit) 
   -> Effect (Effect Unit)
 
+-- BROWSER BOUNDARY: window.addEventListener("storage") is Web API for
+-- cross-tab storage change notifications.
 foreign import onAnyChangeImpl 
   :: (String -> Maybe String -> Effect Unit) 
   -> Effect (Effect Unit)
@@ -206,30 +219,22 @@ clearNamespace prefix = do
   let prefixedKeys = filterPrefix (prefix <> ":") allKeys
   traverse_ removeItem prefixedKeys
   where
-  filterPrefix p arr = filter (startsWith p) arr
+  filterPrefix p arr = Array.filter (startsWith p) arr
   
   startsWith :: String -> String -> Boolean
-  startsWith p str = take (strLength p) str == p
-  
-  filter :: forall a. (a -> Boolean) -> Array a -> Array a
-  filter = filterImpl
+  startsWith p str = String.take (String.length p) str == p
   
   traverse_ :: forall a. (a -> Effect Unit) -> Array a -> Effect Unit
-  traverse_ f arr = void $ traverseImpl f arr
-
-foreign import filterImpl :: forall a. (a -> Boolean) -> Array a -> Array a
-foreign import traverseImpl :: forall a b. (a -> Effect b) -> Array a -> Effect (Array b)
-foreign import take :: Int -> String -> String
-foreign import strLength :: String -> Int
+  traverse_ f arr = void $ Traversable.traverse f arr
 
 -- | Get all keys with a given prefix
 getNamespaceKeys :: String -> Effect (Array String)
 getNamespaceKeys prefix = do
   allKeys <- keysImpl
-  pure $ filterImpl (startsWith (prefix <> ":")) allKeys
+  pure $ Array.filter (startsWith (prefix <> ":")) allKeys
   where
   startsWith :: String -> String -> Boolean
-  startsWith p str = take (strLength p) str == p
+  startsWith p str = String.take (String.length p) str == p
 
 -- | Get a prefixed item with type safety
 getItemPrefixed :: forall a. DecodeJson a => String -> String -> Effect (Maybe a)

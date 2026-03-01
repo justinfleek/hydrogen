@@ -23,14 +23,14 @@ module Hydrogen.Schema.Game.Score.Internal
   ) where
 
 import Prelude
-  ( class Eq
-  , class Show
-  , show
-  , negate
+  ( negate
   , (+)
   , (<)
-  , (<>)
   )
+import Prim (Int, Number, Array, String)
+
+import Data.Int (toNumber, floor) as Int
+import Data.Array (foldl, snoc) as Array
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // bonus // type
@@ -48,17 +48,12 @@ type Bonus =
 
 -- | Convert Int to Number.
 intToNumber :: Int -> Number
-intToNumber n = toNumber n
-  where
-    toNumber :: Int -> Number
-    toNumber = unsafeIntToNumber
+intToNumber = Int.toNumber
 
 -- | Round Number to Int.
+-- | Adds 0.5 then floors to achieve rounding behavior.
 roundToInt :: Number -> Int
-roundToInt n = truncateToInt (n + 0.5)
-  where
-    truncateToInt :: Number -> Int
-    truncateToInt = unsafeNumberToInt
+roundToInt n = Int.floor (n + 0.5)
 
 -- | Absolute value of Int.
 absInt :: Int -> Int
@@ -68,23 +63,10 @@ absInt n = if n < 0 then negate n else n
 --                                                         // array // operations
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Sum all bonus values.
+-- | Sum all bonus values using foldl.
 sumBonuses :: Array Bonus -> Int
-sumBonuses bonuses = foldBonuses bonuses 0
-  where
-    foldBonuses :: Array Bonus -> Int -> Int
-    foldBonuses arr acc = unsafeFoldBonuses arr acc
+sumBonuses bonuses = Array.foldl (\acc b -> acc + b.value) 0 bonuses
 
--- | Append a bonus to array.
+-- | Append a bonus to array using snoc.
 appendBonus :: Array Bonus -> Bonus -> Array Bonus
-appendBonus arr bonus = unsafeAppendBonus arr bonus
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                       // ffi
--- ═════════════════════════════════════════════════════════════════════════════
-
--- Foreign implementations (minimal FFI at serialization boundary)
-foreign import unsafeIntToNumber :: Int -> Number
-foreign import unsafeNumberToInt :: Number -> Int
-foreign import unsafeFoldBonuses :: Array Bonus -> Int -> Int
-foreign import unsafeAppendBonus :: Array Bonus -> Bonus -> Array Bonus
+appendBonus arr bonus = Array.snoc arr bonus

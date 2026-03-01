@@ -88,6 +88,7 @@ import Prelude
   )
 
 import Data.Array (foldl, length, mapWithIndex, index, last)
+import Data.Int (toNumber) as Int
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Hydrogen.Render.Element as E
 import Hydrogen.Element.Compound.Widget.Types
@@ -185,7 +186,7 @@ sparklineStats points =
     maxVal = arrayMax points
     firstVal = fromMaybe 0.0 (index points 0)
     lastVal = fromMaybe 0.0 (last points)
-    avgVal = arraySum points / toNumber (length points)
+    avgVal = arraySum points / Int.toNumber (length points)
     trend = trendDirection firstVal lastVal
   in
     { min: minVal
@@ -218,8 +219,8 @@ sparklineWidget propMods sparkData =
     -- Dimensions
     width = fromMaybe 80 sparkData.width
     height = fromMaybe 24 sparkData.height
-    widthF = toNumber width
-    heightF = toNumber height
+    widthF = Int.toNumber width
+    heightF = Int.toNumber height
     
     -- Color
     lineColor = fromMaybe "#3B82F6" (props.color <|> sparkData.color)
@@ -232,8 +233,8 @@ sparklineWidget propMods sparkData =
     range = if maxVal - minVal == 0.0 then 1.0 else maxVal - minVal
     
     -- Scaling functions
-    step = if numPoints <= 1 then widthF else widthF / toNumber (numPoints - 1)
-    scaleX idx = toNumber idx * step
+    step = if numPoints <= 1 then widthF else widthF / Int.toNumber (numPoints - 1)
+    scaleX idx = Int.toNumber idx * step
     scaleY val = heightF - ((val - minVal) / range * heightF)
     
     -- Generate path
@@ -327,8 +328,8 @@ sparklineBar propMods sparkData =
     -- Dimensions
     width = fromMaybe 80 sparkData.width
     height = fromMaybe 24 sparkData.height
-    widthF = toNumber width
-    heightF = toNumber height
+    widthF = Int.toNumber width
+    heightF = Int.toNumber height
     
     -- Color
     barColor = fromMaybe "#3B82F6" (props.color <|> sparkData.color)
@@ -342,7 +343,7 @@ sparklineBar propMods sparkData =
     
     -- Bar dimensions
     gap = 1.0
-    barWidth = if numPoints <= 0 then widthF else (widthF - gap * toNumber (numPoints - 1)) / toNumber numPoints
+    barWidth = if numPoints <= 0 then widthF else (widthF - gap * Int.toNumber (numPoints - 1)) / Int.toNumber numPoints
     
     viewBox = "0 0 " <> show width <> " " <> show height
     
@@ -360,7 +361,7 @@ sparklineBar propMods sparkData =
           (mapWithIndex (\idx val ->
             let
               barHeight = (val - minVal) / range * heightF
-              x = toNumber idx * (barWidth + gap)
+              x = Int.toNumber idx * (barWidth + gap)
               y = heightF - barHeight
             in
               E.rect_
@@ -420,9 +421,6 @@ arrayMax arr = case index arr 0 of
 -- | Sum array values.
 arraySum :: Array Number -> Number
 arraySum arr = foldl (\acc n -> acc + n) 0.0 arr
-
--- | Convert Int to Number.
-foreign import toNumber :: Int -> Number
 
 -- | Maybe alternative operator.
 infixl 3 alt as <|>

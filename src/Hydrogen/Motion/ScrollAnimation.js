@@ -2,15 +2,34 @@
 //                                                 // hydrogen // scroll-animation
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// Scroll-triggered animations using Intersection Observer
+// BROWSER BOUNDARY: Scroll-triggered animations using Intersection Observer
+//
+// This entire file is browser boundary code:
+// - IntersectionObserver for viewport detection
+// - scroll event listeners
+// - window.scrollY, window.innerHeight, window.scrollTo
+// - element.getBoundingClientRect()
+// - element.scrollIntoView()
+// - requestAnimationFrame for scroll progress
+// - DOM classList manipulation
+//
+// All scroll state, viewport state, and animation computation is pure in PureScript:
+// - Hydrogen.Motion.ScrollAnimation.ScrollState
+// - Hydrogen.Motion.ScrollAnimation.ViewportState
+// - Hydrogen.Motion.ScrollAnimation.scrollDirection
+// - Hydrogen.Motion.ScrollAnimation.scrollProgress
+// - Hydrogen.Motion.ScrollAnimation.computeProgress
+// - Hydrogen.Motion.ScrollAnimation.computeAnimationState
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                           // viewport trigger
+//                                         // browser boundary // viewport trigger
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: DOM classList manipulation
 const addClass = (el, cls) => { el.classList.add(cls); };
 const removeClass = (el, cls) => { el.classList.remove(cls); };
 
+// BROWSER BOUNDARY: IntersectionObserver for viewport enter detection
 export const onEnterViewportImpl = (element) => (config) => () => {
   let hasAnimated = false;
   
@@ -80,6 +99,7 @@ export const onEnterViewportImpl = (element) => (config) => () => {
   };
 };
 
+// BROWSER BOUNDARY: IntersectionObserver for viewport exit detection
 export const onExitViewportImpl = (element) => (config) => () => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -105,6 +125,7 @@ export const onExitViewportImpl = (element) => (config) => () => {
   };
 };
 
+// BROWSER BOUNDARY: IntersectionObserver for viewport intersection ratio changes
 export const onViewportChangeImpl = (element) => (config) => () => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -129,9 +150,12 @@ export const onViewportChangeImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                          // progress animation
+//                                        // browser boundary // progress animation
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: scroll event listener, getBoundingClientRect, requestAnimationFrame
+// Progress calculation logic is duplicated here for performance but exists in pure form:
+// Hydrogen.Motion.ScrollAnimation.computeProgress
 export const onScrollProgressImpl = (element) => (config) => () => {
   let ticking = false;
   
@@ -187,12 +211,15 @@ export const onScrollProgressImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                            // scroll direction
-// ═══════════════════════════════════════════════════════════════════════════════
+//                                          // browser boundary // scroll direction
+// ══════════════════════════���════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Mutable state for direction tracking
 let lastScrollY = 0;
 let currentDirection = "none";
 
+// BROWSER BOUNDARY: scroll event listener, window.scrollY
+// Direction detection logic exists in pure form: Hydrogen.Motion.ScrollAnimation.detectDirection
 export const onScrollDirectionImpl = (config) => () => {
   const onScroll = () => {
     const currentScrollY = window.scrollY;
@@ -219,14 +246,16 @@ export const onScrollDirectionImpl = (config) => () => {
   };
 };
 
+// BROWSER BOUNDARY: Reads mutable scroll direction state
 export const getScrollDirectionImpl = () => {
   return currentDirection;
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                               // smooth scroll
+//                                             // browser boundary // smooth scroll
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: element.scrollIntoView()
 export const scrollToElementImpl = (element) => (options) => () => {
   element.scrollIntoView({
     behavior: options.behavior,
@@ -235,6 +264,7 @@ export const scrollToElementImpl = (element) => (options) => () => {
   });
 };
 
+// BROWSER BOUNDARY: window.scrollTo()
 export const scrollToTopImpl = (behavior) => () => {
   window.scrollTo({
     top: 0,
@@ -243,6 +273,7 @@ export const scrollToTopImpl = (behavior) => () => {
   });
 };
 
+// BROWSER BOUNDARY: window.scrollTo()
 export const scrollToPositionImpl = (position) => (behavior) => () => {
   window.scrollTo({
     top: position.y,
@@ -252,15 +283,17 @@ export const scrollToPositionImpl = (position) => (behavior) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                         // observer management
+//                                       // browser boundary // observer management
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: IntersectionObserver/scroll listener management
 export const disconnectObserver = (scrollObserver) => () => {
   if (scrollObserver && scrollObserver.disconnect) {
     scrollObserver.disconnect();
   }
 };
 
+// BROWSER BOUNDARY: IntersectionObserver/scroll listener reconnection
 export const reconnectObserver = (scrollObserver) => () => {
   if (scrollObserver && scrollObserver.reconnect) {
     scrollObserver.reconnect();

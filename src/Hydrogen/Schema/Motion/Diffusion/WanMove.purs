@@ -30,6 +30,15 @@
 -- | - Max points: 10000 per trajectory
 -- | - Max frames: 10000 per export
 -- | - Max FPS: 120
+-- |
+-- | ## Architecture Note
+-- |
+-- | This module exceeds the standard 500-line limit due to schema coherence.
+-- | All 9 enum types (FlowPattern, MorphShapeType, MorphEasing, ShapeEasing,
+-- | AttractorType, DataMapping, ForceFalloff, InitialDistribution, ShapeType)
+-- | plus trajectory structures form a single export format that mirrors
+-- | `Lattice.Schemas.Exports.WanMoveSchema`. Splitting would fragment a
+-- | cohesive API that agents need to use as a unit.
 
 module Hydrogen.Schema.Motion.Diffusion.WanMove
   ( -- * Flow Patterns

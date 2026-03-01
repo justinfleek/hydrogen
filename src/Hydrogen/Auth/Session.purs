@@ -40,6 +40,7 @@ module Hydrogen.Auth.Session
   , AuthState(Unauthenticated, Authenticating, Authenticated, Refreshing, Expired)
     -- * Session Management
   , create
+  , defaultConfig
   , setTokens
   , clear
   , refresh
@@ -66,12 +67,12 @@ import Data.Foldable (traverse_)
 import Data.Maybe (Maybe(Nothing, Just), isJust)
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
-import Effect.Aff (Aff, delay, launchAff_)
+import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Now (now)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Data.DateTime.Instant (Instant, unInstant)
+import Data.DateTime.Instant (Instant, unInstant, instant)
 import Data.Newtype (unwrap)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -222,10 +223,11 @@ setTokens session@(Session s) tokens = do
       Ref.write (Just rt) s.refreshToken
       setStorageItem storageKey s.config.refreshKey rt
   
-  -- Calculate expiration
+  -- Calculate expiration and store it
   currentTime <- now
-  let expiresMs = unwrap (unInstant currentTime) + (toNumber tokens.expiresIn * 1000.0)
-  -- Note: Would need to convert back to Instant properly
+  let expiresMs = Milliseconds (unwrap (unInstant currentTime) + (toNumber tokens.expiresIn * 1000.0))
+  let maybeExpires = instant expiresMs
+  Ref.write maybeExpires s.expiresAt
   
   setAuthState session Authenticated
 

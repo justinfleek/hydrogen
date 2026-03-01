@@ -20,8 +20,8 @@ module Hydrogen.Element.Compound.Widget.Table.Helpers
   , formatNumber
   
   -- * Conversions
-  , toNumber
-  , mod
+  , module IntReExport
+  , module PreludeReExport
   ) where
 
 import Prelude
@@ -32,6 +32,8 @@ import Prelude
   , (-)
   )
 
+import Prelude (mod) as PreludeReExport
+import Data.Int (toNumber) as IntReExport
 import Data.Array (foldl)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -59,12 +61,4 @@ arrayMax arr = foldl max' (negate (1.0 / 0.0)) arr
 formatNumber :: Number -> String
 formatNumber n = show n
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                // conversions
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert Int to Number.
-foreign import toNumber :: Int -> Number
-
--- | Integer modulo.
-foreign import mod :: Int -> Int -> Int

@@ -77,6 +77,8 @@ import Prelude
   , (>=)
   )
 
+import Data.Number (pow) as Number
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // grade type
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -174,7 +176,7 @@ zero = Grade 0.0
 -- | This is the smallest ε such that 1.0 + ε > 1.0 in double precision.
 -- | It represents the inherent quantization of floating-point arithmetic.
 machineEpsilon :: Grade
-machineEpsilon = Grade (pow 2.0 (-53.0))
+machineEpsilon = Grade (Number.pow 2.0 (-53.0))
 
 -- | Olver's epsilon for relative precision analysis.
 -- |
@@ -187,7 +189,7 @@ machineEpsilon = Grade (pow 2.0 (-53.0))
 -- | Reference: Olver, F. W. J. "A New Approach to Error Arithmetic"
 olverEpsilon :: Grade
 olverEpsilon =
-  let u = pow 2.0 (-53.0)
+  let u = Number.pow 2.0 (-53.0)
   in Grade (u / (1.0 - u))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -231,11 +233,4 @@ isZero (Grade x) = x == 0.0
 isExact :: Grade -> Boolean
 isExact = isZero
 
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                      // helpers
--- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Power function for Number.
--- |
--- | Used to compute machine epsilon as 2^(-53).
-foreign import pow :: Number -> Number -> Number

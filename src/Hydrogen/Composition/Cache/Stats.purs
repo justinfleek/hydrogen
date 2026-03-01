@@ -22,8 +22,6 @@ module Hydrogen.Composition.Cache.Stats
   -- * Debugging
   , showCacheStats
   
-  -- * FFI
-  , toNumberImpl
   ) where
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -40,20 +38,13 @@ import Prelude
   , (<>)
   )
 
+import Data.Int (toNumber)
+
 import Hydrogen.Composition.Cache.Types 
   ( CacheStats
   , CacheConfig
   , CompositionCache
   )
-
--- ═══════════════════════════════════════════════════════════════════════════════
---                                                                          // ffi
--- ═══════════════════════════════════════════════════════════════════════════════
-
--- | Convert Int to Number.
--- |
--- | Foreign implementation for Int -> Number conversion.
-foreign import toNumberImpl :: Int -> Number
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                            // rate calculations
@@ -69,9 +60,6 @@ hitRate stats =
   in if total == 0 
      then 0.0 
      else toNumber stats.hits / toNumber total
-  where
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
 
 -- | Calculate miss rate (0.0 to 1.0).
 -- |
@@ -83,9 +71,6 @@ missRate stats =
   in if total == 0 
      then 0.0 
      else toNumber stats.misses / toNumber total
-  where
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
 
 -- | Calculate eviction rate (evictions per access).
 -- |
@@ -97,9 +82,6 @@ evictionRate stats =
   in if total == 0 
      then 0.0 
      else toNumber stats.evictions / toNumber total
-  where
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                             // memory metrics
@@ -116,9 +98,6 @@ memoryUtilization cache =
                + cache.config.l2.maxSizeBytes
       currentBytes = cache.stats.totalSizeBytes
   in toNumber currentBytes / toNumber maxBytes
-  where
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // debugging

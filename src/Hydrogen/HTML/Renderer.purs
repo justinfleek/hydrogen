@@ -29,7 +29,6 @@ module Hydrogen.HTML.Renderer
 
 import Prelude
   ( Void
-  , otherwise
   , map
   , ($)
   , (#)
@@ -38,6 +37,8 @@ import Prelude
   , (&&)
   , (==)
   )
+
+import Unsafe.Coerce (unsafeCoerce)
 
 import Data.Array as Array
 import Data.Foldable (foldMap)
@@ -138,11 +139,18 @@ isSelfClosing = case _ of
   _ -> false
 
 -- | Render props (attributes/properties) to a string.
--- | This uses unsafe coercion because props is an opaque Array (Prop i)
+-- | This uses unsafe coercion because props is an opaque Array (Prop i).
+-- | The VDom always passes props as Array (Prop i), so coercion to
+-- | Array (Prop Void) is safe for static rendering (handlers are ignored).
 renderPropsUnsafe :: forall a. a -> String
 renderPropsUnsafe props = renderPropArray (unsafeToProps props)
-
-foreign import unsafeToProps :: forall a. a -> Array (Prop Void)
+  where
+  -- | Coerce props to Array (Prop Void) for rendering.
+  -- | Safe because: (1) VDom guarantees Array (Prop i) structure,
+  -- | (2) We only extract Attribute/Property string data,
+  -- | (3) Handler and Ref constructors are ignored (return Nothing).
+  unsafeToProps :: forall x. x -> Array (Prop Void)
+  unsafeToProps = unsafeCoerce
 
 renderPropArray :: Array (Prop Void) -> String
 renderPropArray = Array.mapMaybe renderProp >>> String.joinWith " "

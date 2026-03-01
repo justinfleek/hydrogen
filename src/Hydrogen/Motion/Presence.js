@@ -2,25 +2,39 @@
 //                                                       // hydrogen // presence
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// Enter/exit animations for components
+// BROWSER BOUNDARY: Enter/exit animations for components
+//
+// This entire file is browser boundary code:
+// - MutationObserver for DOM changes
+// - requestAnimationFrame for animation timing
+// - CSS transition event listeners
+// - DOM element style manipulation
+// - WeakMap for element state tracking
+//
+// All presence state and variant logic is pure data in PureScript:
+// - Hydrogen.Motion.Presence.PresenceState
+// - Hydrogen.Motion.Presence.Variant
+// - Hydrogen.Motion.Presence.interpolate
+// - Hydrogen.Motion.Presence.variantToRecord
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                             // presence state
+//                                           // browser boundary // presence state
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Track presence state for elements
+// BROWSER BOUNDARY: WeakMap for tracking DOM element state
 const presenceStates = new WeakMap();
 
+// BROWSER BOUNDARY: Reads mutable state from WeakMap
 export const usePresenceImpl = (element) => () => {
   const state = presenceStates.get(element) || { state: "present", isPresent: true };
   return state;
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                            // animate presence
+//                                          // browser boundary // animate presence
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Initialize AnimatePresence containers
+// BROWSER BOUNDARY: DOM queries, MutationObserver, event listeners
 const initAnimatePresence = () => {
   const containers = document.querySelectorAll("[data-animate-presence]");
   
@@ -62,7 +76,7 @@ const initAnimatePresence = () => {
   }
 };
 
-// Handle element entering
+// BROWSER BOUNDARY: DOM style manipulation, requestAnimationFrame, transitionend events
 const handleEnter = (element, animate, mode) => {
   if (!animate) {
     presenceStates.set(element, { state: "present", isPresent: true });
@@ -103,7 +117,7 @@ const handleEnter = (element, animate, mode) => {
   });
 };
 
-// Handle element exiting
+// BROWSER BOUNDARY: DOM cloning, getBoundingClientRect, style manipulation
 const handleExit = (element, mode, container) => {
   const exitVariant = parseVariant(element.getAttribute("data-motion-exit"));
   
@@ -149,9 +163,11 @@ const handleExit = (element, mode, container) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                    // variants
+//                                              // browser boundary // css variants
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: JSON parsing from DOM data attributes
+// Pure variant logic is in PureScript: Hydrogen.Motion.Presence.Variant
 const parseVariant = (str) => {
   if (!str) return {};
   try {
@@ -161,6 +177,7 @@ const parseVariant = (str) => {
   }
 };
 
+// BROWSER BOUNDARY: Direct DOM style manipulation
 const applyVariant = (element, variant) => {
   if (variant.opacity !== undefined) {
     element.style.opacity = variant.opacity;
@@ -191,6 +208,7 @@ const applyVariant = (element, variant) => {
   }
 };
 
+// BROWSER BOUNDARY: CSS transition string building for DOM
 const buildTransition = (variant) => {
   const duration = variant.duration || 300;
   const delay = variant.delay || 0;
@@ -210,15 +228,7 @@ const buildTransition = (variant) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                   // utilities
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export const filterImpl = (pred) => (arr) => arr.filter(pred);
-
-export const intercalateImpl = (sep) => (arr) => arr.join(sep);
-
-// ═══════════════════════════════════════════════════════════════════════════════
-//                                                              // initialization
+//                                            // browser boundary // initialization
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Auto-initialize when DOM is ready

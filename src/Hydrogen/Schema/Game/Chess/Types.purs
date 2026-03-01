@@ -59,11 +59,13 @@ import Prelude
   , class Show
   , show
   , bind
+  , map
   , (==)
   , (<>)
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.String.CodeUnits (toCharArray, singleton) as StrCU
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // file
@@ -245,7 +247,7 @@ charToRank _   = Nothing
 
 -- | Split string into array of single-character strings.
 stringToChars :: String -> Array String
-stringToChars s = splitStringImpl "" s
+stringToChars s = map StrCU.singleton (StrCU.toCharArray s)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // color
@@ -366,9 +368,4 @@ type ChessState =
   , fullmoveNumber  :: Int
   }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                       // ffi
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | FFI: Split string by delimiter.
-foreign import splitStringImpl :: String -> String -> Array String

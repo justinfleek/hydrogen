@@ -330,8 +330,14 @@ export const initHoverEffectsImpl = (containerId) => () => {
 //                                                                  // utilities
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// NOTE: findSliceAtAngle, normalizeAngle, angleInRange, computeSliceAngles,
+// and computePercentages are now pure PureScript implementations in
+// Hydrogen.Chart.PieChart (no FFI required).
+
 /**
  * Calculate slice angle from mouse position
+ * BROWSER BOUNDARY: Requires getBoundingClientRect() for center calculation.
+ * The atan2 calculation itself is pure, but getting the center requires DOM.
  * @param {string} containerId - Container element ID
  * @param {number} mouseX - Mouse X position
  * @param {number} mouseY - Mouse Y position
@@ -349,32 +355,4 @@ export const getAngleFromMouseImpl = (containerId) => (mouseX) => (mouseY) => ()
   const centerY = rect.top + rect.height / 2;
 
   return Math.atan2(mouseY - centerY, mouseX - centerX);
-};
-
-/**
- * Find slice at angle
- * @param {Array<{startAngle: number, endAngle: number}>} slices - Slice angle data
- * @param {number} angle - Angle to check
- * @returns {number} - Slice index or -1
- */
-export const findSliceAtAngleImpl = (slices) => (angle) => () => {
-  // Normalize angle to [0, 2π)
-  let normalizedAngle = angle;
-  while (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
-  while (normalizedAngle >= Math.PI * 2) normalizedAngle -= Math.PI * 2;
-
-  for (let i = 0; i < slices.length; i++) {
-    let start = slices[i].startAngle;
-    let end = slices[i].endAngle;
-    
-    // Normalize angles
-    while (start < 0) start += Math.PI * 2;
-    while (end < 0) end += Math.PI * 2;
-    
-    if (normalizedAngle >= start && normalizedAngle < end) {
-      return i;
-    }
-  }
-  
-  return -1;
 };

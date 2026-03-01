@@ -24,8 +24,9 @@ import Prelude
   )
 import Prim (Boolean, Int, Number, Array, String)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Array (length, filter, sortBy, take, head, reverse, index, null, drop)
+import Data.Array (length, filter, sortBy, take, head, reverse, index, null, drop, snoc)
 import Data.Ord (comparing)
+import Data.Int (toNumber) as Int
 import Hydrogen.Schema.Game.Card
   ( Suit(Clubs, Diamonds, Hearts, Spades)
   , Rank(Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace)
@@ -403,8 +404,9 @@ strength hi lo suited paired
   | otherwise = 100 + (14 - hi) * 6 + (hi - lo) * 2
 
 -- ═══════════════════════════════════════════════════════════════════════════════
---                                                              // ffi // helpers
+--                                                              // numeric // helpers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-foreign import snoc :: forall a. Array a -> a -> Array a
-foreign import toNumber :: Int -> Number
+-- | Convert Int to Number for odds calculations.
+toNumber :: Int -> Number
+toNumber = Int.toNumber

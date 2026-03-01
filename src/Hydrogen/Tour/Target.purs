@@ -91,6 +91,7 @@ import Prelude
 
 import Data.Array (filter, foldl, head, length)
 import Data.Generic.Rep (class Generic)
+import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Show.Generic (genericShow)
 import Data.String (joinWith)
@@ -531,9 +532,4 @@ computeMultiTargetRect layout rects = case layout of
 multiTargetBounds :: Pixel -> Array TargetRect -> TargetRect
 multiTargetBounds padding rects = rectExpand padding (rectsUnion rects)
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // helpers
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert Int to Number
-foreign import toNumber :: Int -> Number

@@ -116,7 +116,9 @@ import Prelude
   )
 
 import Data.Array (foldl, index, length, mapWithIndex)
+import Data.Int (toNumber, trunc) as Int
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.String.CodeUnits (length) as StrCU
 import Hydrogen.Render.Element as E
 import Hydrogen.Element.Compound.Widget.Types
   ( ChangeDirection(ChangeUp, ChangeDown, ChangeFlat)
@@ -321,23 +323,16 @@ formatNumber n places =
     else 
       let 
         intPart = truncateToInt n
-        fracPart = n - toNumber intPart
+        fracPart = n - Int.toNumber intPart
         multiplier = pow10 places
         fracInt = truncateToInt (fracPart * multiplier)
       in show intPart <> "." <> padLeft places (show fracInt)
 
 -- | Truncate a number to integer (toward zero).
+-- |
+-- | Uses Data.Int.trunc which handles both positive and negative numbers.
 truncateToInt :: Number -> Int
-truncateToInt n = 
-  if n >= 0.0 
-    then truncatePositive n
-    else negate (truncatePositive (negate n))
-
--- | Truncate positive number to int.
-foreign import truncatePositive :: Number -> Int
-
--- | Convert Int to Number.
-foreign import toNumber :: Int -> Number
+truncateToInt = Int.trunc
 
 -- | Power of 10.
 pow10 :: Int -> Number
@@ -353,12 +348,9 @@ padLeft target str = padLeft' target str
   where
     padLeft' :: Int -> String -> String
     padLeft' n s = 
-      if stringLength s >= n
+      if StrCU.length s >= n
         then s
         else padLeft' n ("0" <> s)
-
--- | String length (simple implementation).
-foreign import stringLength :: String -> Int
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
@@ -544,11 +536,11 @@ renderSparklineSvg points =
 generateSparklinePath :: Array Number -> Number -> Number -> Number -> Number -> Int -> String
 generateSparklinePath points width height minVal range numPoints =
   let
-    step = if numPoints <= 1 then width else width / toNumber (numPoints - 1)
+    step = if numPoints <= 1 then width else width / Int.toNumber (numPoints - 1)
     
     pointToCoord :: Int -> Number -> { x :: Number, y :: Number }
     pointToCoord idx val =
-      { x: toNumber idx * step
+      { x: Int.toNumber idx * step
       , y: height - ((val - minVal) / range * height)
       }
     

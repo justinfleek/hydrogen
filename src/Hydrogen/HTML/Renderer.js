@@ -1,17 +1,11 @@
 // FFI for Hydrogen.HTML.Renderer
+//
+// PropValue is a foreign data type in Halogen (see Halogen.VDom.DOM.Prop).
+// It holds JavaScript primitives (string, boolean, number) at runtime.
+// This FFI inspects the runtime type to convert to a string representation.
 
-// Props are passed as an Array of Prop values, which we can inspect at runtime
-export const unsafeToProps = (props) => {
-  // If props is undefined or null, return empty array
-  if (props == null) return [];
-  // If it's already an array, return it
-  if (Array.isArray(props)) return props;
-  // Otherwise return empty
-  return [];
-};
-
-// Convert a PropValue to a string representation
-// PropValue is an opaque type that can be string, boolean, number, etc.
+// Convert a PropValue to a string representation.
+// PropValue is an opaque foreign type that can be string, boolean, number, etc.
 export const propValueToString = (value) => {
   if (value === null || value === undefined) {
     return "";

@@ -46,8 +46,12 @@ module Hydrogen.Tour.Storage
 
 import Prelude
 
-import Data.Maybe (Maybe(Just, Nothing), isJust, isNothing)
+import Data.DateTime.Instant (unInstant)
+import Data.Int (toNumber)
+import Data.Maybe (Maybe(Just, Nothing), isJust)
+import Data.Newtype (unwrap)
 import Effect (Effect)
+import Effect.Now (now)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), TourId(TourId))
 import Hydrogen.Util.LocalStorage as LS
 
@@ -110,8 +114,8 @@ isSnoozed tourId = do
   case maybeUntil of
     Nothing -> pure false
     Just until -> do
-      now <- currentTimeMs
-      if now < until
+      nowMs <- currentTimeMs
+      if nowMs < until
         then pure true
         else do
           -- Snooze expired, clear it
@@ -127,24 +131,24 @@ isSnoozed tourId = do
 -- | This prevents the tour from being shown again (until cleared).
 markCompleted :: TourId -> Effect Unit
 markCompleted tourId = do
-  now <- currentTimeMs
-  LS.setItemRaw (completedKey tourId) (show now)
+  nowMs <- currentTimeMs
+  LS.setItemRaw (completedKey tourId) (show nowMs)
 
 -- | Mark a tour as dismissed
 -- |
 -- | For persistent "don't show again" functionality.
 markDismissed :: TourId -> Effect Unit
 markDismissed tourId = do
-  now <- currentTimeMs
-  LS.setItemRaw (dismissedKey tourId) (show now)
+  nowMs <- currentTimeMs
+  LS.setItemRaw (dismissedKey tourId) (show nowMs)
 
 -- | Snooze a tour for a duration
 -- |
 -- | The tour will not be shown until the snooze expires.
 snooze :: TourId -> Milliseconds -> Effect Unit
 snooze tourId (Milliseconds duration) = do
-  now <- currentTimeMs
-  let expiresAt = now + toNumber duration
+  nowMs <- currentTimeMs
+  let expiresAt = nowMs + toNumber duration
   LS.setItem (snoozeKey tourId) expiresAt
 
 -- | Clear an active snooze
@@ -165,11 +169,11 @@ clearTourState tourId = do
 --                                                                    // helpers
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Get current time in milliseconds
-foreign import currentTimeMs :: Effect Number
-
--- | Convert Int to Number
-toNumber :: Int -> Number
-toNumber = toNumberImpl
-
-foreign import toNumberImpl :: Int -> Number
+-- | Get current time in milliseconds since epoch
+-- |
+-- | Uses Effect.Now.now to get the current Instant, then extracts
+-- | the milliseconds value as a Number.
+currentTimeMs :: Effect Number
+currentTimeMs = do
+  instant <- now
+  pure $ unwrap $ unInstant instant

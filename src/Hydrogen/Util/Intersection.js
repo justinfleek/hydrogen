@@ -82,15 +82,4 @@ export const observeOnceImpl = (element) => (config) => (callback) => () => {
   };
 };
 
-// Simple boolean reference for tracking state
-export const newBoolRef = (initial) => () => {
-  return { value: initial };
-};
-
-export const readBoolRef = (ref) => () => {
-  return ref.value;
-};
-
-export const writeBoolRef = (ref) => (value) => () => {
-  ref.value = value;
-};
+// Note: BoolRef FFI removed - now using pure PureScript Effect.Ref

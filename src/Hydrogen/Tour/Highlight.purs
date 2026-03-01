@@ -92,7 +92,9 @@ module Hydrogen.Tour.Highlight
 
 import Prelude
 
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
+import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Show.Generic (genericShow)
 import Data.String (joinWith)
@@ -518,11 +520,6 @@ cutoutToSvgPath cutout = intercalate " " (map commandToSvg cutout.commands)
   
   intercalate :: String -> Array String -> String
   intercalate sep arr = foldl (\acc s -> if acc == "" then s else acc <> sep <> s) "" arr
-  
-  foldl :: forall a b. (b -> a -> b) -> b -> Array a -> b
-  foldl = foldlImpl
-  
-foreign import foldlImpl :: forall a b. (b -> a -> b) -> b -> Array a -> b
 
 -- | Convert cutout to CSS clip-path
 cutoutToClipPath :: CutoutPath -> String
@@ -613,9 +610,4 @@ pointerEventsFromMode = case _ of
   AllowOnTarget -> { overlay: "auto", target: "auto" }
   DismissOnClick -> { overlay: "auto", target: "auto" }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // helpers
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert Int to Number
-foreign import toNumber :: Int -> Number

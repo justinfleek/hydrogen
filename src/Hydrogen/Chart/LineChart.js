@@ -146,68 +146,9 @@ export const initCrosshairImpl = (containerId) => (padding) => (onMove) => () =>
 //                                                           // nearest point
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * Find nearest data point to cursor
- * @param {Array<{x: number, y: number}>} points - Data points in SVG coordinates
- * @param {number} cursorX - Cursor X in SVG coordinates
- * @param {number} cursorY - Cursor Y in SVG coordinates
- * @returns {{index: number, distance: number, point: {x: number, y: number}}}
- */
-export const findNearestPointImpl = (points) => (cursorX) => (cursorY) => () => {
-  if (points.length === 0) {
-    return { index: -1, distance: Infinity, point: { x: 0, y: 0 } };
-  }
-
-  let nearestIndex = 0;
-  let minDistance = Infinity;
-
-  points.forEach((point, index) => {
-    const dx = point.x - cursorX;
-    const dy = point.y - cursorY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestIndex = index;
-    }
-  });
-
-  return {
-    index: nearestIndex,
-    distance: minDistance,
-    point: points[nearestIndex]
-  };
-};
-
-/**
- * Find nearest point on X axis only (for vertical line hover)
- * @param {Array<{x: number, y: number}>} points - Data points in SVG coordinates
- * @param {number} cursorX - Cursor X in SVG coordinates
- * @returns {{index: number, distance: number, point: {x: number, y: number}}}
- */
-export const findNearestPointXImpl = (points) => (cursorX) => () => {
-  if (points.length === 0) {
-    return { index: -1, distance: Infinity, point: { x: 0, y: 0 } };
-  }
-
-  let nearestIndex = 0;
-  let minDistance = Infinity;
-
-  points.forEach((point, index) => {
-    const distance = Math.abs(point.x - cursorX);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestIndex = index;
-    }
-  });
-
-  return {
-    index: nearestIndex,
-    distance: minDistance,
-    point: points[nearestIndex]
-  };
-};
+// NOTE: findNearestPoint and findNearestPointX are now pure PureScript
+// implementations in Hydrogen.Chart.LineChart (no FFI required).
+// See: distanceEuclidean, distanceX, findNearestPoint, findNearestPointX
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //                                                                    // tooltips

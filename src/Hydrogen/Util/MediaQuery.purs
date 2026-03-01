@@ -67,8 +67,12 @@ import Effect (Effect)
 --                                                                       // FFI
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- BROWSER BOUNDARY: window.matchMedia is CSSOM API for evaluating CSS media queries
+-- against the current viewport/device state.
 foreign import matchMediaImpl :: String -> Effect Boolean
 
+-- BROWSER BOUNDARY: MediaQueryList.addEventListener("change") is CSSOM API for
+-- listening to media query state changes (e.g., viewport resize, orientation change).
 foreign import onMediaChangeImpl 
   :: String 
   -> (Boolean -> Effect Unit) 

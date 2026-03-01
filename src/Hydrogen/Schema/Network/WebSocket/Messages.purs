@@ -29,6 +29,7 @@ import Prelude
   , (<>)
   )
 
+import Data.String.CodeUnits (length) as String
 import Hydrogen.Schema.Network.WebSocket.Types (Bytes, bytesLength)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -45,7 +46,7 @@ data WebSocketMessage
 derive instance eqWebSocketMessage :: Eq WebSocketMessage
 
 instance showWebSocketMessage :: Show WebSocketMessage where
-  show (TextMessage t) = "TextMessage(" <> show (stringLength t) <> " chars)"
+  show (TextMessage t) = "TextMessage(" <> show (String.length t) <> " chars)"
   show (BinaryMessage b) = "BinaryMessage(" <> show (bytesLength b) <> " bytes)"
 
 -- | Create a text message.
@@ -58,7 +59,7 @@ binaryMessage = BinaryMessage
 
 -- | Get approximate message size in bytes.
 messageSize :: WebSocketMessage -> Int
-messageSize (TextMessage t) = stringLength t  -- Approximation (UTF-8 varies)
+messageSize (TextMessage t) = String.length t  -- Approximation (UTF-8 varies)
 messageSize (BinaryMessage b) = bytesLength b
 
 -- | Is this a text message?
@@ -70,6 +71,3 @@ isTextMessage _ = false
 isBinaryMessage :: WebSocketMessage -> Boolean
 isBinaryMessage (BinaryMessage _) = true
 isBinaryMessage _ = false
-
--- | Get the length of a string.
-foreign import stringLength :: String -> Int

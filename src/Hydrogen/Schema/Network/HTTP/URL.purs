@@ -28,7 +28,7 @@ import Prelude
   , (<>)
   )
 
-import Data.Array (find) as Array
+import Data.Array (drop, find) as Array
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (Tuple(Tuple))
 
@@ -93,6 +93,4 @@ urlWithQuery (URL base) params =
     Just h -> foldlArray f (f acc h) (dropFirst xs)
   
   dropFirst :: forall a. Array a -> Array a
-  dropFirst xs = dropFirstImpl xs
-  
-foreign import dropFirstImpl :: forall a. Array a -> Array a
+  dropFirst xs = Array.drop 1 xs

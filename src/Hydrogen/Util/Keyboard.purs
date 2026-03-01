@@ -136,6 +136,8 @@ type ShortcutInfo =
 --                                                                       // FFI
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- BROWSER BOUNDARY: document.addEventListener("keydown") is DOM event API
+-- for capturing keyboard events globally.
 foreign import registerShortcutImpl
   :: { key :: String
      , ctrl :: Boolean
@@ -149,27 +151,38 @@ foreign import registerShortcutImpl
   -> Effect Unit
   -> Effect (Effect Unit)
 
+-- BROWSER BOUNDARY: document.addEventListener("keydown") with setTimeout
+-- for sequence tracking requires DOM event and timer APIs.
 foreign import registerSequenceImpl
   :: Array String
   -> Int  -- timeout
   -> Effect Unit
   -> Effect (Effect Unit)
 
+-- BROWSER BOUNDARY: document.activeElement is DOM API for detecting focus state.
 foreign import isInputFocusedImpl :: Effect Boolean
 
+-- BROWSER BOUNDARY: navigator.platform is Web API for platform detection.
 foreign import isMacPlatformImpl :: Effect Boolean
 
--- Global scope storage
+-- BROWSER BOUNDARY: Global registry maintained in JavaScript for shortcut help.
+-- This could be pure PureScript with a Ref, but kept in JS for consistency
+-- with the shortcut registration lifecycle.
 foreign import addToShortcutRegistry
   :: { key :: String, scope :: String, description :: String }
   -> Effect Unit
 
+-- BROWSER BOUNDARY: Returns the global shortcut registry from JavaScript.
 foreign import getShortcutRegistry
   :: Effect (Array { key :: String, scope :: String, description :: String })
 
+-- BROWSER BOUNDARY: Clears the global shortcut registry in JavaScript.
 foreign import clearShortcutRegistry :: Effect Unit
 
--- Scope management
+-- Note: activeScopesRef uses JavaScript singleton pattern for global state.
+-- This is necessary because PureScript cannot have module-level mutable state
+-- without unsafePerformEffect. The JS implementation ensures a single Ref
+-- instance is shared across all module usages.
 foreign import activeScopesRef :: Effect (Ref (Array String))
 
 -- ═════════════════════════════════════════════════════════════════════════════

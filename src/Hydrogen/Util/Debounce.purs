@@ -76,6 +76,8 @@ type Cancellable a =
 --                                                                       // FFI
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- BROWSER BOUNDARY: setTimeout/clearTimeout/Date.now() are timer APIs
+-- that require JavaScript runtime for proper async scheduling behavior.
 foreign import debounceImpl
   :: forall a
    . Number
@@ -84,6 +86,8 @@ foreign import debounceImpl
   -> (a -> Effect Unit)
   -> Effect { call :: a -> Effect Unit, cancel :: Effect Unit, flush :: Effect Unit }
 
+-- BROWSER BOUNDARY: setTimeout/clearTimeout/Date.now() are timer APIs
+-- that require JavaScript runtime for proper async scheduling behavior.
 foreign import throttleImpl
   :: forall a
    . Number

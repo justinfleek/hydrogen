@@ -36,6 +36,7 @@ import Prelude
   , (>)
   )
 
+import Data.Int (toNumber) as Int
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Math.Core (pow)
 
@@ -98,9 +99,6 @@ shouldReconnect s =
 nextReconnectDelay :: ReconnectStrategy -> Number
 nextReconnectDelay s =
   let
-    exponential = s.baseDelayMs * pow 2.0 (intToNumber s.attempt)
+    exponential = s.baseDelayMs * pow 2.0 (Int.toNumber s.attempt)
   in
     if exponential > s.maxDelayMs then s.maxDelayMs else exponential
-
--- | Convert an Int to a Number.
-foreign import intToNumber :: Int -> Number

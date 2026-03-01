@@ -36,10 +36,12 @@ module Hydrogen.Schema.Game.Card
 
 import Prelude
   ( class Eq, class Ord, class Show
-  , show, compare, otherwise, map, mod, bind, pure
+  , show, compare, otherwise, map, mod, div, bind, pure
   , (==), (+), (*), (>), (<=), (>=), (&&), (<>), Ordering(EQ)
   )
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Array (foldl)
+import Data.String.CodeUnits (length, take, drop) as StrCU
 import Hydrogen.Schema.Bounded (clampInt)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -237,12 +239,10 @@ parseSuit "c" = Just Clubs
 parseSuit _ = Nothing
 
 stringStartsWith :: String -> String -> Boolean
-stringStartsWith prefix str = stringTake (stringLength prefix) str == prefix
+stringStartsWith prefix str = StrCU.take (StrCU.length prefix) str == prefix
 
-foreign import stringLength :: String -> Int
-foreign import stringTake :: Int -> String -> String
-foreign import stringDrop :: Int -> String -> String
-foreign import intDiv :: Int -> Int -> Int
+stringDrop :: Int -> String -> String
+stringDrop = StrCU.drop
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // facing
@@ -298,7 +298,7 @@ unwrapDeckPosition (DeckPosition n) = n
 -- | Bijection: position -> card
 cardAtPosition :: DeckPosition -> Card
 cardAtPosition (DeckPosition n) =
-  { rank: rankFromIndex (intDiv n 4), suit: suitFromIndex (mod n 4) }
+  { rank: rankFromIndex (div n 4), suit: suitFromIndex (mod n 4) }
 
 -- | Bijection: card -> position
 positionOfCard :: Card -> DeckPosition
@@ -438,15 +438,13 @@ countAces :: Array Card -> Int
 countAces cards = countMatching (\c -> isAce c.rank) cards
 
 countMatching :: forall a. (a -> Boolean) -> Array a -> Int
-countMatching pred arr = foldlArray (\acc x -> if pred x then acc + 1 else acc) 0 arr
+countMatching pred arr = foldl (\acc x -> if pred x then acc + 1 else acc) 0 arr
 
 sumArray :: Array Int -> Int
-sumArray = foldlArray (+) 0
+sumArray = foldl (+) 0
 
 findBestTotal :: Int -> Int -> BlackjackValue
 findBestTotal baseTotal aces
   | aces > 0 && baseTotal + 10 <= 21 = Soft (baseTotal + 10)
   | baseTotal <= 21 = Hard baseTotal
   | otherwise = Bust
-
-foreign import foldlArray :: forall a b. (b -> a -> b) -> b -> Array a -> b

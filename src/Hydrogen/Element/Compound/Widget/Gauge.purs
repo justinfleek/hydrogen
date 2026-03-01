@@ -102,7 +102,9 @@ import Prelude
   )
 
 import Data.Array (foldl, length, filter, head)
+import Data.Int (toNumber, trunc) as Int
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Number (cos, pi, sin) as Number
 import Hydrogen.Render.Element as E
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -311,7 +313,7 @@ gaugeWidget propMods gaugeData =
     colorCss = thresholdColorToCss color
     
     -- Arc parameters
-    arcWidth = fromMaybe dims.arcWidth (map toNumber gaugeData.arcWidth)
+    arcWidth = fromMaybe dims.arcWidth (map Int.toNumber gaugeData.arcWidth)
     cx = dims.width / 2.0
     cy = dims.height / 2.0
     radius = dims.radius
@@ -412,13 +414,13 @@ defaultThresholds max =
 describeArc :: Number -> Number -> Number -> Number -> Number -> String
 describeArc cx cy radius startAngle endAngle =
   let
-    startRad = (startAngle - 90.0) * pi / 180.0
-    endRad = (endAngle - 90.0) * pi / 180.0
+    startRad = (startAngle - 90.0) * Number.pi / 180.0
+    endRad = (endAngle - 90.0) * Number.pi / 180.0
     
-    x1 = cx + radius * cos startRad
-    y1 = cy + radius * sin startRad
-    x2 = cx + radius * cos endRad
-    y2 = cy + radius * sin endRad
+    x1 = cx + radius * Number.cos startRad
+    y1 = cy + radius * Number.sin startRad
+    x2 = cx + radius * Number.cos endRad
+    y2 = cy + radius * Number.sin endRad
     
     largeArc = if endAngle - startAngle > 180.0 then "1" else "0"
   in
@@ -436,7 +438,7 @@ formatValue val maybeUnit =
 
 -- | Format number for display.
 formatNumber :: Number -> String
-formatNumber n = show (truncate n)
+formatNumber n = show (Int.trunc n)
 
 -- | Clamp value to range.
 clamp :: Number -> Number -> Number -> Number
@@ -448,22 +450,6 @@ clamp min max val
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // math helpers
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Pi constant.
-pi :: Number
-pi = 3.14159265359
-
--- | Cosine function.
-foreign import cos :: Number -> Number
-
--- | Sine function.
-foreign import sin :: Number -> Number
-
--- | Truncate to integer.
-foreign import truncate :: Number -> Int
-
--- | Convert Int to Number.
-foreign import toNumber :: Int -> Number
 
 -- | Map over Maybe.
 map :: forall a b. (a -> b) -> Maybe a -> Maybe b

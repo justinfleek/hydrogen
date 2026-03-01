@@ -65,7 +65,6 @@ module Hydrogen.Animation.Algebra.Easing
 
 import Prelude
   ( class Eq
-  , eq
   , otherwise
   , negate
   , (+)
@@ -74,10 +73,11 @@ import Prelude
   , (/)
   , (<)
   , (==)
-  , (&&)
   )
 
-import Data.Newtype (class Newtype, unwrap)
+import Data.Int (toNumber) as Int
+import Data.Newtype (unwrap)
+import Data.Number (cos, exp, floor, log, pi, sin, sqrt) as Number
 import Data.Ord (abs)
 
 import Hydrogen.Animation.Time (Progress(Progress))
@@ -311,8 +311,8 @@ applyEasingNumber (Spring (SpringConfig cfg)) t =
 applyEasingNumber (CubicBezier (BezierCurve b)) t =
   cubicBezierValue b.x1 b.y1 b.x2 b.y2 t
 applyEasingNumber (Steps n) t =
-  let step = nativeIntToNumber n
-  in nativeFloor (t * step) / step
+  let step = Int.toNumber n
+  in Number.floor (t * step) / step
 applyEasingNumber (Custom f) t = unwrap (f (Progress t))
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -379,10 +379,12 @@ cubicBezierValue x1 y1 x2 y2 t =
           in 3.0 * mt * mt * pp1 + 6.0 * mt * u * (pp2 - pp1) + 3.0 * u * u * (1.0 - pp2)
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- Math Functions (FFI)
+-- Math Functions (Pure PureScript — no FFI)
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- | Power function for easing calculations.
+-- |
+-- | Re-exported from Data.Number for API stability.
 pow :: Number -> Number -> Number
 pow base exponent = 
   if base == 0.0 then 0.0
@@ -390,34 +392,37 @@ pow base exponent =
   else exp (exponent * ln base)
 
 -- | Natural logarithm.
+-- |
+-- | Re-exported from Data.Number for API stability.
 ln :: Number -> Number
-ln x = nativeLog x
+ln = Number.log
 
 -- | Exponential function.
+-- |
+-- | Re-exported from Data.Number for API stability.
 exp :: Number -> Number
-exp x = nativeExp x
+exp = Number.exp
 
 -- | Square root.
+-- |
+-- | Re-exported from Data.Number for API stability.
 sqrt :: Number -> Number
-sqrt x = nativeSqrt x
+sqrt = Number.sqrt
 
 -- | Sine function.
+-- |
+-- | Re-exported from Data.Number for API stability.
 sin :: Number -> Number
-sin x = nativeSin x
+sin = Number.sin
 
 -- | Cosine function.
+-- |
+-- | Re-exported from Data.Number for API stability.
 cos :: Number -> Number
-cos x = nativeCos x
+cos = Number.cos
 
 -- | Pi constant.
+-- |
+-- | Re-exported from Data.Number for API stability.
 pi :: Number
-pi = 3.141592653589793
-
--- Native math functions (FFI to JavaScript Math)
-foreign import nativeLog :: Number -> Number
-foreign import nativeExp :: Number -> Number
-foreign import nativeSqrt :: Number -> Number
-foreign import nativeSin :: Number -> Number
-foreign import nativeCos :: Number -> Number
-foreign import nativeFloor :: Number -> Number
-foreign import nativeIntToNumber :: Int -> Number
+pi = Number.pi

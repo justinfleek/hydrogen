@@ -2,6 +2,13 @@
 //                                                      // hydrogen // clipboard
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// BROWSER BOUNDARY: These FFIs wrap navigator.clipboard (Async Clipboard API)
+// and ClipboardEvent.clipboardData (Clipboard Events API).
+//
+// Corresponding PureScript module: Hydrogen.Util.Clipboard (pending creation)
+// Schema types: see Hydrogen.Schema.Storage.Clipboard for pure ADT types.
+
+// BROWSER BOUNDARY: navigator.clipboard.writeText() with document.execCommand fallback
 export const copyToClipboardImpl = (text) => (onError) => (onSuccess) => () => {
   // Try modern Clipboard API first
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -35,6 +42,7 @@ export const copyToClipboardImpl = (text) => (onError) => (onSuccess) => () => {
   }
 };
 
+// BROWSER BOUNDARY: navigator.clipboard.readText() for reading clipboard contents
 export const readFromClipboardImpl = (onError) => (onSuccess) => () => {
   if (navigator.clipboard && navigator.clipboard.readText) {
     navigator.clipboard.readText()
@@ -46,6 +54,7 @@ export const readFromClipboardImpl = (onError) => (onSuccess) => () => {
   onError(new Error("Clipboard API not supported"))();
 };
 
+// BROWSER BOUNDARY: ClipboardEvent.clipboardData for paste event handling
 export const getClipboardData = (event) => () => {
   const data = event.clipboardData;
   if (data) {
@@ -55,15 +64,5 @@ export const getClipboardData = (event) => () => {
   return null;
 };
 
-// Result reference for synchronous-style API
-export const newResultRef = () => {
-  return { value: null };
-};
-
-export const writeResultRef = (ref) => (value) => () => {
-  ref.value = value;
-};
-
-export const readResultRef = (ref) => () => {
-  return ref.value;
-};
+// Note: Result reference helpers removed.
+// Use Effect.Ref from PureScript for mutable references.

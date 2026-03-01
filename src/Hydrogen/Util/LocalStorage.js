@@ -82,24 +82,3 @@ export const onAnyChangeImpl = (callback) => () => {
     window.removeEventListener("storage", handler);
   };
 };
-
-// Array and string helpers
-export const filterImpl = (predicate) => (arr) => {
-  return arr.filter(predicate);
-};
-
-export const traverseImpl = (f) => (arr) => () => {
-  const results = [];
-  for (let i = 0; i < arr.length; i++) {
-    results.push(f(arr[i])());
-  }
-  return results;
-};
-
-export const take = (n) => (str) => {
-  return str.substring(0, n);
-};
-
-export const strLength = (str) => {
-  return str.length;
-};

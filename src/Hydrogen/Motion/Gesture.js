@@ -2,12 +2,27 @@
 //                                                        // hydrogen // gesture
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// Unified gesture recognition for touch, mouse, and pointer events
+// BROWSER BOUNDARY: Unified gesture recognition for touch, mouse, and pointer events
+//
+// This file contains ONLY browser boundary code:
+// - Event listener attachment/removal
+// - DOM element access
+// - performance.now() for timestamps
+// - Touch/Pointer/Mouse event handling
+//
+// Pure calculations (velocity, distance, angle, swipe direction) are in PureScript:
+// - Hydrogen.Motion.Gesture.computeVelocityFromPoints
+// - Hydrogen.Motion.Gesture.pointDistance
+// - Hydrogen.Motion.Gesture.pointAngle
+// - Hydrogen.Motion.Gesture.computeTwoFingerData
+// - Hydrogen.Motion.Gesture.detectSwipeDirection
+// - Hydrogen.Motion.Gesture.clampScale
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                   // utilities
+//                                          // browser boundary // event utilities
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Extracts position from browser event objects
 const getPointerPosition = (event) => {
   if (event.touches && event.touches.length > 0) {
     return { x: event.touches[0].clientX, y: event.touches[0].clientY };
@@ -15,6 +30,9 @@ const getPointerPosition = (event) => {
   return { x: event.clientX, y: event.clientY };
 };
 
+// BROWSER BOUNDARY: Extracts two-finger data from browser touch events
+// Note: The math (center, distance, angle) is replicated here for performance
+// but the pure versions exist in PureScript for use in application logic
 const getTwoFingerData = (event) => {
   if (!event.touches || event.touches.length < 2) return null;
   const t1 = event.touches[0];
@@ -28,12 +46,14 @@ const getTwoFingerData = (event) => {
   return { centerX, centerY, distance, angle };
 };
 
+// BROWSER BOUNDARY: Browser timing API
 const now = () => performance.now();
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                 // pan gesture
+//                                               // browser boundary // pan gesture
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches pointer/touch/mouse event listeners to DOM element
 export const createPanGestureImpl = (element) => (config) => () => {
   let state = "idle";
   let startX = 0, startY = 0;
@@ -167,9 +187,12 @@ export const createPanGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                               // pinch gesture
+//                                             // browser boundary // pinch gesture
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches touch event listeners for pinch/zoom detection
+// Scale clamping uses inline Math.max/Math.min for performance
+// Pure version: Hydrogen.Motion.Gesture.clampScale
 export const createPinchGestureImpl = (element) => (config) => () => {
   let state = "idle";
   let initialDistance = 0;
@@ -253,9 +276,12 @@ export const createPinchGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                              // rotate gesture
+//                                            // browser boundary // rotate gesture
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches touch event listeners for rotation detection
+// Angle normalization uses inline math for performance
+// Pure version: Hydrogen.Motion.Gesture.normalizeAngle
 export const createRotateGestureImpl = (element) => (config) => () => {
   let state = "idle";
   let initialAngle = 0;
@@ -349,9 +375,12 @@ export const createRotateGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                               // swipe gesture
+//                                             // browser boundary // swipe gesture
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches pointer/touch/mouse event listeners for swipe detection
+// Direction calculation uses inline math for performance
+// Pure version: Hydrogen.Motion.Gesture.detectSwipeDirection
 export const createSwipeGestureImpl = (element) => (config) => () => {
   let startX = 0, startY = 0;
   let startTime = 0;
@@ -423,9 +452,10 @@ export const createSwipeGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                  // long press
+//                                                // browser boundary // long press
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches pointer/touch/mouse events with setTimeout for duration
 export const createLongPressGestureImpl = (element) => (config) => () => {
   let startX = 0, startY = 0;
   let timer = null;
@@ -512,9 +542,10 @@ export const createLongPressGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                                  // double tap
+//                                                // browser boundary // double tap
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Attaches pointer/touch/mouse events with setTimeout for tap timing
 export const createDoubleTapGestureImpl = (element) => (config) => () => {
   let lastTap = null;
   let singleTapTimer = null;
@@ -580,31 +611,37 @@ export const createDoubleTapGestureImpl = (element) => (config) => () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                        // gesture composition
+//                                      // browser boundary // gesture composition
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Manages gesture recognizer state
 export const composeGestures = (gestures) => () => {
   // Gestures are already composed through their enable/disable methods
   // This function can be extended to handle gesture conflicts
   return;
 };
 
+// BROWSER BOUNDARY: Enables event listener processing
 export const enableGesture = (gesture) => () => {
   if (gesture && gesture.enable) gesture.enable();
 };
 
+// BROWSER BOUNDARY: Disables event listener processing
 export const disableGesture = (gesture) => () => {
   if (gesture && gesture.disable) gesture.disable();
 };
 
+// BROWSER BOUNDARY: Removes all event listeners from DOM
 export const destroyGesture = (gesture) => () => {
   if (gesture && gesture.destroy) gesture.destroy();
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//                                                          // velocity tracking
+//                                        // browser boundary // velocity tracking
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// BROWSER BOUNDARY: Uses performance.now() for timestamps
+// Pure version for velocity calculation: Hydrogen.Motion.Gesture.computeVelocityFromPoints
 export const trackPointImpl = (pointsRef) => (maxSamples) => (point) => () => {
   const points = pointsRef.value;
   points.push({ point, time: now() });
@@ -614,6 +651,9 @@ export const trackPointImpl = (pointsRef) => (maxSamples) => (point) => () => {
   pointsRef.value = points;
 };
 
+// BROWSER BOUNDARY: Reads mutable state populated by browser events
+// This is a thin wrapper; the actual velocity calculation logic is duplicated
+// here for performance but exists in pure form as computeVelocityFromPoints
 export const getVelocityImpl = (pointsRef) => () => {
   const points = pointsRef.value;
   if (points.length < 2) {

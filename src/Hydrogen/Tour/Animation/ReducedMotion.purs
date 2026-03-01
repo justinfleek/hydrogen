@@ -27,9 +27,6 @@
 module Hydrogen.Tour.Animation.ReducedMotion
   ( -- * Application
     applyReducedMotion
-    -- * FFI (internal)
-  , unsafeFloor
-  , toNumber
     -- * Re-exports
   , module Types
   ) where
@@ -38,8 +35,11 @@ import Prelude
   ( map
   , (<)
   , (*)
+  , ($)
   )
 
+import Data.Int (floor, toNumber)
+import Data.Number (floor) as Number
 import Hydrogen.Tour.Animation.Types
   ( EasingCurve(Preset)
   , EasingPreset(EaseLinear, EaseOut)
@@ -106,23 +106,10 @@ applyReducedMotion strategy anim = case strategy of
     Types.AnimComposite cfg -> Types.AnimComposite cfg { animations = map makeSlower cfg.animations }
   
   multiplyDuration :: Number -> Milliseconds -> Milliseconds
-  multiplyDuration factor (Milliseconds ms) = Milliseconds (floor (toNumber ms * factor))
+  multiplyDuration factor (Milliseconds ms) = Milliseconds $ floor $ Number.floor (toNumber ms * factor)
   
   makeSpringSlower :: Types.SpringConfig -> Types.SpringConfig
   makeSpringSlower cfg = cfg 
     { stiffness = cfg.stiffness * 0.5
     , damping = cfg.damping * 1.5
     }
-  
-  floor :: Number -> Int
-  floor n = unsafeFloor n
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                         // ffi
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Floor a Number to Int (FFI)
-foreign import unsafeFloor :: Number -> Int
-
--- | Convert Int to Number (FFI)
-foreign import toNumber :: Int -> Number

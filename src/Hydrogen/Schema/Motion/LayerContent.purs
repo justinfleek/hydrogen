@@ -25,6 +25,13 @@
 -- | - **Effects**: AdjustmentContent, EffectContent
 -- | - **Composition**: PreCompContent, GroupContent, NestedCompContent
 -- | - **Specialized**: ParticleContent, DepthContent, GeneratedContent, etc.
+-- |
+-- | ## Architecture Note
+-- |
+-- | This module exceeds the standard 500-line limit due to schema coherence.
+-- | The LayerContent sum type (26 constructors) requires all associated content
+-- | types to be co-located. The `contentToLayerType` mapping between LayerContent
+-- | and LayerType would be impossible to maintain across multiple files.
 
 module Hydrogen.Schema.Motion.LayerContent
   ( -- * Layer Content

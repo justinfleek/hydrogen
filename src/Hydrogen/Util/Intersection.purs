@@ -54,8 +54,10 @@ module Hydrogen.Util.Intersection
 
 import Prelude hiding (when)
 
-import Data.Maybe (Maybe(Just, Nothing))
+import Data.Maybe (Maybe(Nothing))
 import Effect (Effect)
+import Effect.Ref (Ref)
+import Effect.Ref as Ref
 import Web.DOM.Element (Element)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -91,12 +93,16 @@ type IntersectionConfig =
 --                                                                       // FFI
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- BROWSER BOUNDARY: IntersectionObserver is a Web API for detecting element
+-- visibility relative to viewport or ancestor element.
 foreign import observeImpl
   :: Element
   -> { threshold :: Array Number, rootMargin :: String, root :: Maybe Element }
   -> (IntersectionEntry -> Effect Unit)
   -> Effect (Effect Unit)
 
+-- BROWSER BOUNDARY: IntersectionObserver is a Web API for detecting element
+-- visibility relative to viewport or ancestor element.
 foreign import observeOnceImpl
   :: Element
   -> { threshold :: Array Number, rootMargin :: String, root :: Maybe Element }
@@ -234,13 +240,17 @@ onVisibilityChange element callback = do
       callback entry.isIntersecting
     writeBoolRef wasVisibleRef entry.isIntersecting
 
--- FFI for simple boolean refs
-foreign import newBoolRef :: Boolean -> Effect BoolRef
-foreign import readBoolRef :: BoolRef -> Effect Boolean
-foreign import writeBoolRef :: BoolRef -> Boolean -> Effect Unit
-foreign import data BoolRef :: Type
-
 -- Local when helper
 when :: Boolean -> Effect Unit -> Effect Unit
 when true action = action
 when false _ = pure unit
+
+-- Pure PureScript mutable reference (replaces FFI BoolRef)
+newBoolRef :: Boolean -> Effect (Ref Boolean)
+newBoolRef = Ref.new
+
+readBoolRef :: Ref Boolean -> Effect Boolean
+readBoolRef = Ref.read
+
+writeBoolRef :: Ref Boolean -> Boolean -> Effect Unit
+writeBoolRef ref value = Ref.write value ref

@@ -50,6 +50,7 @@ module Hydrogen.Element.Binary.Primitives
 
 import Prelude
   ( bind
+  , map
   , pure
   , ($)
   , (+)
@@ -58,12 +59,16 @@ import Prelude
   , (==)
   , (&&)
   , (<>)
+  , (<=)
   )
 
 import Data.Array as Array
+import Data.Array (mapMaybe)
+import Data.Char (fromCharCode, toCharCode)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int (floor, toNumber)
 import Data.Int.Bits (shl, shr, (.&.), (.|.))
+import Data.String.CodeUnits (fromCharArray, toCharArray) as SCU
 
 import Hydrogen.Element.Binary.Types
   ( Bytes(Bytes)
@@ -209,11 +214,18 @@ deserializeHeader arr = do
     else Nothing
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                        // ffi
+--                                                      // string/byte conversion
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Convert string to array of code points (ASCII)
-foreign import toCodePointArray :: String -> Array Int
+-- | Characters outside ASCII range (0-127) are replaced with '?' (63)
+toCodePointArray :: String -> Array Int
+toCodePointArray s = map toAsciiCode (SCU.toCharArray s)
+  where
+    toAsciiCode c =
+      let code = toCharCode c
+      in if code <= 127 then code else 63
 
 -- | Convert byte array to String (ASCII)
-foreign import bytesToString :: Array Int -> String
+bytesToString :: Array Int -> String
+bytesToString arr = SCU.fromCharArray (mapMaybe fromCharCode arr)

@@ -41,8 +41,9 @@ import Prelude
 
 import Hydrogen.Schema.Identity.Temporal (unwrapGeneration)
 
+import Data.Int (toNumber)
+
 import Hydrogen.Composition.Cache.Types (CacheEntry)
-import Hydrogen.Composition.Cache.Stats (toNumberImpl)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                      // display
@@ -103,6 +104,3 @@ entryScore entry now =
       recencyWeight = 10.0
       ageWeight = 0.001
   in hits * recencyWeight - age * ageWeight
-  where
-    toNumber :: Int -> Number
-    toNumber n = toNumberImpl n
