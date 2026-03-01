@@ -36,14 +36,14 @@
 -- | ```
 module Hydrogen.Motion.Presence
   ( -- * Presence State (Pure Data)
-    PresenceState(..)
+    PresenceState(Entering, Present, Exiting, Absent)
   , isVisible
   , isAnimating
     -- * Motion Element (Pure Data)
   , MotionElement
   , defaultMotionElement
     -- * Presence Mode
-  , PresenceMode(..)
+  , PresenceMode(Sync, Wait, PopLayout)
     -- * Variants (Pure Data)
   , Variant
   , variant
@@ -55,7 +55,7 @@ module Hydrogen.Motion.Presence
     -- * Preset Variants
   , fadeIn
   , fadeOut
-  , Direction(..)
+  , Direction(FromTop, FromBottom, FromLeft, FromRight, ToTop, ToBottom, ToLeft, ToRight)
   , slideIn
   , slideOut
   , scaleIn

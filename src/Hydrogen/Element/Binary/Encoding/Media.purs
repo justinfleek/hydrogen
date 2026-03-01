@@ -82,6 +82,16 @@ import Hydrogen.Element.Binary.Encoding.Text
   ( serializeProgress
   )
 
+import Hydrogen.Schema.Media.Video
+  ( unwrapPlaybackRate
+  )
+
+-- Schema atoms for bounded type unwrapping
+import Hydrogen.Schema.Geometry.Angle (unwrapDegrees)
+import Hydrogen.Schema.Dimension.Distance (unwrapPositiveLength)
+import Hydrogen.Schema.Audio.Oscillator as Oscillator
+import Hydrogen.Schema.Audio.Frequency as Freq
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // image serialization
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -138,13 +148,14 @@ serializeVideoSource = case _ of
 -- | Serialize VideoPlayback
 -- |
 -- | Layout: currentTime (f32) + playing (u8) + loop (u8) + muted (u8) + playbackRate (f32)
+-- | playbackRate is now bounded PlaybackRate, unwrap to Number for encoding.
 serializeVideoPlayback :: VideoPlayback -> Bytes
 serializeVideoPlayback p =
   concatBytes (serializeProgress p.currentTime) $
   concatBytes (writeU8 (if p.playing then 1 else 0)) $
   concatBytes (writeU8 (if p.loop then 1 else 0)) $
   concatBytes (writeU8 (if p.muted then 1 else 0)) $
-  writeF32 p.playbackRate
+  writeF32 (unwrapPlaybackRate p.playbackRate)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                        // audio serialization
@@ -163,6 +174,9 @@ serializeAudioSpec spec =
   serializeAudioPlayback spec.playback
 
 -- | Serialize AudioSource
+-- |
+-- | AudioOscillator uses bounded types (OscillatorType, Hertz).
+-- | We unwrap them to strings/numbers for binary encoding.
 serializeAudioSource :: AudioSource -> Bytes
 serializeAudioSource = case _ of
   AudioUrl url ->
@@ -173,19 +187,20 @@ serializeAudioSource = case _ of
     concatBytes (writeU8 2) (serializeString id)
   AudioOscillator osc ->
     concatBytes (writeU8 3) $
-    concatBytes (serializeString osc.waveform) $
-    writeF32 osc.frequency
+    concatBytes (serializeString (Oscillator.oscillatorTypeName osc.waveform)) $
+    writeF32 (Freq.unwrapHertz osc.frequency)
 
 -- | Serialize AudioPlayback
 -- |
 -- | Layout: currentTime (f32) + playing (u8) + loop (u8) + volume (f32) + playbackRate (f32)
+-- | playbackRate is now bounded PlaybackRate, unwrap to Number for encoding.
 serializeAudioPlayback :: AudioPlayback -> Bytes
 serializeAudioPlayback p =
   concatBytes (serializeProgress p.currentTime) $
   concatBytes (writeU8 (if p.playing then 1 else 0)) $
   concatBytes (writeU8 (if p.loop then 1 else 0)) $
   concatBytes (serializeOpacity p.volume) $
-  writeF32 p.playbackRate
+  writeF32 (unwrapPlaybackRate p.playbackRate)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // model3d serialization
@@ -217,12 +232,13 @@ serializeModel3DSource = case _ of
 -- | Serialize Model3DCamera
 -- |
 -- | Layout: distance (f32) + azimuth (f32) + elevation (f32) + fov (f32)
+-- | All bounded types are unwrapped to raw Numbers for binary encoding.
 serializeModel3DCamera :: Model3DCamera -> Bytes
 serializeModel3DCamera c =
-  concatBytes (writeF32 c.distance) $
-  concatBytes (writeF32 c.azimuth) $
-  concatBytes (writeF32 c.elevation) $
-  writeF32 c.fov
+  concatBytes (writeF32 (unwrapPositiveLength c.distance)) $
+  concatBytes (writeF32 (unwrapDegrees c.azimuth)) $
+  concatBytes (writeF32 (unwrapDegrees c.elevation)) $
+  writeF32 (unwrapDegrees c.fov)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // shared serialization
@@ -242,3 +258,4 @@ serializeObjectFit = case _ of
   ObjectFit.Cover -> writeU8 2
   ObjectFit.None -> writeU8 3
   ObjectFit.ScaleDown -> writeU8 4
+

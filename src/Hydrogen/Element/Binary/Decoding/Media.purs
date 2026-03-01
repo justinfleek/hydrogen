@@ -81,6 +81,11 @@ import Hydrogen.Schema.Color.Opacity as Opacity
 import Hydrogen.Schema.Geometry.Shape as Shape
 import Hydrogen.Schema.Dimension.ObjectFit as ObjectFit
 import Hydrogen.Schema.Temporal.Progress as Progress
+import Hydrogen.Schema.Media.Video as Video
+import Hydrogen.Schema.Geometry.Angle as Angle
+import Hydrogen.Schema.Dimension.Distance as Distance
+import Hydrogen.Schema.Audio.Oscillator as Oscillator
+import Hydrogen.Schema.Audio.Frequency as Freq
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // image deserialization
@@ -205,7 +210,7 @@ deserializeVideoPlayback arr offset = do
     , playing: playingB /= 0
     , loop: loopB /= 0
     , muted: mutedB /= 0
-    , playbackRate: playbackRateF
+    , playbackRate: Video.playbackRate playbackRateF
     }
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -252,7 +257,10 @@ deserializeAudioSource arr offset = do
     3 -> do -- AudioOscillator
       waveformResult <- deserializeString arr (offset + 1)
       frequencyF <- readF32 arr (offset + 1 + waveformResult.bytesRead)
-      Just { value: AudioOscillator { waveform: waveformResult.value, frequency: frequencyF }
+      Just { value: AudioOscillator 
+               { waveform: Oscillator.oscillatorTypeFromString waveformResult.value
+               , frequency: Freq.hertz frequencyF 
+               }
            , bytesRead: 1 + waveformResult.bytesRead + 4 }
     _ -> Nothing
 
@@ -269,8 +277,26 @@ deserializeAudioPlayback arr offset = do
     , playing: playingB /= 0
     , loop: loopB /= 0
     , volume: Opacity.opacity (floor (volumeF * 100.0))
-    , playbackRate: playbackRateF
+    , playbackRate: Video.playbackRate playbackRateF  -- Use bounded PlaybackRate
     }
+
+-- | Convert string waveform name to OscillatorType
+-- | Defaults to Sine for unknown types (fail-safe during deserialization)
+stringToOscillatorType :: String -> Oscillator.OscillatorType
+stringToOscillatorType "Sine" = Oscillator.Sine
+stringToOscillatorType "Cosine" = Oscillator.Cosine
+stringToOscillatorType "Square" = Oscillator.Square
+stringToOscillatorType "Pulse" = Oscillator.Pulse
+stringToOscillatorType "Sawtooth" = Oscillator.Sawtooth
+stringToOscillatorType "Reverse Saw" = Oscillator.ReverseSaw
+stringToOscillatorType "Triangle" = Oscillator.Triangle
+stringToOscillatorType "White Noise" = Oscillator.NoiseWhite
+stringToOscillatorType "Pink Noise" = Oscillator.NoisePink
+stringToOscillatorType "Brown Noise" = Oscillator.NoiseBrown
+stringToOscillatorType "Blue Noise" = Oscillator.NoiseBlue
+stringToOscillatorType "Violet Noise" = Oscillator.NoiseViolet
+stringToOscillatorType "Sample" = Oscillator.Sample
+stringToOscillatorType _ = Oscillator.Sine  -- Default for unknown
 
 -- | Deserialize Maybe RectangleShape
 deserializeMaybeRectangleShape :: Array Int -> Int -> Maybe (DeserializeResult (Maybe Shape.RectangleShape))
@@ -336,10 +362,17 @@ deserializeModel3DSource arr offset = do
     _ -> Nothing
 
 -- | Deserialize Model3DCamera (16 bytes)
+-- | Converts raw Numbers back to bounded Schema types.
 deserializeModel3DCamera :: Array Int -> Int -> Maybe Model3DCamera
 deserializeModel3DCamera arr offset = do
-  distance <- readF32 arr offset
-  azimuth <- readF32 arr (offset + 4)
-  elevation <- readF32 arr (offset + 8)
-  fov <- readF32 arr (offset + 12)
-  Just { distance, azimuth, elevation, fov }
+  distanceF <- readF32 arr offset
+  azimuthF <- readF32 arr (offset + 4)
+  elevationF <- readF32 arr (offset + 8)
+  fovF <- readF32 arr (offset + 12)
+  -- Convert raw Number values to bounded Schema types
+  Just
+    { distance: Distance.positiveLength distanceF
+    , azimuth: Angle.degrees azimuthF
+    , elevation: Angle.degrees elevationF
+    , fov: Angle.degrees fovF
+    }

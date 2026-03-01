@@ -67,6 +67,19 @@ import Hydrogen.Schema.Temporal.Progress (Progress)
 -- Schema atoms: Color
 import Hydrogen.Schema.Color.Opacity (Opacity)
 
+-- Schema atoms: Media (bounded playback types)
+import Hydrogen.Schema.Media.Video (PlaybackRate)
+
+-- Schema atoms: Audio (oscillator types)
+import Hydrogen.Schema.Audio.Oscillator (OscillatorType)
+import Hydrogen.Schema.Audio.Frequency.Types (Hertz, unwrapHertz)
+
+-- Schema atoms: Geometry (angles)
+import Hydrogen.Schema.Geometry.Angle (Degrees)
+
+-- Schema atoms: Dimension (distances)
+import Hydrogen.Schema.Dimension.Distance (PositiveLength)
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // image // spec
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -142,7 +155,7 @@ type VideoPlayback =
   , playing :: Boolean            -- ^ Is video currently playing?
   , loop :: Boolean               -- ^ Loop when reaching end?
   , muted :: Boolean              -- ^ Is audio muted?
-  , playbackRate :: Number        -- ^ Playback speed (0.25 to 4.0)
+  , playbackRate :: PlaybackRate  -- ^ Playback speed (bounded 0.25x to 4.0x)
   }
 
 -- | Specification for video elements.
@@ -178,13 +191,17 @@ type VideoSpec =
 -- |
 -- | Audio can be loaded from URLs, blob references, or stream IDs.
 -- | The renderer resolves these to playable audio data.
+-- |
+-- | AudioOscillator uses bounded Schema types:
+-- | - OscillatorType: Sine, Square, Sawtooth, Triangle (or noise types)
+-- | - Hertz: Bounded frequency value (non-negative)
 data AudioSource
   = AudioUrl String               -- ^ HTTP/HTTPS URL to audio file
   | AudioBlobId String            -- ^ Reference to blob storage
   | AudioStreamId String          -- ^ Reference to live stream (WebRTC)
   | AudioOscillator               -- ^ Generated oscillator tone
-      { waveform :: String        -- ^ "sine", "square", "sawtooth", "triangle"
-      , frequency :: Number       -- ^ Frequency in Hz (20-20000)
+      { waveform :: OscillatorType -- ^ Waveform type (bounded enum)
+      , frequency :: Hertz         -- ^ Frequency in Hz (bounded)
       }
 
 derive instance eqAudioSource :: Eq AudioSource
@@ -193,18 +210,21 @@ instance showAudioSource :: Show AudioSource where
   show (AudioUrl url) = "(AudioUrl " <> url <> ")"
   show (AudioBlobId id) = "(AudioBlobId " <> id <> ")"
   show (AudioStreamId id) = "(AudioStreamId " <> id <> ")"
-  show (AudioOscillator o) = "(AudioOscillator " <> o.waveform <> " " <> show o.frequency <> "Hz)"
+  show (AudioOscillator o) = "(AudioOscillator " <> show o.waveform <> " " <> show (unwrapHertz o.frequency) <> "Hz)"
 
 -- | Audio playback configuration.
 -- |
--- | Audio elements can have visual representations (waveform, spectrum)
--- | or be purely auditory. Spatial audio uses position for 3D panning.
+-- | All fields are bounded Schema atoms:
+-- | - Progress: 0-1 for playback position
+-- | - Opacity: 0-100% for volume
+-- | - PlaybackRate: 0.25x to 4.0x (bounded)
+-- | - Boolean flags for playing/loop state
 type AudioPlayback =
   { currentTime :: Progress       -- ^ Playback position (0 = start, 1 = end)
   , playing :: Boolean            -- ^ Is audio currently playing?
   , loop :: Boolean               -- ^ Loop when reaching end?
   , volume :: Opacity             -- ^ Volume level (0-100%)
-  , playbackRate :: Number        -- ^ Playback speed (0.25 to 4.0)
+  , playbackRate :: PlaybackRate  -- ^ Playback speed (bounded 0.25x to 4.0x)
   }
 
 -- | Specification for audio elements.
@@ -251,11 +271,15 @@ instance showModel3DSource :: Show Model3DSource where
 -- |
 -- | Defines how the 3D scene is viewed. Uses orbit-style camera
 -- | with distance, azimuth (horizontal), and elevation (vertical).
+-- |
+-- | All fields are bounded Schema atoms:
+-- | - PositiveLength: Strictly positive distance (> 0)
+-- | - Degrees: Angle in degrees (bounded, wrapping for azimuth)
 type Model3DCamera =
-  { distance :: Number            -- ^ Distance from target (1.0 to 1000.0)
-  , azimuth :: Number             -- ^ Horizontal angle in degrees (0 to 360)
-  , elevation :: Number           -- ^ Vertical angle in degrees (-90 to 90)
-  , fov :: Number                 -- ^ Field of view in degrees (10 to 120)
+  { distance :: PositiveLength    -- ^ Distance from target (bounded positive)
+  , azimuth :: Degrees            -- ^ Horizontal angle in degrees
+  , elevation :: Degrees          -- ^ Vertical angle in degrees
+  , fov :: Degrees                -- ^ Field of view in degrees
   }
 
 -- | Specification for 3D model elements.

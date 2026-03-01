@@ -29,6 +29,8 @@ module Hydrogen.Realtime.SSE
     EventSource
   , SSEConfig
   , SSEState(..)
+    -- * Configuration
+  , defaultConfig
     -- * Connection
   , connect
   , close
@@ -42,6 +44,16 @@ module Hydrogen.Realtime.SSE
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , pure
+  , unit
+  , ($)
+  , (==)
+  )
 
 import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)

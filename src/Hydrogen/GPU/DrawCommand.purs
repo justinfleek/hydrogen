@@ -213,4 +213,62 @@ import Hydrogen.GPU.DrawCommand.Batching
   , compareDepth
   ) as Batching
 
-import Hydrogen.GPU.Coordinates as Coord
+import Hydrogen.GPU.Coordinates
+  ( ScreenX(ScreenX)
+  , screenX
+  , unwrapScreenX
+  , screenXBounds
+  , screenXZero
+  , ScreenY(ScreenY)
+  , screenY
+  , unwrapScreenY
+  , screenYBounds
+  , screenYZero
+  , PixelWidth(PixelWidth)
+  , pixelWidth
+  , unwrapPixelWidth
+  , pixelWidthBounds
+  , pixelWidthZero
+  , PixelHeight(PixelHeight)
+  , pixelHeight
+  , unwrapPixelHeight
+  , pixelHeightBounds
+  , pixelHeightZero
+  , DepthValue(DepthValue)
+  , depthValue
+  , unwrapDepthValue
+  , depthValueBounds
+  , depthValueNear
+  , depthValueFar
+  , depthValueMid
+  , DepthLayer(DepthLayer)
+  , depthLayer
+  , unwrapDepthLayer
+  , depthLayerBounds
+  , depthLayerBase
+  , NormalizedX(NormalizedX)
+  , normalizedX
+  , unwrapNormalizedX
+  , NormalizedY(NormalizedY)
+  , normalizedY
+  , unwrapNormalizedY
+  , addScreenX
+  , addScreenY
+  , scaleScreenX
+  , scaleScreenY
+  , addPixelWidth
+  , addPixelHeight
+  , scalePixelWidth
+  , scalePixelHeight
+  , lerpDepthValue
+  , screenXToNumber
+  , screenYToNumber
+  , pixelWidthToNumber
+  , pixelHeightToNumber
+  , depthValueToNumber
+  , depthLayerToInt
+  , screenXFromPixel
+  , screenYFromPixel
+  , pixelWidthFromPixel
+  , pixelHeightFromPixel
+  ) as Coord

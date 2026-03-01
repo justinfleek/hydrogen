@@ -106,7 +106,6 @@ import Hydrogen.GPU.Coordinates as Coord
 import Hydrogen.GPU.Text as Text
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.RGB as RGB
-import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Radius
 
 -- ═════════════════════════════════════════════════════════════════════════════

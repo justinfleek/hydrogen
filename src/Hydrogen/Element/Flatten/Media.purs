@@ -55,6 +55,8 @@ import Hydrogen.GPU.Coordinates as Coord
 import Hydrogen.Schema.Color.RGB as RGB
 import Hydrogen.Schema.Geometry.Radius as Radius
 import Hydrogen.Schema.Temporal.Progress as Progress
+import Hydrogen.Schema.Geometry.Angle as Angle
+import Hydrogen.Schema.Dimension.Distance as Distance
 
 -- Local helpers
 import Hydrogen.Element.Flatten.Types (FlattenState, FlattenResult)
@@ -206,10 +208,10 @@ flattenModel3D state spec =
       , y: Coord.screenYFromPixel y
       , width: Coord.pixelWidthFromPixel spec.bounds.width
       , height: Coord.pixelHeightFromPixel spec.bounds.height
-      , cameraDistance: spec.camera.distance
-      , cameraAzimuth: spec.camera.azimuth
-      , cameraElevation: spec.camera.elevation
-      , cameraFov: spec.camera.fov
+      , cameraDistance: Distance.unwrapPositiveLength spec.camera.distance
+      , cameraAzimuth: Angle.unwrapDegrees spec.camera.azimuth
+      , cameraElevation: Angle.unwrapDegrees spec.camera.elevation
+      , cameraFov: Angle.unwrapDegrees spec.camera.fov
       , animationProgress: Coord.normalizedX (Progress.unwrapProgress spec.animationProgress)
       , depth: Coord.depthValue state.depth
       , pickId: Nothing

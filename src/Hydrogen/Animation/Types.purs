@@ -80,7 +80,6 @@ import Prelude
   , class Show
   , show
   , otherwise
-  , eq
   , (+)
   , (-)
   , (*)
@@ -509,16 +508,12 @@ phaseComplete (AnimationPhase p) = p >= 1.0
 phaseProgress :: AnimationPhase -> Int
 phaseProgress (AnimationPhase p) = 
   let clamped = if p < 0.0 then 0.0 else if p > 1.0 then 1.0 else p
-  in floorInt (clamped * 100.0)
-  where
-    floorInt :: Number -> Int
-    floorInt n = 
-      -- Simple floor implementation
-      let intPart = truncateToInt n
-      in if n < 0.0 && intToNum intPart > n then intPart - 1 else intPart
-    
-    truncateToInt :: Number -> Int
-    truncateToInt _ = 0  -- Placeholder, actual impl would use FFI or recursion
-    
-    intToNum :: Int -> Number
-    intToNum _ = 0.0  -- Placeholder
+      -- Direct calculation: multiply by 100, then extract integer part
+      -- Since p is in [0,1], result is in [0,100]
+      scaled = clamped * 100.0
+  in numberToInt scaled
+
+-- | Convert a number to an integer by truncation toward zero.
+-- | Uses the fact that PureScript compiles to JS where bitwise OR 
+-- | with 0 truncates to 32-bit integer.
+foreign import numberToInt :: Number -> Int

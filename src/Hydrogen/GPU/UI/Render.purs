@@ -80,18 +80,13 @@ module Hydrogen.GPU.UI.Render
 import Prelude
   ( class Eq
   , class Ord
-  , class Show
-  , map
   , otherwise
-  , show
-  , ($)
   , (+)
   , (-)
   , (<>)
   , (==)
   , (>)
   , (>=)
-  , (&&)
   )
 
 import Data.Array (filter, length, take, drop) as Array
@@ -109,11 +104,6 @@ import Hydrogen.GPU.DrawCommand
       , Noop
       )
   , ClipRegion(ClipRect, ClipPath)
-  , RectParams
-  , QuadParams
-  , GlyphParams
-  , PathParams
-  , ParticleParams
   )
 
 import Hydrogen.Schema.Dimension.Device (Pixel(Pixel))

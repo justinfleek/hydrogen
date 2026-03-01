@@ -59,7 +59,25 @@ module Hydrogen.Auth.Session
   ) where
 
 import Prelude
+  ( class Eq
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , flip
+  , pure
+  , unit
+  , ($)
+  , (*)
+  , (+)
+  , (-)
+  , (<=)
+  , (>)
+  , (/=)
+  )
 
+import Control.Bind ((>>=))
+import Control.Semigroupoid ((>>>))
 import Data.Argonaut (class DecodeJson, class EncodeJson, decodeJson, encodeJson, parseJson, stringify)
 import Data.Array as Array
 import Data.Either (hush)

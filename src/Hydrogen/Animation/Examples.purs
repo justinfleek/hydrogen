@@ -11,6 +11,7 @@ module Hydrogen.Animation.Examples where
 import Prelude
 
 import Data.Array (mapWithIndex, replicate)
+import Data.String.CodeUnits (length) as SCU
 
 import Hydrogen.Animation.Algebra
   ( Animation
@@ -158,9 +159,9 @@ calculateCharacterDelays pattern text =
   let len = stringLength text
   in mapWithIndex (\i _ -> applyStagger pattern i len) (replicate len unit)
 
--- Temporary: get string length (would be imported from String module)
+-- | Get string length using String module
 stringLength :: String -> Int
-stringLength _ = 5 -- Placeholder; real implementation uses String.length
+stringLength s = SCU.length s
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- §4 Complete Typography Animation

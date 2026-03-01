@@ -46,14 +46,14 @@
 -- | ```
 module Hydrogen.Motion.ScrollAnimation
   ( -- * Animation Presets (Pure Data)
-    AnimationPreset(..)
+    AnimationPreset(FadeIn, FadeInUp, FadeInDown, FadeInLeft, FadeInRight, SlideUp, SlideDown, SlideLeft, SlideRight, ScaleIn, ScaleInUp, ZoomIn, FlipIn, RotateIn, Bounce, Custom)
   , AnimationClasses
   , presetToClasses
   , initialClasses
     -- * Scroll State (Pure Data)
   , ScrollState
   , defaultScrollState
-  , ScrollDirection(..)
+  , ScrollDirection(ScrollingUp, ScrollingDown, NotScrolling)
   , scrollDirection
   , scrollProgress
   , scrollVelocity
@@ -76,9 +76,9 @@ module Hydrogen.Motion.ScrollAnimation
   , computeOpacityFromProgress
   , computeTransformFromProgress
     -- * Scroll Behavior (Pure Data)
-  , ScrollBehavior(..)
-  , ScrollBlock(..)
-  , ScrollInline(..)
+  , ScrollBehavior(Smooth, Instant, Auto)
+  , ScrollBlock(BlockStart, BlockCenter, BlockEnd, BlockNearest)
+  , ScrollInline(InlineStart, InlineCenter, InlineEnd, InlineNearest)
   , ScrollTarget
   , scrollToTop
   , scrollToPosition

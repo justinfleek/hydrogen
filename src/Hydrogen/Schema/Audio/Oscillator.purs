@@ -20,6 +20,7 @@ module Hydrogen.Schema.Audio.Oscillator
   ( -- * Oscillator Type (Compound)
     OscillatorType(..)
   , oscillatorTypeName
+  , oscillatorTypeFromString
   , isNoiseType
   
   -- * Oscillator Molecule
@@ -89,6 +90,30 @@ oscillatorTypeName NoiseBrown = "Brown Noise"
 oscillatorTypeName NoiseBlue = "Blue Noise"
 oscillatorTypeName NoiseViolet = "Violet Noise"
 oscillatorTypeName Sample = "Sample"
+
+-- | Parse oscillator type from string name.
+-- | Returns Sine for unknown strings (safe default).
+oscillatorTypeFromString :: String -> OscillatorType
+oscillatorTypeFromString "Sine" = Sine
+oscillatorTypeFromString "sine" = Sine
+oscillatorTypeFromString "Cosine" = Cosine
+oscillatorTypeFromString "cosine" = Cosine
+oscillatorTypeFromString "Square" = Square
+oscillatorTypeFromString "square" = Square
+oscillatorTypeFromString "Pulse" = Pulse
+oscillatorTypeFromString "pulse" = Pulse
+oscillatorTypeFromString "Sawtooth" = Sawtooth
+oscillatorTypeFromString "sawtooth" = Sawtooth
+oscillatorTypeFromString "Reverse Saw" = ReverseSaw
+oscillatorTypeFromString "Triangle" = Triangle
+oscillatorTypeFromString "triangle" = Triangle
+oscillatorTypeFromString "White Noise" = NoiseWhite
+oscillatorTypeFromString "Pink Noise" = NoisePink
+oscillatorTypeFromString "Brown Noise" = NoiseBrown
+oscillatorTypeFromString "Blue Noise" = NoiseBlue
+oscillatorTypeFromString "Violet Noise" = NoiseViolet
+oscillatorTypeFromString "Sample" = Sample
+oscillatorTypeFromString _ = Sine  -- Default to Sine for unknown
 
 -- | Check if oscillator type is a noise generator
 isNoiseType :: OscillatorType -> Boolean

@@ -51,7 +51,7 @@
 -- | ```
 module Hydrogen.Motion.Gesture
   ( -- * Gesture State
-    GestureState(..)
+    GestureState(Idle, Active, Ended)
   , Point
   , Velocity
     -- * Pan Gesture (BROWSER BOUNDARY)
@@ -75,7 +75,7 @@ module Hydrogen.Motion.Gesture
     -- * Swipe Gesture (BROWSER BOUNDARY)
   , SwipeGesture
   , SwipeConfig
-  , SwipeDirection(..)
+  , SwipeDirection(SwipeLeft, SwipeRight, SwipeUp, SwipeDown)
   , createSwipeGesture
   , defaultSwipeConfig
     -- * Long Press (BROWSER BOUNDARY)

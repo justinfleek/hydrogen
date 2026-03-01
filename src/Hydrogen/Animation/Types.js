@@ -1,10 +1,9 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//                                            // hydrogen // composition // cache
+//                                             // hydrogen // animation // types
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// FFI for Cache module
+// FFI for Animation Types module
 
-// Convert Int to Number
-export const toNumberImpl = function(n) {
-  return n;
-};
+// | Convert a number to an integer by truncation toward zero.
+// | Uses bitwise OR with 0 which truncates to 32-bit integer in JavaScript.
+export const numberToInt = n => n | 0;

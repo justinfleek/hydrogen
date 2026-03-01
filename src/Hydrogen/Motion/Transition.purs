@@ -32,20 +32,20 @@ module Hydrogen.Motion.Transition
   , transitionShadow
   , transitionTransform
     -- * Duration
-  , Duration(..)
+  , Duration(D0, D75, D100, D150, D200, D300, D500, D700, D1000)
   , duration
     -- * Timing Functions
-  , TimingFunction(..)
+  , TimingFunction(EaseLinear, EaseIn, EaseOut, EaseInOut)
   , timingFunction
     -- * Delay
-  , Delay(..)
+  , Delay(Delay0, Delay75, Delay100, Delay150, Delay200, Delay300, Delay500, Delay700, Delay1000)
   , delay
     -- * Combined
   , transition
-  , TransitionProperty(..)
+  , TransitionProperty(None, All, Default, Colors, Opacity, Shadow, Transform)
     -- * Animation Classes
   , animate
-  , Animation(..)
+  , Animation(AnimateNone, AnimateSpin, AnimatePing, AnimatePulse, AnimateBounce, AnimateFadeIn, AnimateFadeOut, AnimateSlideIn, AnimateSlideOut, AnimateZoomIn, AnimateZoomOut)
   ) where
 
 import Prelude
