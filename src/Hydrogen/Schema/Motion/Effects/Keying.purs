@@ -4,7 +4,7 @@
 
 -- | Keying Effects — Professional compositing key extraction.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements industry-standard keying effects:
 -- |

@@ -5,7 +5,7 @@
 -- | Stroke taper properties.
 -- |
 -- | Tapers the stroke width from start to end of the path.
--- | After Effects introduced this in CC 2020 for shape layers.
+-- | Professional motion graphics tools introduced this in CC 2020 for shape layers.
 -- | All values are bounded and composable.
 
 module Hydrogen.Schema.Motion.Shapes.Modifiers.Taper
@@ -32,7 +32,7 @@ import Hydrogen.Schema.Motion.Shapes.Operators
 -- | Stroke taper properties.
 -- |
 -- | Tapers the stroke width from start to end of the path.
--- | After Effects introduced this in CC 2020 for shape layers.
+-- | Professional motion graphics tools introduced this in CC 2020 for shape layers.
 -- |
 -- | ## Properties
 -- |

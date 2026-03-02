@@ -18,14 +18,14 @@
 -- | - WanMove - Alibaba's Wan trajectory system
 -- | - Uni3C - Universal 3D camera control
 -- | - CameraCtrl - Alternative camera control
--- | - Blender - Blender Python export
+-- | - Open-source 3D Python export format
 -- | - FBX - Autodesk FBX format
 -- |
 -- | ## Coordinate Systems
 -- |
 -- | - OpenGL: Y-up, right-handed
 -- | - OpenCV: Y-down, right-handed  
--- | - Blender: Z-up, right-handed
+-- | - Z-up coordinate systems (common in 3D software)
 -- | - Unity: Y-up, left-handed
 -- |
 -- | ## Module Structure

@@ -5,7 +5,7 @@
 -- | Layer type enumeration and category predicates.
 -- |
 -- | Defines the complete vocabulary of layer types for motion graphics,
--- | matching After Effects and LATTICE backend conventions.
+-- | matching professional motion graphics and LATTICE backend conventions.
 -- |
 -- | ## Layer Categories
 -- |
@@ -75,7 +75,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 -- | Type of layer content.
 -- |
 -- | Defines the rendering behavior and available animatable properties.
--- | Each variant corresponds to a specific content type in After Effects.
+-- | Each variant corresponds to a specific content type in motion graphics software.
 data LayerType
   -- Media layers
   = LTImage            -- ^ Static image (PNG, JPG, SVG, etc.)

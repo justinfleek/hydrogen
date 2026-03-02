@@ -4,7 +4,7 @@
 
 -- | 3D Geometry Effects — Cylinder, Sphere, and Environment mapping.
 -- |
--- | Implements After Effects' CC Cylinder, CC Sphere, and CC Environment
+-- | Implements motion graphics CC Cylinder, CC Sphere, and CC Environment
 -- | effects with bounded properties for deterministic rendering.
 
 module Hydrogen.Schema.Motion.Effects.Perspective.Geometry3D

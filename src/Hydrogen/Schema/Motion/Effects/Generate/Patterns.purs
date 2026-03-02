@@ -4,7 +4,7 @@
 
 -- | Pattern Effects — procedural pattern generation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's pattern effects:
 -- |

@@ -4,7 +4,7 @@
 
 -- | Color Balance — Shift colors along complementary axes.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Color Balance effect with three tonal ranges:
 -- |

@@ -9,7 +9,7 @@
 -- | **System Fonts** — Pre-installed on user devices, no loading required.
 -- | These are enumerable (finite set of well-known fonts).
 -- |
--- | **Custom Fonts** — Require loading via @font-face, Google Fonts, Adobe
+-- | **Custom Fonts** — Require loading via @font-face, Google Fonts, Adobe Fonts
 -- | Fonts, or self-hosting. Infinite possibilities, need import config.
 -- |
 -- | This distinction matters for:

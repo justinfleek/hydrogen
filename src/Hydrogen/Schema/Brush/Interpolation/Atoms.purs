@@ -212,7 +212,7 @@ spacingPixelsDebugInfo s = show s <> " distance:" <> show (unwrapSpacingPixels s
 -- | ## Spacing Effects
 -- |
 -- | - 1-10%: Heavy overlap, continuous coverage
--- | - 25%: Standard brush behavior (Photoshop default)
+-- | - 25%: Standard brush behavior (industry default)
 -- | - 50-100%: Light overlap, visible texture
 -- | - 100%+: Gaps between dabs
 newtype SpacingPercent = SpacingPercent Number

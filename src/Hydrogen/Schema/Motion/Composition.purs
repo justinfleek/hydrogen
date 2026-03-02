@@ -5,7 +5,7 @@
 -- | Composition settings and related types for motion graphics.
 -- |
 -- | A Composition is the fundamental container for animated content — 
--- | analogous to a timeline in After Effects. It defines:
+-- | analogous to a timeline in motion graphics software. It defines:
 -- | - Dimensions (width × height)
 -- | - Frame rate and duration
 -- | - Background color
@@ -116,7 +116,7 @@ mkCompositionId s = Just (CompositionId s)
 -- | Blend mode for compositing layers.
 -- |
 -- | Supports all 28 standard blend modes from Porter-Duff and SVG specifications.
--- | These are the same blend modes available in After Effects, Photoshop, and CSS.
+-- | These are the same blend modes available in motion graphics software and CSS.
 data BlendMode
   -- Standard modes
   = BMNormal

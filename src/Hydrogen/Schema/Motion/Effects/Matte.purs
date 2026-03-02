@@ -4,7 +4,7 @@
 
 -- | Matte Effects — Alpha channel and edge refinement effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's Matte effect category:
 -- |

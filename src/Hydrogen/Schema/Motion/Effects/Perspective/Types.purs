@@ -5,7 +5,7 @@
 -- | Perspective Effect Types — data types for 3D perspective effects.
 -- |
 -- | This module contains all type definitions, type aliases, and instances
--- | for the Perspective effects module. These types model After Effects'
+-- | for the Perspective effects module. These types model professional motion graphics
 -- | Perspective effect category.
 
 module Hydrogen.Schema.Motion.Effects.Perspective.Types

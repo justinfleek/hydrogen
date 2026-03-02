@@ -250,4 +250,4 @@ toNumber (BlurRadius r) = r
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.0 250.0 Bounded.Clamps "blurRadius" "Gaussian blur radius in pixels (0-250, Photoshop max)"
+bounds = Bounded.numberBounds 0.0 250.0 Bounded.Clamps "blurRadius" "Gaussian blur radius in pixels (0-250, industry max)"

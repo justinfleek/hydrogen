@@ -5,9 +5,9 @@
 -- | Light3D — 3D Light layer for motion graphics compositions.
 -- |
 -- | Integrates `Schema.Spatial.Light.Types` with the Motion layer system,
--- | adding After Effects-specific properties and layer behavior.
+-- | adding motion graphics-specific properties and layer behavior.
 -- |
--- | ## After Effects Light Types
+-- | ## Motion Graphics Light Types
 -- |
 -- | - **Parallel** (Directional): Sun-like, infinite distance, parallel rays
 -- | - **Spot**: Cone-shaped with inner/outer angle and feather
@@ -20,7 +20,7 @@
 -- | module provides the rendering primitives; this module provides the
 -- | layer-level properties for animation and composition.
 -- |
--- | ## Properties (After Effects Parity)
+-- | ## Properties (Industry Standard)
 -- |
 -- | - Light type (Parallel, Spot, Point, Ambient)
 -- | - Color (SRGB, animatable)
@@ -151,7 +151,7 @@ mkLight3DId s = Just (Light3DId s)
 --                                                            // light3d // type
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Type of light source (After Effects categories).
+-- | Type of light source (motion graphics categories).
 data Light3DType
   = LT3DParallel     -- ^ Directional/sun light (infinite distance, parallel rays)
   | LT3DSpot         -- ^ Spot light (cone-shaped with angle and feather)

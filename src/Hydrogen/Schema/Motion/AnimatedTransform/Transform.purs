@@ -8,7 +8,7 @@
 -- |
 -- | The AnimatedTransform types combine all individual animated properties
 -- | (position, scale, rotation, anchor, opacity) into a single coherent
--- | transform model matching After Effects' Layer Transform.
+-- | transform model matching motion graphics Layer Transform.
 -- |
 -- | ## Dependencies
 -- |
@@ -65,7 +65,7 @@ import Hydrogen.Schema.Motion.AnimatedTransform.Properties
 -- | Complete animated 2D transform.
 -- |
 -- | Contains all transform properties with full animation support.
--- | This is the After Effects Layer Transform model.
+-- | This is the motion graphics Layer Transform model.
 newtype AnimatedTransform2D = AnimatedTransform2D
   { position :: AnimatedPosition2D
   , scale :: AnimatedScale2D

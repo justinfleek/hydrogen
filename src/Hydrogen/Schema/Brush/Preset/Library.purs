@@ -230,7 +230,7 @@ coloredPencilWax = mkPresetMeta
   "Colored Pencil (Wax)"
   Traditional
   (BuiltIn "Hydrogen")
-  ["pencil", "colored", "wax", "smooth", "blendable", "prismacolor"]
+  ["pencil", "colored", "wax", "smooth", "blendable", "wax-based"]
   "Creamy wax-based colored pencil — blends smoothly, burnishes well."
 
 -- | Oil-based colored pencil — harder, more precise.
@@ -239,7 +239,7 @@ coloredPencilOil = mkPresetMeta
   "Colored Pencil (Oil)"
   Traditional
   (BuiltIn "Hydrogen")
-  ["pencil", "colored", "oil", "hard", "precise", "polychromos"]
+  ["pencil", "colored", "oil", "hard", "precise", "oil-based"]
   "Firmer oil-based colored pencil — sharper details, layers cleanly."
 
 -- ═════════════════════════════════════════════════════════════════════════════

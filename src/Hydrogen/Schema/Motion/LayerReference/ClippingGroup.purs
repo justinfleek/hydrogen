@@ -7,7 +7,7 @@
 -- | ## Clipping Groups
 -- |
 -- | A clipping group constrains multiple layers to the alpha of a base layer.
--- | Similar to Photoshop clipping masks or After Effects clipping groups.
+-- | Similar to standard clipping masks or motion graphics clipping groups.
 -- |
 -- | The base layer defines the clip boundary. All member layers above it
 -- | are clipped to that boundary.
@@ -52,7 +52,7 @@ import Hydrogen.Schema.Motion.LayerReference.Types (LayerRef)
 -- | Clipping group of layers.
 -- |
 -- | All member layers clip to the base layer's alpha.
--- | Similar to Photoshop clipping masks.
+-- | Similar to standard clipping masks.
 newtype ClippingGroup = ClippingGroup
   { base :: LayerRef          -- Bottom layer (defines clip boundary)
   , members :: Array LayerRef -- Layers clipped to base (in order)

@@ -4,7 +4,7 @@
 
 -- | Lift/Gamma/Gain — Professional 3-way color corrector.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors the Lumetri Color panel's 3-way color wheels:
 -- |

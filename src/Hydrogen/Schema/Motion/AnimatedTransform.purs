@@ -2,12 +2,12 @@
 --                        // hydrogen // schema // motion // animated-transform
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | AnimatedTransform — Complete After Effects Transform Model.
+-- | AnimatedTransform — Complete Motion Graphics Transform Model.
 -- |
 -- | ## Design Philosophy
 -- |
 -- | This module provides the COMPLETE transform model for motion graphics,
--- | matching After Effects' capabilities:
+-- | matching motion graphics capabilities:
 -- |
 -- | - **Position** (X, Y, Z) — Object location, animatable along spline paths
 -- | - **Rotation** (Z for 2D, X/Y/Z for 3D) — Object orientation with wrap

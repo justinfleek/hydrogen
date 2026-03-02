@@ -4,7 +4,7 @@
 
 -- | Surface Effects — Shatter and Card Dance.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | - **Shatter**: Glass/surface shatter effect
 -- | - **Card Dance**: Grid-based card animation

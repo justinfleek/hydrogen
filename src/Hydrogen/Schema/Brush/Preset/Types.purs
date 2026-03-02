@@ -198,7 +198,7 @@ categoryToId Experimental = "experimental"
 -- | The conceptual lineage of each category.
 categoryLineage :: PresetCategory -> String
 categoryLineage Traditional = "cave paintings → renaissance → impressionism → you"
-categoryLineage DigitalNative = "oscilloscope → Sketchpad (1963) → Photoshop → you"
+categoryLineage DigitalNative = "oscilloscope → Sketchpad (1963) → digital painting → you"
 categoryLineage Hybrid = "traditional roots, digital wings"
 categoryLineage Expressive = "emotion → gesture → mark"
 categoryLineage Utility = "tools in service of vision"
@@ -309,7 +309,7 @@ dryMediumDescription :: DryMedium -> String
 dryMediumDescription Graphite =
   "The humble pencil — from technical precision (H) to rich darks (9B)"
 dryMediumDescription ColoredPencil =
-  "Waxy pigment cores — Prismacolor, Polychromos, Luminance"
+  "Waxy pigment cores — professional wax-based, oil-based, and lightfast varieties"
 dryMediumDescription Charcoal =
   "Pure carbon — vine for ghosts, compressed for thunder"
 dryMediumDescription Conte =
@@ -491,7 +491,7 @@ digitalToolDescription VectorBrush =
 digitalToolDescription ParticleBrush =
   "Particle system emission — sparks, smoke, magic dust"
 digitalToolDescription CloneBrush =
-  "Sample from source, paint to destination — Photoshop's secret weapon"
+  "Sample from source, paint to destination — a powerful compositing technique"
 digitalToolDescription HealBrush =
   "Content-aware correction — magic eraser for blemishes"
 digitalToolDescription GenerativeBrush =
@@ -517,10 +517,10 @@ digitalToolEra Airbrush = "1982 — Quantel Paintbox"
 digitalToolEra GlowBrush = "1990s — layer blend modes"
 digitalToolEra NoiseBrush = "1985 — Ken Perlin's noise"
 digitalToolEra GlitchBrush = "2000s — glitch art movement"
-digitalToolEra VectorBrush = "1987 — Adobe Illustrator"
+digitalToolEra VectorBrush = "1987 — professional vector graphics"
 digitalToolEra ParticleBrush = "1990s — game VFX"
-digitalToolEra CloneBrush = "1990 — Photoshop 1.0"
-digitalToolEra HealBrush = "2002 — Photoshop 7.0"
+digitalToolEra CloneBrush = "1990 — digital image editing era"
+digitalToolEra HealBrush = "2002 — content-aware editing era"
 digitalToolEra GenerativeBrush = "2022 — diffusion models"
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -9,7 +9,7 @@
 -- | - 24 PPQ: Original MIDI clock resolution
 -- | - 96 PPQ: Basic DAW resolution
 -- | - 480 PPQ: Standard professional resolution (Pro Tools, Cubase)
--- | - 960 PPQ: High resolution (Ableton Live, FL Studio)
+-- | - 960 PPQ: High resolution (professional DAWs)
 -- |
 -- | ## BarBeatTick
 -- | Musical position as bars.beats.ticks — the way producers think about time.

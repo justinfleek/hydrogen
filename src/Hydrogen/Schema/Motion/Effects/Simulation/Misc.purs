@@ -4,7 +4,7 @@
 
 -- | Miscellaneous Simulation Effects — Ball Action, Bubbles, and Star Burst.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | - **CC Ball Action**: Ball grid effect
 -- | - **CC Bubbles**: Rising bubbles effect

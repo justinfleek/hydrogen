@@ -4,7 +4,7 @@
 
 -- | Bevel Effects — functions for bevel alpha and bevel edges effects.
 -- |
--- | Implements After Effects' Bevel Alpha and Bevel Edges effects with
+-- | Implements motion graphics Bevel Alpha and Bevel Edges effects with
 -- | bounded properties for deterministic rendering across agents.
 
 module Hydrogen.Schema.Motion.Effects.Perspective.Bevel

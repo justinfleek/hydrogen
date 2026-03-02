@@ -8,7 +8,7 @@
 -- |
 -- | Shapes are pure data descriptions of geometry. They compose algebraically
 -- | via boolean operations and path combinations. This is the vocabulary for
--- | "Illustrator on steroids" — everything from simple rectangles to complex
+-- | "Vector graphics on steroids" — everything from simple rectangles to complex
 -- | compound paths with boolean operations.
 -- |
 -- | ## Shape Categories

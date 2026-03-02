@@ -6,7 +6,7 @@
 -- |
 -- | Defines foundational types used across all distortion effect modules:
 -- | - RampShape: Gradient ramp shapes
--- | - WarpStyle: Photoshop-style warp presets (15 variants)
+-- | - WarpStyle: standard warp presets (15 variants)
 -- | - DisplacementMapType: Source types for displacement maps
 -- | - DisplacementChannel: Channels for displacement sampling
 -- | - EdgeBehavior: How effects handle image edges
@@ -84,7 +84,7 @@ rampShapeFromString _ = Nothing
 --                                                              // warp // style
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Style of warp distortion (15 variants, matches Photoshop).
+-- | Style of warp distortion (15 variants, industry standard).
 data WarpStyle
   = WSArc          -- ^ Arc warp
   | WSArcLower     -- ^ Lower arc

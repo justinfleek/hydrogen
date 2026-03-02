@@ -4,7 +4,7 @@
 
 -- | Particle Effects — CC Particle World and CC Particle Systems II.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | - **CC Particle World**: Full 3D particle system
 -- | - **CC Particle Systems II**: 2D particle system

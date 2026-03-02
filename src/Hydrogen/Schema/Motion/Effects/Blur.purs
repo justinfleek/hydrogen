@@ -4,7 +4,7 @@
 
 -- | Blur Effects — Complete blur effect types for motion graphics.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Includes full property records for:
 -- | - Gaussian Blur

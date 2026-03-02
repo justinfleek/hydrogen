@@ -6,7 +6,7 @@
 -- |
 -- | ## Architecture
 -- |
--- | After Effects-style per-character 3D enables:
+-- | professional motion graphics per-character 3D enables:
 -- | - Independent X/Y/Z position per character
 -- | - Independent X/Y/Z rotation per character
 -- | - Independent X/Y/Z scale per character
@@ -101,7 +101,7 @@ characterOrientationFromString _ = Nothing
 --                                     // per // character // 3d // properties
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Per-Character 3D Properties — After Effects-style 3D text animation.
+-- | Per-Character 3D Properties — professional motion graphics 3D text animation.
 -- |
 -- | ## AE Properties
 -- |
@@ -159,7 +159,7 @@ defaultPerCharacter3DProperties =
 -- |
 -- | ## AE Architecture
 -- |
--- | In After Effects, when per-character 3D is enabled, the Text Animator
+-- | In professional motion graphics software, when per-character 3D is enabled, the Text Animator
 -- | expands to include full 3D transform properties. This type combines:
 -- |
 -- | - Standard 2D text animator properties (position, scale, rotation, opacity)
@@ -232,7 +232,7 @@ defaultTextAnimator3DProperties =
 -- |
 -- | ## AE Feature Parity
 -- |
--- | This type provides complete After Effects text animator functionality
+-- | This type provides complete motion graphics text animator functionality
 -- | with per-character 3D support:
 -- |
 -- | - Range, Wiggly, and Expression selectors

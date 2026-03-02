@@ -116,7 +116,7 @@ basicPressureLevels = PressureLevels 512
 standardPressureLevels :: PressureLevels
 standardPressureLevels = PressureLevels 2048
 
--- | Professional pressure (8192 levels, Wacom Pro).
+-- | Professional pressure (8192 levels, professional tablet).
 professionalPressureLevels :: PressureLevels
 professionalPressureLevels = PressureLevels 8192
 

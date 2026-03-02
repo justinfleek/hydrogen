@@ -135,13 +135,13 @@ disable3DLayer _ = Layer2D
 -- | The order in which rotations are applied affects the final orientation.
 -- | This is crucial for avoiding gimbal lock in certain configurations.
 -- |
--- | After Effects uses XYZ by default, but other orders are common:
--- | - XYZ: Roll (Z), then Pitch (X), then Yaw (Y) — After Effects default
+-- | Motion graphics software uses XYZ by default, but other orders are common:
+-- | - XYZ: Roll (Z), then Pitch (X), then Yaw (Y) — industry standard
 -- | - YXZ: Common in games for character animation
 -- | - ZYX: Common in aerospace (heading-pitch-roll)
 -- | - XZY, YZX, ZXY: Alternative orders for specific use cases
 data RotationOrder
-  = RotationXYZ   -- X then Y then Z (After Effects default)
+  = RotationXYZ   -- X then Y then Z (industry standard)
   | RotationXZY   -- X then Z then Y
   | RotationYXZ   -- Y then X then Z (common in games)
   | RotationYZX   -- Y then Z then X
@@ -174,7 +174,7 @@ rotationOrderToString RotationYZX = "YZX"
 rotationOrderToString RotationZXY = "ZXY"
 rotationOrderToString RotationZYX = "ZYX"
 
--- | Default rotation order (After Effects standard).
+-- | Default rotation order (industry standard).
 defaultRotationOrder :: RotationOrder
 defaultRotationOrder = RotationXYZ
 

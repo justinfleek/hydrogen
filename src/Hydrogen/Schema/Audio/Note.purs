@@ -18,7 +18,7 @@
 -- | - Velocity range (humanization)
 -- | - Mute flag (silence without deleting)
 -- |
--- | ## Ableton-Style Features
+-- | ## DAW-Style Features
 -- | - Note color (for visual organization)
 -- | - Note expression (MPE-style per-note modulation)
 

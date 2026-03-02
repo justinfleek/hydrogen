@@ -4,7 +4,7 @@
 
 -- | Noise Effects — Complete noise and fractal effect types.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Includes full property records for:
 -- | - Fractal Noise (procedural animated textures)

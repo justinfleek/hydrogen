@@ -186,12 +186,12 @@ isBorderRing _ = false
 -- | - Minimum 2px thickness
 -- | - Must be visible on both light and dark backgrounds
 -- |
--- | **Two-Ring Pattern (Figma, VS Code):**
+-- | **Two-Ring Pattern (modern design tools):**
 -- | - Inner ring: Dark color (e.g., #000000)
 -- | - Outer ring: Light color (e.g., #ffffff)
 -- | - Guarantees contrast on ANY background
 -- |
--- | **Figma's "0px hack":**
+-- | **Design tool "0px hack":**
 -- | - Focus rings outside auto-layout bounds via 0px spread shadow
 -- | - Prevents layout shift when focus appears
 type FocusRing =

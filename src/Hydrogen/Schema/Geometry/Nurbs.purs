@@ -43,7 +43,7 @@
 -- | - CAD/CAM systems (Solidworks, AutoCAD, Rhino)
 -- | - Typography and font design
 -- | - Aircraft and automotive body design
--- | - Professional 3D modeling (Maya, Blender)
+-- | - Professional 3D modeling (professional 3D modeling software)
 -- | - CNC machining tool paths
 -- |
 -- | ## Module Structure

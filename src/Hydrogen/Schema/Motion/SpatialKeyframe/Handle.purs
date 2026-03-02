@@ -9,7 +9,7 @@
 -- | - **SpatialHandle2D/3D**: Control motion path SHAPE in composition space
 -- | - **TemporalHandle**: Control motion SPEED in graph editor
 -- |
--- | These correspond to After Effects' dual-handle system where position
+-- | These correspond to motion graphics dual-handle system where position
 -- | keyframes have both spatial tangents (path shape) and temporal tangents
 -- | (easing/speed curve).
 

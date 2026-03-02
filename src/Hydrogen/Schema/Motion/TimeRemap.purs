@@ -14,7 +14,7 @@
 -- | - **Time stretch**: Slow motion or fast forward
 -- | - **Ramps**: Gradual speed transitions
 -- |
--- | This mirrors After Effects' Time Remap effect and Cinema 4D's
+-- | This mirrors motion graphics Time Remap effect and 3D animation software's
 -- | F-Curve editor with explicit time control.
 -- |
 -- | ## Core Concept

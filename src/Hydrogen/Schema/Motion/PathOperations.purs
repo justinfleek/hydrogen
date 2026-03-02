@@ -2,7 +2,7 @@
 --                            // hydrogen // schema // motion // path-operations
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | PathOperations — Illustrator/C4D-style path manipulation.
+-- | PathOperations — Professional vector graphics-style path manipulation.
 -- |
 -- | ## Design Philosophy
 -- |
@@ -16,9 +16,9 @@
 -- | - **Offset**: Create parallel paths
 -- |
 -- | These operations mirror tools in:
--- | - Adobe Illustrator (Smooth Tool, Simplify, Add Anchor Point)
--- | - Cinema 4D (Spline tools, Resample, Smooth)
--- | - After Effects (Path operations, Zig Zag)
+-- | - professional vector graphics (Smooth Tool, Simplify, Add Anchor Point)
+-- | - Professional 3D (Spline tools, Resample, Smooth)
+-- | - Professional motion graphics (path operations, zig zag)
 -- |
 -- | ## Usage
 -- |

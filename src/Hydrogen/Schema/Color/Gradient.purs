@@ -230,7 +230,7 @@ conicGradient stops = ConicGradient
 
 -- | MeshGradient - bilinear interpolation between 4 corner colors
 -- |
--- | Like Illustrator's mesh gradient but simplified to 4 control points.
+-- | Like professional vector graphics's mesh gradient but simplified to 4 control points.
 -- | Each corner has a color and blend strength.
 -- | Position controls where the color influence reaches (0.0-1.0 from corner)
 newtype MeshGradient = MeshGradient

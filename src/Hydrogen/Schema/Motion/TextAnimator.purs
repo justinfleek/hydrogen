@@ -4,7 +4,7 @@
 
 -- | Text animation types for per-character motion effects.
 -- |
--- | Text animators allow After Effects-style per-character animation
+-- | Text animators allow professional motion graphics per-character animation
 -- | with range selectors, wiggly selectors, and expression selectors.
 -- |
 -- | ## Architecture

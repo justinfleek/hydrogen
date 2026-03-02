@@ -2,7 +2,7 @@
 --                                // hydrogen // element // colorpicker // panel
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | SaturationPanel — 2D color picker panel (Photoshop-style).
+-- | SaturationPanel — 2D color picker panel (standard).
 -- |
 -- | ## Design Philosophy
 -- |

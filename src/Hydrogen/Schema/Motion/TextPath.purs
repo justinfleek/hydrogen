@@ -4,7 +4,7 @@
 
 -- | Text on Path — Type text along arbitrary bezier paths.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's "Path Options" for text layers:
 -- |

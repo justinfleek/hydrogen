@@ -14,9 +14,9 @@
 -- | - **Offset**: Create parallel paths
 -- |
 -- | These operations mirror tools in:
--- | - Adobe Illustrator (Smooth Tool, Simplify)
--- | - Cinema 4D (Spline tools, Resample, Smooth)
--- | - After Effects (Path operations)
+-- | - professional vector graphics (Smooth Tool, Simplify)
+-- | - Professional 3D (Spline tools, Resample, Smooth)
+-- | - Professional motion graphics (path operations)
 -- |
 -- | ## Dependencies
 -- |

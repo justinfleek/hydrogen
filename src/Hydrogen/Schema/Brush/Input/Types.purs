@@ -53,7 +53,7 @@ import Prelude
 data InputDevice
   = Mouse              -- ^ Standard mouse, no pressure
   | Trackpad           -- ^ Laptop trackpad, force touch on some
-  | Stylus             -- ^ Pressure-sensitive pen (Wacom, Apple Pencil)
+  | Stylus             -- ^ Pressure-sensitive pen (professional tablet stylus)
   | Touch              -- ^ Finger on touchscreen
   | VRController       -- ^ 6DOF VR controller
   | VRHand             -- ^ Hand tracking in VR
@@ -90,7 +90,7 @@ allInputDevices =
 inputDeviceDescription :: InputDevice -> String
 inputDeviceDescription Mouse = "Standard mouse, position only, no pressure"
 inputDeviceDescription Trackpad = "Laptop trackpad, may have force touch"
-inputDeviceDescription Stylus = "Pressure-sensitive pen (Wacom, Apple Pencil, etc.)"
+inputDeviceDescription Stylus = "Pressure-sensitive pen (professional tablet stylus, etc.)"
 inputDeviceDescription Touch = "Finger on touchscreen, may have force touch"
 inputDeviceDescription VRController = "6DOF VR controller with trigger pressure"
 inputDeviceDescription VRHand = "Hand tracking in VR with pinch detection"
@@ -146,8 +146,8 @@ has3DCapability MIDIController = false
 -- | Technology type of pressure-sensitive stylus.
 -- | Affects pressure resolution, tilt support, and power requirements.
 data StylusTechnology
-  = EMR               -- ^ Electromagnetic resonance (Wacom), no battery
-  | AES               -- ^ Active electrostatic (Wacom, Dell), battery
+  = EMR               -- ^ Electromagnetic resonance no battery required
+  | AES               -- ^ Active electrostatic requires battery
   | MPP               -- ^ Microsoft Pen Protocol, battery
   | USI               -- ^ Universal Stylus Initiative, battery
   | ApplePencil       -- ^ Apple proprietary, battery

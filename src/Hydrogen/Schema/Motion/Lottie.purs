@@ -7,7 +7,7 @@
 -- | ## Design Philosophy
 -- |
 -- | Lottie animations are JSON-based vector animations exported from
--- | After Effects via Bodymovin. This module provides:
+-- | motion graphics tools via Bodymovin. This module provides:
 -- | - Source management (URL or inline JSON)
 -- | - Playback control (autoplay, loop, direction, speed)
 -- | - Event-triggered playback
@@ -338,7 +338,7 @@ fastPlayback = LottiePlayback
 -- | Lottie animations can be played in segments:
 -- | - Full animation (all frames)
 -- | - Specific frame range (startFrame to endFrame)
--- | - Named markers (if defined in After Effects)
+-- | - Named markers (if defined in motion graphics software)
 -- |
 -- | ## Frame Numbers
 -- |
@@ -347,7 +347,7 @@ fastPlayback = LottiePlayback
 -- |
 -- | ## Markers
 -- |
--- | After Effects allows naming frames with markers. These can be referenced
+-- | Motion graphics software allows naming frames with markers. These can be referenced
 -- | by name rather than frame number, making animations more maintainable.
 -- |
 -- | ## Examples

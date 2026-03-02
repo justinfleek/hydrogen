@@ -6,8 +6,8 @@
 -- |
 -- | ## Design Philosophy
 -- |
--- | PathMotion provides cinema-grade motion path animation like After Effects,
--- | Cinema 4D, and Illustrator. Objects follow paths with:
+-- | PathMotion provides cinema-grade motion path animation like professional motion graphics software,
+-- | professional 3D and vector graphics software. Objects follow paths with:
 -- |
 -- | - **Arc-length parameterization**: Uniform speed along path
 -- | - **Easing integration**: Apply easing curves to path progress

@@ -4,7 +4,7 @@
 
 -- | Levels Effect — Industry-standard levels color correction.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Levels effect with per-channel control:
 -- |

@@ -6,7 +6,7 @@
 -- |
 -- | Design tokens are the atomic units of a design system. They are named values
 -- | with semantic meaning that can be referenced, composed, and exported to
--- | various formats (CSS custom properties, Figma variables, etc.).
+-- | various formats (CSS custom properties, design tool variables, etc.).
 -- |
 -- | ## Token Anatomy
 -- |

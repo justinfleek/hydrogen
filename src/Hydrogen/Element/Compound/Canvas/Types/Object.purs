@@ -13,7 +13,7 @@
 -- | - **Blend Modes**: All standard blend modes from Schema
 -- | - **Clipping**: Binary clip paths
 -- | - **Masking**: Soft alpha masks
--- | - **Track Mattes**: Layer-based masking (After Effects style)
+-- | - **Track Mattes**: Layer-based masking (motion graphics style)
 -- |
 -- | ## Compositing Order
 -- |

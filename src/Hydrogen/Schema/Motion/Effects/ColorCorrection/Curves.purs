@@ -4,7 +4,7 @@
 
 -- | Curves Effect — Industry-standard bezier curve color correction.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Curves effect with per-channel bezier curves:
 -- |

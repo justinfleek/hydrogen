@@ -4,11 +4,11 @@
 
 -- | Distortion Effects — Spatial distortion and warping effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's Distortion effect category:
 -- |
--- | - **Warp**: Photoshop-style warp with 15 presets
+-- | - **Warp**: standard warp with 15 presets
 -- | - **Displacement Map**: Displace pixels using map image
 -- | - **Bezier Warp**: 4-point bezier mesh deformation
 -- | - **Bulge**: Spherical bulge distortion

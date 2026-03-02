@@ -4,7 +4,7 @@
 
 -- | Shape Effects — geometric shape generation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's shape effects:
 -- |

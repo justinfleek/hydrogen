@@ -13,9 +13,9 @@
 -- | - **Adaptive subdivision**: More points in high-curvature areas
 -- |
 -- | These operations mirror tools in:
--- | - Adobe Illustrator (Add Anchor Point)
--- | - Cinema 4D (Spline subdivision)
--- | - After Effects (Path operations)
+-- | - professional vector graphics (Add Anchor Point)
+-- | - Professional 3D (Spline subdivision)
+-- | - Professional motion graphics (path operations)
 -- |
 -- | ## Dependencies
 -- |

@@ -88,7 +88,7 @@ instance showSplineFill :: Show SplineFill where
 -- | Spline/bezier path source.
 -- |
 -- | A spline is a bezier path with stroke, fill, and path effects.
--- | This is the After Effects shape layer equivalent.
+-- | This is the motion graphics shape layer equivalent.
 type SplineSpec =
   { pathData :: String        -- SVG path data or bezier points
   , fill :: SplineFill        -- Fill mode

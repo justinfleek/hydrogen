@@ -4,7 +4,7 @@
 
 -- | Spatial Keyframes — Complete 2D/3D keyframes with spatial and temporal handles.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Each spatial keyframe contains:
 -- |

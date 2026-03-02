@@ -4,7 +4,7 @@
 
 -- | Drop Shadow Effect — functions for creating and querying drop shadows.
 -- |
--- | Implements After Effects' Drop Shadow effect with bounded properties
+-- | Implements motion graphics Drop Shadow effect with bounded properties
 -- | for deterministic rendering across agents.
 
 module Hydrogen.Schema.Motion.Effects.Perspective.Shadow

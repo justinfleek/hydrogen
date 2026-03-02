@@ -4,7 +4,7 @@
 
 -- | Vibrance — Intelligent saturation adjustment.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Vibrance effect which provides smart saturation:
 -- |

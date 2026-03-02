@@ -19,7 +19,7 @@
 -- |
 -- | ## 2D vs 3D
 -- |
--- | - `LayerTransform2D`: Standard 2D composition (After Effects style)
+-- | - `LayerTransform2D`: Standard 2D composition (motion graphics style)
 -- | - `LayerTransform3D`: Full 3D with separate X/Y/Z rotation, orientation
 
 module Hydrogen.Schema.Motion.Transform
@@ -225,7 +225,7 @@ instance showRotation :: Show Rotation where
 
 -- | 3D rotation (Euler angles in degrees).
 -- |
--- | Rotation order is typically X, then Y, then Z (After Effects convention).
+-- | Rotation order is typically X, then Y, then Z (motion graphics convention).
 newtype Rotation3D = Rotation3D { x :: Number, y :: Number, z :: Number }
 
 derive instance eqRotation3D :: Eq Rotation3D

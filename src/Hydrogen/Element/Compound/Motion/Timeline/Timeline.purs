@@ -2,7 +2,7 @@
 --          // hydrogen // element // compound // motion // timeline // timeline
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Timeline UI Component — Visual keyframe editor like After Effects.
+-- | Timeline UI Component — Visual keyframe editor like professional motion graphics software.
 -- |
 -- | ## What This Renders
 -- | A horizontal timeline with:

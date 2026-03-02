@@ -15,7 +15,7 @@
 -- |
 -- | Tilt data comes from many sources:
 -- | - **Stylus (EMR/AES)**: Direct tiltX/tiltY from pen sensor
--- | - **Apple Pencil**: Altitude/azimuth from internal IMU
+-- | - **Tablet Stylus**: Altitude/azimuth from internal IMU
 -- | - **Smartphone/Watch**: Accelerometer pitch/roll, gyroscope heading
 -- | - **VR Controllers**: Full 6DOF orientation quaternion
 -- |

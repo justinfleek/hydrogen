@@ -95,7 +95,7 @@ import Hydrogen.Schema.Motion.Interpolation
 -- | A keyframe for a single numeric property.
 -- |
 -- | Contains the frame position, value, and all interpolation settings.
--- | This is the After Effects keyframe model with full bezier control.
+-- | This is the professional keyframe model with full bezier control.
 newtype PropertyKeyframe = PropertyKeyframe
   { frame :: Frames                      -- Frame position
   , value :: Number                      -- Property value at this frame

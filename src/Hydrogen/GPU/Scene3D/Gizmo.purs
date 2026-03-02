@@ -15,7 +15,7 @@
 -- | - Axis highlighting on hover
 -- | - Snapping (deferred to Phase 5)
 -- |
--- | ## Cinema4D Parity
+-- | ## Industry Standard
 -- | - Universal gizmo (all transforms in one)
 -- | - Per-axis and per-plane manipulation
 -- | - Visual feedback during drag

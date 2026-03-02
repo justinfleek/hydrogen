@@ -179,7 +179,7 @@ signedPercentBounds = Bounded.numberBounds (-100.0) 100.0 Bounded.Clamps "signed
 
 -- | Intensity percentage - 0 to 400.
 -- |
--- | Used for light intensity in After Effects where values can exceed 100%:
+-- | Used for light intensity in motion graphics software where values can exceed 100%:
 -- | - 0%: No light (off)
 -- | - 100%: Normal intensity
 -- | - 200%: Double intensity (overbright)

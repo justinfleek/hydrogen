@@ -4,7 +4,7 @@
 
 -- | Gradient Effects — gradient fill generation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's gradient effects:
 -- |

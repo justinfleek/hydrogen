@@ -2,14 +2,14 @@
 --                                    // hydrogen // schema // surface // blend
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Blend Modes — Complete Photoshop/CSS blend mode vocabulary.
+-- | Blend Modes — Complete Standard blend mode vocabulary.
 -- |
 -- | ## Design Philosophy
 -- |
 -- | Blend modes define how layers combine mathematically. Each mode has
 -- | a precise formula operating on normalized RGB values [0,1].
 -- |
--- | ## Categories (Photoshop organization)
+-- | ## Categories (standard organization)
 -- |
 -- | 1. **Normal**: Normal, Dissolve
 -- | 2. **Darken**: Darken, Multiply, Color Burn, Linear Burn, Darker Color
@@ -87,7 +87,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 --                                                               // blend // mode
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | All 27 Photoshop blend modes.
+-- | All 27 standard blend modes.
 -- |
 -- | Organized by visual effect category for discoverability.
 data BlendMode
@@ -162,7 +162,7 @@ instance showBlendMode :: Show BlendMode where
   show BlendColor = "Color"
   show BlendLuminosity = "Luminosity"
 
--- | All blend modes in Photoshop menu order.
+-- | All blend modes in standard menu order.
 allBlendModes :: Array BlendMode
 allBlendModes =
   [ BlendNormal
@@ -198,7 +198,7 @@ allBlendModes =
 --                                                           // blend // category
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Blend mode categories as organized in Photoshop.
+-- | Blend mode categories as organized in professional tools.
 data BlendCategory
   = CategoryNormal      -- ^ Normal blending operations
   | CategoryDarken      -- ^ Modes that darken the result

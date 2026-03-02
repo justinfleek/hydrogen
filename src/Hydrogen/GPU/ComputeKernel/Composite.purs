@@ -79,7 +79,7 @@ instance showBlendKernel :: Show BlendKernel where
 
 -- | Blend modes for kernel compositing
 -- |
--- | Standard photoshop-like blend modes.
+-- | Standard standard blend modes.
 data BlendKernelMode
   = KernelBlendNormal          -- Alpha compositing
   | KernelBlendAdd             -- Additive (glow)

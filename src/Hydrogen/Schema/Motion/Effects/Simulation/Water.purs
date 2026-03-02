@@ -4,7 +4,7 @@
 
 -- | Water Effects — Caustics, Wave World, and Foam.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | - **Caustics**: Water caustics simulation
 -- | - **Wave World**: 3D water wave simulation

@@ -446,7 +446,7 @@ hslChannelFromString _ = Nothing
 
 -- | Drop Shadow effect — adds shadow behind layer.
 -- |
--- | Properties match After Effects Drop Shadow:
+-- | Properties match standard Drop Shadow:
 -- | - direction: Angle of shadow (0° = right, 90° = down)
 -- | - distance: How far shadow extends in pixels
 -- | - softness: Blur amount of shadow

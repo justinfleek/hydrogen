@@ -4,7 +4,7 @@
 
 -- | Weather Effects — Rain, Drizzle, and Snowfall.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | - **CC Drizzle**: Rain drizzle effect
 -- | - **CC Rain**: Rain particle effect

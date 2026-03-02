@@ -7,7 +7,7 @@
 -- | ## Design Philosophy
 -- |
 -- | A gizmo provides visual handles for manipulating objects in 3D space,
--- | similar to transform controls in Blender, Unity, or After Effects.
+-- | similar to transform controls in professional 3D and motion graphics tools.
 -- | This is the primary interface for spatial manipulation in bento boxes
 -- | and 3D widget systems.
 -- |

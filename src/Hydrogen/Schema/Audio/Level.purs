@@ -242,7 +242,7 @@ decibelBounds = Bounded.numberBounds (-120.0) 0.0 Bounded.Clamps "decibel" "Rela
 
 -- | Bounds for DecibelFS
 -- |
--- | Professional audio typically uses -60 to +12 dB. Ableton uses -24 to +24 for input gain.
+-- | Professional audio typically uses -60 to +12 dB. Professional DAWs use -24 to +24 for input gain.
 -- | We use -60 to +12 as a practical range for most mixing.
 decibelFSBounds :: Bounded.NumberBounds
 decibelFSBounds = Bounded.numberBounds (-60.0) 12.0 Bounded.Clamps "decibelFS" "Amplitude in dB (-60 to +12)"

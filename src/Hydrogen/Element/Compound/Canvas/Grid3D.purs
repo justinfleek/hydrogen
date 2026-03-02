@@ -6,7 +6,7 @@
 -- |
 -- | ## Design Philosophy
 -- |
--- | Professional 3D tools (After Effects, Cinema 4D, Nuke, Blender) require:
+-- | Professional 3D tools (professional motion graphics and 3D tools) require:
 -- |
 -- | 1. **World Origin (0,0,0)** — Center of 3D space
 -- | 2. **World Planes** — XY (floor), XZ (front), YZ (side)

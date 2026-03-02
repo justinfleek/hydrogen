@@ -4,7 +4,7 @@
 
 -- | Generate Effects — Procedural content generation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's Generate effect category:
 -- |

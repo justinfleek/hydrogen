@@ -102,7 +102,7 @@ instance showDeviceFormFactor :: Show DeviceFormFactor where
 -- | Used by gestural and haptic modules to enable appropriate interactions.
 type DeviceCapabilities =
   { touch :: Boolean          -- ^ Multi-touch input
-  , stylus :: Boolean         -- ^ Stylus/pen input (Apple Pencil, S Pen)
+  , stylus :: Boolean         -- ^ Stylus/pen input (tablet stylus)
   , haptics :: Boolean        -- ^ Haptic feedback (Taptic Engine, vibration)
   , forceTouch :: Boolean     -- ^ Pressure-sensitive touch (3D Touch, Force Touch)
   , faceID :: Boolean         -- ^ Face recognition (Face ID)
@@ -200,7 +200,7 @@ iPhoneProCapabilities =
 iPadProCapabilities :: DeviceCapabilities
 iPadProCapabilities =
   { touch: true
-  , stylus: true   -- Apple Pencil
+  , stylus: true   -- tablet stylus support
   , haptics: false -- iPads don't have Taptic Engine
   , forceTouch: false
   , faceID: true

@@ -13,7 +13,7 @@
 -- | - Box selection (marquee)
 -- | - Multi-select with modifiers
 -- |
--- | ## Cinema4D Parity  
+-- | ## Industry Standard  
 -- | - Orange selection highlight
 -- | - Hierarchy selection (parent/children)
 -- | - Component selection (vertex/edge/face)
@@ -115,7 +115,7 @@ type HighlightStyle =
 -- | Default highlight style — no highlighting.
 defaultHighlightStyle :: HighlightStyle
 defaultHighlightStyle =
-  { outlineColor: srgb 255 128 0      -- Orange (Cinema4D style)
+  { outlineColor: srgb 255 128 0      -- Orange (3D animation standard)
   , outlineWidth: 2.0
   , fillTint: Nothing
   , fillOpacity: 0.0

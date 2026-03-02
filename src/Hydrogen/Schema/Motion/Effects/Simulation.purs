@@ -4,7 +4,7 @@
 
 -- | Simulation Effects — Physics-based and procedural simulation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's Simulation effect category:
 -- |

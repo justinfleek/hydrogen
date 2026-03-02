@@ -155,7 +155,7 @@ historyBrushConfig =
 
 -- | Auto erase (magic eraser) configuration.
 -- |
--- | Erases based on color similarity, like Photoshop's magic eraser.
+-- | Erases based on color similarity, like standard magic eraser.
 type AutoEraseConfig =
   { tolerance :: Number              -- ^ Color similarity threshold (0-100)
   , contiguous :: Boolean            -- ^ Only connected areas

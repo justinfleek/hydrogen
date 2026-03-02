@@ -312,7 +312,7 @@ gradeToInt (InputGrade g) =
 -- | always neural.
 data SensorSource
   -- Hardware sources (Provenance.Hardware)
-  = Stylus          -- ^ Wacom, Apple Pencil, etc.
+  = Stylus          -- ^ professional pressure-sensitive stylus
   | Mouse           -- ^ Standard mouse input
   | Touchscreen     -- ^ Touch input
   | Accelerometer   -- ^ Device motion sensor
@@ -404,7 +404,7 @@ sensorIsPhysical _ = false
 
 -- | Human-readable description of each sensor source.
 sensorDescription :: SensorSource -> String
-sensorDescription Stylus = "Pressure-sensitive stylus (Wacom, Apple Pencil)"
+sensorDescription Stylus = "Pressure-sensitive stylus (professional tablet pen)"
 sensorDescription Mouse = "Standard mouse input"
 sensorDescription Touchscreen = "Capacitive touchscreen"
 sensorDescription Accelerometer = "Device motion sensor"

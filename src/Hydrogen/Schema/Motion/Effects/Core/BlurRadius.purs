@@ -100,7 +100,7 @@ instance showBlurRadius :: Show BlurRadius where
 
 -- | Blur radius bounds: 0.0 to 250.0 pixels.
 -- |
--- | 250px matches Photoshop's maximum blur radius.
+-- | 250px matches industry standard maximum blur radius.
 -- | Beyond this, the image is essentially solid color.
 blurRadiusBounds :: Bounded.NumberBounds
 blurRadiusBounds = Bounded.numberBounds 0.0 250.0 Bounded.Clamps "blur_radius" 

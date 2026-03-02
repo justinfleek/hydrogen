@@ -4,7 +4,7 @@
 
 -- | Animation Effects — animated procedural generation effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's animated effects:
 -- |

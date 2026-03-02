@@ -6,7 +6,7 @@
 -- |
 -- | ## Effects Included
 -- |
--- | - **Warp**: Photoshop-style warp with 15 presets
+-- | - **Warp**: standard warp with 15 presets
 -- | - **Bezier Warp**: 4-point bezier mesh deformation
 -- | - **Bulge**: Spherical bulge distortion
 -- | - **Twirl**: Rotational distortion
@@ -80,7 +80,7 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Types (WarpStyle(WSArc))
 --                                                              // warp // effect
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Warp Effect — Photoshop-style warp with 15 presets.
+-- | Warp Effect — standard warp with 15 presets.
 -- |
 -- | ## AE Properties
 -- |
@@ -440,7 +440,7 @@ instance showLiquifyTool :: Show LiquifyTool where
 -- |
 -- | ## AE Properties
 -- |
--- | Interactive brush-based distortion (like Photoshop Liquify).
+-- | Interactive brush-based distortion (like professional liquify tools).
 type LiquifyEffect =
   { tool :: LiquifyTool                  -- ^ Active tool
   , brushSize :: Number                  -- ^ Brush size (1-1500)

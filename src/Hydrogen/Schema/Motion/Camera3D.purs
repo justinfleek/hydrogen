@@ -4,7 +4,7 @@
 
 -- | 3D Camera system for motion graphics compositions.
 -- |
--- | Provides complete camera functionality matching After Effects' 3D camera
+-- | Provides complete camera functionality matching motion graphics 3D camera
 -- | system, including depth of field, iris properties, and viewport states.
 -- |
 -- | ## Architecture

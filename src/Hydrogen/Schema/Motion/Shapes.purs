@@ -386,7 +386,7 @@ data ShapeContentType
   | SCTTransform       -- ^ Transform operator
   -- Group
   | SCTGroup           -- ^ Group container
-  -- Illustrator-style
+  -- vector graphics
   | SCTSimplifyPath    -- ^ Simplify path operator
   | SCTSmoothPath      -- ^ Smooth path operator
   | SCTExtrude         -- ^ 3D extrusion

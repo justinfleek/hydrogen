@@ -4,7 +4,7 @@
 
 -- | Selective Color — Per-color-range CMYK adjustments.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Selective Color effect which allows independent
 -- | adjustment of nine color ranges using CMYK sliders:

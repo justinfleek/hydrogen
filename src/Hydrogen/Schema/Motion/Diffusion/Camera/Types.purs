@@ -85,7 +85,7 @@ data CameraFormat
   | CameraWanMove       -- ^ Alibaba Wan trajectory format
   | CameraUni3C         -- ^ Universal 3D camera control
   | CameraCameraCtrl    -- ^ Alternative camera control format
-  | CameraBlender       -- ^ Blender Python script export
+  | CameraBlender       -- ^ Open-source 3D Python script export
   | CameraFBX           -- ^ Autodesk FBX format
 
 derive instance eqCameraFormat :: Eq CameraFormat
@@ -159,7 +159,7 @@ mapCameraFormats f = map f allCameraFormats
 data CoordinateSystem
   = CoordOpenGL     -- ^ Y-up, right-handed (standard graphics)
   | CoordOpenCV     -- ^ Y-down, right-handed (computer vision)
-  | CoordBlender    -- ^ Z-up, right-handed (Blender default)
+  | CoordBlender    -- ^ Z-up, right-handed coordinate system
   | CoordUnity      -- ^ Y-up, left-handed (Unity engine)
 
 derive instance eqCoordinateSystem :: Eq CoordinateSystem

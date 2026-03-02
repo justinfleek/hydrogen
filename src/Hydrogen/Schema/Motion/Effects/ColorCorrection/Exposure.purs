@@ -4,7 +4,7 @@
 
 -- | Exposure — Photographic exposure adjustment.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Exposure effect with photographic controls:
 -- |

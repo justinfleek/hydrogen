@@ -14,7 +14,7 @@
 -- | - Glowing strokes (animated outer glow)
 -- | - Conic gradient borders (Linear's signature effect)
 -- |
--- | ## Research Findings (Linear, Figma, Vercel)
+-- | ## Research Findings (modern design tools)
 -- |
 -- | **Linear's Glowing Border Effect:**
 -- | - Uses conic gradients rotating around the element

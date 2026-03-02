@@ -4,7 +4,7 @@
 
 -- | Hue/Saturation Effect — Industry-standard HSL color adjustment.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Hue/Saturation effect with:
 -- |

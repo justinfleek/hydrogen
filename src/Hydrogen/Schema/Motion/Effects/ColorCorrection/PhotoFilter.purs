@@ -4,7 +4,7 @@
 
 -- | Photo Filter — Simulates camera lens filters.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's Photo Filter effect which simulates optical lens filters:
 -- |

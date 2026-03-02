@@ -25,7 +25,7 @@
 -- | - **Grading**: LUTs (1D, 3D), curves (RGB, luminance), lift/gamma/gain, ASC-CDL
 -- | - **3D/PBR**: Albedo, specular, metallic, roughness, emissive, subsurface
 -- | - **Maps**: Diffuse, normal, ambient occlusion, displacement, mask, alpha
--- | - **Blending**: Porter-Duff compositing, Photoshop blend modes, mix/lerp
+-- | - **Blending**: Porter-Duff compositing, standard blend modes, mix/lerp
 -- |
 -- | ### 2. Dimension
 -- | Measurement, spacing, and layout.

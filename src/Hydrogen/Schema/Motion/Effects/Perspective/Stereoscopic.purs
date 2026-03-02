@@ -4,7 +4,7 @@
 
 -- | Stereoscopic 3D Effects — functions for 3D Glasses effect.
 -- |
--- | Implements After Effects' 3D Glasses effect for stereoscopic
+-- | Implements motion graphics 3D Glasses effect for stereoscopic
 -- | view generation with bounded properties.
 
 module Hydrogen.Schema.Motion.Effects.Perspective.Stereoscopic

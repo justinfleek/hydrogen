@@ -4,9 +4,9 @@
 
 -- | Spatial Keyframes — Motion path keyframes with bezier handles in 2D/3D space.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
--- | In After Effects, position keyframes have TWO sets of bezier handles:
+-- | In professional motion graphics software, position keyframes have TWO sets of bezier handles:
 -- |
 -- | 1. **Spatial Handles**: Control the SHAPE of the motion path
 -- |    - Visible in the composition viewport as path tangents

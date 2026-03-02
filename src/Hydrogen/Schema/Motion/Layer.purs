@@ -10,7 +10,7 @@
 -- |
 -- | ## Layer Types
 -- |
--- | Supports 56 layer types matching After Effects and LATTICE:
+-- | Supports 56 layer types matching professional motion graphics and LATTICE:
 -- | - Media layers: Image, Video, Audio, Solid
 -- | - Content layers: Text, Shape, Null
 -- | - 3D layers: Camera, Light, Mesh, Environment, Volume

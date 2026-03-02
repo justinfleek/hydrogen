@@ -4,7 +4,7 @@
 
 -- | Perspective Effects — 3D perspective and depth effects.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Implements AE's Perspective effect category:
 -- |

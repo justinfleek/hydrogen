@@ -8,7 +8,7 @@
 -- | Generates the 3D geometry for translate/rotate/scale gizmos.
 -- | Each axis is a separate piece for independent hit testing.
 -- |
--- | ## Color Convention (Three.js/Blender standard)
+-- | ## Color Convention (Three.js/3D graphics standard)
 -- | - X axis: Red   (RGB 1, 0, 0)
 -- | - Y axis: Green (RGB 0, 1, 0)
 -- | - Z axis: Blue  (RGB 0, 0, 1)

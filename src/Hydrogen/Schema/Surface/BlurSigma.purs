@@ -95,7 +95,7 @@ toNumber (BlurSigma s) = s
 
 -- | Bounds documentation for this type
 -- |
--- | Sigma is the standard deviation. In Photoshop, blur goes up to 250px radius
+-- | Sigma is the standard deviation. In professional image editors, blur goes up to 250px radius
 -- | which corresponds to roughly 125px sigma (radius = 2*sigma for most blur effects).
 bounds :: Bounded.NumberBounds
 bounds = Bounded.numberBounds 0.0 125.0 Bounded.Clamps "blurSigma" "Gaussian blur standard deviation (0-125)"

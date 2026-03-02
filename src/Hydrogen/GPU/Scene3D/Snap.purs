@@ -14,7 +14,7 @@
 -- | - Grid snapping
 -- | - Rotation snapping
 -- |
--- | ## Cinema4D/Blender Parity
+-- | ## Industry Standard
 -- | - Vertex snapping
 -- | - Edge snapping (midpoint and along-edge)
 -- | - Face snapping (centroid and surface)

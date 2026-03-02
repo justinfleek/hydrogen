@@ -2,7 +2,7 @@
 --                                       // hydrogen // schema // motion // mask
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | LayerMask — Complete After Effects-style layer mask.
+-- | LayerMask — Complete professional motion graphics layer mask.
 -- |
 -- | ## Purpose
 -- |
@@ -10,7 +10,7 @@
 -- | visibility. Unlike track mattes (which use another layer), masks are
 -- | drawn directly on the layer.
 -- |
--- | ## After Effects Parity
+-- | ## Industry Standard
 -- |
 -- | Mirrors AE's mask properties exactly:
 -- | - Path: Bezier shape defining the mask region (animatable)
@@ -183,7 +183,7 @@ noExpansion = MaskExpansion (Pixel 0.0)
 --                                                              // layer // mask
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Complete After Effects-style layer mask.
+-- | Complete professional motion graphics layer mask.
 -- |
 -- | All animatable properties can be keyframed.
 newtype LayerMask = LayerMask

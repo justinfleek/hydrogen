@@ -10,7 +10,7 @@
 -- | brush touches the canvas once. All brush strokes are sequences of dabs
 -- | placed along a path at intervals defined by spacing.
 -- |
--- | ## Photoshop Brush Tip Categories
+-- | ## Professional Brush Tip Categories
 -- |
 -- | 1. **Round**: Circular with adjustable hardness (soft/hard edges)
 -- | 2. **Flat**: Rectangular, good for calligraphy

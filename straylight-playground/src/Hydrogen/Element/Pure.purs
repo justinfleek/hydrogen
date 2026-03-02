@@ -824,7 +824,7 @@ instance showAnimated :: Show (Animated msg) where
 --                                                            // playhead // types
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Timeline marker (like Ableton markers)
+-- | Timeline marker (like audio workstation markers)
 data TimelineMarker
   = LoopStart
   | LoopEnd
@@ -843,7 +843,7 @@ instance showTimelineMarker :: Show TimelineMarker where
 
 -- | Playhead configuration
 -- |
--- | Like Ableton's transport/playhead. Enables scrubbing, seeking,
+-- | Like audio workstation transport/playhead. Enables scrubbing, seeking,
 -- | looping, and tempo-synced animation.
 type PlayheadConfig =
   { position :: Progress                 -- Current position (0.0-1.0)
@@ -900,7 +900,7 @@ mapPlayhead f (Playhead p) = Playhead
 -- | No strings (except text content and IDs). No CSS. No escape hatches.
 -- |
 -- | Think about what's possible when CSS and JavaScript aren't restrictions.
--- | This Element can describe ANY UI ever conceived — Ableton, After Effects,
+-- | This Element can describe ANY UI ever conceived — professional creative software,
 -- | hospital dashboards, fighter jet HUDs, AI agent interfaces.
 data Element msg
   -- Basic shapes (all fields present with bounded ADTs)
@@ -1065,7 +1065,7 @@ data Element msg
   -- Playhead/Timeline
   | PlayheadElement (Playhead msg)
   
-  -- Viewport (for nested scenes, like After Effects comp)
+  -- Viewport (for nested scenes, like professional compositing software)
   | Viewport
       { scene :: Element msg             -- Nested scene
       , position :: Vec2 Pixel           -- Position

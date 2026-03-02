@@ -6,7 +6,7 @@
 -- |
 -- | **DESIGN TOOL COLOR MODEL:**
 -- | HSV (also called HSB - Hue, Saturation, Brightness) is the color model
--- | preferred by design tools like Photoshop, Figma, and color pickers.
+-- | preferred by professional design tools and color pickers.
 -- |
 -- | **HSV vs HSL:**
 -- | - HSV Value = brightness (V=0 is black, V=100 with S=0 is white)

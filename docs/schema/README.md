@@ -30,7 +30,7 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | [Accessibility](./35-accessibility.md) | 6 | WAI-ARIA 1.2 roles, states, live regions | ✓ |
 | [Attestation](./13-attestation.md) | 12 | Cryptographic integrity, UUID5, signatures | ✓ |
 | [Audio](./10b-audio.md) | 44 | Synthesis, effects, MIDI, spatial audio | ✓ |
-| [Brand](./12-brand.md) | 37 | Design tokens, theme composition | — |
+| [Brand](./12-brand.md) | 37 | Design tokens, theme composition | ✓ |
 | [Brush](./32-brush.md) | 68 | Brush tips, presets, blend modes, erasers | ✓ |
 | [Color](./01-color.md) | 58 | sRGB, P3, LAB, OKLCH, ACES, CDL, LUTs, CVD | ✓ |
 | [Compute](./29-compute.md) | 4 | ML compute graphs, DAG operations | ✓ |
@@ -66,9 +66,7 @@ No NaN. No Infinity. No escape hatches. Invalid states are unrepresentable by co
 | [Typography](./04-typography.md) | 36 | OpenType features, metrics, type scales | ✓ |
 | [Weather](./18-weather.md) | 18 | Atmosphere, precipitation, wind, Beaufort scale | ✓ |
 
-**Documented**: 37 pillars (Color, Dimension, Geometry, Typography, Motion, Surface, Temporal, Elevation, Haptic, Spatial, Attestation, Navigation, Audio, Reactive, Identity, Storage, Numeric, Compute, Brush)
-
-**Pending**: 1 pillar (Brand)
+**Documented**: 38 pillars (all pillars complete)
 
 ---
 

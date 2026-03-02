@@ -10,7 +10,7 @@
 -- | - **Local**: Object's own coordinate system (aligned with object axes)
 -- | - **Parent**: Parent object's coordinate system
 -- | - **Screen**: 2D screen space (for constrained manipulation)
--- | - **Gimbal**: World-aligned axes that follow object position (like Maya)
+-- | - **Gimbal**: World-aligned axes that follow object position (like professional 3D software)
 -- |
 -- | ## Three.js Parity
 -- |

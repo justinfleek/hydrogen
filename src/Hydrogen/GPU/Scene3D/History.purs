@@ -19,7 +19,7 @@
 -- | - Can compress/coalesce similar commands
 -- | - Supports selective undo (future)
 -- |
--- | ## Three.js / Cinema4D Parity
+-- | ## Three.js / Industry Standard
 -- |
 -- | Cinema4D undo system features:
 -- | - Grouped operations (begin/end group)

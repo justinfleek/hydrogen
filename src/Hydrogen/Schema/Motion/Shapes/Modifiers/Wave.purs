@@ -5,7 +5,7 @@
 -- | Stroke wave properties.
 -- |
 -- | Applies a wave deformation to the stroke path.
--- | After Effects introduced this in CC 2020 for shape layers.
+-- | Professional motion graphics tools introduced this in CC 2020 for shape layers.
 -- | All values are bounded and composable.
 
 module Hydrogen.Schema.Motion.Shapes.Modifiers.Wave
@@ -64,7 +64,7 @@ waveTypeToString wt = show wt
 -- | Stroke wave properties.
 -- |
 -- | Applies a wave deformation to the stroke path.
--- | After Effects introduced this in CC 2020 for shape layers.
+-- | Professional motion graphics tools introduced this in CC 2020 for shape layers.
 -- |
 -- | ## Properties
 -- |

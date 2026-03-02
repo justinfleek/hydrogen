@@ -5,7 +5,7 @@
 -- | Blend modes and compositing operations.
 -- |
 -- | This module provides:
--- | - **Blend Modes**: Photoshop-style blending (multiply, screen, overlay...)
+-- | - **Blend Modes**: standard blending (multiply, screen, overlay...)
 -- | - **Porter-Duff**: Alpha compositing operations
 -- | - **Mixing**: Color interpolation
 
@@ -55,7 +55,7 @@ import Hydrogen.Schema.Color.Opacity as Op
 --                                                                // blend modes
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Standard blend modes (Photoshop/CSS)
+-- | Standard blend modes (industry standard/CSS)
 data BlendMode
   -- Normal modes
   = Normal               -- ^ Top layer only
