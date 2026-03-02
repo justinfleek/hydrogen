@@ -28,7 +28,7 @@
 
 module Hydrogen.Schema.Surface.Surface
   ( -- * Surface Type
-    SurfaceType(..)
+    SurfaceType(Matte, Glossy, Metallic, Satin, Textured, Custom)
   
   -- * Types
   , Surface(Surface)

@@ -9,7 +9,7 @@
 
 module Hydrogen.Schema.Reactive.PresenceState
   ( -- * Presence Phase
-    PresencePhase(..)
+    PresencePhase(PhaseEntering, PhaseEntered, PhaseExiting, PhaseExited)
   , isEntering
   , isEntered
   , isExiting
@@ -17,13 +17,13 @@ module Hydrogen.Schema.Reactive.PresenceState
   , isPresent
   , isAnimating
   -- * Mount Status
-  , MountStatus(..)
+  , MountStatus(Unmounted, Mounting, Mounted, Unmounting)
   , isMounted
   , isUnmounted
   , isMounting
   , isUnmounting
   -- * Animation Direction
-  , AnimationDirection(..)
+  , AnimationDirection(Forward, Backward, NoDirection)
   , isForward
   , isBackward
   , isNoDirection

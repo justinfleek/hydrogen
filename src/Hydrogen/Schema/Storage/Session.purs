@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Storage.Session
   ( -- * Storage Type
-    StorageType(..)
+    StorageType(LocalStorage, SessionStorage, Cookies)
   , storageTypeLabel
   , storageTypePersists
   , storageTypeCrossTab
@@ -48,12 +48,12 @@ module Hydrogen.Schema.Storage.Session
   , cookieHttpOnly
   
   -- * SameSite Policy
-  , SameSite(..)
+  , SameSite(SameSiteStrict, SameSiteLax, SameSiteNone)
   , sameSiteLabel
   , isSameSiteStrict
   
   -- * Session Error
-  , SessionError(..)
+  , SessionError(SessionExpired, SessionNotFound, SessionCorrupted, SessionStorageUnavailable, CookieBlocked)
   , sessionErrorMessage
   , isSessionExpiredError
   ) where

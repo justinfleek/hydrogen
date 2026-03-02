@@ -29,10 +29,10 @@
 module Hydrogen.Schema.Color.Profile
   ( -- * Profile Types
     ICCProfile
-  , ProfileClass(..)
-  , ColorSpaceSignature(..)
-  , RenderingIntent(..)
-  , ProfileVersion(..)
+  , ProfileClass(InputDevice, DisplayDevice, OutputDevice, DeviceLink, ColorSpaceConv, AbstractProfile, NamedColor)
+  , ColorSpaceSignature(XYZSpace, LabSpace, LuvSpace, YCbCrSpace, YxySpace, RGBSpace, GraySpace, HSVSpace, HLSSpace, CMYKSpace, CMYSpace)
+  , RenderingIntent(Perceptual, RelativeColorimetric, Saturation, AbsoluteColorimetric)
+  , ProfileVersion(ICC_2_0, ICC_2_1, ICC_2_4, ICC_4_0, ICC_4_2, ICC_4_3, ICC_4_4, ICC_5_0)
   
   -- * Profile Metadata
   , ProfileMetadata

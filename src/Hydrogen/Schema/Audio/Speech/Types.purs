@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Audio.Speech.Types
   ( -- * Confidence Atoms
-    Confidence(..)
+    Confidence(Confidence)
   , confidence
   , unwrapConfidence
   , confidenceHigh
@@ -18,9 +18,9 @@ module Hydrogen.Schema.Audio.Speech.Types
   , confidenceLow
   
   -- * Timing Atoms
-  , WordStart(..)
-  , WordEnd(..)
-  , PhonemeDuration(..)
+  , WordStart(WordStart)
+  , WordEnd(WordEnd)
+  , PhonemeDuration(PhonemeDuration)
   , wordStart
   , wordEnd
   , phonemeDuration

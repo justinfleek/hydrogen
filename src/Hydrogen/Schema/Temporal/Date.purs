@@ -18,13 +18,13 @@
 
 module Hydrogen.Schema.Temporal.Date
   ( -- * Year
-    Year(..)
+    Year(Year)
   , year
   , unwrapYear
   , yearBounds
   
   -- * Month
-  , Month(..)
+  , Month(Month)
   , month
   , unwrapMonth
   , monthBounds
@@ -47,13 +47,13 @@ module Hydrogen.Schema.Temporal.Date
   , december
   
   -- * Day
-  , Day(..)
+  , Day(Day)
   , day
   , unwrapDay
   , dayBounds
   
   -- * Week
-  , WeekOfYear(..)
+  , WeekOfYear(WeekOfYear)
   , weekOfYear
   , unwrapWeekOfYear
   , weekBounds
@@ -85,7 +85,7 @@ import Prelude
   ( class Eq
   , class Ord
   , class Show
-  , Ordering(..)
+  , Ordering(LT, EQ, GT)
   , show
   , compare
   , otherwise

@@ -41,7 +41,7 @@
 
 module Hydrogen.Schema.Elevation.ShadowStyle
   ( -- * Shadow Style Type
-    ShadowStyle(..)
+    ShadowStyle(None, Soft, Hard, Layered, Colored, Long)
   , Intensity
   
   -- * No Shadow

@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Network.WebSocket.Messages
   ( -- * Message Types
-    WebSocketMessage(..)
+    WebSocketMessage(TextMessage, BinaryMessage)
   , textMessage
   , binaryMessage
   , messageSize

@@ -36,10 +36,10 @@
 
 module Hydrogen.Schema.Typography.OpenType.Numerals
   ( -- * Types
-    FigureStyle(..)
-  , FigureSpacing(..)
-  , SlashedZero(..)
-  , Numerals(..)
+    FigureStyle(StyleDefault, StyleLining, StyleOldstyle)
+  , FigureSpacing(SpacingDefault, SpacingProportional, SpacingTabular)
+  , SlashedZero(ZeroDefault, ZeroSlashed, ZeroNormal)
+  , Numerals(Numerals)
   
   -- * Constructors
   , normal

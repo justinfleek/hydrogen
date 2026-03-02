@@ -48,8 +48,8 @@ module Hydrogen.Schema.Brush.Dynamics
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Brush.Dynamics.Types
-  ( DynamicsMapping(..)
-  , ResponseCurve(..)
+  ( DynamicsMapping(DynamicsMapping)
+  , ResponseCurve(Linear, Soft, Firm, SCurve, Logarithmic, Exponential)
   , allResponseCurves
   , constantMapping
   , exponentialMapping

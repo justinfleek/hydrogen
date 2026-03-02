@@ -21,14 +21,14 @@
 
 module Hydrogen.Schema.Storage.Clipboard
   ( -- * MIME Type
-    MimeType(..)
+    MimeType(TextPlain, TextHtml, TextRtf, ImagePng, ImageJpeg, ImageGif, ImageSvg, ImageWebp, ApplicationJson, CustomMimeType)
   , mimeTypeString
   , mimeTypeCategory
   , isTextMimeType
   , isImageMimeType
   
   -- * Clipboard Item
-  , ClipboardItem(..)
+  , ClipboardItem(TextItem, HtmlItem, ImageItem, BinaryItem)
   , clipboardItemMimeType
   , textItem
   , htmlItem
@@ -50,7 +50,7 @@ module Hydrogen.Schema.Storage.Clipboard
   , firstImageItem
   
   -- * Clipboard Operation
-  , ClipboardOp(..)
+  , ClipboardOp(ReadClipboard, WriteClipboard, WriteTextOp, ReadTextOp)
   , readClipboard
   , writeClipboard
   , writeText
@@ -60,13 +60,13 @@ module Hydrogen.Schema.Storage.Clipboard
   , opRequiresPermission
   
   -- * Clipboard Error
-  , ClipboardError(..)
+  , ClipboardError(ClipboardNotSupported, PermissionDenied, ReadFailed, WriteFailed, InvalidData, FocusRequired)
   , clipboardErrorMessage
   , isPermissionError
   , isNotSupportedError
   
   -- * Clipboard Permission
-  , ClipboardPermission(..)
+  , ClipboardPermission(PermissionGranted, PermissionDeniedState, PermissionPrompt)
   , permissionLabel
   , isPermissionGranted
   , permissionForOperation

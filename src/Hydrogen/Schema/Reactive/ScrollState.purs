@@ -9,7 +9,7 @@
 
 module Hydrogen.Schema.Reactive.ScrollState
   ( -- * Scroll Direction
-    ScrollDirection(..)
+    ScrollDirection(ScrollUp, ScrollDown, ScrollLeft, ScrollRight, ScrollIdle)
   , isScrollingUp
   , isScrollingDown
   , isScrollingLeft
@@ -18,18 +18,18 @@ module Hydrogen.Schema.Reactive.ScrollState
   , isVerticalScroll
   , isHorizontalScroll
   -- * Scroll Behavior
-  , ScrollBehavior(..)
+  , ScrollBehavior(SmoothScroll, InstantScroll, AutoScroll)
   , isSmooth
   , isInstant
   , isAuto
   -- * Overflow Behavior
-  , OverflowBehavior(..)
+  , OverflowBehavior(OverflowAuto, OverflowScroll, OverflowHidden, OverflowVisible)
   , isOverflowAuto
   , isOverflowScroll
   , isOverflowHidden
   , isOverflowVisible
   -- * Overscroll Behavior
-  , OverscrollBehavior(..)
+  , OverscrollBehavior(OverscrollAuto, OverscrollContain, OverscrollNone)
   , isOverscrollAuto
   , isOverscrollContain
   , isOverscrollNone
@@ -65,11 +65,11 @@ module Hydrogen.Schema.Reactive.ScrollState
   , isScrolling
   , isFastScroll
   -- * Scroll Snap
-  , ScrollSnapType(..)
+  , ScrollSnapType(SnapMandatory, SnapProximity, SnapNone)
   , isSnapMandatory
   , isSnapProximity
   , isSnapNone
-  , ScrollSnapAlign(..)
+  , ScrollSnapAlign(SnapAlignStart, SnapAlignCenter, SnapAlignEnd)
   , isSnapStart
   , isSnapCenter
   , isSnapEnd

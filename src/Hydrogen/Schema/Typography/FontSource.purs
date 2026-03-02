@@ -18,12 +18,12 @@
 -- | - Brand validation (can we guarantee this font renders?)
 
 module Hydrogen.Schema.Typography.FontSource
-  ( FontSource(..)
-  , SystemFont(..)
+  ( FontSource(System, Custom)
+  , SystemFont(Arial, Helvetica, Verdana, Tahoma, TrebuchetMs, ArialBlack, Impact, Georgia, TimesNewRoman, Palatino, BookAntiqua, CourierNew, LucidaConsole, Monaco, Menlo, Consolas, SFPro, SegoeUi, Roboto, Ubuntu, Cantarell, ComicSansMs, Papyrus, BrushScript)
   , CustomFont
-  , ImportMethod(..)
+  , ImportMethod(GoogleFonts, AdobeFonts, SelfHosted, FontFace)
   , FontFaceConfig
-  , FontFormat(..)
+  , FontFormat(WOFF2, WOFF, TTF, OTF, EOT)
   , customFont
   , customFontFamily
   , customFontImport

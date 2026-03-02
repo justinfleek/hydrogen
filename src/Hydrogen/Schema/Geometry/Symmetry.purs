@@ -94,7 +94,7 @@ module Hydrogen.Schema.Geometry.Symmetry
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Geometry.Symmetry.Reflection
-  ( ReflectionAxis(..)
+  ( ReflectionAxis(ReflectionAxis)
   , reflectionAxis
   , horizontalAxis
   , verticalAxis
@@ -108,7 +108,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Reflection
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Rotational
-  ( RotationalSymmetry(..)
+  ( RotationalSymmetry(RotationalSymmetry)
   , rotationalSymmetry
   , noRotationalSymmetry
   , bilateral
@@ -125,7 +125,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Rotational
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Dihedral
-  ( DihedralSymmetry(..)
+  ( DihedralSymmetry(DihedralSymmetry)
   , dihedralSymmetry
   , dihedral2
   , dihedral3
@@ -138,7 +138,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Dihedral
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Translational
-  ( TranslationalSymmetry(..)
+  ( TranslationalSymmetry(TranslationalSymmetry)
   , translationalSymmetry
   , periodicX
   , periodicY
@@ -150,7 +150,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Translational
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Glide
-  ( GlideReflection(..)
+  ( GlideReflection(GlideReflection)
   , glideReflection
   , horizontalGlide
   , verticalGlide
@@ -159,7 +159,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Glide
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Group
-  ( SymmetryGroup(..)
+  ( SymmetryGroup(SymmetryGroup)
   , noSymmetry
   , identitySymmetry
   , reflectionOnly
@@ -176,14 +176,14 @@ import Hydrogen.Schema.Geometry.Symmetry.Group
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Chirality
-  ( Chirality(..)
+  ( Chirality(Chiral, Achiral)
   , isChiral
   , isAchiral
   , chiralityOf
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Operations
-  ( SymmetryOp(..)
+  ( SymmetryOp(Identity, Reflect, Rotate, Translate, Glide, Compose)
   , identityOp
   , reflectOp
   , rotateOp
@@ -195,7 +195,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Operations
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.PointGroup
-  ( PointGroup(..)
+  ( PointGroup(CyclicGroup, DihedralGroup)
   , pointGroupName
   , pointGroupOrder
   , isCyclic
@@ -203,7 +203,7 @@ import Hydrogen.Schema.Geometry.Symmetry.PointGroup
   )
   
 import Hydrogen.Schema.Geometry.Symmetry.Wallpaper
-  ( WallpaperGroup(..)
+  ( WallpaperGroup(P1, P2, PM, PG, CM, PMM, PMG, PGG, CMM, P4, P4M, P4G, P3, P3M1, P31M, P6, P6M)
   , wallpaperGroupName
   , wallpaperGroupNumber
   )

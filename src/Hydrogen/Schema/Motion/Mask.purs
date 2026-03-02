@@ -35,18 +35,18 @@
 
 module Hydrogen.Schema.Motion.Mask
   ( -- * Layer Mask
-    LayerMask(..)
+    LayerMask(LayerMask)
   , defaultLayerMask
   , mkLayerMask
   
   -- * Mask Feather
-  , MaskFeather(..)
+  , MaskFeather(MaskFeather)
   , maskFeather
   , uniformFeather
   , noFeather
   
   -- * Mask Expansion
-  , MaskExpansion(..)
+  , MaskExpansion(MaskExpansion)
   , maskExpansion
   , noExpansion
   
@@ -81,7 +81,7 @@ module Hydrogen.Schema.Motion.Mask
   , hasMaskExpansion
   
   -- * Mask Group
-  , MaskGroup(..)
+  , MaskGroup(MaskGroup)
   , emptyMaskGroup
   , addMask
   , removeMask

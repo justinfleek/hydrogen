@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Brush.Input.Capabilities
   ( -- * Pressure Levels
-    PressureLevels(..)
+    PressureLevels(PressureLevels)
   , pressureLevels
   , pressureLevelsBounds
   , unwrapPressureLevels
@@ -27,7 +27,7 @@ module Hydrogen.Schema.Brush.Input.Capabilities
   , professionalPressureLevels
   
   -- * Tilt Range
-  , TiltRange(..)
+  , TiltRange(TiltRange)
   , tiltRange
   , tiltRangeBounds
   , unwrapTiltRange
@@ -36,7 +36,7 @@ module Hydrogen.Schema.Brush.Input.Capabilities
   , wideTiltRange
   
   -- * Hover Height
-  , HoverHeight(..)
+  , HoverHeight(HoverHeight)
   , hoverHeight
   , hoverHeightBounds
   , unwrapHoverHeight
@@ -44,7 +44,7 @@ module Hydrogen.Schema.Brush.Input.Capabilities
   , standardHoverHeight
   
   -- * Touch Points
-  , TouchPoints(..)
+  , TouchPoints(TouchPoints)
   , touchPoints
   , touchPointsBounds
   , unwrapTouchPoints

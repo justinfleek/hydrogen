@@ -38,14 +38,14 @@
 
 module Hydrogen.Schema.Typography.TextIndex
   ( -- * Index Types
-    CharacterIndex(..)
-  , WordIndex(..)
-  , LineIndex(..)
-  , BlockIndex(..)
+    CharacterIndex(CharacterIndex)
+  , WordIndex(WordIndex)
+  , LineIndex(LineIndex)
+  , BlockIndex(BlockIndex)
   
   -- * Geometry Indices
-  , ContourIndex(..)
-  , PointIndex(..)
+  , ContourIndex(ContourIndex)
+  , PointIndex(PointIndex)
   
   -- * Compound Addresses
   , TextAddress

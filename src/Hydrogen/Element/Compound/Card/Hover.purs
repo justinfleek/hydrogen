@@ -55,8 +55,8 @@ module Hydrogen.Element.Compound.Card.Hover
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Element.Compound.Card.Hover.Types
-  ( CardHoverConfig(..)
-  , HoverEasing(..)
+  ( CardHoverConfig(CardHoverConfig)
+  , HoverEasing(EaseLinear, EaseIn, EaseOut, EaseInOut, EaseSpring)
   , cardHoverConfig
   , defaultCardHover
   , noHover

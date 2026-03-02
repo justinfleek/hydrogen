@@ -35,7 +35,7 @@ module Hydrogen.Schema.Weather.Wind.Direction
   , directionNorthWest
   
   -- * Cardinal Enum
-  , Cardinal(..)
+  , Cardinal(N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW)
   , allCardinals
   , cardinalToDegrees
   , degreesToCardinal

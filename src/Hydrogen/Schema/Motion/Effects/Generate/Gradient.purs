@@ -18,7 +18,7 @@
 module Hydrogen.Schema.Motion.Effects.Generate.Gradient
   ( -- * Gradient Ramp
     GradientRampEffect
-  , RampShape(..)
+  , RampShape(RSLinear, RSRadial)
   , defaultGradientRamp
   , linearGradientRamp
   , radialGradientRamp
@@ -55,7 +55,7 @@ import Prelude
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, point2D)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMNormal))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // gradient // ramp

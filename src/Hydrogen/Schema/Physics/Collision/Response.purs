@@ -26,7 +26,7 @@
 
 module Hydrogen.Schema.Physics.Collision.Response
   ( -- * Response Types
-    CollisionResponse(..)
+    CollisionResponse(ResponseNone, ResponseBounce, ResponseSlide, ResponseStick, ResponseCustom)
   , responseNone
   , responseBounce
   , responseSlide
@@ -54,11 +54,11 @@ import Prelude
   )
 
 import Hydrogen.Schema.Physics.Collision.Point
-  ( Point2D(..)
+  ( Point2D(Point2D)
   )
 
 import Hydrogen.Schema.Physics.Collision.Contact
-  ( Contact(..)
+  ( Contact(NoContact, Contact)
   )
 
 import Hydrogen.Schema.Physics.Collision.Internal

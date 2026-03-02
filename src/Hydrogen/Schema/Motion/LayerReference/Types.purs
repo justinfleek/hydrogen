@@ -19,27 +19,27 @@
 
 module Hydrogen.Schema.Motion.LayerReference.Types
   ( -- * Layer Reference
-    LayerRef(..)
+    LayerRef(LayerRef)
   , mkLayerRef
   , mkLayerRefFromUUID
   , layerRefId
   , layerRefUUID
   
   -- * Property Reference
-  , PropertyRef(..)
+  , PropertyRef(PropertyRef)
   , mkPropertyRef
   , mkPropertyRefFromUUID
   , propertyRefPath
   , propertyRefUUID
   
   -- * Effect Reference
-  , EffectRef(..)
+  , EffectRef(EffectRef)
   , mkEffectRef
   , mkEffectRefFromUUID
   , effectRefUUID
   
   -- * Mask Reference
-  , MaskRef(..)
+  , MaskRef(MaskRef)
   , mkMaskRef
   , mkMaskRefFromUUID
   , maskRefUUID

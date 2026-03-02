@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Reactive.Feedback.Overlay
   ( -- * Drawer (Molecule)
-    DrawerPosition(..)
+    DrawerPosition(DrawerLeft, DrawerRight, DrawerTop, DrawerBottom)
   , Drawer
   , drawer
   , navigationDrawer
@@ -20,7 +20,7 @@ module Hydrogen.Schema.Reactive.Feedback.Overlay
   , closeDrawer
   , toggleDrawer
   -- * Sheet (Molecule)
-  , SheetSnapPoint(..)
+  , SheetSnapPoint(SheetMinimized, SheetPartial, SheetExpanded, SheetCustom)
   , Sheet
   , sheet
   , standardSheet

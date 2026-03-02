@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Graph.Layout.Types
   ( -- * Layout Algorithm
-    LayoutAlgorithm(..)
+    LayoutAlgorithm(IndentedList, Outline, Radial, Sunburst, CirclePack, Treemap, Icicle, Partition, Tidy, Cluster, Dendrogram, OrgChart, MindMap, Force, HierarchicalForce)
   , isLinearLayout
   , isRadialLayout
   , isSpaceFillingLayout
@@ -25,20 +25,20 @@ module Hydrogen.Schema.Graph.Layout.Types
   , isForceLayout
   
   -- * Layout Direction
-  , LayoutDirection(..)
+  , LayoutDirection(Horizontal, Vertical)
   , isHorizontal
   , isVertical
   , flipDirection
   
   -- * Layout Orientation  
-  , LayoutOrientation(..)
+  , LayoutOrientation(TopDown, BottomUp, LeftRight, RightLeft)
   , isTopDown
   , isBottomUp
   , isLeftRight
   , isRightLeft
   
   -- * Node Sizing
-  , NodeSizing(..)
+  , NodeSizing(FixedSize, FitContent, Proportional, AspectRatio)
   , isFixedSize
   , isFitContent
   , isProportional

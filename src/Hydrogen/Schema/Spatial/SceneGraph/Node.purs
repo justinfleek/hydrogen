@@ -23,7 +23,7 @@ module Hydrogen.Schema.Spatial.SceneGraph.Node
   , unwrapNodeId
   
   -- * Transform
-  , Transform3D(..)
+  , Transform3D(Transform3D)
   , identityTransform
   , translateTransform
   , rotateTransform
@@ -31,15 +31,15 @@ module Hydrogen.Schema.Spatial.SceneGraph.Node
   , combineTransforms
   
   -- * Node
-  , NodeContent(..)
-  , Node(..)
+  , NodeContent(ContentEmpty, ContentMesh, ContentLight, ContentCamera)
+  , Node(Node)
   , emptyNode
   , meshNode
   , lightNode
   , groupNode
   
   -- * Scene
-  , Scene(..)
+  , Scene(Scene)
   , emptyScene
   , sceneWithNodes
   

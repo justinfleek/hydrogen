@@ -16,46 +16,46 @@
 
 module Hydrogen.Schema.Motion.Shapes
   ( -- * Fill/Stroke Enums
-    FillRule(..)
+    FillRule(FRNonzero, FREvenodd)
   , fillRuleToString
   , fillRuleFromString
   
-  , LineCap(..)
+  , LineCap(LCButt, LCRound, LCSquare)
   , lineCapToString
   , lineCapFromString
   
-  , LineJoin(..)
+  , LineJoin(LJMiter, LJRound, LJBevel)
   , lineJoinToString
   , lineJoinFromString
   
   -- * Path Operator Enums
-  , TrimMode(..)
+  , TrimMode(TMSimultaneously, TMIndividually)
   , trimModeToString
   , trimModeFromString
   
-  , MergeMode(..)
+  , MergeMode(MMAdd, MMSubtract, MMIntersect, MMExclude, MMMinusFront, MMMinusBack)
   , mergeModeToString
   , mergeModeFromString
   
-  , OffsetJoin(..)
+  , OffsetJoin(OJMiter, OJRound, OJBevel)
   , offsetJoinToString
   , offsetJoinFromString
   
-  , WigglePointType(..)
+  , WigglePointType(WPTCorner, WPTSmooth)
   , wigglePointTypeToString
   , wigglePointTypeFromString
   
-  , ZigZagPointType(..)
+  , ZigZagPointType(ZZPTCorner, ZZPTSmooth)
   , zigZagPointTypeToString
   , zigZagPointTypeFromString
   
   -- * Repeater/Group
-  , RepeaterComposite(..)
+  , RepeaterComposite(RCAbove, RCBelow)
   , repeaterCompositeToString
   , repeaterCompositeFromString
   
   -- * Shape Content Type
-  , ShapeContentType(..)
+  , ShapeContentType(SCTRectangle, SCTEllipse, SCTPolygon, SCTStar, SCTPath, SCTFill, SCTStroke, SCTGradientFill, SCTGradientStroke, SCTTrimPaths, SCTMergePaths, SCTOffsetPaths, SCTPuckerBloat, SCTWigglePaths, SCTZigZag, SCTTwist, SCTRoundedCorners, SCTRepeater, SCTTransform, SCTGroup, SCTSimplifyPath, SCTSmoothPath, SCTExtrude, SCTTrace)
   , shapeContentTypeToString
   , shapeContentTypeFromString
   , isShapeContentTypeGenerator
@@ -63,27 +63,27 @@ module Hydrogen.Schema.Motion.Shapes
   , isShapeContentTypeOperator
   
   -- * Gradient
-  , GradientType(..)
+  , GradientType(GTLinear, GTRadial)
   , gradientTypeToString
   , gradientTypeFromString
   
   -- * Quality
-  , ShapeQuality(..)
+  , ShapeQuality(SQDraft, SQNormal, SQHigh)
   , shapeQualityToString
   , shapeQualityFromString
   
   -- * Extrude
-  , ExtrudeCapType(..)
+  , ExtrudeCapType(ECTFlat, ECTRound, ECTBevel)
   , extrudeCapTypeToString
   , extrudeCapTypeFromString
   
   -- * Trace
-  , TraceMode(..)
+  , TraceMode(TMBlackAndWhite, TMGrayscale, TMColor)
   , traceModeToString
   , traceModeFromString
   
   -- * Path Direction
-  , PathDirection(..)
+  , PathDirection(PDClockwise, PDCounterClockwise)
   , pathDirectionToString
   , pathDirectionFromString
   , pathDirectionToInt

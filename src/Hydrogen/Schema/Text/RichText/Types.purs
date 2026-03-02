@@ -24,30 +24,30 @@
 
 module Hydrogen.Schema.Text.RichText.Types
   ( -- * URL Type
-    URL(..)
+    URL(URL)
   , url
   , unwrapURL
   
   -- * Language Type
-  , Language(..)
+  , Language(PlainText, JavaScript, TypeScript, PureScript, Haskell, Lean, Python, Rust, Go, C, Cpp, CSharp, Java, Kotlin, Swift, Ruby, PHP, Elixir, Erlang, Clojure, Scala, FSharp, OCaml, Lua, R, Julia, Zig, Nim, Crystal, Dart, HTML, CSS, SCSS, SASS, Less, JSON, YAML, TOML, XML, Markdown, LaTeX, Bash, Shell, PowerShell, SQL, GraphQL, Protobuf, Dockerfile, Makefile, Nix, Dhall)
   , languageFromString
   , languageToString
   
   -- * Heading Level
-  , HeadingLevel(..)
+  , HeadingLevel(H1, H2, H3, H4, H5, H6)
   
   -- * List Types
-  , ListType(..)
+  , ListType(Bullet, Numbered, Checkbox)
   , ListItem
   
   -- * Inline Type
-  , Inline(..)
+  , Inline(TextNode, Bold, Italic, Code, Link, Strikethrough, Underline, Subscript, Superscript)
   
   -- * Block Type
-  , Block(..)
+  , Block(Paragraph, Heading, CodeBlock, BlockQuote, List, HorizontalRule)
   
   -- * Document Type
-  , RichTextDocument(..)
+  , RichTextDocument(RichTextDocument)
   , emptyDocument
   , documentBlocks
   ) where

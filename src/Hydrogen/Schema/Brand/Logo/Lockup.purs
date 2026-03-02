@@ -18,12 +18,12 @@ module Hydrogen.Schema.Brand.Logo.Lockup
   , unLockupName
   
     -- * Lockup Priority
-  , LockupPriority(..)
+  , LockupPriority(Primary, Secondary, Tertiary)
   , allLockupPriorities
   , priorityToString
   
     -- * Usage Context
-  , UsageContext(..)
+  , UsageContext(Letterhead, BusinessCard, EmailSignature, SocialProfile, WebsiteHeader, AppIcon, Favicon, Merchandise, PrintAdvertising, DigitalAdvertising, Presentation, Video)
   , allUsageContexts
   , contextToString
   

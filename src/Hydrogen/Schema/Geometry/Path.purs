@@ -40,7 +40,7 @@ module Hydrogen.Schema.Geometry.Path
   ) where
 
 import Hydrogen.Schema.Geometry.Path.Types
-  ( PathCommand(..)
+  ( PathCommand(MoveTo, LineTo, HLineTo, VLineTo, QuadTo, SmoothQuadTo, CubicTo, SmoothCurveTo, ArcTo, ClosePath)
   , allPathCommandTags
   , Path(Path)
   , ArcParams

@@ -78,7 +78,7 @@ module Hydrogen.Schema.Physics.Fluid.Solver
   , velocitiesEqual
   , velocityExceeds
   , negateVelocity
-  , VelocityOrder(..)
+  , VelocityOrder(Slower, SameSpeed, Faster)
   , compareVelocities
   , totalCells
   ) where

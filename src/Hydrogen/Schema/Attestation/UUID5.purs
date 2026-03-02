@@ -72,7 +72,7 @@ import Hydrogen.Schema.Attestation.SHA256 (sha256Bytes, toBytes) as SHA256
 
 -- Re-export namespaces
 import Hydrogen.Schema.Attestation.UUID5.Namespaces
-  ( UUID5(..)
+  ( UUID5(UUID5)
   , nsElement
   , nsEvent
   , nsAttestation

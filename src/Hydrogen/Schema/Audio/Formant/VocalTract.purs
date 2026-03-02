@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Audio.Formant.VocalTract
   ( -- * Vocal Tract Atoms
-    TractLength(..)
+    TractLength(TractLength)
   , tractLength
   , unwrapTractLength
   , tractLengthMale
@@ -23,12 +23,12 @@ module Hydrogen.Schema.Audio.Formant.VocalTract
   , tractLengthChild
   
   -- * Vocoder Parameters
-  , VocoderBands(..)
+  , VocoderBands(VocoderBands)
   , vocoderBands
   , unwrapVocoderBands
   
   -- * Formant Shift
-  , FormantShift(..)
+  , FormantShift(FormantShift)
   , formantShift
   , unwrapFormantShift
   ) where

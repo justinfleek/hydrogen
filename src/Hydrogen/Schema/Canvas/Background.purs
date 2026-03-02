@@ -30,7 +30,7 @@
 
 module Hydrogen.Schema.Canvas.Background
   ( -- * Background Fill
-    BackgroundFill(..)
+    BackgroundFill(FillSolid, FillGradient, FillPattern, FillTransparent)
   , allBackgroundFills
   , defaultFill
   
@@ -40,7 +40,7 @@ module Hydrogen.Schema.Canvas.Background
   , solidColor
   
   -- * Gradient
-  , GradientType(..)
+  , GradientType(LinearGradient, RadialGradient, ConicGradient)
   , allGradientTypes
   , GradientStop
   , mkGradientStop
@@ -51,7 +51,7 @@ module Hydrogen.Schema.Canvas.Background
   , gradientAngle
   
   -- * Pattern
-  , PatternType(..)
+  , PatternType(CheckerPattern, GridPattern, DotsPattern, LinesPattern, CrosshatchPattern, NoisePattern)
   , allPatternTypes
   , PatternBackground
   , mkPatternBackground
@@ -60,7 +60,7 @@ module Hydrogen.Schema.Canvas.Background
   , patternOpacity
   
   -- * Paper Properties
-  , PaperTexture(..)
+  , PaperTexture(SmoothPaper, ColdPressPaper, RoughPaper, ToothPaper, CanvasPaper, VellumPaper)
   , allPaperTextures
   , PaperProperties
   , mkPaperProperties
@@ -126,7 +126,7 @@ import Prelude
   , otherwise
   )
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // background fill

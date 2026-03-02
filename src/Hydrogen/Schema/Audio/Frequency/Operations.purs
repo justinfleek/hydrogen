@@ -24,10 +24,10 @@ import Prelude (otherwise, (*), (/), (<=))
 
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Audio.Frequency.Types 
-  ( Hertz(..)
-  , Cent(..)
-  , Semitone(..)
-  , Octave(..)
+  ( Hertz(Hertz)
+  , Cent(Cent)
+  , Semitone(Semitone)
+  , Octave(Octave)
   , hertz
   , cent
   , semitone

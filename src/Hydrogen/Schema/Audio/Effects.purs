@@ -21,7 +21,7 @@
 
 module Hydrogen.Schema.Audio.Effects
   ( -- * Reverb
-    ReverbAlgorithm(..)
+    ReverbAlgorithm(Hall, Room, Chamber, Plate, Spring, Convolution, Algorithmic)
   , Reverb
   , reverb
   , reverbHall
@@ -55,7 +55,7 @@ module Hydrogen.Schema.Audio.Effects
   , eqTelephone
   
   -- * Distortion
-  , DistortionType(..)
+  , DistortionType(Overdrive, Distort, Fuzz, BitCrush, WaveShaper)
   , Distortion
   , distortion
   , distortionSubtle

@@ -10,11 +10,14 @@
 
 module Hydrogen.GPU.RenderEffect.Particle
   ( -- * Particle Effect Type
-    ParticleEffect(..)
+    ParticleEffect
+      ( ParticleFieldEffect
+      , ParticleEmitterEffect
+      )
   
   -- * Particle Variants
-  , ParticleField(..)
-  , ParticleEmitter(..)
+  , ParticleField(ParticleField)
+  , ParticleEmitter(ParticleEmitter)
   
   ) where
 

@@ -80,7 +80,7 @@ import Prelude
   )
 
 import Data.Array (snoc, foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int (toNumber, floor) as Int
 
 import Hydrogen.Schema.Geometry.Point (Point2D)

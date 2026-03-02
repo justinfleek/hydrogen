@@ -62,7 +62,7 @@ module Hydrogen.Schema.Motion.Effects.Generate
 
 import Hydrogen.Schema.Motion.Effects.Generate.Gradient
   ( GradientRampEffect
-  , RampShape(..)
+  , RampShape(RSLinear, RSRadial)
   , defaultGradientRamp
   , linearGradientRamp
   , radialGradientRamp
@@ -78,18 +78,18 @@ import Hydrogen.Schema.Motion.Effects.Generate.Gradient
 
 import Hydrogen.Schema.Motion.Effects.Generate.Patterns
   ( CellPatternEffect
-  , CellType(..)
+  , CellType(CTBubbles, CTPipes, CTCrystals, CTMixed, CTPlates, CTSoft)
   , defaultCellPattern
   , cellPatternWithType
   , CheckerboardEffect
   , defaultCheckerboard
   , checkerboardWithSize
   , GridEffect
-  , GridType(..)
+  , GridType(GTLines, GTRectangles)
   , defaultGrid
   , gridWithSize
   , FractalEffect
-  , FractalNoiseType(..)
+  , FractalNoiseType(FNTBasic, FNTTurbulentSmooth, FNTTurbulentSharp, FNTDynamic, FNTDynamicTwist, FNTSplineTurbulence)
   , defaultFractal
   , fractalWithComplexity
   , cellTypeToString
@@ -110,18 +110,18 @@ import Hydrogen.Schema.Motion.Effects.Generate.Patterns
 
 import Hydrogen.Schema.Motion.Effects.Generate.Shapes
   ( CircleEffect
-  , CircleEdgeType(..)
+  , CircleEdgeType(CETNone, CETThickness)
   , defaultCircle
   , circleWithRadius
   , EllipseEffect
   , defaultEllipse
   , ellipseWithSize
   , FillEffect
-  , FillMaskMode(..)
+  , FillMaskMode(FMMAllMasks, FMMFillMask, FMMNone)
   , defaultFill
   , fillWithColor
   , StrokeEffect
-  , StrokePaintStyle(..)
+  , StrokePaintStyle(SPSOnTransparent, SPSOnOriginal)
   , defaultStroke
   , strokeWithWidth
   , circleEdgeTypeToString
@@ -137,11 +137,11 @@ import Hydrogen.Schema.Motion.Effects.Generate.Shapes
 
 import Hydrogen.Schema.Motion.Effects.Generate.Animation
   ( VegasEffect
-  , VegasPathMode(..)
+  , VegasPathMode(VPMMasks, VPMLayer, VPMAllPaths)
   , defaultVegas
   , vegasWithSegments
   , LensFlareEffect
-  , LensType(..)
+  , LensType(LT50_300mm, LT35mm, LT105mm)
   , defaultLensFlare
   , lensFlareWithBrightness
   , vegasPathModeToString

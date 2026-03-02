@@ -23,7 +23,7 @@ import Prelude
   )
 
 import Data.Array (snoc, uncons, init, last, reverse, foldl) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (sin, cos, pi)
 
 import Hydrogen.Schema.Geometry.Point (Point2D, point2D, getX, getY)

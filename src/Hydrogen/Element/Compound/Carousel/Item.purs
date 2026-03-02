@@ -53,7 +53,7 @@ module Hydrogen.Element.Compound.Carousel.Item
   , module Config
   
     -- * Complete Item
-  , Item(..)
+  , Item(Item)
   , item
   , simpleItem
   , imageItem
@@ -179,7 +179,7 @@ import Hydrogen.Element.Compound.Carousel.Item.Content
   ) as Content
 
 import Hydrogen.Element.Compound.Carousel.Item.Config
-  ( ItemConfig(..)
+  ( ItemConfig(ItemConfig)
   , itemConfig
   , defaultItemConfig
   , imageItemConfig

@@ -37,7 +37,7 @@ module Hydrogen.Element.Compound.Widget.Card
   , sparklineCard
   
   -- * Value Formatting
-  , TrendDirection(..)
+  , TrendDirection(TrendUp, TrendDown, TrendFlat)
   , formatValue
   , formatPercent
   , formatCurrency
@@ -60,8 +60,8 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Element.Compound.Widget.Theme 
-  ( ThemeMode(..)
-  , GlowIntensity(..)
+  ( ThemeMode(ModeDark, ModeLight)
+  , GlowIntensity(GlowSubtle, GlowMedium, GlowIntense, GlowExtreme)
   , containerBackground
   , textPrimary
   , textSecondary

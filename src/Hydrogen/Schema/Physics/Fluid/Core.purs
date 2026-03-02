@@ -55,45 +55,45 @@ module Hydrogen.Schema.Physics.Fluid.Core
   , nsFluidEffect
   
   -- * Fluid Effects (graded)
-  , FluidEffect(..)
+  , FluidEffect(EffectNone, EffectEmit, EffectForce, EffectTransfer, EffectTopology, EffectRender, EffectComposite)
   , allFluidEffects
   , effectCombine
   , effectNone
   , effectAll
   
   -- * Fluid Co-Effects (resources needed)
-  , FluidCoEffect(..)
+  , FluidCoEffect(CoEffectNone, CoEffectNeighbors, CoEffectGrid, CoEffectGPU, CoEffectMemory, CoEffectBandwidth, CoEffectComposite)
   , allFluidCoEffects
   , coEffectCombine
   , coEffectNone
   , coEffectAll
   
   -- * Fluid Expression AST
-  , FluidExpr(..)
+  , FluidExpr(FluidPure, FluidParticleOp, FluidSolverOp, FluidSeq, FluidPar, FluidIf, FluidLoop, FluidAnnotate)
   , exprEffect
   , exprCoEffect
   , exprUUID
   
   -- * Particle Operations
-  , ParticleOp(..)
+  , ParticleOp(OpEmitParticle, OpRemoveParticle, OpMoveParticle, OpAccelerate, OpComputeDensity, OpComputePressure, OpComputeViscosity, OpFindNeighbors)
   , allParticleOps
   
   -- * Solver Operations
-  , SolverOp(..)
+  , SolverOp(OpAdvect, OpDiffuse, OpProject, OpApplyGravity, OpEnforceBoundary, OpTransferToGrid, OpTransferToParticles)
   , allSolverOps
   
   -- * Constraints (Presburger)
-  , FluidConstraint(..)
+  , FluidConstraint(ConstraintParticleCount, ConstraintGridDimension, ConstraintMemory, ConstraintFrameTime, ConstraintAnd, ConstraintTrue, ConstraintFalse)
   , particleCountBound
   , gridDimensionBound
   , memoryCostBound
   , constraintSatisfied
   
   -- * Optimization (ILP)
-  , FluidObjective(..)
-  , QualityMetric(..)
+  , FluidObjective
+  , QualityMetric(QualityParticleCount, QualityGridResolution, QualitySolverIterations, QualityTimestep)
   , allQualityMetrics
-  , PerformanceMetric(..)
+  , PerformanceMetric(PerfFrameTime, PerfMemoryUsage, PerfBandwidth, PerfGPUOccupancy)
   , allPerformanceMetrics
   
   -- * Configuration Identity

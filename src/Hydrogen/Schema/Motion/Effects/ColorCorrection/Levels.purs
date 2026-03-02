@@ -36,7 +36,7 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.Levels
   ( -- * Channel Levels
-    ChannelLevels(..)
+    ChannelLevels(ChannelLevels)
   , defaultChannelLevels
   , mkChannelLevels
   
@@ -47,7 +47,7 @@ module Hydrogen.Schema.Motion.Effects.ColorCorrection.Levels
   , defaultLevelsGamma
   
   -- * Levels Effect
-  , LevelsEffect(..)
+  , LevelsEffect(LevelsEffect)
   , defaultLevelsEffect
   , mkLevelsEffect
   

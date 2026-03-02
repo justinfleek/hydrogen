@@ -25,7 +25,7 @@
 
 module Hydrogen.Schema.Physics.Collision.Volumes
   ( -- * AABB
-    AABB(..)
+    AABB(AABB)
   , aabb
   , aabbFromPoints
   , aabbCenter
@@ -36,20 +36,20 @@ module Hydrogen.Schema.Physics.Collision.Volumes
   , aabbMerge
   
   -- * Bounding Circle
-  , BoundingCircle(..)
+  , BoundingCircle(BoundingCircle)
   , boundingCircle
   , circleContains
   , circleExpand
   , circleMerge
   
   -- * Bounding Capsule
-  , BoundingCapsule(..)
+  , BoundingCapsule(BoundingCapsule)
   , boundingCapsule
   , capsuleContains
   , pointToSegmentDistance
   
   -- * Oriented Bounding Box
-  , OBB(..)
+  , OBB(OBB)
   , obb
   , obbCorners
   , obbContains
@@ -79,7 +79,7 @@ import Prelude
 import Data.Number (sqrt, cos, sin)
 
 import Hydrogen.Schema.Physics.Collision.Point
-  ( Point2D(..)
+  ( Point2D(Point2D)
   , point2D
   , distance
   , distanceSquared

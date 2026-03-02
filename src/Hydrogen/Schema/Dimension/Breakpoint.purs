@@ -25,7 +25,7 @@
 module Hydrogen.Schema.Dimension.Breakpoint
   ( -- * Types
     Breakpoint(Breakpoint)
-  , BreakpointName(..)
+  , BreakpointName(XS, SM, MD, LG, XL, XXL, Custom)
   , BreakpointSet
   
   -- * Constructors

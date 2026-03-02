@@ -54,7 +54,7 @@ module Hydrogen.Schema.Weather.Atmosphere
   , module Hydrogen.Schema.Weather.Atmosphere.Layer
   
   -- * Atmospheric State
-  , AtmosphericState(..)
+  , AtmosphericState(AtmosphericState)
   , atmosphericState
   , defaultAtmosphere
   , standardAtmosphere
@@ -167,7 +167,7 @@ import Hydrogen.Schema.Weather.Atmosphere.Visibility
   , visibilityHaze
   , visibilityClear
   , visibilityUnlimited
-  , VisibilityCategory(..)
+  , VisibilityCategory(VisZero, VisDenseFog, VisFog, VisMist, VisHaze, VisClear)
   , allVisibilityCategories
   , visibilityToCategory
   , categoryToMinVisibility
@@ -186,14 +186,14 @@ import Hydrogen.Schema.Weather.Atmosphere.CloudCover
   , cloudCoverScattered
   , cloudCoverBroken
   , cloudCoverOvercast
-  , CloudCategory(..)
+  , CloudCategory(SKC, FEW, SCT, BKN, OVC)
   , allCloudCategories
   , cloudCoverToCategory
   , categoryDescription
   )
 
 import Hydrogen.Schema.Weather.Atmosphere.Layer
-  ( AtmosphericLayer(..)
+  ( AtmosphericLayer(Troposphere, Stratosphere, Mesosphere, Thermosphere, Exosphere)
   , allAtmosphericLayers
   , layerAltitudeRange
   , layerDescription

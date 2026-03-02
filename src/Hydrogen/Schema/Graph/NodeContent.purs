@@ -57,8 +57,8 @@ module Hydrogen.Schema.Graph.NodeContent
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Graph.NodeContent.Types
-  ( ContentSlot(..)
-  , ContentTemplate(..)
+  ( ContentSlot(SlotLeading, SlotIcon, SlotMain, SlotSubtitle, SlotTrailing, SlotActions, SlotBelow, SlotOverlay, SlotBackground)
+  , ContentTemplate(TemplateTextOnly, TemplateIconText, TemplateTitleSubtitle, TemplateCard, TemplateAvatar, TemplateMetric, TemplateProgress, TemplateThumbnail, TemplateCustom)
   , isCardTemplate
   , isCustomTemplate
   , isLeadingSlot
@@ -69,7 +69,7 @@ import Hydrogen.Schema.Graph.NodeContent.Types
   ) as Types
 
 import Hydrogen.Schema.Graph.NodeContent.SlotContent
-  ( SlotContent(..)
+  ( SlotContent(ContentText, ContentIcon, ContentBadge, ContentAction, ContentProgress, ContentImage, ContentCustom)
   , TextContent
   , actionContent
   , badgeContent
@@ -98,8 +98,8 @@ import Hydrogen.Schema.Graph.NodeContent.ContentTypes
   ) as ContentTypes
 
 import Hydrogen.Schema.Graph.NodeContent.CardAndShape
-  ( CardField(..)
-  , NodeShape(..)
+  ( CardField(FieldTitle, FieldSubtitle, FieldMetadata, FieldImage, FieldAvatar, FieldBadge, FieldProgress, FieldDivider, FieldSpacer)
+  , NodeShape(ShapeRectangle, ShapeRoundedRect, ShapePill, ShapeCircle, ShapeEllipse, ShapeDiamond, ShapeHexagon, ShapeOctagon, ShapeParallelogram, ShapeCylinder, ShapeDocument, ShapeCloud, ShapeCustomPath)
   , avatarField
   , imageField
   , isCircle

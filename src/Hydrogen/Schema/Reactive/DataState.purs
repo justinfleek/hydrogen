@@ -9,18 +9,18 @@
 
 module Hydrogen.Schema.Reactive.DataState
   ( -- * Fetch State
-    FetchState(..)
+    FetchState(Idle, Fetching, Revalidating, Success, Failure)
   , isFetchIdle
   , isFetching
   , isFetchSuccess
   , isFetchError
   -- * Freshness
-  , Freshness(..)
+  , Freshness(Fresh, Stale, FreshnessUnknown)
   , isFresh
   , isStale
   , isUnknown
   -- * Mutation State
-  , MutationState(..)
+  , MutationState(MutationIdle, MutationPending, MutationOptimistic, MutationSuccess, MutationError, MutationRollingBack)
   , isMutating
   , isSettled
   -- * Combined Data State

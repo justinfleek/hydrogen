@@ -54,12 +54,12 @@ import Hydrogen.Schema.Brush.Smoothing.Types
   ) as Types
 
 import Hydrogen.Schema.Brush.Smoothing.Atoms
-  ( Beta(..)
-  , CatchUpSpeed(..)
-  , MinCutoff(..)
-  , SmoothingStrength(..)
-  , StringLength(..)
-  , WindowSize(..)
+  ( Beta(Beta)
+  , CatchUpSpeed(CatchUpSpeed)
+  , MinCutoff(MinCutoff)
+  , SmoothingStrength(SmoothingStrength)
+  , StringLength(StringLength)
+  , WindowSize(WindowSize)
   , beta
   , betaBounds
   , betaDebugInfo

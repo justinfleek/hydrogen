@@ -18,16 +18,16 @@
 -- | https://www.w3.org/TR/wai-aria-1.2/#role_definitions
 module Hydrogen.Schema.Accessibility.Role
   ( -- * Widget Roles
-    WidgetRole(..)
+    WidgetRole(RoleButton, RoleCheckbox, RoleGridcell, RoleLink, RoleMenuitem, RoleMenuitemcheckbox, RoleMenuitemradio, RoleOption, RoleProgressbar, RoleRadio, RoleScrollbar, RoleSearchbox, RoleSeparator, RoleSlider, RoleSpinbutton, RoleSwitch, RoleTab, RoleTabpanel, RoleTextbox, RoleTreeitem)
   , widgetRoleToString
     -- * Composite Widget Roles
-  , CompositeRole(..)
+  , CompositeRole(RoleCombobox, RoleGrid, RoleListbox, RoleMenu, RoleMenubar, RoleRadiogroup, RoleTablist, RoleTree, RoleTreegrid)
   , compositeRoleToString
     -- * Document Structure Roles
-  , StructureRole(..)
+  , StructureRole(RoleApplication, RoleArticle, RoleBlockquote, RoleCaption, RoleCell, RoleColumnheader, RoleDefinition, RoleDirectory, RoleDocument, RoleFeed, RoleFigure, RoleGroup, RoleHeading, RoleImg, RoleList, RoleListitem, RoleMath, RoleMeter, RoleNote, RoleParagraph, RoleRow, RoleRowgroup, RoleRowheader, RoleTable, RoleTerm, RoleToolbar, RoleTooltip)
   , structureRoleToString
     -- * Window Roles
-  , WindowRole(..)
+  , WindowRole(RoleAlert, RoleAlertdialog, RoleDialog)
   , windowRoleToString
   ) where
 

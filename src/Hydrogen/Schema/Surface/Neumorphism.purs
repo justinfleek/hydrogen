@@ -28,7 +28,7 @@
 
 module Hydrogen.Schema.Surface.Neumorphism
   ( -- * Neumorphism Variant
-    NeumorphismVariant(..)
+    NeumorphismVariant(Raised, Inset, Flat, Concave, Convex)
   
   -- * Types
   , Neumorphism(Neumorphism)

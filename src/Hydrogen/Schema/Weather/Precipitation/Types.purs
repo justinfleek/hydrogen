@@ -13,7 +13,7 @@
 
 module Hydrogen.Schema.Weather.Precipitation.Types
   ( -- * Precipitation Type
-    PrecipitationType(..)
+    PrecipitationType(Rain, Drizzle, Snow, Sleet, FreezingRain, Hail, Graupel, IcePellets, MixedRainSnow, MixedSleet)
   , allPrecipitationTypes
   , isLiquid
   , isFrozen

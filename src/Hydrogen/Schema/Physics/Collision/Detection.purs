@@ -59,22 +59,22 @@ import Prelude
   )
 
 import Hydrogen.Schema.Physics.Collision.Point
-  ( Point2D(..)
+  ( Point2D(Point2D)
   , point2D
   , distance
   , midpoint
   )
 
 import Hydrogen.Schema.Physics.Collision.Volumes
-  ( AABB(..)
-  , BoundingCircle(..)
-  , BoundingCapsule(..)
+  ( AABB(AABB)
+  , BoundingCircle(BoundingCircle)
+  , BoundingCapsule(BoundingCapsule)
   , aabbContains
   , pointToSegmentDistance
   )
 
 import Hydrogen.Schema.Physics.Collision.Contact
-  ( Contact(..)
+  ( Contact(NoContact, Contact)
   , flipContact
   )
 

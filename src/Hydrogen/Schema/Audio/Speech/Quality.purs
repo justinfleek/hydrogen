@@ -21,15 +21,15 @@
 
 module Hydrogen.Schema.Audio.Speech.Quality
   ( -- * Speech Quality Atoms
-    SignalToNoise(..)
-  , Intelligibility(..)
+    SignalToNoise(SignalToNoise)
+  , Intelligibility(Intelligibility)
   , signalToNoise
   , intelligibility
   , unwrapSignalToNoise
   , unwrapIntelligibility
   
   -- * Language Detection
-  , LanguageCode(..)
+  , LanguageCode(LangEN, LangES, LangFR, LangDE, LangIT, LangPT, LangRU, LangZH, LangJA, LangKO, LangAR, LangHI, LangOther)
   , DetectedLanguage
   , detectedLanguage
   , languageCodeISO

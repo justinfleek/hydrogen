@@ -31,7 +31,7 @@
 
 module Hydrogen.Schema.Brand.Theme
   ( -- * Theme Mode
-    ThemeMode(..)
+    ThemeMode(ThemeModeLight, ThemeModeDark, ThemeModeContrast, ThemeModeAuto, ThemeModeCustom)
   , themeModeToString
   , themeModeFromString
   , allThemeModes
@@ -70,7 +70,7 @@ module Hydrogen.Schema.Brand.Theme
   , themeSetModes
   
   -- * Auto Theme Resolution
-  , ThemePreference(..)
+  , ThemePreference(PreferLight, PreferDark, PreferContrast, PreferSystem, PreferTime)
   , resolveAutoTheme
   , preferenceToMode
   ) where

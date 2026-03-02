@@ -39,7 +39,7 @@ module Hydrogen.Util.MediaQuery
   , isLargeDesktop
     -- * Breakpoint Listeners
   , onBreakpointChange
-  , Breakpoint(..)
+  , Breakpoint(Mobile, Tablet, Desktop, LargeDesktop)
   , currentBreakpoint
     -- * User Preferences
   , prefersDarkMode

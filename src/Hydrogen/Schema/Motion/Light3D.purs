@@ -35,16 +35,16 @@
 
 module Hydrogen.Schema.Motion.Light3D
   ( -- * Light3D Type
-    Light3D(..)
+    Light3D(Light3D)
   , defaultLight3D
   , mkLight3D
   
   -- * Light3D ID
-  , Light3DId(..)
+  , Light3DId(Light3DId)
   , mkLight3DId
   
   -- * Light Type
-  , Light3DType(..)
+  , Light3DType(LT3DParallel, LT3DSpot, LT3DPoint, LT3DAmbient)
   , allLight3DTypes
   , light3DTypeToString
   , light3DTypeFromString
@@ -54,31 +54,31 @@ module Hydrogen.Schema.Motion.Light3D
   , isAmbient
   
   -- * Falloff Mode
-  , LightFalloff(..)
+  , LightFalloff(LFNone, LFSmooth, LFInverseSquare)
   , allLightFalloffs
   , lightFalloffToString
   , lightFalloffFromString
   
   -- * Shadow Mode
-  , ShadowMode(..)
+  , ShadowMode(SMOff, SMOn, SMOnly)
   , allShadowModes
   , shadowModeToString
   , shadowModeFromString
   
   -- * Shadow Settings
-  , LightShadowSettings(..)
+  , LightShadowSettings(LightShadowSettings)
   , defaultShadowSettings
   , shadowsOff
   , shadowsOn
   , shadowsOnly
   
   -- * Cone Settings (Spot Only)
-  , ConeSettings(..)
+  , ConeSettings(ConeSettings)
   , defaultConeSettings
   , mkConeSettings
   
   -- * Falloff Settings
-  , FalloffSettings(..)
+  , FalloffSettings(FalloffSettings)
   , noFalloff
   , smoothFalloff
   , inverseSquareFalloff

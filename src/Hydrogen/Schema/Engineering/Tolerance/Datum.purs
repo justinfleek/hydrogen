@@ -17,19 +17,19 @@
 
 module Hydrogen.Schema.Engineering.Tolerance.Datum
   ( -- * Datum Labels
-    DatumLabel(..)
+    DatumLabel(DatumA, DatumB, DatumC, DatumD, DatumE, DatumF, DatumG, DatumH, DatumJ, DatumK, DatumL, DatumM, DatumN, DatumP, DatumR, DatumS, DatumT, DatumU, DatumV, DatumW, DatumX, DatumY, DatumZ)
   , allDatumLabels
   , datumLabelChar
   
   -- * Datum Features
-  , DatumFeature(..)
+  , DatumFeature(DatumFeature)
   , datumFeature
   , primaryDatum
   , secondaryDatum
   , tertiaryDatum
   
   -- * Material Conditions
-  , MaterialCondition(..)
+  , MaterialCondition(MMC, LMC, RFS)
   , allMaterialConditions
   , conditionSymbol
   , conditionDescription

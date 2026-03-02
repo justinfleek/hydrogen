@@ -26,7 +26,7 @@
 -- | - Prelude (Eq, Ord, Show)
 
 module Hydrogen.Schema.Geometry.Symmetry.Dihedral
-  ( DihedralSymmetry(..)
+  ( DihedralSymmetry(DihedralSymmetry)
   , dihedralSymmetry
   , dihedral2
   , dihedral3

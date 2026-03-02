@@ -79,7 +79,7 @@ module Hydrogen.Schema.Canvas.Grid
   , isInterior
   , isWithinBounds
   , buildCellPath
-  , BoundaryType(..)
+  , BoundaryType(Corner, Edge, Interior)
   , cellBoundaryType
   ) where
 

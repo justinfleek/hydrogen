@@ -44,7 +44,7 @@ module Hydrogen.Schema.Brush.Tilt
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Brush.Tilt.Atoms
-  ( TiltX(..)
+  ( TiltX(TiltX)
   , tiltX
   , tiltXBounds
   , unwrapTiltX
@@ -52,7 +52,7 @@ import Hydrogen.Schema.Brush.Tilt.Atoms
   , maxTiltXLeft
   , maxTiltXRight
   , tiltXDebugInfo
-  , TiltY(..)
+  , TiltY(TiltY)
   , tiltY
   , tiltYBounds
   , unwrapTiltY
@@ -60,7 +60,7 @@ import Hydrogen.Schema.Brush.Tilt.Atoms
   , maxTiltYForward
   , maxTiltYBack
   , tiltYDebugInfo
-  , Altitude(..)
+  , Altitude(Altitude)
   , altitude
   , altitudeBounds
   , unwrapAltitude
@@ -69,7 +69,7 @@ import Hydrogen.Schema.Brush.Tilt.Atoms
   , midAltitude
   , perpendicularAltitude
   , altitudeDebugInfo
-  , Azimuth(..)
+  , Azimuth(Azimuth)
   , azimuth
   , azimuthBounds
   , unwrapAzimuth

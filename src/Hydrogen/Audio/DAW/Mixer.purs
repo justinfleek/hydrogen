@@ -89,7 +89,7 @@ module Hydrogen.Audio.DAW.Mixer
 
 import Prelude
 
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Array (replicate, length)
 import Hydrogen.Audio.DAW.Types (Decibel, mkDecibel, mkDecibelChannel, mkDecibelMaster, Pan, mkPan, panCenter, Frequency, mkFrequency, silence, unity, freq1k)
 import Hydrogen.Audio.DAW.Control (ControlId, mkControlId, Knob, Slider, Button)

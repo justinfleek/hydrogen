@@ -65,11 +65,11 @@ import Hydrogen.Schema.Brush.Interpolation.Types
   ) as Types
 
 import Hydrogen.Schema.Brush.Interpolation.Atoms
-  ( InterpolationQuality(..)
-  , PositionSmoothing(..)
-  , PressureSmoothing(..)
-  , SpacingPercent(..)
-  , SpacingPixels(..)
+  ( InterpolationQuality(InterpolationQuality)
+  , PositionSmoothing(PositionSmoothing)
+  , PressureSmoothing(PressureSmoothing)
+  , SpacingPercent(SpacingPercent)
+  , SpacingPixels(SpacingPixels)
   , heavyPositionSmoothing
   , heavyPressureSmoothing
   , highQuality

@@ -33,7 +33,7 @@
 
 module Hydrogen.Schema.Surface.BorderImage
   ( -- * Repeat Mode
-    BorderImageRepeat(..)
+    BorderImageRepeat(Stretch, Repeat, Round, Space)
   
   -- * Slice
   , BorderImageSlice(BorderImageSlice)

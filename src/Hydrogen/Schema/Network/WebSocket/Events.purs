@@ -12,7 +12,7 @@
 
 module Hydrogen.Schema.Network.WebSocket.Events
   ( -- * WebSocket Events
-    WebSocketEvent(..)
+    WebSocketEvent(WSConnecting, WSOpen, WSMessage, WSError, WSClose, WSReconnecting)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -20,7 +20,7 @@
 -- | - **linear**: (0, 0, 1, 1)
 
 module Hydrogen.Schema.Temporal.CubicBezierEasing
-  ( CubicBezierEasing(..)
+  ( CubicBezierEasing(CubicBezierEasing)
   , cubicBezier
   , cubicBezierFromNumbers
   

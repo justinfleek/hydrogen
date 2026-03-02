@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Brush.Input.Types
   ( -- * Input Device
-    InputDevice(..)
+    InputDevice(Mouse, Trackpad, Stylus, Touch, VRController, VRHand, Gamepad, MIDIController)
   , allInputDevices
   , inputDeviceDescription
   , inputDeviceDebugInfo
@@ -25,7 +25,7 @@ module Hydrogen.Schema.Brush.Input.Types
   , has3DCapability
   
   -- * Stylus Technology
-  , StylusTechnology(..)
+  , StylusTechnology(EMR, AES, MPP, USI, ApplePencil, Capacitive)
   , allStylusTechnologies
   , stylusTechnologyDescription
   , stylusTechnologyDebugInfo

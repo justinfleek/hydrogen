@@ -35,7 +35,34 @@
 
 module Hydrogen.Schema.Motion.LayerContent
   ( -- * Layer Content
-    LayerContent(..)
+    LayerContent
+      ( LCImage
+      , LCVideo
+      , LCAudio
+      , LCSolid
+      , LCText
+      , LCShape
+      , LCNull
+      , LCCamera
+      , LCLight
+      , LCAdjustment
+      , LCEffect
+      , LCPreComp
+      , LCGroup
+      , LCNestedComp
+      , LCParticle
+      , LCDepth
+      , LCNormal
+      , LCGenerated
+      , LCMatte
+      , LCControl
+      , LCSpline
+      , LCPath
+      , LCPose
+      , LCModel
+      , LCPointCloud
+      , LCDepthflow
+      )
   , contentToLayerType
   , isContentMedia
   , isContent3D
@@ -50,50 +77,50 @@ module Hydrogen.Schema.Motion.LayerContent
   , isValidGeneratedParams
   
   -- * Media Content
-  , ImageContent(..)
+  , ImageContent(ImageContent)
   , mkImageContent
-  , VideoContent(..)
+  , VideoContent(VideoContent)
   , mkVideoContent
-  , AudioContent(..)
+  , AudioContent(AudioContent)
   , mkAudioContent
-  , SolidContent(..)
+  , SolidContent(SolidContent)
   , mkSolidContent
   
   -- * Content Layers
-  , TextContent(..)
+  , TextContent(TextContent)
   , mkTextContent
-  , ShapeContent(..)
+  , ShapeContent(ShapeContent)
   , mkShapeContent
   
   -- * 3D Content
-  , CameraContent(..)
-  , LightContent(..)
-  , LightType(..)
+  , CameraContent(CameraContent)
+  , LightContent(LightContent)
+  , LightType(LightPoint, LightSpot, LightParallel, LightAmbient)
   , lightTypeToString
   , lightTypeFromString
   
   -- * Composition Content
-  , PreCompContent(..)
-  , GroupContent(..)
-  , NestedCompContent(..)
+  , PreCompContent(PreCompContent)
+  , GroupContent(GroupContent)
+  , NestedCompContent(NestedCompContent)
   
   -- * Specialized Content
-  , ParticleContent(..)
-  , DepthContent(..)
-  , NormalContent(..)
-  , GeneratedContent(..)
+  , ParticleContent(ParticleContent)
+  , DepthContent(DepthContent)
+  , NormalContent(NormalContent)
+  , GeneratedContent(GeneratedContent)
   , mkGeneratedContent
-  , MatteContent(..)
-  , ControlContent(..)
-  , SplineContent(..)
-  , PathContent(..)
-  , PoseContent(..)
-  , ModelContent(..)
-  , PointCloudContent(..)
-  , DepthflowContent(..)
+  , MatteContent(MatteContent)
+  , ControlContent(ControlContent)
+  , SplineContent(SplineContent)
+  , PathContent(PathContent)
+  , PoseContent(PoseContent)
+  , ModelContent(ModelContent)
+  , PointCloudContent(PointCloudContent)
+  , DepthflowContent(DepthflowContent)
   
   -- * Asset Reference
-  , AssetRef(..)
+  , AssetRef(AssetRef)
   , mkAssetRef
   ) where
 
@@ -115,7 +142,36 @@ import Prelude
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
-import Hydrogen.Schema.Motion.Layer (LayerType(..))
+import Hydrogen.Schema.Motion.Layer 
+  ( LayerType
+      ( LTImage
+      , LTVideo
+      , LTAudio
+      , LTSolid
+      , LTText
+      , LTShape
+      , LTNull
+      , LTCamera
+      , LTLight
+      , LTAdjustment
+      , LTEffect
+      , LTPreComp
+      , LTGroup
+      , LTNestedComp
+      , LTParticle
+      , LTDepth
+      , LTNormal
+      , LTGenerated
+      , LTMatte
+      , LTControl
+      , LTSpline
+      , LTPath
+      , LTPose
+      , LTModel
+      , LTPointCloud
+      , LTDepthflow
+      )
+  )
 import Hydrogen.Schema.Motion.Diffusion.Model (DiffusionModel)
 import Hydrogen.Schema.Motion.Diffusion.WanMove (WanMoveTrajectory)
 import Hydrogen.Schema.Motion.Diffusion.TTM (TTMExport)

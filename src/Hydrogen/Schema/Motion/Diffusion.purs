@@ -47,7 +47,7 @@ module Hydrogen.Schema.Motion.Diffusion
   ) where
 
 import Hydrogen.Schema.Motion.Diffusion.Model
-  ( ImageModel(..)
+  ( ImageModel(IMFlux2Dev, IMFlux2Pro, IMFlux2Schnell, IMZImage, IMQwenImage2509, IMSDXL, IMSD3, IMDalle3, IMMidjourney, IMIdeogram2)
   , imageModelToString
   , imageModelFromString
   , isImageModelFast
@@ -57,7 +57,7 @@ import Hydrogen.Schema.Motion.Diffusion.Model
   , lastImageModel
   , filterImageModels
   , mapImageModels
-  , VideoModel(..)
+  , VideoModel(VMWan22, VMWan21, VMCogVideoX, VMCogVideoX5B, VMSVD, VMSVDXT, VMATI, VMRunway, VMKling, VMPika, VMLuma, VMHunyuanVideo)
   , videoModelToString
   , videoModelFromString
   , videoModelMaxFrames
@@ -69,92 +69,92 @@ import Hydrogen.Schema.Motion.Diffusion.Model
   , mapVideoModels
   , videoModelsWithMinFrames
   , videoModelsWithMinResolution
-  , Model3D(..)
+  , Model3D(M3DHunyuan3D, M3DTrellis2, M3DTripoSR, M3DLGMesh, M3DInstant3D, M3DZero123Plus, M3DMeshAnything)
   , model3DToString
   , model3DFromString
   , all3DModels
   , first3DModel
   , last3DModel
   , map3DModels
-  , EditModel(..)
+  , EditModel(EMQwenImageEdit2511, EMZImageEdit, EMInstructPix2Pix, EMSDEdit, EMControlNetInpaint, EMFluxFill)
   , editModelToString
   , editModelFromString
   , allEditModels
   , firstEditModel
   , lastEditModel
   , mapEditModels
-  , MotionModel(..)
+  , MotionModel(MMMotionCtrl, MMUni3C, MMWanMove, MMTimeToMove, MMCameraCtrl, MMAnimateDiff, MMDragAnything)
   , motionModelToString
   , motionModelFromString
   , allMotionModels
   , firstMotionModel
   , lastMotionModel
   , mapMotionModels
-  , DiffusionModel(..)
+  , DiffusionModel(DMImage, DMVideo, DM3D, DMEdit, DMMotion)
   , diffusionModelToString
   , diffusionModelFromString
   , diffusionModelCategory
   , lookupAndTransform
-  , ModelCategory(..)
+  , ModelCategory(MCImage, MCVideo, MC3D, MCEdit, MCMotion)
   )
 
 import Hydrogen.Schema.Motion.Diffusion.WanMove
-  ( FlowPattern(..)
+  ( FlowPattern(FlowSpiral, FlowWave, FlowExplosion, FlowVortex, FlowDataRiver, FlowMorph, FlowSwarm)
   , flowPatternToString
   , flowPatternFromString
   , allFlowPatterns
   , defaultFlowPattern
   , lastFlowPattern
   , flowPatternStrings
-  , MorphShapeType(..)
+  , MorphShapeType(MorphCircle, MorphGrid, MorphText, MorphCustom)
   , morphShapeTypeToString
   , morphShapeTypeFromString
   , allMorphShapeTypes
   , defaultMorphShapeType
-  , MorphEasing(..)
+  , MorphEasing(MEasingLinear, MEasingEaseIn, MEasingEaseOut, MEasingEaseInOut)
   , morphEasingToString
   , morphEasingFromString
   , allMorphEasings
   , defaultMorphEasing
-  , ShapeEasing(..)
+  , ShapeEasing(SEasingLinear, SEasingEaseIn, SEasingEaseOut, SEasingEaseInOut, SEasingElastic, SEasingBounce)
   , shapeEasingToString
   , shapeEasingFromString
   , allShapeEasings
   , defaultShapeEasing
-  , AttractorType(..)
+  , AttractorType(AttractorLorenz, AttractorRossler, AttractorAizawa, AttractorThomas, AttractorHalvorsen)
   , attractorTypeToString
   , attractorTypeFromString
   , allAttractorTypes
   , defaultAttractorType
   , attractorTypeStrings
-  , DataMapping(..)
+  , DataMapping(MapSpeed, MapDirection, MapAmplitude, MapPhase, MapSize)
   , dataMappingToString
   , dataMappingFromString
   , allDataMappings
   , defaultDataMapping
-  , ForceFalloff(..)
+  , ForceFalloff(FalloffLinear, FalloffQuadratic, FalloffNone)
   , forceFalloffToString
   , forceFalloffFromString
   , allForceFalloffs
   , defaultForceFalloff
-  , InitialDistribution(..)
+  , InitialDistribution(DistRandom, DistGrid, DistEdge, DistCenter)
   , initialDistributionToString
   , initialDistributionFromString
   , allInitialDistributions
   , defaultInitialDistribution
-  , ShapeType(..)
+  , ShapeType(ShapeCircle, ShapeGrid, ShapeText, ShapeHeart, ShapeStar, ShapeSpiral, ShapeRandom, ShapeCustom)
   , shapeTypeToString
   , shapeTypeFromString
   , allShapeTypes
   , defaultShapeType
   , lastShapeType
   , shapeTypeStrings
-  , TrackPoint(..)
+  , TrackPoint(TrackPoint)
   , mkTrackPoint
   , isValidTrackPoint
-  , WanMoveMetadata(..)
+  , WanMoveMetadata(WanMoveMetadata)
   , mkWanMoveMetadata
-  , WanMoveTrajectory(..)
+  , WanMoveTrajectory(WanMoveTrajectory)
   , mkWanMoveTrajectory
   , wanMoveMaxDimension
   , wanMoveMaxPoints
@@ -167,7 +167,7 @@ import Hydrogen.Schema.Motion.Diffusion.WanMove
   ) as WanMove
 
 import Hydrogen.Schema.Motion.Diffusion.TTM
-  ( TTMModel(..)
+  ( TTMModel(TTMWan, TTMCogVideoX, TTMSVD)
   , ttmModelToString
   , ttmModelFromString
   , allTTMModels
@@ -179,24 +179,24 @@ import Hydrogen.Schema.Motion.Diffusion.TTM
   , ttmMaxLayers
   , ttmMaxTweakIndex
   , ttmMaxInferenceSteps
-  , TrajectoryPoint(..)
+  , TrajectoryPoint(TrajectoryPoint)
   , mkTrajectoryPoint
   , isValidTrajectoryPoint
   , trajectoryPointAtFrame
   , trajectoryFirstPoint
   , trajectoryLastPoint
-  , TTMLayerExport(..)
+  , TTMLayerExport(TTMLayerExport)
   , mkTTMLayerExport
   , isValidLayerExport
-  , TTMModelConfig(..)
+  , TTMModelConfig(TTMModelConfig)
   , mkTTMModelConfig
   , isValidModelConfig
   , defaultModelConfig
-  , TTMMetadata(..)
+  , TTMMetadata(TTMMetadata)
   , mkTTMMetadata
   , isValidMetadata
   , metadataLayerCount
-  , TTMExport(..)
+  , TTMExport(TTMExport)
   , mkTTMExport
   , isValidExport
   , mapTrajectoryPoints
@@ -207,7 +207,7 @@ import Hydrogen.Schema.Motion.Diffusion.TTM
   ) as TTM
 
 import Hydrogen.Schema.Motion.Diffusion.Camera
-  ( CameraFormat(..)
+  ( CameraFormat(CameraMotionCtrl, CameraWanMove, CameraUni3C, CameraCameraCtrl, CameraBlender, CameraFBX)
   , cameraFormatToString
   , cameraFormatFromString
   , allCameraFormats
@@ -216,7 +216,7 @@ import Hydrogen.Schema.Motion.Diffusion.Camera
   , lastCameraFormat
   , filterCameraFormats
   , mapCameraFormats
-  , CoordinateSystem(..)
+  , CoordinateSystem(CoordOpenGL, CoordOpenCV, CoordBlender, CoordUnity)
   , coordinateSystemToString
   , coordinateSystemFromString
   , allCoordinateSystems
@@ -228,7 +228,7 @@ import Hydrogen.Schema.Motion.Diffusion.Camera
   , isZUp
   , filterCoordinateSystems
   , mapCoordinateSystems
-  , EulerOrder(..)
+  , EulerOrder(EulerXYZ, EulerYXZ, EulerZXY, EulerZYX, EulerXZY, EulerYZX)
   , eulerOrderToString
   , eulerOrderFromString
   , allEulerOrders
@@ -237,7 +237,7 @@ import Hydrogen.Schema.Motion.Diffusion.Camera
   , lastEulerOrder
   , filterEulerOrders
   , mapEulerOrders
-  , CameraInterpolation(..)
+  , CameraInterpolation(InterpLinear, InterpBezier, InterpSpline)
   , cameraInterpolationToString
   , cameraInterpolationFromString
   , allCameraInterpolations
@@ -246,7 +246,7 @@ import Hydrogen.Schema.Motion.Diffusion.Camera
   , lastCameraInterpolation
   , filterCameraInterpolations
   , mapCameraInterpolations
-  , Position3D(..)
+  , Position3D(Position3D)
   , mkPosition3D
   , originPosition3D
   , translatePosition3D
@@ -260,7 +260,7 @@ import Hydrogen.Schema.Motion.Diffusion.Camera
   , isOutsideBounds3D
   , arePositionsEqual
   , isCloserThan
-  , CameraIntrinsics(..)
+  , CameraIntrinsics(CameraIntrinsics)
   , mkCameraIntrinsics
   , isValidCameraIntrinsics
   , isValidSensorSize

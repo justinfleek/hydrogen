@@ -81,7 +81,7 @@ module Hydrogen.Audio.DAW.Types
 import Prelude
 
 import Data.Int (toNumber, floor)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (pow, log, ln2)
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -64,8 +64,8 @@ import Data.Set (Set)
 import Data.Set as Set
 
 import Hydrogen.Render.Online.Core
-  ( Region(..)
-  , RegionSelection(..)
+  ( Region(Region)
+  , RegionSelection(RegionSelection)
   , RenderTier(Foveal, Peripheral, Background)
   )
 import Hydrogen.Render.Online.Matroid.Class (class Matroid, independent)

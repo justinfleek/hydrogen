@@ -24,7 +24,7 @@
 
 module Hydrogen.Schema.Motion.LayerReference.TrackMatte
   ( -- * Track Matte Link
-    TrackMatteLink(..)
+    TrackMatteLink(TrackMatteLink)
   , mkTrackMatteLink
   , trackMatteLinkSource
   , trackMatteLinkMatte

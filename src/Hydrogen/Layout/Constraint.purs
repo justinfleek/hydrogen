@@ -49,8 +49,8 @@ module Hydrogen.Layout.Constraint
 
 import Prelude ((*), (+), negate, map, (<>))
 import Data.Array (uncons)
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                     // variables

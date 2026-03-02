@@ -22,7 +22,7 @@ module Hydrogen.Schema.Brand.Logo.Rules
   , showWatermarkRule
   
     -- * Social Platform
-  , SocialPlatform(..)
+  , SocialPlatform(Twitter, LinkedIn, Facebook, Instagram, YouTube, TikTok, Discord, Slack)
   , allSocialPlatforms
   , platformToString
   

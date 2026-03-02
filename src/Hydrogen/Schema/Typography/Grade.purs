@@ -23,7 +23,7 @@
 
 module Hydrogen.Schema.Typography.Grade
   ( -- * Type
-    Grade(..)
+    Grade(Grade)
     
   -- * Constructors
   , grade

@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Brand.Logo.Errors
   ( -- * Error Category
-    ErrorCategory(..)
+    ErrorCategory(ContrastError, ColorError, DistortionError, LayoutError, ClearSpaceError)
   , allErrorCategories
   , categoryToString
   

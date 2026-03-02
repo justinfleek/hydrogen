@@ -188,7 +188,7 @@ import Hydrogen.Schema.Spatial.Material.StandardSurface.Emission
 import Hydrogen.Schema.Spatial.Material.StandardSurface.Geometry
   ( Geometry
   , Opacity
-  , ThinWalled(..)
+  , ThinWalled(ThinWalledTrue, ThinWalledFalse)
   , geometry
   , opacity
   , thinWalled

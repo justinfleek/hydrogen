@@ -21,7 +21,7 @@
 
 module Hydrogen.Schema.Motion.AnimatedTransform.Core
   ( -- * Property Keyframe
-    PropertyKeyframe(..)
+    PropertyKeyframe(PropertyKeyframe)
   , mkPropertyKeyframe
   , keyframeFrame
   , keyframeValue
@@ -32,7 +32,7 @@ module Hydrogen.Schema.Motion.AnimatedTransform.Core
   , keyframeSpatialOut
   
   -- * Animatable Value Container
-  , AnimatableValue(..)
+  , AnimatableValue(AnimatableValue)
   , mkAnimatableValue
   , mkAnimatableValueStatic
   , isAnimated
@@ -41,14 +41,14 @@ module Hydrogen.Schema.Motion.AnimatedTransform.Core
   , getKeyframes
   
   -- * Speed Graph
-  , SpeedGraphPoint(..)
-  , SpeedGraph(..)
+  , SpeedGraphPoint(SpeedGraphPoint)
+  , SpeedGraph(SpeedGraph)
   , defaultSpeedGraph
   , addSpeedGraphPoint
   , evaluateSpeedGraph
   
   -- * Motion Path Mode
-  , MotionPathMode(..)
+  , MotionPathMode(MotionPathOff, MotionPathLinear, MotionPathBezier, MotionPathAutoOrient)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

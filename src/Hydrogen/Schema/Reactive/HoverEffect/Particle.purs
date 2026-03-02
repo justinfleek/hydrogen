@@ -28,9 +28,9 @@
 -- | ```
 
 module Hydrogen.Schema.Reactive.HoverEffect.Particle
-  ( HoverParticle(..)
-  , ParticleType(..)
-  , EmissionMode(..)
+  ( HoverParticle(HoverParticle)
+  , ParticleType(NoParticle, SparkleParticle, ConfettiParticle, DustParticle, BubbleParticle, SnowParticle, HeartParticle, StarParticle, CustomParticle)
+  , EmissionMode(EmitNone, EmitBurst, EmitContinuous, EmitOnMove, EmitOnLeave)
   , hoverParticle
   , noHoverParticle
   , hoverParticleBurst

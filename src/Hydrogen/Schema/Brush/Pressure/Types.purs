@@ -40,7 +40,7 @@ module Hydrogen.Schema.Brush.Pressure.Types
   , pressureCurveDebugInfo
   
   -- * Pressure Simulation
-  , PressureSimulation(..)
+  , PressureSimulation(SimulateVelocity, SimulateDistance, SimulateTime, SimulateForceTouch, SimulateFixed)
   , allPressureSimulations
   , pressureSimulationDescription
   , pressureSimulationQuality

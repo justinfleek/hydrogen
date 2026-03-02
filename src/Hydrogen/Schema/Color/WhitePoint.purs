@@ -31,7 +31,7 @@
 module Hydrogen.Schema.Color.WhitePoint
   ( -- * Types
     WhitePoint
-  , Illuminant(..)
+  , Illuminant(D50, D55, D65, D75, IllumA, IllumE, IllumF2, IllumF11)
   
   -- * Constructors
   , whitePoint

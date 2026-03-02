@@ -39,7 +39,7 @@ module Hydrogen.Schema.Audio.Automation
   , unwrapAutomationValue
   
   -- * Curve Types
-  , CurveType(..)
+  , CurveType(Linear, Exponential, Logarithmic, SCurve, Hold)
   
   -- * Automation Point
   , AutomationPoint
@@ -69,7 +69,7 @@ module Hydrogen.Schema.Audio.Automation
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int as Int
 import Data.Number (sqrt) as Number
 import Hydrogen.Schema.Audio.Tick (TickPosition, unwrapTickPosition)

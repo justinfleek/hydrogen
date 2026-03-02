@@ -97,7 +97,7 @@ module Hydrogen.Schema.Audio.Arrangement
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Audio.Clip (MIDIClip, clipLength)
 import Hydrogen.Schema.Audio.Tick (TickPosition, TickDuration, tickPosition, tickDuration, unwrapTickPosition, unwrapTickDuration, TimeSignature, ts4_4)
 import Hydrogen.Schema.Color.SRGB (SRGB, srgb)

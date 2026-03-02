@@ -18,7 +18,7 @@
 
 module Hydrogen.Schema.Audio.Buffer
   ( -- * Sample Rate
-    SampleRate(..)
+    SampleRate(SampleRate)
   , sampleRate
   , unwrapSampleRate
   , sampleRateBounds
@@ -30,7 +30,7 @@ module Hydrogen.Schema.Audio.Buffer
   , sampleRateHigherThan
   
   -- * Bit Depth
-  , BitDepth(..)
+  , BitDepth(BitDepth)
   , bitDepth
   , unwrapBitDepth
   , bitDepthBounds
@@ -40,7 +40,7 @@ module Hydrogen.Schema.Audio.Buffer
   , isProfessionalBitDepth
   
   -- * Channel Count
-  , ChannelCount(..)
+  , ChannelCount(ChannelCount)
   , channelCount
   , unwrapChannelCount
   , channelCountBounds
@@ -85,12 +85,12 @@ module Hydrogen.Schema.Audio.Buffer
   , isPitchShifted
   
   -- * Loop Mode
-  , LoopMode(..)
+  , LoopMode(LoopNone, LoopForward, LoopPingPong, LoopReverse)
   , loopModeLabel
   , isLooping
   
   -- * Audio Format
-  , AudioFormat(..)
+  , AudioFormat(FormatWAV, FormatAIFF, FormatFLAC, FormatMP3, FormatAAC, FormatOGG, FormatOpus, FormatWebM)
   , formatExtension
   , formatMimeType
   , formatLossy

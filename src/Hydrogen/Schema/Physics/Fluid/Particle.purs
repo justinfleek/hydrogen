@@ -56,7 +56,7 @@ module Hydrogen.Schema.Physics.Fluid.Particle
   , particleCount
   
   -- * SPH Kernels
-  , KernelType(..)
+  , KernelType(Poly6Kernel, SpikyKernel, ViscosityKernel)
   , allKernelTypes
   , kernelPoly6
   , kernelSpiky
@@ -85,7 +85,7 @@ module Hydrogen.Schema.Physics.Fluid.Particle
   , integrateSystem
   
   -- * Boundary Handling
-  , BoundaryType(..)
+  , BoundaryType(ReflectBoundary, ClampBoundary, WrapBoundary)
   , allBoundaryTypes
   , enforceBoundary
   
@@ -136,7 +136,7 @@ import Prelude
   )
 
 import Data.Array (length, index, updateAt, filter, foldl, snoc, deleteAt) as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Number (sqrt, pi, pow) as Num
 import Data.Int (toNumber) as Int
 

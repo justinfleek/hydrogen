@@ -9,21 +9,21 @@
 
 module Hydrogen.Schema.Reactive.Feedback.Types
   ( -- * Feedback Type
-    FeedbackType(..)
+    FeedbackType(ToastType, SnackbarType, BannerType, AlertType, DialogType')
   , isToast
   , isSnackbar
   , isBanner
   , isAlert
   , isDialog
   -- * Feedback Severity
-  , FeedbackSeverity(..)
+  , FeedbackSeverity(FeedbackSuccess, FeedbackInfo, FeedbackWarning, FeedbackError, FeedbackNeutral)
   , isFeedbackSuccess
   , isFeedbackInfo
   , isFeedbackWarning
   , isFeedbackError
   , isFeedbackNeutral
   -- * Feedback Position
-  , FeedbackPosition(..)
+  , FeedbackPosition(TopLeft, TopCenter, TopRight, BottomLeft, BottomCenter, BottomRight)
   , isTopLeft
   , isTopCenter
   , isTopRight
@@ -31,14 +31,14 @@ module Hydrogen.Schema.Reactive.Feedback.Types
   , isBottomCenter
   , isBottomRight
   -- * Duration
-  , FeedbackDuration(..)
+  , FeedbackDuration(DurationShort, DurationMedium, DurationLong, DurationPersistent)
   , isShort
   , isMedium
   , isLong
   , isPersistent
   , durationMs
   -- * Dismissal
-  , DismissalMethod(..)
+  , DismissalMethod(AutoDismiss, ManualDismiss, ActionDismiss, SwipeDismiss)
   , isAutoDismiss
   , isManualDismiss
   , isActionDismiss

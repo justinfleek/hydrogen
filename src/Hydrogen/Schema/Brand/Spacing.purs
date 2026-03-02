@@ -38,7 +38,7 @@ module Hydrogen.Schema.Brand.Spacing
   , grid8
   
   -- * Brand Spacing
-  , SpacingSystem(..)
+  , SpacingSystem(Geometric, Linear)
   , BrandSpacing
   , defaultSpacing
   , getSpacing

@@ -21,8 +21,8 @@
 -- | - **skewX/Y**: Skew angles in degrees
 
 module Hydrogen.Schema.Reactive.HoverEffect.Transform
-  ( HoverTransform(..)
-  , TransformOrigin(..)
+  ( HoverTransform(HoverTransform)
+  , TransformOrigin(OriginCenter, OriginTop, OriginBottom, OriginLeft, OriginRight, OriginTopLeft, OriginTopRight, OriginBottomLeft, OriginBottomRight, OriginCustom)
   , hoverTransform
   , identityTransform
   , defaultHoverTransform

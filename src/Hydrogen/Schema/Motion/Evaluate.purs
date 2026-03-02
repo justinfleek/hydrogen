@@ -41,7 +41,7 @@ module Hydrogen.Schema.Motion.Evaluate
   
   -- * Keyframe Finding
   , findBracketingKeyframes
-  , Bracket(..)
+  , Bracket(BeforeFirst, AfterLast, Between, ExactMatch, NoKeyframes)
   
   -- * Progress Calculation
   , calculateProgress

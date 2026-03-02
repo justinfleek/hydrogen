@@ -33,36 +33,36 @@ module Hydrogen.Schema.Engineering.Dimension
   , module Hydrogen.Schema.Engineering.Dimension.Value
   
   -- * Linear Dimension
-  , LinearDimension(..)
+  , LinearDimension(LinearDimension)
   , horizontalDimension
   , verticalDimension
   , alignedDimension
   , rotatedDimension
   
   -- * Angular Dimension
-  , AngularDimension(..)
+  , AngularDimension(AngularDimension)
   , angularDim
   , arcAngleDimension
   
   -- * Radial Dimension
-  , RadialDimension(..)
+  , RadialDimension(RadiusDim, DiameterDim, CenterMarkDim, CenterLineDim)
   , radiusDimension
   , diameter
   , centerMark
   , centerLine
   
   -- * Ordinate Dimension
-  , OrdinateDimension(..)
+  , OrdinateDimension(OrdinateDimension)
   , xOrdinate
   , yOrdinate
   
   -- * Chain Dimension
-  , ChainDimension(..)
+  , ChainDimension(ChainDim, BaselineDim)
   , chainDimension
   , baselineDimension
   
   -- * Dimension Style
-  , DimensionStyle(..)
+  , DimensionStyle(DimensionStyle)
   , defaultStyle
   , isoStyle
   , asmeStyle
@@ -88,24 +88,24 @@ import Data.Array (foldl) as Array
 
 -- Re-export all submodules
 import Hydrogen.Schema.Engineering.Dimension.Types
-  ( DimensionType(..)
+  ( DimensionType(Linear, Angular, Radial, Diameter, ArcLength, Ordinate, Chain, Baseline)
   , allDimensionTypes
   , dimensionTypeDescription
-  , ArrowheadStyle(..)
+  , ArrowheadStyle(FilledArrow, OpenArrow, ClosedArrow, Tick, Dot, OpenDot, ArchitecturalTick, Integral, NoArrow)
   , allArrowheadStyles
   , arrowheadDescription
-  , TextPosition(..)
+  , TextPosition(TextAbove, TextCentered, TextBelow, TextInline, TextOutside)
   , allTextPositions
   )
 
 import Hydrogen.Schema.Engineering.Dimension.Value
-  ( DimensionValue(..)
+  ( DimensionValue(LinearValue, AngularValue, RadialValue, DiameterValue, ArcLengthValue)
   , linearDimension
   , angularDimension
   , radialDimension
   , diameterDimension
   , arcLengthDimension
-  , DimensionText(..)
+  , DimensionText(BasicDimensionText, LimitDimensionText, ReferenceDimensionText, BasicBoxedText)
   , dimensionText
   , textWithTolerance
   , textWithLimits

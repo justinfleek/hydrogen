@@ -37,7 +37,7 @@ module Hydrogen.Schema.Tensor.Dimension
   ( -- * Core Types
     Dim(Dim)
   , DimVar(DimVar)
-  , DimExpr(..)
+  , DimExpr(DimLit, DimSym, DimMul, DimDiv, DimAdd)
   
   -- * Constructors
   , dim

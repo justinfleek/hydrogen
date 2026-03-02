@@ -28,9 +28,9 @@
 
 module Hydrogen.Schema.Typography.FontVariation
   ( -- * Types
-    VariationAxis(..)
-  , AxisValue(..)
-  , FontVariation(..)
+    VariationAxis(VariationAxis)
+  , AxisValue(AxisValue)
+  , FontVariation(FontVariation)
   
   -- * Axis Constructors
   , weight

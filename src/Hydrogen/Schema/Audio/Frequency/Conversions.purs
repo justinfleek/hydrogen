@@ -40,13 +40,13 @@ import Data.Int as Int
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Math.Core as Math
 import Hydrogen.Schema.Audio.Frequency.Types 
-  ( Hertz(..)
-  , Kilohertz(..)
-  , MidiNote(..)
-  , MidiPitch(..)
-  , Cent(..)
-  , Semitone(..)
-  , Octave(..)
+  ( Hertz(Hertz)
+  , Kilohertz(Kilohertz)
+  , MidiNote(MidiNote)
+  , MidiPitch(MidiPitch)
+  , Cent(Cent)
+  , Semitone(Semitone)
+  , Octave(Octave)
   , midiNote
   , midiPitch
   , cent

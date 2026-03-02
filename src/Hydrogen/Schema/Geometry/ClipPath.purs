@@ -37,7 +37,7 @@ module Hydrogen.Schema.Geometry.ClipPath
     Point
     
   -- * ClipPath Type
-  , ClipPath(..)
+  , ClipPath(ClipNone, ClipPath, ClipCircle, ClipEllipse, ClipPolygon, ClipInset)
   
   -- * Construction
   , clipPath

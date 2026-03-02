@@ -11,12 +11,12 @@
 
 module Hydrogen.Schema.Color.Blend
   ( -- * Blend Modes
-    BlendMode(..)
+    BlendMode(Normal, Dissolve, Darken, Multiply, ColorBurn, LinearBurn, DarkerColor, Lighten, Screen, ColorDodge, LinearDodge, LighterColor, Overlay, SoftLight, HardLight, VividLight, LinearLight, PinLight, HardMix, Difference, Exclusion, Subtract, Divide)
   , blendRGBA
   , blendChannel
   
   -- * Porter-Duff Compositing
-  , CompositeOp(..)
+  , CompositeOp(Clear, Copy, Destination, SourceOver, DestinationOver, SourceIn, DestinationIn, SourceOut, DestinationOut, SourceAtop, DestinationAtop, Xor)
   , composite
   
   -- * Color Mixing

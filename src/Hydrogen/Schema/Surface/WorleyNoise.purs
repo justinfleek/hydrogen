@@ -49,7 +49,7 @@
 
 module Hydrogen.Schema.Surface.WorleyNoise
   ( -- * Distance Types
-    DistanceType(..)
+    DistanceType(F1, F2, F2MinusF1, F1PlusF2, F3)
   
   -- * Types
   , WorleyNoise(WorleyNoise)

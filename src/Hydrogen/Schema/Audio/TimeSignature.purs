@@ -13,7 +13,7 @@
 
 module Hydrogen.Schema.Audio.TimeSignature
   ( -- * Time Signature
-    TimeSignature(..)
+    TimeSignature(TimeSignature, TimeFree)
   , timeSignature
   , timeSignatureNumerator
   , timeSignatureDenominator
@@ -31,7 +31,7 @@ module Hydrogen.Schema.Audio.TimeSignature
   , timeFree
   
   -- * Tempo
-  , Tempo(..)
+  , Tempo(Tempo)
   , tempo
   , unwrapTempo
   , tempoBounds
@@ -52,7 +52,7 @@ module Hydrogen.Schema.Audio.TimeSignature
   , positionTick
   
   -- * Tick Resolution
-  , TicksPerBeat(..)
+  , TicksPerBeat(TicksPerBeat)
   , ticksPerBeat
   , unwrapTicksPerBeat
   , ppq96

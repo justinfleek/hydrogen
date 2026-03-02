@@ -10,12 +10,12 @@
 
 module Hydrogen.Schema.Reactive.ValidationState
   ( -- * Validation Result
-    ValidationResult(..)
+    ValidationResult(ValidationValid, ValidationInvalid, ValidationPending, ValidationSkipped)
   , isValidResult
   , isInvalidResult
   , isPendingResult
   -- * Validation Severity
-  , ValidationSeverity(..)
+  , ValidationSeverity(SeverityError, SeverityWarning, SeverityInfo)
   , isSeverityError
   , isSeverityWarning
   , isSeverityInfo
@@ -26,11 +26,11 @@ module Hydrogen.Schema.Reactive.ValidationState
   , warningMessage
   , infoMessage
   -- * Field Modification State
-  , ModificationState(..)
+  , ModificationState(Pristine, Modified)
   , isPristine
   , isDirty
   -- * Field Touch State
-  , TouchState(..)
+  , TouchState(Untouched, Touched)
   , isTouched
   , isUntouched
   -- * Field Validation State (Molecule)

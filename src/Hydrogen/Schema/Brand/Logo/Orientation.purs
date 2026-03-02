@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Brand.Logo.Orientation
   ( -- * Orientation
-    Orientation(..)
+    Orientation(Horizontal, Vertical, Square)
   , allOrientations
   , orientationToString
   , orientationFromString

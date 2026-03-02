@@ -87,7 +87,7 @@ module Hydrogen.Audio.AudioEffect
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Audio.Effects as FX
 import Hydrogen.Schema.Audio.Spatial as Spatial
 

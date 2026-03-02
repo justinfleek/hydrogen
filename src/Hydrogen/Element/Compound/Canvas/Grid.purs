@@ -85,8 +85,8 @@ import Hydrogen.Element.Compound.Canvas.Grid.Types
   , lineStart
   , lineEnd
   , lineIsMajor
-  , SnapPointType(..)
-  , SnapPoint
+  , SnapPointType(SnapMajorIntersection, SnapMinorIntersection, SnapHexCenter, SnapHexVertex, SnapPolarCenter, SnapPolarIntersection, SnapVanishingPoint, SnapCompositionPoint)
+  , SnapPoint(SnapPoint)
   , snapPoint
   , snapPointPosition
   , snapPointType
@@ -105,7 +105,7 @@ import Hydrogen.Element.Compound.Canvas.Grid.Snap
   ) as Snap
 
 import Hydrogen.Element.Compound.Canvas.Grid.Style
-  ( ExtendedGridStyle(..)
+  ( ExtendedGridStyle(StyleSquare, StyleDot, StyleCrosshair, StyleIsometric, StyleIsometric30, StyleIsometric45, StylePerspective1, StylePerspective2, StylePerspective3, StylePolar, StyleHexagonal, StyleGoldenRatio, StyleRuleOfThirds, StyleDiagonal)
   , gridStyleAngle
   , isIsometricFamily
   , isPerspectiveFamily

@@ -24,10 +24,10 @@
 
 module Hydrogen.Schema.Text.Code.Indentation
   ( -- * Indent Style
-    IndentStyle(..)
+    IndentStyle(IndentSpaces, IndentTabs)
   
   -- * Indent Size
-  , IndentSize(..)
+  , IndentSize(IndentSize)
   , indentSize
   , unwrapIndentSize
   

@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Physics.Force.Fields
   ( -- * Force Field
-    ForceField(..)
+    ForceField(EmptyField, UniformField, CompositeField)
   , emptyField
   , uniformField
   , addForceToField

@@ -16,8 +16,8 @@
 
 module Hydrogen.Schema.Motion.AnimatedTransform.Properties
   ( -- * Position Properties
-    AnimatedPosition2D(..)
-  , AnimatedPosition3D(..)
+    AnimatedPosition2D(AnimatedPosition2D)
+  , AnimatedPosition3D(AnimatedPosition3D)
   , defaultAnimatedPosition2D
   , defaultAnimatedPosition3D
   , separatePositionDimensions
@@ -27,27 +27,27 @@ module Hydrogen.Schema.Motion.AnimatedTransform.Properties
   , enableAutoOrient
   
   -- * Scale Properties
-  , AnimatedScale2D(..)
-  , AnimatedScale3D(..)
+  , AnimatedScale2D(AnimatedScale2D)
+  , AnimatedScale3D(AnimatedScale3D)
   , defaultAnimatedScale2D
   , defaultAnimatedScale3D
   , linkScaleDimensions
   , unlinkScaleDimensions
   
   -- * Rotation Properties
-  , AnimatedRotation(..)
-  , AnimatedRotation3D(..)
+  , AnimatedRotation(AnimatedRotation)
+  , AnimatedRotation3D(AnimatedRotation3D)
   , defaultAnimatedRotation
   , defaultAnimatedRotation3D
   
   -- * Anchor Point Properties
-  , AnimatedAnchor2D(..)
-  , AnimatedAnchor3D(..)
+  , AnimatedAnchor2D(AnimatedAnchor2D)
+  , AnimatedAnchor3D(AnimatedAnchor3D)
   , defaultAnimatedAnchor2D
   , defaultAnimatedAnchor3D
   
   -- * Opacity Property
-  , AnimatedOpacity(..)
+  , AnimatedOpacity(AnimatedOpacity)
   , defaultAnimatedOpacity
   ) where
 

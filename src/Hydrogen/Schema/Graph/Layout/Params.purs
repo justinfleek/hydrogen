@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Graph.Layout.Params
   ( -- * Treemap Specific
-    TreemapAlgorithm(..)
+    TreemapAlgorithm(Squarify, Binary, Slice, Dice, SliceDice)
   , TreemapParams
   , treemapParams
   , defaultTreemapParams

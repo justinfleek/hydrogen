@@ -69,9 +69,9 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, foldl, sortBy)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int (toNumber) as Int
-import Data.Ordering (Ordering(..))
+import Data.Ordering (Ordering(LT, EQ, GT))
 
 import Hydrogen.Schema.Motion.Easing (Easing, evaluate)
 import Hydrogen.Schema.Motion.TimeRemap.Types (SpeedKeyframe(SpeedKeyframe))

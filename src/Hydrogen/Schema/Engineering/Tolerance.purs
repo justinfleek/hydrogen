@@ -51,26 +51,26 @@ module Hydrogen.Schema.Engineering.Tolerance
   , toleranceLoose
   
   -- * Feature Control Frame
-  , FeatureControlFrame(..)
+  , FeatureControlFrame(FeatureControlFrame)
   , featureControlFrame
   , simpleFrame
   , frameWithDatums
   , frameWithModifier
   
   -- * Bilateral Tolerance
-  , BilateralTolerance(..)
+  , BilateralTolerance(BilateralTolerance)
   , symmetricTolerance
   , asymmetricTolerance
   , plusTolerance
   , minusTolerance
   
   -- * Unilateral Tolerance
-  , UnilateralTolerance(..)
+  , UnilateralTolerance(UnilateralPlus, UnilateralMinus)
   , unilateralPlus
   , unilateralMinus
   
   -- * Limit Dimensions
-  , LimitDimension(..)
+  , LimitDimension(LimitDimension)
   , limitDimension
   , limitFromBilateral
   
@@ -99,12 +99,12 @@ import Hydrogen.Schema.Bounded as Bounded
 
 -- Re-export all submodules
 import Hydrogen.Schema.Engineering.Tolerance.Characteristic
-  ( GeometricCharacteristic(..)
+  ( GeometricCharacteristic(Straightness, Flatness, Circularity, Cylindricity, Perpendicularity, Angularity, Parallelism, Position, Concentricity, Symmetry, CircularRunout, TotalRunout, ProfileOfLine, ProfileOfSurface)
   , allGeometricCharacteristics
   , characteristicSymbol
   , characteristicCategory
   , characteristicDescription
-  , ToleranceCategory(..)
+  , ToleranceCategory(Form, Orientation, Location, Runout, Profile)
   , allToleranceCategories
   , isFormTolerance
   , isOrientationTolerance
@@ -114,22 +114,22 @@ import Hydrogen.Schema.Engineering.Tolerance.Characteristic
   )
 
 import Hydrogen.Schema.Engineering.Tolerance.Datum
-  ( DatumLabel(..)
+  ( DatumLabel(DatumA, DatumB, DatumC, DatumD, DatumE, DatumF, DatumG, DatumH, DatumJ, DatumK, DatumL, DatumM, DatumN, DatumP, DatumR, DatumS, DatumT, DatumU, DatumV, DatumW, DatumX, DatumY, DatumZ)
   , allDatumLabels
   , datumLabelChar
-  , DatumFeature(..)
+  , DatumFeature(DatumFeature)
   , datumFeature
   , primaryDatum
   , secondaryDatum
   , tertiaryDatum
-  , MaterialCondition(..)
+  , MaterialCondition(MMC, LMC, RFS)
   , allMaterialConditions
   , conditionSymbol
   , conditionDescription
   )
 
 import Hydrogen.Schema.Engineering.Tolerance.Fit
-  ( FitClass(..)
+  ( FitClass(H11c11, H9d9, H8f7, H7g6, H7h6, H7k6, H7m6, H7n6, H7p6, H7s6, H7u6)
   , allFitClasses
   , fitDescription
   , fitTolerance

@@ -36,13 +36,13 @@ module Hydrogen.Schema.Brand.Compound.Types
   , stateDisabled
   
   -- * Component Size
-  , ComponentSize(..)
+  , ComponentSize(SizeXS, SizeSM, SizeMD, SizeLG, SizeXL, Size2XL)
   , sizeToString
   , sizeFromString
   , allSizes
   
   -- * Component Variant
-  , ComponentVariant(..)
+  , ComponentVariant(VariantPrimary, VariantSecondary, VariantTertiary, VariantGhost, VariantOutline, VariantLink, VariantDestructive, VariantSuccess, VariantWarning, VariantInfo)
   , variantToString
   , variantFromString
   , allVariants
@@ -55,12 +55,12 @@ module Hydrogen.Schema.Brand.Compound.Types
   , compoundCategory
   
   -- * Compound Category
-  , CompoundCategory(..)
+  , CompoundCategory(CategoryInteractive, CategoryContainer, CategoryForm, CategoryDataDisplay, CategoryFeedback, CategoryNavigation, CategoryOverlay, CategoryLayout)
   , categoryToString
   , categoryFromString
   
   -- * Style Property
-  , StyleProperty(..)
+  , StyleProperty(PropBackground, PropBackgroundHover, PropBackgroundActive, PropBackgroundDisabled, PropText, PropTextHover, PropTextDisabled, PropBorder, PropBorderHover, PropBorderFocus, PropFocusRing, PropPlaceholder, PropIcon, PropIconHover, PropPadding, PropPaddingX, PropPaddingY, PropPaddingTop, PropPaddingBottom, PropPaddingLeft, PropPaddingRight, PropMargin, PropGap, PropHeight, PropMinHeight, PropMaxHeight, PropWidth, PropMinWidth, PropMaxWidth, PropBorderWidth, PropBorderRadius, PropBorderRadiusTop, PropBorderRadiusBottom, PropShadow, PropShadowHover, PropOpacity, PropOpacityDisabled, PropFontSize, PropFontWeight, PropLineHeight, PropLetterSpacing, PropTransitionDuration, PropTransitionEasing, PropZIndex)
   , propertyToString
   
   -- * Compound Registry

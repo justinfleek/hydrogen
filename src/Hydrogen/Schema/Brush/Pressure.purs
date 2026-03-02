@@ -35,8 +35,8 @@ module Hydrogen.Schema.Brush.Pressure
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Brush.Pressure.Types
-  ( PressureCurve(..)
-  , PressureSimulation(..)
+  ( PressureCurve(Linear, Soft, Firm, SCurve, Logarithmic, Exponential)
+  , PressureSimulation(SimulateVelocity, SimulateDistance, SimulateTime, SimulateForceTouch, SimulateFixed)
   , allPressureCurves
   , allPressureSimulations
   , pressureCurveDebugInfo
@@ -49,9 +49,9 @@ import Hydrogen.Schema.Brush.Pressure.Types
   ) as Types
 
 import Hydrogen.Schema.Brush.Pressure.Atoms
-  ( Pressure(..)
-  , PressureMax(..)
-  , PressureMin(..)
+  ( Pressure(Pressure)
+  , PressureMax(PressureMax)
+  , PressureMin(PressureMin)
   , defaultPressureMax
   , defaultPressureMin
   , fullPressure

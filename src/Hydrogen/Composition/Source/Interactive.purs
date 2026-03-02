@@ -68,7 +68,7 @@ import Prelude
 import Data.Maybe (Maybe(Nothing))
 
 import Hydrogen.Schema.Color.Opacity (Opacity)
-import Hydrogen.Composition.Source.Data (DataRef(..))
+import Hydrogen.Composition.Source.Data (DataRef(DataRef))
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                       // widget

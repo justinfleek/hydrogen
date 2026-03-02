@@ -12,19 +12,19 @@
 -- | https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
 module Hydrogen.Schema.Accessibility.State
   ( -- * Tristate Values
-    Tristate(..)
+    Tristate(TriFalse, TriTrue, TriMixed)
   , tristateToString
     -- * ARIA States
-  , AriaExpanded(..)
-  , AriaSelected(..)
-  , AriaPressed(..)
-  , AriaChecked(..)
-  , AriaDisabled(..)
-  , AriaHidden(..)
-  , AriaInvalid(..)
-  , AriaBusy(..)
-  , AriaCurrent(..)
-  , AriaGrabbed(..)
+  , AriaExpanded(AriaExpanded)
+  , AriaSelected(AriaSelected)
+  , AriaPressed(AriaPressed)
+  , AriaChecked(AriaChecked)
+  , AriaDisabled(AriaDisabled)
+  , AriaHidden(AriaHidden)
+  , AriaInvalid(InvalidFalse, InvalidTrue, InvalidGrammar, InvalidSpelling)
+  , AriaBusy(AriaBusy)
+  , AriaCurrent(CurrentFalse, CurrentTrue, CurrentPage, CurrentStep, CurrentLocation, CurrentDate, CurrentTime)
+  , AriaGrabbed(AriaGrabbed)
     -- * State Rendering
   , expandedToAttr
   , selectedToAttr
@@ -40,7 +40,7 @@ module Hydrogen.Schema.Accessibility.State
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // tristate values

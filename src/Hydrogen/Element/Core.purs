@@ -87,7 +87,7 @@ module Hydrogen.Element.Core
 
 -- Element type, composition specs, instances, and smart constructors
 import Hydrogen.Element.Core.Element
-  ( Element(..)
+  ( Element(Rectangle, Ellipse, Path, Text, Image, Video, Audio, Model3D, Group, Transform, Empty)
   , GroupSpec
   , TransformSpec
   , rectangle
@@ -123,15 +123,15 @@ import Hydrogen.Element.Core.Stroke
 -- Media specifications (image, video, audio, 3D)
 import Hydrogen.Element.Core.Media
   ( ImageSpec
-  , ImageSource(..)
+  , ImageSource(ImageUrl, ImageDataUri, ImageTextureId)
   , VideoSpec
-  , VideoSource(..)
+  , VideoSource(VideoUrl, VideoBlobId, VideoStreamId)
   , VideoPlayback
   , AudioSpec
-  , AudioSource(..)
+  , AudioSource(AudioUrl, AudioBlobId, AudioStreamId, AudioOscillator)
   , AudioPlayback
   , Model3DSpec
-  , Model3DSource(..)
+  , Model3DSource(ModelUrl, ModelGeometryId)
   , Model3DCamera
   ) as ReExportMedia
 

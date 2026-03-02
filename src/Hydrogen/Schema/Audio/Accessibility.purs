@@ -36,8 +36,8 @@
 
 module Hydrogen.Schema.Audio.Accessibility
   ( -- * Announcement Atoms
-    AnnouncementPriority(..)
-  , Politeness(..)
+    AnnouncementPriority(PriorityLow, PriorityMedium, PriorityHigh, PriorityCritical)
+  , Politeness(PolitenessOff, PolitenessPolite, PolitenessAssertive)
   , priorityName
   , politenessName
   
@@ -53,15 +53,15 @@ module Hydrogen.Schema.Audio.Accessibility
   , liveRegionAssertive
   
   -- * Audio Description
-  , DescriptionLength(..)
-  , DescriptionContext(..)
+  , DescriptionLength(LengthBrief, LengthStandard, LengthExtended)
+  , DescriptionContext(ContextImage, ContextChart, ContextVideo, ContextAnimation, ContextIcon, ContextLayout)
   , AudioDescription
   , audioDescription
   , descriptionBrief
   , descriptionExtended
   
   -- * Earcon Types
-  , EarconCategory(..)
+  , EarconCategory(EarconSuccess, EarconError, EarconWarning, EarconInfo, EarconProgress, EarconComplete, EarconNotify, EarconNavigate)
   , earconCategoryName
   
   -- * Earcon Molecule
@@ -77,13 +77,13 @@ module Hydrogen.Schema.Audio.Accessibility
   , auditoryIcon
   
   -- * Sonification Mapping
-  , SonificationDimension(..)
-  , SonificationScale(..)
+  , SonificationDimension(DimPitch, DimVolume, DimPan, DimTempo, DimTimbre, DimDuration)
+  , SonificationScale(ScaleLinear, ScaleLogarithmic, ScaleExponential, ScaleDiscrete)
   , SonificationMapping
   , sonificationMapping
   
   -- * Audio Cue
-  , AudioCue(..)
+  , AudioCue(CueFocusEnter, CueFocusLeave, CueSelect, CueDeselect, CueExpand, CueCollapse, CueScrollStart, CueScrollEnd, CueBoundary, CueLoading, CueReady)
   , audioCueName
   
   -- * Navigation Sound
@@ -94,7 +94,7 @@ module Hydrogen.Schema.Audio.Accessibility
   , navSoundBack
   
   -- * Reading Speed
-  , ReadingSpeed(..)
+  , ReadingSpeed(ReadingSpeed)
   , readingSpeed
   , unwrapReadingSpeed
   , readingSpeedSlow

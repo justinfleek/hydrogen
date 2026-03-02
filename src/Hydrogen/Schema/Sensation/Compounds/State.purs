@@ -25,7 +25,7 @@ module Hydrogen.Schema.Sensation.Compounds.State
   , sensationOptimal
   , sensationHostile
   , evaluateSensation
-  , SensationEvaluation(..)
+  , SensationEvaluation(Positive, Neutral, Negative)
     -- * Wellbeing Score
   , WellbeingScore
   , computeWellbeing

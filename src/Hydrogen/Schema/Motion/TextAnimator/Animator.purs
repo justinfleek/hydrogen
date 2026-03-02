@@ -20,7 +20,7 @@ module Hydrogen.Schema.Motion.TextAnimator.Animator
   , defaultTextAnimatorProperties
   
     -- * Animator Id
-  , TextAnimatorId(..)
+  , TextAnimatorId(TextAnimatorId)
   , mkTextAnimatorId
   
     -- * Text Animator

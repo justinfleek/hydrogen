@@ -41,7 +41,7 @@
 
 module Hydrogen.Schema.Color.OnoSendai
   ( -- * Types
-    BlackLevel(..)
+    BlackLevel(Void, Deep, Night, Carbon, GitHub)
   , OnoSendaiPalette
   
   -- * Palette Generation

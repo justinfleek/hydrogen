@@ -28,11 +28,11 @@ module Hydrogen.Schema.Motion.LayerReference.Validation
   ( -- * Reference Validation
     validateReference
   , validateAllReferences
-  , ReferenceError(..)
+  , ReferenceError(RELayerNotFound, REPropertyNotFound, RECircularReference, RESelfReference, REInvalidMatteOrder)
   , referenceErrorToString
   
   -- * Composition Namespace
-  , CompositionNamespace(..)
+  , CompositionNamespace(CompositionNamespace)
   , mkCompositionNamespace
   , registerLayer
   , unregisterLayer

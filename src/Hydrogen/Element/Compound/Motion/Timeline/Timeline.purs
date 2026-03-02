@@ -77,7 +77,7 @@ import Prelude
 
 import Data.Array as Array
 import Data.Int as Int
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Render.Element (Element)
 import Hydrogen.Render.Element as E
 import Hydrogen.Schema.Color.SRGB (SRGB, srgb, srgbToLegacyCss)

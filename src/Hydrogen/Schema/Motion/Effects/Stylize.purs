@@ -9,79 +9,79 @@
 
 module Hydrogen.Schema.Motion.Effects.Stylize
   ( -- * Scanlines Direction
-    ScanlinesDirection(..)
+    ScanlinesDirection(SDHorizontal, SDVertical)
   , allScanlinesDirections
   , scanlinesDirectionToString
   , scanlinesDirectionFromString
   
   -- * RGB Split Blend Mode
-  , RGBSplitBlendMode(..)
+  , RGBSplitBlendMode(RSBMScreen, RSBMAdd, RSBMNormal)
   , allRGBSplitBlendModes
   , rgbSplitBlendModeToString
   , rgbSplitBlendModeFromString
   
   -- * Pixel Sort Direction
-  , PixelSortDirection(..)
+  , PixelSortDirection(PSDHorizontal, PSDVertical)
   , allPixelSortDirections
   , pixelSortDirectionToString
   , pixelSortDirectionFromString
   
   -- * Sort By Criterion
-  , SortByCriterion(..)
+  , SortByCriterion(SBCSaturation, SBCBrightness, SBCHue)
   , allSortByCriteria
   , sortByCriterionToString
   , sortByCriterionFromString
   
   -- * Halftone Color Mode
-  , HalftoneColorMode(..)
+  , HalftoneColorMode(HCMGrayscale, HCMRGB, HCMCMYK)
   , allHalftoneColorModes
   , halftoneColorModeToString
   , halftoneColorModeFromString
   
   -- * Dither Method
-  , DitherMethod(..)
+  , DitherMethod(DMOrdered, DMFloydSteinberg, DMAtkinson)
   , allDitherMethods
   , ditherMethodToString
   , ditherMethodFromString
   
   -- * Dither Matrix Size
-  , DitherMatrixSize(..)
+  , DitherMatrixSize(DMS2x2, DMS4x4, DMS8x8)
   , allDitherMatrixSizes
   , ditherMatrixSizeToString
   , ditherMatrixSizeFromString
   
   -- * Effect Color Channel
-  , EffectColorChannel(..)
+  , EffectColorChannel(ECCRGB, ECCRed, ECCGreen, ECCBlue, ECCAlpha)
   , allEffectColorChannels
   , effectColorChannelToString
   , effectColorChannelFromString
   
   -- * HSL Channel
-  , HSLChannel(..)
+  , HSLChannel(HSLMaster, HSLReds, HSLYellows, HSLGreens, HSLCyans, HSLBlues, HSLMagentas)
   , allHSLChannels
   , hslChannelToString
   , hslChannelFromString
   
   -- * Drop Shadow Effect
-  , DropShadowEffect(..)
+  , DropShadowEffect
   , defaultDropShadow
   , mkDropShadow
   , isDropShadowVisible
   
   -- * Bevel/Emboss Effect
-  , BevelEmbossEffect(..)
-  , BevelStyle(..)
-  , BevelDirection(..)
-  , HighlightMode(..)
-  , ShadowMode(..)
+  , BevelEmbossEffect
+  , BevelStyle(BevelOuter, BevelInner, BevelEmboss, BevelPillowEmboss, BevelStrokeEmboss)
+  , BevelDirection(BevelUp, BevelDown)
+  , HighlightMode(HMScreen, HMAdd, HMNormal)
+  , ShadowMode(SMMultiply, SMDarken, SMNormal)
   , bevelStyleToString
   , bevelStyleFromString
   , defaultBevelEmboss
   , mkBevelEmboss
   
   -- * Stroke Effect
-  , StrokeEffect(..)
-  , StrokePosition(..)
+  , StrokeEffect
+  , StrokePosition(StrokeOutside, StrokeInside, StrokeCenter)
   , strokePositionToString
   , strokePositionFromString
   , defaultStroke

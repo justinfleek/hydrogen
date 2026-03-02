@@ -56,13 +56,13 @@ import Prelude
   )
 
 import Data.Array (snoc, length, index, mapMaybe, null, all) as Data.Array
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple))
 
 import Hydrogen.Layout.ILP.Problem.Types
   ( VarId
   , VarSpec
-  , VarType(..)
+  , VarType(Continuous, Integer)
   , ILPProblem
   , defaultUpperBound
   )

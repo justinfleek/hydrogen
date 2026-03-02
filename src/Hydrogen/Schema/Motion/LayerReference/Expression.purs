@@ -26,14 +26,14 @@
 
 module Hydrogen.Schema.Motion.LayerReference.Expression
   ( -- * Expression Link
-    ExpressionLink(..)
+    ExpressionLink(ExpressionLink)
   , mkExpressionLink
   , expressionLinkSource
   , expressionLinkTarget
   , expressionLinkExpression
   
   -- * Mask Mode
-  , MaskMode(..)
+  , MaskMode(MMNone, MMAdd, MMSubtract, MMIntersect, MMLighten, MMDarken, MMDifference)
   , allMaskModes
   , maskModeToString
   ) where

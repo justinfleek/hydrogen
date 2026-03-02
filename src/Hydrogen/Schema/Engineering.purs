@@ -73,13 +73,13 @@ module Hydrogen.Schema.Engineering
 
 import Hydrogen.Schema.Engineering.Tolerance
   ( -- Geometric Characteristics
-    GeometricCharacteristic(..)
+    GeometricCharacteristic(Straightness, Flatness, Circularity, Cylindricity, Perpendicularity, Angularity, Parallelism, Position, Concentricity, Symmetry, CircularRunout, TotalRunout, ProfileOfLine, ProfileOfSurface)
   , allGeometricCharacteristics
   , characteristicSymbol
   , characteristicCategory
   , characteristicDescription
   -- Tolerance Categories
-  , ToleranceCategory(..)
+  , ToleranceCategory(Form, Orientation, Location, Runout, Profile)
   , allToleranceCategories
   -- Tolerance Value
   , ToleranceValue
@@ -93,39 +93,39 @@ import Hydrogen.Schema.Engineering.Tolerance
   , toleranceStandard
   , toleranceLoose
   -- Datum Reference
-  , DatumLabel(..)
+  , DatumLabel(DatumA, DatumB, DatumC, DatumD, DatumE, DatumF, DatumG, DatumH, DatumJ, DatumK, DatumL, DatumM, DatumN, DatumP, DatumR, DatumS, DatumT, DatumU, DatumV, DatumW, DatumX, DatumY, DatumZ)
   , allDatumLabels
   , datumLabelChar
-  , DatumFeature(..)
+  , DatumFeature(DatumFeature)
   , datumFeature
   , primaryDatum
   , secondaryDatum
   , tertiaryDatum
   -- Material Condition
-  , MaterialCondition(..)
+  , MaterialCondition(MMC, LMC, RFS)
   , allMaterialConditions
   , conditionSymbol
   , conditionDescription
   -- Feature Control Frame
-  , FeatureControlFrame(..)
+  , FeatureControlFrame(FeatureControlFrame)
   , featureControlFrame
   , simpleFrame
   , frameWithDatums
   , frameWithModifier
   -- Tolerances
-  , BilateralTolerance(..)
+  , BilateralTolerance(BilateralTolerance)
   , symmetricTolerance
   , asymmetricTolerance
   , plusTolerance
   , minusTolerance
-  , UnilateralTolerance(..)
+  , UnilateralTolerance(UnilateralPlus, UnilateralMinus)
   , unilateralPlus
   , unilateralMinus
-  , LimitDimension(..)
+  , LimitDimension(LimitDimension)
   , limitDimension
   , limitFromBilateral
   -- Fit Classes
-  , FitClass(..)
+  , FitClass(H11c11, H9d9, H8f7, H7g6, H7h6, H7k6, H7m6, H7n6, H7p6, H7s6, H7u6)
   , allFitClasses
   , fitDescription
   , fitTolerance
@@ -152,56 +152,56 @@ import Hydrogen.Schema.Engineering.Tolerance
 
 import Hydrogen.Schema.Engineering.Dimension
   ( -- Dimension Type
-    DimensionType(..)
+    DimensionType(Linear, Angular, Radial, Diameter, ArcLength, Ordinate, Chain, Baseline)
   , allDimensionTypes
   , dimensionTypeDescription
   -- Arrowhead Style
-  , ArrowheadStyle(..)
+  , ArrowheadStyle(FilledArrow, OpenArrow, ClosedArrow, Tick, Dot, OpenDot, ArchitecturalTick, Integral, NoArrow)
   , allArrowheadStyles
   , arrowheadDescription
   -- Dimension Value
-  , DimensionValue(..)
+  , DimensionValue(LinearValue, AngularValue, RadialValue, DiameterValue, ArcLengthValue)
   , linearDimension
   , angularDimension
   , radialDimension
   , diameterDimension
   , arcLengthDimension
   -- Dimension Text
-  , DimensionText(..)
+  , DimensionText(BasicDimensionText, LimitDimensionText, ReferenceDimensionText, BasicBoxedText)
   , dimensionText
   , textWithTolerance
   , textWithLimits
   , referenceText
   , basicText
   -- Text Position
-  , TextPosition(..)
+  , TextPosition(TextAbove, TextCentered, TextBelow, TextInline, TextOutside)
   , allTextPositions
   -- Linear Dimension
-  , LinearDimension(..)
+  , LinearDimension(LinearDimension)
   , horizontalDimension
   , verticalDimension
   , alignedDimension
   , rotatedDimension
   -- Angular Dimension
-  , AngularDimension(..)
+  , AngularDimension(AngularDimension)
   , angularDim
   , arcAngleDimension
   -- Radial Dimension
-  , RadialDimension(..)
+  , RadialDimension(RadiusDim, DiameterDim, CenterMarkDim, CenterLineDim)
   , radiusDimension
   , diameter
   , centerMark
   , centerLine
   -- Ordinate Dimension
-  , OrdinateDimension(..)
+  , OrdinateDimension(OrdinateDimension)
   , xOrdinate
   , yOrdinate
   -- Chain Dimension
-  , ChainDimension(..)
+  , ChainDimension(ChainDim, BaselineDim)
   , chainDimension
   , baselineDimension
   -- Dimension Style
-  , DimensionStyle(..)
+  , DimensionStyle(DimensionStyle)
   , defaultStyle
   , isoStyle
   , asmeStyle
@@ -212,36 +212,36 @@ import Hydrogen.Schema.Engineering.Dimension
 
 import Hydrogen.Schema.Engineering.Section
   ( -- Section Type
-    SectionType(..)
+    SectionType(FullSection, HalfSection, OffsetSection, BrokenOutSection, RevolvedSection, RemovedSection, AlignedSection)
   , allSectionTypes
   , sectionTypeDescription
   -- Cut Plane
-  , CutPlane(..)
+  , CutPlane(SimplePlane, OffsetPlane, BentPlane)
   , cutPlane
   , offsetCutPlane
   , bentCutPlane
   -- Section Line
-  , SectionLine(..)
+  , SectionLine(SectionLine)
   , sectionLine
   , sectionLineWithArrows
   -- Hatch Pattern
-  , HatchPattern(..)
+  , HatchPattern(SolidFill, GeneralPurpose, Steel, CastIron, Bronze, Brass, Aluminum, Rubber, Plastic, Glass, Concrete, Brick, Stone, Wood, Earth, Water, Insulation, CustomPattern)
   , allHatchPatterns
   , patternDescription
   , patternForMaterial
   -- Hatch Style
-  , HatchStyle(..)
+  , HatchStyle(HatchStyle)
   , hatchStyle
   , defaultHatch
   , steelHatch
   , brassHatch
   , castIronHatch
   -- Hatched Region
-  , HatchedRegion(..)
+  , HatchedRegion(HatchedRegion)
   , hatchedRegion
   , hatchWithBoundary
   -- Section View
-  , SectionView(..)
+  , SectionView(SectionView)
   , fullSection
   , halfSection
   , offsetSection
@@ -253,15 +253,15 @@ import Hydrogen.Schema.Engineering.Section
 
 import Hydrogen.Schema.Engineering.Drawing
   ( -- Sheet Size
-    SheetSize(..)
+    SheetSize(A0, A1, A2, A3, A4, ANSI_A, ANSI_B, ANSI_C, ANSI_D, ANSI_E, Arch_A, Arch_B, Arch_C, Arch_D, Arch_E, CustomSize)
   , allSheetSizes
   , sheetDimensions
   , sheetDescription
   -- Sheet Orientation
-  , SheetOrientation(..)
+  , SheetOrientation(Portrait, Landscape)
   , allSheetOrientations
   -- Drawing Scale
-  , DrawingScale(..)
+  , DrawingScale(DrawingScale)
   , scaleRatio
   , fullScale
   , halfScale
@@ -279,31 +279,31 @@ import Hydrogen.Schema.Engineering.Drawing
   , scale5to1
   , scale10to1
   -- Title Block
-  , TitleBlock(..)
+  , TitleBlock(TitleBlock)
   , titleBlock
   , minimalTitleBlock
   -- Revision
-  , Revision(..)
+  , Revision(Revision)
   , revision
   , initialRevision
   -- Bill of Materials
-  , BomEntry(..)
+  , BomEntry(BomEntry)
   , bomEntry
-  , BillOfMaterials(..)
+  , BillOfMaterials(BillOfMaterials)
   , billOfMaterials
   , addBomEntry
   , bomTotal
   -- View Type
-  , ViewType(..)
+  , ViewType(FrontView, RearView, TopView, BottomView, LeftView, RightView, IsometricView_, DiametricView, TrimetricView, DetailView_, AuxiliaryView, SectionView_)
   , allViewTypes
   , viewTypeDescription
   -- Drawing View
-  , DrawingView(..)
+  , DrawingView(DrawingView)
   , orthographicView
   , isometricView
   , detailView
   -- Drawing Sheet
-  , DrawingSheet(..)
+  , DrawingSheet(DrawingSheet)
   , drawingSheet
   , addView
   -- Operations

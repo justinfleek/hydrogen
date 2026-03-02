@@ -29,7 +29,7 @@ module Hydrogen.Schema.Weather.Precipitation.Hail
   , hailSoftball
   
   -- * Classification
-  , HailCategory(..)
+  , HailCategory(HailSmall, HailSevere, HailSignificant, HailGiant)
   , allHailCategories
   , hailToCategory
   , categoryToMinDiameter

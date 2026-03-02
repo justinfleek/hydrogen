@@ -16,7 +16,7 @@ module Hydrogen.Schema.Color.Palette
   , PaletteEntry
   
   -- * Semantic Roles
-  , Role(..)
+  , Role(Primary, Secondary, Accent, Background, Surface, OnPrimary, OnSecondary, OnBackground, OnSurface, Neutral, Success, Warning, Error, Info, Unassigned)
   
   -- * Palette Generation
   , tints

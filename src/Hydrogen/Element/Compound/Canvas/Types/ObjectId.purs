@@ -10,7 +10,7 @@
 -- | Both Core (for SelectionState) and Object (for CanvasObject) need this type.
 
 module Hydrogen.Element.Compound.Canvas.Types.ObjectId
-  ( CanvasObjectId(..)
+  ( CanvasObjectId(CanvasObjectId)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

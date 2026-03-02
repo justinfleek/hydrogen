@@ -52,7 +52,7 @@ module Hydrogen.Schema.Elevation.DepthEffects
     Parallax
   , ParallaxLayer
   , ParallaxDepth
-  , ScrollAxis(..)
+  , ScrollAxis(ScrollVertical, ScrollHorizontal, ScrollBoth)
   , parallax
   , parallaxLayer
   , parallaxDepth

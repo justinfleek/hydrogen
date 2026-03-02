@@ -9,19 +9,19 @@
 
 module Hydrogen.Schema.Motion.Effects.Core
   ( -- * Effect Parameter Type
-    EffectParameterType(..)
+    EffectParameterType(EPTNumber, EPTColor, EPTPoint, EPTPoint3D, EPTAngle, EPTCheckbox, EPTDropdown, EPTLayer, EPTString, EPTCurve, EPTData)
   , allEffectParameterTypes
   , effectParameterTypeToString
   , effectParameterTypeFromString
   
     -- * Effect Animatable Type
-  , EffectAnimatableType(..)
+  , EffectAnimatableType(EATNumber, EATPosition, EATColor, EATEnum, EATVector3)
   , allEffectAnimatableTypes
   , effectAnimatableTypeToString
   , effectAnimatableTypeFromString
   
     -- * Effect Category
-  , EffectCategory(..)
+  , EffectCategory(ECBlurSharpen, ECColorCorrection, ECDistort, ECGenerate, ECKeying, ECMatte, ECNoiseGrain, ECPerspective, ECStylize, ECTime, ECTransition, ECUtility)
   , allEffectCategories
   , effectCategoryToString
   , effectCategoryFromString
@@ -40,7 +40,7 @@ module Hydrogen.Schema.Motion.Effects.Core
   , CurvePoint
   , mkCurvePoint
   
-  , EffectParameterValue(..)
+  , EffectParameterValue(EPVNumber, EPVString, EPVBoolean, EPVPoint2D, EPVPoint3D, EPVColor, EPVCurve, EPVData, EPVNull)
   
   , EffectDropdownOption
   
@@ -52,7 +52,7 @@ module Hydrogen.Schema.Motion.Effects.Core
   , defaultEffectParameter
   
     -- * Effect Types
-  , EffectId(..)
+  , EffectId(EffectId)
   , mkEffectId
   
   , Effect

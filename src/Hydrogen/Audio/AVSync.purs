@@ -99,7 +99,7 @@ import Prelude
   , (<>)
   )
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Audio.Voice as Voice
 import Hydrogen.Schema.Audio.Trigger as Trigger
 

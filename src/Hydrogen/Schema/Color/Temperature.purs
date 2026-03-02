@@ -12,7 +12,7 @@
 -- | Also provides Kelvin-based temperature for light sources.
 
 module Hydrogen.Schema.Color.Temperature
-  ( Temperature(..)
+  ( Temperature(VeryCool, Cool, Neutral, Warm, VeryWarm)
   , temperatureFromHSL
   , kelvin
   ) where

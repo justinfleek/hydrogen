@@ -63,7 +63,7 @@ module Hydrogen.Schema.Color.WideGamut
   , toRecord
   
   -- * Gamut Info
-  , GamutCoverage(..)
+  , GamutCoverage(SRGBCoverage, Rec709Coverage, AdobeRGBCoverage, DisplayP3Coverage, Rec2020Coverage, ProPhotoCoverage)
   , gamutCoverage
   , isWiderThan
   , isNarrowerThan

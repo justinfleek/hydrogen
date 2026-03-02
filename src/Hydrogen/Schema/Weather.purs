@@ -49,7 +49,7 @@ module Hydrogen.Schema.Weather
   , module Hydrogen.Schema.Weather.Atmosphere
   
   -- * Weather Condition
-  , WeatherCondition(..)
+  , WeatherCondition(Clear, Cloudy, Rainy, Snowy, Stormy, Foggy, Windy, Hazy)
   , clearCondition
   , cloudyCondition
   , rainyCondition
@@ -58,7 +58,7 @@ module Hydrogen.Schema.Weather
   , foggyCondition
   
   -- * Weather Event (Complete)
-  , WeatherEvent(..)
+  , WeatherEvent(WeatherEvent)
   , weatherEvent
   , currentCondition
   , eventPrecipitation
@@ -98,7 +98,7 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Weather.Precipitation
-  ( PrecipitationType(..)
+  ( PrecipitationType(Rain, Drizzle, Snow, Sleet, FreezingRain, Hail, Graupel, IcePellets, MixedRainSnow, MixedSleet)
   , PrecipitationRate
   , precipitationRate
   , unwrapRate
@@ -106,16 +106,16 @@ import Hydrogen.Schema.Weather.Precipitation
   , rateLight
   , rateModerate
   , rateHeavy
-  , Intensity(..)
+  , Intensity(IntensityNone, IntensityTrace, IntensityLight, IntensityModerate, IntensityHeavy, IntensityViolent)
   , rateToIntensity
   , DropletDiameter
   , dropletLight
-  , SnowflakeType(..)
+  , SnowflakeType(Plates, StellarDendrites, Columns, Needles, SpatialDendrites, CappedColumns, IrregularCrystals, SnowGraupel, SleetCrystals)
   , SnowDensity
   , densityFresh
   , HailDiameter
-  , HailCategory(..)
-  , PrecipitationEvent(..)
+  , HailCategory(HailSmall, HailSevere, HailSignificant, HailGiant)
+  , PrecipitationEvent(RainEvent, SnowEvent, SleetEvent, HailEvent, FreezingRainEvent, MixedEvent)
   , rainEvent
   , snowEvent
   , Accumulation
@@ -140,7 +140,7 @@ import Hydrogen.Schema.Weather.Wind
   , unwrapGustFactor
   , TurbulenceIntensity
   , turbulenceNone
-  , WindEvent(..)
+  , WindEvent(SteadyWind, GustyWind, CalmConditions)
   , steadyWind
   , calmConditions
   , isHazardous
@@ -167,16 +167,16 @@ import Hydrogen.Schema.Weather.Atmosphere
   , visibility
   , unwrapVisibility
   , visibilityClear
-  , VisibilityCategory(..)
+  , VisibilityCategory(VisZero, VisDenseFog, VisFog, VisMist, VisHaze, VisClear)
   , visibilityToCategory
   , CloudCover
   , cloudCover
   , unwrapCloudCover
   , cloudCoverClear
   , cloudCoverOvercast
-  , CloudCategory(..)
+  , CloudCategory(SKC, FEW, SCT, BKN, OVC)
   , cloudCoverToCategory
-  , AtmosphericState(..)
+  , AtmosphericState(AtmosphericState)
   , atmosphericState
   , defaultAtmosphere
   , standardAtmosphere

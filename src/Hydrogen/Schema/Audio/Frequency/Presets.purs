@@ -35,7 +35,7 @@ module Hydrogen.Schema.Audio.Frequency.Presets
   , bit32
   ) where
 
-import Hydrogen.Schema.Audio.Frequency.Types (Hertz(..), SampleRate(..), BitDepth(..))
+import Hydrogen.Schema.Audio.Frequency.Types (Hertz(Hertz), SampleRate(SampleRate), BitDepth(BitDepth))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                     // predefined frequencies

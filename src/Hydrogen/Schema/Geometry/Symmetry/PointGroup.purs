@@ -21,7 +21,7 @@
 -- | - Prelude (Eq, Ord, Show)
 
 module Hydrogen.Schema.Geometry.Symmetry.PointGroup
-  ( PointGroup(..)
+  ( PointGroup(CyclicGroup, DihedralGroup)
   , pointGroupName
   , pointGroupOrder
   , isCyclic

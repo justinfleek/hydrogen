@@ -11,7 +11,7 @@
 -- | - **Luxurious**: Deep, rich, dark - elegance, exclusivity
 
 module Hydrogen.Schema.Color.Mood
-  ( Mood(..)
+  ( Mood(Energetic, Calm, Professional, Playful, Luxurious, Natural, Dramatic, Soft)
   , moodFromHSL
   , moodDescription
   ) where

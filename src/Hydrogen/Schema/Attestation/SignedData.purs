@@ -46,7 +46,7 @@
 module Hydrogen.Schema.Attestation.SignedData
   ( -- * SignedData Type
     SignedData
-  , SignatureScheme(..)
+  , SignatureScheme(ECDSA_secp256k1, ECDSA_secp256r1, Ed25519, RSA_PSS, HMAC_SHA256, Unknown)
   , SignerId
   
   -- * Construction

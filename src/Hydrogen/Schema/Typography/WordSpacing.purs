@@ -18,7 +18,7 @@
 
 module Hydrogen.Schema.Typography.WordSpacing
   ( -- * Type
-    WordSpacing(..)
+    WordSpacing(WordSpacing)
     
   -- * Constructors
   , wordSpacing

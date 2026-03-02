@@ -20,14 +20,14 @@ module Hydrogen.Element.Compound.Canvas.Grid3D.Types
   , defaultExtent
   
   -- * World Planes
-  , WorldPlane(..)
+  , WorldPlane(PlaneXY, PlaneXZ, PlaneYZ)
   , planeNormal
   , planeTangent
   , planeBitangent
   , planeAxisColor
   
   -- * Axis
-  , Axis(..)
+  , Axis(AxisX, AxisY, AxisZ)
   , axisColor
   , axisVector
   ) where

@@ -28,13 +28,13 @@
 
 module Hydrogen.Schema.Brush.Dynamics.Types
   ( -- * Response Curves
-    ResponseCurve(..)
+    ResponseCurve(Linear, Soft, Firm, SCurve, Logarithmic, Exponential)
   , allResponseCurves
   , responseCurveDescription
   , responseCurveMaxSensitivity
   
   -- * Dynamics Mapping
-  , DynamicsMapping(..)
+  , DynamicsMapping(DynamicsMapping)
   , identityMapping
   , constantMapping
   , softMapping

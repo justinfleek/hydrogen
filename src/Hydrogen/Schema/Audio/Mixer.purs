@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Audio.Mixer
   ( -- * Bus Types
-    BusType(..)
+    BusType(BusInput, BusGroup, BusAux, BusMaster, BusMonitor)
   , busTypeLabel
   
   -- * Audio Bus
@@ -52,7 +52,7 @@ module Hydrogen.Schema.Audio.Mixer
   , mixerMaster
   
   -- * Metering
-  , MeterType(..)
+  , MeterType(MeterVU, MeterPeak, MeterRMS, MeterLoudness, MeterSpectrogram, MeterPhaseScope)
   , meterTypeLabel
   
   , MeterReading

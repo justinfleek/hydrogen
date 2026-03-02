@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Text.Code.Diagnostic
   ( -- * Severity
-    DiagnosticSeverity(..)
+    DiagnosticSeverity(SeverityError, SeverityWarning, SeverityInfo, SeverityHint)
   
   -- * Diagnostic Type
   , Diagnostic

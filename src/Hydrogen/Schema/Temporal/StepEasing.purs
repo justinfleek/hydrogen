@@ -29,7 +29,7 @@ module Hydrogen.Schema.Temporal.StepEasing
   , stepsToInt
   
   -- * Step Position
-  , StepPosition(..)
+  , StepPosition(JumpStart, JumpEnd, JumpNone, JumpBoth)
   , stepPositionToString
   
   -- * Bounds

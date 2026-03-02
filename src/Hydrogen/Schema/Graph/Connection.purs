@@ -25,24 +25,24 @@
 
 module Hydrogen.Schema.Graph.Connection
   ( -- * Connection Routing
-    ConnectionRouting(..)
+    ConnectionRouting(RoutingStraight, RoutingCurved, RoutingOrthogonal, RoutingDiagonal, RoutingStep, RoutingBundle, RoutingArc, RoutingSpline)
   , isStraightRouting
   , isCurvedRouting
   , isOrthogonalRouting
   
   -- * Curve Style
-  , CurveStyle(..)
+  , CurveStyle(CurveBasis, CurveBezier, CurveCardinal, CurveCatmullRom, CurveMonotone, CurveNatural, CurveLinear)
   , curveTension
   
   -- * Connection Terminals
-  , TerminalStyle(..)
+  , TerminalStyle(TerminalNone, TerminalArrow, TerminalArrowFilled, TerminalArrowOpen, TerminalDot, TerminalDotFilled, TerminalDiamond, TerminalSquare, TerminalBar)
   , isArrowTerminal
   , isDotTerminal
   , isNoneTerminal
-  , TerminalPosition(..)
+  , TerminalPosition(TerminalStart, TerminalEnd, TerminalBoth)
   
   -- * Stroke Pattern
-  , StrokePattern(..)
+  , StrokePattern(StrokeSolid, StrokeDashed, StrokeDotted, StrokeDashDot, StrokeCustom)
   , isSolidStroke
   , isDashedStroke
   , isDottedStroke
@@ -69,7 +69,7 @@ module Hydrogen.Schema.Graph.Connection
   , bundleRadius
   
   -- * Connection Animation
-  , ConnectionAnimation(..)
+  , ConnectionAnimation(AnimationStatic, AnimationDraw, AnimationFlow, AnimationPulse, AnimationDash)
   , isStaticConnection
   , isDrawConnection
   , isFlowConnection

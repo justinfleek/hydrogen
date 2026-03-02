@@ -10,7 +10,7 @@
 -- | - **Paused**: Animation is halted at current progress.
 
 module Hydrogen.Schema.Temporal.PlayState
-  ( PlayState(..)
+  ( PlayState(Running, Paused)
   , playStateToString
   , playStateFromString
   , toggle
@@ -27,7 +27,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // play state

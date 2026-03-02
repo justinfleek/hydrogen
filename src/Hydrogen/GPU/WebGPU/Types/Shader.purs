@@ -13,7 +13,7 @@
 module Hydrogen.GPU.WebGPU.Types.Shader
   ( -- Shader
     GPUShaderModuleDescriptor
-  , WGSLSource(..)
+  , WGSLSource(WGSLSource)
   ) where
 
 import Prelude

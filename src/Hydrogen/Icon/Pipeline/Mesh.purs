@@ -97,12 +97,26 @@ import Prelude
   , (/)
   )
 import Data.Int (toNumber) as Int
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Array (head, length, drop, index, snoc) as Array
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(Tuple))
 import Data.Number (sqrt) as Number
 
-import Hydrogen.Schema.Geometry.Path.Types (Path(..), PathCommand(..))
+import Hydrogen.Schema.Geometry.Path.Types 
+  ( Path(Path)
+  , PathCommand
+      ( MoveTo
+      , LineTo
+      , HLineTo
+      , VLineTo
+      , QuadTo
+      , SmoothQuadTo
+      , CubicTo
+      , SmoothCurveTo
+      , ArcTo
+      , ClosePath
+      )
+  )
 import Hydrogen.Schema.Geometry.Path.Query (firstPoint, lastPoint)
 import Hydrogen.Schema.Geometry.Point (Point2D, getX, getY)
 import Hydrogen.Schema.Dimension.Physical.SI (Meter, meter, unwrapMeter)
@@ -110,31 +124,31 @@ import Hydrogen.Schema.Dimension.Device.Types (Pixel(Pixel))
 import Hydrogen.Schema.Geometry.Angle (Degrees, degrees)
 
 import Hydrogen.GPU.Scene3D.Mesh
-  ( Mesh3D(..)
-  , Shape2D(..)
+  ( Mesh3D
+  , Shape2D
   , Point2DProfile
   , ExtrudeMeshParams
   , extrudeMesh3D
   )
 
 import Hydrogen.Icon.Types
-  ( IconDefinition(..)
-  , IconPath(..)
+  ( IconDefinition
+  , IconPath(SinglePath, MultiPath, PartedIcon)
   , IconPart
-  , IconStyle(..)
+  , IconStyle
   )
 
 import Hydrogen.Icon.Brand
   ( ThemedIcon
   , resolveIconColor
-  , IconTheme(..)
+  , IconTheme
   , iconThemeMode
   , iconThemeColors
   )
 
 import Hydrogen.Schema.Brand.ColorSystem (ThemedColorSystem)
 import Hydrogen.Schema.Brand.Token.Color (ColorRole)
-import Hydrogen.Schema.Brand.ColorSystem (PaletteMode(..))
+import Hydrogen.Schema.Brand.ColorSystem (PaletteMode)
 
 import Hydrogen.Schema.Color.OKLCH (OKLCH)
 import Hydrogen.GPU.Scene3D.Material (Material3D)

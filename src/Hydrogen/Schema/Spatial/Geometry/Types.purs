@@ -25,39 +25,39 @@
 
 module Hydrogen.Schema.Spatial.Geometry.Types
   ( -- * Mesh Data
-    VertexBuffer(..)
-  , IndexBuffer(..)
-  , MeshData(..)
+    VertexBuffer(VertexBuffer)
+  , IndexBuffer(IndexBuffer)
+  , MeshData(MeshData)
   
   -- * Skinning
   , BoneIndex
   , boneIndex
   , BoneWeight
   , boneWeight
-  , SkinWeight(..)
-  , Bone(..)
-  , Skeleton(..)
-  , SkinnedMesh(..)
+  , SkinWeight
+  , Bone(Bone)
+  , Skeleton(Skeleton)
+  , SkinnedMesh(SkinnedMesh)
   
   -- * Instancing
-  , InstanceData(..)
-  , InstancedMesh(..)
+  , InstanceData
+  , InstancedMesh(InstancedMesh)
   
   -- * Point Cloud
-  , PointCloudData(..)
-  , PointCloud(..)
+  , PointCloudData
+  , PointCloud(PointCloud)
   
   -- * Lines
-  , LineVertex(..)
-  , Line3D(..)
-  , LineStyle(..)
+  , LineVertex
+  , Line3D(Line3D)
+  , LineStyle(LineSolid, LineDashed, LineDotted)
   
   -- * Sprites
-  , Sprite3D(..)
-  , SpriteAlignment(..)
+  , Sprite3D(Sprite3D)
+  , SpriteAlignment(AlignCamera, AlignCameraY, AlignWorld)
   
   -- * Unified Geometry
-  , Geometry(..)
+  , Geometry(GeoMesh, GeoSkinned, GeoInstanced, GeoPoints, GeoLine, GeoSprite)
   
   -- * Constructors
   , meshData

@@ -11,7 +11,7 @@
 
 module Hydrogen.Schema.Engineering.Dimension.Value
   ( -- * Dimension Value
-    DimensionValue(..)
+    DimensionValue(LinearValue, AngularValue, RadialValue, DiameterValue, ArcLengthValue)
   , linearDimension
   , angularDimension
   , radialDimension
@@ -19,7 +19,7 @@ module Hydrogen.Schema.Engineering.Dimension.Value
   , arcLengthDimension
   
   -- * Dimension Text
-  , DimensionText(..)
+  , DimensionText(BasicDimensionText, LimitDimensionText, ReferenceDimensionText, BasicBoxedText)
   , dimensionText
   , textWithTolerance
   , textWithLimits

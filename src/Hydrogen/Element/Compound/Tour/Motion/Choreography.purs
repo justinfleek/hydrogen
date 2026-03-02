@@ -28,7 +28,7 @@ module Hydrogen.Element.Compound.Tour.Motion.Choreography
   , MicroInteractionConfig
   
     -- * Phases
-  , ChoreographyPhase(..)
+  , ChoreographyPhase(PhaseIdle, PhaseEntering, PhaseVisible, PhaseExiting, PhaseFollowing)
   
     -- * Presets
   , defaultChoreography

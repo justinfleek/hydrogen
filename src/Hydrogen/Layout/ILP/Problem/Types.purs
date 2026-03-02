@@ -64,7 +64,7 @@ import Prelude
   , class Show
   )
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing))
 import Data.Tuple (Tuple)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

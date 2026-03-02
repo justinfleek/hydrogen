@@ -40,9 +40,9 @@
 module Hydrogen.Schema.Attestation.MerkleTree
   ( -- * MerkleTree Type
     MerkleTree
-  , MerkleNode(..)
+  , MerkleNode(Leaf, Branch, Empty)
   , MerkleProof
-  , ProofElement(..)
+  , ProofElement(LeftSibling, RightSibling)
   
   -- * Construction
   , fromLeaves

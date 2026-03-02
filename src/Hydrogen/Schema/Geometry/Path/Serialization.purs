@@ -19,7 +19,7 @@ import Prelude
   )
 
 import Data.Array (uncons, foldl) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Schema.Geometry.Point (getX, getY)
 import Hydrogen.Schema.Geometry.Angle (unwrapDegrees)

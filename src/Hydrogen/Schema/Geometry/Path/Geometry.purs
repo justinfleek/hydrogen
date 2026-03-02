@@ -29,7 +29,7 @@ import Prelude
   )
 
 import Data.Array (uncons, foldl) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (sqrt)
 
 import Hydrogen.Schema.Geometry.Point (Point2D, point2D, getX, getY)

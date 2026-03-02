@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Physics.Force.Types
   ( -- * Force Vector
-    Force2D(..)
+    Force2D(Force2D)
   , force2D
   , forceZero
   , forceUp
@@ -36,7 +36,7 @@ module Hydrogen.Schema.Physics.Force.Types
   , forceClamp
   
   -- * Force Classification
-  , ForceType(..)
+  , ForceType(Conservative, NonConservative)
   , isConservative
   , isNonConservative
   ) where

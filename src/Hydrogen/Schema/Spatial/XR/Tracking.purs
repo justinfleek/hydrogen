@@ -22,27 +22,27 @@
 
 module Hydrogen.Schema.Spatial.XR.Tracking
   ( -- * Hand Tracking
-    HandJoint(..)
+    HandJoint(Wrist, ThumbMetacarpal, ThumbProximal, ThumbDistal, ThumbTip, IndexMetacarpal, IndexProximal, IndexIntermediate, IndexDistal, IndexTip, MiddleMetacarpal, MiddleProximal, MiddleIntermediate, MiddleDistal, MiddleTip, RingMetacarpal, RingProximal, RingIntermediate, RingDistal, RingTip, PinkyMetacarpal, PinkyProximal, PinkyIntermediate, PinkyDistal, PinkyTip)
   , allHandJoints
-  , XRHandedness(..)
-  , XRJointPose(..)
-  , XRHand(..)
+  , XRHandedness(LeftHand, RightHand)
+  , XRJointPose
+  , XRHand(XRHand)
   
   -- * Controller
-  , XRControllerProfile(..)
-  , XRButton(..)
-  , XRButtonState(..)
-  , XRAxis(..)
-  , XRController(..)
+  , XRControllerProfile(GenericController, OculusTouch, ValveIndex, HTCVive, MicrosoftMixed, PicoNeo)
+  , XRButton(Trigger, Squeeze, Thumbstick, Touchpad, ButtonA, ButtonB, ButtonX, ButtonY, Menu, System)
+  , XRButtonState
+  , XRAxis(ThumbstickX, ThumbstickY, TouchpadX, TouchpadY)
+  , XRController(XRController)
   
   -- * Hit Testing
-  , XRHitTestSource(..)
-  , XRHitTestResult(..)
-  , XRHitTest(..)
+  , XRHitTestSource(ViewerRay, ControllerRay, TransientInput)
+  , XRHitTestResult
+  , XRHitTest(XRHitTest)
   
   -- * Light Estimation
-  , XRLightProbe(..)
-  , XRLight(..)
+  , XRLightProbe(XRLightProbe)
+  , XRLight(XRLight)
   
   -- * Constructors
   , emptyHand

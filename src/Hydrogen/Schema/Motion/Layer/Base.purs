@@ -26,11 +26,11 @@
 
 module Hydrogen.Schema.Motion.Layer.Base
   ( -- * Layer Identifier
-    LayerId(..)
+    LayerId(LayerId)
   , mkLayerId
   
   -- * Layer Visibility
-  , LayerVisibility(..)
+  , LayerVisibility(LayerVisibility)
   , layerVisibilityToString
   , layerVisibilityFromString
   , defaultVisibility
@@ -39,12 +39,12 @@ module Hydrogen.Schema.Motion.Layer.Base
   , soloVisibility
   
   -- * Quality Setting
-  , SamplingQuality(..)
+  , SamplingQuality(SQDraft, SQStandard, SQHigh, SQBest)
   , samplingQualityToString
   , samplingQualityFromString
   
   -- * Layer Base
-  , LayerBase(..)
+  , LayerBase(LayerBase)
   , defaultLayerBase
   , mkLayerBase
   

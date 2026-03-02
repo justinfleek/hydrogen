@@ -19,14 +19,14 @@
 
 module Hydrogen.Schema.Audio.Analysis
   ( -- * Level Atoms
-    RMSLevel(..)
-  , PeakLevel(..)
-  , CrestFactor(..)
+    RMSLevel(RMSLevel)
+  , PeakLevel(PeakLevel)
+  , CrestFactor(CrestFactor)
   
   -- * Spectral Atoms
-  , FFTBin(..)
-  , SpectralCentroid(..)
-  , ZeroCrossing(..)
+  , FFTBin(FFTBin)
+  , SpectralCentroid(SpectralCentroid)
+  , ZeroCrossing(ZeroCrossing)
   
   -- * Constructors
   , rmsLevel
@@ -53,7 +53,7 @@ module Hydrogen.Schema.Audio.Analysis
   , pitchDetection
   
   -- * Metering Standards
-  , MeteringStandard(..)
+  , MeteringStandard(VUMeter, PeakMeter, RMSMeter, LoudnessMeter, TruePeak, PhaseMeter)
   , meteringStandardName
   
   -- * Bounds

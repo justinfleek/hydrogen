@@ -11,7 +11,7 @@
 
 module Hydrogen.Schema.Brand.Logo.Variants
   ( -- * Color Variant
-    ColorVariant(..)
+    ColorVariant(FullColor, BlackWhite, Reversed, SingleColor)
   , allColorVariants
   , variantToString
   , variantFromString

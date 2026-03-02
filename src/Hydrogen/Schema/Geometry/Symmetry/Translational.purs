@@ -23,7 +23,7 @@
 -- | - Prelude (Eq, Ord, Show)
 
 module Hydrogen.Schema.Geometry.Symmetry.Translational
-  ( TranslationalSymmetry(..)
+  ( TranslationalSymmetry(TranslationalSymmetry)
   , translationalSymmetry
   , periodicX
   , periodicY

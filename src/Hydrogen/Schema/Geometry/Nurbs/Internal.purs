@@ -91,7 +91,7 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, foldl, take, drop)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Number (sqrt, cos, sin)
 import Data.Int (toNumber) as Int
 

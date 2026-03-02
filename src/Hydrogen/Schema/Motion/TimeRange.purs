@@ -35,7 +35,7 @@
 -- | ```
 module Hydrogen.Schema.Motion.TimeRange
   ( -- * Core Type
-    TimeRange(..)
+    TimeRange(TimeRange)
   
   -- * Constructors
   , timeRange

@@ -31,8 +31,18 @@ module Hydrogen.GPU.WebGPU.Device
   , GPUCommandBuffer
   , GPUQuerySet
     -- Errors
-  , DeviceError(..)
-  , DeviceLostReason(..)
+  , DeviceError
+      ( WebGPUNotSupported
+      , AdapterRequestFailed
+      , DeviceRequestFailed
+      , FeatureNotSupported
+      , LimitExceeded
+      , CanvasConfigurationFailed
+      )
+  , DeviceLostReason
+      ( DeviceLostUnknown
+      , DeviceLostDestroyed
+      )
     -- Initialization
   , isWebGPUSupported
   , requestAdapter
@@ -107,14 +117,37 @@ import Hydrogen.GPU.WebGPU.Types
   ( GPUAdapterDescriptor
   , GPUBufferDescriptor
   , GPUCanvasConfiguration
-  , GPUFeatureName(..)
-  , GPUIndexFormat(..)
+  , GPUFeatureName
+      ( DepthClipControl
+      , FeatureDepth32FloatStencil8
+      , TextureCompressionBC
+      , TextureCompressionETC2
+      , TextureCompressionASTC
+      , TimestampQuery
+      , IndirectFirstInstance
+      , ShaderF16
+      , RG11B10UfloatRenderable
+      , BGRA8UnormStorage
+      , Float32Filterable
+      )
+  , GPUIndexFormat
+      ( IndexUint16
+      , IndexUint32
+      )
   , GPULimits
   , GPURenderPassDescriptor
   , GPUSamplerDescriptor
   , GPUShaderModuleDescriptor
   , GPUTextureDescriptor
-  , GPUTextureFormat(..)
+  , GPUTextureFormat
+      ( BGRA8Unorm
+      , RGBA8Unorm
+      , RGBA8UnormSrgb
+      , BGRA8UnormSrgb
+      , Depth24Plus
+      , Depth24PlusStencil8
+      , Depth32Float
+      )
   )
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

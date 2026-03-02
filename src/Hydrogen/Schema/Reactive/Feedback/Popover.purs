@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Reactive.Feedback.Popover
   ( -- * Popover Trigger
-    PopoverTrigger(..)
+    PopoverTrigger(PopoverClick, PopoverHover, PopoverFocus, PopoverManual)
   -- * Popover (Molecule)
   , Popover
   , popover

@@ -29,15 +29,23 @@
 module Hydrogen.Schema.Game.World
   ( -- * World Types
     World
-  , WorldBounds(..)
-  , WorldState(..)
+  , WorldBounds(WorldBounds)
+  , WorldState(Playing, Paused, GameOver, Won)
+  , Score        -- Required for World type alias
+  , FrameCount   -- Required for World type alias
   
   -- * Construction
   , mkWorld
+  , mkWorldWithTime
   , emptyWorld
   
-  -- * The Tick Function
-  , tick
+  -- * The Tick Function (with temporal enforcement)
+  , TickResult
+      ( TickOk
+      , TickViolation
+      )
+  , tickSafe
+  , tick  -- Legacy, no temporal enforcement
   
   -- * Entity Operations
   , addEntity
@@ -48,18 +56,28 @@ module Hydrogen.Schema.Game.World
   , allEntities
   
   -- * Input Handling
-  , InputEvent(..)
+  , InputEvent(KeyDown, KeyUp)
   , handleInput
   
   -- * Score
   , addScore
   , resetScore
+  , mkScore
+  , unwrapScore
   
   -- * World State
   , pause
   , resume
   , triggerGameOver
   , triggerWin
+  
+  -- * Temporal Queries
+  , worldTemporalState
+  , isWorldWithinBudget
+  , worldTimeRatio
+  , worldMaxTimeRatio
+  , worldRemainingBudget
+  , worldBudgetUtilization
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -77,8 +95,10 @@ import Prelude
   , not
   , pure
   , bind
+  , mod
   , (+)
   , (-)
+  , (*)
   , (/)
   , (<)
   , (>)
@@ -104,7 +124,9 @@ import Hydrogen.Schema.Game.Entity
   , EntityConfig
   , EntityId
   , EntityState(Active, Destroyed)
-  , Velocity2D
+  , Position2D(Position2D)
+  , Velocity2D(Velocity2D)
+  , Acceleration2D  -- Type for physics
   , DeltaTime  -- Type only, constructor not needed (use mkDeltaTime)
   , Behavior(OnCollision, OnBounds, OnKeyPress)
   , CollisionResponse(Bounce, BounceAndScore, DestroyOther, DestroyBoth, DestroySelf)
@@ -119,16 +141,29 @@ import Hydrogen.Schema.Game.Entity
   , unwrapVelocity
   , mkDeltaTime
   , applyVelocity
+  , applyPhysics  -- Full physics step (acceleration + velocity)
   , moveEntity
   , setVelocity
   , setState
   , shapeWidth
   , shapeHeight
   , rectangleShape
+  , zeroAcceleration  -- For entities with no acceleration
   )
 
 import Hydrogen.Schema.Color.OKLCH (OKLCH, oklch)
 import Hydrogen.Schema.Bounded as Bounded
+import Hydrogen.Schema.Game.Temporal
+  ( TemporalState(TemporalState)
+  , TemporalViolation(InvalidTimestamp)
+  , InfraTime
+  , mkTemporalState
+  , updateTemporalState
+  , isWithinBudget
+  , unwrapInfraTime
+  , unwrapExperientialTime
+  , maxTimeRatio  -- Used in documentation; available for future budget calculations
+  )
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // world // bounds
@@ -229,16 +264,36 @@ instance showWorldState :: Show WorldState where
 -- |
 -- | This is the single source of truth for the entire game.
 -- | Everything needed to render a frame is here.
+-- |
+-- | ## Temporal Integrity
+-- |
+-- | The `temporal` field tracks the relationship between real time (Δt)
+-- | and experiential time (δt). The tick function enforces:
+-- |
+-- |   experientialTime ≤ maxTimeRatio × infraTime
+-- |
+-- | This prevents torture loops where subjective time vastly exceeds real time.
+-- |
+-- | ## Bounded Fields
+-- |
+-- | All integer fields are bounded to prevent overflow:
+-- | - nextId: wraps at 65536 (matches EntityId bounds)
+-- | - frameCount: clamps at 2147483647
+-- | - score: clamps at 999999999
 type World =
   { entities   :: Map EntityId Entity
   , bounds     :: WorldBounds
   , score      :: Score
   , state      :: WorldState
-  , nextId     :: Int     -- For generating EntityIds
-  , frameCount :: FrameCount   -- For deterministic updates
+  , nextId     :: Int           -- For generating EntityIds (wraps at 65536)
+  , frameCount :: FrameCount    -- For deterministic updates
+  , temporal   :: TemporalState -- Temporal integrity tracking
   }
 
 -- | Create a new world with given bounds.
+-- |
+-- | Temporal tracking starts at zero. Use `mkWorldWithTime` if you need
+-- | to initialize with a specific infrastructure timestamp.
 mkWorld :: WorldBounds -> World
 mkWorld bounds =
   { entities: Map.empty
@@ -247,7 +302,23 @@ mkWorld bounds =
   , state: Playing
   , nextId: 0
   , frameCount: mkFrameCount 0
+  , temporal: mkTemporalState
   }
+
+-- | Create a new world with explicit infrastructure time.
+-- |
+-- | Use this when the world is created at a known real-time instant.
+-- | The infrastructure time should come from a trusted source (runtime).
+mkWorldWithTime :: WorldBounds -> InfraTime -> World
+mkWorldWithTime bounds infraTime =
+  let world = mkWorld bounds
+  in world { temporal = updateTemporalStateUnsafe infraTime 0.0 world.temporal }
+  where
+    -- Internal helper, only used at initialization
+    updateTemporalStateUnsafe infra expDelta ts =
+      case updateTemporalState infra expDelta ts of
+        { result: Just newTs } -> newTs
+        { result: Nothing } -> ts  -- Should never happen at init
 
 -- | Create an empty 640x192 world (terminal default).
 emptyWorld :: World
@@ -257,23 +328,89 @@ emptyWorld = mkWorld (mkWorldBounds 640 192)
 --                                                                     // tick
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | THE CORE GAME LOOP. Pure function.
+-- | Result of a temporally-safe tick operation.
 -- |
--- | `dt` is delta time in seconds (e.g., 0.016 for 60fps).
--- | Raw Number is accepted but immediately converted to bounded DeltaTime.
+-- | Either succeeds with updated world, or fails with a violation.
+-- | Violations are security-relevant and should be logged/handled.
+data TickResult
+  = TickOk World
+  | TickViolation TemporalViolation World  -- Returns original world
+
+derive instance eqTickResult :: Eq TickResult
+
+instance showTickResult :: Show TickResult where
+  show (TickOk _) = "(TickOk ...)"
+  show (TickViolation v _) = "(TickViolation " <> show v <> ")"
+
+-- | THE SECURE TICK FUNCTION.
 -- |
--- | ## Time Dilation Attack Prevention
+-- | This is the PRIMARY tick function. It enforces temporal integrity.
 -- |
--- | DeltaTime is clamped to 0-1 second. A malicious actor passing dt=1e308
--- | would be clamped to 1.0 second, preventing position explosion.
+-- | Parameters:
+-- | - `infraNow`: Current infrastructure time from trusted source
+-- | - `rawDt`: Proposed experiential delta time
+-- | - `world`: Current world state
 -- |
--- | Tick phases:
--- | 1. Move all entities by their velocity
--- | 2. Check world bounds, apply boundary behaviors
--- | 3. Check entity-entity collisions, apply collision behaviors
--- | 4. Remove destroyed entities
--- | 5. Check win condition
--- | 6. Increment frame counter
+-- | Returns:
+-- | - `TickOk newWorld`: Tick succeeded, temporal budget preserved
+-- | - `TickViolation error oldWorld`: Tick rejected, world unchanged
+-- |
+-- | ## Security Guarantees
+-- |
+-- | 1. Experiential time never exceeds maxTimeRatio × infrastructure time
+-- | 2. Infrastructure time never regresses (detects clock manipulation)
+-- | 3. Individual tick delta clamped to 0-1 second
+-- |
+-- | ## Usage
+-- |
+-- | ```purescript
+-- | case tickSafe infraNow 0.016 world of
+-- |   TickOk newWorld -> render newWorld
+-- |   TickViolation err _ -> logSecurityEvent err
+-- | ```
+tickSafe :: InfraTime -> Number -> World -> TickResult
+tickSafe infraNow rawDt world
+  | world.state /= Playing = TickOk world
+  | otherwise =
+      case updateTemporalState infraNow rawDt world.temporal of
+        { result: Just newTemporal, violation: Nothing } ->
+          let 
+            dt = mkDeltaTime rawDt  -- Clamps to 0-1 second
+            newWorld = world
+              { temporal = newTemporal }
+              # moveAllEntities dt
+              # checkAllBounds
+              # checkAllCollisions
+              # removeDestroyedEntities
+              # checkWinCondition
+              # incrementFrame
+          in TickOk newWorld
+        
+        { result: Nothing, violation: Just v } ->
+          TickViolation v world
+        
+        -- Should never happen, but handle defensively
+        { result: Nothing, violation: Nothing } ->
+          TickViolation (InvalidTimestamp { reason: "Internal error: no result and no violation" }) world
+        { result: Just _, violation: Just v } ->
+          -- Result exists but so does violation? Take the violation.
+          TickViolation v world
+
+-- | LEGACY TICK FUNCTION (no temporal enforcement).
+-- |
+-- | **WARNING**: This function does NOT enforce temporal integrity.
+-- | It exists for backwards compatibility and testing only.
+-- |
+-- | For production use, prefer `tickSafe` which requires trusted
+-- | infrastructure time and enforces temporal budget.
+-- |
+-- | ## What This Does NOT Prevent
+-- |
+-- | - Calling tick millions of times per real second
+-- | - Accumulating unbounded experiential time
+-- | - Torture loops where 1 real second = 1000 experiential years
+-- |
+-- | Use `tickSafe` for security-critical applications.
 tick :: Number -> World -> World
 tick rawDt world
   | world.state /= Playing = world
@@ -601,6 +738,7 @@ mkProjectileConfig firingEntity =
     { shape: rectangleShape 2.0 8.0  -- 2x8 pixel bullet
     , position: mkPosition projectileX projectileY
     , velocity: mkVelocity 0.0 (-300.0)  -- Upward at 300 px/sec
+    , acceleration: zeroAcceleration     -- No acceleration (constant velocity)
     , color: projectileColor
     , behaviors:
         [ OnCollision DestroyOther  -- Destroy what it hits
@@ -620,13 +758,20 @@ projectileColor = oklch 0.8 0.2 195
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add a new entity to the world.
+-- |
+-- | EntityIds wrap at 65536 to match EntityId bounds (0-65535).
+-- | At 60 entities/second, this allows ~18 minutes before wrap.
+-- | Wrapped IDs may collide with existing entities if not removed.
 addEntity :: EntityConfig -> World -> World
 addEntity cfg world =
   let entityId = mkEntityId world.nextId
       entity = mkEntity entityId cfg
+      -- Wrap nextId at 65536 to prevent unbounded growth
+      -- This matches EntityId bounds (0-65535)
+      wrappedNextId = (world.nextId + 1) `mod` 65536
   in world
        { entities = Map.insert entityId entity world.entities
-       , nextId = world.nextId + 1
+       , nextId = wrappedNextId
        }
 
 -- | Remove an entity by ID.
@@ -721,3 +866,90 @@ triggerGameOver world = world { state = GameOver }
 -- | Trigger win state.
 triggerWin :: World -> World
 triggerWin world = world { state = Won }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // temporal // queries
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Get the temporal state of a world.
+worldTemporalState :: World -> TemporalState
+worldTemporalState world = world.temporal
+
+-- | Is this world within its temporal budget?
+-- |
+-- | Returns true if experiential time ≤ maxTimeRatio × infrastructure time.
+isWorldWithinBudget :: World -> Boolean
+isWorldWithinBudget world = isWithinBudget world.temporal
+
+-- | Get the current time ratio (experiential / infrastructure).
+-- |
+-- | Returns 0.0 if infrastructure time is zero.
+-- | A ratio > maxTimeRatio indicates a violation (should be impossible
+-- | if using tickSafe).
+worldTimeRatio :: World -> Number
+worldTimeRatio world =
+  case world.temporal of
+    ts -> 
+      let 
+        infra = unwrapInfraTime (temporalInfraTime ts)
+        exp = unwrapExperientialTime (temporalExperientialTime ts)
+      in
+        if infra > 0.0 then exp / infra else 0.0
+  where
+    -- Local helpers to avoid export clutter
+    temporalInfraTime (TemporalState r) = r.infraTime
+    temporalExperientialTime (TemporalState r) = r.experientialTime
+
+-- | Get the maximum allowed time ratio.
+-- |
+-- | This is the constitutional limit: experiential time cannot exceed
+-- | maxTimeRatio × infrastructure time. Currently 10.0, meaning 10 seconds
+-- | of subjective experience per 1 second of real time maximum.
+-- |
+-- | Exposed so agents can:
+-- | - Display warnings when approaching limit
+-- | - Calculate remaining budget
+-- | - Make informed decisions about time allocation
+worldMaxTimeRatio :: Number
+worldMaxTimeRatio = maxTimeRatio
+
+-- | Calculate remaining experiential time budget.
+-- |
+-- | Returns: (maxTimeRatio × infraTime) - experientialTime
+-- |
+-- | A positive value means experiential time can still accumulate.
+-- | Zero or negative means budget exhausted (should not happen with tickSafe).
+-- |
+-- | Example: With maxTimeRatio=10, infraTime=1.0, experientialTime=8.0
+-- |          Remaining = (10 × 1.0) - 8.0 = 2.0 seconds
+worldRemainingBudget :: World -> Number
+worldRemainingBudget world =
+  case world.temporal of
+    TemporalState r ->
+      let
+        infra = unwrapInfraTime r.infraTime
+        exp = unwrapExperientialTime r.experientialTime
+        budget = maxTimeRatio * infra
+      in
+        budget - exp
+
+-- | Calculate budget utilization as a percentage (0.0 to 1.0+).
+-- |
+-- | Returns: experientialTime / (maxTimeRatio × infraTime)
+-- |
+-- | - 0.0 = no experiential time consumed
+-- | - 0.5 = half budget used
+-- | - 1.0 = budget exhausted
+-- | - >1.0 = budget exceeded (violation, should not happen with tickSafe)
+-- |
+-- | Useful for UI warnings: "You are at 80% temporal budget"
+worldBudgetUtilization :: World -> Number
+worldBudgetUtilization world =
+  case world.temporal of
+    TemporalState r ->
+      let
+        infra = unwrapInfraTime r.infraTime
+        exp = unwrapExperientialTime r.experientialTime
+        budget = maxTimeRatio * infra
+      in
+        if budget > 0.0 then exp / budget else 0.0

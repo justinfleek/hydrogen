@@ -69,7 +69,7 @@ import Prelude
   )
 
 import Data.Array (length, index, (!!), foldl, updateAt, zipWith)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 
 import Hydrogen.Schema.Geometry.Point (Point2D(Point2D), point2D)
 import Hydrogen.Schema.Geometry.Bezier 

@@ -36,18 +36,18 @@
 
 module Hydrogen.Schema.Spatial.Light.Types
   ( -- * Light Types
-    DirectionalLight(..)
-  , PointLight(..)
-  , SpotLight(..)
-  , AreaLight(..)
-  , AreaShape(..)
-  , HemisphereLight(..)
-  , ProbeLight(..)
-  , IESLight(..)
-  , IESProfile(..)
+    DirectionalLight(DirectionalLight)
+  , PointLight(PointLight)
+  , SpotLight(SpotLight)
+  , AreaLight(AreaLight)
+  , AreaShape(Rectangle, Disc, Sphere)
+  , HemisphereLight(HemisphereLight)
+  , ProbeLight(ProbeLight)
+  , IESLight(IESLight)
+  , IESProfile(IESProfile)
   
   -- * Unified Light
-  , Light(..)
+  , Light(LightDirectional, LightPoint, LightSpot, LightArea, LightHemisphere, LightProbe, LightIES)
   
   -- * Constructors
   , directional

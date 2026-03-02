@@ -33,7 +33,7 @@ module Hydrogen.Schema.Geometry.Shape.Compound
   , excludeShapes
   
   -- * Unified Shape Type
-  , Shape(..)
+  , Shape(ShapeRectangle, ShapeEllipse, ShapeLine, ShapePolygon, ShapeStar, ShapeRing, ShapeSpiral, ShapeArrow, ShapeCross, ShapeGear, ShapePath, ShapeCompound)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

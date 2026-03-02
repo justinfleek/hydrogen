@@ -43,39 +43,39 @@ module Hydrogen.Schema.Brush
 
 -- Preset Types (categories, media, registers, metadata)
 import Hydrogen.Schema.Brush.Preset.Types
-  ( PresetCategory(..)
+  ( PresetCategory(Traditional, DigitalNative, Hybrid, Expressive, Utility, Experimental)
   , allPresetCategories
   , categoryDescription
   , categoryToId
   , categoryLineage
-  , TraditionalMedium(..)
+  , TraditionalMedium(DryMedia, WetMedia, PrintMedia, SculpturalMedia)
   , allTraditionalMedia
   , mediumDescription
   , mediumToId
   , mediumCentury
   , mediumRequiresFixative
-  , DryMedium(..)
+  , DryMedium(Graphite, ColoredPencil, Charcoal, Conte, SoftPastel, OilPastel, Chalk, Crayon)
   , allDryMedia
   , dryMediumDescription
   , dryMediumToId
   , dryMediumHardness
-  , WetMedium(..)
+  , WetMedium(Ink, Watercolor, Gouache, Acrylic, OilPaint, Encaustic, Tempera, Fresco)
   , allWetMedia
   , wetMediumDescription
   , wetMediumToId
   , wetMediumDryTime
-  , DigitalTool(..)
+  , DigitalTool(PixelBrush, Airbrush, GlowBrush, NoiseBrush, GlitchBrush, VectorBrush, ParticleBrush, CloneBrush, HealBrush, GenerativeBrush)
   , allDigitalTools
   , digitalToolDescription
   , digitalToolToId
   , digitalToolEra
-  , ExpressiveRegister(..)
+  , ExpressiveRegister(Calm, Anxious, Melancholic, Joyful, Rage, Tender, Nostalgic, Awe, Grief, Playful)
   , allExpressiveRegisters
   , registerDescription
   , registerToId
   , registerValence
   , registerArousal
-  , PresetProvenance(..)
+  , PresetProvenance(BuiltIn, HumanAuthored, AIGenerated, CommunityContributed, Procedural, Unknown)
   , provenanceToId
   , isHumanAuthored
   , isAIGenerated
@@ -179,13 +179,13 @@ import Hydrogen.Schema.Brush.Preset.Library
 
 -- Blend Tools
 import Hydrogen.Schema.Brush.Blend.Types
-  ( BlendMode(..)
+  ( BlendMode(Smudge, Blur, Sharpen, Blend, Liquify)
   , allBlendModes
   , blendModeDescription
   , blendModeToId
   , blendModeDebugInfo
   , isDestructive
-  , LiquifyMode(..)
+  , LiquifyMode(LiquifyPush, LiquifyTwirl, LiquifyPinch, LiquifyBloat, LiquifyReconstruct)
   , allLiquifyModes
   , liquifyModeDescription
   , liquifyModeToId
@@ -215,7 +215,7 @@ import Hydrogen.Schema.Brush.Blend.Config
 
 -- Eraser Tools
 import Hydrogen.Schema.Brush.Eraser.Types
-  ( EraserMode(..)
+  ( EraserMode(AlphaErase, BackgroundErase, LayerErase, AllLayersErase, AutoErase, HistoryErase)
   , allEraserModes
   , eraserModeDescription
   , eraserModeToId

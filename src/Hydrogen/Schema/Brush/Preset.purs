@@ -39,14 +39,14 @@ module Hydrogen.Schema.Brush.Preset
 
 import Hydrogen.Schema.Brush.Preset.Types
   ( -- Categories
-    PresetCategory(..)
+    PresetCategory(Traditional, DigitalNative, Hybrid, Expressive, Utility, Experimental)
   , allPresetCategories
   , categoryDescription
   , categoryToId
   , categoryLineage
   
   -- Traditional Media
-  , TraditionalMedium(..)
+  , TraditionalMedium(DryMedia, WetMedia, PrintMedia, SculpturalMedia)
   , allTraditionalMedia
   , mediumDescription
   , mediumToId
@@ -54,28 +54,28 @@ import Hydrogen.Schema.Brush.Preset.Types
   , mediumRequiresFixative
   
   -- Dry Media
-  , DryMedium(..)
+  , DryMedium(Graphite, ColoredPencil, Charcoal, Conte, SoftPastel, OilPastel, Chalk, Crayon)
   , allDryMedia
   , dryMediumDescription
   , dryMediumToId
   , dryMediumHardness
   
   -- Wet Media
-  , WetMedium(..)
+  , WetMedium(Ink, Watercolor, Gouache, Acrylic, OilPaint, Encaustic, Tempera, Fresco)
   , allWetMedia
   , wetMediumDescription
   , wetMediumToId
   , wetMediumDryTime
   
   -- Digital Tools
-  , DigitalTool(..)
+  , DigitalTool(PixelBrush, Airbrush, GlowBrush, NoiseBrush, GlitchBrush, VectorBrush, ParticleBrush, CloneBrush, HealBrush, GenerativeBrush)
   , allDigitalTools
   , digitalToolDescription
   , digitalToolToId
   , digitalToolEra
   
   -- Expressive Registers
-  , ExpressiveRegister(..)
+  , ExpressiveRegister(Calm, Anxious, Melancholic, Joyful, Rage, Tender, Nostalgic, Awe, Grief, Playful)
   , allExpressiveRegisters
   , registerDescription
   , registerToId
@@ -83,7 +83,7 @@ import Hydrogen.Schema.Brush.Preset.Types
   , registerArousal
   
   -- Provenance
-  , PresetProvenance(..)
+  , PresetProvenance(BuiltIn, HumanAuthored, AIGenerated, CommunityContributed, Procedural, Unknown)
   , provenanceToId
   , isHumanAuthored
   , isAIGenerated

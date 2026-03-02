@@ -138,8 +138,8 @@ import Data.Array (length) as Array
 
 import Hydrogen.Schema.Brush.Preset.Types
   ( PresetMeta
-  , PresetCategory(..)
-  , PresetProvenance(..)
+  , PresetCategory(Traditional, DigitalNative, Hybrid, Expressive, Utility, Experimental)
+  , PresetProvenance(BuiltIn, HumanAuthored, AIGenerated, CommunityContributed, Procedural, Unknown)
   , mkPresetMeta
   )
 

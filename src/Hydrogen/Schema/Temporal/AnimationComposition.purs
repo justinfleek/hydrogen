@@ -46,7 +46,7 @@ module Hydrogen.Schema.Temporal.AnimationComposition
   , showStagger
   
   -- * Fill Mode
-  , FillMode(..)
+  , FillMode(FillNone, FillForwards, FillBackwards, FillBoth)
   , fillModeLabel
   
   -- * Transition
@@ -59,7 +59,7 @@ module Hydrogen.Schema.Temporal.AnimationComposition
   , showTransition
   
   -- * Animation Group
-  , AnimationGroup(..)
+  , AnimationGroup(GroupSequence, GroupParallel, GroupStagger)
   , groupDuration
   ) where
 

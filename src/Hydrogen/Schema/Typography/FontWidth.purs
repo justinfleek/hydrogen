@@ -27,7 +27,7 @@
 
 module Hydrogen.Schema.Typography.FontWidth
   ( -- * Type
-    FontWidth(..)
+    FontWidth(FontWidth)
     
   -- * Constructor
   , fontWidth

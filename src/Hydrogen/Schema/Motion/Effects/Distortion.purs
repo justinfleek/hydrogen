@@ -72,23 +72,23 @@ module Hydrogen.Schema.Motion.Effects.Distortion
   ) where
 
 import Hydrogen.Schema.Motion.Effects.Distortion.Types
-  ( RampShape(..)
+  ( RampShape(RSLinear, RSRadial)
   , allRampShapes
   , rampShapeToString
   , rampShapeFromString
-  , WarpStyle(..)
+  , WarpStyle(WSArc, WSArcLower, WSArcUpper, WSArch, WSBulge, WSShellLower, WSShellUpper, WSFlag, WSWave, WSFish, WSRise, WSFisheye, WSInflate, WSSqueeze, WSTwist)
   , allWarpStyles
   , warpStyleToString
   , warpStyleFromString
-  , DisplacementMapType(..)
+  , DisplacementMapType(DMTLayer, DMTNoise, DMTGradientH, DMTGradientV, DMTRadial, DMTSineH, DMTSineV, DMTChecker)
   , allDisplacementMapTypes
   , displacementMapTypeToString
   , displacementMapTypeFromString
-  , DisplacementChannel(..)
+  , DisplacementChannel(DCRed, DCGreen, DCBlue, DCAlpha, DCLuminance, DCOff)
   , allDisplacementChannels
   , displacementChannelToString
   , displacementChannelFromString
-  , EdgeBehavior(..)
+  , EdgeBehavior(EBOff, EBTiles, EBMirror)
   , allEdgeBehaviors
   , edgeBehaviorToString
   , edgeBehaviorFromString
@@ -108,18 +108,18 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Warp
   , defaultTwirl
   , twirlWithAngle
   , WaveWarpEffect
-  , WaveType(..)
+  , WaveType(WTSine, WTSquare, WTTriangle, WTSawtooth, WTCircle, WTSemicircle, WTUncircle, WTNoise)
   , defaultWaveWarp
   , waveWarpWithHeight
   , RippleEffect
-  , RippleConversion(..)
+  , RippleConversion(RCSymmetric, RCAsymmetric)
   , defaultRipple
   , rippleWithWaves
   , SpherizeEffect
   , defaultSpherize
   , spherizeWithRadius
   , LiquifyEffect
-  , LiquifyTool(..)
+  , LiquifyTool(LTWarp, LTTurbulence, LTTwirl, LTTwirlCCW, LTPucker, LTBloat, LTShift, LTReflection, LTReconstruction)
   , defaultLiquify
   , liquifyToolToString
   , rippleConversionToString
@@ -131,7 +131,7 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Displacement
   , defaultDisplacementMap
   , displacementMapWithLayer
   , TurbulentDisplaceEffect
-  , TurbulentDisplaceType(..)
+  , TurbulentDisplaceType(TDTTurbulentSmooth, TDTTurbulentSharp, TDTBulgeSmooth, TDTBulgeSharp, TDTTwist)
   , defaultTurbulentDisplace
   , turbulentDisplaceWithAmount
   , turbulentDisplaceTypeToString
@@ -149,7 +149,7 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Transform
   , OpticsCompensationEffect
   , defaultOpticsCompensation
   , PolarCoordinatesEffect
-  , PolarType(..)
+  , PolarType(PTRectToPolar, PTPolarToRect)
   , defaultPolarCoordinates
   , TransformEffect
   , defaultTransform
@@ -179,7 +179,7 @@ import Hydrogen.Schema.Motion.Effects.Distortion.Extended
   , SmearEffect
   , defaultSmear
   , SplitEffect
-  , SplitDirection(..)
+  , SplitDirection(SDHorizontal, SDVertical, SDBoth)
   , defaultSplit
   , TilerEffect
   , defaultTiler

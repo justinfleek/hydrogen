@@ -31,7 +31,7 @@ module Hydrogen.Schema.Physical.Optical.IOR.Core
   , totalInternalReflection
   
   -- * Category
-  , MaterialCategory(..)
+  , MaterialCategory(Gas, Liquid, Glass, Plastic, GemPrecious, GemSemiPrecious, GemQuartz, GemBeryl, GemRare, Crystal, Metal, Semiconductor, Biological)
   , category
   ) where
 

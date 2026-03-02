@@ -14,7 +14,7 @@
 
 module Hydrogen.Schema.Compute.Graph.Types
   ( -- * Node Identity
-    NodeId(..)
+    NodeId(NodeId)
   , unwrapNodeId
   
   -- * Port Types

@@ -78,7 +78,7 @@ module Hydrogen.Schema.Audio.Clip
 import Prelude
 
 import Data.Array as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Audio.Note (Note, transposeNote, scaleNoteVelocity, noteStart, noteEnd, noteDuration, sortByStart, moveNote)
 import Hydrogen.Schema.Audio.Tick (TickPosition, TickDuration, tickPosition, tickDuration, unwrapTickPosition, unwrapTickDuration, PPQ, ticksPerBeat)
 import Hydrogen.Schema.Color.SRGB (SRGB, srgb)

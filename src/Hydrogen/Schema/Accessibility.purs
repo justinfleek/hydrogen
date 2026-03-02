@@ -48,29 +48,29 @@ module Hydrogen.Schema.Accessibility
   ) where
 
 import Hydrogen.Schema.Accessibility.Role
-  ( WidgetRole(..)
+  ( WidgetRole(RoleButton, RoleCheckbox, RoleGridcell, RoleLink, RoleMenuitem, RoleMenuitemcheckbox, RoleMenuitemradio, RoleOption, RoleProgressbar, RoleRadio, RoleScrollbar, RoleSearchbox, RoleSeparator, RoleSlider, RoleSpinbutton, RoleSwitch, RoleTab, RoleTabpanel, RoleTextbox, RoleTreeitem)
   , widgetRoleToString
-  , CompositeRole(..)
+  , CompositeRole(RoleCombobox, RoleGrid, RoleListbox, RoleMenu, RoleMenubar, RoleRadiogroup, RoleTablist, RoleTree, RoleTreegrid)
   , compositeRoleToString
-  , StructureRole(..)
+  , StructureRole(RoleApplication, RoleArticle, RoleBlockquote, RoleCaption, RoleCell, RoleColumnheader, RoleDefinition, RoleDirectory, RoleDocument, RoleFeed, RoleFigure, RoleGroup, RoleHeading, RoleImg, RoleList, RoleListitem, RoleMath, RoleMeter, RoleNote, RoleParagraph, RoleRow, RoleRowgroup, RoleRowheader, RoleTable, RoleTerm, RoleToolbar, RoleTooltip)
   , structureRoleToString
-  , WindowRole(..)
+  , WindowRole(RoleAlert, RoleAlertdialog, RoleDialog)
   , windowRoleToString
   ) as Role
 
 import Hydrogen.Schema.Accessibility.State
-  ( Tristate(..)
+  ( Tristate(TriFalse, TriTrue, TriMixed)
   , tristateToString
-  , AriaExpanded(..)
-  , AriaSelected(..)
-  , AriaPressed(..)
-  , AriaChecked(..)
-  , AriaDisabled(..)
-  , AriaHidden(..)
-  , AriaInvalid(..)
-  , AriaBusy(..)
-  , AriaCurrent(..)
-  , AriaGrabbed(..)
+  , AriaExpanded(AriaExpanded)
+  , AriaSelected(AriaSelected)
+  , AriaPressed(AriaPressed)
+  , AriaChecked(AriaChecked)
+  , AriaDisabled(AriaDisabled)
+  , AriaHidden(AriaHidden)
+  , AriaInvalid(InvalidFalse, InvalidTrue, InvalidGrammar, InvalidSpelling)
+  , AriaBusy(AriaBusy)
+  , AriaCurrent(CurrentFalse, CurrentTrue, CurrentPage, CurrentStep, CurrentLocation, CurrentDate, CurrentTime)
+  , AriaGrabbed(AriaGrabbed)
   , expandedToAttr
   , selectedToAttr
   , pressedToAttr
@@ -84,35 +84,35 @@ import Hydrogen.Schema.Accessibility.State
   ) as State
 
 import Hydrogen.Schema.Accessibility.Property
-  ( AriaLabelledBy(..)
-  , AriaDescribedBy(..)
-  , AriaControls(..)
-  , AriaOwns(..)
-  , AriaFlowTo(..)
-  , AriaDetails(..)
-  , AriaErrorMessage(..)
-  , AriaAutocomplete(..)
-  , AriaHaspopup(..)
-  , AriaOrientation(..)
-  , AriaPosInSet(..)
-  , AriaSetSize(..)
-  , AriaLevel(..)
-  , AriaValueNow(..)
-  , AriaValueMin(..)
-  , AriaValueMax(..)
-  , AriaValueText(..)
-  , AriaLabel(..)
-  , AriaPlaceholder(..)
-  , AriaRoleDescription(..)
+  ( AriaLabelledBy(AriaLabelledBy)
+  , AriaDescribedBy(AriaDescribedBy)
+  , AriaControls(AriaControls)
+  , AriaOwns(AriaOwns)
+  , AriaFlowTo(AriaFlowTo)
+  , AriaDetails(AriaDetails)
+  , AriaErrorMessage(AriaErrorMessage)
+  , AriaAutocomplete(AutocompleteNone, AutocompleteInline, AutocompleteList, AutocompleteBoth)
+  , AriaHaspopup(HasPopupFalse, HasPopupTrue, HasPopupMenu, HasPopupListbox, HasPopupTree, HasPopupGrid, HasPopupDialog)
+  , AriaOrientation(OrientationHorizontal, OrientationVertical, OrientationUndefined)
+  , AriaPosInSet(AriaPosInSet)
+  , AriaSetSize(AriaSetSize)
+  , AriaLevel(AriaLevel)
+  , AriaValueNow(AriaValueNow)
+  , AriaValueMin(AriaValueMin)
+  , AriaValueMax(AriaValueMax)
+  , AriaValueText(AriaValueText)
+  , AriaLabel(AriaLabel)
+  , AriaPlaceholder(AriaPlaceholder)
+  , AriaRoleDescription(AriaRoleDescription)
   ) as Property
 
 import Hydrogen.Schema.Accessibility.LiveRegion
-  ( Politeness(..)
+  ( Politeness(Off, Polite, Assertive)
   , politenessToString
-  , AriaLive(..)
-  , AriaAtomic(..)
-  , AriaRelevant(..)
-  , Relevance(..)
+  , AriaLive(AriaLive)
+  , AriaAtomic(AriaAtomic)
+  , AriaRelevant(AriaRelevant)
+  , Relevance(RelevanceAdditions, RelevanceRemovals, RelevanceText, RelevanceAll)
   , LiveRegionConfig
   , defaultLiveRegion
   , assertive
@@ -123,7 +123,7 @@ import Hydrogen.Schema.Accessibility.LiveRegion
   ) as LiveRegion
 
 import Hydrogen.Schema.Accessibility.Landmark
-  ( LandmarkRole(..)
+  ( LandmarkRole(LandmarkBanner, LandmarkComplementary, LandmarkContentinfo, LandmarkForm, LandmarkMain, LandmarkNavigation, LandmarkRegion, LandmarkSearch)
   , landmarkToString
   , landmarkFromString
   , isUniqueLandmark

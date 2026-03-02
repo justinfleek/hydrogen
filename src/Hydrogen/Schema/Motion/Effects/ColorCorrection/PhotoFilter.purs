@@ -33,13 +33,13 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.PhotoFilter
   ( -- * Filter Type
-    FilterType(..)
+    FilterType(Warming85, Warming81, WarmingLBA, Cooling80, Cooling82, CoolingLBB, Red, Orange, Yellow, Green, Cyan, Blue, Violet, Magenta, Sepia, DeepRed, DeepBlue, DeepGreen, Underwater, Custom)
   , filterTypeToString
   , filterTypeFromString
   , filterTypeColor
   
   -- * Photo Filter Effect
-  , PhotoFilterEffect(..)
+  , PhotoFilterEffect
   , defaultPhotoFilterEffect
   , mkPhotoFilterEffect
   , mkPhotoFilterFromType

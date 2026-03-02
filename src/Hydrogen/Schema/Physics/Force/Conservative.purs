@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Physics.Force.Conservative
   ( -- * Gravitational Force
-    Gravity(..)
+    Gravity(Gravity)
   , gravity
   , gravityEarth
   , gravityMoon
@@ -28,7 +28,7 @@ module Hydrogen.Schema.Physics.Force.Conservative
   , gravityDirection
   
   -- * Spring Force (Hooke's Law)
-  , SpringForce(..)
+  , SpringForce(SpringForce)
   , springForce
   , springForceDefault
   , springForceSoft
@@ -39,7 +39,7 @@ module Hydrogen.Schema.Physics.Force.Conservative
   , springRestLength
   
   -- * Attractive/Repulsive Force
-  , PointForce(..)
+  , PointForce(PointForce)
   , pointForce
   , attractiveForce
   , repulsiveForce
@@ -66,7 +66,7 @@ import Prelude
   )
 
 import Hydrogen.Schema.Physics.Force.Types
-  ( Force2D(..)
+  ( Force2D(Force2D)
   , forceDown
   , forceMagnitude
   , forceNormalize

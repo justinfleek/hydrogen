@@ -20,7 +20,7 @@
 
 module Hydrogen.Schema.Audio.Filter
   ( -- * Filter Type (Compound)
-    FilterType(..)
+    FilterType(LowPass, HighPass, BandPass, BandStop, Notch, AllPass, Peak, LowShelf, HighShelf, Resonant)
   , filterTypeName
   
   -- * Filter Molecule
@@ -31,7 +31,7 @@ module Hydrogen.Schema.Audio.Filter
   , bandPassFilter
   
   -- * Filter Slopes
-  , FilterSlope(..)
+  , FilterSlope(Slope6dB, Slope12dB, Slope18dB, Slope24dB, Slope36dB, Slope48dB)
   , filterSlopeDb
   ) where
 

@@ -57,7 +57,7 @@ module Hydrogen.Element.Compound.Tour.Motion
 
 -- Spring Physics
 import Hydrogen.Element.Compound.Tour.Motion.Spring
-  ( SpringPreset(..)
+  ( SpringPreset(Snappy, Bouncy, Smooth, Precise, Critical)
   , SpringParams
   , snappySpring
   , bouncySpring
@@ -86,8 +86,8 @@ import Hydrogen.Element.Compound.Tour.Motion.Spotlight
   , defaultMorphConfig
   , snappyMorphConfig
   , elasticMorphConfig
-  , MorphInterpolation(..)
-  , MorphPath(..)
+  , MorphInterpolation(InterpolateDirect, InterpolateSmooth, InterpolateSuperellipse, InterpolateCorners)
+  , MorphPath(PathDirect, PathArc, PathBezier, PathAvoid, PathFollow)
   , ShapeInterpolation
   , interpolateRect
   , interpolateCircle
@@ -99,7 +99,7 @@ import Hydrogen.Element.Compound.Tour.Motion.Spotlight
 import Hydrogen.Element.Compound.Tour.Motion.Choreography
   ( TooltipChoreography
   , MicroInteractionConfig
-  , ChoreographyPhase(..)
+  , ChoreographyPhase(PhaseIdle, PhaseEntering, PhaseVisible, PhaseExiting, PhaseFollowing)
   , defaultChoreography
   , minimalChoreography
   , dramaticChoreography
@@ -111,8 +111,8 @@ import Hydrogen.Element.Compound.Tour.Motion.Choreography
 
 -- Progress Animations
 import Hydrogen.Element.Compound.Tour.Motion.Progress
-  ( ProgressAnimationStyle(..)
-  , BarFillStyle(..)
+  ( ProgressAnimationStyle(ProgressDots, ProgressBar, ProgressCircular, ProgressFlipCounter, ProgressNone)
+  , BarFillStyle(FillLinear, FillLiquid, FillElastic, FillGradient)
   , DotProgressConfig
   , BarProgressConfig
   , CircularProgressConfig
@@ -125,7 +125,7 @@ import Hydrogen.Element.Compound.Tour.Motion.Progress
 
 -- Attention Grabbers
 import Hydrogen.Element.Compound.Tour.Motion.Attention
-  ( AttentionPattern(..)
+  ( AttentionPattern(AttentionPulse, AttentionBeacon, AttentionMagnetic, AttentionCelebration, AttentionNone)
   , PulseConfig
   , BeaconConfig
   , MagneticConfig
@@ -138,8 +138,8 @@ import Hydrogen.Element.Compound.Tour.Motion.Attention
 
 -- Responsive Motion
 import Hydrogen.Element.Compound.Tour.Motion.Responsive
-  ( MotionScale(..)
-  , PerformanceTier(..)
+  ( MotionScale(MotionFull, MotionReduced, MotionMinimal, MotionNone)
+  , PerformanceTier(TierHigh, TierMedium, TierLow, TierMinimal)
   , ReducedMotionFallback
   , computeMotionScale
   , reducedMotionFallbacks

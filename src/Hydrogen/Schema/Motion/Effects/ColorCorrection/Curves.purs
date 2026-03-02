@@ -29,12 +29,12 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.Curves
   ( -- * Curve Point
-    CurveControlPoint(..)
+    CurveControlPoint(CurveControlPoint)
   , curvePoint
   , curvePointWithHandles
   
   -- * Channel Curve
-  , ChannelCurve(..)
+  , ChannelCurve(ChannelCurve)
   , linearCurve
   , sCurve
   , invertCurve
@@ -44,7 +44,7 @@ module Hydrogen.Schema.Motion.Effects.ColorCorrection.Curves
   , curvePointCount
   
   -- * Curves Effect
-  , CurvesEffect(..)
+  , CurvesEffect(CurvesEffect)
   , defaultCurvesEffect
   , mkCurvesEffect
   

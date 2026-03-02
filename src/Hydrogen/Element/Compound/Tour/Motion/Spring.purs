@@ -21,7 +21,7 @@
 
 module Hydrogen.Element.Compound.Tour.Motion.Spring
   ( -- * Types
-    SpringPreset(..)
+    SpringPreset(Snappy, Bouncy, Smooth, Precise, Critical)
   , SpringParams
   
     -- * Presets

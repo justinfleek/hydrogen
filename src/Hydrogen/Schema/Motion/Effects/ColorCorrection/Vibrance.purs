@@ -33,7 +33,7 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.Vibrance
   ( -- * Vibrance Effect
-    VibranceEffect(..)
+    VibranceEffect
   , defaultVibranceEffect
   , mkVibranceEffect
   

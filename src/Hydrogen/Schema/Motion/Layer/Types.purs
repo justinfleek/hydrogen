@@ -33,7 +33,64 @@
 
 module Hydrogen.Schema.Motion.Layer.Types
   ( -- * Layer Type
-    LayerType(..)
+    LayerType
+      ( LTImage
+      , LTVideo
+      , LTSolid
+      , LTAudio
+      , LTText
+      , LTShape
+      , LTNull
+      , LTCamera
+      , LTLight
+      , LTAdjustment
+      , LTEffect
+      , LTPreComp
+      , LTGroup
+      , LTNestedComp
+      , LTParticle
+      , LTDepth
+      , LTNormal
+      , LTGenerated
+      , LTMatte
+      , LTControl
+      , LTSpline
+      , LTPath
+      , LTPose
+      , LTModel
+      , LTPointCloud
+      , LTDepthflow
+      , LTSVG
+      , LTVectorGraphic
+      , LTLottie
+      , LTRive
+      , LTMesh
+      , LTEnvironment
+      , LTVolume
+      , LTSkeleton
+      , LTHDR
+      , LTLUT
+      , LTGradient
+      , LTWaveform
+      , LTSpectrogram
+      , LTMIDI
+      , LTCSV
+      , LTJSON
+      , LTGeoJSON
+      , LTData
+      , LTMarker
+      , LTSubtitle
+      , LTAnnotation
+      , LTComment
+      , LTTracker
+      , LTPlanarTracking
+      , LTStabilizer
+      , LTReference
+      , LTGrid
+      , LTGuide
+      , LTMask
+      , LTRoto
+      )
   , layerTypeToString
   , layerTypeFromString
   

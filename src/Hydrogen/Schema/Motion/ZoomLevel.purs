@@ -35,7 +35,7 @@
 -- | ```
 module Hydrogen.Schema.Motion.ZoomLevel
   ( -- * Core Type
-    ZoomLevel(..)
+    ZoomLevel(ZoomLevel)
   
   -- * Constructors
   , zoomLevel

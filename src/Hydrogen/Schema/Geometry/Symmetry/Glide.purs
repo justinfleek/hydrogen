@@ -24,7 +24,7 @@
 -- | - Symmetry.Reflection (ReflectionAxis)
 
 module Hydrogen.Schema.Geometry.Symmetry.Glide
-  ( GlideReflection(..)
+  ( GlideReflection(GlideReflection)
   , glideReflection
   , horizontalGlide
   , verticalGlide

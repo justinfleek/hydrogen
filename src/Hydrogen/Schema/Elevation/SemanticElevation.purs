@@ -50,7 +50,7 @@
 
 module Hydrogen.Schema.Elevation.SemanticElevation
   ( -- * Elevation Level (Atom)
-    ElevationLevel(..)
+    ElevationLevel(Flat, Raised, Floating, Overlay, Modal, Toast)
   , allLevels
   , levelToInt
   , levelFromInt

@@ -46,7 +46,7 @@ module Hydrogen.Schema.Media.Image
   
   -- * Flip State
   , FlipState
-  , FlipAxis(..)
+  , FlipAxis(FlipX, FlipY)
   , flipNone
   , flipHorizontal
   , flipVertical
@@ -94,7 +94,7 @@ module Hydrogen.Schema.Media.Image
   , applyCropTransform
   
   -- * Image Command
-  , ImageCommand(..)
+  , ImageCommand(SetCrop, ZoomIn, ZoomOut, SetZoom, RotateCW, RotateCCW, SetRotation, FlipHorizontal, FlipVertical, ResetTransforms)
   , applyImageCommand
   
   -- * Image Dimensions

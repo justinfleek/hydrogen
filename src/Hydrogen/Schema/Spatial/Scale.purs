@@ -35,7 +35,7 @@ module Hydrogen.Schema.Spatial.Scale
   , unwrapScaleZ
   
   -- * Scale3D
-  , Scale3D(..)
+  , Scale3D(Scale3D)
   , scale3D
   , uniformScale3D
   , identityScale3D

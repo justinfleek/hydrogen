@@ -16,14 +16,14 @@
 
 module Hydrogen.Schema.Graph.NodeContent.Types
   ( -- * Content Slots
-    ContentSlot(..)
+    ContentSlot(SlotLeading, SlotIcon, SlotMain, SlotSubtitle, SlotTrailing, SlotActions, SlotBelow, SlotOverlay, SlotBackground)
   , isLeadingSlot
   , isMainSlot
   , isTrailingSlot
   , slotPriority
   
   -- * Content Templates
-  , ContentTemplate(..)
+  , ContentTemplate(TemplateTextOnly, TemplateIconText, TemplateTitleSubtitle, TemplateCard, TemplateAvatar, TemplateMetric, TemplateProgress, TemplateThumbnail, TemplateCustom)
   , isTextTemplate
   , isCardTemplate
   , isCustomTemplate

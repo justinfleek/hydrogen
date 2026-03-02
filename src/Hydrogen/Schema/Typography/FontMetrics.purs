@@ -23,13 +23,13 @@
 
 module Hydrogen.Schema.Typography.FontMetrics
   ( -- * Types
-    FontMetrics(..)
-  , UnitsPerEm(..)
-  , Ascender(..)
-  , Descender(..)
-  , XHeight(..)
-  , CapHeight(..)
-  , LineGap(..)
+    FontMetrics
+  , UnitsPerEm(UnitsPerEm)
+  , Ascender(Ascender)
+  , Descender(Descender)
+  , XHeight(XHeight)
+  , CapHeight(CapHeight)
+  , LineGap(LineGap)
   
   -- * Constructors
   , fontMetrics

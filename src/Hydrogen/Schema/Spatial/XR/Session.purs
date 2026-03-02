@@ -21,28 +21,28 @@
 
 module Hydrogen.Schema.Spatial.XR.Session
   ( -- * Session
-    XRSessionMode(..)
-  , XRSessionFeature(..)
-  , XRReferenceSpace(..)
-  , XRSession(..)
+    XRSessionMode(Inline, ImmersiveVR, ImmersiveAR)
+  , XRSessionFeature(LocalFloor, BoundedFloor, Unbounded, HandTracking, HitTest, DomOverlay, LightEstimation, Anchors, PlaneDetection, MeshDetection, DepthSensing, CameraAccess)
+  , XRReferenceSpace(Viewer, Local, LocalFloorSpace, BoundedFloorSpace, UnboundedSpace)
+  , XRSession(XRSession)
   
   -- * Anchors
   , XRAnchorId
   , xrAnchorId
   , unwrapAnchorId
-  , XRAnchorState(..)
-  , XRAnchor(..)
+  , XRAnchorState(AnchorTracking, AnchorPaused, AnchorLost)
+  , XRAnchor(XRAnchor)
   
   -- * Planes
   , XRPlaneId
   , xrPlaneId
-  , XRPlaneOrientation(..)
-  , XRPlane(..)
+  , XRPlaneOrientation(Horizontal, Vertical)
+  , XRPlane(XRPlane)
   
   -- * Meshes
   , XRMeshId
   , xrMeshId
-  , XRMesh(..)
+  , XRMesh(XRMesh)
   
   -- * Constructors
   , immersiveVR
@@ -62,8 +62,8 @@ module Hydrogen.Schema.Spatial.XR.Session
   , meshVertexCount
   
   -- * Session State
-  , XRSessionState(..)
-  , XRVisibilityState(..)
+  , XRSessionState(SessionPending, SessionActive, SessionEnded)
+  , XRVisibilityState(Visible, VisibleBlurred, Hidden)
   ) where
 
 import Prelude

@@ -69,7 +69,7 @@ module Hydrogen.Schema.Motion.Layer.Operations
   , setTimeRemapEnabled
   , shiftLayerTime
     -- * LayerTransform Monoid
-  , LayerTransform(..)
+  , LayerTransform(LayerTransform)
   , runTransform
   , mkTransform
   , emptyTransform

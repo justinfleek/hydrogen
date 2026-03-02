@@ -40,9 +40,9 @@ import Prelude
   , (<)
   )
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (abs, tan)
-import Hydrogen.Schema.Geometry.Vector (Vector3D(..))
+import Hydrogen.Schema.Geometry.Vector (Vector3D(Vector3D))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // matrix4

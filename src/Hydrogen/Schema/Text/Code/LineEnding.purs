@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Text.Code.LineEnding
   ( -- * Line Ending Type
-    LineEnding(..)
+    LineEnding(LineLF, LineCRLF, LineCR)
   
   -- * Detection
   , detectLineEnding

@@ -29,8 +29,8 @@
 
 module Hydrogen.Schema.Typography.OpenType.Ligatures
   ( -- * Types
-    LigatureSet(..)
-  , Ligatures(..)
+    LigatureSet(LigatureOn, LigatureOff)
+  , Ligatures(Ligatures)
   
   -- * Constructors
   , none

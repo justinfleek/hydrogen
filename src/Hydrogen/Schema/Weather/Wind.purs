@@ -35,7 +35,7 @@ module Hydrogen.Schema.Weather.Wind
   , module Hydrogen.Schema.Weather.Wind.Gust
   
   -- * Wind Vector
-  , WindVector(..)
+  , WindVector(WindVector)
   , windVector
   , windVectorFromComponents
   , speedFromVector
@@ -44,7 +44,7 @@ module Hydrogen.Schema.Weather.Wind
   , vComponent
   
   -- * Wind Event
-  , WindEvent(..)
+  , WindEvent(SteadyWind, GustyWind, CalmConditions)
   , steadyWind
   , gustyWind
   , calmConditions
@@ -118,7 +118,7 @@ import Hydrogen.Schema.Weather.Wind.Direction
   , directionSouthWest
   , directionWest
   , directionNorthWest
-  , Cardinal(..)
+  , Cardinal(N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW)
   , allCardinals
   , cardinalToDegrees
   , degreesToCardinal

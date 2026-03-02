@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Physics.Collision.Point
   ( -- * Point2D Type
-    Point2D(..)
+    Point2D(Point2D)
   
   -- * Construction
   , point2D

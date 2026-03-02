@@ -9,14 +9,14 @@
 
 module Hydrogen.Schema.Reactive.InteractiveState
   ( -- * Pointer State
-    PointerState(..)
+    PointerState(PointerIdle, PointerHover, PointerPressed, PointerDragging)
   , pointerIdle
   , pointerHover
   , pointerPressed
   , isPointerOver
   , isPointerDown
   -- * Focus State
-  , FocusState(..)
+  , FocusState(FocusNone, FocusKeyboard, FocusPointer, FocusProgrammatic)
   , focusNone
   , focusKeyboard
   , focusPointer
@@ -24,7 +24,7 @@ module Hydrogen.Schema.Reactive.InteractiveState
   , hasFocus
   , showFocusRing
   -- * Activation State
-  , ActivationState(..)
+  , ActivationState(Inactive, Activating, Active, Deactivating)
   , inactive
   , activating
   , active
@@ -38,7 +38,7 @@ module Hydrogen.Schema.Reactive.InteractiveState
   , toAriaAttributes
   , toLegacyCssClasses
   -- * Pointer Device
-  , PointerDevice(..)
+  , PointerDevice(Mouse, Touch, Pen, Unknown)
   , pointerDevice
   ) where
 

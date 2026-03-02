@@ -18,7 +18,7 @@
 
 module Hydrogen.Element.Compound.QRCode.Document.Logo
   ( -- * Logo Configuration
-    LogoConfig(..)
+    LogoConfig(LogoImage, LogoText, LogoShape, LogoIcon)
   
   -- * Logo Constructors
   , imageLogo

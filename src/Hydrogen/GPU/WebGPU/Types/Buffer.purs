@@ -13,8 +13,22 @@
 module Hydrogen.GPU.WebGPU.Types.Buffer
   ( -- Buffer
     GPUBufferDescriptor
-  , GPUBufferUsage(..)
-  , GPUMapMode(..)
+  , GPUBufferUsage
+      ( MapRead
+      , MapWrite
+      , CopySrc
+      , CopyDst
+      , Index
+      , Vertex
+      , Uniform
+      , Storage
+      , Indirect
+      , QueryResolve
+      )
+  , GPUMapMode
+      ( MapModeRead
+      , MapModeWrite
+      )
   , combineBufferUsage
   , combineMapMode
   ) where

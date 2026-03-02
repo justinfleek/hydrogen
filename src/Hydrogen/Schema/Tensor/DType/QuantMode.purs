@@ -27,7 +27,7 @@
 
 module Hydrogen.Schema.Tensor.DType.QuantMode
   ( -- * Quantization Mode
-    QuantMode(..)
+    QuantMode(NoQuant, W8A8_SQ, W8A16, W4A16, W4A16_AWQ, W4A16_GPTQ, FP8_Linear, FP8_Full, W4A8_NVFP4_FP8, W4A8_MXFP4_FP8, W8A8_FP8)
   
   -- * Smart Constructors
   , quantNone

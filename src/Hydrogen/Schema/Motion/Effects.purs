@@ -59,15 +59,15 @@ module Hydrogen.Schema.Motion.Effects
   ) where
 
 import Hydrogen.Schema.Motion.Effects.Core
-  ( EffectParameterType(..)
+  ( EffectParameterType(EPTNumber, EPTColor, EPTPoint, EPTPoint3D, EPTAngle, EPTCheckbox, EPTDropdown, EPTLayer, EPTString, EPTCurve, EPTData)
   , allEffectParameterTypes
   , effectParameterTypeToString
   , effectParameterTypeFromString
-  , EffectAnimatableType(..)
+  , EffectAnimatableType(EATNumber, EATPosition, EATColor, EATEnum, EATVector3)
   , allEffectAnimatableTypes
   , effectAnimatableTypeToString
   , effectAnimatableTypeFromString
-  , EffectCategory(..)
+  , EffectCategory(ECBlurSharpen, ECColorCorrection, ECDistort, ECGenerate, ECKeying, ECMatte, ECNoiseGrain, ECPerspective, ECStylize, ECTime, ECTransition, ECUtility)
   , allEffectCategories
   , effectCategoryToString
   , effectCategoryFromString
@@ -80,13 +80,13 @@ import Hydrogen.Schema.Motion.Effects.Core
   , effectRGBAOpaque
   , CurvePoint
   , mkCurvePoint
-  , EffectParameterValue(..)
+  , EffectParameterValue(EPVNumber, EPVString, EPVBoolean, EPVPoint2D, EPVPoint3D, EPVColor, EPVCurve, EPVData, EPVNull)
   , EffectDropdownOption
   , EffectParameterDef
   , defaultEffectParameterDef
   , EffectParameter
   , defaultEffectParameter
-  , EffectId(..)
+  , EffectId(EffectId)
   , mkEffectId
   , Effect
   , defaultEffect
@@ -99,141 +99,141 @@ import Hydrogen.Schema.Motion.Effects.Core
   ) as Core
 
 import Hydrogen.Schema.Motion.Effects.Blur
-  ( BlurDimension(..)
+  ( BlurDimension(BDHorizontal, BDVertical, BDBoth)
   , allBlurDimensions
   , blurDimensionToString
   , blurDimensionFromString
-  , RadialBlurType(..)
+  , RadialBlurType(RBTSpin, RBTZoom)
   , allRadialBlurTypes
   , radialBlurTypeToString
   , radialBlurTypeFromString
-  , AntialiasingQuality(..)
+  , AntialiasingQuality(AAQLow, AAQMedium, AAQHigh)
   , allAntialiasingQualities
   , antialiasingQualityToString
   , antialiasingQualityFromString
   ) as Blur
 
 import Hydrogen.Schema.Motion.Effects.Distortion
-  ( RampShape(..)
+  ( RampShape(RSLinear, RSRadial)
   , allRampShapes
   , rampShapeToString
   , rampShapeFromString
-  , WarpStyle(..)
+  , WarpStyle(WSArc, WSArcLower, WSArcUpper, WSArch, WSBulge, WSShellLower, WSShellUpper, WSFlag, WSWave, WSFish, WSRise, WSFisheye, WSInflate, WSSqueeze, WSTwist)
   , allWarpStyles
   , warpStyleToString
   , warpStyleFromString
-  , DisplacementMapType(..)
+  , DisplacementMapType(DMTLayer, DMTNoise, DMTGradientH, DMTGradientV, DMTRadial, DMTSineH, DMTSineV, DMTChecker)
   , allDisplacementMapTypes
   , displacementMapTypeToString
   , displacementMapTypeFromString
-  , DisplacementChannel(..)
+  , DisplacementChannel(DCRed, DCGreen, DCBlue, DCAlpha, DCLuminance, DCOff)
   , allDisplacementChannels
   , displacementChannelToString
   , displacementChannelFromString
-  , EdgeBehavior(..)
+  , EdgeBehavior(EBOff, EBTiles, EBMirror)
   , allEdgeBehaviors
   , edgeBehaviorToString
   , edgeBehaviorFromString
   ) as Distortion
 
 import Hydrogen.Schema.Motion.Effects.Glow
-  ( GlowCompositeMode(..)
+  ( GlowCompositeMode(GCMOnTop, GCMBehind, GCMNone)
   , allGlowCompositeModes
   , glowCompositeModeToString
   , glowCompositeModeFromString
-  , GlowColorsMode(..)
+  , GlowColorsMode(GCMOriginal, GCMAB)
   , allGlowColorsModes
   , glowColorsModeToString
   , glowColorsModeFromString
-  , ColorLooping(..)
+  , ColorLooping(CLNone, CLSawtoothAB, CLSawtoothBA, CLTriangle)
   , allColorLoopings
   , colorLoopingToString
   , colorLoopingFromString
-  , FalloffMode(..)
+  , FalloffMode(FMInverseSquare, FMGaussian, FMExponential)
   , allFalloffModes
   , falloffModeToString
   , falloffModeFromString
-  , TonemapMode(..)
+  , TonemapMode(TMNone, TMACES, TMReinhard, TMHable)
   , allTonemapModes
   , tonemapModeToString
   , tonemapModeFromString
-  , BloomBlendMode(..)
+  , BloomBlendMode(BBMAdd, BBMScreen, BBMOverlay, BBMSoftLight)
   , allBloomBlendModes
   , bloomBlendModeToString
   , bloomBlendModeFromString
   ) as Glow
 
 import Hydrogen.Schema.Motion.Effects.Noise
-  ( FractalType(..)
+  ( FractalType(FTBasic, FTTurbulentBasic, FTSoftLinear, FTTurbulentSoft)
   , allFractalTypes
   , fractalTypeToString
   , fractalTypeFromString
-  , NoiseType(..)
+  , NoiseType(NTBlock, NTLinear, NTSoftLinear, NTSpline)
   , allNoiseTypes
   , noiseTypeToString
   , noiseTypeFromString
   ) as Noise
 
 import Hydrogen.Schema.Motion.Effects.Time
-  ( EchoOperator(..)
+  ( EchoOperator(EOAdd, EOScreen, EOMaximum, EOMinimum, EOCompositeBack, EOCompositeFront, EOBlend)
   , allEchoOperators
   , echoOperatorToString
   , echoOperatorFromString
-  , TimeResolution(..)
+  , TimeResolution(TRFrame, TRHalf, TRQuarter)
   , allTimeResolutions
   , timeResolutionToString
   , timeResolutionFromString
   ) as Time
 
 import Hydrogen.Schema.Motion.Effects.Mesh
-  ( PinFalloff(..)
+  ( PinFalloff(PFInverseDistance, PFRadialBasis)
   , allPinFalloffs
   , pinFalloffToString
   , pinFalloffFromString
-  , TurbulentDisplaceType(..)
+  , TurbulentDisplaceType(TDTTurbulent, TDTBulge, TDTTwist, TDTTurbulentSmoother, TDTHorizontal, TDTVertical, TDTCross)
   , allTurbulentDisplaceTypes
   , turbulentDisplaceTypeToString
   , turbulentDisplaceTypeFromString
-  , PinningMode(..)
+  , PinningMode(PMNone, PMAll, PMHorizontal, PMVertical)
   , allPinningModes
   , pinningModeToString
   , pinningModeFromString
   ) as Mesh
 
 import Hydrogen.Schema.Motion.Effects.Stylize
-  ( ScanlinesDirection(..)
+  ( ScanlinesDirection(SDHorizontal, SDVertical)
   , allScanlinesDirections
   , scanlinesDirectionToString
   , scanlinesDirectionFromString
-  , RGBSplitBlendMode(..)
+  , RGBSplitBlendMode(RSBMScreen, RSBMAdd, RSBMNormal)
   , allRGBSplitBlendModes
   , rgbSplitBlendModeToString
   , rgbSplitBlendModeFromString
-  , PixelSortDirection(..)
+  , PixelSortDirection(PSDHorizontal, PSDVertical)
   , allPixelSortDirections
   , pixelSortDirectionToString
   , pixelSortDirectionFromString
-  , SortByCriterion(..)
+  , SortByCriterion(SBCSaturation, SBCBrightness, SBCHue)
   , allSortByCriteria
   , sortByCriterionToString
   , sortByCriterionFromString
-  , HalftoneColorMode(..)
+  , HalftoneColorMode(HCMGrayscale, HCMRGB, HCMCMYK)
   , allHalftoneColorModes
   , halftoneColorModeToString
   , halftoneColorModeFromString
-  , DitherMethod(..)
+  , DitherMethod(DMOrdered, DMFloydSteinberg, DMAtkinson)
   , allDitherMethods
   , ditherMethodToString
   , ditherMethodFromString
-  , DitherMatrixSize(..)
+  , DitherMatrixSize(DMS2x2, DMS4x4, DMS8x8)
   , allDitherMatrixSizes
   , ditherMatrixSizeToString
   , ditherMatrixSizeFromString
-  , EffectColorChannel(..)
+  , EffectColorChannel(ECCRGB, ECCRed, ECCGreen, ECCBlue, ECCAlpha)
   , allEffectColorChannels
   , effectColorChannelToString
   , effectColorChannelFromString
-  , HSLChannel(..)
+  , HSLChannel(HSLMaster, HSLReds, HSLYellows, HSLGreens, HSLCyans, HSLBlues, HSLMagentas)
   , allHSLChannels
   , hslChannelToString
   , hslChannelFromString

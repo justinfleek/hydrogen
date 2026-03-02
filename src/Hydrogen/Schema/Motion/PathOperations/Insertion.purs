@@ -51,7 +51,7 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, head, take, drop, concat, foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Number (abs)
 import Data.Int (toNumber) as Int
 

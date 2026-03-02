@@ -36,7 +36,7 @@
 
 module Hydrogen.Schema.Dimension.MediaQuery
   ( -- * Media Query Type
-    MediaQuery(..)
+    MediaQuery(MinWidth, MaxWidth, MinHeight, MaxHeight, Orientation, PrefersColorScheme, PrefersReducedMotion, PrefersReducedTransparency, PrefersContrast, Pointer, AnyPointer, HoverMedia, AnyHover, DisplayModeQuery, Resolution, MinResolution, ColorGamut, Type, And, Or, Not)
   
   -- * Screen Orientation
   , ScreenOrientation(Portrait, Landscape)

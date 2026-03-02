@@ -73,13 +73,13 @@ import Hydrogen.Schema.Brush.Tip.Types
   ) as Types
 
 import Hydrogen.Schema.Brush.Tip.Parameters 
-  ( Diameter(..)
-  , FlipX(..)
-  , FlipY(..)
-  , Hardness(..)
-  , Roundness(..)
-  , Spacing(..)
-  , TipAngle(..)
+  ( Diameter(Diameter)
+  , FlipX(FlipX)
+  , FlipY(FlipY)
+  , Hardness(Hardness)
+  , Roundness(Roundness)
+  , Spacing(Spacing)
+  , TipAngle(TipAngle)
   , airbrushSpacing
   , circularRoundness
   , defaultDiameter

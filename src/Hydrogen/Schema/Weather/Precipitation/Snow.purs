@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Weather.Precipitation.Snow
   ( -- * Snowflake Types
-    SnowflakeType(..)
+    SnowflakeType(Plates, StellarDendrites, Columns, Needles, SpatialDendrites, CappedColumns, IrregularCrystals, SnowGraupel, SleetCrystals)
   , allSnowflakeTypes
   , snowflakeDescription
   

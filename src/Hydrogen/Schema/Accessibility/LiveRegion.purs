@@ -18,15 +18,15 @@
 -- | https://www.w3.org/TR/wai-aria-1.2/#aria-live
 module Hydrogen.Schema.Accessibility.LiveRegion
   ( -- * Politeness Levels
-    Politeness(..)
+    Politeness(Off, Polite, Assertive)
   , politenessToString
     -- * Live Region Properties
-  , AriaLive(..)
-  , AriaAtomic(..)
-  , AriaRelevant(..)
-  , Relevance(..)
+  , AriaLive(AriaLive)
+  , AriaAtomic(AriaAtomic)
+  , AriaRelevant(AriaRelevant)
+  , Relevance(RelevanceAdditions, RelevanceRemovals, RelevanceText, RelevanceAll)
     -- * Live Region Molecule
-  , LiveRegionConfig(..)
+  , LiveRegionConfig
   , defaultLiveRegion
   , assertive
   , polite

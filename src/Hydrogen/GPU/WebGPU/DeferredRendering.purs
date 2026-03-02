@@ -27,17 +27,40 @@
 
 module Hydrogen.GPU.WebGPU.DeferredRendering
   ( -- Types
-    GBufferTargets(..)
-  , GBufferFormat(..)
-  , LightingPassConfig(..)
-  , SSAOConfig(..)
-  , DeferredPipeline(..)
+    GBufferTargets
+  , GBufferFormat
+      ( GBufferR16G16B16A16Float
+      , GBufferR32G32B32A32Float
+      , GBufferR11G11B10Float
+      )
+  , LightingPassConfig
+  , SSAOConfig
+  , DeferredPipeline
   , TextureTarget
   , FogConfig
-  , FogType(..)
-  , OutputFormat(..)
-  , GBBufferSemantic(..)
-  , CullingMethod(..)
+  , FogType
+      ( FogNone
+      , FogLinear
+      , FogExponential
+      , FogExponential2
+      , FogVolumetric
+      )
+  , OutputFormat
+      ( OutputHDR
+      , OutputLDR
+      )
+  , GBBufferSemantic
+      ( Position
+      , Normal
+      , Albedo
+      , Material
+      , Emissive
+      )
+  , CullingMethod
+      ( TiledForward
+      , ClusteredForward
+      , ZPrefix
+      )
     -- GBuffer
   , gbufferTargets
   , defaultGBufferFormat
@@ -45,11 +68,16 @@ module Hydrogen.GPU.WebGPU.DeferredRendering
     -- Lighting
   , lightingPassConfig
   , Light
-  , LightType(..)
+  , LightType
+      ( LightDirectional
+      , LightPoint
+      , LightSpot
+      , LightArea
+      )
   , DirectionalLight
   , PointLight
   , SpotLight
-  , LightCulling(..)
+  , LightCulling
   , cullingConfig
     -- SSAO
   , ssaoConfig

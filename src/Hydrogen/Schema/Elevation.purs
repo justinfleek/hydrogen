@@ -89,5 +89,5 @@ import Hydrogen.Schema.Elevation.Shadow
   ) as Shadow
 
 import Hydrogen.Schema.Elevation.ZIndex
-  ( ZIndex(..)
+  ( ZIndex(ZIndexAuto, ZIndexValue)
   ) as ZIndex

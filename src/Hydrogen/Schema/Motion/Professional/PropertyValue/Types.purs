@@ -8,7 +8,7 @@
 -- | defines the PropertyValueType enum for professional motion graphics interchange.
 
 module Hydrogen.Schema.Motion.Professional.PropertyValue.Types
-  ( PropertyValueType(..)
+  ( PropertyValueType(PVTNoValue, PVTThreeDSpatial, PVTThreeD, PVTTwoDSpatial, PVTTwoD, PVTOneD, PVTColor, PVTCustomValue, PVTMarker, PVTLayerIndex, PVTMaskIndex, PVTShape, PVTTextDocument)
   , propertyValueTypeToString
   , propertyValueTypeFromString
   ) where

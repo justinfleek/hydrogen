@@ -55,7 +55,7 @@ module Hydrogen.Element.Compound.Canvas.Transform
   , resizeObjectFromCorner
   
   -- * Anchor/Pivot Points
-  , AnchorPoint(..)
+  , AnchorPoint(AnchorCenter, AnchorTopLeft, AnchorTop, AnchorTopRight, AnchorLeft, AnchorRight, AnchorBottomLeft, AnchorBottom, AnchorBottomRight, AnchorCustom)
   , anchorPosition
   , objectAnchor
   

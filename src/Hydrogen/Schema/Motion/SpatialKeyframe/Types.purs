@@ -21,17 +21,17 @@ module Hydrogen.Schema.Motion.SpatialKeyframe.Types
   , setAutoBezier
   
   -- * Spatial Interpolation Type
-  , SpatialInterpolation(..)
+  , SpatialInterpolation(SILinear, SIBezier, SIAuto)
   , spatialInterpolationToString
   , spatialInterpolationFromString
   
   -- * Temporal Interpolation Type  
-  , TemporalInterpolation(..)
+  , TemporalInterpolation(TILinear, TIBezier, TIHold, TIAuto)
   , temporalInterpolationToString
   , temporalInterpolationFromString
   
   -- * Dimension Mode
-  , DimensionMode(..)
+  , DimensionMode(DMUnified, DMSeparated)
   , dimensionModeToString
   , dimensionModeFromString
   ) where

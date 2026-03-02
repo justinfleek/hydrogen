@@ -34,7 +34,7 @@ module Hydrogen.Util.Keyboard
   ( -- * Types
     Shortcut
   , ShortcutConfig
-  , Modifier(..)
+  , Modifier(Ctrl, Alt, Shift, Meta)
   , Scope
     -- * Shortcut Creation
   , shortcut

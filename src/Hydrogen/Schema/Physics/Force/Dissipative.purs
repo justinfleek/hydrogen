@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Physics.Force.Dissipative
   ( -- * Drag Force
-    DragForce(..)
+    DragForce(DragForce)
   , dragForce
   , dragForceLight
   , dragForceMedium
@@ -25,7 +25,7 @@ module Hydrogen.Schema.Physics.Force.Dissipative
   , dragCoefficient
   
   -- * Friction Force
-  , FrictionForce(..)
+  , FrictionForce(FrictionForce)
   , frictionForce
   , frictionStatic
   , frictionKinetic
@@ -36,7 +36,7 @@ module Hydrogen.Schema.Physics.Force.Dissipative
   , kineticCoefficient
   
   -- * Damping Force
-  , DampingForce(..)
+  , DampingForce(DampingForce)
   , dampingForce
   , dampingLight
   , dampingCritical

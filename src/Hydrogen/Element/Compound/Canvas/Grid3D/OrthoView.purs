@@ -12,7 +12,7 @@
 
 module Hydrogen.Element.Compound.Canvas.Grid3D.OrthoView
   ( -- * View Type
-    OrthoView(..)
+    OrthoView(ViewTop, ViewBottom, ViewFront, ViewBack, ViewLeft, ViewRight)
   
   -- * View Properties
   , viewPlane

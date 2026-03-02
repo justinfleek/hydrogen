@@ -63,7 +63,7 @@
 
 module Hydrogen.Schema.Network.ServiceWorker
   ( -- * Service Worker State Machine
-    ServiceWorkerState(..)
+    ServiceWorkerState(Installing, Installed, Activating, Activated, Redundant)
   , isInstalling
   , isInstalled
   , isActivating
@@ -84,7 +84,7 @@ module Hydrogen.Schema.Network.ServiceWorker
   , defaultScope
   
   -- * Update Via Cache
-  , UpdateViaCache(..)
+  , UpdateViaCache(Imports, All, None)
   
   -- * Registration Configuration
   , SWConfig
@@ -94,7 +94,7 @@ module Hydrogen.Schema.Network.ServiceWorker
   , withUpdateViaCache
   
   -- * Registration State
-  , RegistrationState(..)
+  , RegistrationState(NotRegistered, Registering, Registered, RegistrationError, Updating)
   , isRegistered
   , isUnregistered
   , hasUpdate
@@ -115,10 +115,10 @@ module Hydrogen.Schema.Network.ServiceWorker
   , workerScriptURL
   
   -- * Lifecycle Events
-  , SWEvent(..)
+  , SWEvent(SWInstalling, SWInstalled, SWActivating, SWActivated, SWRedundant, SWError, SWUpdateFound, SWControllerChange)
   
   -- * Cache Strategy
-  , CacheStrategy(..)
+  , CacheStrategy(CacheFirst, NetworkFirst, CacheOnly, NetworkOnly, StaleWhileRevalidate)
   , strategyName
   
   -- * Cache Configuration
@@ -129,16 +129,16 @@ module Hydrogen.Schema.Network.ServiceWorker
   , withMaxEntries
   
   -- * Update State
-  , UpdateState(..)
+  , UpdateState(NoUpdate, UpdateAvailable, UpdateActivating, UpdateComplete)
   , hasNewVersion
   , needsRefresh
   
   -- * Navigation Preload
-  , NavigationPreload(..)
+  , NavigationPreload(PreloadDisabled, PreloadEnabled, PreloadUnsupported)
   , isPreloadEnabled
   
   -- * Push Subscription State
-  , PushState(..)
+  , PushState(PushNotSubscribed, PushSubscribed, PushDenied, PushUnsupported)
   , isPushSubscribed
   , isPushDenied
   

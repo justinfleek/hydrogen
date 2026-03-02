@@ -16,8 +16,23 @@ module Hydrogen.GPU.WebGPU.Types.Core
   , GPUDeviceDescriptor
   , GPUQueueDescriptor
   , GPULimits
-  , GPUFeatureName(..)
-  , GPUPowerPreference(..)
+  , GPUFeatureName
+      ( DepthClipControl
+      , FeatureDepth32FloatStencil8
+      , TextureCompressionBC
+      , TextureCompressionETC2
+      , TextureCompressionASTC
+      , TimestampQuery
+      , IndirectFirstInstance
+      , ShaderF16
+      , RG11B10UfloatRenderable
+      , BGRA8UnormStorage
+      , Float32Filterable
+      )
+  , GPUPowerPreference
+      ( LowPower
+      , HighPerformance
+      )
   ) where
 
 import Prelude

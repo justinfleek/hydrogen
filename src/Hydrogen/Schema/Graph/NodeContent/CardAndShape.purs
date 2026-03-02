@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Graph.NodeContent.CardAndShape
   ( -- * Card Fields
-    CardField(..)
+    CardField(FieldTitle, FieldSubtitle, FieldMetadata, FieldImage, FieldAvatar, FieldBadge, FieldProgress, FieldDivider, FieldSpacer)
   , titleField
   , subtitleField
   , metadataField
@@ -25,7 +25,7 @@ module Hydrogen.Schema.Graph.NodeContent.CardAndShape
   , avatarField
   
   -- * Node Shape
-  , NodeShape(..)
+  , NodeShape(ShapeRectangle, ShapeRoundedRect, ShapePill, ShapeCircle, ShapeEllipse, ShapeDiamond, ShapeHexagon, ShapeOctagon, ShapeParallelogram, ShapeCylinder, ShapeDocument, ShapeCloud, ShapeCustomPath)
   , isRectangle
   , isCircle
   , isDiamond

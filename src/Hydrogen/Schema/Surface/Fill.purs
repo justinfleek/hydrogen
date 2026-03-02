@@ -32,14 +32,14 @@
 
 module Hydrogen.Schema.Surface.Fill
   ( -- * Pattern Repeat
-    PatternRepeat(..)
+    PatternRepeat(RepeatBoth, RepeatX, RepeatY, NoRepeat)
   
   -- * Pattern
   , Pattern(Pattern)
   , pattern
   
   -- * Fill Type
-  , Fill(..)
+  , Fill(FillNone, FillSolid, FillGradient, FillPattern, FillNoise)
   
   -- * Constructors
   , fillNone

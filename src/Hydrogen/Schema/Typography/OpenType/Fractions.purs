@@ -32,8 +32,8 @@
 
 module Hydrogen.Schema.Typography.OpenType.Fractions
   ( -- * Types
-    FractionStyle(..)
-  , Fractions(..)
+    FractionStyle(FractionNormal, FractionDiagonal, FractionStacked)
+  , Fractions(Fractions)
   
   -- * Constructors
   , normal

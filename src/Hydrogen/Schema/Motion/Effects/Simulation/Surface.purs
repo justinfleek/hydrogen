@@ -16,14 +16,14 @@
 module Hydrogen.Schema.Motion.Effects.Simulation.Surface
   ( -- * Shatter
     ShatterEffect
-  , ShatterShape(..)
-  , ShatterForce(..)
+  , ShatterShape(SSGlass, SSBrick, SSPuzzle, SSTriangles, SSCustom)
+  , ShatterForce(SFGradient, SFRadius, SFDepth)
   , defaultShatter
   , shatterWithForce
   
   -- * Card Dance
   , CardDanceEffect
-  , CardDanceAxis(..)
+  , CardDanceAxis(CDAPosition, CDARotation, CDAScale)
   , defaultCardDance
   , cardDanceWithRows
   

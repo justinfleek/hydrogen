@@ -51,14 +51,14 @@ module Hydrogen.Schema.Text.RichText
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Text.RichText.Types
-  ( Block(..)
-  , HeadingLevel(..)
-  , Inline(..)
-  , Language(..)
+  ( Block(Paragraph, Heading, CodeBlock, BlockQuote, List, HorizontalRule)
+  , HeadingLevel(H1, H2, H3, H4, H5, H6)
+  , Inline(TextNode, Bold, Italic, Code, Link, Strikethrough, Underline, Subscript, Superscript)
+  , Language(PlainText, JavaScript, TypeScript, PureScript, Haskell, Lean, Python, Rust, Go, C, Cpp, CSharp, Java, Kotlin, Swift, Ruby, PHP, Elixir, Erlang, Clojure, Scala, FSharp, OCaml, Lua, R, Julia, Zig, Nim, Crystal, Dart, HTML, CSS, SCSS, SASS, Less, JSON, YAML, TOML, XML, Markdown, LaTeX, Bash, Shell, PowerShell, SQL, GraphQL, Protobuf, Dockerfile, Makefile, Nix, Dhall)
   , ListItem
-  , ListType(..)
-  , RichTextDocument(..)
-  , URL(..)
+  , ListType(Bullet, Numbered, Checkbox)
+  , RichTextDocument(RichTextDocument)
+  , URL(URL)
   , documentBlocks
   , emptyDocument
   , languageFromString

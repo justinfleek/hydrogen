@@ -22,7 +22,7 @@ module Hydrogen.Schema.Attestation.DID
   , showDID
   
   -- * DID Methods
-  , DIDMethod(..)
+  , DIDMethod(MethodKey, MethodWeb, MethodEthr, MethodIon, MethodPkh, MethodOther)
   , didMethodLabel
   
   -- * DID Document
@@ -47,7 +47,7 @@ module Hydrogen.Schema.Attestation.DID
   , showVerificationMethod
   
   -- * Verification Method Type
-  , VerificationMethodType(..)
+  , VerificationMethodType(Ed25519VerificationKey2020, EcdsaSecp256k1VerificationKey2019, JsonWebKey2020, X25519KeyAgreementKey2020, Bls12381G1Key2020, Bls12381G2Key2020)
   , verificationMethodTypeLabel
   ) where
 
@@ -62,8 +62,8 @@ import Prelude
   , (<>)
   )
 
-import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), split, joinWith)
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.String (Pattern(Pattern), split, joinWith)
 import Data.Array (length, (!!), drop)
 
 -- ═════════════════════════════════════════════════════════════════════════════

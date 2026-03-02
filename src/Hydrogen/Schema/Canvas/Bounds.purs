@@ -29,7 +29,7 @@ module Hydrogen.Schema.Canvas.Bounds
   , boundsCenter
   
   -- * Coordinate Systems
-  , CoordinateSystem(..)
+  , CoordinateSystem(ScreenCoords, CartesianCoords, NormalizedCoords)
   , allCoordinateSystems
   
   -- * Point Queries

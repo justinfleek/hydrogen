@@ -37,11 +37,11 @@ module Hydrogen.Schema.Audio.Note
   , noteEnd
   
   -- * Extended Properties
-  , NoteProbability(..)
+  , NoteProbability(NoteProbability)
   , noteProbability
   , unwrapNoteProbability
   
-  , VelocityRange(..)
+  , VelocityRange(VelocityRange)
   , velocityRange
   , unwrapVelocityRange
   

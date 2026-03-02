@@ -26,7 +26,7 @@
 
 module Hydrogen.Schema.Audio.Tick
   ( -- * PPQ (Resolution)
-    PPQ(..)
+    PPQ(PPQ)
   , ppq
   , unwrapPPQ
   , ppqBounds
@@ -36,14 +36,14 @@ module Hydrogen.Schema.Audio.Tick
   , ppq960
   
   -- * Tick Position (Absolute)
-  , TickPosition(..)
+  , TickPosition(TickPosition)
   , tickPosition
   , unwrapTickPosition
   , tickPositionBounds
   , tickZero
   
   -- * Tick Duration (Relative)
-  , TickDuration(..)
+  , TickDuration(TickDuration)
   , tickDuration
   , unwrapTickDuration
   , tickDurationBounds

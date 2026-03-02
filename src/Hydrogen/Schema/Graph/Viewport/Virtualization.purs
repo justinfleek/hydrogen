@@ -38,7 +38,7 @@ module Hydrogen.Schema.Graph.Viewport.Virtualization
   , isInWindow
   
   -- * Progressive Loading
-  , LoadingPriority(..)
+  , LoadingPriority(Immediate, High, Normal, Low, Deferred)
   , loadingPriority
   , LoadingRegion
   , loadingRegion

@@ -8,17 +8,17 @@
 
 module Hydrogen.Schema.Motion.Camera3D.Viewport
   ( -- * Custom View State
-    CustomViewState(..)
+    CustomViewState(CustomViewState)
   , mkCustomViewState
   , defaultCustomViewState
   
     -- * Custom Views
-  , CustomViews(..)
+  , CustomViews(CustomViews)
   , mkCustomViews
   , defaultCustomViews
   
     -- * Viewport State
-  , ViewportState(..)
+  , ViewportState(ViewportState)
   , mkViewportState
   , defaultViewportState
   ) where

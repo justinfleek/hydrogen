@@ -29,7 +29,7 @@
 
 module Hydrogen.Schema.Motion.Diffusion.TTM
   ( -- * TTM Model
-    TTMModel(..)
+    TTMModel(TTMWan, TTMCogVideoX, TTMSVD)
   , ttmModelToString
   , ttmModelFromString
   , allTTMModels
@@ -45,7 +45,7 @@ module Hydrogen.Schema.Motion.Diffusion.TTM
   , ttmMaxInferenceSteps
   
   -- * Trajectory Point
-  , TrajectoryPoint(..)
+  , TrajectoryPoint(TrajectoryPoint)
   , mkTrajectoryPoint
   , isValidTrajectoryPoint
   , trajectoryPointAtFrame
@@ -53,24 +53,24 @@ module Hydrogen.Schema.Motion.Diffusion.TTM
   , trajectoryLastPoint
   
   -- * Layer Export
-  , TTMLayerExport(..)
+  , TTMLayerExport(TTMLayerExport)
   , mkTTMLayerExport
   , isValidLayerExport
   
   -- * Model Configuration
-  , TTMModelConfig(..)
+  , TTMModelConfig(TTMModelConfig)
   , mkTTMModelConfig
   , isValidModelConfig
   , defaultModelConfig
   
   -- * Metadata
-  , TTMMetadata(..)
+  , TTMMetadata(TTMMetadata)
   , mkTTMMetadata
   , isValidMetadata
   , metadataLayerCount
   
   -- * TTM Export
-  , TTMExport(..)
+  , TTMExport(TTMExport)
   , mkTTMExport
   , isValidExport
   

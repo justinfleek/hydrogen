@@ -19,7 +19,7 @@ module Hydrogen.Schema.Spatial.Material.StandardSurface.Geometry
   
   -- * Bounded Primitives
   , Opacity
-  , ThinWalled(..)
+  , ThinWalled(ThinWalledTrue, ThinWalledFalse)
   , opacity
   , thinWalled
   ) where

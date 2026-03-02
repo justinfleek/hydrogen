@@ -64,7 +64,7 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, last, foldl)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Number (sqrt, abs, atan2, pi, floor)
 
 import Hydrogen.Schema.Geometry.Point (Point2D(Point2D), point2D)

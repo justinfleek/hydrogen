@@ -16,12 +16,12 @@
 
 module Hydrogen.Schema.Motion.AnimatedTransform.Transform
   ( -- * Animated Transform 2D
-    AnimatedTransform2D(..)
+    AnimatedTransform2D(AnimatedTransform2D)
   , defaultAnimatedTransform2D
   , identityAnimatedTransform2D
   
   -- * Animated Transform 3D
-  , AnimatedTransform3D(..)
+  , AnimatedTransform3D(AnimatedTransform3D)
   , defaultAnimatedTransform3D
   , identityAnimatedTransform3D
   ) where

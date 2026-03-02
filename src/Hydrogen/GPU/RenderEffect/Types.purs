@@ -14,12 +14,39 @@ module Hydrogen.GPU.RenderEffect.Types
   
   -- * Effect Pass Types
   , EffectPass
-  , PassInput(..)
-  , PassOutput(..)
-  , BlendMode(..)
+  , PassInput
+      ( InputPrevious
+      , InputOriginal
+      , InputTexture
+      , InputMultiple
+      )
+  , PassOutput
+      ( OutputNext
+      , OutputFinal
+      , OutputTexture
+      , OutputScreen
+      )
+  , BlendMode
+      ( BlendNormal
+      , BlendAdd
+      , BlendMultiply
+      , BlendScreen
+      , BlendOverlay
+      , BlendSoftLight
+      , BlendHardLight
+      , BlendDifference
+      , BlendExclusion
+      )
   
   -- * Condition Types
-  , EffectCondition(..)
+  , EffectCondition
+      ( ConditionHover
+      , ConditionActive
+      , ConditionFocus
+      , ConditionAnimationPhase
+      , ConditionViewportSize
+      , ConditionAlways
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

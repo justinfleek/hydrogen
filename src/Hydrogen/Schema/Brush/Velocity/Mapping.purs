@@ -61,7 +61,7 @@ import Prelude
   )
 
 import Hydrogen.Schema.Brush.Velocity.Types
-  ( VelocityCurve(..)
+  ( VelocityCurve(VelocityLinear, VelocitySCurve, VelocitySoft, VelocityFirm, VelocityExponential, VelocityLogarithmic)
   )
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -33,28 +33,28 @@
 
 module Hydrogen.Schema.Surface.GlassEffect
   ( -- * Glass Type
-    GlassType(..)
+    GlassType(FrostedGlass, LiquidGlass, AcrylicGlass, MicaGlass, MaterialGlass, CustomGlass)
   
   -- * Fresnel Effect
-  , FresnelConfig(..)
+  , FresnelConfig(FresnelConfig)
   , fresnelConfig
   , defaultFresnel
   , noFresnel
   
   -- * Noise Texture
-  , NoiseConfig(..)
+  , NoiseConfig(NoiseConfig)
   , noiseConfig
   , defaultNoise
   , noNoise
   
   -- * Internal Border
-  , InternalBorder(..)
+  , InternalBorder(InternalBorder)
   , internalBorder
   , defaultInternalBorder
   , noInternalBorder
   
   -- * Glass Effect
-  , GlassEffect(..)
+  , GlassEffect(GlassEffect)
   , glassEffect
   , frostedGlass
   , liquidGlass

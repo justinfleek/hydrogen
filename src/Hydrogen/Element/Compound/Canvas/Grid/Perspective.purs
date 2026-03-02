@@ -129,30 +129,34 @@ getVPAt vps idx =
   else 
     case vps of
       [] -> Nothing
-      _ -> Just (unsafeIndexVP vps idx)
+      _ -> Just (indexVPBounded vps idx)
 
--- For perspective grids, we only have 1-3 vanishing points, so this is safe
-unsafeIndexVP :: Array VanishingPoint -> Int -> VanishingPoint
-unsafeIndexVP vps idx =
+-- | Index into perspective grid vanishing points (max 3 elements).
+-- |
+-- | This function is total — it handles all array sizes via pattern matching
+-- | and provides a fallback for invalid cases. The name "bounded" reflects
+-- | that perspective grids have a bounded number of vanishing points (1-3).
+indexVPBounded :: Array VanishingPoint -> Int -> VanishingPoint
+indexVPBounded vps idx =
   case vps of
     [a] -> a
     [a, b] -> if idx == 0 then a else b
     [a, b, c] -> if idx == 0 then a else if idx == 1 then b else c
     _ -> 
-      -- This case should never happen as perspective grids have 1-3 VPs
-      -- Return first element as fallback
-      case vps of
-        [] -> vanishingPoint 0.0 0.0 0.0  -- Fallback for empty (unreachable)
-        _ -> unsafeGetFirst vps
+      -- Fallback for unexpected array sizes (>3 or empty)
+      -- Perspective grids are constructed with exactly 1-3 VPs
+      getFirstVPOrDefault vps
 
--- Get first element (only called when array is non-empty)
-unsafeGetFirst :: Array VanishingPoint -> VanishingPoint
-unsafeGetFirst vps = 
+-- | Get first element, or return default vanishing point at origin.
+-- |
+-- | Total function — handles empty arrays with a sensible default.
+getFirstVPOrDefault :: Array VanishingPoint -> VanishingPoint
+getFirstVPOrDefault vps = 
   case vps of
     [a] -> a
     [a, _] -> a
     [a, _, _] -> a
-    _ -> vanishingPoint 0.0 0.0 0.0  -- Fallback
+    _ -> vanishingPoint 0.0 0.0 0.0  -- Origin fallback for empty
 
 generateRaysFromVP :: VanishingPoint -> Int -> { x :: Number, y :: Number, width :: Number, height :: Number } -> Array GridLine
 generateRaysFromVP (VanishingPoint vp) rayCount bounds =

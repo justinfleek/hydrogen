@@ -26,7 +26,7 @@
 
 module Hydrogen.Schema.Motion.Layer.Full
   ( -- * Layer Type
-    Layer(..)
+    Layer(Layer)
   , mkLayer
   , mkLayerUnchecked
   
@@ -64,6 +64,7 @@ module Hydrogen.Schema.Motion.Layer.Full
   , extractVideoContent
   , extractTextContent
   , extractGeneratedContent
+  
   ) where
 
 import Prelude
@@ -80,7 +81,7 @@ import Prelude
 import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Motion.Layer 
   ( LayerBase
-  , LayerType(..)
+  , LayerType(LTImage, LTVideo, LTText, LTShape, LTSolid, LTGenerated)
   , layerType
   , layerVisible
   , layerLocked
@@ -88,7 +89,7 @@ import Hydrogen.Schema.Motion.Layer
   , layerEnabled
   )
 import Hydrogen.Schema.Motion.LayerContent
-  ( LayerContent(..)
+  ( LayerContent(LCImage, LCVideo, LCAudio, LCSolid, LCText, LCShape, LCNull, LCCamera, LCLight, LCAdjustment, LCEffect, LCPreComp, LCGroup, LCNestedComp, LCParticle, LCDepth, LCNormal, LCGenerated, LCMatte, LCControl, LCSpline, LCPath, LCPose, LCModel, LCPointCloud, LCDepthflow)
   , contentToLayerType
   , isContentGenerated
   , ImageContent

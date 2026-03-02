@@ -40,12 +40,12 @@
 
 module Hydrogen.Schema.Audio.VoiceCompounds
   ( -- * Persona Types
-    Persona(..)
+    Persona(PersonaNeutral, PersonaFriendly, PersonaAuthoritative, PersonaCalm, PersonaEnergetic, PersonaThoughtful, PersonaPlayful, PersonaEmpathetic)
   , personaName
   , personaDescription
   
   -- * Speaking Style
-  , SpeakingStyle(..)
+  , SpeakingStyle(StyleConversational, StyleNarrative, StyleInstructional, StylePresentational, StyleIntimate, StyleDeclamatory)
   , speakingStyleName
   
   -- * Voice Character Compound
@@ -62,9 +62,9 @@ module Hydrogen.Schema.Audio.VoiceCompounds
   , presetEnthusiasticGuide
   
   -- * Speech Pattern
-  , PausePattern(..)
-  , EmphasisPattern(..)
-  , FillerUsage(..)
+  , PausePattern(PausesMinimal, PausesNatural, PausesDeliberate, PausesDramatic)
+  , EmphasisPattern(EmphasisSubtle, EmphasisNormal, EmphasisStrong, EmphasisVaried)
+  , FillerUsage(FillersNone, FillersRare, FillersNatural, FillersFrequent)
   , SpeechPattern
   , speechPattern
   , speechPatternFluent
@@ -72,7 +72,7 @@ module Hydrogen.Schema.Audio.VoiceCompounds
   , speechPatternDeliberate
   
   -- * Speech Act
-  , SpeechAct(..)
+  , SpeechAct(ActStatement, ActQuestion, ActExclamation, ActCommand, ActGreeting, ActAcknowledgment, ActApology, ActThanks, ActFarewell)
   , speechActName
   
   -- * DialogueTurn
@@ -85,7 +85,7 @@ module Hydrogen.Schema.Audio.VoiceCompounds
   , dialogueAppend
   
   -- * Voice Transition
-  , VoiceTransition(..)
+  , VoiceTransition(TransitionInstant, TransitionSmooth, TransitionCrossfade, TransitionDramatic)
   , transitionDurationMs
   
   -- * Emotional Shift

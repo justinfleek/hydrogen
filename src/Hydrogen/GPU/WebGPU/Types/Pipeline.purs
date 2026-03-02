@@ -24,27 +24,112 @@ module Hydrogen.GPU.WebGPU.Types.Pipeline
     GPUVertexState
   , GPUVertexBufferLayout
   , GPUVertexAttribute
-  , GPUVertexFormat(..)
-  , GPUVertexStepMode(..)
+  , GPUVertexFormat
+      ( Uint8x2
+      , Uint8x4
+      , Sint8x2
+      , Sint8x4
+      , Unorm8x2
+      , Unorm8x4
+      , Snorm8x2
+      , Snorm8x4
+      , Uint16x2
+      , Uint16x4
+      , Sint16x2
+      , Sint16x4
+      , Unorm16x2
+      , Unorm16x4
+      , Snorm16x2
+      , Snorm16x4
+      , Float16x2
+      , Float16x4
+      , Float32
+      , Float32x2
+      , Float32x3
+      , Float32x4
+      , Uint32
+      , Uint32x2
+      , Uint32x3
+      , Uint32x4
+      , Sint32
+      , Sint32x2
+      , Sint32x3
+      , Sint32x4
+      )
+  , GPUVertexStepMode
+      ( StepVertex
+      , StepInstance
+      )
     -- Primitive State
   , GPUPrimitiveState
-  , GPUPrimitiveTopology(..)
-  , GPUCullMode(..)
-  , GPUFrontFace(..)
-  , GPUIndexFormat(..)
+  , GPUPrimitiveTopology
+      ( PointList
+      , LineList
+      , LineStrip
+      , TriangleList
+      , TriangleStrip
+      )
+  , GPUCullMode
+      ( CullNone
+      , CullFront
+      , CullBack
+      )
+  , GPUFrontFace
+      ( FrontCCW
+      , FrontCW
+      )
+  , GPUIndexFormat
+      ( IndexUint16
+      , IndexUint32
+      )
     -- Fragment State
   , GPUFragmentState
   , GPUColorTargetState
   , GPUBlendState
   , GPUBlendComponent
-  , GPUBlendFactor(..)
-  , GPUBlendOperation(..)
-  , GPUColorWriteMask(..)
+  , GPUBlendFactor
+      ( BlendZero
+      , BlendOne
+      , BlendSrc
+      , BlendOneMinusSrc
+      , BlendSrcAlpha
+      , BlendOneMinusSrcAlpha
+      , BlendDst
+      , BlendOneMinusDst
+      , BlendDstAlpha
+      , BlendOneMinusDstAlpha
+      , BlendSrcAlphaSaturated
+      , BlendConstant
+      , BlendOneMinusConstant
+      )
+  , GPUBlendOperation
+      ( BlendAdd
+      , BlendSubtract
+      , BlendReverseSubtract
+      , BlendMin
+      , BlendMax
+      )
+  , GPUColorWriteMask
+      ( WriteRed
+      , WriteGreen
+      , WriteBlue
+      , WriteAlpha
+      , WriteAll
+      )
   , combineColorWriteMask
     -- Depth/Stencil State
   , GPUDepthStencilState
   , GPUStencilFaceState
-  , GPUStencilOperation(..)
+  , GPUStencilOperation
+      ( StencilKeep
+      , StencilZero
+      , StencilReplace
+      , StencilInvert
+      , StencilIncrementClamp
+      , StencilDecrementClamp
+      , StencilIncrementWrap
+      , StencilDecrementWrap
+      )
     -- Multisample State
   , GPUMultisampleState
     -- Pipeline
@@ -56,12 +141,38 @@ module Hydrogen.GPU.WebGPU.Types.Pipeline
   , GPUBindGroupLayoutEntry
   , GPUBindGroupDescriptor
   , GPUBindGroupEntry
-  , BindGroupResourceType(..)
-  , GPUBufferBindingType(..)
-  , GPUSamplerBindingType(..)
-  , GPUTextureSampleType(..)
-  , GPUStorageTextureAccess(..)
-  , GPUShaderStage(..)
+  , BindGroupResourceType
+      ( BufferResource
+      , SamplerResource
+      , TextureViewResource
+      )
+  , GPUBufferBindingType
+      ( BufferUniform
+      , BufferStorage
+      , BufferReadOnlyStorage
+      )
+  , GPUSamplerBindingType
+      ( SamplerFiltering
+      , SamplerNonFiltering
+      , SamplerComparison
+      )
+  , GPUTextureSampleType
+      ( SampleFloat
+      , SampleUnfilterableFloat
+      , SampleDepth
+      , SampleSint
+      , SampleUint
+      )
+  , GPUStorageTextureAccess
+      ( StorageWriteOnly
+      , StorageReadOnly
+      , StorageReadWrite
+      )
+  , GPUShaderStage
+      ( StageVertex
+      , StageFragment
+      , StageCompute
+      )
   , combineShaderStage
   ) where
 

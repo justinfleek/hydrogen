@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Brush.Tip.Types
   ( -- * Tip Shape
-    TipShape(..)
+    TipShape(TipRound, TipFlat, TipFan, TipChisel, TipRake, TipScatter, TipTexture, TipBristle)
   , allTipShapes
   , tipShapeDescription
   , tipShapeToId

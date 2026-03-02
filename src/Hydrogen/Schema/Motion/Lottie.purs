@@ -49,7 +49,7 @@ module Hydrogen.Schema.Motion.Lottie
       )
   
   -- * Playback Config
-  , LottiePlayback(..)
+  , LottiePlayback(LottiePlayback)
   , lottiePlayback
   , defaultPlayback
   , autoplayLoop
@@ -92,7 +92,7 @@ module Hydrogen.Schema.Motion.Lottie
       )
   
   -- * Lottie Animation
-  , LottieAnimation(..)
+  , LottieAnimation(LottieAnimation)
   , lottieAnimation
   , defaultLottie
   , fromUrl

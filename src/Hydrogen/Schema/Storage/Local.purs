@@ -37,7 +37,7 @@ module Hydrogen.Schema.Storage.Local
   , storageValueLength
   
   -- * Local Storage Operations
-  , LocalStorageOp(..)
+  , LocalStorageOp(GetItem, SetItem, RemoveItem, Clear, HasItem, GetAllKeys)
   , getItem
   , setItem
   , removeItem
@@ -52,7 +52,7 @@ module Hydrogen.Schema.Storage.Local
   , opKey
   
   -- * Storage Error
-  , LocalStorageError(..)
+  , LocalStorageError(StorageNotAvailable, QuotaExceeded, SecurityError, SerializationError, KeyNotFound)
   , errorMessage
   , isQuotaError
   , isSecurityError
@@ -85,7 +85,7 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Either (Either(Left, Right))
-import Data.String (length, null, indexOf, take, Pattern(..)) as String
+import Data.String (length, null, indexOf, take, Pattern(Pattern)) as String
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // storage key

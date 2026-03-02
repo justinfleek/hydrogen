@@ -29,7 +29,7 @@
 
 module Hydrogen.Schema.Typography.TextBlock
   ( -- * Alignment
-    TextAlignment(..)
+    TextAlignment(AlignLeft, AlignCenter, AlignRight, AlignJustify, AlignJustifyAll)
   
   -- * Line Types
   , PositionedWord

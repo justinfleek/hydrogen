@@ -14,7 +14,7 @@
 
 module Hydrogen.Schema.Weather.Atmosphere.Layer
   ( -- * Atmospheric Layer
-    AtmosphericLayer(..)
+    AtmosphericLayer(Troposphere, Stratosphere, Mesosphere, Thermosphere, Exosphere)
   , allAtmosphericLayers
   , layerAltitudeRange
   , layerDescription

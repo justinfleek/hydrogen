@@ -20,13 +20,13 @@
 
 module Hydrogen.Element.Compound.Canvas.Selection.Types
   ( -- * Hit Test Result
-    HitTestResult(..)
+    HitTestResult(HitObject, HitHandle, HitGuide, HitNothing)
     
   -- * Handle Type
-  , HandleType(..)
+  , HandleType(HandleTopLeft, HandleTopCenter, HandleTopRight, HandleMiddleLeft, HandleMiddleRight, HandleBottomLeft, HandleBottomCenter, HandleBottomRight, HandleRotation, HandleCenter)
   
   -- * Lasso Path
-  , LassoPath(..)
+  , LassoPath(LassoPath)
   
   -- * Selection Handle
   , SelectionHandle

@@ -29,7 +29,7 @@
 
 module Hydrogen.Schema.Brush.Tilt.Atoms
   ( -- * TiltX (-90 to 90 degrees)
-    TiltX(..)
+    TiltX(TiltX)
   , tiltX
   , tiltXBounds
   , unwrapTiltX
@@ -39,7 +39,7 @@ module Hydrogen.Schema.Brush.Tilt.Atoms
   , tiltXDebugInfo
   
   -- * TiltY (-90 to 90 degrees)
-  , TiltY(..)
+  , TiltY(TiltY)
   , tiltY
   , tiltYBounds
   , unwrapTiltY
@@ -49,7 +49,7 @@ module Hydrogen.Schema.Brush.Tilt.Atoms
   , tiltYDebugInfo
   
   -- * Altitude (0 to 90 degrees)
-  , Altitude(..)
+  , Altitude(Altitude)
   , altitude
   , altitudeBounds
   , unwrapAltitude
@@ -60,7 +60,7 @@ module Hydrogen.Schema.Brush.Tilt.Atoms
   , altitudeDebugInfo
   
   -- * Azimuth (0 to 360 degrees)
-  , Azimuth(..)
+  , Azimuth(Azimuth)
   , azimuth
   , azimuthBounds
   , unwrapAzimuth

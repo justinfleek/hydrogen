@@ -8,18 +8,18 @@
 
 module Hydrogen.Schema.Motion.Camera3D.DepthOfField
   ( -- * Depth of Field Settings
-    DepthOfFieldSettings(..)
+    DepthOfFieldSettings(DepthOfFieldSettings)
   , mkDepthOfFieldSettings
   , defaultDepthOfFieldSettings
   , dofDisabled
   
     -- * Iris Properties
-  , IrisProperties(..)
+  , IrisProperties(IrisProperties)
   , mkIrisProperties
   , defaultIrisProperties
   
     -- * Highlight Properties
-  , HighlightProperties(..)
+  , HighlightProperties(HighlightProperties)
   , mkHighlightProperties
   , defaultHighlightProperties
   ) where

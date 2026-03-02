@@ -29,7 +29,7 @@ module Hydrogen.Schema.Weather.Atmosphere.CloudCover
   , cloudCoverOvercast
   
   -- * Categories
-  , CloudCategory(..)
+  , CloudCategory(SKC, FEW, SCT, BKN, OVC)
   , allCloudCategories
   , cloudCoverToCategory
   , categoryDescription

@@ -19,7 +19,7 @@
 
 module Hydrogen.Schema.Typography.TypeHierarchy
   ( TypeHierarchy
-  , HierarchyLevel(..)
+  , HierarchyLevel(Hero, H1, H2, H3, H4, H5, H6, Body, Small, Caption, Overline)
   , typeHierarchy
   -- Accessors
   , hero

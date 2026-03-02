@@ -27,7 +27,7 @@
 
 module Hydrogen.Schema.Graph.Viewport.Animation
   ( -- * Viewport Animation
-    ViewportTransition(..)
+    ViewportTransition(Instant, Linear, EaseInOut, Spring)
   , viewportTransition
   , instantTransition
   , smoothTransition

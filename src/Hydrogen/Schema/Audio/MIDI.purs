@@ -26,13 +26,13 @@
 
 module Hydrogen.Schema.Audio.MIDI
   ( -- * Channel
-    Channel(..)
+    Channel(Channel)
   , channel
   , unwrapChannel
   , channelBounds
   
   -- * Velocity
-  , Velocity(..)
+  , Velocity(Velocity)
   , velocity
   , unwrapVelocity
   , velocityBounds
@@ -40,7 +40,7 @@ module Hydrogen.Schema.Audio.MIDI
   , linearToVelocity
   
   -- * Pitch Bend
-  , PitchBend(..)
+  , PitchBend(PitchBend)
   , pitchBend
   , unwrapPitchBend
   , pitchBendBounds
@@ -49,8 +49,8 @@ module Hydrogen.Schema.Audio.MIDI
   , normalizedToPitchBend
   
   -- * Control Change
-  , CCNumber(..)
-  , CCValue(..)
+  , CCNumber(CCNumber)
+  , CCValue(CCValue)
   , ccNumber
   , ccValue
   , unwrapCCNumber
@@ -69,13 +69,13 @@ module Hydrogen.Schema.Audio.MIDI
   , ccAllNotesOff
   
   -- * Aftertouch
-  , Aftertouch(..)
+  , Aftertouch(Aftertouch)
   , aftertouch
   , unwrapAftertouch
   , aftertouchBounds
   
   -- * Program Change
-  , Program(..)
+  , Program(Program)
   , program
   , unwrapProgram
   , programBounds

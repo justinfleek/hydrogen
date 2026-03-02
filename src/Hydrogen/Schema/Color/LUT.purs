@@ -26,8 +26,8 @@ module Hydrogen.Schema.Color.LUT
   ( -- * LUT Types
     LUT1D
   , LUT3D
-  , LUTSize(..)
-  , LUT3DSize(..)
+  , LUTSize(Size1K, Size4K, Size16K, Size65K)
+  , LUT3DSize(Cube17, Cube33, Cube65)
   , LUTMetadata
   
   -- * LUT1D Operations
@@ -54,7 +54,7 @@ module Hydrogen.Schema.Color.LUT
   , resizeLUT1D
   
   -- * Format Detection
-  , LUTFormat(..)
+  , LUTFormat(CubeFormat, ThreeDLFormat, CLFFormat, LOOKFormat, CTLFormat, UnknownFormat)
   ) where
 
 import Prelude

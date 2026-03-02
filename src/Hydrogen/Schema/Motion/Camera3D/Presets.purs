@@ -8,7 +8,7 @@
 
 module Hydrogen.Schema.Motion.Camera3D.Presets
   ( -- * Camera Preset
-    CameraPreset(..)
+    CameraPreset(CameraPreset)
   , mkCameraPreset
   
     -- * Standard Presets

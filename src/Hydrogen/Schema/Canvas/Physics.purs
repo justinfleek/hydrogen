@@ -83,7 +83,7 @@ module Hydrogen.Schema.Canvas.Physics
   , gravitiesEqual
   , gravityWithinBand
   , gravityStrongerThan
-  , GravityOrdering(..)
+  , GravityOrdering(GravityWeaker, GravityEqual, GravityStronger)
   , compareGravityStrength
   ) where
 

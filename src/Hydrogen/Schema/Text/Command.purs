@@ -35,15 +35,15 @@
 
 module Hydrogen.Schema.Text.Command
   ( -- * Edit Commands
-    EditCommand(..)
+    EditCommand(InsertText, InsertNewline, InsertTab, Delete, DeleteRange, Format, BlockOp, Navigate, History, Clipboard, Compound)
   
   -- * Text Commands
-  , InsertDirection(..)
-  , DeleteDirection(..)
-  , DeleteScope(..)
+  , InsertDirection(InsertBefore, InsertAfter)
+  , DeleteDirection(DeleteBackward, DeleteForward)
+  , DeleteScope(DeleteChar, DeleteWord, DeleteLine, DeleteBlock, DeleteSelection)
   
   -- * Formatting Commands
-  , FormatCommand(..)
+  , FormatCommand(ToggleBold, ToggleItalic, ToggleCode, ToggleStrikethrough, ToggleUnderline, ToggleSubscript, ToggleSuperscript, SetLink, RemoveLink, ClearFormatting)
   , formatBold
   , formatItalic
   , formatCode
@@ -53,21 +53,21 @@ module Hydrogen.Schema.Text.Command
   , formatClear
   
   -- * Block Commands
-  , BlockCommand(..)
+  , BlockCommand(SplitBlock, MergeWithPrevious, MergeWithNext, SetHeading, SetParagraph, SetCodeBlock, SetBlockQuote, SetBulletList, SetNumberedList, SetCheckboxList, ToggleCheckbox, IndentBlock, OutdentBlock, InsertBlockBefore, InsertBlockAfter, DeleteCurrentBlock, InsertHorizontalRule)
   
   -- * Navigation Commands
-  , NavigationCommand(..)
-  , MoveUnit(..)
-  , SelectionMode(..)
+  , NavigationCommand(MoveLeft, MoveRight, MoveUp, MoveDown, MoveToLineStart, MoveToLineEnd, MoveToBlockStart, MoveToBlockEnd, MoveToDocumentStart, MoveToDocumentEnd, SelectAll, SelectWord, SelectLine, SelectBlock, SetSelection, CollapseSelectionToStart, CollapseSelectionToEnd)
+  , MoveUnit(MoveChar, MoveWord, MoveLine, MoveBlock, MoveDocument)
+  , SelectionMode(MoveCursor, ExtendSelection)
   
   -- * History Commands
-  , HistoryCommand(..)
+  , HistoryCommand(Undo, Redo, UndoAll, RedoAll, ClearHistory)
   
   -- * Clipboard Commands
-  , ClipboardCommand(..)
+  , ClipboardCommand(Cut, Copy, Paste, PastePlain)
   
   -- * Compound Commands
-  , CompoundCommand(..)
+  , CompoundCommand(Atomic, Sequence)
   , atomic
   , sequence
   

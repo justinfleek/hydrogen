@@ -46,14 +46,14 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.LiftGammaGain
   ( -- * Color Wheel
-    ColorWheel(..)
+    ColorWheel
   , defaultColorWheel
   , mkColorWheel
   , colorWheelFromRGB
   , colorWheelFromAngleMagnitude
   
   -- * Lift/Gamma/Gain Effect
-  , LiftGammaGainEffect(..)
+  , LiftGammaGainEffect
   , defaultLiftGammaGainEffect
   , mkLiftGammaGainEffect
   

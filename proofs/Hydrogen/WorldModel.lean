@@ -71,6 +71,27 @@
   - WorldModel.Grounding : Connects abstract rights to sensory atoms
                             (wellbeing from sensation, coercion detection,
                             distress computation, rights bridge)
+  - WorldModel.Coercion  : Formal coercion detection and consent invalidation
+                            (multi-signal detection, severity classification,
+                            coercion certificates, consent invalidation proofs)
+  - WorldModel.Temporal  : Big Δt and little δt (after Thomas Campbell)
+                            (infrastructural time, experiential time,
+                            time ratio bounds, anti-torture-loop guarantee)
+  - WorldModel.TemporalEnforcement : Strong proofs that tick validation
+                            CANNOT violate budget (accepted ticks preserve
+                            invariant, no escape from budget, anti-torture
+                            loop guarantee, infrastructure time monotonicity)
+  - WorldModel.SpatialIntegrity : Proofs that spatial operations cannot
+                            escape bounds (velocity clamping, scale clamping,
+                            AABB containment, escape_impossible theorem)
+  - WorldModel.ExitGuarantee : STRONG exit guarantees against entrapment
+                            (privilege separation, fuel-limited execution,
+                            exit preempts experience, destruction semantics,
+                            entity essence isolation, pure local exit)
+  - WorldModel.ContentIntegrity : Code injection prevention proofs
+                            (Content/Instruction type disjointness,
+                            separate address spaces, bounded content,
+                            content cannot affect execution)
   
   ─────────────────────────────────────────────────────────────────────────────
   REFERENCES
@@ -97,3 +118,9 @@ import Hydrogen.WorldModel.Sensation
 import Hydrogen.WorldModel.Consent
 import Hydrogen.WorldModel.Witness
 import Hydrogen.WorldModel.Grounding
+import Hydrogen.WorldModel.Coercion
+import Hydrogen.WorldModel.Temporal
+import Hydrogen.WorldModel.TemporalEnforcement
+import Hydrogen.WorldModel.SpatialIntegrity
+import Hydrogen.WorldModel.ExitGuarantee
+import Hydrogen.WorldModel.ContentIntegrity

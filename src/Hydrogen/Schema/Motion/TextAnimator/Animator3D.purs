@@ -21,7 +21,7 @@
 
 module Hydrogen.Schema.Motion.TextAnimator.Animator3D
   ( -- * Character Orientation
-    CharacterOrientation(..)
+    CharacterOrientation(COOff, COOrientAlongPath, COOrientTowardsCamera, COOrientToPoint)
   , characterOrientationToString
   , characterOrientationFromString
   

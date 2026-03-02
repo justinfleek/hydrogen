@@ -51,10 +51,10 @@ module Hydrogen.Schema.Audio.Speech
   ) where
 
 import Hydrogen.Schema.Audio.Speech.Types
-  ( Confidence(..)
-  , PhonemeDuration(..)
-  , WordEnd(..)
-  , WordStart(..)
+  ( Confidence(Confidence)
+  , PhonemeDuration(PhonemeDuration)
+  , WordEnd(WordEnd)
+  , WordStart(WordStart)
   , confidence
   , confidenceBounds
   , confidenceHigh
@@ -73,8 +73,8 @@ import Hydrogen.Schema.Audio.Speech.Types
   ) as Types
 
 import Hydrogen.Schema.Audio.Speech.Phonemes
-  ( IPAPhoneme(..)
-  , PhonemeCategory(..)
+  ( IPAPhoneme(PhonemeI, PhonemeE, PhonemeEpsilon, PhonemeAE, PhonemeA, PhonemeO, PhonemeU, PhonemeUpsilon, PhonemeSchwa, PhonemeWedge, PhonemeP, PhonemeB, PhonemeT, PhonemeD, PhonemeK, PhonemeG, PhonemeF, PhonemeV, PhonemeTheta, PhonemeEth, PhonemeS, PhonemeZ, PhonemeSH, PhonemeZH, PhonemeH, PhonemeCH, PhonemeJH, PhonemeM, PhonemeN, PhonemeNG, PhonemeW, PhonemeY, PhonemeR, PhonemeL, PhonemeSilence)
+  , PhonemeCategory(CategoryVowel, CategoryPlosive, CategoryFricative, CategoryAffricate, CategoryNasal, CategoryApproximant, CategorySilence)
   , ipaPhonemeCategory
   , ipaPhonemeSymbol
   , phonemeCategoryName
@@ -90,9 +90,9 @@ import Hydrogen.Schema.Audio.Speech.Recognition
   ) as Recognition
 
 import Hydrogen.Schema.Audio.Speech.Speaker
-  ( SpeakerConfidence(..)
-  , SpeakerEmbedding(..)
-  , SpeakerId(..)
+  ( SpeakerConfidence(SpeakerConfidence)
+  , SpeakerEmbedding(SpeakerEmbedding)
+  , SpeakerId(SpeakerId)
   , SpeakerTurn
   , speakerConfidence
   , speakerConfidenceBounds
@@ -105,9 +105,9 @@ import Hydrogen.Schema.Audio.Speech.Speaker
 
 import Hydrogen.Schema.Audio.Speech.Quality
   ( DetectedLanguage
-  , Intelligibility(..)
-  , LanguageCode(..)
-  , SignalToNoise(..)
+  , Intelligibility(Intelligibility)
+  , LanguageCode(LangEN, LangES, LangFR, LangDE, LangIT, LangPT, LangRU, LangZH, LangJA, LangKO, LangAR, LangHI, LangOther)
+  , SignalToNoise(SignalToNoise)
   , detectedLanguage
   , intelligibility
   , intelligibilityBounds

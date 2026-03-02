@@ -34,7 +34,7 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Transform
   
   -- * Polar Coordinates Effect
   , PolarCoordinatesEffect
-  , PolarType(..)
+  , PolarType(PTRectToPolar, PTPolarToRect)
   , defaultPolarCoordinates
   
   -- * Transform Effect

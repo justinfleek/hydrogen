@@ -73,7 +73,7 @@ module Hydrogen.Schema.Physics.Collision
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Physics.Collision.Point
-  ( Point2D(..)
+  ( Point2D(Point2D)
   , point2D
   , origin2D
   , distance
@@ -85,7 +85,7 @@ import Hydrogen.Schema.Physics.Collision.Point
   ) as Point
 
 import Hydrogen.Schema.Physics.Collision.Volumes
-  ( AABB(..)
+  ( AABB(AABB)
   , aabb
   , aabbFromPoints
   , aabbCenter
@@ -94,23 +94,23 @@ import Hydrogen.Schema.Physics.Collision.Volumes
   , aabbContains
   , aabbExpand
   , aabbMerge
-  , BoundingCircle(..)
+  , BoundingCircle(BoundingCircle)
   , boundingCircle
   , circleContains
   , circleExpand
   , circleMerge
-  , BoundingCapsule(..)
+  , BoundingCapsule(BoundingCapsule)
   , boundingCapsule
   , capsuleContains
   , pointToSegmentDistance
-  , OBB(..)
+  , OBB(OBB)
   , obb
   , obbCorners
   , obbContains
   ) as Volumes
 
 import Hydrogen.Schema.Physics.Collision.Contact
-  ( Contact(..)
+  ( Contact(NoContact, Contact)
   , contact
   , noContact
   , hasContact
@@ -133,7 +133,7 @@ import Hydrogen.Schema.Physics.Collision.Detection
   ) as Detection
 
 import Hydrogen.Schema.Physics.Collision.Response
-  ( CollisionResponse(..)
+  ( CollisionResponse(ResponseNone, ResponseBounce, ResponseSlide, ResponseStick, ResponseCustom)
   , responseNone
   , responseBounce
   , responseSlide
@@ -144,15 +144,15 @@ import Hydrogen.Schema.Physics.Collision.Response
   ) as Response
 
 import Hydrogen.Schema.Physics.Collision.Layers
-  ( CollisionLayer(..)
-  , CollisionMask(..)
+  ( CollisionLayer(CollisionLayer)
+  , CollisionMask(CollisionMask)
   , layerCollides
   , allLayers
   , noLayers
   ) as Layers
 
 import Hydrogen.Schema.Physics.Collision.State
-  ( CollisionState(..)
+  ( CollisionState(NotColliding, Colliding, Separating, Resting, Sliding, Rolling)
   , isColliding
   , isSeparating
   , isResting

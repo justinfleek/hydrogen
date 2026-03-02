@@ -88,7 +88,7 @@ module Hydrogen.Schema.Physics.Projective.Core
   , predictPosition
   
   -- * Constraint Types
-  , PDConstraintType(..)
+  , PDConstraintType(DistancePDConstraint, BendingPDConstraint, StretchPDConstraint, AttachmentPDConstraint, VolumePDConstraint, CollisionPDConstraint)
   , allPDConstraintTypes
   , pdConstraintStiffness
   
@@ -182,7 +182,7 @@ import Prelude
   )
 
 import Data.Array (length, foldl, mapWithIndex, filter, zipWith, index) as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Int (toNumber) as Int
 import Data.Number (sqrt, abs) as Num
 

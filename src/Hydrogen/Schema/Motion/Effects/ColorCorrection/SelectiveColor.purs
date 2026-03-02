@@ -35,23 +35,23 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.SelectiveColor
   ( -- * Color Range
-    ColorRange(..)
+    ColorRange(RangeReds, RangeYellows, RangeGreens, RangeCyans, RangeBlues, RangeMagentas, RangeWhites, RangeNeutrals, RangeBlacks)
   , colorRangeToString
   , colorRangeFromString
   , allColorRanges
   
   -- * Correction Method
-  , CorrectionMethod(..)
+  , CorrectionMethod(Relative, Absolute)
   , correctionMethodToString
   , correctionMethodFromString
   
   -- * CMYK Adjustment
-  , CMYKAdjustment(..)
+  , CMYKAdjustment
   , defaultCMYKAdjustment
   , mkCMYKAdjustment
   
   -- * Selective Color Effect
-  , SelectiveColorEffect(..)
+  , SelectiveColorEffect
   , defaultSelectiveColorEffect
   , mkSelectiveColorEffect
   

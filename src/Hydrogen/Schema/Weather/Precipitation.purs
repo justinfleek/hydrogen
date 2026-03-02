@@ -42,7 +42,7 @@ module Hydrogen.Schema.Weather.Precipitation
   , module Hydrogen.Schema.Weather.Precipitation.Hail
   
   -- * Precipitation Event
-  , PrecipitationEvent(..)
+  , PrecipitationEvent(RainEvent, SnowEvent, SleetEvent, HailEvent, FreezingRainEvent, MixedEvent)
   , rainEvent
   , snowEvent
   , sleetEvent
@@ -78,7 +78,7 @@ import Hydrogen.Schema.Bounded as Bounded
 
 -- Re-export all submodules
 import Hydrogen.Schema.Weather.Precipitation.Types
-  ( PrecipitationType(..)
+  ( PrecipitationType(Rain, Drizzle, Snow, Sleet, FreezingRain, Hail, Graupel, IcePellets, MixedRainSnow, MixedSleet)
   , allPrecipitationTypes
   , isLiquid
   , isFrozen
@@ -100,7 +100,7 @@ import Hydrogen.Schema.Weather.Precipitation.Rate
   , rateHeavy
   , rateViolent
   , rateTorrential
-  , Intensity(..)
+  , Intensity(IntensityNone, IntensityTrace, IntensityLight, IntensityModerate, IntensityHeavy, IntensityViolent)
   , allIntensities
   , rateToIntensity
   , intensityToMinRate
@@ -124,7 +124,7 @@ import Hydrogen.Schema.Weather.Precipitation.Rain
   )
 
 import Hydrogen.Schema.Weather.Precipitation.Snow
-  ( SnowflakeType(..)
+  ( SnowflakeType(Plates, StellarDendrites, Columns, Needles, SpatialDendrites, CappedColumns, IrregularCrystals, SnowGraupel, SleetCrystals)
   , allSnowflakeTypes
   , snowflakeDescription
   , SnowDensity
@@ -153,7 +153,7 @@ import Hydrogen.Schema.Weather.Precipitation.Hail
   , hailGolfBall
   , hailTennisBall
   , hailSoftball
-  , HailCategory(..)
+  , HailCategory(HailSmall, HailSevere, HailSignificant, HailGiant)
   , allHailCategories
   , hailToCategory
   , categoryToMinDiameter

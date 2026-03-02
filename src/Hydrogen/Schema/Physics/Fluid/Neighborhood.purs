@@ -76,7 +76,7 @@ module Hydrogen.Schema.Physics.Fluid.Neighborhood
   , rebuildGrid
   
   -- * Octree Node
-  , OctreeNode(..)
+  , OctreeNode(OctreeLeaf, OctreeBranch)
   , OctreeConfig
   , mkOctreeConfig
   , maxParticlesPerNode
@@ -115,7 +115,7 @@ module Hydrogen.Schema.Physics.Fluid.Neighborhood
   , cacheHitRate
   
   -- * Search Strategy
-  , SearchStrategy(..)
+  , SearchStrategy(StrategyUniformGrid, StrategyOctree, StrategyHashGrid, StrategyBruteForce)
   , allSearchStrategies
   , chooseStrategy
   , strategyComplexity
@@ -150,7 +150,7 @@ import Prelude
   )
 
 import Data.Array (length, filter, foldl, snoc, concat, index) as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Int (floor, toNumber) as Int
 import Data.Number (sqrt, abs) as Num
 

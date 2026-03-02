@@ -20,7 +20,7 @@
 module Hydrogen.Schema.Motion.Effects.Generate.Patterns
   ( -- * Cell Pattern
     CellPatternEffect
-  , CellType(..)
+  , CellType(CTBubbles, CTPipes, CTCrystals, CTMixed, CTPlates, CTSoft)
   , defaultCellPattern
   , cellPatternWithType
   
@@ -31,13 +31,13 @@ module Hydrogen.Schema.Motion.Effects.Generate.Patterns
   
   -- * Grid
   , GridEffect
-  , GridType(..)
+  , GridType(GTLines, GTRectangles)
   , defaultGrid
   , gridWithSize
   
   -- * Fractal
   , FractalEffect
-  , FractalNoiseType(..)
+  , FractalNoiseType(FNTBasic, FNTTurbulentSmooth, FNTTurbulentSharp, FNTDynamic, FNTDynamicTwist, FNTSplineTurbulence)
   , defaultFractal
   , fractalWithComplexity
   
@@ -76,7 +76,7 @@ import Prelude
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, origin, point2D)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMNormal))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // cell // pattern

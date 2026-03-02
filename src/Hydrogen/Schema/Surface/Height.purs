@@ -116,7 +116,7 @@ import Prelude
   )
 
 import Data.Array (length, index, updateAt, replicate, filter, foldl) as Array
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Number (sqrt, atan2, abs) as Num
 import Data.Int (toNumber) as Int
 

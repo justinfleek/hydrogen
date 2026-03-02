@@ -9,18 +9,18 @@
 
 module Hydrogen.Schema.Reactive.NetworkState
   ( -- * Connection Status
-    ConnectionStatus(..)
+    ConnectionStatus(Online, Offline, Reconnecting)
   , isOnline
   , isOffline
   , isReconnecting
   -- * Connection Type
-  , ConnectionType(..)
+  , ConnectionType(Wifi, Cellular, Ethernet, Bluetooth, Wimax, None, UnknownType)
   , isWifi
   , isCellular
   , isEthernet
   , isUnknownType
   -- * Effective Connection Type (Network Information API)
-  , EffectiveType(..)
+  , EffectiveType(Slow2g, Ect2g, Ect3g, Ect4g)
   , isSlow2g
   , is2g
   , is3g
@@ -33,13 +33,13 @@ module Hydrogen.Schema.Reactive.NetworkState
   , isLowQuality
   , shouldReduceData
   -- * Latency Atoms
-  , RoundTripTime(..)
+  , RoundTripTime(RoundTripTime)
   , rttMs
   , unwrapRtt
   , isLowLatency
   , isHighLatency
   -- * Bandwidth Atoms
-  , Downlink(..)
+  , Downlink(Downlink)
   , downlinkMbps
   , unwrapDownlink
   , isFastDownlink

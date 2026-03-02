@@ -25,7 +25,7 @@
 -- | - Geometry.Angle (Degrees)
 
 module Hydrogen.Schema.Geometry.Symmetry.Reflection
-  ( ReflectionAxis(..)
+  ( ReflectionAxis(ReflectionAxis)
   , reflectionAxis
   , horizontalAxis
   , verticalAxis

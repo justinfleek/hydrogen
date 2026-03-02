@@ -23,9 +23,9 @@
 
 module Hydrogen.Schema.Spatial.Bounds.Frustum
   ( -- * Types
-    Plane(..)
-  , Frustum(..)
-  , FrustumPlane(..)
+    Plane(Plane)
+  , Frustum(Frustum)
+  , FrustumPlane(Near, Far, Left, Right, Top, Bottom)
   
   -- * Plane Constructors
   , plane

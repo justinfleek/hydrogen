@@ -24,7 +24,7 @@
 
 module Hydrogen.Schema.Motion.Transform
   ( -- * Layer Transform 2D
-    LayerTransform2D(..)
+    LayerTransform2D(LayerTransform2D)
   , defaultTransform2D
   , identityTransform2D
   , transform2DPosition
@@ -34,7 +34,7 @@ module Hydrogen.Schema.Motion.Transform
   , transform2DOpacity
   
   -- * Layer Transform 3D
-  , LayerTransform3D(..)
+  , LayerTransform3D(LayerTransform3D)
   , defaultTransform3D
   , identityTransform3D
   , transform3DPosition
@@ -45,16 +45,16 @@ module Hydrogen.Schema.Motion.Transform
   , transform3DOpacity
   
   -- * Position Types
-  , Position2D(..)
-  , Position3D(..)
+  , Position2D(Position2D)
+  , Position3D(Position3D)
   , mkPosition2D
   , mkPosition3D
   , positionZero2D
   , positionZero3D
   
   -- * Scale Types
-  , Scale2D(..)
-  , Scale3D(..)
+  , Scale2D(Scale2D)
+  , Scale3D(Scale3D)
   , mkScale2D
   , mkScale3D
   , scaleIdentity2D
@@ -63,9 +63,9 @@ module Hydrogen.Schema.Motion.Transform
   , scaleUniform3D
   
   -- * Rotation Types
-  , Rotation(..)
-  , Rotation3D(..)
-  , Orientation(..)
+  , Rotation(Rotation)
+  , Rotation3D(Rotation3D)
+  , Orientation(Orientation)
   , mkRotation
   , mkRotation3D
   , mkOrientation
@@ -74,8 +74,8 @@ module Hydrogen.Schema.Motion.Transform
   , orientationZero
   
   -- * Anchor Point
-  , AnchorPoint2D(..)
-  , AnchorPoint3D(..)
+  , AnchorPoint2D(AnchorPoint2D)
+  , AnchorPoint3D(AnchorPoint3D)
   , mkAnchorPoint2D
   , mkAnchorPoint3D
   , anchorCenter2D
@@ -83,7 +83,7 @@ module Hydrogen.Schema.Motion.Transform
   , anchorTopLeft2D
   
   -- * Opacity
-  , Opacity(..)
+  , Opacity(Opacity)
   , mkOpacity
   , opacityFull
   , opacityHalf

@@ -27,7 +27,7 @@
 -- | https://www.w3.org/TR/wai-aria-1.2/#landmark_roles
 module Hydrogen.Schema.Accessibility.Landmark
   ( -- * Landmark Role
-    LandmarkRole(..)
+    LandmarkRole(LandmarkBanner, LandmarkComplementary, LandmarkContentinfo, LandmarkForm, LandmarkMain, LandmarkNavigation, LandmarkRegion, LandmarkSearch)
   , landmarkToString
   , landmarkFromString
     -- * Landmark Queries
@@ -37,7 +37,7 @@ module Hydrogen.Schema.Accessibility.Landmark
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // landmark role

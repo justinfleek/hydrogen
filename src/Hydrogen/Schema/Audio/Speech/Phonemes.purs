@@ -20,11 +20,11 @@
 
 module Hydrogen.Schema.Audio.Speech.Phonemes
   ( -- * Phoneme Category
-    PhonemeCategory(..)
+    PhonemeCategory(CategoryVowel, CategoryPlosive, CategoryFricative, CategoryAffricate, CategoryNasal, CategoryApproximant, CategorySilence)
   , phonemeCategoryName
   
   -- * IPA Phonemes
-  , IPAPhoneme(..)
+  , IPAPhoneme(PhonemeI, PhonemeE, PhonemeEpsilon, PhonemeAE, PhonemeA, PhonemeO, PhonemeU, PhonemeUpsilon, PhonemeSchwa, PhonemeWedge, PhonemeP, PhonemeB, PhonemeT, PhonemeD, PhonemeK, PhonemeG, PhonemeF, PhonemeV, PhonemeTheta, PhonemeEth, PhonemeS, PhonemeZ, PhonemeSH, PhonemeZH, PhonemeH, PhonemeCH, PhonemeJH, PhonemeM, PhonemeN, PhonemeNG, PhonemeW, PhonemeY, PhonemeR, PhonemeL, PhonemeSilence)
   , ipaPhonemeSymbol
   , ipaPhonemeCategory
   ) where

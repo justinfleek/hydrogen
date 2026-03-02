@@ -23,7 +23,7 @@
 
 module Hydrogen.Schema.Brush.Pressure.Atoms
   ( -- * Pressure (0.0-1.0)
-    Pressure(..)
+    Pressure(Pressure)
   , pressure
   , pressureBounds
   , unwrapPressure
@@ -33,7 +33,7 @@ module Hydrogen.Schema.Brush.Pressure.Atoms
   , pressureDebugInfo
   
   -- * PressureMin (0.0-1.0)
-  , PressureMin(..)
+  , PressureMin(PressureMin)
   , pressureMin
   , pressureMinBounds
   , unwrapPressureMin
@@ -41,7 +41,7 @@ module Hydrogen.Schema.Brush.Pressure.Atoms
   , pressureMinDebugInfo
   
   -- * PressureMax (0.0-1.0)
-  , PressureMax(..)
+  , PressureMax(PressureMax)
   , pressureMax
   , pressureMaxBounds
   , unwrapPressureMax

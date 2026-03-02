@@ -13,14 +13,14 @@
 
 module Hydrogen.Schema.Engineering.Tolerance.Characteristic
   ( -- * Geometric Characteristics
-    GeometricCharacteristic(..)
+    GeometricCharacteristic(Straightness, Flatness, Circularity, Cylindricity, Perpendicularity, Angularity, Parallelism, Position, Concentricity, Symmetry, CircularRunout, TotalRunout, ProfileOfLine, ProfileOfSurface)
   , allGeometricCharacteristics
   , characteristicSymbol
   , characteristicCategory
   , characteristicDescription
   
   -- * Tolerance Categories
-  , ToleranceCategory(..)
+  , ToleranceCategory(Form, Orientation, Location, Runout, Profile)
   , allToleranceCategories
   
   -- * Operations

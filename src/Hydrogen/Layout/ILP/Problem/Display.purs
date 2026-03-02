@@ -34,18 +34,18 @@ import Prelude
   )
 
 import Data.Array (length) as Data.Array
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldl)
 
 import Hydrogen.Layout.ILP.Problem.Types
-  ( Sense(..)
-  , VarType(..)
+  ( Sense(Minimize, Maximize)
+  , VarType(Continuous, Integer)
   , VarSpec
-  , ConstraintSense(..)
+  , ConstraintSense(Le, Eq, Ge)
   , ConstraintRow
   , ILPProblem
-  , SolveStatus(..)
+  , SolveStatus(Optimal, Feasible, Infeasible, Unbounded, NotSolved)
   )
 
 import Hydrogen.Layout.ILP.Problem.Variables

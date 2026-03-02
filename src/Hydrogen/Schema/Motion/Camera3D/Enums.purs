@@ -8,49 +8,49 @@
 
 module Hydrogen.Schema.Motion.Camera3D.Enums
   ( -- * Camera Type
-    CameraType(..)
+    CameraType(CTOneNode, CTTwoNode)
   , allCameraTypes
   , cameraTypeToString
   , cameraTypeFromString
   
     -- * Auto Orient Mode
-  , AutoOrientMode(..)
+  , AutoOrientMode(AOMOff, AOMOrientAlongPath, AOMOrientTowardsPOI)
   , allAutoOrientModes
   , autoOrientModeToString
   , autoOrientModeFromString
   
     -- * Measure Film Size
-  , MeasureFilmSize(..)
+  , MeasureFilmSize(MFSHorizontal, MFSVertical, MFSDiagonal)
   , allMeasureFilmSizes
   , measureFilmSizeToString
   , measureFilmSizeFromString
   
     -- * Wireframe Visibility
-  , WireframeVisibility(..)
+  , WireframeVisibility(WVAlways, WVSelected, WVOff)
   , allWireframeVisibilities
   , wireframeVisibilityToString
   , wireframeVisibilityFromString
   
     -- * View Type
-  , ViewType(..)
+  , ViewType(VTActiveCamera, VTCustom1, VTCustom2, VTCustom3, VTFront, VTBack, VTLeft, VTRight, VTTop, VTBottom)
   , allViewTypes
   , viewTypeToString
   , viewTypeFromString
   
     -- * View Layout
-  , ViewLayout(..)
+  , ViewLayout(VLOneView, VLTwoViewHorizontal, VLTwoViewVertical, VLFourView)
   , allViewLayouts
   , viewLayoutToString
   , viewLayoutFromString
   
     -- * Spatial Interpolation
-  , SpatialInterpolation(..)
+  , SpatialInterpolation(SILinear, SIBezier, SIAutoBezier, SIContinuousBezier)
   , allSpatialInterpolations
   , spatialInterpolationToString
   , spatialInterpolationFromString
   
     -- * Temporal Interpolation
-  , TemporalInterpolation(..)
+  , TemporalInterpolation(TILinear, TIBezier, TIHold)
   , allTemporalInterpolations
   , temporalInterpolationToString
   , temporalInterpolationFromString

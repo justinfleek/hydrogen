@@ -42,7 +42,7 @@ module Hydrogen.Schema.Compute.Graph
 
 -- Re-export all types and construction
 import Hydrogen.Schema.Compute.Graph.Types
-  ( NodeId(..)
+  ( NodeId(NodeId)
   , unwrapNodeId
   , Port
   , TensorRef

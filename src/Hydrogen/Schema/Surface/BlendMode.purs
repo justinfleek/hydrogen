@@ -35,11 +35,11 @@
 
 module Hydrogen.Schema.Surface.BlendMode
   ( -- * Blend Mode Type
-    BlendMode(..)
+    BlendMode(BlendNormal, BlendDissolve, BlendDarken, BlendMultiply, BlendColorBurn, BlendLinearBurn, BlendDarkerColor, BlendLighten, BlendScreen, BlendColorDodge, BlendLinearDodge, BlendLighterColor, BlendOverlay, BlendSoftLight, BlendHardLight, BlendVividLight, BlendLinearLight, BlendPinLight, BlendHardMix, BlendDifference, BlendExclusion, BlendSubtract, BlendDivide, BlendHue, BlendSaturation, BlendColor, BlendLuminosity)
   , allBlendModes
   
   -- * Category Groupings
-  , BlendCategory(..)
+  , BlendCategory(CategoryNormal, CategoryDarken, CategoryLighten, CategoryContrast, CategoryInversion, CategoryComponent)
   , allBlendCategories
   , blendCategory
   , blendModesInCategory

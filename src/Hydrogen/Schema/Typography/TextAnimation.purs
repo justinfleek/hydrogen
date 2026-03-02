@@ -31,25 +31,25 @@
 
 module Hydrogen.Schema.Typography.TextAnimation
   ( -- * Target Levels
-    TextTarget(..)
+    TextTarget(TargetBlock, TargetLine, TargetWord, TargetCharacter, TargetContour, TargetControlPoint)
   
   -- * Animation Scope
-  , AnimationScope(..)
+  , AnimationScope(ScopeIndividual, ScopeStaggered, ScopeSynchronized)
   
   -- * Range Selectors
-  , CharacterRange(..)
-  , WordRange(..)
-  , LineRange(..)
+  , CharacterRange(CharSingle, CharRange, CharAll, CharEveryNth)
+  , WordRange(WordSingle, WordRange, WordAll, WordEveryNth)
+  , LineRange(LineSingle, LineRange, LineAll, LineEveryNth)
   
   -- * Control Point Selectors
-  , PointSelector(..)
+  , PointSelector(PointSingle, PointRange, ContourAll, AllContours)
   
   -- * Compound Selectors
   , TextSelector
   
-  -- * Stagger Patterns
-  , StaggerDirection(..)
-  , StaggerPattern(..)
+  -- * Stagger Patterns (re-exported type aliases)
+  , StaggerDirection
+  , StaggerPattern
   
   -- * Selector Constructors
   , selectCharacter

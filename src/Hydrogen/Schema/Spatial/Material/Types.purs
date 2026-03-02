@@ -36,16 +36,16 @@
 
 module Hydrogen.Schema.Spatial.Material.Types
   ( -- * Material Types
-    StandardPBR(..)
-  , UnlitMaterial(..)
-  , TransparentMaterial(..)
-  , SubsurfaceMaterial(..)
-  , ClothMaterial(..)
-  , HairMaterial(..)
-  , ToonMaterial(..)
+    StandardPBR(StandardPBR)
+  , UnlitMaterial(UnlitMaterial)
+  , TransparentMaterial(TransparentMaterial)
+  , SubsurfaceMaterial(SubsurfaceMaterial)
+  , ClothMaterial(ClothMaterial)
+  , HairMaterial(HairMaterial)
+  , ToonMaterial(ToonMaterial)
   
   -- * Unified Material
-  , Material(..)
+  , Material(MatStandardPBR, MatUnlit, MatTransparent, MatSubsurface, MatCloth, MatHair, MatToon)
   
   -- * Constructors
   , standardPBR
@@ -70,8 +70,8 @@ module Hydrogen.Schema.Spatial.Material.Types
   , isDoubleSided
   
   -- * Blending
-  , BlendMode(..)
-  , AlphaMode(..)
+  , BlendMode(BlendOpaque, BlendAlpha, BlendPremultiplied, BlendAdditive, BlendMultiply)
+  , AlphaMode(AlphaOpaque, AlphaMask, AlphaBlend)
   ) where
 
 import Prelude

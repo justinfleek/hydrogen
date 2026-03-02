@@ -52,7 +52,7 @@ module Hydrogen.Schema.Brand.Token.Shadow
   , shadowInset
   
   -- * Elevation Level
-  , ElevationLevel(..)
+  , ElevationLevel(Elevation0, Elevation1, Elevation2, Elevation3, Elevation4, Elevation5)
   , elevationToInt
   , elevationFromInt
   , elevationToString

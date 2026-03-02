@@ -20,43 +20,43 @@
 
 module Hydrogen.Schema.Motion.Property
   ( -- * Property Value Type
-    PropertyValueType(..)
+    PropertyValueType(PVTNumber, PVTPosition, PVTColor, PVTEnum, PVTVector3)
   , propertyValueTypeToString
   , propertyValueTypeFromString
   , isPropertyValueNumeric
   , isPropertyValueVector
   
   -- * Property Expression
-  , PropertyExpression(..)
+  , PropertyExpression(PropertyExpression)
   , defaultPropertyExpression
   , propertyExpressionEnabled
   
   -- * Expression Type
-  , ExpressionType(..)
+  , ExpressionType(ETWiggle, ETTime, ETLoop, ETLinear, ETHold, ETSmooth, ETThisProperty, ETComp, ETLayer, ETMarker, ETAdd, ETSubtract, ETMultiply, ETDivide, ETModulo, ETLength, ETNormalize, ETDistance, ETClamp, ETLerp, ETNoise, ETSimplexNoise, ETAudioSpectrum, ETAudioLevel, ETCustom)
   , expressionTypeToString
   , expressionTypeFromString
   , isExpressionTypeMath
   , isExpressionTypeTime
   
   -- * Animatable Property Identifier
-  , AnimatablePropertyId(..)
+  , AnimatablePropertyId(AnimatablePropertyId)
   , mkAnimatablePropertyId
   , unwrapAnimatablePropertyId
   
   -- * Animatable Property
-  , AnimatableProperty(..)
+  , AnimatableProperty(AnimatableProperty)
   , defaultAnimatableProperty
   , propertyAnimated
   , propertyHasKeyframes
   , propertyHasExpression
   
   -- * Property Group
-  , PropertyGroup(..)
+  , PropertyGroup(PropertyGroup)
   , propertyGroupName
   , propertyGroupProperties
   
   -- * Property Path
-  , PropertyPath(..)
+  , PropertyPath(PropertyPath)
   , propertyPathToString
   , propertyPathFromString
   ) where

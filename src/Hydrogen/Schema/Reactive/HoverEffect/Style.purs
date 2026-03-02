@@ -21,8 +21,8 @@
 -- | - Creates more realistic depth perception
 
 module Hydrogen.Schema.Reactive.HoverEffect.Style
-  ( HoverStyle(..)
-  , OpacityChange(..)
+  ( HoverStyle(HoverStyle)
+  , OpacityChange(OpacityAbsolute, OpacityRelative, OpacityUnchanged)
   , hoverStyle
   , identityStyle
   , defaultHoverStyle

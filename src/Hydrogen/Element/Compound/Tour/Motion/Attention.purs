@@ -20,7 +20,7 @@
 
 module Hydrogen.Element.Compound.Tour.Motion.Attention
   ( -- * Pattern Types
-    AttentionPattern(..)
+    AttentionPattern(AttentionPulse, AttentionBeacon, AttentionMagnetic, AttentionCelebration, AttentionNone)
   
     -- * Configuration Types
   , PulseConfig

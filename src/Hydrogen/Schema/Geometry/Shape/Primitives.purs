@@ -48,12 +48,12 @@ module Hydrogen.Schema.Geometry.Shape.Primitives
   -- * Spiral
   , SpiralShape
   , spiralShape
-  , SpiralDirection(..)
+  , SpiralDirection(SpiralClockwise, SpiralCounterclockwise)
   
   -- * Arrow
   , ArrowShape
   , arrowShape
-  , ArrowHeadStyle(..)
+  , ArrowHeadStyle(ArrowTriangle, ArrowStealth, ArrowDiamond, ArrowCircle, ArrowSquare, ArrowNone)
   
   -- * Cross
   , CrossShape

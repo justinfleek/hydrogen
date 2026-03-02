@@ -9,13 +9,13 @@
 
 module Hydrogen.Schema.Reactive.SelectionState
   ( -- * Selection Mode
-    SelectionMode(..)
+    SelectionMode(SelectionNone, SelectionSingle, SelectionMultiple, SelectionRange)
   , isSingleMode
   , isMultipleMode
   , isRangeMode
   , isNoneMode
   -- * Selection Status (per item)
-  , SelectionStatus(..)
+  , SelectionStatus(Selected, Unselected, Indeterminate)
   , isSelected
   , isUnselected
   , isIndeterminate
@@ -57,7 +57,7 @@ module Hydrogen.Schema.Reactive.SelectionState
   , isNoneSelected
   , isSomeSelected
   -- * Hierarchical Selection (Compound)
-  , HierarchicalStatus(..)
+  , HierarchicalStatus(FullySelected, PartiallySelected, NotSelected)
   , isFullySelected
   , isPartiallySelected
   , isNotSelected

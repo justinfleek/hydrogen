@@ -27,34 +27,34 @@
 
 module Hydrogen.Schema.Motion.Composition
   ( -- * Composition Settings
-    CompositionSettings(..)
+    CompositionSettings(CompositionSettings)
   , defaultCompositionSettings
   , mkCompositionSettings
   
   -- * Composition Identifier
-  , CompositionId(..)
+  , CompositionId(CompositionId)
   , mkCompositionId
   
   -- * Blend Mode
-  , BlendMode(..)
+  , BlendMode(BMNormal, BMMultiply, BMScreen, BMOverlay, BMDarken, BMColorBurn, BMLinearBurn, BMDarkerColor, BMLighten, BMColorDodge, BMLinearDodge, BMLighterColor, BMHardLight, BMSoftLight, BMVividLight, BMLinearLight, BMPinLight, BMHardMix, BMDifference, BMExclusion, BMSubtract, BMDivide, BMHue, BMSaturation, BMColor, BMLuminosity, BMAdd, BMDissolve)
   , blendModeToString
   , blendModeFromString
   , isBlendModeAdditive
   , isBlendModeSubtractive
   
   -- * Track Matte Mode
-  , TrackMatteMode(..)
+  , TrackMatteMode(TMNone, TMAlpha, TMAlphaInverted, TMLuma, TMLumaInverted)
   , trackMatteModeToString
   , trackMatteModeFromString
   
   -- * Motion Blur Settings
-  , MotionBlurSettings(..)
+  , MotionBlurSettings(MotionBlurSettings)
   , defaultMotionBlurSettings
   , motionBlurEnabled
   
   -- * Color Settings
-  , ColorSpace(..)
-  , BitDepth(..)
+  , ColorSpace(CSSrgb, CSLinearSrgb, CSRec709, CSRec2020, CSDciP3, CSAcesCg, CSAces2065)
+  , BitDepth(BD8Bit, BD16Bit, BD32Bit)
   
   -- * Accessors
   , compositionWidth

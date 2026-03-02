@@ -54,13 +54,13 @@ module Hydrogen.Schema.Brand.Token.Color
   , colorTokenMeta
   
   -- * Color Roles
-  , ColorRole(..)
+  , ColorRole(RolePrimary, RoleSecondary, RoleTertiary, RoleAccent, RoleNeutral, RoleBackground, RoleSurface, RoleSuccess, RoleWarning, RoleError, RoleInfo, RoleOnPrimary, RoleOnSecondary, RoleOnBackground, RoleOnSurface, RoleOutline, RoleScrim)
   , roleToString
   , roleFromString
   , allRoles
   
   -- * Color Shade
-  , ColorShade(..)
+  , ColorShade(Shade50, Shade100, Shade200, Shade300, Shade400, Shade500, Shade600, Shade700, Shade800, Shade900, Shade950)
   , shadeToInt
   , shadeFromInt
   , allShades

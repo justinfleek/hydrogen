@@ -12,7 +12,7 @@
 -- | - **AlternateReverse**: Backward then Forward (100% -> 0% -> 100%)
 
 module Hydrogen.Schema.Temporal.Direction
-  ( Direction(..)
+  ( Direction(Normal, Reverse, Alternate, AlternateReverse)
   , directionToString
   , directionFromString
   ) where
@@ -28,7 +28,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // direction

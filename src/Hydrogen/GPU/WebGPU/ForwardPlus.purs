@@ -23,13 +23,21 @@
 
 module Hydrogen.GPU.WebGPU.ForwardPlus
   ( -- Types
-    TiledConfig(..)
-  , TileSize(..)
-  , LightTile(..)
-  , TiledLightList(..)
-  , ClusteredConfig(..)
-  , Cluster(..)
-  , CullingMethod(..)
+    TiledConfig
+  , TileSize
+      ( Tile16
+      , Tile32
+      , Tile64
+      )
+  , LightTile
+  , TiledLightList
+  , ClusteredConfig
+  , Cluster
+  , CullingMethod
+      ( CPUCulling
+      , GPUCulling
+      , HybridCulling
+      )
     -- Configuration
   , tiledConfig
   , clusteredConfig
@@ -42,7 +50,7 @@ module Hydrogen.GPU.WebGPU.ForwardPlus
   , createCluster
   , clusterLights
     -- Pipeline
-  , ForwardPlusPipeline(..)
+  , ForwardPlusPipeline
   , forwardPlusPipeline
   ) where
 
@@ -51,7 +59,7 @@ import Prelude
 import Data.Array (catMaybes, mapWithIndex, length, filter, concatMap, range) as Data.Array
 import Data.Functor (map) as Data.Functor
 import Data.Int (toNumber) as Data.Int
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.GPU.Types.Bounded
   ( TileCount

@@ -69,7 +69,7 @@ module Hydrogen.Schema.Media.Upload
   , entryLastModified
   
   -- * Upload Status
-  , UploadStatus(..)
+  , UploadStatus(Pending, Uploading, Processing, Complete, Failed, Cancelled)
   , isUploading
   , isComplete
   , isFailed
@@ -100,7 +100,7 @@ module Hydrogen.Schema.Media.Upload
   , failedCount
   
   -- * Upload Command
-  , UploadCommand(..)
+  , UploadCommand(StartUpload, CancelUpload, RetryUpload, PauseUpload, ResumeUpload, RemoveUpload, ClearCompleted, ClearFailed)
   , applyUploadCommand
   
   -- * Upload Config
@@ -112,7 +112,7 @@ module Hydrogen.Schema.Media.Upload
   , validateFile
   
   -- * Validation
-  , ValidationError(..)
+  , ValidationError(FileTooLarge, InvalidFileType, TooManyFiles)
   , validateFileEntry
   ) where
 

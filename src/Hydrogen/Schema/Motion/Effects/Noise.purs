@@ -17,34 +17,34 @@
 
 module Hydrogen.Schema.Motion.Effects.Noise
   ( -- * Fractal Type
-    FractalType(..)
+    FractalType(FTBasic, FTTurbulentBasic, FTSoftLinear, FTTurbulentSoft)
   , allFractalTypes
   , fractalTypeToString
   , fractalTypeFromString
   
   -- * Noise Type
-  , NoiseType(..)
+  , NoiseType(NTBlock, NTLinear, NTSoftLinear, NTSpline)
   , allNoiseTypes
   , noiseTypeToString
   , noiseTypeFromString
   
   -- * Fractal Noise Effect
-  , FractalNoiseEffect(..)
-  , OverflowMode(..)
-  , NoiseBlendMode(..)
+  , FractalNoiseEffect
+  , OverflowMode(OverflowClip, OverflowSoftClamp, OverflowWrapBack, OverflowHDR)
+  , NoiseBlendMode(NoiseBlendNone, NoiseBlendAdd, NoiseBlendMultiply, NoiseBlendScreen, NoiseBlendOverlay, NoiseBlendDifference)
   , defaultFractalNoise
   , mkFractalNoise
   
   -- * Transform Controls
-  , NoiseTransform(..)
+  , NoiseTransform
   , defaultNoiseTransform
   
   -- * Sub Settings
-  , SubSettings(..)
+  , SubSettings
   , defaultSubSettings
   
   -- * Evolution Options
-  , EvolutionOptions(..)
+  , EvolutionOptions
   , defaultEvolutionOptions
   
   -- * Queries

@@ -62,25 +62,25 @@ module Hydrogen.Schema.Physics.Projective.Domain
     nsDomain
     
   -- * Domain Effects (graded)
-  , DomainEffect(..)
+  , DomainEffect(EffectNone, EffectModifyPositions, EffectModifyVelocities, EffectExchangeBoundary, EffectSynchronize, EffectComposite)
   , allDomainEffects
   , effectCombine
   , effectNone
   
   -- * Domain Co-Effects (needs)
-  , DomainCoEffect(..)
+  , DomainCoEffect(CoEffectNone, CoEffectNeighborDomain, CoEffectGlobalState, CoEffectConstraints, CoEffectMemory, CoEffectCPUCores, CoEffectComposite)
   , allDomainCoEffects
   , coEffectCombine
   , coEffectNone
   
   -- * Domain Expression AST
-  , DomainExpr(..)
+  , DomainExpr(DomainPure, DomainOp, DomainSeq, DomainPar, DomainLoop, DomainAnnotate)
   , exprEffect
   , exprCoEffect
   , exprUUID
   
   -- * Domain Operations
-  , DomainOp(..)
+  , DomainOp(OpSolveInterior, OpSolveBoundary, OpSolveCorners, OpExchangeForces, OpExchangePositions, OpComputeResidual, OpPartition, OpIdentifyBoundaries, OpIdentifyCorners)
   , allDomainOps
   , domainOpEffect
   , domainOpCoEffect
@@ -119,7 +119,7 @@ module Hydrogen.Schema.Physics.Projective.Domain
   , decompositionCornerDOFs
   
   -- * Constraints (Presburger)
-  , DomainConstraint(..)
+  , DomainConstraint(ConstraintDomainCount, ConstraintDOFCount, ConstraintBoundaryRatio, ConstraintMemoryPerDomain, ConstraintAnd, ConstraintTrue, ConstraintFalse)
   , domainCountBound
   , dofCountBound
   , boundaryRatioBound
@@ -127,8 +127,8 @@ module Hydrogen.Schema.Physics.Projective.Domain
   
   -- * Optimization (ILP)
   , DomainObjective
-  , LoadBalanceMetric(..)
-  , OverheadMetric(..)
+  , LoadBalanceMetric(MetricMinMaxRatio, MetricVariance)
+  , OverheadMetric(MetricBoundaryRatio, MetricCornerCount, MetricCommunication)
   , mkObjective
   , emptyObjective
   
@@ -184,7 +184,7 @@ import Prelude
   )
 
 import Data.Array (length, foldl, filter) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
 import Hydrogen.Schema.Physics.Projective.Core as Core

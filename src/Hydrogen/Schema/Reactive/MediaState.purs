@@ -9,7 +9,7 @@
 
 module Hydrogen.Schema.Reactive.MediaState
   ( -- * Playback Status
-    PlaybackStatus(..)
+    PlaybackStatus(Playing, Paused, Stopped, Buffering, Seeking, Ended, Error)
   , isPlaying
   , isPaused
   , isStopped
@@ -18,7 +18,7 @@ module Hydrogen.Schema.Reactive.MediaState
   , isEnded
   , hasError
   -- * Ready State (HTMLMediaElement.readyState)
-  , ReadyState(..)
+  , ReadyState(HaveNothing, HaveMetadata, HaveCurrentData, HaveFutureData, HaveEnoughData)
   , isHaveNothing
   , isHaveMetadata
   , isHaveCurrentData
@@ -27,13 +27,13 @@ module Hydrogen.Schema.Reactive.MediaState
   , canPlay
   , canPlayThrough
   -- * Network State (HTMLMediaElement.networkState)
-  , NetworkLoadState(..)
+  , NetworkLoadState(NetworkEmpty, NetworkIdle, NetworkLoading, NetworkNoSource)
   , isNetworkEmpty
   , isNetworkIdle
   , isNetworkLoading
   , isNetworkNoSource
   -- * Playback Rate
-  , PlaybackRate(..)
+  , PlaybackRate(PlaybackRate)
   , playbackRate
   , normalSpeed
   , halfSpeed
@@ -43,7 +43,7 @@ module Hydrogen.Schema.Reactive.MediaState
   , isSlowMotion
   , isFastForward
   -- * Volume Level
-  , VolumeLevel(..)
+  , VolumeLevel(VolumeLevel)
   , volumeLevel
   , fullVolume
   , halfVolume
@@ -52,12 +52,12 @@ module Hydrogen.Schema.Reactive.MediaState
   , isMuted
   , isAudible
   -- * Time Position
-  , TimePosition(..)
+  , TimePosition(TimePosition)
   , timePosition
   , startPosition
   , unwrapTime
   -- * Duration
-  , Duration(..)
+  , Duration(Duration)
   , duration
   , unknownDuration
   , unwrapDuration

@@ -27,8 +27,8 @@
 
 module Hydrogen.Schema.Typography.TextVariant
   ( -- * Types
-    CapsVariant(..)
-  , TextVariant(..)
+    CapsVariant(CapsNormal, SmallCaps, AllSmallCaps, PetiteCaps, AllPetiteCaps, Unicase, TitlingCaps)
+  , TextVariant(TextVariant)
   
   -- * Constructors
   , normal

@@ -104,16 +104,16 @@ import Prelude
   )
 
 import Data.Array (filter, concatMap, null, all, any, sortBy, uncons, length)
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..), fst, snd)
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Foldable (foldl)
 
 import Hydrogen.Layout.Constraint
   ( Var
   , LinTerm
   , LinConstraint
-  , Rel(..)
-  , Formula(..)
+  , Rel(RelEq, RelLe, RelLt, RelGe, RelGt)
+  , Formula(Atom, And, Or, Not, Tt, Ff)
   , linZero
   , linConst
   , linVar

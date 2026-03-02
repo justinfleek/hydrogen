@@ -22,20 +22,20 @@
 
 module Hydrogen.Schema.Motion.AnimatedTransform.Layer
   ( -- * 3D Layer System
-    LayerDimensionality(..)
+    LayerDimensionality(Layer2D, Layer3D)
   , is3DLayer
   , enable3DLayer
   , disable3DLayer
   
   -- * Gimbal / Rotation Order
-  , RotationOrder(..)
+  , RotationOrder(RotationXYZ, RotationXZY, RotationYXZ, RotationYZX, RotationZXY, RotationZYX)
   , allRotationOrders
   , rotationOrderToString
   , defaultRotationOrder
   
   -- * Layer Parenting (Pick-Whip)
-  , LayerParent(..)
-  , ParentLink(..)
+  , LayerParent(NoParent, ParentLayer, ParentNull)
+  , ParentLink(ParentLink)
   , mkParentLink
   , parentToLayer
   , parentToNull
@@ -47,14 +47,14 @@ module Hydrogen.Schema.Motion.AnimatedTransform.Layer
   , inheritRotation
   
   -- * Transform with Parenting
-  , LayerTransformState(..)
+  , LayerTransformState(LayerTransformState)
   , defaultLayerTransformState
   , setLayerParent
   , getEffectiveTransform2D
   , getEffectiveTransform3D
   
   -- * Null Object
-  , NullObject(..)
+  , NullObject(NullObject)
   , mkNullObject
   , nullObjectTransform
   ) where

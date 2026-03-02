@@ -18,13 +18,13 @@
 module Hydrogen.Schema.Motion.Effects.Generate.Animation
   ( -- * Vegas
     VegasEffect
-  , VegasPathMode(..)
+  , VegasPathMode(VPMMasks, VPMLayer, VPMAllPaths)
   , defaultVegas
   , vegasWithSegments
   
   -- * Lens Flare
   , LensFlareEffect
-  , LensType(..)
+  , LensType(LT50_300mm, LT35mm, LT105mm)
   , defaultLensFlare
   , lensFlareWithBrightness
   
@@ -57,7 +57,7 @@ import Prelude
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, point2D)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMNormal))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // vegas

@@ -78,8 +78,8 @@ import Hydrogen.Schema.Reactive.HoverEffect.State
   ) as State
 
 import Hydrogen.Schema.Reactive.HoverEffect.Transform
-  ( HoverTransform(..)
-  , TransformOrigin(..)
+  ( HoverTransform(HoverTransform)
+  , TransformOrigin(OriginCenter, OriginTop, OriginBottom, OriginLeft, OriginRight, OriginTopLeft, OriginTopRight, OriginBottomLeft, OriginBottomRight, OriginCustom)
   , hoverTransform
   , identityTransform
   , defaultHoverTransform
@@ -90,8 +90,8 @@ import Hydrogen.Schema.Reactive.HoverEffect.Transform
   ) as Transform
 
 import Hydrogen.Schema.Reactive.HoverEffect.Style
-  ( HoverStyle(..)
-  , OpacityChange(..)
+  ( HoverStyle(HoverStyle)
+  , OpacityChange(OpacityAbsolute, OpacityRelative, OpacityUnchanged)
   , hoverStyle
   , identityStyle
   , defaultHoverStyle
@@ -102,8 +102,8 @@ import Hydrogen.Schema.Reactive.HoverEffect.Style
   ) as Style
 
 import Hydrogen.Schema.Reactive.HoverEffect.Audio
-  ( HoverAudio(..)
-  , HoverAudioSource(..)
+  ( HoverAudio(HoverAudio)
+  , HoverAudioSource(HoverAudioNone, HoverAudioUrl, HoverAudioInline)
   , hoverAudio
   , noHoverAudio
   , hoverAudioEnter
@@ -112,8 +112,8 @@ import Hydrogen.Schema.Reactive.HoverEffect.Audio
   ) as Audio
 
 import Hydrogen.Schema.Reactive.HoverEffect.Animation
-  ( HoverAnimation(..)
-  , HoverAnimationType(..)
+  ( HoverAnimation(HoverAnimation)
+  , HoverAnimationType(HoverAnimNone, HoverAnimLottie, HoverAnimLottieInline, HoverAnimCss, HoverAnimSpring)
   , HoverSpringConfig
   , hoverAnimation
   , noHoverAnimation
@@ -124,9 +124,9 @@ import Hydrogen.Schema.Reactive.HoverEffect.Animation
   ) as Animation
 
 import Hydrogen.Schema.Reactive.HoverEffect.Particle
-  ( HoverParticle(..)
-  , ParticleType(..)
-  , EmissionMode(..)
+  ( HoverParticle(HoverParticle)
+  , ParticleType(NoParticle, SparkleParticle, ConfettiParticle, DustParticle, BubbleParticle, SnowParticle, HeartParticle, StarParticle, CustomParticle)
+  , EmissionMode(EmitNone, EmitBurst, EmitContinuous, EmitOnMove, EmitOnLeave)
   , hoverParticle
   , noHoverParticle
   , hoverParticleBurst
@@ -135,7 +135,7 @@ import Hydrogen.Schema.Reactive.HoverEffect.Particle
   ) as Particle
 
 import Hydrogen.Schema.Reactive.HoverEffect.Combined
-  ( HoverEffect(..)
+  ( HoverEffect(HoverEffect)
   , hoverEffect
   , noHoverEffect
   , defaultHoverEffect

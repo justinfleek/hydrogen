@@ -43,10 +43,10 @@
 
 module Hydrogen.Schema.Typography.TypeRole
   ( -- * TypeRole Type
-    TypeRole(..)
+    TypeRole(Hero, Display, Title, Subtitle, Lead, Body, BodyLarge, BodySmall, Label, Button, Input, Link, Navigation, Tab, Chip, Badge, Caption, Helper, Placeholder, Error, Success, Warning, Info, Overline, Footnote, Code, CodeBlock, PreFormatted, Keyboard, Variable, Output)
   
   -- * Category Classification
-  , RoleCategory(..)
+  , RoleCategory(DisplayCategory, ContentCategory, UICategory, SupportingCategory, CodeCategory)
   , category
   
   -- * Properties

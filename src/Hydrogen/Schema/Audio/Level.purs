@@ -18,10 +18,10 @@
 
 module Hydrogen.Schema.Audio.Level
   ( -- * Types
-    Decibel(..)
-  , DecibelFS(..)
-  , LinearGain(..)
-  , Percent(..)
+    Decibel(Decibel)
+  , DecibelFS(DecibelFS)
+  , LinearGain(LinearGain)
+  , Percent(Percent)
   
   -- * Constructors
   , decibel

@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Motion.Shapes.Modifiers.Wave
   ( -- * Wave Type
-    WaveType(..)
+    WaveType(WTSine, WTSquare, WTTriangle, WTSawtooth)
   , waveTypeToString
   
   -- * Stroke Wave

@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Geometry.Shape.Operations
   ( -- * Boolean Operations
-    BooleanOp(..)
+    BooleanOp(BoolUnion, BoolSubtract, BoolIntersect, BoolExclude, BoolDivide)
   
   -- * 3D Operations
   , ExtrudeOp

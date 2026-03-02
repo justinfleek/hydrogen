@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Brand.Typography
   ( -- * Font Weight
-    FontWeight(..)
+    FontWeight(Thin, ExtraLight, Light, Regular, Medium, SemiBold, Bold, ExtraBold, Black)
   , fontWeightToInt
   , fontWeightFromInt
   

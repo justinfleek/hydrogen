@@ -14,12 +14,12 @@
 
 module Hydrogen.Schema.Brand.Voice
   ( -- * Tone
-    Tone(..)
+    Tone(Formal, Casual, Playful, Authoritative, Empathetic, Inspirational, Technical, Minimalist)
   , toneToString
   , toneFromString
   
   -- * Traits
-  , Trait(..)
+  , Trait(Trustworthy, Reliable, Authentic, Transparent, Innovative, Creative, Bold, Visionary, Friendly, Approachable, Warm, Inclusive, Expert, Knowledgeable, Sophisticated, Premium, Energetic, Passionate, Dynamic, Driven)
   , traitToString
   , TraitSet
   , mkTraitSet

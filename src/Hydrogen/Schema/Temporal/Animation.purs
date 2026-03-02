@@ -12,7 +12,7 @@
 -- | - **PhysicsAnim**: Velocity-based simulation (friction/gravity).
 
 module Hydrogen.Schema.Temporal.Animation
-  ( Animation(..)
+  ( Animation(Transition, KeyframeAnim, SpringAnim, PhysicsAnim)
   , transition
   , keyframeAnim
   , springAnim

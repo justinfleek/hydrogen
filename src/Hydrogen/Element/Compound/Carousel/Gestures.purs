@@ -99,7 +99,15 @@ module Hydrogen.Element.Compound.Carousel.Gestures
   , activeGestureCount
   , dominantGesture
   , compareGesturePriority
-  , GestureKind(..)
+  , GestureKind
+      ( GestureSwipe
+      , GestureDrag
+      , GesturePinch
+      , GestureScroll
+      , GestureRetinal
+      , GestureVoice
+      , GestureNone
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

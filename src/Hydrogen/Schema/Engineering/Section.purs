@@ -29,29 +29,29 @@
 
 module Hydrogen.Schema.Engineering.Section
   ( -- * Section Type
-    SectionType(..)
+    SectionType(FullSection, HalfSection, OffsetSection, BrokenOutSection, RevolvedSection, RemovedSection, AlignedSection)
   , allSectionTypes
   , sectionTypeDescription
   
   -- * Cut Plane
-  , CutPlane(..)
+  , CutPlane(SimplePlane, OffsetPlane, BentPlane)
   , cutPlane
   , offsetCutPlane
   , bentCutPlane
   
   -- * Section Line
-  , SectionLine(..)
+  , SectionLine(SectionLine)
   , sectionLine
   , sectionLineWithArrows
   
   -- * Hatch Pattern
-  , HatchPattern(..)
+  , HatchPattern(SolidFill, GeneralPurpose, Steel, CastIron, Bronze, Brass, Aluminum, Rubber, Plastic, Glass, Concrete, Brick, Stone, Wood, Earth, Water, Insulation, CustomPattern)
   , allHatchPatterns
   , patternDescription
   , patternForMaterial
   
   -- * Hatch Style
-  , HatchStyle(..)
+  , HatchStyle(HatchStyle)
   , hatchStyle
   , defaultHatch
   , steelHatch
@@ -59,12 +59,12 @@ module Hydrogen.Schema.Engineering.Section
   , castIronHatch
   
   -- * Hatched Region
-  , HatchedRegion(..)
+  , HatchedRegion(HatchedRegion)
   , hatchedRegion
   , hatchWithBoundary
   
   -- * Section View
-  , SectionView(..)
+  , SectionView(SectionView)
   , fullSection
   , halfSection
   , offsetSection

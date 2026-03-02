@@ -41,7 +41,7 @@
 module Hydrogen.Schema.Dimension.Spacing
   ( -- * Types
     Spacing
-  , Unit(..)
+  , Unit(Px, Rem, Em, Percent, Vw, Vh, Vmin, Vmax)
   
   -- * Constructors
   , spacing

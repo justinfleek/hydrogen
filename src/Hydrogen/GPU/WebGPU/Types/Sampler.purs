@@ -13,10 +13,29 @@
 module Hydrogen.GPU.WebGPU.Types.Sampler
   ( -- Sampler
     GPUSamplerDescriptor
-  , GPUAddressMode(..)
-  , GPUFilterMode(..)
-  , GPUMipmapFilterMode(..)
-  , GPUCompareFunction(..)
+  , GPUAddressMode
+      ( ClampToEdge
+      , Repeat
+      , MirrorRepeat
+      )
+  , GPUFilterMode
+      ( FilterNearest
+      , FilterLinear
+      )
+  , GPUMipmapFilterMode
+      ( MipmapNearest
+      , MipmapLinear
+      )
+  , GPUCompareFunction
+      ( CompareNever
+      , CompareLess
+      , CompareEqual
+      , CompareLessEqual
+      , CompareGreater
+      , CompareNotEqual
+      , CompareGreaterEqual
+      , CompareAlways
+      )
   ) where
 
 import Prelude

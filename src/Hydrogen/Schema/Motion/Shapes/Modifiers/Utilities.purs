@@ -49,7 +49,7 @@ module Hydrogen.Schema.Motion.Shapes.Modifiers.Utilities
   , maxWaveParam
   
   -- * Semigroup Combinable
-  , CombinableStrokeWidth(..)
+  , CombinableStrokeWidth(CombinableStrokeWidth)
   , combinableWidth
   , unwrapCombinableWidth
   ) where

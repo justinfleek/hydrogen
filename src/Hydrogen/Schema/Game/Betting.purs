@@ -10,7 +10,7 @@ module Hydrogen.Schema.Game.Betting
   , Odds(AmericanOdds, DecimalOdds, FractionalOdds)
   , americanOdds, decimalOdds, fractionalOdds
   , toDecimalOdds, toAmericanOdds, toFractionalOdds, impliedProbability
-  , BetType(..), Wager, wager, wagerAmount, wagerType
+  , BetType(RouletteStraight, RouletteSplit, RouletteStreet, RouletteCorner, RouletteLine, RouletteDozen, RouletteColumn, RouletteRed, RouletteBlack, RouletteOdd, RouletteEven, RouletteLow, RouletteHigh, CrapsPassLine, CrapsDontPass, CrapsCome, CrapsDontCome, CrapsField, CrapsPlace, CrapsHardway, CrapsAny7, CrapsAnyCraps, BlackjackInsurance, BlackjackEvenMoney, BlackjackDouble, BlackjackSplit, CustomBet), Wager, wager, wagerAmount, wagerType
   , BetResult(Win, Loss, Push, PartialWin)
   , Bankroll, bankroll, updateBankroll, bankrollBalance, sessionProfit, canAffordBet
   , calculatePayout, rouletteOdds, roulettePayout, crapsOdds, crapsPayout

@@ -17,7 +17,7 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Displacement
   
   -- * Turbulent Displace Effect
   , TurbulentDisplaceEffect
-  , TurbulentDisplaceType(..)
+  , TurbulentDisplaceType(TDTTurbulentSmooth, TDTTurbulentSharp, TDTBulgeSmooth, TDTBulgeSharp, TDTTwist)
   , defaultTurbulentDisplace
   , turbulentDisplaceWithAmount
   

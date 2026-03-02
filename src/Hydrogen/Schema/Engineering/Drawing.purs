@@ -30,17 +30,17 @@
 
 module Hydrogen.Schema.Engineering.Drawing
   ( -- * Sheet Size
-    SheetSize(..)
+    SheetSize(A0, A1, A2, A3, A4, ANSI_A, ANSI_B, ANSI_C, ANSI_D, ANSI_E, Arch_A, Arch_B, Arch_C, Arch_D, Arch_E, CustomSize)
   , allSheetSizes
   , sheetDimensions
   , sheetDescription
   
   -- * Sheet Orientation
-  , SheetOrientation(..)
+  , SheetOrientation(Portrait, Landscape)
   , allSheetOrientations
   
   -- * Drawing Scale
-  , DrawingScale(..)
+  , DrawingScale(DrawingScale)
   , scaleRatio
   , fullScale
   , halfScale
@@ -61,38 +61,38 @@ module Hydrogen.Schema.Engineering.Drawing
   , scale10to1
   
   -- * Title Block
-  , TitleBlock(..)
+  , TitleBlock(TitleBlock)
   , titleBlock
   , minimalTitleBlock
   
   -- * Revision
-  , Revision(..)
+  , Revision(Revision)
   , revision
   , initialRevision
   
   -- * Bill of Materials Entry
-  , BomEntry(..)
+  , BomEntry(BomEntry)
   , bomEntry
   
   -- * Bill of Materials
-  , BillOfMaterials(..)
+  , BillOfMaterials(BillOfMaterials)
   , billOfMaterials
   , addBomEntry
   , bomTotal
   
   -- * View Type
-  , ViewType(..)
+  , ViewType(FrontView, RearView, TopView, BottomView, LeftView, RightView, IsometricView_, DiametricView, TrimetricView, DetailView_, AuxiliaryView, SectionView_)
   , allViewTypes
   , viewTypeDescription
   
   -- * Drawing View
-  , DrawingView(..)
+  , DrawingView(DrawingView)
   , orthographicView
   , isometricView
   , detailView
   
   -- * Drawing Sheet
-  , DrawingSheet(..)
+  , DrawingSheet(DrawingSheet)
   , drawingSheet
   , addView
   

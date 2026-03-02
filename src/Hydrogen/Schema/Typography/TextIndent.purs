@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Typography.TextIndent
   ( -- * Type
-    TextIndent(..)
+    TextIndent(TextIndent)
     
   -- * Constructors
   , textIndent

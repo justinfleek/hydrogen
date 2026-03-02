@@ -25,7 +25,7 @@
 
 module Hydrogen.Schema.Brand.Compound.State
   ( -- * Interactive State
-    InteractiveState(..)
+    InteractiveState(StateDefault, StateHover, StateActive, StateFocus, StateFocusVisible, StateDisabled, StateReadOnly, StatePressed, StateDragging)
   , interactiveStateToString
   , interactiveStateFromString
   , allInteractiveStates
@@ -33,19 +33,19 @@ module Hydrogen.Schema.Brand.Compound.State
   , isDisabledState
   
   -- * Validation State
-  , ValidationState(..)
+  , ValidationState(ValidationNone, ValidationPristine, ValidationDirty, ValidationTouched, ValidationValid, ValidationInvalid, ValidationPending)
   , validationStateToString
   , validationStateFromString
   , allValidationStates
   
   -- * Loading State
-  , LoadingState(..)
+  , LoadingState(LoadingIdle, LoadingPending, LoadingLoading, LoadingSuccess, LoadingError, LoadingStale)
   , loadingStateToString
   , loadingStateFromString
   , allLoadingStates
   
   -- * Selection State
-  , SelectionState(..)
+  , SelectionState(SelectionNone, SelectionSelected, SelectionChecked, SelectionUnchecked, SelectionIndeterminate, SelectionExpanded, SelectionCollapsed)
   , selectionStateToString
   , selectionStateFromString
   , allSelectionStates
@@ -62,7 +62,7 @@ module Hydrogen.Schema.Brand.Compound.State
   , stateLayerDisabled
   
   -- * State Transitions
-  , StateTransition(..)
+  , StateTransition(TransitionEnter, TransitionLeave, TransitionToggle, TransitionImmediate)
   , transitionToString
   , allTransitions
   

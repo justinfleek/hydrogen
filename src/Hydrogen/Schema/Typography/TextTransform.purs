@@ -14,7 +14,7 @@
 -- | readability. See LetterSpacing.uppercase for the standard adjustment.
 
 module Hydrogen.Schema.Typography.TextTransform
-  ( TextTransform(..)
+  ( TextTransform(None, Uppercase, Lowercase, Capitalize)
   , toLegacyCss
   , requiresTracking
   ) where

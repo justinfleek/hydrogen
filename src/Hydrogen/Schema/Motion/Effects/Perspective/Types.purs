@@ -14,27 +14,27 @@ module Hydrogen.Schema.Motion.Effects.Perspective.Types
   
   -- * Bevel Alpha
   , BevelAlphaEffect
-  , BevelEdgeStyle(..)
+  , BevelEdgeStyle(BESSmooth, BESChisel, BESRound, BESFlat)
   
   -- * Bevel Edges
   , BevelEdgesEffect
   
   -- * 3D Glasses
   , Glasses3DEffect
-  , Glasses3DView(..)
-  , ConvergenceMode(..)
+  , Glasses3DView(G3DAnaglyph, G3DInterlaced, G3DSideBySide, G3DOverUnder, G3DBalanced, G3DRedCyan, G3DGreenMagenta, G3DYellowBlue)
+  , ConvergenceMode(CMOffset, CMConverge, CMRotate, CMPreset)
   
   -- * CC Cylinder
   , CylinderEffect
-  , CylinderRenderMode(..)
+  , CylinderRenderMode(CRMFull, CRMOutside, CRMInside)
   
   -- * CC Sphere
   , SphereEffect
-  , SphereRenderMode(..)
+  , SphereRenderMode(SRMFull, SRMOutside, SRMInside)
   
   -- * CC Environment
   , EnvironmentEffect
-  , EnvironmentMapType(..)
+  , EnvironmentMapType(EMTReflection, EMTRefraction, EMTGlass, EMTMetal)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

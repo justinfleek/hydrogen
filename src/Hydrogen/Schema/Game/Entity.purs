@@ -38,14 +38,21 @@ module Hydrogen.Schema.Game.Entity
   , unwrapDeltaTime
   
   -- * Position and Velocity (bounded 0-10000 px, -10000 to 10000 px/s)
-  , Position2D
+  , Position2D(Position2D)  -- Export constructor for pattern matching
   , positionBounds
-  , Velocity2D
+  , Velocity2D(Velocity2D)  -- Export constructor for pattern matching
   , velocityBounds
   , mkPosition
   , mkVelocity
   , unwrapPosition
   , unwrapVelocity
+  
+  -- * Acceleration (bounded -5000 to 5000 px/s², for tilt-based physics)
+  , Acceleration2D(Acceleration2D)  -- Export constructor for pattern matching
+  , accelerationBounds
+  , mkAcceleration
+  , unwrapAcceleration
+  , zeroAcceleration
   
   -- * Game Shapes (dimensions bounded 1-10000 px)
   , GameShape
@@ -130,9 +137,12 @@ module Hydrogen.Schema.Game.Entity
   
   -- * Entity Operations
   , applyVelocity
+  , applyAcceleration
+  , applyPhysics
   , moveEntity
   , setPosition
   , setVelocity
+  , setAcceleration
   , setState
   , reflectVelocityX
   , reflectVelocityY
@@ -151,6 +161,7 @@ import Prelude
   , (+)
   , (*)
   , (<>)
+  , (#)
   )
 
 import Hydrogen.Schema.Color.OKLCH (OKLCH)
@@ -291,6 +302,51 @@ mkVelocity vx vy = Velocity2D
 -- | Extract velocity components
 unwrapVelocity :: Velocity2D -> { vx :: Number, vy :: Number }
 unwrapVelocity (Velocity2D v) = v
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                        // acceleration // 2d
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Acceleration in pixels per second squared.
+-- |
+-- | Bounded: -5000 to 5000 px/s² on each axis (clamped).
+-- | Applied each tick to update velocity: v' = v + a * dt
+-- |
+-- | ## Physics Integration
+-- |
+-- | For tilt-based games like ball-in-maze:
+-- | - Tilt angle maps to acceleration (not velocity)
+-- | - Gravity pulls proportional to tilt
+-- | - Friction can be modeled by negative acceleration opposing velocity
+-- |
+-- | 5000 px/s² means reaching max velocity (10000 px/s) in 2 seconds,
+-- | which feels responsive without being twitchy.
+newtype Acceleration2D = Acceleration2D { ax :: Number, ay :: Number }
+
+derive instance eqAcceleration2D :: Eq Acceleration2D
+
+instance showAcceleration2D :: Show Acceleration2D where
+  show (Acceleration2D { ax, ay }) = "(Acceleration2D " <> show ax <> " " <> show ay <> ")"
+
+-- | Bounds for acceleration components (-5000 to 5000 px/s², clamps).
+accelerationBounds :: Bounded.NumberBounds
+accelerationBounds = Bounded.numberBounds (-5000.0) 5000.0 Bounded.Clamps
+  "acceleration" "Acceleration in pixels per second squared (-5000 to 5000)"
+
+-- | Create an acceleration (clamped to -5000 to 5000 on each axis).
+mkAcceleration :: Number -> Number -> Acceleration2D
+mkAcceleration ax ay = Acceleration2D 
+  { ax: Bounded.clampNumber (-5000.0) 5000.0 ax
+  , ay: Bounded.clampNumber (-5000.0) 5000.0 ay
+  }
+
+-- | Extract acceleration components
+unwrapAcceleration :: Acceleration2D -> { ax :: Number, ay :: Number }
+unwrapAcceleration (Acceleration2D a) = a
+
+-- | Zero acceleration (no change to velocity).
+zeroAcceleration :: Acceleration2D
+zeroAcceleration = Acceleration2D { ax: 0.0, ay: 0.0 }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // game // shapes
@@ -612,25 +668,37 @@ instance showBehavior :: Show Behavior where
 -- | - Structural equality (two entities with same fields are equal)
 -- | - Easy serialization (just encode each field)
 -- | - Simple construction (record syntax)
+-- |
+-- | ## Physics Model
+-- |
+-- | Entities have position, velocity, and acceleration:
+-- | - Position updated by: pos' = pos + vel * dt
+-- | - Velocity updated by: vel' = vel + acc * dt
+-- |
+-- | For tilt-based games, acceleration comes from device tilt.
+-- | For static entities (bricks), acceleration is zero.
 type Entity =
-  { id        :: EntityId
-  , shape     :: GameShape
-  , position  :: Position2D
-  , velocity  :: Velocity2D
-  , color     :: OKLCH
-  , state     :: EntityState
-  , behaviors :: Array Behavior
+  { id           :: EntityId
+  , shape        :: GameShape
+  , position     :: Position2D
+  , velocity     :: Velocity2D
+  , acceleration :: Acceleration2D
+  , color        :: OKLCH
+  , state        :: EntityState
+  , behaviors    :: Array Behavior
   }
 
 -- | Configuration for creating a new entity.
 -- |
 -- | ID is assigned by World, not provided in config.
+-- | Acceleration defaults to zero if not specified.
 type EntityConfig =
-  { shape     :: GameShape
-  , position  :: Position2D
-  , velocity  :: Velocity2D
-  , color     :: OKLCH
-  , behaviors :: Array Behavior
+  { shape        :: GameShape
+  , position     :: Position2D
+  , velocity     :: Velocity2D
+  , acceleration :: Acceleration2D
+  , color        :: OKLCH
+  , behaviors    :: Array Behavior
   }
 
 -- | Create an entity from config and assigned ID.
@@ -640,6 +708,7 @@ mkEntity entityId cfg =
   , shape: cfg.shape
   , position: cfg.position
   , velocity: cfg.velocity
+  , acceleration: cfg.acceleration
   , color: cfg.color
   , state: Active
   , behaviors: cfg.behaviors
@@ -708,3 +777,47 @@ reflectVelocityY :: Entity -> Entity
 reflectVelocityY entity =
   let Velocity2D vel = entity.velocity
   in entity { velocity = mkVelocity vel.vx (negate vel.vy) }
+
+-- | Apply acceleration to velocity over delta time.
+-- |
+-- | Physics: v' = v + a * dt
+-- |
+-- | DeltaTime is bounded (0-1 second), preventing velocity explosion.
+-- | Velocity is clamped to bounds (-10000 to 10000) after update.
+-- |
+-- | For tilt-based games:
+-- | ```purescript
+-- | -- Tilt angle maps to acceleration
+-- | let acc = tiltToAcceleration sensitivity tiltX tiltY
+-- | let entity' = setAcceleration acc entity
+-- | let entity'' = applyAcceleration dt entity'
+-- | ```
+applyAcceleration :: DeltaTime -> Entity -> Entity
+applyAcceleration dt entity =
+  let
+    Velocity2D vel = entity.velocity
+    Acceleration2D acc = entity.acceleration
+    dtVal = unwrapDeltaTime dt
+    newVx = vel.vx + acc.ax * dtVal
+    newVy = vel.vy + acc.ay * dtVal
+  in
+    entity { velocity = mkVelocity newVx newVy }
+
+-- | Set entity acceleration.
+setAcceleration :: Acceleration2D -> Entity -> Entity
+setAcceleration acc entity = entity { acceleration = acc }
+
+-- | Apply full physics step: acceleration → velocity → position.
+-- |
+-- | Combines applyAcceleration and applyVelocity in proper order.
+-- | This is the physics integration for tilt-based games:
+-- |
+-- | 1. Update velocity from acceleration: v' = v + a * dt
+-- | 2. Update position from velocity: p' = p + v' * dt
+-- |
+-- | Note: Uses updated velocity for position update (semi-implicit Euler).
+applyPhysics :: DeltaTime -> Entity -> Entity
+applyPhysics dt entity =
+  entity
+    # applyAcceleration dt
+    # applyVelocity dt

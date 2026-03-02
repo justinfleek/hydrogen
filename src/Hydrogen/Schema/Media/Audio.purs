@@ -44,7 +44,7 @@ module Hydrogen.Schema.Media.Audio
   , audioRemainingTime
   
   -- * Audio Command
-  , AudioCommand(..)
+  , AudioCommand(AudioPlay, AudioPause, AudioTogglePlayPause, AudioSeek, AudioSeekRelative, AudioSetVolume, AudioToggleMute, AudioSetMuted, AudioSetPlaybackRate, AudioRestart, AudioSkipForward, AudioSkipBackward)
   , applyAudioCommand
   
   -- * Audio Track
@@ -69,7 +69,7 @@ module Hydrogen.Schema.Media.Audio
   -- * Playlist State
   , PlaylistState
   , initialPlaylistState
-  , PlaylistMode(..)
+  , PlaylistMode(Sequential, RepeatAll, RepeatOne, Shuffle)
   , setPlaylistMode
   
   -- * Audio Metadata

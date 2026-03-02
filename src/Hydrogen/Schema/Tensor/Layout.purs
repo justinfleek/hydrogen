@@ -37,9 +37,9 @@
 
 module Hydrogen.Schema.Tensor.Layout
   ( -- * Core Types
-    Layout(..)
-  , MemoryOrder(..)
-  , Stride(..)
+    Layout(Contiguous, Strided, Named)
+  , MemoryOrder(RowMajor, ColumnMajor)
+  , Stride(Stride)
   
   -- * Image Layouts
   , nchw

@@ -26,7 +26,7 @@ module Hydrogen.Schema.Geometry.Path.Construction
 import Prelude (map)
 
 import Data.Array (snoc, cons, uncons) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Schema.Geometry.Point (Point2D)
 import Hydrogen.Schema.Geometry.Path.Types

@@ -16,16 +16,16 @@
 
 module Hydrogen.Schema.Tensor.DType.Types
   ( -- * Float Format
-    FloatFormat(..)
+    FloatFormat(IEEE_FP32, IEEE_FP16, BF16, FP8_E4M3, FP8_E5M2, FP4_E2M1, MXFP4_E2M1)
   
   -- * Integer Format
-  , IntFormat(..)
+  , IntFormat(Int4Signed, Int4Unsigned, Int8Signed, Int8Unsigned, Int16Signed, Int32Signed, Int64Signed, Bool)
   
   -- * Quantization Format
-  , QuantFormat(..)
+  , QuantFormat(PerTensor, PerChannel, PerGroup, PerBlock)
   
   -- * Core DType
-  , DType(..)
+  , DType(FloatType, IntType, QuantizedType)
   
   -- * Smart Constructors
   , float32

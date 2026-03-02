@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Motion.Professional.PropertyValue.Text
   ( -- * Justification
-    ParagraphJustification(..)
+    ParagraphJustification(PJLeftJustify, PJCenterJustify, PJRightJustify, PJFullJustifyLastLineLeft, PJFullJustifyLastLineRight, PJFullJustifyLastLineCenter, PJFullJustifyLastLineFull)
   , paragraphJustificationToInt
   , paragraphJustificationFromInt
   

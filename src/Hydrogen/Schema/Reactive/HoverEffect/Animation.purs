@@ -28,8 +28,8 @@
 -- | ```
 
 module Hydrogen.Schema.Reactive.HoverEffect.Animation
-  ( HoverAnimation(..)
-  , HoverAnimationType(..)
+  ( HoverAnimation(HoverAnimation)
+  , HoverAnimationType(HoverAnimNone, HoverAnimLottie, HoverAnimLottieInline, HoverAnimCss, HoverAnimSpring)
   , HoverSpringConfig
   , hoverAnimation
   , noHoverAnimation

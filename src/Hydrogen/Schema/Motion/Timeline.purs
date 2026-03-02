@@ -148,7 +148,7 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, foldl, filter)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (floor)
 import Data.Int (toNumber) as Int
 

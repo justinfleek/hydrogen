@@ -28,7 +28,7 @@
 -- | - Symmetry.Reflection (ReflectionAxis)
 
 module Hydrogen.Schema.Geometry.Symmetry.Operations
-  ( SymmetryOp(..)
+  ( SymmetryOp(Identity, Reflect, Rotate, Translate, Glide, Compose)
   , identityOp
   , reflectOp
   , rotateOp

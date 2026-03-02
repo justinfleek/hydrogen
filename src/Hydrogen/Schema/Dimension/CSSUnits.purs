@@ -16,30 +16,30 @@
 
 module Hydrogen.Schema.Dimension.CSSUnits
   ( -- * Cap Height
-    Cap(..)
+    Cap(Cap)
   , cap
   , unwrapCap
   , capAtLeast
   
   -- * Ideograph Width
-  , Ic(..)
+  , Ic(Ic)
   , ic
   , unwrapIc
   , icAtLeast
   
   -- * Line Height
-  , Lh(..)
+  , Lh(Lh)
   , lh
   , unwrapLh
   , lhAtLeast
   
-  , Rlh(..)
+  , Rlh(Rlh)
   , rlh
   , unwrapRlh
   , rlhAtLeast
   
   -- * Gradians (angle)
-  , Gradian(..)
+  , Gradian(Gradian)
   , gradian
   , unwrapGradian
   , gradianBounds
@@ -48,7 +48,7 @@ module Hydrogen.Schema.Dimension.CSSUnits
   , gradianAtLeast
   
   -- * Turns (angle)
-  , Turn(..)
+  , Turn(Turn)
   , turn
   , unwrapTurn
   , turnBounds

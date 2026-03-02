@@ -54,7 +54,7 @@ module Hydrogen.Element.Compound.Canvas.Grid.Types
   , lineIsMajor
   
   -- * Snap Point Types
-  , SnapPointType(..)
+  , SnapPointType(SnapMajorIntersection, SnapMinorIntersection, SnapHexCenter, SnapHexVertex, SnapPolarCenter, SnapPolarIntersection, SnapVanishingPoint, SnapCompositionPoint)
   , SnapPoint(SnapPoint)
   , snapPoint
   , snapPointPosition

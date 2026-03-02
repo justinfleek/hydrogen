@@ -9,17 +9,17 @@
 
 module Hydrogen.Schema.Engineering.Dimension.Types
   ( -- * Dimension Type
-    DimensionType(..)
+    DimensionType(Linear, Angular, Radial, Diameter, ArcLength, Ordinate, Chain, Baseline)
   , allDimensionTypes
   , dimensionTypeDescription
   
   -- * Arrowhead Style
-  , ArrowheadStyle(..)
+  , ArrowheadStyle(FilledArrow, OpenArrow, ClosedArrow, Tick, Dot, OpenDot, ArchitecturalTick, Integral, NoArrow)
   , allArrowheadStyles
   , arrowheadDescription
   
   -- * Text Position
-  , TextPosition(..)
+  , TextPosition(TextAbove, TextCentered, TextBelow, TextInline, TextOutside)
   , allTextPositions
   ) where
 

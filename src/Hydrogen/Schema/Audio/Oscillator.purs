@@ -18,7 +18,7 @@
 
 module Hydrogen.Schema.Audio.Oscillator
   ( -- * Oscillator Type (Compound)
-    OscillatorType(..)
+    OscillatorType(Sine, Cosine, Square, Pulse, Sawtooth, ReverseSaw, Triangle, NoiseWhite, NoisePink, NoiseBrown, NoiseBlue, NoiseViolet, Sample)
   , oscillatorTypeName
   , oscillatorTypeFromString
   , isNoiseType

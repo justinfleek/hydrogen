@@ -26,7 +26,7 @@ module Hydrogen.Schema.Elevation.Depth
   , parallaxLayers
   , parallaxDirection
   
-  , ParallaxDirection(..)
+  , ParallaxDirection(ParallaxVertical, ParallaxHorizontal, ParallaxBoth)
   , parallaxDirectionLabel
   
   -- * Depth Stack
@@ -58,7 +58,7 @@ module Hydrogen.Schema.Elevation.Depth
   , backdropNone
   
   -- * Bokeh (Depth of Field)
-  , BokehRadius(..)
+  , BokehRadius(BokehRadius)
   , bokehRadius
   , unwrapBokehRadius
   , bokehRadiusBounds

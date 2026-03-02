@@ -10,11 +10,11 @@
 
 module Hydrogen.Schema.Game.Roulette
   ( -- Wheel variants
-    WheelType(..)
+    WheelType(European, American)
     -- Pocket representation
-  , Pocket(..)
+  , Pocket(PocketZero, PocketDoubleZero, PocketNumber)
     -- Pocket color
-  , PocketColor(..)
+  , PocketColor(Red, Black, Green)
     -- Wheel layout type
   , WheelLayout
     -- Wheel section for neighbor bets
@@ -77,7 +77,7 @@ import Data.Array
   )
 
 import Data.Maybe
-  ( Maybe(..)
+  ( Maybe(Just, Nothing)
   , fromMaybe
   )
 

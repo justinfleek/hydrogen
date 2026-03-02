@@ -74,7 +74,7 @@ module Hydrogen.Schema.Physical
   ) where
 
 import Hydrogen.Schema.Physical.Element
-  ( Element(..)
+  ( Element(Hydrogen, Helium, Lithium, Beryllium, Boron, Carbon, Nitrogen, Oxygen, Fluorine, Neon, Sodium, Magnesium, Aluminium, Silicon, Phosphorus, Sulfur, Chlorine, Argon, Potassium, Calcium, Scandium, Titanium, Vanadium, Chromium, Manganese, Iron, Cobalt, Nickel, Copper, Zinc, Gallium, Germanium, Arsenic, Selenium, Bromine, Krypton, Rubidium, Strontium, Yttrium, Zirconium, Niobium, Molybdenum, Technetium, Ruthenium, Rhodium, Palladium, Silver, Cadmium, Indium, Tin, Antimony, Tellurium, Iodine, Xenon, Cesium, Barium, Lanthanum, Cerium, Praseodymium, Neodymium, Promethium, Samarium, Europium, Gadolinium, Terbium, Dysprosium, Holmium, Erbium, Thulium, Ytterbium, Lutetium, Hafnium, Tantalum, Tungsten, Rhenium, Osmium, Iridium, Platinum, Gold, Mercury, Thallium, Lead, Bismuth, Polonium, Astatine, Radon, Francium, Radium, Actinium, Thorium, Protactinium, Uranium, Neptunium, Plutonium, Americium, Curium, Berkelium, Californium, Einsteinium, Fermium, Mendelevium, Nobelium, Lawrencium, Rutherfordium, Dubnium, Seaborgium, Bohrium, Hassium, Meitnerium, Darmstadtium, Roentgenium, Copernicium, Nihonium, Flerovium, Moscovium, Livermorium, Tennessine, Oganesson)
   , allElements
   , AtomicNumber
   , atomicNumber
@@ -85,7 +85,7 @@ import Hydrogen.Schema.Physical.Element
   ) as Element
 
 import Hydrogen.Schema.Physical.Element.Block
-  ( ElementBlock(..)
+  ( ElementBlock(SBlock, PBlock, DBlock, FBlock)
   , allElementBlocks
   , block
   ) as Block
@@ -107,7 +107,7 @@ import Hydrogen.Schema.Physical.Element.Group
   ) as Group
 
 import Hydrogen.Schema.Physical.Element.Category
-  ( ElementCategory(..)
+  ( ElementCategory(AlkaliMetal, AlkalineEarthMetal, TransitionMetal, PostTransitionMetal, Metalloid, ReactiveNonmetal, NobleGas, Lanthanide, Actinide, Unknown)
   , allElementCategories
   , category
   ) as Category

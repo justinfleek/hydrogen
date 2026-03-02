@@ -35,49 +35,49 @@
 
 module Hydrogen.Schema.Geometry.AnimatedBorder
   ( -- * Gradient Stroke
-    GradientType(..)
+    GradientType(GradientLinear, GradientRadial, GradientConic, GradientConicAnimated)
   , GradientColorStop
-  , GradientStroke(..)
+  , GradientStroke(GradientStroke)
   , gradientStroke
   , linearGradientStroke
   , conicGradientStroke
   
   -- * Conic Border (Linear-style)
-  , ConicBorderConfig(..)
+  , ConicBorderConfig(ConicBorderConfig)
   , conicBorder
   , linearStyleBorder
   , spotlightBorder
   
   -- * Animated Dash
-  , DashPattern(..)
+  , DashPattern(DashPattern)
   , dashPattern
-  , DashAnimation(..)
-  , DashDirection(..)
+  , DashAnimation(DashAnimation)
+  , DashDirection(DashForward, DashBackward, DashAlternate)
   , dashAnimation
-  , AnimatedDash(..)
+  , AnimatedDash(AnimatedDash)
   , animatedDash
   , marchingAnts
   , flowingEnergy
   
   -- * Pulsing Stroke
-  , PulseConfig(..)
+  , PulseConfig(PulseConfig)
   , pulseConfig
-  , PulsingStroke(..)
+  , PulsingStroke(PulsingStroke)
   , pulsingStroke
   , subtlePulse
   , heartbeatPulse
   
   -- * Glowing Stroke
-  , GlowConfig(..)
+  , GlowConfig(GlowConfig)
   , glowConfig
-  , GlowingStroke(..)
+  , GlowingStroke(GlowingStroke)
   , glowingStroke
   , softGlow
   , neonGlow
   
   -- * Combined Animated Border
-  , AnimatedBorder(..)
-  , BorderEffect(..)
+  , AnimatedBorder(AnimatedBorder)
+  , BorderEffect(EffectGradient, EffectConic, EffectDash, EffectPulse, EffectGlow, EffectNone)
   , animatedBorder
   , defaultAnimatedBorder
   , noAnimatedBorder

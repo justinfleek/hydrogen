@@ -40,13 +40,13 @@
 
 module Hydrogen.Schema.Temporal.ProceduralEasing
   ( -- * Elastic Easing
-    ElasticConfig(..)
+    ElasticConfig
   , defaultElastic
   , elasticWithAmplitude
   , elasticWithPeriod
   
   -- * Bounce Easing
-  , BounceConfig(..)
+  , BounceConfig
   , defaultBounce
   , bounceWithRestitution
   
@@ -59,10 +59,10 @@ module Hydrogen.Schema.Temporal.ProceduralEasing
   , easeInOutBounce
   
   -- * Direction
-  , ProceduralDirection(..)
+  , ProceduralDirection(In, Out, InOut)
   
   -- * Combined Type
-  , ProceduralEasing(..)
+  , ProceduralEasing(Elastic, Bounce)
   , isElastic
   , isBounce
   ) where

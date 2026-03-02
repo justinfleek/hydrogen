@@ -11,7 +11,7 @@
 -- | - And more...
 
 module Hydrogen.Schema.Color.Harmony
-  ( Harmony(..)
+  ( Harmony(Complementary, SplitComplementary, Triadic, Tetradic, Square, Analogous, AnalogousWide, DoubleSplit)
   , HarmonyConfig
   , generateHarmony
   ) where

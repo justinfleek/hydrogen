@@ -24,10 +24,10 @@
 
 module Hydrogen.Schema.Physics.Collision.Layers
   ( -- * Collision Layer
-    CollisionLayer(..)
+    CollisionLayer(CollisionLayer)
   
   -- * Collision Mask
-  , CollisionMask(..)
+  , CollisionMask(CollisionMask)
   
   -- * Layer Operations
   , layerCollides

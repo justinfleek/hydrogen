@@ -34,7 +34,7 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.Exposure
   ( -- * Exposure Effect
-    ExposureEffect(..)
+    ExposureEffect
   , defaultExposureEffect
   , mkExposureEffect
   

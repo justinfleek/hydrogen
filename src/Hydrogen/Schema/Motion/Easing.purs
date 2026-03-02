@@ -31,8 +31,8 @@
 -- | ```
 module Hydrogen.Schema.Motion.Easing
   ( -- * Core Types
-    Easing(..)
-  , CubicBezier(..)
+    Easing(Linear, Bezier, Steps)
+  , CubicBezier(CubicBezier)
   
   -- * Constructors
   , linear

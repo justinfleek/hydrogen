@@ -29,7 +29,7 @@
 
 module Hydrogen.Schema.Brush.Input.Channel
   ( -- * Provenance Grade
-    Provenance(..)
+    Provenance(Hardware, Neural, Simulated, Intent)
   , allProvenances
   , provenanceToInt
   , provenanceDescription
@@ -37,7 +37,7 @@ module Hydrogen.Schema.Brush.Input.Channel
   , meetProvenance
   
   -- * Certainty Grade
-  , Certainty(..)
+  , Certainty(Exact, Estimated, Interpolated, Default)
   , allCertainties
   , certaintyToInt
   , certaintyDescription
@@ -45,7 +45,7 @@ module Hydrogen.Schema.Brush.Input.Channel
   , meetCertainty
   
   -- * Input Grade (Product)
-  , InputGrade(..)
+  , InputGrade(InputGrade)
   , topGrade
   , bottomGrade
   , joinGrade
@@ -53,7 +53,7 @@ module Hydrogen.Schema.Brush.Input.Channel
   , gradeToInt
   
   -- * Sensor Sources
-  , SensorSource(..)
+  , SensorSource(Stylus, Mouse, Touchscreen, Accelerometer, Gyroscope, BMI, EEG, EMG, AIAgent, Replay, Procedural, VoiceCommand, GestureRecog, TextDescription)
   , allSensorSources
   , sensorProvenance
   , sensorRequiresConsent
@@ -62,7 +62,7 @@ module Hydrogen.Schema.Brush.Input.Channel
   , sensorDescription
   
   -- * Input Channel
-  , InputChannel(..)
+  , InputChannel(InputChannel)
   , inputChannelFromHardware
   , inputChannelFromSimulation
   , inputChannelDefault
@@ -70,12 +70,12 @@ module Hydrogen.Schema.Brush.Input.Channel
   , inputChannelDebugInfo
   
   -- * Bipolar Input Channel
-  , BipolarInputChannel(..)
+  , BipolarInputChannel(BipolarInputChannel)
   , bipolarChannelToUnsigned
   , bipolarChannelDebugInfo
   
   -- * Graded Transformation
-  , GradedTransformation(..)
+  , GradedTransformation(GradedTransformation)
   , interpolationTransform
   , estimationTransform
   , defaultFallbackTransform

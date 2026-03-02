@@ -50,7 +50,7 @@
 -- | ```
 module Hydrogen.Schema.Motion.Timecode
   ( -- * Core Type
-    Timecode(..)
+    Timecode(Timecode)
   , TimecodeComponents
   
   -- * Constructors

@@ -8,7 +8,7 @@
 -- | Position and orientation are handled by `Transform3D` in the Scene graph.
 
 module Hydrogen.Schema.Spatial.Camera
-  ( Camera(..)
+  ( Camera(PerspectiveCamera, OrthographicCamera, PhysicalCamera)
   , perspective
   , orthographic
   , physical
@@ -27,7 +27,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Spatial.FOV (FOV)
 import Hydrogen.Schema.Spatial.NearClip (NearClip)
 import Hydrogen.Schema.Spatial.FarClip (FarClip)

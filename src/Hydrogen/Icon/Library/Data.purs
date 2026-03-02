@@ -21,7 +21,7 @@ module Hydrogen.Icon.Library.Data
   , iconUmbrella
   ) where
 
-import Prelude (map, ($), (+), (-), (*), (==))
+import Prelude (map, ($), (+), (-), (*), (==), (<>))
 import Data.EuclideanRing (mod)
 import Data.Int (toNumber)
 
@@ -29,7 +29,7 @@ import Hydrogen.Schema.Geometry.Point (point2D, getX, getY)
 import Hydrogen.Schema.Geometry.Angle (Degrees, degrees, cosAngle, sinAngle)
 import Hydrogen.Schema.Geometry.Path.Types (PathCommand(MoveTo, LineTo, ClosePath))
 import Hydrogen.Schema.Geometry.Path.Construction (pathFromCommands)
-import Hydrogen.Icon.Types (IconCategory(..), IconDefinition, IconName(..))
+import Hydrogen.Icon.Types (IconCategory(CategoryData), IconDefinition, IconName(IconName))
 
 import Data.Array (head)
 import Data.Maybe (fromMaybe)

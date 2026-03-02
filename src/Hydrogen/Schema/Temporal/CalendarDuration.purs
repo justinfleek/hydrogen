@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Temporal.CalendarDuration
   ( -- * Calendar Duration
-    CalendarDuration(..)
+    CalendarDuration(CalendarDuration)
   , calendarDuration
   , durationYears
   , durationMonths

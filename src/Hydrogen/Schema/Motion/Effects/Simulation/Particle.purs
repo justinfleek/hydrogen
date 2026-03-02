@@ -16,8 +16,8 @@
 module Hydrogen.Schema.Motion.Effects.Simulation.Particle
   ( -- * CC Particle World
     ParticleWorldEffect
-  , ParticleType(..)
-  , PhysicsModel(..)
+  , ParticleType(PTLine, PTTriPolyExplosive, PTTripolyBilinear, PTQuadPolyExplosive, PTQuadPolyBilinear, PTStarExplosive, PTStar, PTFadedSphere, PTShaded, PTBubble, PTTextured, PTCloudy, PTLensConvex, PTLensConcave, PTMotionPolygon)
+  , PhysicsModel(PMExplosive, PMTwirl, PMVortex, PMFire, PMJet, PMViscocity, PMDirectional, PMSprite)
   , defaultParticleWorld
   , particleWorldWithCount
   
@@ -60,7 +60,7 @@ import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, point2D)
 import Hydrogen.Schema.Dimension.Vector.Vec3 (Vec3, vec3)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMAdd))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // particle // world

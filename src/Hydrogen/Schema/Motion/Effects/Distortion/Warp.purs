@@ -38,13 +38,13 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Warp
   
   -- * Wave Warp Effect
   , WaveWarpEffect
-  , WaveType(..)
+  , WaveType(WTSine, WTSquare, WTTriangle, WTSawtooth, WTCircle, WTSemicircle, WTUncircle, WTNoise)
   , defaultWaveWarp
   , waveWarpWithHeight
   
   -- * Ripple Effect
   , RippleEffect
-  , RippleConversion(..)
+  , RippleConversion(RCSymmetric, RCAsymmetric)
   , defaultRipple
   , rippleWithWaves
   
@@ -55,7 +55,7 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Warp
   
   -- * Liquify Effect
   , LiquifyEffect
-  , LiquifyTool(..)
+  , LiquifyTool(LTWarp, LTTurbulence, LTTwirl, LTTwirlCCW, LTPucker, LTBloat, LTShift, LTReflection, LTReconstruction)
   , defaultLiquify
   
   -- * Serialization

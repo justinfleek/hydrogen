@@ -8,12 +8,12 @@
 
 module Hydrogen.Schema.Motion.Camera3D.Vectors
   ( -- * Vec2
-    Vec2(..)
+    Vec2(Vec2)
   , mkVec2
   , vec2Zero
   
     -- * Vec3
-  , Vec3(..)
+  , Vec3(Vec3)
   , mkVec3
   , vec3Zero
   ) where

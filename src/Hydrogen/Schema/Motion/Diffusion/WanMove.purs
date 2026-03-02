@@ -42,55 +42,55 @@
 
 module Hydrogen.Schema.Motion.Diffusion.WanMove
   ( -- * Flow Patterns
-    FlowPattern(..)
+    FlowPattern(FlowSpiral, FlowWave, FlowExplosion, FlowVortex, FlowDataRiver, FlowMorph, FlowSwarm)
   , flowPatternToString
   , flowPatternFromString
   , allFlowPatterns
   
   -- * Morph Shape Types
-  , MorphShapeType(..)
+  , MorphShapeType(MorphCircle, MorphGrid, MorphText, MorphCustom)
   , morphShapeTypeToString
   , morphShapeTypeFromString
   , allMorphShapeTypes
   
   -- * Morph Easing
-  , MorphEasing(..)
+  , MorphEasing(MEasingLinear, MEasingEaseIn, MEasingEaseOut, MEasingEaseInOut)
   , morphEasingToString
   , morphEasingFromString
   , allMorphEasings
   
   -- * Shape Easing (Extended)
-  , ShapeEasing(..)
+  , ShapeEasing(SEasingLinear, SEasingEaseIn, SEasingEaseOut, SEasingEaseInOut, SEasingElastic, SEasingBounce)
   , shapeEasingToString
   , shapeEasingFromString
   , allShapeEasings
   
   -- * Attractor Types
-  , AttractorType(..)
+  , AttractorType(AttractorLorenz, AttractorRossler, AttractorAizawa, AttractorThomas, AttractorHalvorsen)
   , attractorTypeToString
   , attractorTypeFromString
   , allAttractorTypes
   
   -- * Data Mapping
-  , DataMapping(..)
+  , DataMapping(MapSpeed, MapDirection, MapAmplitude, MapPhase, MapSize)
   , dataMappingToString
   , dataMappingFromString
   , allDataMappings
   
   -- * Force Falloff
-  , ForceFalloff(..)
+  , ForceFalloff(FalloffLinear, FalloffQuadratic, FalloffNone)
   , forceFalloffToString
   , forceFalloffFromString
   , allForceFalloffs
   
   -- * Initial Distribution
-  , InitialDistribution(..)
+  , InitialDistribution(DistRandom, DistGrid, DistEdge, DistCenter)
   , initialDistributionToString
   , initialDistributionFromString
   , allInitialDistributions
   
   -- * Shape Types
-  , ShapeType(..)
+  , ShapeType(ShapeCircle, ShapeGrid, ShapeText, ShapeHeart, ShapeStar, ShapeSpiral, ShapeRandom, ShapeCustom)
   , shapeTypeToString
   , shapeTypeFromString
   , allShapeTypes
@@ -102,11 +102,11 @@ module Hydrogen.Schema.Motion.Diffusion.WanMove
   , wanMoveMaxFPS
   
   -- * Trajectory Structures
-  , TrackPoint(..)
+  , TrackPoint(TrackPoint)
   , mkTrackPoint
-  , WanMoveMetadata(..)
+  , WanMoveMetadata(WanMoveMetadata)
   , mkWanMoveMetadata
-  , WanMoveTrajectory(..)
+  , WanMoveTrajectory(WanMoveTrajectory)
   , mkWanMoveTrajectory
   
   -- * Validation

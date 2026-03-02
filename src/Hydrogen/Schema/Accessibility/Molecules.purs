@@ -15,29 +15,29 @@
 -- | - Modal patterns (dialogs, alerts)
 module Hydrogen.Schema.Accessibility.Molecules
   ( -- * Disclosure Pattern
-    DisclosureState(..)
+    DisclosureState
   , disclosureExpanded
   , disclosureCollapsed
     -- * Selection Pattern
-  , SelectionState(..)
+  , SelectionState
   , singleSelect
   , multiSelect
     -- * Range Pattern
-  , RangeState(..)
+  , RangeState
   , mkRange
   , normalizeRange
     -- * Tab Pattern
-  , TabState(..)
+  , TabState
   , mkTabState
     -- * Dialog Pattern
-  , DialogState(..)
+  , DialogState
   , modalDialog
   , nonModalDialog
   ) where
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // disclosure pattern

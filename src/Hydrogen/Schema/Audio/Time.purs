@@ -17,11 +17,11 @@
 
 module Hydrogen.Schema.Audio.Time
   ( -- * Types
-    BeatTime(..)
-  , BarTime(..)
-  , SampleCount(..)
-  , LatencyMs(..)
-  , BPM(..)
+    BeatTime(BeatTime)
+  , BarTime(BarTime)
+  , SampleCount(SampleCount)
+  , LatencyMs(LatencyMs)
+  , BPM(BPM)
   
   -- * Constructors
   , beatTime

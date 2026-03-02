@@ -16,7 +16,7 @@
 
 module Hydrogen.Schema.Geometry.Radius
   ( -- * Core Types
-    Radius(..)
+    Radius(RadiusPx, RadiusPercent, RadiusRem, RadiusFull, RadiusNone)
   , Corners
   
   -- * Radius Constructors

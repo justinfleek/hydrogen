@@ -24,20 +24,20 @@
 
 module Hydrogen.Schema.Spatial.Camera.Types
   ( -- * Cubemap Camera
-    CubemapFace(..)
-  , CubemapCamera(..)
+    CubemapFace(PositiveX, NegativeX, PositiveY, NegativeY, PositiveZ, NegativeZ)
+  , CubemapCamera(CubemapCamera)
   , cubemapCamera
   , getFaceCamera
   
   -- * VR/Stereo Camera
-  , Eye(..)
-  , VRCamera(..)
+  , Eye(LeftEye, RightEye)
+  , VRCamera(VRCamera)
   , vrCamera
   , getEyeCamera
   
   -- * Cinematic Camera
-  , LensDistortion(..)
-  , CinematicCamera(..)
+  , LensDistortion(LensDistortion)
+  , CinematicCamera(CinematicCamera)
   , cinematicCamera
   
   -- * Accessors

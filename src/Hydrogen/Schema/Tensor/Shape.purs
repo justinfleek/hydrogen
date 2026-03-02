@@ -32,8 +32,8 @@
 
 module Hydrogen.Schema.Tensor.Shape
   ( -- * Core Types
-    Shape(..)
-  , ShapeExpr(..)
+    Shape(Shape)
+  , ShapeExpr(ShapeExpr)
   
   -- * Constructors
   , scalar

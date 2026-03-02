@@ -30,12 +30,12 @@
 
 module Hydrogen.Schema.Typography.TextEmphasis
   ( -- * Atoms
-    EmphasisShape(..)
-  , EmphasisFill(..)
-  , EmphasisPosition(..)
+    EmphasisShape(ShapeNone, ShapeDot, ShapeCircle, ShapeDoubleCircle, ShapeTriangle, ShapeSesame)
+  , EmphasisFill(Filled, Open)
+  , EmphasisPosition(PositionOver, PositionUnder)
   
   -- * Compound
-  , TextEmphasis(..)
+  , TextEmphasis(TextEmphasis)
   
   -- * Constructors
   , none

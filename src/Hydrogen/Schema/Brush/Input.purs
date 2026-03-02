@@ -39,8 +39,8 @@ module Hydrogen.Schema.Brush.Input
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Brush.Input.Types 
-  ( InputDevice(..)
-  , StylusTechnology(..)
+  ( InputDevice(Mouse, Trackpad, Stylus, Touch, VRController, VRHand, Gamepad, MIDIController)
+  , StylusTechnology(EMR, AES, MPP, USI, ApplePencil, Capacitive)
   , allInputDevices
   , allStylusTechnologies
   , has3DCapability
@@ -55,10 +55,10 @@ import Hydrogen.Schema.Brush.Input.Types
 
 import Hydrogen.Schema.Brush.Input.Capabilities 
   ( DeviceCapabilities
-  , HoverHeight(..)
-  , PressureLevels(..)
-  , TiltRange(..)
-  , TouchPoints(..)
+  , HoverHeight(HoverHeight)
+  , PressureLevels(PressureLevels)
+  , TiltRange(TiltRange)
+  , TouchPoints(TouchPoints)
   , basicPressureLevels
   , deviceCapabilities
   , hoverHeight

@@ -13,31 +13,31 @@
 
 module Hydrogen.Schema.Motion.Effects.Distortion.Types
   ( -- * Ramp Shape
-    RampShape(..)
+    RampShape(RSLinear, RSRadial)
   , allRampShapes
   , rampShapeToString
   , rampShapeFromString
   
     -- * Warp Style
-  , WarpStyle(..)
+  , WarpStyle(WSArc, WSArcLower, WSArcUpper, WSArch, WSBulge, WSShellLower, WSShellUpper, WSFlag, WSWave, WSFish, WSRise, WSFisheye, WSInflate, WSSqueeze, WSTwist)
   , allWarpStyles
   , warpStyleToString
   , warpStyleFromString
   
     -- * Displacement Map Type
-  , DisplacementMapType(..)
+  , DisplacementMapType(DMTLayer, DMTNoise, DMTGradientH, DMTGradientV, DMTRadial, DMTSineH, DMTSineV, DMTChecker)
   , allDisplacementMapTypes
   , displacementMapTypeToString
   , displacementMapTypeFromString
   
     -- * Displacement Channel
-  , DisplacementChannel(..)
+  , DisplacementChannel(DCRed, DCGreen, DCBlue, DCAlpha, DCLuminance, DCOff)
   , allDisplacementChannels
   , displacementChannelToString
   , displacementChannelFromString
   
     -- * Edge Behavior
-  , EdgeBehavior(..)
+  , EdgeBehavior(EBOff, EBTiles, EBMirror)
   , allEdgeBehaviors
   , edgeBehaviorToString
   , edgeBehaviorFromString

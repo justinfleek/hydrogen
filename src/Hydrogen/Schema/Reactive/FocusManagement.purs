@@ -9,18 +9,18 @@
 
 module Hydrogen.Schema.Reactive.FocusManagement
   ( -- * Focus Visibility
-    FocusVisibility(..)
+    FocusVisibility(FocusVisible, FocusHidden, FocusAuto)
   , isFocusVisible
   , isFocusHidden
   , shouldShowRing
   -- * Focus Origin
-  , FocusOrigin(..)
+  , FocusOrigin(KeyboardOrigin, MouseOrigin, TouchOrigin, ProgrammaticOrigin)
   , isKeyboardOrigin
   , isMouseOrigin
   , isTouchOrigin
   , isProgrammaticOrigin
   -- * Focus Ring Style
-  , FocusRingStyle(..)
+  , FocusRingStyle(OutlineRing, ShadowRing, BorderRing)
   , isOutlineRing
   , isShadowRing
   , isBorderRing
@@ -37,7 +37,7 @@ module Hydrogen.Schema.Reactive.FocusManagement
   , withRingOffset
   , withTwoRing
   -- * Focus Trap Mode
-  , FocusTrapMode(..)
+  , FocusTrapMode(HardTrap, SoftTrap, NoTrap)
   , isHardTrap
   , isSoftTrap
   , isNoTrap

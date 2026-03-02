@@ -26,7 +26,7 @@
 -- | - Data.Maybe (Maybe)
 
 module Hydrogen.Schema.Geometry.Symmetry.Rotational
-  ( RotationalSymmetry(..)
+  ( RotationalSymmetry(RotationalSymmetry)
   , rotationalSymmetry
   , noRotationalSymmetry
   , bilateral

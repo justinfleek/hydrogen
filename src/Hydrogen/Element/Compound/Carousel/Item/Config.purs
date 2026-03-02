@@ -20,7 +20,7 @@
 -- | - Data.Maybe for optional sizing
 
 module Hydrogen.Element.Compound.Carousel.Item.Config
-  ( ItemConfig(..)
+  ( ItemConfig(ItemConfig)
   , itemConfig
   , defaultItemConfig
   , imageItemConfig

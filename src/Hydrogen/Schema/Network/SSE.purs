@@ -50,7 +50,7 @@
 
 module Hydrogen.Schema.Network.SSE
   ( -- * SSE State Machine
-    SSEState(..)
+    SSEState(SSEConnecting, SSEOpen, SSEClosed)
   , isSSEConnecting
   , isSSEOpen
   , isSSEClosed
@@ -91,7 +91,7 @@ module Hydrogen.Schema.Network.SSE
   , eventIdOf
   
   -- * SSE Result Events
-  , SSEResult(..)
+  , SSEResult(SSEMessage, SSEError, SSEOpenEvent)
   , isSSEMessage
   , isSSEError
   , isSSEOpenEvent

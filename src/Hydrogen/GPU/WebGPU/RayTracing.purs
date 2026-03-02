@@ -33,11 +33,11 @@
 
 module Hydrogen.GPU.WebGPU.RayTracing
   ( -- Types
-    Vec3(..)
-  , Ray3D(..)
-  , HitRecord(..)
-  , HitAttribute(..)
-  , MaterialPoint(..)
+    Vec3(Vec3)
+  , Ray3D
+  , HitRecord
+  , HitAttribute
+  , MaterialPoint
     -- Ray construction
   , ray3
   , rayAt
@@ -47,26 +47,48 @@ module Hydrogen.GPU.WebGPU.RayTracing
   , reflectionRay
   , refractionRay
     -- Acceleration structures
-  , BLASGeometry(..)
-  , BLASBuildInput(..)
-  , TLASInstance(..)
-  , TLASBuildInput(..)
-  , AccelerationStructure(..)
-  , AccelerationKind(..)
-  , BuildInput(..)
+  , BLASGeometry
+      ( Triangles
+      , AABBs
+      , Procedural
+      )
+  , BLASBuildInput
+  , TLASInstance
+  , TLASBuildInput
+  , AccelerationStructure
+  , AccelerationKind
+      ( BLAS
+      , TLAS
+      )
+  , BuildInput
+      ( BLASInput
+      , TLASInput
+      )
   , accelerationStructure
     -- Path tracing
-  , PathState(..)
+  , PathState
   , pathState
-  , PathPayload(..)
+  , PathPayload
   , pathPayload
-  , RadianceSample(..)
+  , RadianceSample
   , bounceRay
   , russianRoulette
     -- Ray flags
-  , RayFlags(..)
+  , RayFlags
+      ( Opaque
+      , NoOpaque
+      , TerminateOnFirstHit
+      , SkipClosestHitShader
+      , SkipAnyHitShader
+      , CullBackFacingTriangles
+      , CullFrontFacingTriangles
+      , CullOpaque
+      , CullNoOpaque
+      , SkipTriangles
+      , SkipAABBs
+      )
   , combineRayFlags
-  , RayMask(..)
+  , RayMask(RayMask)
   , rayMask
     -- Constants
   , rayTMin
@@ -95,7 +117,7 @@ module Hydrogen.GPU.WebGPU.RayTracing
 import Prelude
 
 import Data.Array (head, length, catMaybes, mapWithIndex) as Data.Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.GPU.Types.Bounded
   ( Metallic

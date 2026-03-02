@@ -27,8 +27,8 @@ module Hydrogen.Element.Compound.Tour.Motion.Spotlight
   , elasticMorphConfig
   
     -- * Interpolation Types
-  , MorphInterpolation(..)
-  , MorphPath(..)
+  , MorphInterpolation(InterpolateDirect, InterpolateSmooth, InterpolateSuperellipse, InterpolateCorners)
+  , MorphPath(PathDirect, PathArc, PathBezier, PathAvoid, PathFollow)
   , ShapeInterpolation
   
     -- * Interpolation Functions

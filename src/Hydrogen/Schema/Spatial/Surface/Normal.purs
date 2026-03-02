@@ -25,10 +25,10 @@
 
 module Hydrogen.Schema.Spatial.Surface.Normal
   ( -- * Types
-    Normal(..)
-  , Tangent(..)
-  , Bitangent(..)
-  , TBNFrame(..)
+    Normal(Normal)
+  , Tangent(Tangent)
+  , Bitangent(Bitangent)
+  , TBNFrame(TBNFrame)
   
   -- * Constructors
   , normal

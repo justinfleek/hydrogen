@@ -19,31 +19,31 @@
 
 module Hydrogen.Schema.Spatial.SceneGraph.Environment
   ( -- * Skybox
-    SkyboxType(..)
-  , Skybox(..)
+    SkyboxType(SkyboxCubemap, SkyboxProcedural, SkyboxSolidColor, SkyboxGradient, SkyboxNone)
+  , Skybox(Skybox)
   , cubemapSkybox
   , proceduralSky
   , solidColorSkybox
   
   -- * Fog
-  , FogType(..)
-  , Fog(..)
+  , FogType(FogLinear, FogExponential, FogExponentialSquared, FogHeight)
+  , Fog(Fog)
   , linearFog
   , exponentialFog
   , heightFog
   , noFog
   
   -- * Post-Processing
-  , ToneMappingMode(..)
-  , AntiAliasMode(..)
-  , BloomSettings(..)
-  , ColorGrading(..)
-  , PostProcess(..)
+  , ToneMappingMode(ToneLinear, ToneReinhard, ToneACES, ToneFilmic, ToneAgX)
+  , AntiAliasMode(AANone, AAFXAA, AASMAA, AATAA, AAMSAA)
+  , BloomSettings
+  , ColorGrading
+  , PostProcess(PostProcess)
   , defaultPostProcess
   
   -- * Environment
-  , AmbientMode(..)
-  , Environment(..)
+  , AmbientMode(AmbientFlat, AmbientHemisphere, AmbientIBL)
+  , Environment(Environment)
   , defaultEnvironment
   , outdoorEnvironment
   , studioEnvironment

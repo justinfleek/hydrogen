@@ -21,7 +21,7 @@
 
 module Hydrogen.Schema.Text.Code.Token
   ( -- * Token Types
-    TokenType(..)
+    TokenType(TokKeyword, TokKeywordControl, TokKeywordOperator, TokIdentifier, TokFunction, TokFunctionCall, TokType, TokTypeParameter, TokNamespace, TokClass, TokInterface, TokEnum, TokEnumMember, TokProperty, TokParameter, TokVariable, TokConstant, TokString, TokStringEscape, TokStringInterp, TokNumber, TokBoolean, TokNull, TokRegexp, TokOperator, TokPunctuation, TokBracket, TokComment, TokCommentBlock, TokCommentDoc, TokTag, TokTagAttribute, TokMacro, TokLabel, TokInvalid, TokPlain)
   , isKeyword
   , isString
   , isNumber

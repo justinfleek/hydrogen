@@ -7,7 +7,7 @@
 -- | Controls visibility of guides, wireframes, motion paths, and overlays.
 
 module Hydrogen.Schema.Motion.Camera3D.ViewOptions
-  ( ViewOptions(..)
+  ( ViewOptions(ViewOptions)
   , mkViewOptions
   , defaultViewOptions
   ) where

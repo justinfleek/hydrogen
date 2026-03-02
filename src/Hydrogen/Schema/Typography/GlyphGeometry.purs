@@ -30,7 +30,7 @@ module Hydrogen.Schema.Typography.GlyphGeometry
   ( -- * Core Types
     GlyphPath
   , Contour
-  , ContourWinding(..)
+  , ContourWinding(WindingClockwise, WindingCounterClockwise)
   
   -- * 3D Control Points
   , ControlPoint3D
@@ -38,7 +38,7 @@ module Hydrogen.Schema.Typography.GlyphGeometry
   , controlPoint2D
   
   -- * Path Commands in 3D
-  , PathCommand3D(..)
+  , PathCommand3D(MoveTo3D, LineTo3D, QuadraticTo3D, CubicTo3D, ClosePath3D)
   
   -- * Glyph Bounds
   , GlyphBounds

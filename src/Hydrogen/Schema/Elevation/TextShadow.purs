@@ -45,7 +45,7 @@
 module Hydrogen.Schema.Elevation.TextShadow
   ( -- * Core Types
     TextShadow
-  , LayeredTextShadow(..)
+  , LayeredTextShadow(LayeredTextShadow)
   
   -- * Constructors
   , textShadow

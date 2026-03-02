@@ -101,16 +101,16 @@ import Prelude
   )
 
 import Data.Array (length, index, updateAt, snoc, replicate, filter, all, any, mapWithIndex, take) as Array
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple (Tuple(..), fst, snd)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
+import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Foldable (foldl)
 
 import Hydrogen.Layout.ILP.Problem
   ( ILPProblem
   , Solution
-  , SolveStatus(..)
-  , Sense(..)
-  , ConstraintSense(..)
+  , SolveStatus(Optimal, Feasible, Infeasible, Unbounded)
+  , Sense(Minimize, Maximize)
+  , ConstraintSense(Le, Ge, Eq)
   , ConstraintRow
   , VarId
   , numVariables

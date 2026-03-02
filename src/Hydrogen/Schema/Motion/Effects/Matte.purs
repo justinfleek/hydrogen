@@ -50,15 +50,15 @@ import Hydrogen.Schema.Motion.Effects.Matte.Types
   , geometricSoftness
   , unwrapGeometricSoftness
   , RefineMatteEffect
-  , RefinementType(..)
-  , MotionBlurMode(..)
+  , RefinementType(RTSmooth, RTFeather, RTChoke, RTShiftEdge, RTReduceChatter)
+  , MotionBlurMode(MBMNone, MBMNormal, MBMHighQuality)
   , SetMatteEffect
-  , SetMatteChannel(..)
-  , SetMatteStretch(..)
+  , SetMatteChannel(SMCRed, SMCGreen, SMCBlue, SMCAlpha, SMCLuminance, SMCHue, SMCSaturation, SMCLightness, SMCFullOn, SMCFullOff)
+  , SetMatteStretch(SMSStretch, SMSTile, SMSCenter)
   , ChannelCombinerEffect
-  , CombinerSource(..)
+  , CombinerSource(CSSourceRed, CSSourceGreen, CSSourceBlue, CSSourceAlpha, CSSourceLuma, CSLayerRed, CSLayerGreen, CSLayerBlue, CSLayerAlpha, CSLayerLuma, CSFullOn, CSFullOff, CSInvert)
   , MatteCleanupEffect
-  , CleanupOperation(..)
+  , CleanupOperation(COBlur, COContrast, COGamma, COShrink, COExpand, COSimplify)
   ) as Types
 
 import Hydrogen.Schema.Motion.Effects.Matte.Operations

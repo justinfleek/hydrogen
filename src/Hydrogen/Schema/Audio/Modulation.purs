@@ -18,9 +18,9 @@
 
 module Hydrogen.Schema.Audio.Modulation
   ( -- * Modulation Atoms
-    ModDepth(..)
-  , ModRate(..)
-  , LFOPhase(..)
+    ModDepth(ModDepth)
+  , ModRate(ModRate)
+  , LFOPhase(LFOPhase)
   
   -- * Constructors
   , modDepth
@@ -33,7 +33,7 @@ module Hydrogen.Schema.Audio.Modulation
   , unwrapLFOPhase
   
   -- * Sync Ratios
-  , SyncRatio(..)
+  , SyncRatio(Ratio1_16, Ratio1_8, Ratio1_4, Ratio1_2, Ratio1_1, Ratio2_1, Ratio4_1, Ratio1_8T, Ratio1_4T, Ratio1_8D, Ratio1_4D)
   , syncRatioToMultiplier
   , syncRatioToString
   

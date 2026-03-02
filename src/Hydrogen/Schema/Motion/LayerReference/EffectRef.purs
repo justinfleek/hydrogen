@@ -25,12 +25,12 @@
 
 module Hydrogen.Schema.Motion.LayerReference.EffectRef
   ( -- * Effect Channel
-    EffectChannel(..)
+    EffectChannel(ECFull, ECRed, ECGreen, ECBlue, ECAlpha, ECLuminance, ECLightness, ECSaturation, ECHue, ECEffectsAndMasks, ECSourceOnly)
   , allEffectChannels
   , effectChannelToString
   
   -- * Effect Layer Reference
-  , EffectLayerRef(..)
+  , EffectLayerRef(EffectLayerRef)
   , mkEffectLayerRef
   , effectRefTargetLayer
   , effectRefChannel

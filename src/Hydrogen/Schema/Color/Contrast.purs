@@ -13,7 +13,7 @@
 
 module Hydrogen.Schema.Color.Contrast
   ( -- * WCAG Levels
-    WCAGLevel(..)
+    WCAGLevel(WCAGFail, WCAGAA_Large, WCAGAA, WCAGAAA_Large, WCAGAAA)
   
   -- * Contrast Calculation
   , Contrast

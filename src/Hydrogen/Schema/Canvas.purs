@@ -55,7 +55,7 @@ import Hydrogen.Schema.Canvas.Bounds
   , boundsArea
   , boundsAspectRatio
   , boundsCenter
-  , CoordinateSystem(..)
+  , CoordinateSystem(ScreenCoords, CartesianCoords, NormalizedCoords)
   , allCoordinateSystems
   , isInBounds
   , clampToBounds
@@ -110,7 +110,7 @@ import Hydrogen.Schema.Canvas.Physics
   , gravitiesEqual
   , gravityWithinBand
   , gravityStrongerThan
-  , GravityOrdering(..)
+  , GravityOrdering(GravityWeaker, GravityEqual, GravityStronger)
   , compareGravityStrength
   ) as Physics
 
@@ -152,18 +152,18 @@ import Hydrogen.Schema.Canvas.Grid
   , isInterior
   , isWithinBounds
   , buildCellPath
-  , BoundaryType(..)
+  , BoundaryType(Corner, Edge, Interior)
   , cellBoundaryType
   ) as Grid
 
 import Hydrogen.Schema.Canvas.Background
-  ( BackgroundFill(..)
+  ( BackgroundFill(FillSolid, FillGradient, FillPattern, FillTransparent)
   , allBackgroundFills
   , defaultFill
   , SolidBackground
   , mkSolidBackground
   , solidColor
-  , GradientType(..)
+  , GradientType(LinearGradient, RadialGradient, ConicGradient)
   , allGradientTypes
   , GradientStop
   , mkGradientStop
@@ -172,14 +172,14 @@ import Hydrogen.Schema.Canvas.Background
   , gradientType
   , gradientStops
   , gradientAngle
-  , PatternType(..)
+  , PatternType(CheckerPattern, GridPattern, DotsPattern, LinesPattern, CrosshatchPattern, NoisePattern)
   , allPatternTypes
   , PatternBackground
   , mkPatternBackground
   , patternType
   , patternScale
   , patternOpacity
-  , PaperTexture(..)
+  , PaperTexture(SmoothPaper, ColdPressPaper, RoughPaper, ToothPaper, CanvasPaper, VellumPaper)
   , allPaperTextures
   , PaperProperties
   , mkPaperProperties

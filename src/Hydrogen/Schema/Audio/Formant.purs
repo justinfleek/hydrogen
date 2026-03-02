@@ -41,13 +41,13 @@ module Hydrogen.Schema.Audio.Formant
   ) where
 
 import Hydrogen.Schema.Audio.Formant.Types
-  ( F1(..)
-  , F2(..)
-  , F3(..)
-  , F4(..)
-  , F5(..)
-  , FormantAmplitude(..)
-  , FormantBandwidth(..)
+  ( F1(F1)
+  , F2(F2)
+  , F3(F3)
+  , F4(F4)
+  , F5(F5)
+  , FormantAmplitude(FormantAmplitude)
+  , FormantBandwidth(FormantBandwidth)
   , bandwidthMedium
   , bandwidthNarrow
   , bandwidthWide
@@ -68,10 +68,10 @@ import Hydrogen.Schema.Audio.Formant.Types
   ) as Types
 
 import Hydrogen.Schema.Audio.Formant.Vowels
-  ( IPAVowel(..)
-  , VowelBackness(..)
-  , VowelHeight(..)
-  , VowelRounding(..)
+  ( IPAVowel(VowelI, VowelY, VowelE, VowelOE, VowelEpsilon, VowelSchwa, VowelA, VowelAE, VowelOpenO, VowelO, VowelU, VowelUpsilon, VowelWedge, VowelAsh)
+  , VowelBackness(BacknessFront, BacknessCentral, BacknessBack)
+  , VowelHeight(HeightClose, HeightCloseMid, HeightMid, HeightOpenMid, HeightOpen)
+  , VowelRounding(RoundingUnrounded, RoundingRounded)
   , ipaVowelExample
   , ipaVowelSymbol
   , ipaVowelToFormants
@@ -90,9 +90,9 @@ import Hydrogen.Schema.Audio.Formant.Molecules
   ) as Molecules
 
 import Hydrogen.Schema.Audio.Formant.VocalTract
-  ( FormantShift(..)
-  , TractLength(..)
-  , VocoderBands(..)
+  ( FormantShift(FormantShift)
+  , TractLength(TractLength)
+  , VocoderBands(VocoderBands)
   , formantShift
   , tractLength
   , tractLengthChild

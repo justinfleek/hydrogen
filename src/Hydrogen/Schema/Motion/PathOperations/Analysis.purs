@@ -64,7 +64,7 @@ import Prelude
   )
 
 import Data.Array (length, index, snoc, head, last, take, drop, concat, foldl, filter, cons, zipWith)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (sqrt, abs)
 import Data.Int (toNumber) as Int
 

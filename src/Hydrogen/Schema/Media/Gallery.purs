@@ -38,7 +38,7 @@
 module Hydrogen.Schema.Media.Gallery
   ( -- * Media Item
     MediaItem
-  , MediaType(..)
+  , MediaType(Image, Video, Audio)
   , imageItem
   , videoItem
   , itemId
@@ -67,7 +67,7 @@ module Hydrogen.Schema.Media.Gallery
   , isSlideshowActive
   
   -- * Gallery Command
-  , GalleryCommand(..)
+  , GalleryCommand(Open, Close, Next, Previous, GoTo, First, Last, EnterFullscreen, ExitFullscreen, ToggleFullscreen, StartSlideshow, StopSlideshow, ToggleSlideshow, SetLoop)
   , applyGalleryCommand
   
   -- * Navigation

@@ -27,7 +27,7 @@ module Hydrogen.Schema.Motion.Effects.Simulation.Weather
   
   -- * CC Snowfall
   , SnowfallEffect
-  , SnowflakeType(..)
+  , SnowflakeType(SFTDot, SFTCrystal, SFTFlake, SFTMixed)
   , defaultSnowfall
   , snowfallWithFlakes
   

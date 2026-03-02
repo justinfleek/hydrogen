@@ -18,8 +18,8 @@
 
 module Hydrogen.Element.Compound.Tour.Motion.Responsive
   ( -- * Scale Types
-    MotionScale(..)
-  , PerformanceTier(..)
+    MotionScale(MotionFull, MotionReduced, MotionMinimal, MotionNone)
+  , PerformanceTier(TierHigh, TierMedium, TierLow, TierMinimal)
   
     -- * Configuration
   , ReducedMotionFallback

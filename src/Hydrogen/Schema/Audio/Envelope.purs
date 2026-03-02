@@ -21,11 +21,11 @@
 
 module Hydrogen.Schema.Audio.Envelope
   ( -- * ADSR Atoms
-    AttackTime(..)
-  , DecayTime(..)
-  , SustainLevel(..)
-  , ReleaseTime(..)
-  , HoldTime(..)
+    AttackTime(AttackTime)
+  , DecayTime(DecayTime)
+  , SustainLevel(SustainLevel)
+  , ReleaseTime(ReleaseTime)
+  , HoldTime(HoldTime)
   
   -- * Constructors
   , attackTime

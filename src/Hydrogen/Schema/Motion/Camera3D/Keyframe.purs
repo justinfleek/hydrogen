@@ -8,7 +8,7 @@
 -- | spatial and temporal interpolation controls.
 
 module Hydrogen.Schema.Motion.Camera3D.Keyframe
-  ( CameraKeyframe(..)
+  ( CameraKeyframe(CameraKeyframe)
   , mkCameraKeyframe
   , cameraKeyframeAtFrame
   ) where

@@ -62,7 +62,7 @@ module Hydrogen.Schema.Motion.Effects.Distortion.Extended
   
   -- * Split Effect  
   , SplitEffect
-  , SplitDirection(..)
+  , SplitDirection(SDHorizontal, SDVertical, SDBoth)
   , defaultSplit
   
   -- * Tiler Effect

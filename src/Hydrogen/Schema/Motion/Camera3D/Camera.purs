@@ -8,11 +8,11 @@
 
 module Hydrogen.Schema.Motion.Camera3D.Camera
   ( -- * Camera ID
-    CameraId(..)
+    CameraId(CameraId)
   , mkCameraId
   
     -- * Camera3D
-  , Camera3D(..)
+  , Camera3D(Camera3D)
   , mkCamera3D
   , defaultCamera3D
   ) where

@@ -21,7 +21,7 @@
 -- | - **molasses**: Very slow, syrupy
 
 module Hydrogen.Schema.Temporal.SpringConfig
-  ( SpringConfig(..)
+  ( SpringConfig(SpringConfig)
   , springConfig
   , springConfigWithVelocity
   

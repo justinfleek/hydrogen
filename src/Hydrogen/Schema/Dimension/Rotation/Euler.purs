@@ -32,7 +32,7 @@
 
 module Hydrogen.Schema.Dimension.Rotation.Euler
   ( -- * Types
-    RotationOrder(..)
+    RotationOrder(XYZ, YZX, ZXY, XZY, YXZ, ZYX)
   , Euler(Euler)
   
   -- * Rotation Order

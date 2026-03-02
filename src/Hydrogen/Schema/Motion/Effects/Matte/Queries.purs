@@ -76,7 +76,7 @@ import Hydrogen.Schema.Motion.Effects.Matte.Types
   , geometricSoftness
   , unwrapGeometricSoftness
   , RefineMatteEffect
-  , MotionBlurMode(..)
+  , MotionBlurMode(MBMNone, MBMNormal, MBMHighQuality)
   , SetMatteEffect
   , MatteCleanupEffect
   )

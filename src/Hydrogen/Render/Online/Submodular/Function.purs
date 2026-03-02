@@ -73,7 +73,7 @@ import Data.Set (Set)
 
 import Hydrogen.Render.Online.Core
   ( BoundedNumber
-  , Utility(..)
+  , Utility(Utility)
   , clampToBounds
   , mkBoundedNumber
   , unwrapBounded

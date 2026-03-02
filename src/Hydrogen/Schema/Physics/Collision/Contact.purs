@@ -24,7 +24,7 @@
 
 module Hydrogen.Schema.Physics.Collision.Contact
   ( -- * Contact Type
-    Contact(..)
+    Contact(NoContact, Contact)
   
   -- * Construction
   , contact
@@ -52,7 +52,7 @@ import Prelude
   )
 
 import Hydrogen.Schema.Physics.Collision.Point
-  ( Point2D(..)
+  ( Point2D(Point2D)
   , origin2D
   , normalizePoint
   , negatePoint

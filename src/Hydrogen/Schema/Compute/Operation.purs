@@ -39,8 +39,8 @@
 
 module Hydrogen.Schema.Compute.Operation
   ( -- * Core Types
-    Operation(..)
-  , ActivationType(..)
+    Operation(MatMul, Linear, Conv1D, Conv2D, Conv3D, Add, Mul, Sub, Div, Neg, Abs, Sqrt, Exp, Log, Activation, Softmax, LayerNorm, BatchNorm, GroupNorm, RMSNorm, ScaledDotProductAttention, MultiHeadAttention, FlashAttention, Reshape, Transpose, Concat, Split, Broadcast, Squeeze, Unsqueeze, Permute, ReduceSum, ReduceMean, ReduceMax, ReduceMin)
+  , ActivationType(ReLU, GELU, SiLU, Sigmoid, Tanh, LeakyReLU, Identity)
   , ConvParams
   , AttentionParams
   , NormParams

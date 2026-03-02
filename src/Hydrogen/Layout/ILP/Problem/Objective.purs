@@ -53,11 +53,11 @@ import Prelude
   )
 
 import Data.Array (snoc, filter, all) as Data.Array
-import Data.Tuple (Tuple(..), fst)
+import Data.Tuple (Tuple(Tuple), fst)
 import Data.Foldable (foldl)
 
 import Hydrogen.Layout.ILP.Problem.Types
-  ( Sense(..)
+  ( Sense(Minimize, Maximize)
   , VarId
   , ILPProblem
   )

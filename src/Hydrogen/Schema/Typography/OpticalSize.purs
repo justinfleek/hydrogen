@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Typography.OpticalSize
   ( -- * Type
-    OpticalSize(..)
+    OpticalSize(OpticalSize)
     
   -- * Constructors
   , opticalSize

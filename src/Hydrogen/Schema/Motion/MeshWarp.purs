@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Motion.MeshWarp
   ( -- * Enumerations
-    WarpPinType(..)
+    WarpPinType(WPTPosition, WPTRotation, WPTStarch, WPTOverlap, WPTBend, WPTAdvanced)
   , warpPinTypeToString
   , warpPinTypeFromString
   , warpPinTypeUsesPosition
@@ -32,22 +32,22 @@ module Hydrogen.Schema.Motion.MeshWarp
   , warpPinTypeUsesOverlap
   , warpPinTypeDefaultStiffness
   
-  , WarpWeightMethod(..)
+  , WarpWeightMethod(WWMInverseDistance, WWMHeatDiffusion, WWMRadialBasis, WWMBounded)
   , warpWeightMethodToString
   , warpWeightMethodFromString
   
   -- * Warp Pin
-  , WarpPin(..)
-  , WarpPinId(..)
+  , WarpPin
+  , WarpPinId(WarpPinId)
   , mkWarpPinId
   , defaultWarpPin
   
   -- * Warp Pin Rest State
-  , WarpPinRestState(..)
+  , WarpPinRestState
   , mkWarpPinRestState
   
   -- * Warp Mesh
-  , WarpMesh(..)
+  , WarpMesh
   , mkWarpMesh
   , warpMeshVertexCount
   , warpMeshIsDirty
@@ -55,11 +55,11 @@ module Hydrogen.Schema.Motion.MeshWarp
   , warpMeshMarkClean
   
   -- * Deformation Result
-  , DeformedControlPoint(..)
-  , WarpDeformationResult(..)
+  , DeformedControlPoint
+  , WarpDeformationResult
   
   -- * Weight Options
-  , WarpWeightOptions(..)
+  , WarpWeightOptions
   , defaultWarpWeightOptions
   ) where
 

@@ -52,12 +52,12 @@ module Hydrogen.Schema.Brand.Token.Spacing
   , spacingValueRem
   
   -- * Spacing Purpose
-  , SpacingPurpose(..)
+  , SpacingPurpose(PurposePadding, PurposeMargin, PurposeGap, PurposeInset, PurposeStack, PurposeInline, PurposeSection, PurposeComponent, PurposeLayout)
   , purposeToString
   , purposeFromString
   
   -- * Spacing Scale
-  , SpacingScale(..)
+  , SpacingScale(ScaleNone, ScaleXs, ScaleSm, ScaleMd, ScaleLg, ScaleXl, Scale2xl, Scale3xl, Scale4xl)
   , scaleToString
   , scaleFromString
   , scaleToMultiplier

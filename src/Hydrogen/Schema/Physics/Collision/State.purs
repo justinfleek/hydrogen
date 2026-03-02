@@ -18,7 +18,7 @@
 
 module Hydrogen.Schema.Physics.Collision.State
   ( -- * Collision State
-    CollisionState(..)
+    CollisionState(NotColliding, Colliding, Separating, Resting, Sliding, Rolling)
   
   -- * State Queries
   , isColliding

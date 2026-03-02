@@ -36,7 +36,7 @@
 
 module Hydrogen.Schema.Audio.Voice
   ( -- * Pitch Atoms
-    VoicePitch(..)
+    VoicePitch(VoicePitch)
   , voicePitch
   , unwrapVoicePitch
   , pitchVeryLow
@@ -46,7 +46,7 @@ module Hydrogen.Schema.Audio.Voice
   , pitchVeryHigh
   
   -- * Rate Atoms
-  , SpeechRate(..)
+  , SpeechRate(SpeechRate)
   , speechRate
   , unwrapSpeechRate
   , rateVerySlow
@@ -56,10 +56,10 @@ module Hydrogen.Schema.Audio.Voice
   , rateVeryFast
   
   -- * Quality Atoms
-  , Breathiness(..)
-  , Roughness(..)
-  , Nasality(..)
-  , Strain(..)
+  , Breathiness(Breathiness)
+  , Roughness(Roughness)
+  , Nasality(Nasality)
+  , Strain(Strain)
   , breathiness
   , roughness
   , nasality
@@ -70,16 +70,16 @@ module Hydrogen.Schema.Audio.Voice
   , unwrapStrain
   
   -- * Resonance
-  , Resonance(..)
+  , Resonance(ResonanceHead, ResonanceChest, ResonanceThroat, ResonanceMixed)
   , resonanceHead
   , resonanceChest
   , resonanceThroat
   , resonanceMixed
   
   -- * Prosody Atoms
-  , PitchVariation(..)
-  , Emphasis(..)
-  , Pause(..)
+  , PitchVariation(PitchVariation)
+  , Emphasis(Emphasis)
+  , Pause(Pause)
   , pitchVariation
   , emphasis
   , pause
@@ -88,7 +88,7 @@ module Hydrogen.Schema.Audio.Voice
   , unwrapPause
   
   -- * Expression Atoms
-  , Expression(..)
+  , Expression(ExpressionNeutral, ExpressionJoyful, ExpressionConcerned, ExpressionCurious, ExpressionConfident, ExpressionHesitant, ExpressionUrgent, ExpressionCalm)
   , expressionNeutral
   , expressionJoyful
   , expressionConcerned
@@ -100,7 +100,7 @@ module Hydrogen.Schema.Audio.Voice
   , expressionName
   
   -- * Articulation
-  , Articulation(..)
+  , Articulation(ArticulationPrecise, ArticulationRelaxed, ArticulationClipped, ArticulationDrawn)
   , articulationName
   , articulationPrecise
   , articulationRelaxed

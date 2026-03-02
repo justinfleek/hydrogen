@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Reactive.Feedback.Dialog
   ( -- * Dialog Type
-    DialogType(..)
+    DialogType(ConfirmDialog, AlertDialogType, PromptDialog)
   , isConfirmDialog
   , isAlertDialog
   , isPromptDialog

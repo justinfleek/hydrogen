@@ -42,7 +42,7 @@ import Prelude (($))
 import Hydrogen.Schema.Geometry.Point (point2D)
 import Hydrogen.Schema.Geometry.Path.Types (PathCommand(MoveTo, LineTo, ClosePath))
 import Hydrogen.Schema.Geometry.Path.Construction (pathFromCommands)
-import Hydrogen.Icon.Types (IconCategory(..), IconDefinition, IconName(..))
+import Hydrogen.Icon.Types (IconCategory(CategoryActions), IconDefinition, IconName(IconName))
 
 import Hydrogen.Icon.Library.Core
   ( mkIcon

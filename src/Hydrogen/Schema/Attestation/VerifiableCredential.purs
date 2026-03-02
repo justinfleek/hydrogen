@@ -15,15 +15,15 @@
 
 module Hydrogen.Schema.Attestation.VerifiableCredential
   ( -- * Credential Types
-    CredentialType(..)
+    CredentialType(VerifiableCredentialType, IdentityCredential, UniversityDegreeCredential, EmploymentCredential, MembershipCredential, AgeVerificationCredential, AddressCredential, HealthCredential, LicenseCredential, CustomCredential)
   , credentialTypeLabel
   
   -- * Credential Status
-  , CredentialStatus(..)
+  , CredentialStatus(StatusActive, StatusRevoked, StatusSuspended, StatusExpired)
   , credentialStatusLabel
   
   -- * Proof Type
-  , ProofType(..)
+  , ProofType(Ed25519Signature2020, EcdsaSecp256k1Signature2019, JsonWebSignature2020, BbsBlsSignature2020, BbsBlsSignatureProof2020)
   , proofTypeLabel
   
   -- * Proof

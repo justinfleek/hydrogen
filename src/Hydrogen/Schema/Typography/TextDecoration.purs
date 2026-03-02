@@ -26,13 +26,13 @@
 
 module Hydrogen.Schema.Typography.TextDecoration
   ( -- * Atoms
-    DecorationLine(..)
-  , DecorationStyle(..)
-  , DecorationThickness(..)
-  , UnderlineOffset(..)
+    DecorationLine(LineNone, Underline, Overline, LineThrough, UnderlineOverline)
+  , DecorationStyle(StyleSolid, StyleDouble, StyleDotted, StyleDashed, StyleWavy)
+  , DecorationThickness(ThicknessAuto, ThicknessFromFont, ThicknessPixels, ThicknessEm, ThicknessPercent)
+  , UnderlineOffset(OffsetAuto, OffsetPixels, OffsetEm, OffsetPercent)
   
   -- * Compound
-  , TextDecoration(..)
+  , TextDecoration(TextDecoration)
   
   -- * Constructors
   , none

@@ -44,7 +44,7 @@
 
 module Hydrogen.Schema.Physical.Fluid.FlowBehavior
   ( -- * Flow Behavior Type
-    FlowBehavior(..)
+    FlowBehavior(Newtonian, ShearThinning, ShearThickening, BinghamPlasticType, Thixotropic, Rheopectic, Viscoelastic)
   , allFlowBehaviors
   , isNewtonian
   , isNonNewtonian

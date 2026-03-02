@@ -18,15 +18,15 @@
 
 module Hydrogen.Schema.Audio.Formant.Vowels
   ( -- * Vowel Atoms
-    VowelHeight(..)
-  , VowelBackness(..)
-  , VowelRounding(..)
+    VowelHeight(HeightClose, HeightCloseMid, HeightMid, HeightOpenMid, HeightOpen)
+  , VowelBackness(BacknessFront, BacknessCentral, BacknessBack)
+  , VowelRounding(RoundingUnrounded, RoundingRounded)
   , vowelHeightName
   , vowelBacknessName
   , vowelRoundingName
   
   -- * IPA Vowels
-  , IPAVowel(..)
+  , IPAVowel(VowelI, VowelY, VowelE, VowelOE, VowelEpsilon, VowelSchwa, VowelA, VowelAE, VowelOpenO, VowelO, VowelU, VowelUpsilon, VowelWedge, VowelAsh)
   , ipaVowelSymbol
   , ipaVowelExample
   , ipaVowelToFormants

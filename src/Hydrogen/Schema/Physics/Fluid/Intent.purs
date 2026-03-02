@@ -35,25 +35,25 @@
 
 module Hydrogen.Schema.Physics.Fluid.Intent
   ( -- * Fluid Behavior (semantic)
-    FluidBehavior(..)
+    FluidBehavior(Flowing, Dripping, Pooling, Splashing, Spreading, Mixing, Drying, Toppling)
   , allFluidBehaviors
   , describeBehavior
   
   -- * Viscosity Class (semantic)
-  , ViscosityClass(..)
+  , ViscosityClass(Watery, Milky, Syrupy, Oily, Honey, Tar, Solid)
   , allViscosityClasses
   , viscosityToCoefficient
   , describeViscosity
   
   -- * Scale Class (semantic)
-  , ScaleClass(..)
+  , ScaleClass(Microscopic, Small, Medium, Large, Massive)
   , allScaleClasses
   , scaleToParticleCount
   , scaleToGridResolution
   , describeScale
   
   -- * Interaction Type
-  , InteractionType(..)
+  , InteractionType(Passive, Painting, Pouring, Tilting, Touching, Blowing)
   , allInteractionTypes
   , describeInteraction
   
@@ -66,7 +66,7 @@ module Hydrogen.Schema.Physics.Fluid.Intent
   , intentInteraction
   
   -- * Intent to Configuration
-  , SimulationChoice(..)
+  , SimulationChoice(UseSPH, UseGridSolver, UseHybrid)
   , chooseSimulation
   , intentToSolverConfig
   , intentToFluidProperties

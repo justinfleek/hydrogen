@@ -50,7 +50,7 @@ module Hydrogen.Schema.Motion.Effects.Keying
   
   -- * Luma Key
   , LumaKeyEffect
-  , LumaKeyType(..)
+  , LumaKeyType(LKTKeyOutBrighter, LKTKeyOutDarker, LKTKeyOutSimilar, LKTKeyOutDissimilar)
   , defaultLumaKey
   , lumaKeyBrightness
   , lumaKeyDarkness
@@ -61,7 +61,7 @@ module Hydrogen.Schema.Motion.Effects.Keying
   
   -- * Linear Color Key
   , LinearColorKeyEffect
-  , LinearKeyOperation(..)
+  , LinearKeyOperation(LKOKeyColors, LKOMask, LKOKeepColors, LKODropColors)
   , defaultLinearColorKey
   
   -- * Edge Refinement (shared)

@@ -43,11 +43,11 @@
 -- | ```
 module Hydrogen.Schema.Motion.Keyframe
   ( -- * Core Types
-    Keyframe(..)
-  , KeyframeId(..)
-  , KeyframeValue(..)
-  , Tangent(..)
-  , InterpolationType(..)
+    Keyframe(Keyframe)
+  , KeyframeId(KeyframeId)
+  , KeyframeValue(NumberValue, Vec2Value, Vec3Value, ColorValue, AngleValue, PercentValue)
+  , Tangent(Tangent)
+  , InterpolationType(Linear, Bezier, Hold, Auto)
   
   -- * Constructors
   , keyframe

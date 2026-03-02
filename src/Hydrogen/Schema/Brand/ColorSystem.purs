@@ -58,7 +58,7 @@ module Hydrogen.Schema.Brand.ColorSystem
   , hasPaletteColor
   
   -- * Palette Mode
-  , PaletteMode(..)
+  , PaletteMode(ModeLight, ModeDark, ModeContrast, ModeCustom)
   , paletteModeToString
   , paletteModeFromString
   , allPaletteModes
@@ -123,7 +123,7 @@ import Hydrogen.Schema.Brand.Token (TokenName, mkTokenDesc, unTokenName)
 import Hydrogen.Schema.Brand.Token.Color 
   ( ColorToken
   , ColorRole
-  , ColorShade(..)
+  , ColorShade(Shade50, Shade100, Shade200, Shade300, Shade400, Shade500, Shade600, Shade700, Shade800, Shade900, Shade950)
   , colorTokenName
   , colorTokenRole
   , mkColorToken

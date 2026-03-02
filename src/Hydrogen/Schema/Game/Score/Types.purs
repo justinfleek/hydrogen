@@ -24,7 +24,7 @@ module Hydrogen.Schema.Game.Score.Types
   , clampEloRating
   
   -- * K-Factor
-  , KFactor(..)
+  , KFactor(KFactor)
   , kFactor
   , unwrapKFactor
   , kFactorBounds
@@ -32,7 +32,7 @@ module Hydrogen.Schema.Game.Score.Types
   , masterKFactor
   
   -- * Rating Deviation (Glicko)
-  , RatingDeviation(..)
+  , RatingDeviation(RatingDeviation)
   , ratingDeviation
   , unwrapRatingDeviation
   , ratingDeviationBounds

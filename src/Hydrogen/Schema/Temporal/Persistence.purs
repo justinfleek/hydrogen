@@ -24,7 +24,7 @@
 -- |   Equivalent to CSS 'both'.
 
 module Hydrogen.Schema.Temporal.Persistence
-  ( Persistence(..)
+  ( Persistence(None, PersistEnd, PersistStart, PersistBoth)
   , persistenceToString
   , persistenceFromString
   ) where
@@ -40,7 +40,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // persistence

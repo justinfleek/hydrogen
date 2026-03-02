@@ -46,7 +46,64 @@ module Hydrogen.Schema.Motion.Layer
   ) where
 
 import Hydrogen.Schema.Motion.Layer.Types
-  ( LayerType(..)
+  ( LayerType
+      ( LTImage
+      , LTVideo
+      , LTSolid
+      , LTAudio
+      , LTText
+      , LTShape
+      , LTNull
+      , LTCamera
+      , LTLight
+      , LTAdjustment
+      , LTEffect
+      , LTPreComp
+      , LTGroup
+      , LTNestedComp
+      , LTParticle
+      , LTDepth
+      , LTNormal
+      , LTGenerated
+      , LTMatte
+      , LTControl
+      , LTSpline
+      , LTPath
+      , LTPose
+      , LTModel
+      , LTPointCloud
+      , LTDepthflow
+      , LTSVG
+      , LTVectorGraphic
+      , LTLottie
+      , LTRive
+      , LTMesh
+      , LTEnvironment
+      , LTVolume
+      , LTSkeleton
+      , LTHDR
+      , LTLUT
+      , LTGradient
+      , LTWaveform
+      , LTSpectrogram
+      , LTMIDI
+      , LTCSV
+      , LTJSON
+      , LTGeoJSON
+      , LTData
+      , LTMarker
+      , LTSubtitle
+      , LTAnnotation
+      , LTComment
+      , LTTracker
+      , LTPlanarTracking
+      , LTStabilizer
+      , LTReference
+      , LTGrid
+      , LTGuide
+      , LTMask
+      , LTRoto
+      )
   , layerTypeToString
   , layerTypeFromString
   , isLayerType3D
@@ -68,19 +125,19 @@ import Hydrogen.Schema.Motion.Layer.Types
   ) as Types
 
 import Hydrogen.Schema.Motion.Layer.Base
-  ( LayerId(..)
+  ( LayerId(LayerId)
   , mkLayerId
-  , LayerVisibility(..)
+  , LayerVisibility(LayerVisibility)
   , layerVisibilityToString
   , layerVisibilityFromString
   , defaultVisibility
   , hiddenVisibility
   , lockedVisibility
   , soloVisibility
-  , SamplingQuality(..)
+  , SamplingQuality(SQDraft, SQBest)
   , samplingQualityToString
   , samplingQualityFromString
-  , LayerBase(..)
+  , LayerBase(LayerBase)
   , defaultLayerBase
   , mkLayerBase
   , layerId

@@ -54,13 +54,13 @@ import Prelude
   )
 
 import Data.Array (snoc, filter, all) as Data.Array
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..), fst, snd)
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Foldable (foldl)
 
 import Hydrogen.Layout.ILP.Problem.Types
   ( VarId
-  , ConstraintSense(..)
+  , ConstraintSense(Le, Eq, Ge)
   , ConstraintRow
   , ILPProblem
   , VarSpec

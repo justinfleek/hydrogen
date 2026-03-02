@@ -39,11 +39,11 @@ module Hydrogen.Schema.Brand.Token.Duration
   , durationSeconds
   
   -- * Duration Purpose
-  , DurationPurpose(..)
+  , DurationPurpose(PurposeTransition, PurposeAnimation, PurposeDelay, PurposeDebounce, PurposeTimeout)
   , durationPurposeToString
   
   -- * Duration Scale
-  , DurationScale(..)
+  , DurationScale(DurationInstant, DurationFast, DurationNormal, DurationSlow, DurationSlower, DurationSlowest)
   , durationScaleToString
   , durationScaleToMs
   ) where

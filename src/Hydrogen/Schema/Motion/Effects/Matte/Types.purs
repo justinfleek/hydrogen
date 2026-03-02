@@ -27,21 +27,21 @@ module Hydrogen.Schema.Motion.Effects.Matte.Types
   
   -- * Refine Matte
   , RefineMatteEffect
-  , RefinementType(..)
-  , MotionBlurMode(..)
+  , RefinementType(RTSmooth, RTFeather, RTChoke, RTShiftEdge, RTReduceChatter)
+  , MotionBlurMode(MBMNone, MBMNormal, MBMHighQuality)
   
   -- * Set Matte
   , SetMatteEffect
-  , SetMatteChannel(..)
-  , SetMatteStretch(..)
+  , SetMatteChannel(SMCRed, SMCGreen, SMCBlue, SMCAlpha, SMCLuminance, SMCHue, SMCSaturation, SMCLightness, SMCFullOn, SMCFullOff)
+  , SetMatteStretch(SMSStretch, SMSTile, SMSCenter)
   
   -- * Channel Combiner
   , ChannelCombinerEffect
-  , CombinerSource(..)
+  , CombinerSource(CSSourceRed, CSSourceGreen, CSSourceBlue, CSSourceAlpha, CSSourceLuma, CSLayerRed, CSLayerGreen, CSLayerBlue, CSLayerAlpha, CSLayerLuma, CSFullOn, CSFullOff, CSInvert)
   
   -- * Matte Cleanup
   , MatteCleanupEffect
-  , CleanupOperation(..)
+  , CleanupOperation(COBlur, COContrast, COGamma, COShrink, COExpand, COSimplify)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

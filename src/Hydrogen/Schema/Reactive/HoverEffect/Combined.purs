@@ -38,7 +38,7 @@
 -- | ```
 
 module Hydrogen.Schema.Reactive.HoverEffect.Combined
-  ( HoverEffect(..)
+  ( HoverEffect(HoverEffect)
   , hoverEffect
   , noHoverEffect
   , defaultHoverEffect

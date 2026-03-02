@@ -11,7 +11,7 @@
 -- | - **Absolute**: Place animations at specific time offsets.
 
 module Hydrogen.Schema.Temporal.Timeline
-  ( Timeline(..)
+  ( Timeline(Single, Sequence, Parallel, Stagger, Absolute)
   , sequence
   , parallel
   , stagger

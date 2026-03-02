@@ -34,7 +34,7 @@
 
 module Hydrogen.Schema.Surface.BorderSide
   ( -- * Border Style
-    BorderStyle(..)
+    BorderStyle(None, Hidden, Solid, Dashed, Dotted, Double, Groove, Ridge, Inset, Outset)
   
   -- * Types
   , BorderSide(BorderSide)

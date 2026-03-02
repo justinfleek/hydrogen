@@ -41,7 +41,7 @@ module Hydrogen.Schema.Brand.Token.ZIndex
   , zIndexInt
   
   -- * Layer Type
-  , Layer(..)
+  , Layer(LayerBase, LayerDropdown, LayerSticky, LayerFixed, LayerModalBackdrop, LayerModal, LayerPopover, LayerToast, LayerMax)
   , layerToString
   , layerToInt
   , layerFromString

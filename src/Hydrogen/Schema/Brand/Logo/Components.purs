@@ -11,7 +11,7 @@
 
 module Hydrogen.Schema.Brand.Logo.Components
   ( -- * Logo Component
-    LogoComponent(..)
+    LogoComponent(Icon, Wordmark)
   , allLogoComponents
   , componentToString
   , componentFromString

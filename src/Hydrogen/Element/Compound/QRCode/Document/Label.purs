@@ -16,7 +16,7 @@
 
 module Hydrogen.Element.Compound.QRCode.Document.Label
   ( -- * Label Position
-    LabelPosition(..)
+    LabelPosition(LabelBelow, LabelAbove, LabelRight, LabelLeft)
   
   -- * Label Configuration
   , LabelConfig

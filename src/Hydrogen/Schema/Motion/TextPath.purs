@@ -26,7 +26,7 @@
 
 module Hydrogen.Schema.Motion.TextPath
   ( -- * Path Reference
-    TextPathSource(..)
+    TextPathSource(TPSNone, TPSMask, TPSMaskNamed, TPSShapeLayer, TPSCustomPath)
   , textPathSourceToString
   , textPathSourceFromString
   
@@ -36,12 +36,12 @@ module Hydrogen.Schema.Motion.TextPath
   , textPathOptions
   
   -- * Path Alignment
-  , PathAlignment(..)
+  , PathAlignment(PALeft, PACenter, PARight, PAJustify)
   , pathAlignmentToString
   , pathAlignmentFromString
   
   -- * Baseline Shift Mode
-  , BaselineShiftMode(..)
+  , BaselineShiftMode(BSMNone, BSMAutomatic, BSMManual)
   , baselineShiftModeToString
   , baselineShiftModeFromString
   

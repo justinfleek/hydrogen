@@ -35,8 +35,8 @@ import Prelude
   )
 
 import Data.Array (snoc, index) as Data.Array
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldl)
 
 -- ═══════════════════════════════════════════════════════════════════════════════

@@ -21,17 +21,17 @@
 
 module Hydrogen.Schema.Motion.PathMotion.Types
   ( -- * Path Source
-    PathSource(..)
+    PathSource(CatmullRomSource, BSplineSource, PointArraySource)
   
   -- * Orient Mode
-  , OrientMode(..)
+  , OrientMode(NoOrient, OrientToPath, OrientToPathFlipped, OrientPerpendicular, OrientCustomOffset)
   
   -- * Motion Sample
-  , MotionSample(..)
+  , MotionSample(MotionSample)
   , unwrapMotionSample
   
   -- * Motion Path
-  , MotionPath(..)
+  , MotionPath(MotionPath)
   , unwrapMotionPath
   ) where
 

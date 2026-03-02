@@ -71,33 +71,33 @@ import Hydrogen.Schema.Physics.Fluid.Core
   , nsFluidSolver
   , nsFluidIntent
   , nsFluidEffect
-  , FluidEffect(..)
+  , FluidEffect(EffectNone, EffectEmit, EffectForce, EffectTransfer, EffectTopology, EffectRender, EffectComposite)
   , allFluidEffects
   , effectCombine
   , effectNone
   , effectAll
-  , FluidCoEffect(..)
+  , FluidCoEffect(CoEffectNone, CoEffectNeighbors, CoEffectGrid, CoEffectGPU, CoEffectMemory, CoEffectBandwidth, CoEffectComposite)
   , allFluidCoEffects
   , coEffectCombine
   , coEffectNone
   , coEffectAll
-  , FluidExpr(..)
+  , FluidExpr(FluidPure, FluidParticleOp, FluidSolverOp, FluidSeq, FluidPar, FluidIf, FluidLoop, FluidAnnotate)
   , exprEffect
   , exprCoEffect
   , exprUUID
-  , ParticleOp(..)
+  , ParticleOp(OpEmitParticle, OpRemoveParticle, OpMoveParticle, OpAccelerate, OpComputeDensity, OpComputePressure, OpComputeViscosity, OpFindNeighbors)
   , allParticleOps
-  , SolverOp(..)
+  , SolverOp(OpAdvect, OpDiffuse, OpProject, OpApplyGravity, OpEnforceBoundary, OpTransferToGrid, OpTransferToParticles)
   , allSolverOps
-  , FluidConstraint(..)
+  , FluidConstraint(ConstraintParticleCount, ConstraintGridDimension, ConstraintMemory, ConstraintFrameTime, ConstraintAnd, ConstraintTrue, ConstraintFalse)
   , particleCountBound
   , gridDimensionBound
   , memoryCostBound
   , constraintSatisfied
   , FluidObjective
-  , QualityMetric(..)
+  , QualityMetric(QualityParticleCount, QualityGridResolution, QualitySolverIterations, QualityTimestep)
   , allQualityMetrics
-  , PerformanceMetric(..)
+  , PerformanceMetric(PerfFrameTime, PerfMemoryUsage, PerfBandwidth, PerfGPUOccupancy)
   , allPerformanceMetrics
   , fluidConfigUUID
   , particleUUID
@@ -158,7 +158,7 @@ import Hydrogen.Schema.Physics.Fluid.Solver
   , velocitiesEqual
   , velocityExceeds
   , negateVelocity
-  , VelocityOrder(..)
+  , VelocityOrder(Slower, SameSpeed, Faster)
   , compareVelocities
   , totalCells
   ) as Solver
@@ -180,7 +180,7 @@ import Hydrogen.Schema.Physics.Fluid.Particle
   , removeParticle
   , clearParticles
   , particleCount
-  , KernelType(..)
+  , KernelType(Poly6Kernel, SpikyKernel, ViscosityKernel)
   , allKernelTypes
   , kernelPoly6
   , kernelSpiky
@@ -199,7 +199,7 @@ import Hydrogen.Schema.Physics.Fluid.Particle
   , computeTotalForce
   , integrateParticle
   , integrateSystem
-  , BoundaryType(..)
+  , BoundaryType(ReflectBoundary, ClampBoundary, WrapBoundary)
   , allBoundaryTypes
   , enforceBoundary
   , systemEnergy
@@ -216,19 +216,19 @@ import Hydrogen.Schema.Physics.Fluid.Particle
   ) as Particle
 
 import Hydrogen.Schema.Physics.Fluid.Intent
-  ( FluidBehavior(..)
+  ( FluidBehavior(Flowing, Dripping, Pooling, Splashing, Spreading, Mixing, Drying, Toppling)
   , allFluidBehaviors
   , describeBehavior
-  , ViscosityClass(..)
+  , ViscosityClass(Watery, Milky, Syrupy, Oily, Honey, Tar, Solid)
   , allViscosityClasses
   , viscosityToCoefficient
   , describeViscosity
-  , ScaleClass(..)
+  , ScaleClass(Microscopic, Small, Medium, Large, Massive)
   , allScaleClasses
   , scaleToParticleCount
   , scaleToGridResolution
   , describeScale
-  , InteractionType(..)
+  , InteractionType(Passive, Painting, Pouring, Tilting, Touching, Blowing)
   , allInteractionTypes
   , describeInteraction
   , FluidIntent
@@ -237,7 +237,7 @@ import Hydrogen.Schema.Physics.Fluid.Intent
   , intentViscosity
   , intentScale
   , intentInteraction
-  , SimulationChoice(..)
+  , SimulationChoice(UseSPH, UseGridSolver, UseHybrid)
   , chooseSimulation
   , intentToSolverConfig
   , intentToFluidProperties
@@ -305,7 +305,7 @@ import Hydrogen.Schema.Physics.Fluid.Neighborhood
   , queryNeighbors
   , clearGrid
   , rebuildGrid
-  , OctreeNode(..)
+  , OctreeNode(OctreeLeaf, OctreeBranch)
   , OctreeConfig
   , mkOctreeConfig
   , maxParticlesPerNode
@@ -334,7 +334,7 @@ import Hydrogen.Schema.Physics.Fluid.Neighborhood
   , totalNeighborsFound
   , averageNeighbors
   , cacheHitRate
-  , SearchStrategy(..)
+  , SearchStrategy(StrategyUniformGrid, StrategyOctree, StrategyHashGrid, StrategyBruteForce)
   , allSearchStrategies
   , chooseStrategy
   , strategyComplexity

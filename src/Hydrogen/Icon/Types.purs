@@ -30,30 +30,62 @@
 
 module Hydrogen.Icon.Types
   ( -- * Core Types
-    IconDefinition(..)
-  , IconPath(..)
-  , IconPart(..)
-  , IconPartName(..)
+    IconDefinition
+  , IconPath
+      ( SinglePath
+      , MultiPath
+      , PartedIcon
+      )
+  , IconPart
+  , IconPartName
+      ( IconPartName
+      )
   , mkIconPartName
   , unIconPartName
   , partNameEq
   
   -- * Icon Identification
-  , IconName(..)
+  , IconName
+      ( IconName
+      )
   , mkIconName
   , unIconName
-  , IconCategory(..)
+  , IconCategory
+      ( CategoryActions
+      , CategoryArrows
+      , CategoryStatus
+      , CategoryObjects
+      , CategoryMedia
+      , CategoryLayout
+      , CategoryData
+      , CategoryCommunication
+      , CategoryCommerce
+      , CategoryBrand
+      , CategoryCustom
+      )
   , allCategories
   , categoryToString
   
   -- * Size System
-  , IconSize(..)
+  , IconSize
+      ( SizeXs
+      , SizeSm
+      , SizeMd
+      , SizeLg
+      , SizeXl
+      , SizeXxl
+      )
   , allSizes
   , sizeToPixels
   , sizeFromPixels
   
   -- * Style System
-  , IconStyle(..)
+  , IconStyle
+      ( StyleOutline
+      , StyleSolid
+      , StyleDuotone
+      , StyleFilled
+      )
   , allStyles
   , styleToString
   
@@ -75,7 +107,10 @@ module Hydrogen.Icon.Types
   , viewBox16
   
   -- * Fill Rules
-  , FillRule(..)
+  , FillRule
+      ( FillNonZero
+      , FillEvenOdd
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

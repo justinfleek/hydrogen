@@ -16,14 +16,14 @@
 
 module Hydrogen.Schema.Dimension.Mobile
   ( -- * Android Units
-    DP(..)
+    DP(DP)
   , dp
   , unwrapDP
   , dpBounds
   , dpToPx
   , pxToDP
   
-  , SP(..)
+  , SP(SP)
   , sp
   , unwrapSP
   , spBounds
@@ -31,14 +31,14 @@ module Hydrogen.Schema.Dimension.Mobile
   , pxToSP
   
   -- * iOS Units  
-  , IOSPoint(..)
+  , IOSPoint(IOSPoint)
   , iosPoint
   , unwrapIOSPoint
   , iosPointToPx
   , pxToIOSPoint
   
   -- * Density
-  , Density(..)
+  , Density(LDPI, MDPI, HDPI, XHDPI, XXHDPI, XXXHDPI)
   , densityLabel
   , densityScale
   , mdpi

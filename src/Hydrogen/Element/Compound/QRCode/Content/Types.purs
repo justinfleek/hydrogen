@@ -37,7 +37,7 @@
 
 module Hydrogen.Element.Compound.QRCode.Content.Types
   ( -- * Main Content ADT
-    QRContent(..)
+    QRContent(ContentURL, ContentEmail, ContentPhone, ContentSMS, ContentWiFi, ContentVCard, ContentCalendar, ContentGeo, ContentBitcoin, ContentSlack, ContentWebhook, ContentDeepLink, ContentText)
   , contentToString
   
   -- * URL Content

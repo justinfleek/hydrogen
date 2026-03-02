@@ -37,7 +37,7 @@ module Hydrogen.Schema.Typography.Word
   , PositionedGlyph
   
   -- * Letter Spacing (computed pixels)
-  , LetterSpacingPx(..)
+  , LetterSpacingPx(LetterSpacingPx)
   , letterSpacingPx
   , unwrapLetterSpacingPx
   

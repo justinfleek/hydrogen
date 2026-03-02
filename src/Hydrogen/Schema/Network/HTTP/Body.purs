@@ -8,7 +8,7 @@
 -- | Represents the various content types that can be sent in a request body.
 
 module Hydrogen.Schema.Network.HTTP.Body
-  ( RequestBody(..)
+  ( RequestBody(JSONBody, TextBody, FormBody, EmptyBody)
   , jsonBody
   , textBody
   , formBody

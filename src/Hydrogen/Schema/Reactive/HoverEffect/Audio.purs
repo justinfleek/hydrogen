@@ -33,8 +33,8 @@
 -- | ```
 
 module Hydrogen.Schema.Reactive.HoverEffect.Audio
-  ( HoverAudio(..)
-  , HoverAudioSource(..)
+  ( HoverAudio(HoverAudio)
+  , HoverAudioSource(HoverAudioNone, HoverAudioUrl, HoverAudioInline)
   , hoverAudio
   , noHoverAudio
   , hoverAudioEnter

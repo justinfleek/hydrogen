@@ -14,7 +14,7 @@ module Hydrogen.Element.Shape
   , PathSpec
   , SolidSpec
   , SVGSpec
-  , SVGSource(..)
+  , SVGSource(SVGUrl, SVGInline, SVGAssetId)
   
   -- * Text Specs
   , TextSpec
@@ -55,8 +55,8 @@ import Hydrogen.Schema.Geometry.Stroke
   , MiterLimit
   , miterLimitDefault
   ) as Stroke
-import Hydrogen.Schema.Geometry.Stroke (LineCap(..)) as ReExportLineCap
-import Hydrogen.Schema.Geometry.Stroke (LineJoin(..)) as ReExportLineJoin
+import Hydrogen.Schema.Geometry.Stroke (LineCap(CapButt, CapRound, CapSquare)) as ReExportLineCap
+import Hydrogen.Schema.Geometry.Stroke (LineJoin(JoinMiter, JoinRound, JoinBevel)) as ReExportLineJoin
 import Hydrogen.Schema.Surface.Fill (Fill, fillNone)
 import Hydrogen.Schema.Dimension.Stroke
   ( StrokeWidth

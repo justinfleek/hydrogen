@@ -22,8 +22,8 @@
 
 module Hydrogen.Element.Compound.Tour.Motion.Progress
   ( -- * Style Types
-    ProgressAnimationStyle(..)
-  , BarFillStyle(..)
+    ProgressAnimationStyle(ProgressDots, ProgressBar, ProgressCircular, ProgressFlipCounter, ProgressNone)
+  , BarFillStyle(FillLinear, FillLiquid, FillElastic, FillGradient)
   
     -- * Configuration Types
   , DotProgressConfig

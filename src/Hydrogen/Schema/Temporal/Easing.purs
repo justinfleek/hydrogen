@@ -20,7 +20,7 @@
 -- | providing a unified interface for the runtime to interpret.
 
 module Hydrogen.Schema.Temporal.Easing
-  ( Easing(..)
+  ( Easing(Linear, CubicBezier, Steps, Spring, Procedural)
   
   -- * Smart Constructors
   , linearEasing

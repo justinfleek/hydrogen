@@ -28,15 +28,15 @@ module Hydrogen.Schema.Geometry.Shape.Types
   , smoothAnchor
   , cornerAnchor
   , symmetricAnchor
-  , AnchorType(..)
+  , AnchorType(AnchorSmooth, AnchorCorner, AnchorSymmetric)
   
   -- * Path Primitives
-  , PathCommand(..)
-  , WindingRule(..)
+  , PathCommand(MoveTo, LineTo, HorizontalTo, VerticalTo, CubicTo, QuadraticTo, ArcTo, ClosePath)
+  , WindingRule(WindingNonZero, WindingEvenOdd)
   , ArcParams
   
   -- * Primitive Shapes Enumeration
-  , ShapePrimitive(..)
+  , ShapePrimitive(PrimitiveRectangle, PrimitiveEllipse, PrimitiveLine, PrimitivePolygon, PrimitiveStar, PrimitiveRing, PrimitiveSpiral, PrimitiveArrow, PrimitiveCross, PrimitiveGear, PrimitivePath)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

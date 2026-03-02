@@ -25,7 +25,7 @@
 module Hydrogen.Schema.Dimension.Grid
   ( -- * Types
     Grid(Grid)
-  , GridTrack(..)
+  , GridTrack(Fixed, Fr, MinMax, Auto, FitContent)
   , GridGap
   
   -- * Constructors

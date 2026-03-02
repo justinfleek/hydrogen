@@ -76,7 +76,7 @@ import Hydrogen.Schema.Brand.Palette
   , Lightness
   , Chroma
   , Hue
-  , Role(..)
+  , Role
   , PaletteEntry
   , mkBrandPalette
   , getPrimary
@@ -93,7 +93,7 @@ import Hydrogen.Schema.Brand.Palette
 import Hydrogen.Schema.Brand.Typography
   ( BrandTypography
   , FontFamily
-  , FontWeight(..)
+  , FontWeight
   , FontSize
   , TypeScale
   , ScaleRatio
@@ -109,7 +109,7 @@ import Hydrogen.Schema.Brand.Typography
 import Hydrogen.Schema.Brand.Spacing
   ( BrandSpacing
   , SpacingUnit
-  , SpacingSystem(..)
+  , SpacingSystem
   , SpacingScale
   , LinearSpacing
   , defaultSpacing
@@ -121,8 +121,8 @@ import Hydrogen.Schema.Brand.Spacing
 
 import Hydrogen.Schema.Brand.Voice
   ( BrandVoice
-  , Tone(..)
-  , Trait(..)
+  , Tone
+  , Trait
   , TraitSet
   , Vocabulary
   , Term
@@ -153,7 +153,7 @@ import Hydrogen.Schema.Brand.Provenance
   , ContentHash
   , Timestamp
   , SourceURL
-  , Scheme(..)
+  , Scheme
   , sha256
   , mkProvenance
   , mkSourceURL

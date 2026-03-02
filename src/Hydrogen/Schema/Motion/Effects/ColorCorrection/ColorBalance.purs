@@ -38,12 +38,12 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.ColorBalance
   ( -- * Tonal Range
-    TonalRange(..)
+    TonalRange
   , defaultTonalRange
   , mkTonalRange
   
   -- * Color Balance Effect
-  , ColorBalanceEffect(..)
+  , ColorBalanceEffect
   , defaultColorBalanceEffect
   , mkColorBalanceEffect
   

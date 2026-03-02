@@ -78,7 +78,7 @@ module Hydrogen.Schema.Media.Video
   , remainingTime
   
   -- * Video Command
-  , VideoCommand(..)
+  , VideoCommand(Play, Pause, TogglePlayPause, Seek, SeekRelative, SetVolume, ToggleMute, SetMuted, SetPlaybackRate, EnterFullscreen, ExitFullscreen, ToggleFullscreen, Restart)
   , applyCommand
   
   -- * Buffering

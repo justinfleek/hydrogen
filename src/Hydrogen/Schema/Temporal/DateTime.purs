@@ -59,7 +59,7 @@ import Prelude
   , show
   , compare
   , otherwise
-  , Ordering(..)
+  , Ordering(LT, EQ, GT)
   , (&&)
   , (||)
   , (<)

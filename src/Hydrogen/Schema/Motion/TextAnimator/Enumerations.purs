@@ -14,62 +14,62 @@
 
 module Hydrogen.Schema.Motion.TextAnimator.Enumerations
   ( -- * Font Style
-    FontStyle(..)
+    FontStyle(FSNormal, FSItalic)
   , fontStyleToString
   , fontStyleFromString
   
     -- * Text Align
-  , TextAlign(..)
+  , TextAlign(TALeft, TACenter, TARight)
   , textAlignToString
   , textAlignFromString
   
     -- * Anchor Point Grouping
-  , AnchorPointGrouping(..)
+  , AnchorPointGrouping(APGCharacter, APGWord, APGLine, APGAll)
   , anchorPointGroupingToString
   , anchorPointGroupingFromString
   
     -- * Fill And Stroke
-  , FillAndStroke(..)
+  , FillAndStroke(FASOFillOverStroke, FASOStrokeOverFill)
   , fillAndStrokeToString
   , fillAndStrokeFromString
   
     -- * Inter Character Blending
-  , InterCharacterBlending(..)
+  , InterCharacterBlending(ICBNormal, ICBMultiply, ICBScreen, ICBOverlay)
   , interCharacterBlendingToString
   , interCharacterBlendingFromString
   
     -- * Text Case
-  , TextCase(..)
+  , TextCase(TCNormal, TCUppercase, TCLowercase, TCSmallCaps)
   , textCaseToString
   , textCaseFromString
   
     -- * Vertical Align
-  , VerticalAlign(..)
+  , VerticalAlign(VANormal, VASuperscript, VASubscript)
   , verticalAlignToString
   , verticalAlignFromString
   
     -- * Range Selector Mode
-  , RangeSelectorMode(..)
+  , RangeSelectorMode(RSMPercent, RSMIndex)
   , rangeSelectorModeToString
   , rangeSelectorModeFromString
   
     -- * Selection Based On
-  , SelectionBasedOn(..)
+  , SelectionBasedOn(SBOCharacters, SBOCharactersExcludingSpaces, SBOWords, SBOLines)
   , selectionBasedOnToString
   , selectionBasedOnFromString
   
     -- * Selection Shape
-  , SelectionShape(..)
+  , SelectionShape(SSSquare, SSRampUp, SSRampDown, SSTriangle, SSRound, SSSmooth)
   , selectionShapeToString
   , selectionShapeFromString
   
     -- * Selector Mode
-  , SelectorMode(..)
+  , SelectorMode(SMAdd, SMSubtract, SMIntersect, SMMin, SMMax, SMDifference)
   , selectorModeToString
   , selectorModeFromString
   
     -- * Text Animator Preset Type
-  , TextAnimatorPresetType(..)
+  , TextAnimatorPresetType(TAPTypewriter, TAPFadeInByCharacter, TAPFadeInByWord, TAPBounceIn, TAPWave, TAPScaleIn, TAPRotateIn, TAPSlideInLeft, TAPSlideInRight, TAPBlurIn, TAPRandomFade)
   , textAnimatorPresetTypeToString
   , textAnimatorPresetTypeFromString
   ) where

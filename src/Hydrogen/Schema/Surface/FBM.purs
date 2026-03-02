@@ -57,7 +57,7 @@
 
 module Hydrogen.Schema.Surface.FBM
   ( -- * Noise Type Selection
-    NoiseType(..)
+    NoiseType(PerlinType, SimplexType, ValueType, WorleyType)
   
   -- * Types
   , FBM(FBM)

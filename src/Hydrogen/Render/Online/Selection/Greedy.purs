@@ -36,14 +36,14 @@
 
 module Hydrogen.Render.Online.Selection.Greedy
   ( -- * Selection Result
-    SelectionResult(..)
+    SelectionResult(SelectionResult)
   
   -- * Greedy Algorithms
   , greedySelect
   , lazyGreedySelect
   
   -- * Approximation Witness
-  , ApproxWitness(..)
+  , ApproxWitness(MonotoneMatroidWitness, NonMonotoneWitness)
   , approximationRatio
   ) where
 
@@ -72,7 +72,7 @@ import Data.Tuple (Tuple(Tuple), fst, snd)
 
 import Hydrogen.Render.Online.Core
   ( RegionSelection
-  , Utility(..)
+  , Utility(Utility)
   , clampToBounds
   , unwrapBounded
   , zeroUtility

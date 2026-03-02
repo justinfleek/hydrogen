@@ -22,12 +22,12 @@
 
 module Hydrogen.Schema.Motion.LayerReference.Purpose
   ( -- * Reference Purpose
-    ReferencePurpose(..)
+    ReferencePurpose(RPTrackMatte, RPClipping, RPParent, RPEffectInput, RPExpressionLink, RPMaskSource, RPControlLayer, RPPrecompSource)
   , allReferencePurposes
   , referencePurposeToString
   
   -- * Layer Link
-  , LayerLink(..)
+  , LayerLink(LayerLink)
   , mkLayerLink
   , linkSource
   , linkTarget

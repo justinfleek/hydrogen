@@ -20,7 +20,7 @@
 module Hydrogen.Schema.Motion.Effects.Generate.Shapes
   ( -- * Circle
     CircleEffect
-  , CircleEdgeType(..)
+  , CircleEdgeType(CETNone, CETThickness)
   , defaultCircle
   , circleWithRadius
   
@@ -31,13 +31,13 @@ module Hydrogen.Schema.Motion.Effects.Generate.Shapes
   
   -- * Fill
   , FillEffect
-  , FillMaskMode(..)
+  , FillMaskMode(FMMAllMasks, FMMFillMask, FMMNone)
   , defaultFill
   , fillWithColor
   
   -- * Stroke
   , StrokeEffect
-  , StrokePaintStyle(..)
+  , StrokePaintStyle(SPSOnTransparent, SPSOnOriginal)
   , defaultStroke
   , strokeWithWidth
   
@@ -69,7 +69,7 @@ import Prelude
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, point2D)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMNormal))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // circle

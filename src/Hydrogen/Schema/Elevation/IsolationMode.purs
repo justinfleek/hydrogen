@@ -38,7 +38,7 @@
 -- | ```
 
 module Hydrogen.Schema.Elevation.IsolationMode
-  ( IsolationMode(..)
+  ( IsolationMode(Auto, Isolate)
   , auto
   , isolate
   , isIsolated

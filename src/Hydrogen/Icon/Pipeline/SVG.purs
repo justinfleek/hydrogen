@@ -104,7 +104,7 @@ import Prelude
   , (+)
   )
 
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Array (head, tail) 
 import Data.Array (uncons) as Array
 
@@ -112,13 +112,13 @@ import Hydrogen.Schema.Geometry.Path.Serialization (toSvgString) as PathSerial
 import Hydrogen.Schema.Geometry.Path.Types (Path)
 
 import Hydrogen.Icon.Types
-  ( IconDefinition(..)
-  , IconPath(..)
+  ( IconDefinition
+  , IconPath(SinglePath, MultiPath, PartedIcon)
   , IconPart
   , IconName
   , IconProps
-  , IconSize(..)
-  , IconStyle(..)
+  , IconSize(SizeXs, SizeSm, SizeMd, SizeLg, SizeXl, SizeXxl)
+  , IconStyle(StyleOutline, StyleSolid, StyleDuotone, StyleFilled)
   , IconViewBox
   , defaultViewBox
   , viewBox24
@@ -129,7 +129,7 @@ import Hydrogen.Icon.Types
 import Hydrogen.Icon.Brand
   ( ThemedIcon
   , applyTheme
-  , IconTheme(..)
+  , IconTheme(IconTheme)
   , resolveIconColor
   )
 

@@ -69,7 +69,7 @@ module Hydrogen.Schema.Brand.Token.Ref
   , isEmptySet
   
   -- * Any Token (Union Type)
-  , AnyToken(..)
+  , AnyToken(ColorTok, SpacingTok, SizeTok, RadiusTok, ShadowTok, TypeTok, DurationTok, EasingTok, ZIndexTok)
   , anyTokenName
   , anyTokenCategory
   , anyTokenDisplay
@@ -99,7 +99,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Brand.Token
   ( TokenName
   , TokenDesc
-  , TokenCategory(..)
+  , TokenCategory(CategoryColor, CategorySpacing, CategorySize, CategoryRadius, CategoryShadow, CategoryType, CategoryDuration, CategoryEasing, CategoryZIndex, CategoryOpacity, CategoryBorder, CategoryMotion, CategoryBreakpoint, CategoryAsset)
   , unTokenName
   )
 

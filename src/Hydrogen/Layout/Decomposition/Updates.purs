@@ -36,7 +36,7 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (all, any)
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(Tuple))
 import Data.Map as Map
 import Data.Set (Set)
 import Data.Set as Set

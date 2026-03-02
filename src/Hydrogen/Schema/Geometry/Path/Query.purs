@@ -18,7 +18,7 @@ module Hydrogen.Schema.Geometry.Path.Query
 import Prelude (($))
 
 import Data.Array (head, last, length, null) as Array
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 
 import Hydrogen.Schema.Geometry.Point (Point2D)
 import Hydrogen.Schema.Geometry.Path.Types

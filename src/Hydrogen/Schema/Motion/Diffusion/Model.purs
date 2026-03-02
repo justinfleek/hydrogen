@@ -53,36 +53,36 @@
 
 module Hydrogen.Schema.Motion.Diffusion.Model
   ( -- * Image Generation Models
-    ImageModel(..)
+    ImageModel(IMFlux2Dev, IMFlux2Pro, IMFlux2Schnell, IMZImage, IMQwenImage2509, IMSDXL, IMSD3, IMDalle3, IMMidjourney, IMIdeogram2)
   , imageModelToString
   , imageModelFromString
   , isImageModelFast
   , isImageModelHighQuality
   
   -- * Video Generation Models
-  , VideoModel(..)
+  , VideoModel(VMWan22, VMWan21, VMCogVideoX, VMCogVideoX5B, VMSVD, VMSVDXT, VMATI, VMRunway, VMKling, VMPika, VMLuma, VMHunyuanVideo)
   , videoModelToString
   , videoModelFromString
   , videoModelMaxFrames
   , videoModelMaxResolution
   
   -- * 3D Generation Models
-  , Model3D(..)
+  , Model3D(M3DHunyuan3D, M3DTrellis2, M3DTripoSR, M3DLGMesh, M3DInstant3D, M3DZero123Plus, M3DMeshAnything)
   , model3DToString
   , model3DFromString
   
   -- * Image Editing Models
-  , EditModel(..)
+  , EditModel(EMQwenImageEdit2511, EMZImageEdit, EMInstructPix2Pix, EMSDEdit, EMControlNetInpaint, EMFluxFill)
   , editModelToString
   , editModelFromString
   
   -- * Motion Control Models
-  , MotionModel(..)
+  , MotionModel(MMMotionCtrl, MMUni3C, MMWanMove, MMTimeToMove, MMCameraCtrl, MMAnimateDiff, MMDragAnything)
   , motionModelToString
   , motionModelFromString
   
   -- * Unified Model Type
-  , DiffusionModel(..)
+  , DiffusionModel(DMImage, DMVideo, DM3D, DMEdit, DMMotion)
   , diffusionModelToString
   , diffusionModelFromString
   , diffusionModelCategory
@@ -121,7 +121,7 @@ module Hydrogen.Schema.Motion.Diffusion.Model
   , lastEditModel
   , firstMotionModel
   , lastMotionModel
-  , ModelCategory(..)
+  , ModelCategory(MCImage, MCVideo, MC3D, MCEdit, MCMotion)
   ) where
 
 import Prelude

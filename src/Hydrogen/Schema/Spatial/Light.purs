@@ -8,7 +8,7 @@
 -- | Position and orientation are handled by `Transform3D`.
 
 module Hydrogen.Schema.Spatial.Light
-  ( Light(..)
+  ( Light(DirectionalLight, PointLight, SpotLight, AmbientLight, HemisphereLight)
   , ShadowConfig
   , directional
   , point
@@ -30,7 +30,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Color.SRGB (SRGB)
 import Hydrogen.Schema.Spatial.LightIntensity (LightIntensity)
 import Hydrogen.Schema.Spatial.LightRange (LightRange)

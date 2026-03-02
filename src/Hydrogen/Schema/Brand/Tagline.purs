@@ -26,7 +26,7 @@ module Hydrogen.Schema.Brand.Tagline
   , allTaglines
   
   -- * Usage Rules
-  , TaglineUsageRule(..)
+  , TaglineUsageRule(CanUseWithLogo, CanUseStandalone, NeverCombineWithCampaign, NeverRewrite)
   , defaultUsageRules
   ) where
 

@@ -30,22 +30,22 @@
 
 module Hydrogen.Schema.Motion.Effects.ColorCorrection.HueSaturation
   ( -- * Color Channel
-    ColorChannel(..)
+    ColorChannel(CCMaster, CCReds, CCYellows, CCGreens, CCCyans, CCBlues, CCMagentas)
   , allColorChannels
   , colorChannelToString
   
   -- * Channel Adjustment
-  , ChannelAdjustment(..)
+  , ChannelAdjustment(ChannelAdjustment)
   , defaultChannelAdjustment
   , mkChannelAdjustment
   
   -- * Colorize Settings
-  , ColorizeSettings(..)
+  , ColorizeSettings(ColorizeSettings)
   , defaultColorizeSettings
   , mkColorizeSettings
   
   -- * Hue/Saturation Effect
-  , HueSaturationEffect(..)
+  , HueSaturationEffect(HueSaturationEffect)
   , defaultHueSaturationEffect
   , mkHueSaturationEffect
   

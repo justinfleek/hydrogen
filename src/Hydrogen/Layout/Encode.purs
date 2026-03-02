@@ -24,7 +24,7 @@ module Hydrogen.Layout.Encode
 
 import Prelude ((<>), (-))
 import Data.Array (concatMap, uncons, zipWith)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Nothing, Just))
 
 import Hydrogen.Layout.Constraint
   ( Var

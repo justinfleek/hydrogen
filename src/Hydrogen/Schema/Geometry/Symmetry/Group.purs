@@ -26,7 +26,7 @@
 -- | - Symmetry.Glide (GlideReflection)
 
 module Hydrogen.Schema.Geometry.Symmetry.Group
-  ( SymmetryGroup(..)
+  ( SymmetryGroup(SymmetryGroup)
   , noSymmetry
   , identitySymmetry
   , reflectionOnly
@@ -62,7 +62,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Geometry.Symmetry.Reflection (ReflectionAxis)
 
 import Hydrogen.Schema.Geometry.Symmetry.Rotational 
-  ( RotationalSymmetry(..)
+  ( RotationalSymmetry(RotationalSymmetry)
   , rotationalSymmetry
   , noRotationalSymmetry
   , hasRotationalSymmetry
@@ -71,7 +71,7 @@ import Hydrogen.Schema.Geometry.Symmetry.Rotational
   )
 
 import Hydrogen.Schema.Geometry.Symmetry.Dihedral 
-  ( DihedralSymmetry(..)
+  ( DihedralSymmetry(DihedralSymmetry)
   , dihedralFoldCount
   )
 

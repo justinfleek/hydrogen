@@ -33,22 +33,22 @@
 
 module Hydrogen.Schema.Text.Selection
   ( -- * Position Types
-    BlockIndex(..)
+    BlockIndex(BlockIndex)
   , blockIndex
   , unwrapBlockIndex
   , maxBlockIndex
   
-  , CharOffset(..)
+  , CharOffset(CharOffset)
   , charOffset
   , unwrapCharOffset
   , maxCharOffset
   
-  , LineNumber(..)
+  , LineNumber(LineNumber)
   , lineNumber
   , unwrapLineNumber
   , maxLineNumber
   
-  , Column(..)
+  , Column(Column)
   , column
   , unwrapColumn
   , maxColumn

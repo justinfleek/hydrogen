@@ -34,7 +34,7 @@ module Hydrogen.Schema.Weather.Atmosphere.Visibility
   , visibilityUnlimited
   
   -- * Classification
-  , VisibilityCategory(..)
+  , VisibilityCategory(VisZero, VisDenseFog, VisFog, VisMist, VisHaze, VisClear)
   , allVisibilityCategories
   , visibilityToCategory
   , categoryToMinVisibility

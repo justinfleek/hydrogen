@@ -13,7 +13,7 @@
 
 module Hydrogen.Schema.Network.WebSocket.Types
   ( -- * WebSocket State Machine
-    WebSocketState(..)
+    WebSocketState(Connecting, Open, Closing, Closed)
   , isConnecting
   , isOpen
   , isClosing
@@ -34,7 +34,7 @@ module Hydrogen.Schema.Network.WebSocket.Types
   , unwrapProtocol
   
   -- * Binary Type
-  , BinaryType(..)
+  , BinaryType(ArrayBuffer, Blob)
   
   -- * Binary Data
   , Bytes

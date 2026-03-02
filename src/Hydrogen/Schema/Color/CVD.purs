@@ -34,7 +34,7 @@
 -- | For each view, show contrast ratios and distinguishability warnings.
 
 module Hydrogen.Schema.Color.CVD
-  ( CVDType(..)
+  ( CVDType(Normal, Protanopia, Protanomaly, Deuteranopia, Deuteranomaly, Tritanopia, Tritanomaly, Achromatopsia)
   , cvdPrevalence
   , AccessibilityIssue
   , AccessibilityReport

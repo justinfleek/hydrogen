@@ -28,7 +28,7 @@
 
 module Hydrogen.Schema.Audio.Format
   ( -- * Container Format
-    ContainerFormat(..)
+    ContainerFormat(FormatWAV, FormatAIFF, FormatFLAC, FormatMP3, FormatAAC, FormatOGG, FormatOpus, FormatM4A, FormatWebM, FormatCustom)
   , containerLabel
   , isLossless
   , isCompressed
@@ -36,7 +36,7 @@ module Hydrogen.Schema.Audio.Format
   , defaultFileExtension
     
     -- * Codec Format  
-  , CodecFormat(..)
+  , CodecFormat(CodecPCM, CodecFLAC, CodecMP3, CodecAAC, CodecVorbis, CodecOpus, CodecALAC, CodecAPE, CodecCustom)
   , codecLabel
   , isLossy
   , typicalBitrate
@@ -63,7 +63,7 @@ module Hydrogen.Schema.Audio.Format
   , isStreaming
     
     -- * Quality Presets
-  , QualityPreset(..)
+  , QualityPreset(QualityLow, QualityMedium, QualityHigh, QualityMaximum)
   , presetLabel
   , presetToQuality
   
@@ -84,7 +84,7 @@ import Prelude
   )
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Audio.Buffer (SampleRate, BitDepth, ChannelCount)
 import Hydrogen.Schema.Temporal.Duration (Duration)
 

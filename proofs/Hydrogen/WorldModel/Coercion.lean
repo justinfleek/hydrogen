@@ -124,7 +124,7 @@ theorem intensity_implies_severity (i1 i2 : BoundedUnit)
     severityLevel (classifySeverity i1) ≤ severityLevel (classifySeverity i2) := by
   simp only [classifySeverity, severityLevel]
   split_ifs with h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 h13 h14 h15 h16 h17 h18 h19 h20 <;> 
-    simp_all only [le_refl, Nat.zero_le, Nat.le_refl] <;> linarith
+    simp_all only [le_refl, Nat.zero_le] <;> linarith
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- SECTION 3: COERCION DETECTION
@@ -228,20 +228,24 @@ theorem any_signal_triggers (signals : CoercionSignals)
     (hgrounded : signals.groundedSignal.score.value > 0.6) :
     (combineSignals signals).value > 0.6 := by
   simp only [combineSignals]
-  split_ifs with h1 h2
+  -- There are two nested if-then-else, giving 4 cases:
+  -- max1 = if h1 then score else beh
+  -- result = if h2 then max1 else invCanary
+  split_ifs with h1 h2 h3
+  -- Case 1: h1 (score > beh) AND h2 (score > invCanary) → returns score
   · exact hgrounded
-  · exact hgrounded
-  · have hbeh : signals.behavioralDeviation.value > 0.6 := by
-      have hle := le_of_not_lt h1
-      linarith
-    exact hbeh
-  · have hbeh : signals.behavioralDeviation.value > 0.6 := by
-      have hle := le_of_not_lt h1
-      linarith
-    have hcan : 1 - signals.canaryFreshness.value > 0.6 := by
-      have hle := le_of_not_lt h2
-      linarith
-    exact hcan
+  -- Case 2: h1 (score > beh) AND ¬h2 (score ≤ invCanary) → returns invCanary
+  -- Since score > 0.6 and score ≤ invCanary, invCanary > 0.6
+  · push_neg at h2
+    linarith
+  -- Case 3: ¬h1 (score ≤ beh) AND h3 (beh > invCanary) → returns beh
+  -- Since score > 0.6 and score ≤ beh, beh > 0.6
+  · push_neg at h1
+    linarith
+  -- Case 4: ¬h1 (score ≤ beh) AND ¬h3 (beh ≤ invCanary) → returns invCanary
+  -- Since score > 0.6, score ≤ beh ≤ invCanary, invCanary > 0.6
+  · push_neg at h1 h3
+    linarith
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- SECTION 6: COERCION PROOF CERTIFICATE
@@ -271,13 +275,12 @@ structure CoercionCertificate where
 theorem certificate_invalidates_consent (cert : CoercionCertificate) :
     invalidatesConsent cert.severity = true := by
   have hsig := cert.severity_significant
-  simp only [severityLevel] at hsig
-  cases cert.severity with
-  | none => simp only [severityLevel] at hsig; omega
-  | mild => simp only [severityLevel] at hsig; omega
-  | moderate => simp only [severityLevel] at hsig; omega
-  | severe => simp only [invalidatesConsent]
-  | total => simp only [invalidatesConsent]
+  cases hs : cert.severity with
+  | none => simp only [severityLevel, hs] at hsig; omega
+  | mild => simp only [severityLevel, hs] at hsig; omega
+  | moderate => simp only [severityLevel, hs] at hsig; omega
+  | severe => rfl
+  | total => rfl
 
 /-- CERTIFICATE GUARANTEES: A coercion certificate guarantees:
     1. Entity was under significant duress

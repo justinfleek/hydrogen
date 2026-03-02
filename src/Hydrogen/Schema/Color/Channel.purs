@@ -21,6 +21,8 @@ module Hydrogen.Schema.Color.Channel
   , invert
   , add
   , blend
+  , brighten
+  , darken
   , bounds
   , toNumber
   , toUnitInterval
@@ -90,6 +92,24 @@ blend weight (Channel a) (Channel b) =
     w = Bounded.clampNumber 0.0 1.0 weight
     result = Int.toNumber a * (1.0 - w) + Int.toNumber b * w
   in channel (Int.round result)
+
+-- | Brighten channel by adding a value.
+-- |
+-- | ```purescript
+-- | brighten 10 (channel 200)  -- 210
+-- | brighten 100 (channel 200) -- 255 (clamped)
+-- | ```
+brighten :: Int -> Channel -> Channel
+brighten amount (Channel c) = channel (c + amount)
+
+-- | Darken channel by subtracting a value.
+-- |
+-- | ```purescript
+-- | darken 10 (channel 200)  -- 190
+-- | darken 250 (channel 200) -- 0 (clamped)
+-- | ```
+darken :: Int -> Channel -> Channel
+darken amount (Channel c) = channel (c - amount)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors

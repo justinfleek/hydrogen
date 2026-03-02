@@ -10,7 +10,7 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 module Hydrogen.GPU.WebGPU.Shader.Types
-  ( WGSLSource(..)
+  ( WGSLSource(WGSLSource)
   , shaderSourceToString
   , combineShaderSource
   ) where

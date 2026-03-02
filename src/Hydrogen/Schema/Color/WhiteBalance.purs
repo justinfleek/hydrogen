@@ -34,7 +34,7 @@
 
 module Hydrogen.Schema.Color.WhiteBalance
   ( WhiteBalance
-  , Preset(..)
+  , Preset(AsShot, Auto, Daylight, Cloudy, Shade, Tungsten, Fluorescent, Flash, Custom)
   , whiteBalance
   , fromPreset
   , temperature

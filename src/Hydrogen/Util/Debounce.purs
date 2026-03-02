@@ -45,7 +45,7 @@ module Hydrogen.Util.Debounce
   , throttleWithCancel
   , Cancellable
     -- * Types
-  , Milliseconds(..)
+  , Milliseconds(Milliseconds)
   ) where
 
 import Prelude

@@ -19,7 +19,7 @@
 
 module Hydrogen.Element.Compound.Canvas.State.Core
   ( -- * Interaction Mode
-    InteractionMode(..)
+    InteractionMode(ModeIdle, ModePanning, ModeZooming, ModeSelecting, ModeDragging, ModeDrawing, ModeEditing, ModeContextMenu, ModeCustom)
     
   -- * History Entry
   , HistoryEntry

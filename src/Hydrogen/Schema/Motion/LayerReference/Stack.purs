@@ -29,7 +29,7 @@
 
 module Hydrogen.Schema.Motion.LayerReference.Stack
   ( -- * Layer Stack
-    LayerStack(..)
+    LayerStack(LayerStack)
   , mkLayerStack
   , layerStackLayers
   , layerStackLinks

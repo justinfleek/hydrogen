@@ -21,7 +21,7 @@
 -- | - Symmetry.Group (SymmetryGroup, hasReflection)
 
 module Hydrogen.Schema.Geometry.Symmetry.Chirality
-  ( Chirality(..)
+  ( Chirality(Chiral, Achiral)
   , isChiral
   , isAchiral
   , chiralityOf

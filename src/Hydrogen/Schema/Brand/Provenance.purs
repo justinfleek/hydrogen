@@ -35,7 +35,7 @@ module Hydrogen.Schema.Brand.Provenance
   , timestampZero
   
   -- * Source URL
-  , Scheme(..)
+  , Scheme(HTTP, HTTPS)
   , SourceURL
   , mkSourceURL
   , sourceURLToString

@@ -141,7 +141,7 @@ module Hydrogen.Audio.DAW.Control
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int (toNumber, floor)
 import Data.Array (index, replicate)
 

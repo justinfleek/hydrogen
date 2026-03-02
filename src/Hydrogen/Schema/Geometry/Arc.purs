@@ -44,7 +44,7 @@ module Hydrogen.Schema.Geometry.Arc
   , arcDirection
   
   -- * Direction
-  , ArcDirection(..)
+  , ArcDirection(Clockwise, CounterClockwise)
   
   -- * Measurements
   , arcLength

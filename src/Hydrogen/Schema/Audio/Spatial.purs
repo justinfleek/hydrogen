@@ -18,12 +18,12 @@
 
 module Hydrogen.Schema.Audio.Spatial
   ( -- * Types
-    Pan(..)
-  , Balance(..)
-  , StereoWidth(..)
-  , Azimuth(..)
-  , Elevation(..)
-  , AudioDistance(..)
+    Pan(Pan)
+  , Balance(Balance)
+  , StereoWidth(StereoWidth)
+  , Azimuth(Azimuth)
+  , Elevation(Elevation)
+  , AudioDistance(AudioDistance)
   
   -- * Constructors
   , pan

@@ -49,12 +49,12 @@ module Hydrogen.Schema.Brand.Token.Radius
   , isCircular
   
   -- * Radius Style
-  , RadiusStyle(..)
+  , RadiusStyle(StyleSharp, StyleSubtle, StyleRounded, StylePill, StyleCircle, StyleSquircle)
   , radiusStyleToString
   , radiusStyleFromString
   
   -- * Radius Scale
-  , RadiusScale(..)
+  , RadiusScale(RadiusNone, RadiusSm, RadiusMd, RadiusLg, RadiusXl, Radius2xl, Radius3xl, RadiusFull)
   , radiusScaleToString
   , radiusScaleFromString
   , radiusScaleToPx

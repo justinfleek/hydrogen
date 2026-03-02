@@ -15,7 +15,7 @@
 
 module Hydrogen.Schema.Graph.NodeContent.SlotContent
   ( -- * Slot Content
-    SlotContent(..)
+    SlotContent(ContentText, ContentIcon, ContentBadge, ContentAction, ContentProgress, ContentImage, ContentCustom)
   , textContent
   , iconContent
   , badgeContent

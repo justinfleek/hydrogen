@@ -12,28 +12,28 @@
 -- | https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
 module Hydrogen.Schema.Accessibility.Property
   ( -- * Relationship Properties
-    AriaLabelledBy(..)
-  , AriaDescribedBy(..)
-  , AriaControls(..)
-  , AriaOwns(..)
-  , AriaFlowTo(..)
-  , AriaDetails(..)
-  , AriaErrorMessage(..)
+    AriaLabelledBy(AriaLabelledBy)
+  , AriaDescribedBy(AriaDescribedBy)
+  , AriaControls(AriaControls)
+  , AriaOwns(AriaOwns)
+  , AriaFlowTo(AriaFlowTo)
+  , AriaDetails(AriaDetails)
+  , AriaErrorMessage(AriaErrorMessage)
     -- * Widget Properties  
-  , AriaAutocomplete(..)
-  , AriaHaspopup(..)
-  , AriaOrientation(..)
-  , AriaPosInSet(..)
-  , AriaSetSize(..)
-  , AriaLevel(..)
-  , AriaValueNow(..)
-  , AriaValueMin(..)
-  , AriaValueMax(..)
-  , AriaValueText(..)
+  , AriaAutocomplete(AutocompleteNone, AutocompleteInline, AutocompleteList, AutocompleteBoth)
+  , AriaHaspopup(HasPopupFalse, HasPopupTrue, HasPopupMenu, HasPopupListbox, HasPopupTree, HasPopupGrid, HasPopupDialog)
+  , AriaOrientation(OrientationHorizontal, OrientationVertical, OrientationUndefined)
+  , AriaPosInSet(AriaPosInSet)
+  , AriaSetSize(AriaSetSize)
+  , AriaLevel(AriaLevel)
+  , AriaValueNow(AriaValueNow)
+  , AriaValueMin(AriaValueMin)
+  , AriaValueMax(AriaValueMax)
+  , AriaValueText(AriaValueText)
     -- * Label Properties
-  , AriaLabel(..)
-  , AriaPlaceholder(..)
-  , AriaRoleDescription(..)
+  , AriaLabel(AriaLabel)
+  , AriaPlaceholder(AriaPlaceholder)
+  , AriaRoleDescription(AriaRoleDescription)
   ) where
 
 import Prelude

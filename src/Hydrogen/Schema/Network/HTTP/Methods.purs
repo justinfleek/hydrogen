@@ -9,7 +9,7 @@
 -- | and whether a request body is expected.
 
 module Hydrogen.Schema.Network.HTTP.Methods
-  ( HTTPMethod(..)
+  ( HTTPMethod(GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
   , isIdempotent
   , isSafe
   , hasRequestBody

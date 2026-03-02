@@ -22,7 +22,7 @@
 
 module Hydrogen.Schema.Spatial.Bounds.OBB
   ( -- * Types
-    OBB(..)
+    OBB(OBB)
   
   -- * Constructors
   , obb

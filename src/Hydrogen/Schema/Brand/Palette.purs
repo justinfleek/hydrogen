@@ -37,7 +37,7 @@ module Hydrogen.Schema.Brand.Palette
   , oklchH
   
   -- * Semantic Roles
-  , Role(..)
+  , Role(Primary, Secondary, Accent, Background, Surface, OnPrimary, OnSecondary, OnBackground, OnSurface, Success, Warning, Error, Info)
   
   -- * Palette Types
   , PaletteEntry

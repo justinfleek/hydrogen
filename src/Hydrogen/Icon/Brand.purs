@@ -50,13 +50,17 @@ module Hydrogen.Icon.Brand
   , resolveWithFallback
   
   -- * Icon Theming
-  , IconTheme(..)
+  , IconTheme
+      ( IconTheme
+      )
   , mkIconTheme
   , iconThemeMode
   , iconThemeColors
   
   -- * Themed Icon
-  , ThemedIcon(..)
+  , ThemedIcon
+      ( ThemedIcon
+      )
   , applyTheme
   , themedIconDefinition
   , themedIconColors

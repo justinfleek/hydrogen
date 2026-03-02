@@ -52,7 +52,7 @@ module Hydrogen.Schema.Brand.Token.Type
   , typeStyleLetterSpacing
   
   -- * Type Role
-  , TypeRole(..)
+  , TypeRole(RoleDisplay, RoleHeading1, RoleHeading2, RoleHeading3, RoleHeading4, RoleHeading5, RoleHeading6, RoleBodyLarge, RoleBodyMedium, RoleBodySmall, RoleCaption, RoleOverline, RoleCode, RoleQuote, RoleLabel)
   , typeRoleToString
   , typeRoleFromString
   , allTypeRoles

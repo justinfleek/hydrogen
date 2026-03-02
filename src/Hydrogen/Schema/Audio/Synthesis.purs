@@ -17,9 +17,9 @@
 
 module Hydrogen.Schema.Audio.Synthesis
   ( -- * Filter Parameters
-    CutoffFreq(..)
-  , Resonance(..)
-  , ResonanceDb(..)
+    CutoffFreq(CutoffFreq)
+  , Resonance(Resonance)
+  , ResonanceDb(ResonanceDb)
   , cutoffFreq
   , resonance
   , resonanceDb
@@ -28,14 +28,14 @@ module Hydrogen.Schema.Audio.Synthesis
   , unwrapResonanceDb
   
   -- * Saturation
-  , Drive(..)
+  , Drive(Drive)
   , drive
   , unwrapDrive
   
   -- * Effects Parameters
-  , Mix(..)
-  , Feedback(..)
-  , DecayTime(..)
+  , Mix(Mix)
+  , Feedback(Feedback)
+  , DecayTime(DecayTime)
   , mix
   , feedback
   , decayTime

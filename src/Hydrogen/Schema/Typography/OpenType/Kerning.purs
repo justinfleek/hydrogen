@@ -36,9 +36,9 @@
 
 module Hydrogen.Schema.Typography.OpenType.Kerning
   ( -- * Types
-    KerningMode(..)
-  , OpticalSizing(..)
-  , Kerning(..)
+    KerningMode(KerningAuto, KerningOn, KerningOff)
+  , OpticalSizing(OpticalAuto, OpticalNone)
+  , Kerning(Kerning)
   
   -- * Constructors
   , auto

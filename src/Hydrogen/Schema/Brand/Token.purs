@@ -49,7 +49,7 @@ module Hydrogen.Schema.Brand.Token
   , unTokenDesc
   
   -- * Token Category
-  , TokenCategory(..)
+  , TokenCategory(CategoryColor, CategorySpacing, CategorySize, CategoryRadius, CategoryShadow, CategoryType, CategoryDuration, CategoryEasing, CategoryZIndex, CategoryOpacity, CategoryBorder, CategoryMotion, CategoryBreakpoint, CategoryAsset)
   , categoryToString
   , categoryFromString
   , allCategories

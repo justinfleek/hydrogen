@@ -12,21 +12,21 @@
 
 module Hydrogen.Schema.Audio.Frequency.Types
   ( -- * Frequency Types
-    Hertz(..)
-  , Kilohertz(..)
+    Hertz(Hertz)
+  , Kilohertz(Kilohertz)
   
   -- * MIDI Types
-  , MidiNote(..)
-  , MidiPitch(..)
+  , MidiNote(MidiNote)
+  , MidiPitch(MidiPitch)
   
   -- * Interval Types
-  , Cent(..)
-  , Semitone(..)
-  , Octave(..)
+  , Cent(Cent)
+  , Semitone(Semitone)
+  , Octave(Octave)
   
   -- * Digital Audio Types
-  , SampleRate(..)
-  , BitDepth(..)
+  , SampleRate(SampleRate)
+  , BitDepth(BitDepth)
   
   -- * Constructors
   , hertz

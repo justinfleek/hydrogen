@@ -12,7 +12,7 @@
 -- | The runtime interpolates between these points.
 
 module Hydrogen.Schema.Temporal.Keyframe
-  ( Keyframe(..)
+  ( Keyframe(Keyframe)
   , keyframe
   , at
   ) where

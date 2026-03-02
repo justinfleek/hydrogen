@@ -47,8 +47,8 @@
 
 module Hydrogen.Schema.Elevation.ZIndex
   ( -- * Core Types
-    ZIndex(..)
-  , IsolationMode(..)
+    ZIndex(ZIndexAuto, ZIndexValue)
+  , IsolationMode(Isolate, IsolationAuto)
   
   -- * ZIndex Constructors
   , z

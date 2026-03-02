@@ -40,14 +40,14 @@ module Hydrogen.Element.Compound.Widget.Theme
   , neonPink
   
   -- * Glow Effects
-  , GlowIntensity(..)
+  , GlowIntensity(GlowSubtle, GlowMedium, GlowIntense, GlowExtreme)
   , glowFilter
   , glowFilterId
   , textGlow
   , boxGlow
   
   -- * Theme Modes
-  , ThemeMode(..)
+  , ThemeMode(ModeDark, ModeLight)
   , containerBackground
   , containerBorder
   , textPrimary
@@ -55,7 +55,7 @@ module Hydrogen.Element.Compound.Widget.Theme
   , textMuted
   
   -- * Widget Sizing
-  , WidgetSize(..)
+  , WidgetSize(SizeSmall, SizeMedium, SizeLarge, SizeWide, SizeTall)
   , widgetWidth
   , widgetHeight
   , chartHeight

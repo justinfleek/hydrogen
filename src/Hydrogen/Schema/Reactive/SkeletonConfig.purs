@@ -36,14 +36,14 @@
 
 module Hydrogen.Schema.Reactive.SkeletonConfig
   ( -- * Skeleton Timing
-    SkeletonTiming(..)
+    SkeletonTiming(SkeletonTiming)
   , skeletonTiming
   , defaultTiming
   , aggressiveTiming
   , patientTiming
   
   -- * Skeleton Shape
-  , SkeletonShape(..)
+  , SkeletonShape(ShapeRectangle, ShapeCircle, ShapeTextLine, ShapeParagraph, ShapeAvatar, ShapeCard, ShapeCustomPath)
   , rectangleShape
   , circleShape
   , textLineShape
@@ -51,18 +51,18 @@ module Hydrogen.Schema.Reactive.SkeletonConfig
   , customShape
   
   -- * Content Type Validation
-  , ContentType(..)
+  , ContentType(ContentText, ContentMedia, ContentData, ContentCard, ContentButton, ContentInput, ContentNavigation, ContentAction)
   , canShowSkeleton
   , skeletonWarning
   
   -- * Complete Skeleton Config
-  , SkeletonConfig(..)
-  , ShimmerDirection(..)
+  , SkeletonConfig(SkeletonConfig)
+  , ShimmerDirection(ShimmerLTR, ShimmerRTL, ShimmerTTB, ShimmerBTT)
   , skeletonConfig
   , defaultConfig
   
   -- * Slow Connection Handling
-  , SlowConnectionBehavior(..)
+  , SlowConnectionBehavior(ShowWarningText, ShowProgressBar, ShowRetryButton, KeepAnimating, FadeToStatic)
   , slowConnectionConfig
   ) where
 

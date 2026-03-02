@@ -33,7 +33,7 @@ module Hydrogen.Schema.Weather.Precipitation.Rate
   , rateTorrential
   
   -- * Intensity Classification
-  , Intensity(..)
+  , Intensity(IntensityNone, IntensityTrace, IntensityLight, IntensityModerate, IntensityHeavy, IntensityViolent)
   , allIntensities
   , rateToIntensity
   , intensityToMinRate

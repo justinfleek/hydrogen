@@ -16,7 +16,27 @@
 
 module Hydrogen.Element.Compound.Canvas.Render.Types
   ( -- * Canvas Messages
-    CanvasMsg(..)
+    CanvasMsg
+      ( CanvasMouseDown
+      , CanvasMouseMove
+      , CanvasMouseUp
+      , CanvasWheel
+      , CanvasKeyDown
+      , CanvasKeyUp
+      , CanvasTouchStart
+      , CanvasTouchMove
+      , CanvasTouchEnd
+      , CanvasToolChange
+      , CanvasObjectSelect
+      , CanvasObjectDeselect
+      , CanvasZoomIn
+      , CanvasZoomOut
+      , CanvasZoomFit
+      , CanvasPanStart
+      , CanvasPanEnd
+      , CanvasUndo
+      , CanvasRedo
+      )
   
   -- * Render Config
   , RenderConfig

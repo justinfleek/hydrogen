@@ -19,9 +19,9 @@
 
 module Hydrogen.Schema.Audio.Speech.Speaker
   ( -- * Speaker Identity Atoms
-    SpeakerId(..)
-  , SpeakerEmbedding(..)
-  , SpeakerConfidence(..)
+    SpeakerId(SpeakerId)
+  , SpeakerEmbedding(SpeakerEmbedding)
+  , SpeakerConfidence(SpeakerConfidence)
   , speakerId
   , speakerEmbedding
   , speakerConfidence

@@ -25,7 +25,7 @@
 
 module Hydrogen.Schema.Brush.Tip.Parameters
   ( -- * Diameter (1-5000 pixels)
-    Diameter(..)
+    Diameter(Diameter)
   , diameter
   , diameterBounds
   , unwrapDiameter
@@ -34,7 +34,7 @@ module Hydrogen.Schema.Brush.Tip.Parameters
   , defaultDiameter
   
   -- * Hardness (0-100%)
-  , Hardness(..)
+  , Hardness(Hardness)
   , hardness
   , hardnessBounds
   , unwrapHardness
@@ -44,7 +44,7 @@ module Hydrogen.Schema.Brush.Tip.Parameters
   , maxHardness
   
   -- * Roundness (1-100%)
-  , Roundness(..)
+  , Roundness(Roundness)
   , roundness
   , roundnessBounds
   , unwrapRoundness
@@ -53,7 +53,7 @@ module Hydrogen.Schema.Brush.Tip.Parameters
   , flatRoundness
   
   -- * Tip Angle (0-360°)
-  , TipAngle(..)
+  , TipAngle(TipAngle)
   , tipAngle
   , tipAngleBounds
   , unwrapTipAngle
@@ -62,7 +62,7 @@ module Hydrogen.Schema.Brush.Tip.Parameters
   , diagonalAngle
   
   -- * Spacing (1-1000%)
-  , Spacing(..)
+  , Spacing(Spacing)
   , spacing
   , spacingBounds
   , unwrapSpacing
@@ -72,8 +72,8 @@ module Hydrogen.Schema.Brush.Tip.Parameters
   , airbrushSpacing
   
   -- * Flip Axes
-  , FlipX(..)
-  , FlipY(..)
+  , FlipX(FlipX)
+  , FlipY(FlipY)
   , flipX
   , flipY
   , noFlipX

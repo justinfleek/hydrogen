@@ -11,7 +11,7 @@
 
 module Hydrogen.Schema.Attestation.UUID5.Namespaces
   ( -- * UUID5 Type
-    UUID5(..)
+    UUID5(UUID5)
   -- * Core Namespaces
   , nsElement
   , nsEvent

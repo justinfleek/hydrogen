@@ -26,9 +26,9 @@
 
 module Hydrogen.Schema.Typography.TypeContrast
   ( -- * Types
-    ContrastLevel(..)
-  , ContrastMode(..)
-  , TypeContrast(..)
+    ContrastLevel(LevelHigh, LevelNormal, LevelReduced)
+  , ContrastMode(ModeFixed, ModeAuto, ModeCustomRatio)
+  , TypeContrast(TypeContrast)
   
   -- * Constructors
   , normal

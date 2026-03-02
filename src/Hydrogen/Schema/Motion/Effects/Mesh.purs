@@ -8,19 +8,19 @@
 
 module Hydrogen.Schema.Motion.Effects.Mesh
   ( -- * Pin Falloff
-    PinFalloff(..)
+    PinFalloff(PFInverseDistance, PFRadialBasis)
   , allPinFalloffs
   , pinFalloffToString
   , pinFalloffFromString
   
     -- * Turbulent Displace Type
-  , TurbulentDisplaceType(..)
+  , TurbulentDisplaceType(TDTTurbulent, TDTBulge, TDTTwist, TDTTurbulentSmoother, TDTHorizontal, TDTVertical, TDTCross)
   , allTurbulentDisplaceTypes
   , turbulentDisplaceTypeToString
   , turbulentDisplaceTypeFromString
   
     -- * Pinning Mode
-  , PinningMode(..)
+  , PinningMode(PMNone, PMAll, PMHorizontal, PMVertical)
   , allPinningModes
   , pinningModeToString
   , pinningModeFromString

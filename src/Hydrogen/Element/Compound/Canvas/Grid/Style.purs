@@ -20,7 +20,7 @@
 
 module Hydrogen.Element.Compound.Canvas.Grid.Style
   ( -- * Extended Grid Styles
-    ExtendedGridStyle(..)
+    ExtendedGridStyle(StyleSquare, StyleDot, StyleCrosshair, StyleIsometric, StyleIsometric30, StyleIsometric45, StylePerspective1, StylePerspective2, StylePerspective3, StylePolar, StyleHexagonal, StyleGoldenRatio, StyleRuleOfThirds, StyleDiagonal)
   , gridStyleAngle
   , isIsometricFamily
   , isPerspectiveFamily

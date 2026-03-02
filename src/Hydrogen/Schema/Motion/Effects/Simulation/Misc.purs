@@ -49,7 +49,7 @@ import Prelude
 import Hydrogen.Schema.Bounded (clampNumber)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
 import Hydrogen.Schema.Dimension.Point2D (Point2D, point2D)
-import Hydrogen.Schema.Motion.Composition (BlendMode(..))
+import Hydrogen.Schema.Motion.Composition (BlendMode(BMAdd))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // ball // action

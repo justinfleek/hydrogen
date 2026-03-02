@@ -41,7 +41,7 @@ module Hydrogen.Schema.Storage.IndexedDB
   , isValidStoreName
   
   -- * Key Path
-  , KeyPath(..)
+  , KeyPath(SingleKeyPath, CompoundKeyPath, AutoIncrement)
   , keyPathSingle
   , keyPathCompound
   , keyPathAutoIncrement
@@ -73,18 +73,18 @@ module Hydrogen.Schema.Storage.IndexedDB
   , dbHasStore
   
   -- * Transaction Mode
-  , TransactionMode(..)
+  , TransactionMode(ReadOnly, ReadWrite, VersionChange)
   , transactionModeLabel
   , isReadOnly
   
   -- * IndexedDB Operations
-  , IndexedDBOp(..)
+  , IndexedDBOp(Get, GetAll, Put, Add, Delete, ClearStore, Count, OpenCursor)
   , opStoreName
   , opIsRead
   , opIsWrite
   
   -- * IndexedDB Error
-  , IndexedDBError(..)
+  , IndexedDBError(DatabaseNotFound, StoreNotFound, VersionError, ConstraintError, QuotaExceededError, TransactionAborted, InvalidState, DataError, ReadOnlyError)
   , indexedDBErrorMessage
   , isVersionError
   , isNotFoundError

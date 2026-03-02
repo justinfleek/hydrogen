@@ -45,7 +45,7 @@ module Hydrogen.Schema.Brand.Token.Size
   , sizeValuePx
   
   -- * Size Purpose
-  , SizePurpose(..)
+  , SizePurpose(PurposeIcon, PurposeAvatar, PurposeButton, PurposeInput, PurposeTouch, PurposeContainer, PurposeBreakpoint, PurposeFixed, PurposeMinimum, PurposeMaximum)
   , sizePurposeToString
   , sizePurposeFromString
   ) where

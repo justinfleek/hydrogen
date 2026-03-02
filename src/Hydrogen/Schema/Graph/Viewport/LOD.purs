@@ -25,14 +25,14 @@
 
 module Hydrogen.Schema.Graph.Viewport.LOD
   ( -- * Level of Detail
-    LevelOfDetail(..)
+    LevelOfDetail(LOD_Full, LOD_Simplified, LOD_Minimal, LOD_Dot, LOD_Hidden)
   , lodForZoom
   , shouldRenderNode
   , shouldRenderLabel
   , shouldRenderConnection
   
   -- * Viewport Culling
-  , CullResult(..)
+  , CullResult(Visible, PartiallyVisible, Culled)
   , cullNode
   , cullConnection
   ) where

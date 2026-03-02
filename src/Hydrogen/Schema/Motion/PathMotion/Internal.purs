@@ -71,7 +71,7 @@ import Prelude
   )
 
 import Data.Array (length, snoc, foldl, index)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (sqrt, atan2, pi, floor)
 import Data.Int (toNumber, floor) as Int
 
@@ -88,7 +88,7 @@ import Hydrogen.Schema.Geometry.Spline
   , bSplineTangentAt
   , bSplineLength
   )
-import Hydrogen.Schema.Motion.PathMotion.Types (PathSource(..))
+import Hydrogen.Schema.Motion.PathMotion.Types (PathSource(CatmullRomSource, BSplineSource, PointArraySource))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // path evaluation

@@ -15,11 +15,20 @@ module Hydrogen.GPU.WebGPU.Types.RenderPass
     GPURenderPassDescriptor
   , GPURenderPassColorAttachment
   , GPURenderPassDepthStencilAttachment
-  , GPULoadOp(..)
-  , GPUStoreOp(..)
+  , GPULoadOp
+      ( LoadOpLoad
+      , LoadOpClear
+      )
+  , GPUStoreOp
+      ( StoreOpStore
+      , StoreOpDiscard
+      )
     -- Canvas Configuration
   , GPUCanvasConfiguration
-  , GPUCanvasAlphaMode(..)
+  , GPUCanvasAlphaMode
+      ( AlphaOpaque
+      , AlphaPremultiplied
+      )
   ) where
 
 import Prelude

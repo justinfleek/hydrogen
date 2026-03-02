@@ -11,7 +11,7 @@
 
 module Hydrogen.Schema.Audio.Frequency.Notes
   ( -- * Note Name Type
-    NoteName(..)
+    NoteName(C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B)
   
   -- * Enumeration
   , allNoteNames
@@ -26,7 +26,7 @@ module Hydrogen.Schema.Audio.Frequency.Notes
 
 import Prelude (class Eq, class Ord, class Show, mod, (-), (/))
 
-import Hydrogen.Schema.Audio.Frequency.Types (MidiNote(..))
+import Hydrogen.Schema.Audio.Frequency.Types (MidiNote(MidiNote))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // note names

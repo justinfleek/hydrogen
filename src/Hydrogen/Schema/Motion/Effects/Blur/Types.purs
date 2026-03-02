@@ -9,38 +9,38 @@
 
 module Hydrogen.Schema.Motion.Effects.Blur.Types
   ( -- * Blur Dimension
-    BlurDimension(..)
+    BlurDimension(BDHorizontal, BDVertical, BDBoth)
   , allBlurDimensions
   , blurDimensionToString
   , blurDimensionFromString
   , combineDimensions
   
   -- * Radial Blur Type
-  , RadialBlurType(..)
+  , RadialBlurType(RBTSpin, RBTZoom)
   , allRadialBlurTypes
   , radialBlurTypeToString
   , radialBlurTypeFromString
   
   -- * Antialiasing Quality
-  , AntialiasingQuality(..)
+  , AntialiasingQuality(AAQLow, AAQMedium, AAQHigh)
   , allAntialiasingQualities
   , antialiasingQualityToString
   , antialiasingQualityFromString
   
   -- * Iris Shape
-  , IrisShape(..)
+  , IrisShape(IrisTriangle, IrisSquare, IrisPentagon, IrisHexagon, IrisHeptagon, IrisOctagon, IrisDecagon, IrisCircle)
   , irisShapeToString
   , irisShapeFromString
   
   -- * Depth Map Channel
-  , DepthMapChannel(..)
+  , DepthMapChannel(DepthLuminance, DepthRed, DepthGreen, DepthBlue, DepthAlpha)
   
   -- * Smart Blur Types
-  , SmartBlurMode(..)
-  , SmartBlurQuality(..)
+  , SmartBlurMode(SBMNormal, SBMEdgeOnly, SBMOverlay)
+  , SmartBlurQuality(SBQLow, SBQMedium, SBQHigh)
   
   -- * Validation
-  , BlurValidationError(..)
+  , BlurValidationError(BlurOutOfRange, InvalidIterations, InvalidCenter)
   
   -- * Internal Utilities
   , clampInt

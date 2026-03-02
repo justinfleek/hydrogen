@@ -27,7 +27,7 @@
 
 module Hydrogen.Schema.Surface.FilterChain
   ( -- * Filter Operation
-    FilterOp(..)
+    FilterOp(Blur, Brightness, Contrast, Grayscale, HueRotate, Invert, Opacity, Saturate, Sepia)
   
   -- * Types
   , FilterChain(FilterChain)

@@ -40,12 +40,12 @@
 
 module Hydrogen.Schema.Typography.OpenType.CJK
   ( -- * Types
-    WritingMode(..)
-  , TextOrientation(..)
-  , RubyPosition(..)
-  , EastAsianVariant(..)
-  , EastAsianWidth(..)
-  , CJKFeatures(..)
+    WritingMode(HorizontalTB, VerticalRL, VerticalLR)
+  , TextOrientation(Mixed, Upright, Sideways)
+  , RubyPosition(RubyOver, RubyUnder, RubyInterCharacter)
+  , EastAsianVariant(VariantNormal, VariantTraditional, VariantSimplified, VariantJIS78, VariantJIS83, VariantJIS90, VariantJIS04, VariantExpert, VariantRuby)
+  , EastAsianWidth(WidthNormal, WidthFullWidth, WidthProportional)
+  , CJKFeatures(CJKFeatures)
   
   -- * Constructors
   , horizontal

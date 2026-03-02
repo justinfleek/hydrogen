@@ -41,7 +41,7 @@ module Hydrogen.Schema.Spatial.Bounds.AABB
   -- * Queries
   , surfaceArea
   , volume
-  , Axis(..)
+  , Axis(AxisX, AxisY, AxisZ)
   , longestAxis
   , shortestAxis
   , isDegenerate
@@ -71,7 +71,7 @@ import Prelude
   )
 import Prelude (negate) as P
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Array (head) as Array
 import Data.Foldable (foldl)
 

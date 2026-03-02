@@ -61,7 +61,7 @@ module Hydrogen.Schema.Motion.Orchestration
   , animateWithConfig
   
   -- * Orchestration ADT
-  , Orchestration(..)
+  , Orchestration(Single, Sequence, Parallel, Stagger, Delayed, Timeline)
   
   -- * Combinators
   , sequence

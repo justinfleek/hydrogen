@@ -33,10 +33,10 @@
 
 module Hydrogen.Schema.Geometry.Mask
   ( -- * Mask Mode
-    MaskMode(..)
+    MaskMode(AlphaMode, LuminanceMode, InverseLuminanceMode)
   
   -- * Mask Source
-  , MaskSource(..)
+  , MaskSource(ShapeSource, LinearGradientSource, RadialGradientSource, ImageSource, SolidSource)
   
   -- * Mask
   , Mask(Mask)
@@ -71,7 +71,7 @@ module Hydrogen.Schema.Geometry.Mask
   , isInverted
   
   -- * Composition
-  , MaskComposite(..)
+  , MaskComposite(MultiplyMasks, IntersectMasks, SubtractMasks, AddMasks)
   , composeMasks
   , intersectMasks
   , subtractMask

@@ -19,7 +19,7 @@ module Hydrogen.Schema.Spatial.Position
   , unwrapCoordinate
   
   -- * Position3D
-  , Position3D(..)
+  , Position3D(Position3D)
   , position3D
   , origin
   , positionX

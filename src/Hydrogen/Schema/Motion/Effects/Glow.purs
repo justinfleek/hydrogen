@@ -9,37 +9,37 @@
 
 module Hydrogen.Schema.Motion.Effects.Glow
   ( -- * Glow Composite Mode
-    GlowCompositeMode(..)
+    GlowCompositeMode(GCMOnTop, GCMBehind, GCMNone)
   , allGlowCompositeModes
   , glowCompositeModeToString
   , glowCompositeModeFromString
   
     -- * Glow Colors Mode
-  , GlowColorsMode(..)
+  , GlowColorsMode(GCMOriginal, GCMAB)
   , allGlowColorsModes
   , glowColorsModeToString
   , glowColorsModeFromString
   
     -- * Color Looping
-  , ColorLooping(..)
+  , ColorLooping(CLNone, CLSawtoothAB, CLSawtoothBA, CLTriangle)
   , allColorLoopings
   , colorLoopingToString
   , colorLoopingFromString
   
     -- * Falloff Mode
-  , FalloffMode(..)
+  , FalloffMode(FMInverseSquare, FMGaussian, FMExponential)
   , allFalloffModes
   , falloffModeToString
   , falloffModeFromString
   
     -- * Tonemap Mode
-  , TonemapMode(..)
+  , TonemapMode(TMNone, TMACES, TMReinhard, TMHable)
   , allTonemapModes
   , tonemapModeToString
   , tonemapModeFromString
   
     -- * Bloom Blend Mode
-  , BloomBlendMode(..)
+  , BloomBlendMode(BBMAdd, BBMScreen, BBMOverlay, BBMSoftLight)
   , allBloomBlendModes
   , bloomBlendModeToString
   , bloomBlendModeFromString

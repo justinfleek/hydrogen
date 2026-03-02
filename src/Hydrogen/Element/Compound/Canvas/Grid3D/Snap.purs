@@ -14,7 +14,7 @@
 
 module Hydrogen.Element.Compound.Canvas.Grid3D.Snap
   ( -- * Snap Point Type
-    SnapPoint3DType(..)
+    SnapPoint3DType(Snap3DOrigin, Snap3DAxisPoint, Snap3DMajorIntersection, Snap3DMinorIntersection, Snap3DPlaneCenter)
   
   -- * Snap Point
   , SnapPoint3D

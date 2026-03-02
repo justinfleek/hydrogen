@@ -10,13 +10,13 @@
 
 module Hydrogen.Schema.Network.HTTP.Result
   ( -- * HTTP Result
-    HTTPResult(..)
+    HTTPResult(HTTPOk, HTTPTimeout, HTTPNetworkError, HTTPCORSError, HTTPAborted)
   , isOk
   , isError
   , mapOk
   
   -- * HTTP Error Details
-  , HTTPError(..)
+  , HTTPError(TimeoutError, NetworkFailure, CORSBlocked, RequestAborted, InvalidResponse, StatusError)
   , errorMessage
   ) where
 

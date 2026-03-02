@@ -31,17 +31,17 @@
 
 module Hydrogen.Render.Online.Selection.State
   ( -- * Online State
-    OnlineState(..)
+    OnlineState(OnlineState)
   , mkOnlineState
   , emptyOnlineState
   
   -- * Marginal Estimate
-  , MarginalEstimate(..)
+  , MarginalEstimate(MarginalEstimate)
   , mkMarginalEstimate
   , zeroEstimate
   
   -- * EMA State
-  , EMAState(..)
+  , EMAState(EMAState)
   , mkEMAState
   , defaultEMADecay
   , updateEMA
@@ -82,9 +82,9 @@ import Data.Tuple (Tuple(Tuple))
 import Hydrogen.Render.Online.Core
   ( AgentId
   , BoundedNumber
-  , EpochId(..)
+  , EpochId(EpochId)
   , RegionId
-  , Utility(..)
+  , Utility(Utility)
   , clampToBounds
   , unwrapBounded
   , zeroUtility

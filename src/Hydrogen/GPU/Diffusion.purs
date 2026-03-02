@@ -65,35 +65,142 @@ module Hydrogen.GPU.Diffusion
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.GPU.Diffusion.Types
-  ( SchedulerType(..)
-  , NoiseType(..)
-  , NoiseMode(..)
-  , GuideMode(..)
-  , ImplicitType(..)
+  ( SchedulerType
+      ( SchedulerNormal
+      , SchedulerKarras
+      , SchedulerExponential
+      , SchedulerSGMUniform
+      , SchedulerSimple
+      , SchedulerDDIMUniform
+      , SchedulerBeta
+      , SchedulerLinearQuadratic
+      , SchedulerBeta57
+      , SchedulerPolyExponential
+      , SchedulerVPSDE
+      , SchedulerLCMSD
+      , SchedulerLCMSDXL
+      , SchedulerAYS
+      , SchedulerGITS
+      , SchedulerConstant
+      )
+  , NoiseType
+      ( NoiseGaussian
+      , NoiseBrownian
+      , NoiseUniform
+      , NoiseLaplacian
+      , NoiseStudentT
+      , NoisePerlin
+      , NoiseWavelet
+      , NoiseFractalBrown
+      , NoiseFractalPink
+      , NoiseFractalWhite
+      , NoiseFractalBlue
+      , NoiseFractalViolet
+      , NoisePyramidBilinear
+      , NoisePyramidBicubic
+      , NoisePyramidNearest
+      , NoiseHiresPyramidBilinear
+      , NoiseHiresPyramidBicubic
+      , NoiseSimplex
+      , NoiseNone
+      )
+  , NoiseMode
+      ( NoiseModeNone
+      , NoiseModeHard
+      , NoiseModeLorentzian
+      , NoiseModeSoft
+      , NoiseModeSoftLinear
+      , NoiseModeSofter
+      , NoiseModeEpsilon
+      , NoiseModeSinusoidal
+      , NoiseModeExp
+      , NoiseModeVPSDE
+      , NoiseModeER4
+      , NoiseModeHardVar
+      )
+  , GuideMode
+      ( GuideModeFlow
+      , GuideModeSync
+      , GuideModeLure
+      , GuideModeData
+      , GuideModeEpsilon
+      , GuideModeInversion
+      , GuideModePseudoimplicit
+      , GuideModeFullyPseudoimplicit
+      , GuideModeNone
+      )
+  , ImplicitType
+      ( ImplicitRebound
+      , ImplicitRetroEta
+      , ImplicitBongmath
+      , ImplicitPredictorCorrector
+      )
   , LatentTensor
   , LatentShape
-  , TensorDtype(..)
-  , TensorDevice(..)
-  , Conditioning(..)
+  , TensorDtype
+      ( DtypeFloat16
+      , DtypeFloat32
+      , DtypeBFloat16
+      )
+  , TensorDevice
+      ( DeviceCPU
+      , DeviceCUDA
+      , DeviceWebGPU
+      )
+  , Conditioning
+      ( ConditioningText
+      , ConditioningImage
+      , ConditioningComposite
+      , ConditioningNone
+      )
   , TextConditioning
   , ImageConditioning
-  , ImageConditionType(..)
+  , ImageConditionType
+      ( ConditionControlNet
+      , ConditionIPAdapter
+      , ConditionReference
+      , ConditionT2IAdapter
+      )
   , NoiseSchedule
   , SigmaSchedule
-  , DiffusionBlendMode(..)
-  , StepStrategy(..)
+  , DiffusionBlendMode
+      ( BlendLinear
+      , BlendSoftmax
+      , BlendMultiply
+      , BlendFeathered
+      )
+  , StepStrategy
+      ( StrategyStandard
+      , StrategySubstep
+      , StrategyAncestral
+      , StrategySDE
+      )
   , SubstepConfig
-  , SubstepMethod(..)
+  , SubstepMethod
+      ( SubstepEuler
+      , SubstepHeun
+      , SubstepRK4
+      , SubstepDPMSolver
+      )
   ) as Types
 
 import Hydrogen.GPU.Diffusion.Kernels
-  ( DiffusionKernel(..)
-  , EncodeKernel(..)
-  , DecodeKernel(..)
-  , DenoiseKernel(..)
-  , NoiseScheduleKernel(..)
-  , LatentBlendKernel(..)
-  , CFGKernel(..)
+  ( DiffusionKernel
+      ( KernelEncode
+      , KernelDecode
+      , KernelDenoise
+      , KernelNoiseSchedule
+      , KernelLatentBlend
+      , KernelCFG
+      , KernelSequence
+      , KernelNoop
+      )
+  , EncodeKernel(EncodeKernel)
+  , DecodeKernel(DecodeKernel)
+  , DenoiseKernel(DenoiseKernel)
+  , NoiseScheduleKernel(NoiseScheduleKernel)
+  , LatentBlendKernel(LatentBlendKernel)
+  , CFGKernel(CFGKernel)
   , DiffusionConfig
   ) as Kernels
 

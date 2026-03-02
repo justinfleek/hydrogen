@@ -10,7 +10,7 @@
 
 module Hydrogen.Schema.Reactive.Feedback.Tooltip
   ( -- * Tooltip Placement
-    TooltipPlacement(..)
+    TooltipPlacement(TooltipTop, TooltipTopStart, TooltipTopEnd, TooltipBottom, TooltipBottomStart, TooltipBottomEnd, TooltipLeft, TooltipLeftStart, TooltipLeftEnd, TooltipRight, TooltipRightStart, TooltipRightEnd)
   -- * Tooltip (Molecule)
   , Tooltip
   , tooltip

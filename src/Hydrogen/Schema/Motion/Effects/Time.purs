@@ -8,13 +8,13 @@
 
 module Hydrogen.Schema.Motion.Effects.Time
   ( -- * Echo Operator
-    EchoOperator(..)
+    EchoOperator(EOAdd, EOScreen, EOMaximum, EOMinimum, EOCompositeBack, EOCompositeFront, EOBlend)
   , allEchoOperators
   , echoOperatorToString
   , echoOperatorFromString
   
     -- * Time Resolution
-  , TimeResolution(..)
+  , TimeResolution(TRFrame, TRHalf, TRQuarter)
   , allTimeResolutions
   , timeResolutionToString
   , timeResolutionFromString

@@ -12,26 +12,26 @@ module Hydrogen.Element.Scene
     
   -- * Camera
   , CameraSpec
-  , CameraType(..)
-  , CameraProjection(..)
+  , CameraType(CameraOneNode, CameraTwoNode)
+  , CameraProjection(Perspective, Orthographic)
   
   -- * Light
   , LightSpec
-  , LightType(..)
+  , LightType(PointLight, SpotLight, DirectionalLight, AmbientLight, AreaLight)
   
   -- * Particles
   , ParticleSpec
-  , EmitterShape(..)
-  , ParticleForce(..)
+  , EmitterShape(EmitPoint, EmitLine, EmitCircle, EmitBox, EmitSphere, EmitCone, EmitMesh)
+  , ParticleForce(ForceGravity, ForceWind, ForceTurbulence, ForceVortex, ForceAttractor)
   
   -- * Lottie
   , LottieSpec
-  , LottieSource(..)
+  , LottieSource(LottieUrl, LottieJson, LottieAssetId)
   
   -- * Diffusion (AI Generation)
   , DiffusionSpec
-  , DiffusionModel(..)
-  , ControlNetType(..)
+  , DiffusionModel(SDXL, SD15, DALLE3, Flux, Midjourney)
+  , ControlNetType(ControlCanny, ControlDepth, ControlPose, ControlSeg, ControlNormal, ControlSoftEdge, ControlLineArt)
   ) where
 
 import Prelude

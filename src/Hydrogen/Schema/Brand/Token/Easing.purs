@@ -33,7 +33,7 @@ module Hydrogen.Schema.Brand.Token.Easing
   , easingTokenMeta
   
   -- * Easing Value
-  , EasingValue(..)
+  , EasingValue(Linear, CubicBezierEasing, Steps)
   , easingToString
   , isLinear
   , isCubicBezier
@@ -47,7 +47,7 @@ module Hydrogen.Schema.Brand.Token.Easing
   , bezierY2
   
   -- * Easing Purpose
-  , EasingPurpose(..)
+  , EasingPurpose(PurposeEnter, PurposeExit, PurposeMove, PurposeExpand, PurposeCollapse, PurposeStandard)
   , easingPurposeToString
   
   -- * Predefined Easings

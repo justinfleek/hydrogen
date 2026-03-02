@@ -9,19 +9,19 @@
 
 module Hydrogen.Schema.Reactive.DragState
   ( -- * Drag Status
-    DragStatus(..)
+    DragStatus(DragIdle, Dragging, DraggedOver, Dropping)
   , isDragIdle
   , isDragging
   , isDraggedOver
   , isDropping
   -- * Drop Effect
-  , DropEffect(..)
+  , DropEffect(DropCopy, DropMove, DropLink, DropNone)
   , isCopy
   , isMove
   , isLink
   , isDropNone
   -- * Drag Type
-  , DragType(..)
+  , DragType(FileDrag, ElementDrag, TextDrag, ExternalDrag)
   , isFileDrag
   , isElementDrag
   , isTextDrag
@@ -57,7 +57,7 @@ module Hydrogen.Schema.Reactive.DragState
   , ghostPreview
   , previewOffset
   -- * Drop Zone Feedback
-  , DropZoneFeedback(..)
+  , DropZoneFeedback(DropZoneAccepting, DropZoneRejecting, DropZoneNeutral)
   , isAccepting
   , isRejecting
   , isNeutral

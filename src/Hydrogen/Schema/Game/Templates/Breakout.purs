@@ -115,6 +115,7 @@ import Hydrogen.Schema.Game.Entity
   , mkPosition
   , mkVelocity
   , rectangleShape
+  , zeroAcceleration  -- Static entities have no acceleration
   )
 import Hydrogen.Schema.Game.World
   ( World
@@ -199,6 +200,7 @@ paddleConfig =
   { shape: rectangleShape paddleWidth paddleHeight
   , position: mkPosition paddleX paddleY
   , velocity: mkVelocity 0.0 0.0
+  , acceleration: zeroAcceleration  -- Paddle moves by direct input, not physics
   , color: paddleColor
   , behaviors:
       [ OnKeyPress ArrowLeft (MoveBy (0.0 - paddleMoveSpeed) 0.0)
@@ -241,6 +243,7 @@ ballConfig =
   { shape: rectangleShape ballSize ballSize
   , position: mkPosition ballX ballY
   , velocity: mkVelocity ballVx ballVy
+  , acceleration: zeroAcceleration  -- Ball has constant velocity (no gravity)
   , color: ballColor
   , behaviors:
       [ OnBounds BounceOffWalls       -- Bounce off top/left/right walls
@@ -297,6 +300,7 @@ brickConfig row col =
       (brickStartX + toNumber col * brickSpacingX)
       (brickStartY + toNumber row * brickSpacingY)
   , velocity: mkVelocity 0.0 0.0
+  , acceleration: zeroAcceleration  -- Bricks are static
   , color: rowColor row
   , behaviors:
       [ OnCollision DestroyOther  -- Ball destroys this brick

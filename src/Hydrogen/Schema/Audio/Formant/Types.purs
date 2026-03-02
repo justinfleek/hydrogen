@@ -11,11 +11,11 @@
 
 module Hydrogen.Schema.Audio.Formant.Types
   ( -- * Formant Frequency Atoms
-    F1(..)
-  , F2(..)
-  , F3(..)
-  , F4(..)
-  , F5(..)
+    F1(F1)
+  , F2(F2)
+  , F3(F3)
+  , F4(F4)
+  , F5(F5)
   , f1
   , f2
   , f3
@@ -28,7 +28,7 @@ module Hydrogen.Schema.Audio.Formant.Types
   , unwrapF5
   
   -- * Formant Bandwidth
-  , FormantBandwidth(..)
+  , FormantBandwidth(FormantBandwidth)
   , formantBandwidth
   , unwrapFormantBandwidth
   , bandwidthNarrow
@@ -36,7 +36,7 @@ module Hydrogen.Schema.Audio.Formant.Types
   , bandwidthWide
   
   -- * Formant Amplitude
-  , FormantAmplitude(..)
+  , FormantAmplitude(FormantAmplitude)
   , formantAmplitude
   , unwrapFormantAmplitude
   ) where

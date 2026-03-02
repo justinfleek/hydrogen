@@ -17,7 +17,7 @@
 
 module Hydrogen.Schema.Engineering.Tolerance.Fit
   ( -- * Fit Classes
-    FitClass(..)
+    FitClass(H11c11, H9d9, H8f7, H7g6, H7h6, H7k6, H7m6, H7n6, H7p6, H7s6, H7u6)
   , allFitClasses
   , fitDescription
   , fitTolerance

@@ -13,14 +13,14 @@
 
 module Hydrogen.Schema.Color.Space
   ( -- * Color Space Identifiers
-    ColorSpace(..)
-  , Gamut(..)
-  , TransferFunction(..)
-  , WhitePoint(..)
-  , Illuminant(..)
+    ColorSpace(SRGB, LinearSRGB, DisplayP3, AdobeRGB, ProPhotoRGB, Rec709, Rec2020, DCIP3, ACES_AP0, ACES_AP1, CIE_XYZ, CIE_LAB, CIE_LCH, OKLab, OKLCH, CMYK_FOGRA39, CMYK_GRACoL)
+  , Gamut(GamutSRGB, GamutP3, GamutRec2020, GamutAP0, GamutProPhoto)
+  , TransferFunction(Linear, Gamma22, Gamma24, Gamma26, SRGBTransfer, PQTransfer, HLGTransfer, ACEScct, ACEScc)
+  , WhitePoint
+  , Illuminant(D50, D55, D65, D75, DCI, ACES)
   
   -- * Space-Aware Color
-  , ColorInSpace(..)
+  , ColorInSpace(InSRGB, InLinearRGB, InDisplayP3, InXYZ, InLAB, InOKLAB, InLCH, InOKLCH, InCMYK)
   , LinearRGB
   , LAB
   , OKLAB
@@ -47,7 +47,7 @@ module Hydrogen.Schema.Color.Space
   , fromXYZ
   
   -- * Working Space
-  , WorkingSpace(..)
+  , WorkingSpace
   , acesAP0
   , acesAP1
   , rec709
@@ -55,7 +55,7 @@ module Hydrogen.Schema.Color.Space
   , dciP3
   
   -- * Gamut Mapping
-  , GamutMapping(..)
+  , GamutMapping(Clip, Compress, ProjectToSurface, PreserveLightness)
   , isInGamut
   ) where
 

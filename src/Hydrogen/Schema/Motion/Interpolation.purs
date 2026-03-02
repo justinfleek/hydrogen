@@ -32,7 +32,7 @@
 
 module Hydrogen.Schema.Motion.Interpolation
   ( -- * Full Interpolation Type
-    FullInterpolationType(..)
+    FullInterpolationType(FITLinear, FITBezier, FITHold, FITEaseInSine, FITEaseOutSine, FITEaseInOutSine, FITEaseInQuad, FITEaseOutQuad, FITEaseInOutQuad, FITEaseInCubic, FITEaseOutCubic, FITEaseInOutCubic, FITEaseInQuart, FITEaseOutQuart, FITEaseInOutQuart, FITEaseInQuint, FITEaseOutQuint, FITEaseInOutQuint, FITEaseInExpo, FITEaseOutExpo, FITEaseInOutExpo, FITEaseInCirc, FITEaseOutCirc, FITEaseInOutCirc, FITEaseInBack, FITEaseOutBack, FITEaseInOutBack, FITEaseInElastic, FITEaseOutElastic, FITEaseInOutElastic, FITEaseInBounce, FITEaseOutBounce, FITEaseInOutBounce)
   , allFullInterpolationTypes
   , fullInterpolationTypeToString
   , fullInterpolationTypeFromString
@@ -95,25 +95,25 @@ module Hydrogen.Schema.Motion.Interpolation
   , fitEaseInOutBounce
   
   -- * Spatial Tangent
-  , SpatialTangent(..)
+  , SpatialTangent(SpatialTangent)
   , mkSpatialTangent
   , defaultSpatialTangent
   , spatialTangentZero
   
   -- * Bezier Handle
-  , BezierHandle(..)
+  , BezierHandle(BezierHandle)
   , mkBezierHandle
   , defaultInHandle
   , defaultOutHandle
   
   -- * Control Mode
-  , ControlMode(..)
+  , ControlMode(CMSymmetric, CMSmooth, CMCorner)
   , allControlModes
   , controlModeToString
   , controlModeFromString
   
   -- * Extended Keyframe Data
-  , ExtendedKeyframeData(..)
+  , ExtendedKeyframeData(ExtendedKeyframeData)
   , defaultExtendedKeyframeData
   ) where
 

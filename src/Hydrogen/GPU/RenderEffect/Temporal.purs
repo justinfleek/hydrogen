@@ -11,15 +11,25 @@
 
 module Hydrogen.GPU.RenderEffect.Temporal
   ( -- * Temporal Effect Type
-    TemporalEffect(..)
+    TemporalEffect
+      ( TemporalMotionBlur
+      , TemporalEcho
+      , TemporalTimeWarp
+      )
   
   -- * Temporal Variants
-  , MotionBlur(..)
-  , EchoEffect(..)
-  , TimeWarp(..)
+  , MotionBlur(MotionBlur)
+  , EchoEffect(EchoEffect)
+  , TimeWarp(TimeWarp)
   
   -- * Temporal Configuration
-  , EchoOperator(..)
+  , EchoOperator
+      ( EchoAdd
+      , EchoScreen
+      , EchoMaximum
+      , EchoMinimum
+      , EchoBlend
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

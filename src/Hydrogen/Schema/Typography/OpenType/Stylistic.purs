@@ -38,9 +38,9 @@
 
 module Hydrogen.Schema.Typography.OpenType.Stylistic
   ( -- * Types
-    StylisticSet(..)
-  , CharacterVariant(..)
-  , Stylistic(..)
+    StylisticSet(StylisticSet)
+  , CharacterVariant(CharacterVariant)
+  , Stylistic(Stylistic)
   
   -- * Constructors
   , none

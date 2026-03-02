@@ -19,17 +19,17 @@
 
 module Hydrogen.Element.Compound.QRCode.Document.Styles
   ( -- * QR Style Preset
-    QRStyle(..)
+    QRStyle(StyleClassic, StyleRounded, StyleDots, StyleOrganic, StyleGradient, StyleArtistic)
   
   -- * Color Configuration
   , QRColors
   , defaultColors
   
   -- * Module Shapes
-  , ModuleShape(..)
+  , ModuleShape(ModuleSquare, ModuleRoundedSquare, ModuleCircle, ModuleDiamond, ModuleHeart, ModuleStar, ModuleHexagon, ModuleCustomPath)
   
   -- * Finder Styles
-  , FinderStyle(..)
+  , FinderStyle(FinderClassic, FinderRounded, FinderCircular, FinderDots, FinderCustom)
   
   -- * Module Style Configuration
   , ModuleStyles

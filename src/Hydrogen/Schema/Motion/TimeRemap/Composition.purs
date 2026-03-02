@@ -62,7 +62,7 @@ import Prelude
   )
 
 import Data.Array (length, foldl)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (abs)
 import Data.Int (toNumber) as Int
 

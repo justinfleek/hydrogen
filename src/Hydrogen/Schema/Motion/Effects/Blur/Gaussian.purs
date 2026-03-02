@@ -42,7 +42,7 @@ module Hydrogen.Schema.Motion.Effects.Blur.Gaussian
   , mapBlurAmount
   
   -- * Combinable Blur (Semigroup)
-  , CombinableGaussian(..)
+  , CombinableGaussian(CombinableGaussian)
   , toCombinableGaussian
   , fromCombinableGaussian
   ) where

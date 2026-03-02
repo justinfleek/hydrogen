@@ -17,19 +17,19 @@
 module Hydrogen.Schema.Motion.Effects.Simulation.Water
   ( -- * Caustics
     CausticsEffect
-  , CausticsLightType(..)
+  , CausticsLightType(CLTPointAbove, CLTDistantAbove, CLTPointBelow, CLTDistantBelow)
   , defaultCaustics
   , causticsWithIntensity
   
   -- * Wave World
   , WaveWorldEffect
-  , WaveMethod(..)
+  , WaveMethod(WMSteep, WMSmooth, WMRelaxed)
   , defaultWaveWorld
   , waveWorldWithHeight
   
   -- * Foam
   , FoamEffect
-  , FoamProducer(..)
+  , FoamProducer(FPPoint, FPLine, FPArea)
   , defaultFoam
   , foamWithBubbles
   
