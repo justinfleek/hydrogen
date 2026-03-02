@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Conway's Game of Life", 
+        "path": "gameoflife.json"
+    },
+    {
+        "name": "Wolfram's Rule 30",
+        "path": "rule30.json"
+    },
+    {
+        "name": "Stars",
+        "path": "stars.json"
+    },
+    {
+        "name": "Worms",
+        "path": "worms.json"
+    },
+    {
+        "name": "Slime mold",
+        "path": "slime_mold.json"
+    },
+    {
+        "name": "Waves",
+        "path": "waves.json"
+    },
+    {
+        "name": "Mitosis",
+        "path": "mitosis.json"
+    },
+    {
+        "name": "Fabric",
+        "path": "fabric.json"
+    },
+    {
+        "name": "Pathways",
+        "path": "pathways.json"
+    }
+]
