@@ -46,12 +46,24 @@ module Hydrogen.Audio.DAW.Mixer
   , SendSlot
   , ChannelEQ
   , EQBand
-  , EQBandType(..)
+  , EQBandType
+      ( EQLowShelf
+      , EQHighShelf
+      , EQPeak
+      , EQLowPass
+      , EQHighPass
+      , EQNotch
+      )
   , mkEQBand
     -- * Bus
   , Bus
   , BusId
-  , BusType(..)
+  , BusType
+      ( BusMaster
+      , BusGroup
+      , BusAux
+      , BusMatrix
+      )
   , mkBus
     -- * Master
   , MasterBus
@@ -65,7 +77,13 @@ module Hydrogen.Audio.DAW.Mixer
   , mixerBusCount
     -- * Metering
   , Meter
-  , MeterType(..)
+  , MeterType
+      ( MeterPeak
+      , MeterRMS
+      , MeterVU
+      , MeterLUFS
+      , MeterKMeter
+      )
   , PeakHold
   ) where
 

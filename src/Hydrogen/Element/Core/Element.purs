@@ -29,7 +29,19 @@
 
 module Hydrogen.Element.Core.Element
   ( -- * Core Element Type
-    Element(..)
+    Element
+      ( Rectangle
+      , Ellipse
+      , Path
+      , Text
+      , Image
+      , Video
+      , Audio
+      , Model3D
+      , Group
+      , Transform
+      , Empty
+      )
     
   -- * Composition Specs
   , GroupSpec

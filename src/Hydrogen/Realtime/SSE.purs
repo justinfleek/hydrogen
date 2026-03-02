@@ -28,7 +28,11 @@ module Hydrogen.Realtime.SSE
   ( -- * Types
     EventSource
   , SSEConfig
-  , SSEState(..)
+  , SSEState
+      ( SSEConnecting
+      , SSEOpen
+      , SSEClosed
+      )
     -- * Configuration
   , defaultConfig
     -- * Connection

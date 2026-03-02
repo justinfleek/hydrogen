@@ -37,7 +37,14 @@
 -- | Council gap: COUNCIL_REVIEW.md §3.6 "MISSING: Audio-visual sync"
 module Hydrogen.Audio.AVSync
   ( -- * Sync Mode
-    SyncMode(..)
+    SyncMode
+      ( SyncImmediate
+      , SyncOnVisible
+      , SyncOnProgress
+      , SyncOnMarker
+      , SyncManual
+      , SyncNone
+      )
     -- * Audio Cue
   , AudioCue
   , audioCue
@@ -51,13 +58,31 @@ module Hydrogen.Audio.AVSync
   , voiceElement
   , voiceElementSimple
     -- * Emotion Tags
-  , EmotionTag(..)
+  , EmotionTag
+      ( EmotionNeutral
+      , EmotionHappy
+      , EmotionSad
+      , EmotionAngry
+      , EmotionFear
+      , EmotionSurprise
+      , EmotionDisgust
+      , EmotionContempt
+      , EmotionExcitement
+      , EmotionCalm
+      , EmotionConcern
+      , EmotionConfidence
+      )
   , emotionIntensity
     -- * Timeline Marker
   , TimelineMarker
   , marker
     -- * Lip Sync
-  , LipSyncMode(..)
+  , LipSyncMode
+      ( LipSyncNone
+      , LipSyncViseme
+      , LipSyncBlendShape
+      , LipSyncPhoneme
+      )
   , LipSyncData
   , VisemeFrame
   , lipSyncData

@@ -31,7 +31,12 @@ module Hydrogen.Realtime.WebSocket
   ( -- * Types
     WebSocketConnection
   , WebSocketConfig
-  , WebSocketState(..)
+  , WebSocketState
+      ( Connecting
+      , Open
+      , Closing
+      , Closed
+      )
   , CloseCode
     -- * Configuration
   , defaultConfig

@@ -30,15 +30,47 @@
 -- | Council gap: COUNCIL_REVIEW.md §3.6 "RenderEffect.purs is visual-only"
 module Hydrogen.Audio.AudioEffect
   ( -- * Core Effect Type
-    AudioEffect(..)
+    AudioEffect
+      ( EffectReverb
+      , EffectDelay
+      , EffectCompressor
+      , EffectEQ
+      , EffectDistortion
+      , EffectGate
+      , EffectLimiter
+      , EffectSpatialize
+      , EffectSequence
+      , EffectParallel
+      , EffectConditional
+      , EffectAnimated
+      , EffectNone
+      )
     -- * Spatial Effect
   , SpatialEffect
     -- * Conditions
-  , AudioCondition(..)
+  , AudioCondition
+      ( ConditionPlaying
+      , ConditionMuted
+      , ConditionVolumeAbove
+      , ConditionVolumeBelow
+      , ConditionFrequencyAbove
+      , ConditionFrequencyBelow
+      , ConditionBeatDetected
+      , ConditionSilence
+      , ConditionAlways
+      )
     -- * Effect Pass
   , AudioPass
-  , AudioInput(..)
-  , AudioOutput(..)
+  , AudioInput
+      ( InputSource
+      , InputPrevious
+      , InputMix
+      )
+  , AudioOutput
+      ( OutputDestination
+      , OutputBus
+      , OutputAnalyzer
+      )
     -- * Composition
   , effectSequence
   , effectParallel

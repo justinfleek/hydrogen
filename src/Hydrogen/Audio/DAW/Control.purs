@@ -41,22 +41,52 @@ module Hydrogen.Audio.DAW.Control
     -- * Knob
   , Knob
   , mkKnob
-  , KnobStyle(..)
-  , KnobSize(..)
+  , KnobStyle
+      ( KnobClassic
+      , KnobArc
+      , KnobDot
+      , KnobVintage
+      , KnobLED
+      , KnobBipolar
+      )
+  , KnobSize
+      ( KnobTiny
+      , KnobSmall
+      , KnobMedium
+      , KnobLarge
+      , KnobXLarge
+      )
   , KnobConfig
   , defaultKnobConfig
     -- * Slider  
   , Slider
   , mkSlider
-  , SliderOrientation(..)
-  , SliderStyle(..)
+  , SliderOrientation
+      ( SliderVertical
+      , SliderHorizontal
+      )
+  , SliderStyle
+      ( SliderFader
+      , SliderBar
+      , SliderFill
+      , SliderBipolar
+      )
   , SliderConfig
   , defaultSliderConfig
     -- * Button
   , Button
   , mkButton
-  , ButtonMode(..)
-  , ButtonStyle(..)
+  , ButtonMode
+      ( ButtonMomentary
+      , ButtonToggle
+      , ButtonRadio
+      )
+  , ButtonStyle
+      ( ButtonFlat
+      , ButtonRaised
+      , ButtonLED
+      , ButtonPad
+      )
   , ButtonConfig
   , defaultButtonConfig
     -- * Pad
@@ -73,13 +103,21 @@ module Hydrogen.Audio.DAW.Control
     -- * Wheel
   , Wheel
   , mkWheel
-  , WheelType(..)
+  , WheelType
+      ( WheelPitchBend
+      , WheelMod
+      , WheelExpression
+      )
   , WheelConfig
     -- * Switch
   , Switch
   , mkSwitch
   , SwitchConfig
-  , SwitchStyle(..)
+  , SwitchStyle
+      ( SwitchRotary
+      , SwitchSlide
+      , SwitchSegment
+      )
     -- * XY Pad
   , XYPad
   , mkXYPad

@@ -43,7 +43,18 @@
 
 module Hydrogen.Serialize.CBOR
   ( -- * CBOR Value Type
-    CBORValue(..)
+    CBORValue
+      ( CBORUInt
+      , CBORNInt
+      , CBORBytes
+      , CBORText
+      , CBORArray
+      , CBORMap
+      , CBORBool
+      , CBORNull
+      , CBORFloat32
+      , CBORFloat64
+      )
   
   -- * Encoding Typeclass
   , class CBOREncode
