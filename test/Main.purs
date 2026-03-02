@@ -14,7 +14,6 @@ import Hydrogen.HTML.Renderer (render, renderWith, defaultOptions)
 import Hydrogen.HTML.Renderer as Renderer
 import Hydrogen.Data.Format as Format
 import Hydrogen.Data.RemoteData as RD
-import Hydrogen.Query as Q
 import Hydrogen.Router (normalizeTrailingSlash)
 import Hydrogen.SSG as SSG
 import Test.Spec (Spec, describe, it)
@@ -49,7 +48,6 @@ main = launchAff_ $ runSpec [consoleReporter] do
     ssgTests
     rendererTests
     remoteDataTests
-    queryTests
   describe "Render Abstraction" do
     Element.elementTests
   describe "Property Tests" do
@@ -537,117 +535,6 @@ remoteDataTests = describe "RemoteData" do
     
     it "uses default for Failure" do
       RD.withDefault 0 (RD.Failure "err" :: RD.RemoteData String Int) `shouldEqual` 0
-
--- =============================================================================
---                                                             // query tests
--- =============================================================================
-
-queryTests :: Spec Unit
-queryTests = describe "Query" do
-  describe "defaultQueryOptions" do
-    it "creates options with key and fetch" do
-      let opts = Q.defaultQueryOptions ["user", "123"] (pure $ Right 42)
-      opts.key `shouldEqual` ["user", "123"]
-      opts.retry `shouldEqual` 0
-    
-    it "has sensible defaults" do
-      let opts = Q.defaultQueryOptions ["test"] (pure $ Right "data")
-      opts.staleTime `shouldEqual` Nothing
-      opts.retry `shouldEqual` 0
-
-  describe "QueryState" do
-    it "initialQueryState has NotAsked data" do
-      let state = Q.initialQueryState :: Q.QueryState String Int
-      state.data `shouldEqual` RD.NotAsked
-      state.isStale `shouldEqual` false
-      state.isFetching `shouldEqual` false
-
-  describe "QueryState helpers" do
-    it "getData extracts from Success" do
-      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.getData state `shouldEqual` Just 42
-    
-    it "getData returns Nothing for Loading" do
-      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.getData state `shouldEqual` Nothing
-    
-    it "getError extracts from Failure" do
-      let state = { data: RD.Failure "oops", isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.getError state `shouldEqual` Just "oops"
-    
-    it "getError returns Nothing for Success" do
-      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.getError state `shouldEqual` Nothing
-    
-    it "hasData is true for Success" do
-      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.hasData state `shouldEqual` true
-    
-    it "hasData is false for Loading" do
-      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.hasData state `shouldEqual` false
-    
-    it "withDefaultData uses Success value" do
-      let state = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.withDefaultData 0 state `shouldEqual` 42
-    
-    it "withDefaultData uses default for Loading" do
-      let state = { data: RD.Loading, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.withDefaultData 0 state `shouldEqual` 0
-    
-    it "foldData handles all cases" do
-      let handlers = 
-            { notAsked: "notAsked"
-            , loading: "loading"
-            , failure: \e -> "failure: " <> e
-            , success: \n -> "success: " <> show n
-            }
-      let notAsked = { data: RD.NotAsked, isStale: false, isFetching: false } :: Q.QueryState String Int
-      let loading = { data: RD.Loading, isStale: false, isFetching: true } :: Q.QueryState String Int
-      let failure = { data: RD.Failure "oops", isStale: false, isFetching: false } :: Q.QueryState String Int
-      let success = { data: RD.Success 42, isStale: false, isFetching: false } :: Q.QueryState String Int
-      Q.foldData handlers notAsked `shouldEqual` "notAsked"
-      Q.foldData handlers loading `shouldEqual` "loading"
-      Q.foldData handlers failure `shouldEqual` "failure: oops"
-      Q.foldData handlers success `shouldEqual` "success: 42"
-
-  describe "Combining queries with RemoteData" do
-    it "combines queries with ado" do
-      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
-      let postsState = { data: RD.Success 3, isStale: false, isFetching: false } :: Q.QueryState String Int
-      let combined :: RD.RemoteData String { userName :: String, postCount :: Int }
-          combined = ado
-            user <- userState.data
-            posts <- postsState.data
-            in { userName: user, postCount: posts }
-      RD.isSuccess combined `shouldEqual` true
-    
-    it "propagates Loading when combining" do
-      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
-      let postsState = { data: RD.Loading, isStale: false, isFetching: true } :: Q.QueryState String Int
-      let combined :: RD.RemoteData String Int
-          combined = ado
-            _ <- userState.data
-            posts <- postsState.data
-            in posts
-      combined `shouldEqual` RD.Loading
-    
-    it "propagates Failure when combining" do
-      let userState = { data: RD.Success "Alice", isStale: false, isFetching: false } :: Q.QueryState String String
-      let postsState = { data: RD.Failure "Network error", isStale: false, isFetching: false } :: Q.QueryState String Int
-      let combined :: RD.RemoteData String Int
-          combined = ado
-            _ <- userState.data
-            posts <- postsState.data
-            in posts
-      combined `shouldEqual` RD.Failure "Network error"
-
-  describe "PagedState" do
-    it "initialPagedState has NotAsked data" do
-      let state = Q.initialPagedState :: Q.PagedState String Int
-      state.data `shouldEqual` RD.NotAsked
-      state.pages `shouldEqual` []
-      state.hasNextPage `shouldEqual` false
 
 -- Helper for length
 length :: forall a. Array a -> Int

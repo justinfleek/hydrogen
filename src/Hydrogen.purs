@@ -23,7 +23,6 @@
 -- |
 -- | ```purescript
 -- | import Hydrogen.Router (class IsRoute, parseRoute, routeToPath)
--- | import Hydrogen.API.Client (get, post, withAuth)
 -- | import Hydrogen.UI.Core (cls, row, column)
 -- | import Hydrogen.UI.Loading (loadingState, spinnerMd)
 -- | import Hydrogen.UI.Error (errorState, emptyState)
@@ -41,7 +40,6 @@
 -- |
 -- | ### Core
 -- | - **Hydrogen.Router** - Type-safe client-side routing
--- | - **Hydrogen.API.Client** - HTTP client with JSON encoding
 -- | - **Hydrogen.SSG** - Static site generation
 -- | - **Hydrogen.HTML.Renderer** - Render Element to HTML strings
 -- |
@@ -94,7 +92,6 @@
 module Hydrogen
   ( -- * Core
     module Hydrogen.Router
-  , module Hydrogen.API.Client
   , module Hydrogen.SSG
   , module Hydrogen.HTML.Renderer
     -- * UI
@@ -110,7 +107,6 @@ module Hydrogen
   ) where
 
 import Hydrogen.Router (class IsRoute, class RouteMetadata, parseRoute, routeToPath, isProtected, isStaticRoute, routeTitle, routeDescription, routeOgImage, getPathname, getHostname, getOrigin, pushState, replaceState, onPopState, interceptLinks, navigate, normalizeTrailingSlash)
-import Hydrogen.API.Client (ApiConfig, defaultConfig, withAuth, withLogging, get, post, put, patch, delete, ApiResult)
 import Hydrogen.UI.Core (classes, cls, svgCls, flex, row, column, box, container, section, svgNS)
 import Hydrogen.UI.Loading (spinner, spinnerSm, spinnerMd, spinnerLg, loadingState, loadingInline, loadingCard, loadingCardLarge, skeletonText, skeletonRow)
 import Hydrogen.UI.Error (errorState, errorCard, errorBadge, errorInline, emptyState)

@@ -28,6 +28,7 @@ import Prelude
   ( show
   , (<>)
   , (<)
+  , (>)
   )
 
 import Data.Array (foldl)

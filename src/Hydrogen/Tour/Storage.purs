@@ -50,6 +50,7 @@ import Data.DateTime.Instant (unInstant)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(Just, Nothing), isJust)
 import Data.Newtype (unwrap)
+import Data.Number as Number
 import Effect (Effect)
 import Effect.Now (now)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), TourId(TourId))
@@ -110,8 +111,8 @@ hasDismissed tourId = do
 -- | Automatically clears expired snoozes.
 isSnoozed :: TourId -> Effect Boolean
 isSnoozed tourId = do
-  maybeUntil <- LS.getItem (snoozeKey tourId) :: Effect (Maybe Number)
-  case maybeUntil of
+  maybeUntilStr <- LS.getItemRaw (snoozeKey tourId)
+  case maybeUntilStr >>= parseNumber of
     Nothing -> pure false
     Just until -> do
       nowMs <- currentTimeMs
@@ -121,6 +122,10 @@ isSnoozed tourId = do
           -- Snooze expired, clear it
           clearSnooze tourId
           pure false
+  where
+  -- Parse a string to a Number, returning Nothing on failure
+  parseNumber :: String -> Maybe Number
+  parseNumber = Number.fromString
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // persistence
@@ -149,7 +154,7 @@ snooze :: TourId -> Milliseconds -> Effect Unit
 snooze tourId (Milliseconds duration) = do
   nowMs <- currentTimeMs
   let expiresAt = nowMs + toNumber duration
-  LS.setItem (snoozeKey tourId) expiresAt
+  LS.setItemRaw (snoozeKey tourId) (show expiresAt)
 
 -- | Clear an active snooze
 clearSnooze :: TourId -> Effect Unit

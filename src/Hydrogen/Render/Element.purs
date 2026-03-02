@@ -186,6 +186,7 @@ import Hydrogen.Render.Element.SVG
   , text_
   , tspan_
   , polyline_
+  , polygon_
   )
 
 import Hydrogen.Render.Element.Attributes

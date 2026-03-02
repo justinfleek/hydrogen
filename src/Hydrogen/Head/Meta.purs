@@ -4,7 +4,7 @@
 
 -- | Dynamic document head management
 -- |
--- | Manage title, meta tags, links, and structured data.
+-- | Manage title, meta tags, links, and resource hints.
 -- |
 -- | ## Usage
 -- |
@@ -18,17 +18,13 @@
 -- | Meta.setMeta "description" "Page description here"
 -- | Meta.setMeta "og:title" "Share Title"
 -- |
--- | -- Add structured data (JSON-LD)
--- | Meta.setJsonLd
--- |   { "@context": "https://schema.org"
--- |   , "@type": "Article"
--- |   , "headline": "Article Title"
--- |   }
--- |
 -- | -- Preload resources
 -- | Meta.preload "/api/data" "fetch"
 -- | Meta.prefetch "/next-page"
 -- | ```
+-- |
+-- | Note: JSON-LD structured data has been removed. Use Schema atoms with
+-- | CBOR serialization for structured data transport.
 module Hydrogen.Head.Meta
   ( -- * Title
     setTitle
@@ -43,9 +39,6 @@ module Hydrogen.Head.Meta
     -- * Twitter Cards
   , setTwitterCard
   , TwitterCard
-    -- * Structured Data
-  , setJsonLd
-  , removeJsonLd
     -- * Resource Hints
   , preload
   , prefetch
@@ -60,8 +53,12 @@ module Hydrogen.Head.Meta
   ) where
 
 import Prelude
+  ( Unit
+  , discard
+  , pure
+  , unit
+  )
 
-import Data.Argonaut (class EncodeJson, encodeJson, stringify)
 import Data.Maybe (Maybe(Nothing, Just))
 import Effect (Effect)
 
@@ -98,8 +95,6 @@ foreign import getTitleImpl :: Effect String
 foreign import setMetaImpl :: String -> String -> Effect Unit
 foreign import removeMetaImpl :: String -> Effect Unit
 foreign import getMetaImpl :: String -> Effect (Maybe String)
-foreign import setJsonLdImpl :: String -> Effect Unit
-foreign import removeJsonLdImpl :: Effect Unit
 foreign import addLinkImpl :: String -> String -> String -> Effect Unit
 foreign import removeLinkImpl :: String -> Effect Unit
 foreign import setFaviconImpl :: String -> Effect Unit
@@ -173,18 +168,6 @@ setTwitterCard card = do
   case card.creator of
     Just creator -> setMeta "twitter:creator" creator
     Nothing -> pure unit
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                            // structured data
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set JSON-LD structured data
-setJsonLd :: forall a. EncodeJson a => a -> Effect Unit
-setJsonLd data' = setJsonLdImpl (stringify $ encodeJson data')
-
--- | Remove JSON-LD structured data
-removeJsonLd :: Effect Unit
-removeJsonLd = removeJsonLdImpl
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // resource hints

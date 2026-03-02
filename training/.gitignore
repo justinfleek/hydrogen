@@ -1,0 +1,11 @@
+# Training outputs (large checkpoint files)
+outputs/
+
+# Keep data files tracked (they're the training corpus)
+# !data/
+
+# Temporary files
+*.tmp
+*.log
+*.cache
+__pycache__/

@@ -2,53 +2,49 @@
 --                                                  // hydrogen // local-storage
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Type-safe localStorage utilities
+-- | Raw localStorage utilities
 -- |
--- | Provides type-safe access to localStorage with JSON encoding/decoding.
+-- | Provides access to localStorage with raw string operations only.
+-- | JSON serialization is forbidden — use Schema atoms with CBOR instead.
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Util.LocalStorage as LS
 -- |
--- | -- Store a value (any type with EncodeJson)
--- | LS.setItem "user" { name: "Alice", age: 30 }
+-- | -- Store a raw string value
+-- | LS.setItemRaw "theme" "dark"
 -- |
--- | -- Retrieve a value (any type with DecodeJson)
--- | maybeUser :: Maybe User <- LS.getItem "user"
+-- | -- Retrieve a raw string value
+-- | maybeTheme :: Maybe String <- LS.getItemRaw "theme"
 -- |
 -- | -- Remove a value
--- | LS.removeItem "user"
+-- | LS.removeItem "theme"
 -- |
 -- | -- Clear all storage
 -- | LS.clear
 -- |
 -- | -- Listen for changes
--- | unsubscribe <- LS.onChange "user" \maybeValue ->
--- |   Console.log $ "User changed: " <> show maybeValue
+-- | unsubscribe <- LS.onChange "theme" \maybeValue ->
+-- |   Console.log $ "Theme changed: " <> show maybeValue
 -- |
 -- | -- With namespacing
 -- | ns <- LS.namespace "myapp"
--- | ns.setItem "setting" true
--- | ns.getItem "setting"  -- Stored as "myapp:setting"
+-- | ns.setItemRaw "setting" "true"
+-- | maybeVal <- ns.getItemRaw "setting"  -- Stored as "myapp:setting"
 -- | ```
 module Hydrogen.Util.LocalStorage
-  ( -- * Core Operations
-    getItem
-  , setItem
+  ( -- * Core Operations (raw strings only)
+    getItemRaw
+  , setItemRaw
   , removeItem
   , clear
-    -- * String Operations (no encoding)
-  , getItemRaw
-  , setItemRaw
     -- * Change Listening
   , onChange
   , onAnyChange
     -- * Namespacing
   , namespace
   , Namespaced
-  , getItemPrefixed
-  , setItemPrefixed
     -- * Utilities
   , keys
   , length
@@ -57,10 +53,8 @@ module Hydrogen.Util.LocalStorage
 
 import Prelude hiding (void)
 
-import Data.Argonaut (class DecodeJson, class EncodeJson, decodeJson, encodeJson, parseJson, stringify)
 import Data.Array (filter) as Array
-import Data.Either (hush)
-import Data.Maybe (Maybe(Just, Nothing), isJust)
+import Data.Maybe (Maybe, isJust)
 import Data.Traversable (traverse) as Traversable
 import Data.String (take, length) as String
 import Effect (Effect)
@@ -119,27 +113,23 @@ foreign import onAnyChangeImpl
 --                                                            // core operations
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Get an item from localStorage with JSON decoding
+-- | Get a raw string from localStorage
 -- |
--- | Returns `Nothing` if the key doesn't exist or decoding fails.
+-- | Returns `Nothing` if the key doesn't exist.
 -- |
 -- | ```purescript
--- | maybeUser :: Maybe User <- getItem "user"
+-- | maybeTheme :: Maybe String <- getItemRaw "theme"
 -- | ```
-getItem :: forall a. DecodeJson a => String -> Effect (Maybe a)
-getItem key = do
-  maybeStr <- getItemImpl key
-  pure $ case maybeStr of
-    Nothing -> Nothing
-    Just str -> hush (parseJson str) >>= hush <<< decodeJson
+getItemRaw :: String -> Effect (Maybe String)
+getItemRaw = getItemImpl
 
--- | Set an item in localStorage with JSON encoding
+-- | Set a raw string in localStorage
 -- |
 -- | ```purescript
--- | setItem "settings" { theme: "dark", fontSize: 14 }
+-- | setItemRaw "theme" "dark"
 -- | ```
-setItem :: forall a. EncodeJson a => String -> a -> Effect Unit
-setItem key value = setItemImpl key (stringify $ encodeJson value)
+setItemRaw :: String -> String -> Effect Unit
+setItemRaw = setItemImpl
 
 -- | Remove an item from localStorage
 removeItem :: String -> Effect Unit
@@ -148,18 +138,6 @@ removeItem = removeItemImpl
 -- | Clear all items from localStorage
 clear :: Effect Unit
 clear = clearImpl
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                          // string operations
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Get a raw string from localStorage (no JSON decoding)
-getItemRaw :: String -> Effect (Maybe String)
-getItemRaw = getItemImpl
-
--- | Set a raw string in localStorage (no JSON encoding)
-setItemRaw :: String -> String -> Effect Unit
-setItemRaw = setItemImpl
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // change listening
@@ -198,9 +176,6 @@ onAnyChange = onAnyChangeImpl
 -- | ns.setItemRaw "theme" "dark"  -- Stored as "myapp:theme"
 -- | maybeTheme <- ns.getItemRaw "theme"
 -- | ns.clear  -- Only clears "myapp:*" keys
--- |
--- | -- For typed access, use the prefix:
--- | setItem (ns.prefix <> ":setting") myValue
 -- | ```
 namespace :: String -> Effect Namespaced
 namespace prefix = pure
@@ -235,14 +210,6 @@ getNamespaceKeys prefix = do
   where
   startsWith :: String -> String -> Boolean
   startsWith p str = String.take (String.length p) str == p
-
--- | Get a prefixed item with type safety
-getItemPrefixed :: forall a. DecodeJson a => String -> String -> Effect (Maybe a)
-getItemPrefixed prefix key = getItem (prefix <> ":" <> key)
-
--- | Set a prefixed item with type safety
-setItemPrefixed :: forall a. EncodeJson a => String -> String -> a -> Effect Unit
-setItemPrefixed prefix key value = setItem (prefix <> ":" <> key) value
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // utilities

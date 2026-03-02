@@ -1,0 +1,68 @@
+### Hydrogen Schema Training Configuration (QLoRA)
+### Fine-tune DeepSeek-Coder-V2-Lite on Hydrogen Schema using 4-bit quantization
+###
+### Usage (from training/ directory):
+###   source .venv/bin/activate
+###   LD_LIBRARY_PATH=/run/opengl-driver/lib:$LD_LIBRARY_PATH llamafactory-cli train configs/deepseek_coder_qlora.yaml
+###
+### Hardware: RTX 5090 32GB VRAM
+
+### Model (6.7B works reliably, 33B has loading issues with LlamaFactory)
+model_name_or_path: deepseek-ai/deepseek-coder-6.7b-instruct
+trust_remote_code: true
+
+### Method
+stage: sft
+do_train: true
+finetuning_type: lora
+
+### Quantization (4-bit FP4 for Blackwell)
+quantization_bit: 4
+quantization_method: bitsandbytes
+quantization_type: fp4
+double_quantization: true
+
+### Dataset
+dataset_dir: .
+dataset: hydrogen_schema_combined
+template: deepseek
+cutoff_len: 2048
+max_samples: 100000
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA Configuration (full for 6.7B)
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+lora_target: q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj
+
+### Training
+output_dir: outputs/hydrogen_schema_6.7b_qlora_v1
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+plot_loss: true
+
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+gradient_checkpointing: true
+
+### Optimization
+optim: paged_adamw_8bit
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+### Evaluation
+val_size: 0.02
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 500
+
+### Reporting
+report_to: tensorboard

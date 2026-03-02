@@ -1,0 +1,69 @@
+### Hydrogen Engram Training Configuration
+### Fine-tune DeepSeek-Coder on Hydrogen Schema
+###
+### Usage:
+###   llamafactory-cli train training/configs/deepseek_coder_lora.yaml
+###
+### Hardware: Minimum 24GB VRAM (RTX 3090/4090), recommended 40GB+ (A100)
+
+### Model
+model_name_or_path: deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct
+# Alternative larger models:
+# model_name_or_path: deepseek-ai/DeepSeek-Coder-33B-Instruct
+# model_name_or_path: deepseek-ai/DeepSeek-V3  # Requires 8x A100 80GB
+
+### Method
+stage: sft
+do_train: true
+finetuning_type: lora
+
+### Dataset
+dataset_dir: training
+dataset: hydrogen_schema
+template: deepseek
+cutoff_len: 4096
+max_samples: 100000  # Use all examples
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA Configuration
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+lora_target: q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj
+
+### Training
+output_dir: training/outputs/hydrogen_engram_v1
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+plot_loss: true
+
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+gradient_checkpointing: true
+
+### Optimization
+optim: adamw_torch
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+### Memory Optimization (for smaller GPUs)
+# Uncomment for 24GB VRAM:
+# quantization_bit: 4
+# quantization_method: bitsandbytes
+
+### Evaluation
+val_size: 0.02
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 500
+
+### Reporting
+report_to: tensorboard
+# report_to: wandb  # Uncomment for Weights & Biases

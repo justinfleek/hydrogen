@@ -42,28 +42,6 @@ export const getMetaImpl = (name) => () => {
   return meta ? meta.getAttribute('content') : null;
 };
 
-export const setJsonLdImpl = (jsonString) => () => {
-  // Remove existing JSON-LD
-  const existing = document.querySelector('script[type="application/ld+json"][data-hydrogen]');
-  if (existing) {
-    existing.remove();
-  }
-  
-  // Add new JSON-LD
-  const script = document.createElement('script');
-  script.type = 'application/ld+json';
-  script.setAttribute('data-hydrogen', 'true');
-  script.textContent = jsonString;
-  document.head.appendChild(script);
-};
-
-export const removeJsonLdImpl = () => {
-  const script = document.querySelector('script[type="application/ld+json"][data-hydrogen]');
-  if (script) {
-    script.remove();
-  }
-};
-
 export const addLinkImpl = (rel) => (href) => (as) => () => {
   // Check for existing
   let link = document.querySelector(`link[rel="${rel}"][href="${href}"]`);

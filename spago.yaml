@@ -46,6 +46,10 @@ package:
     - refs
     - strings
     - tuples
+    # Type-level programming
+    - type-equality
+    - typelevel-prelude
+    - typelevel-lists
     # Web APIs
     - web-dom
     - web-events
