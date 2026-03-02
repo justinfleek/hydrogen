@@ -31,14 +31,18 @@ module Hydrogen.Render.Online.Submodular.Function
   , NonMonotone
   
   -- * Curvature Type
-  , Curvature(..)
+  , Curvature
+      ( Curvature
+      )
   , mkCurvature
   , unwrapCurvature
   , zeroCurvature
   , maxCurvature
   
   -- * Submodular Function Type
-  , SubmodularFn(..)
+  , SubmodularFn
+      ( SubmodularFn
+      )
   , evaluate
   , marginalGain
   , getCurvature

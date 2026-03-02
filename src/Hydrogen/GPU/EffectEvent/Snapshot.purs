@@ -15,7 +15,7 @@
 
 module Hydrogen.GPU.EffectEvent.Snapshot
   ( -- * Snapshot Types
-    EffectSnapshot(..)
+    EffectSnapshot(EffectSnapshot)
   , FrameSnapshot
   , AnimationSnapshot
   , SpringSnapshot

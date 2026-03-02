@@ -12,17 +12,17 @@
 
 module Hydrogen.GPU.RenderEffect.Glow
   ( -- * Glow Effect Type
-    GlowEffect(..)
-  
+    GlowEffect(GlowInner, GlowOuter, GlowPulsing, GlowNeon)
+   
   -- * Glow Variants
-  , InnerGlow(..)
-  , OuterGlow(..)
-  , PulsingGlow(..)
-  , NeonGlow(..)
-  
+  , InnerGlow(InnerGlow)
+  , OuterGlow(OuterGlow)
+  , PulsingGlow(PulsingGlow)
+  , NeonGlow(NeonGlow)
+   
   -- * Glow Configuration
-  , GlowEasing(..)
-  
+  , GlowEasing(GlowEaseLinear, GlowEaseSine, GlowEaseQuad, GlowEaseCubic)
+   
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

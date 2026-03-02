@@ -11,15 +11,15 @@
 
 module Hydrogen.GPU.ComputeKernel.Composite
   ( -- * Composite Types
-    CompositeKernel(..)
-  , BlendKernelMode(..)
-  , MaskChannel(..)
-  , AlphaOperation(..)
+    CompositeKernel(CompositeBlend, CompositeMask, CompositeAlpha)
+  , BlendKernelMode(KernelBlendNormal, KernelBlendAdd, KernelBlendMultiply, KernelBlendScreen, KernelBlendOverlay, KernelBlendSoftLight, KernelBlendHardLight, KernelBlendDifference)
+  , MaskChannel(MaskRed, MaskGreen, MaskBlue, MaskAlpha, MaskLuminance)
+  , AlphaOperation(AlphaMultiply, AlphaThreshold, AlphaInvert, AlphaRemapRange)
   
   -- * Specific Kernels
-  , BlendKernel(..)
-  , MaskKernel(..)
-  , AlphaKernel(..)
+  , BlendKernel(BlendKernel)
+  , MaskKernel(MaskKernel)
+  , AlphaKernel(AlphaKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

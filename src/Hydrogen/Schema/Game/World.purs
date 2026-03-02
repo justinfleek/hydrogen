@@ -104,8 +104,7 @@ import Hydrogen.Schema.Game.Entity
   , EntityConfig
   , EntityId
   , EntityState(Active, Destroyed)
-  , Position2D(Position2D)
-  , Velocity2D(Velocity2D)
+  , Velocity2D
   , DeltaTime  -- Type only, constructor not needed (use mkDeltaTime)
   , Behavior(OnCollision, OnBounds, OnKeyPress)
   , CollisionResponse(Bounce, BounceAndScore, DestroyOther, DestroyBoth, DestroySelf)
@@ -115,6 +114,9 @@ import Hydrogen.Schema.Game.Entity
   , mkEntity
   , mkEntityId
   , mkPosition
+  , unwrapPosition
+  , mkVelocity
+  , unwrapVelocity
   , mkDeltaTime
   , applyVelocity
   , moveEntity
@@ -122,11 +124,11 @@ import Hydrogen.Schema.Game.Entity
   , setState
   , shapeWidth
   , shapeHeight
-  , mkVelocity
   , rectangleShape
   )
 
 import Hydrogen.Schema.Color.OKLCH (OKLCH, oklch)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // world // bounds
@@ -145,6 +147,59 @@ derive instance eqWorldBounds :: Eq WorldBounds
 instance showWorldBounds :: Show WorldBounds where
   show (WorldBounds { width, height }) = 
     "(WorldBounds " <> show width <> "x" <> show height <> ")"
+
+-- | Create world bounds, clamped to 1-100000 to prevent infinite or negative areas
+mkWorldBounds :: Int -> Int -> WorldBounds
+mkWorldBounds w h = WorldBounds
+  { width: Bounded.clampInt 1 100000 w
+  , height: Bounded.clampInt 1 100000 h
+  }
+
+-- | Unwrap world bounds
+unwrapWorldBounds :: WorldBounds -> { width :: Int, height :: Int }
+unwrapWorldBounds (WorldBounds b) = b
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                  // score
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Game score, clamped from 0 to 999,999,999 to prevent overflow.
+newtype Score = Score Int
+
+derive instance eqScore :: Eq Score
+derive instance ordScore :: Ord Score
+
+instance showScore :: Show Score where
+  show (Score s) = "(Score " <> show s <> ")"
+
+-- | Create a clamped score
+mkScore :: Int -> Score
+mkScore n = Score (Bounded.clampInt 0 999999999 n)
+
+-- | Unwrap score
+unwrapScore :: Score -> Int
+unwrapScore (Score s) = s
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // frame count
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Frame count, clamped to prevent integer overflow.
+newtype FrameCount = FrameCount Int
+
+derive instance eqFrameCount :: Eq FrameCount
+derive instance ordFrameCount :: Ord FrameCount
+
+instance showFrameCount :: Show FrameCount where
+  show (FrameCount f) = "(FrameCount " <> show f <> ")"
+
+-- | Create a clamped frame count
+mkFrameCount :: Int -> FrameCount
+mkFrameCount n = FrameCount (Bounded.clampInt 0 2147483647 n)
+
+-- | Unwrap frame count
+unwrapFrameCount :: FrameCount -> Int
+unwrapFrameCount (FrameCount f) = f
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // world // state
@@ -177,10 +232,10 @@ instance showWorldState :: Show WorldState where
 type World =
   { entities   :: Map EntityId Entity
   , bounds     :: WorldBounds
-  , score      :: Int
+  , score      :: Score
   , state      :: WorldState
   , nextId     :: Int     -- For generating EntityIds
-  , frameCount :: Int     -- For deterministic updates
+  , frameCount :: FrameCount   -- For deterministic updates
   }
 
 -- | Create a new world with given bounds.
@@ -188,15 +243,15 @@ mkWorld :: WorldBounds -> World
 mkWorld bounds =
   { entities: Map.empty
   , bounds
-  , score: 0
+  , score: mkScore 0
   , state: Playing
   , nextId: 0
-  , frameCount: 0
+  , frameCount: mkFrameCount 0
   }
 
 -- | Create an empty 640x192 world (terminal default).
 emptyWorld :: World
-emptyWorld = mkWorld (WorldBounds { width: 640, height: 192 })
+emptyWorld = mkWorld (mkWorldBounds 640 192)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // tick
@@ -244,7 +299,7 @@ moveAllEntities dt world =
 
 -- | Increment frame counter.
 incrementFrame :: World -> World
-incrementFrame world = world { frameCount = world.frameCount + 1 }
+incrementFrame world = world { frameCount = mkFrameCount (unwrapFrameCount world.frameCount + 1) }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // bounds // check
@@ -253,7 +308,7 @@ incrementFrame world = world { frameCount = world.frameCount + 1 }
 -- | Check all entities against world bounds.
 checkAllBounds :: World -> World
 checkAllBounds world =
-  let WorldBounds bounds = world.bounds
+  let bounds = unwrapWorldBounds world.bounds
   in foldl (checkEntityBounds bounds) world (Map.values world.entities)
 
 -- | Check single entity against world bounds.
@@ -622,7 +677,7 @@ checkWinCondition world =
     -- Count entities that have DestroyOther in their behaviors (these are targets)
     targets = Array.filter isTarget entities
   in
-    if Array.length targets == 0 && world.frameCount > 10
+    if Array.length targets == 0 && unwrapFrameCount world.frameCount > 10
     then world { state = Won }
     else world
   where
@@ -641,11 +696,11 @@ checkWinCondition world =
 
 -- | Add points to the score.
 addScore :: Int -> World -> World
-addScore points world = world { score = world.score + points }
+addScore points world = world { score = mkScore (unwrapScore world.score + points) }
 
 -- | Reset score to zero.
 resetScore :: World -> World
-resetScore world = world { score = 0 }
+resetScore world = world { score = mkScore 0 }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // state // control

@@ -16,18 +16,18 @@
 
 module Hydrogen.GPU.EffectEvent.Event
   ( -- * Core Event Type
-    EffectEvent(..)
+    EffectEvent(EventLifecycle, EventAnimation, EventInteraction)
   
   -- * Lifecycle Events
-  , EffectLifecycle(..)
+  , EffectLifecycle(EffectStarted, EffectUpdated, EffectCompleted, EffectCancelled, EffectPaused, EffectResumed)
   
   -- * Animation Events
-  , AnimationEvent(..)
-  , AnimDirection(..)
+  , AnimationEvent(AnimationTick, AnimationKeyframe, AnimationLoop, AnimationDirectionChange)
+  , AnimDirection(Forward, Backward)
   
   -- * Interaction Events
-  , InteractionEvent(..)
-  , SwipeDirection(..)
+  , InteractionEvent(Click, DoubleClick, LongPress, DragStart, DragMove, DragEnd, Swipe, Pinch, Rotate)
+  , SwipeDirection(SwipeUp, SwipeDown, SwipeLeft, SwipeRight)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

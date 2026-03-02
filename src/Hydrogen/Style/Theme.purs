@@ -22,7 +22,11 @@
 -- | ```
 module Hydrogen.Style.Theme
   ( -- * Theme Mode
-    ThemeMode(..)
+    ThemeMode
+      ( Light
+      , Dark
+      , System
+      )
   , themeClass
   , themeAttr
     -- * Theme Definition
@@ -33,7 +37,11 @@ module Hydrogen.Style.Theme
   , themeLegacyCss
   , themeLegacyCssVars
     -- * Color Scheme
-  , ColorScheme(..)
+  , ColorScheme
+      ( ColorSchemeLight
+      , ColorSchemeDark
+      , ColorSchemeNormal
+      )
   , colorScheme
     -- * Dark Mode Variants
   , dark

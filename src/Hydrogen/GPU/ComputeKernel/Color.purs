@@ -11,15 +11,15 @@
 
 module Hydrogen.GPU.ComputeKernel.Color
   ( -- * Color Types
-    ColorKernel(..)
+    ColorKernel(ColorGrading, ColorToneMapping, ColorSpace)
   , ColorAdjust
-  , ToneMappingAlgorithm(..)
-  , ColorSpaceType(..)
+  , ToneMappingAlgorithm(TonemapReinhard, TonemapACES, TonemapHable, TonemapFilmic)
+  , ColorSpaceType(ColorSpaceSRGB, ColorSpaceLinear, ColorSpaceP3, ColorSpaceRec2020, ColorSpaceOKLab, ColorSpaceOKLCH)
   
   -- * Specific Kernels
-  , ColorGradingKernel(..)
-  , ToneMappingKernel(..)
-  , ColorSpaceKernel(..)
+  , ColorGradingKernel(ColorGradingKernel)
+  , ToneMappingKernel(ToneMappingKernel)
+  , ColorSpaceKernel(ColorSpaceKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

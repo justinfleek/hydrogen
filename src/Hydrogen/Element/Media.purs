@@ -9,23 +9,39 @@
 module Hydrogen.Element.Media
   ( -- * Image
     ImageSpec
-  , ImageSource(..)
+  , ImageSource
+      ( ImageUrl
+      , ImageDataUri
+      , ImageTextureId
+      )
   
   -- * Video
   , VideoSpec
-  , VideoSource(..)
+  , VideoSource
+      ( VideoUrl
+      , VideoBlobId
+      , VideoStreamId
+      )
   , VideoPlayback
   , defaultVideoPlayback
   
   -- * Audio
   , AudioSpec
-  , AudioSource(..)
+  , AudioSource
+      ( AudioUrl
+      , AudioBlobId
+      , AudioStreamId
+      , AudioOscillator
+      )
   , AudioPlayback
   , defaultAudioPlayback
   
   -- * 3D Model
   , Model3DSpec
-  , Model3DSource(..)
+  , Model3DSource
+      ( ModelUrl
+      , ModelGeometryId
+      )
   , Model3DCamera
   , defaultCamera
   ) where

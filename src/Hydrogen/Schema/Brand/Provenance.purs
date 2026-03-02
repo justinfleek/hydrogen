@@ -78,6 +78,8 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.String (length, take) as String
 import Data.String.CodeUnits (toCharArray) as StringCU
 
+import Hydrogen.Schema.Attestation.SHA256 as SHA256
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // content hash
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -120,30 +122,13 @@ mkContentHash s =
 unContentHash :: ContentHash -> String
 unContentHash (ContentHash h) = h
 
--- | SHA256 hash function (placeholder).
+-- | SHA256 hash function.
 -- |
--- | In the actual system, SHA256 is computed at the Haskell boundary.
--- | This function exists for API completeness but should not be called
--- | in hot paths — use pre-computed hashes from the backend.
--- |
--- | For now, this returns a deterministic mock hash for testing.
+-- | Uses the pure PureScript SHA-256 implementation for deterministic content hashing
+-- | without FFI. This guarantees reproducible outputs across all runtimes.
+-- | Note that for very large payloads, it may be faster to compute at the Haskell boundary.
 sha256 :: String -> ContentHash
-sha256 input =
-  -- Deterministic mock: repeat first char to make 64-char "hash"
-  -- In production, this would be replaced by backend-computed values
-  let 
-    firstChar = String.take 1 input
-    padded = if String.length firstChar == 0 then "0" else firstChar
-    -- Create a deterministic 64-char string
-    mockHash = repeatString padded 64
-  in 
-    ContentHash (String.take 64 mockHash)
-  where
-    repeatString :: String -> Int -> String
-    repeatString s n = 
-      if n <= 0 
-      then "" 
-      else s <> repeatString s (n - 1)
+sha256 input = ContentHash (SHA256.sha256Hex input)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // timestamp

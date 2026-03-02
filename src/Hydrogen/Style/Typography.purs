@@ -25,37 +25,120 @@
 -- | ```
 module Hydrogen.Style.Typography
   ( -- * Font Size
-    FontSize(..)
+    FontSize
+      ( TextXs
+      , TextSm
+      , TextBase
+      , TextLg
+      , TextXl
+      , Text2xl
+      , Text3xl
+      , Text4xl
+      , Text5xl
+      , Text6xl
+      , Text7xl
+      , Text8xl
+      , Text9xl
+      )
   , fontSize
     -- * Font Weight
-  , FontWeight(..)
+  , FontWeight
+      ( Thin
+      , Extralight
+      , Light
+      , Normal
+      , Medium
+      , Semibold
+      , Bold
+      , Extrabold
+      , Black
+      )
   , fontWeight
     -- * Line Height
-  , LineHeight(..)
+  , LineHeight
+      ( LeadingNone
+      , LeadingTight
+      , LeadingSnug
+      , LeadingNormal
+      , LeadingRelaxed
+      , LeadingLoose
+      , Leading3
+      , Leading4
+      , Leading5
+      , Leading6
+      , Leading7
+      , Leading8
+      , Leading9
+      , Leading10
+      )
   , lineHeight
     -- * Letter Spacing
-  , LetterSpacing(..)
+  , LetterSpacing
+      ( TrackingTighter
+      , TrackingTight
+      , TrackingNormal
+      , TrackingWide
+      , TrackingWider
+      , TrackingWidest
+      )
   , letterSpacing
     -- * Font Family
-  , FontFamily(..)
+  , FontFamily
+      ( FontSans
+      , FontSerif
+      , FontMono
+      )
   , fontFamily
     -- * Text Alignment
-  , TextAlign(..)
+  , TextAlign
+      ( TextLeft
+      , TextCenter
+      , TextRight
+      , TextJustify
+      , TextStart
+      , TextEnd
+      )
   , textAlign
     -- * Text Transform
-  , TextTransform(..)
+  , TextTransform
+      ( Uppercase
+      , Lowercase
+      , Capitalize
+      , NormalCase
+      )
   , textTransform
     -- * Text Decoration
-  , TextDecoration(..)
+  , TextDecoration
+      ( Underline
+      , Overline
+      , LineThrough
+      , NoUnderline
+      )
   , textDecoration
     -- * Text Overflow
-  , TextOverflow(..)
+  , TextOverflow
+      ( Truncate
+      , TextEllipsis
+      , TextClip
+      )
   , textOverflow
     -- * Whitespace
-  , Whitespace(..)
+  , Whitespace
+      ( WhitespaceNormal
+      , WhitespaceNowrap
+      , WhitespacePre
+      , WhitespacePreLine
+      , WhitespacePreWrap
+      , WhitespaceBreakSpaces
+      )
   , whitespace
     -- * Word Break
-  , WordBreak(..)
+  , WordBreak
+      ( BreakNormal
+      , BreakWords
+      , BreakAll
+      , BreakKeep
+      )
   , wordBreak
     -- * Combined Utilities
   , textStyle

@@ -49,7 +49,7 @@ Zero-based position in a sequence.
 | Bounds | 0 to 9999 |
 | Behavior | Clamps |
 
-**Functions**: `index`, `unsafeIndex`, `unwrapIndex`, `isFirst`, `isLast`
+**Functions**: `index`, `fromValidated`, `unwrapIndex`, `isFirst`, `isLast`
 
 ### ItemsVisible
 **File**: `Pagination.purs`

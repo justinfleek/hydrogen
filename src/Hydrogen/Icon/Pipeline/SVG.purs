@@ -33,16 +33,29 @@ module Hydrogen.Icon.Pipeline.SVG
   , renderThemedSvg
   
   -- * SVG Element Construction
-  , SvgElement(..)
+  , SvgElement
+      ( SvgElement
+      )
   , SvgAttributes
-  , SvgAttribute(..)
+  , SvgAttribute
+      ( SvgAttribute
+      )
   , svgElement
   , pathElement
   , symbolElement
   
   -- * SVG Attributes
-  , SvgFill(..)
-  , SvgStroke(..)
+  , SvgFill
+      ( SvgFillNone
+      , SvgFillCurrentColor
+      , SvgFillColor
+      , SvgFillUrl
+      )
+  , SvgStroke
+      ( SvgStrokeNone
+      , SvgStrokeCurrentColor
+      , SvgStrokeColor
+      )
   , defaultSvgAttributes
   , fillToString
   , strokeToString

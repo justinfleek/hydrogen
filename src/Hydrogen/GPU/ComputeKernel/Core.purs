@@ -17,13 +17,13 @@ module Hydrogen.GPU.ComputeKernel.Core
   , DispatchSize
   
   -- * Input/Output
-  , KernelInput(..)
-  , KernelOutput(..)
+  , KernelInput(InputTexture, InputBuffer, InputUniform, InputPrevious, InputConstant)
+  , KernelOutput(OutputTexture, OutputBuffer, OutputNext, OutputScreen)
   , KernelConfig
   
   -- * Conditions
-  , KernelCondition(..)
-  , QualityLevel(..)
+  , KernelCondition(ConditionQuality, ConditionSize, ConditionPerformance, ConditionAlways)
+  , QualityLevel(QualityLow, QualityMedium, QualityHigh, QualityUltra)
   , SizeThreshold
   
   -- * Helpers

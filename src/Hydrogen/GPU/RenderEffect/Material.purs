@@ -12,17 +12,17 @@
 
 module Hydrogen.GPU.RenderEffect.Material
   ( -- * Material Effect Type
-    MaterialEffect(..)
-  
+    MaterialEffect(MaterialGlass, MaterialFrosted, MaterialNoise, MaterialGrain)
+   
   -- * Material Variants
-  , GlassEffect(..)
-  , FrostedGlass(..)
-  , NoiseOverlay(..)
-  , GrainEffect(..)
-  
+  , GlassEffect(GlassEffect)
+  , FrostedGlass(FrostedGlass)
+  , NoiseOverlay(NoiseOverlay)
+  , GrainEffect(GrainEffect)
+   
   -- * Material Configuration
-  , NoiseType(..)
-  
+  , NoiseType(NoisePerlin, NoiseSimplex, NoiseWorley, NoiseWhite, NoiseFBM)
+   
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

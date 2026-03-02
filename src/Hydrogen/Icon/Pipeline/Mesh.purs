@@ -43,12 +43,19 @@ module Hydrogen.Icon.Pipeline.Mesh
   , profileWithHoles
   
   -- * Extrusion Parameters
-  , IconExtrusionParams(..)
+  , IconExtrusionParams
+        ( IconExtrusionParams
+        )
   , defaultExtrusionParams
   , iconExtrusionParams
   
   -- * Bevel Configuration
-  , BevelConfig(..)
+  , BevelConfig
+        ( BevelNone
+        , BevelSubtle
+        , BevelMedium
+        , BevelHeavy
+        )
   , noBevel
   , subtleBevel
   , mediumBevel

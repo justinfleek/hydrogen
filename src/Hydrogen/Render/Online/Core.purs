@@ -37,35 +37,61 @@ module Hydrogen.Render.Online.Core
   , clampToBounds
   
   -- * Utility Type
-  , Utility(..)
+  , Utility
+      ( Utility
+      )
   , zeroUtility
   , addUtility
   , maxUtility
   
   -- * Quality Types
-  , Quality(..)
-  , DiffusionSteps(..)
+  , Quality
+      ( Quality
+      )
+  , DiffusionSteps
+      ( DiffusionSteps
+      )
   , mkDiffusionSteps
   
   -- * Grid Types
-  , GridLevel(..)
-  , GridCoord(..)
+  , GridLevel
+      ( Coarse
+      , Medium
+      , Fine
+      )
+  , GridCoord
+      ( GridCoord
+      )
   , mkGridCoord
   , gridLevelSize
   
   -- * Render Tiers
-  , RenderTier(..)
+  , RenderTier
+      ( Foveal
+      , Peripheral
+      , Background
+      )
   , tierPriority
   , tierDefaultSteps
   
   -- * Region Types
-  , RegionId(..)
-  , Region(..)
-  , RegionSelection(..)
+  , RegionId
+      ( RegionId
+      )
+  , Region
+      ( Region
+      )
+  , RegionSelection
+      ( RegionSelection
+      )
   
   -- * Epoch Types
-  , EpochId(..)
-  , AgentId(..)
+  , EpochId
+      ( EpochId
+      )
+  , AgentId
+      ( AgentId
+      )
   , nextEpoch
   ) where
 

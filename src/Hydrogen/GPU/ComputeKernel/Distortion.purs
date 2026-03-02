@@ -11,14 +11,14 @@
 
 module Hydrogen.GPU.ComputeKernel.Distortion
   ( -- * Distortion Types
-    DistortionKernel(..)
-  , DisplacementChannel(..)
-  , WarpType(..)
+    DistortionKernel(DistortDisplacement, DistortWarp, DistortRipple)
+  , DisplacementChannel(DisplaceRed, DisplaceGreen, DisplaceBlue, DisplaceAlpha, DisplaceLuminance)
+  , WarpType(WarpSphere, WarpPinch, WarpTwirl, WarpWave)
   
   -- * Specific Kernels
-  , DisplacementKernel(..)
-  , WarpKernel(..)
-  , RippleKernel(..)
+  , DisplacementKernel(DisplacementKernel)
+  , WarpKernel(WarpKernel)
+  , RippleKernel(RippleKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

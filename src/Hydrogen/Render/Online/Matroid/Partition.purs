@@ -24,17 +24,23 @@
 
 module Hydrogen.Render.Online.Matroid.Partition
   ( -- * Tiered Partition Matroid
-    TieredPartitionMatroid(..)
+    TieredPartitionMatroid
+      ( TieredPartitionMatroid
+      )
   , mkTieredPartitionMatroid
   , defaultTierBounds
   
   -- * Tier Counts
-  , TierCounts(..)
+  , TierCounts
+      ( TierCounts
+      )
   , countByTier
   , emptyTierCounts
   
   -- * Bounds Configuration
-  , TierBounds(..)
+  , TierBounds
+      ( TierBounds
+      )
   , mkTierBounds
   ) where
 

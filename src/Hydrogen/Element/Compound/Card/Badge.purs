@@ -65,7 +65,9 @@ module Hydrogen.Element.Compound.Card.Badge
       )
   
   -- * Badge Config
-  , BadgeConfig(..)
+  , BadgeConfig
+      ( BadgeConfig
+      )
   , badgeConfig
   , defaultBadgeConfig
   

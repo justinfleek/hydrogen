@@ -11,13 +11,13 @@
 
 module Hydrogen.GPU.RenderEffect.Shadow
   ( -- * Shadow Effect Type
-    ShadowEffect(..)
-  
+    ShadowEffect(ShadowDrop, ShadowBox, ShadowContact)
+   
   -- * Shadow Variants
-  , DropShadowEffect(..)
-  , BoxShadowEffect(..)
-  , ContactShadow(..)
-  
+  , DropShadowEffect(DropShadowEffect)
+  , BoxShadowEffect(BoxShadowEffect)
+  , ContactShadow(ContactShadow)
+   
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

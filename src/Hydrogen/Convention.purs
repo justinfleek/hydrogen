@@ -39,7 +39,11 @@ module Hydrogen.Convention
   , titlePrefix
   , titlePrefixLen
     -- * Line Characters
-  , LineType(..)
+  , LineType
+      ( Heavy
+      , Double
+      , Light
+      )
   , lineChar
   , lineCharCount
     -- * Generation

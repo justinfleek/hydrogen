@@ -47,7 +47,10 @@ module Hydrogen.Schema.Geometry.Polygon
   , isConvex
   , isClockwise
   , windingOrder
-  , WindingOrder(..)
+  , WindingOrder
+      ( CounterClockwise
+      , Clockwise
+      )
   
   -- * Point Operations
   , contains

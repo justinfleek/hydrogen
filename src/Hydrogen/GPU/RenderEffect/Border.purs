@@ -12,18 +12,18 @@
 
 module Hydrogen.GPU.RenderEffect.Border
   ( -- * Border Effect Type
-    BorderEffect(..)
-  
+    BorderEffect(BorderGradient, BorderConic, BorderAnimatedDash, BorderGlowing)
+   
   -- * Border Variants
-  , GradientBorder(..)
-  , ConicBorder(..)
-  , AnimatedDashBorder(..)
-  , GlowingBorder(..)
-  
+  , GradientBorder(GradientBorder)
+  , ConicBorder(ConicBorder)
+  , AnimatedDashBorder(AnimatedDashBorder)
+  , GlowingBorder(GlowingBorder)
+   
   -- * Border Configuration
-  , BorderGradientType(..)
-  , DashDirection(..)
-  
+  , BorderGradientType(BorderGradientLinear, BorderGradientRadial, BorderGradientConic)
+  , DashDirection(DashDirectionForward, DashDirectionBackward, DashDirectionAlternate)
+   
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -8,7 +8,7 @@
 -- | This type is the primary interface for GPU compute operations.
 
 module Hydrogen.GPU.ComputeKernel.Types
-  ( ComputeKernel(..)
+  ( ComputeKernel(KernelBlur, KernelGlow, KernelNoise, KernelParticle, KernelColor, KernelDistortion, KernelComposite, KernelSequence, KernelParallel, KernelConditional, KernelNoop)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

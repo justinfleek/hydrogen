@@ -15,10 +15,58 @@
 -- | DOM, static HTML, Canvas, WebGL, or native views.
 module Hydrogen.Render.Element.Types
   ( -- * Core Types
-    Element(..)
-  , Attribute(..)
-  , EventHandler(..)
-  , Namespace(..)
+    Element
+      ( Text
+      , Element
+      , Keyed
+      , Lazy
+      , Empty
+      )
+  , Attribute
+      ( Attr
+      , AttrNS
+      , Prop
+      , PropBool
+      , Handler
+      , Style
+      )
+  , EventHandler
+      ( OnClick
+      , OnDoubleClick
+      , OnMouseDown
+      , OnMouseUp
+      , OnMouseMove
+      , OnMouseEnter
+      , OnMouseLeave
+      , OnFocus
+      , OnBlur
+      , OnInput
+      , OnChange
+      , OnSubmit
+      , OnKeyDown
+      , OnKeyUp
+      , OnKeyPress
+      , OnScroll
+      , OnWheel
+      , OnDragStart
+      , OnDrag
+      , OnDragEnd
+      , OnDragEnter
+      , OnDragLeave
+      , OnDragOver
+      , OnDrop
+      , OnTouchStart
+      , OnTouchMove
+      , OnTouchEnd
+      , OnTouchCancel
+      , CustomEvent
+      )
+  , Namespace
+      ( HTML
+      , SVG
+      , MathML
+      , Custom
+      )
   
   -- * Internal Helpers
   , mapAttrMsg

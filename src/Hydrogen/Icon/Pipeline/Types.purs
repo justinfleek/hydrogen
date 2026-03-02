@@ -46,37 +46,88 @@ module Hydrogen.Icon.Pipeline.Types
   , mkIconPipelineRequest
   , IconPrompt
   , IconStylePrompt
-  , IconBaseStyle(..)
-  , IconColorMode(..)
-  , IconComplexity(..)
+  , IconBaseStyle
+      ( StyleMinimal
+      , StyleDetailed
+      , StyleIsometric
+      , StyleGlyph
+      , StyleIllustrative
+      )
+  , IconColorMode
+      ( ColorMonochrome
+      , ColorDuotone
+      , ColorMulti
+      , ColorGradient
+      )
+  , IconComplexity
+      ( ComplexitySimple
+      , ComplexityMedium
+      , ComplexityComplex
+      )
   
   -- * T2I Stage
   , T2IRequest
   , T2IResult
-  , T2IModel(..)
+  , T2IModel
+      ( T2IFlux2Schnell
+      , T2IFlux2Dev
+      , T2IFlux2Pro
+      , T2ISDXL
+      , T2IIdeogram2
+      )
   , allT2IModels
   , t2iModelToString
   , ImageData
-  , ImageFormat(..)
+  , ImageFormat
+      ( FormatPNG
+      , FormatJPEG
+      , FormatWebP
+      )
   
   -- * I2SVG Stage  
   , I2SVGRequest
   , I2SVGResult
   , ExtractedPath
-  , VectorizationMethod(..)
+  , VectorizationMethod
+      ( VMPotrace
+      , VMVtracer
+      , VMAutotrace
+      , VMImageTracerJS
+      )
   , allVectorizationMethods
   , VectorizationParams
-  , VectorizationColorMode(..)
+  , VectorizationColorMode
+      ( VCMBinary
+      , VCMGrayscale
+      , VCMColor
+      , VCMQuantized
+      )
   , defaultVectorizationParams
   
   -- * I2-3D Stage
   , I23DRequest
   , I23DResult
-  , I23DModel(..)
+  , I23DModel
+      ( I23DTrellis2
+      , I23DHunyuan3D
+      , I23DTripoSR
+      , I23DInstant3D
+      , I23DMeshAnything
+      )
   , allI23DModels
   , i23DModelToString
-  , MeshOutputFormat(..)
-  , MeshSimplification(..)
+  , MeshOutputFormat
+      ( MeshGLTF
+      , MeshOBJ
+      , MeshFBX
+      , MeshUSD
+      )
+  , MeshSimplification
+      ( MeshFull
+      , MeshMedium
+      , MeshLow
+      , MeshCustom
+      )
   , IconMesh
   , UVMapping
   , MeshBounds
@@ -84,7 +135,9 @@ module Hydrogen.Icon.Pipeline.Types
   -- * Mesh Segmentation
   , MeshSegment
   , MeshCentroid
-  , SegmentId(..)
+  , SegmentId
+      ( SegmentId
+      )
   , mkSegmentId
   , unSegmentId
   , segmentIdEq
@@ -97,9 +150,20 @@ module Hydrogen.Icon.Pipeline.Types
   , BrandedIconMesh
   
   -- * Pipeline Result
-  , IconPipelineResult(..)
+  , IconPipelineResult
+      ( PipelineSuccess
+      , PipelinePartial
+      , PipelineFailure
+      )
   , IconPipelineOutput
-  , PipelineStage(..)
+  , PipelineStage
+      ( StageT2I
+      , StageI2SVG
+      , StageSVGParse
+      , StageI23D
+      , StageSegmentation
+      , StageBrandMapping
+      )
   , PipelineError
   ) where
 

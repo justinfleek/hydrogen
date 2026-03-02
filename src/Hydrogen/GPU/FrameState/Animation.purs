@@ -42,11 +42,11 @@ module Hydrogen.GPU.FrameState.Animation
     
   -- * Animation Types
   , AnimationHandle
-  , AnimationPhase(..)
+  , AnimationPhase(AnimationIdle, AnimationRunning, AnimationComplete, AnimationReversing)
   , AnimationInstance
-  , EasingType(..)
-  , AnimationDirection(..)
-  , AnimationIteration(..)
+  , EasingType(EasingLinear, EasingEaseIn, EasingEaseOut, EasingEaseInOut, EasingSpring)
+  , AnimationDirection(DirectionNormal, DirectionReverse, DirectionAlternate, DirectionAlternateReverse)
+  , AnimationIteration(IterateOnce, IterateCount, IterateInfinite)
   
   -- * Animation Registry
   , AnimationRegistry

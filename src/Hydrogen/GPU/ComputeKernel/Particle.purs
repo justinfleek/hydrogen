@@ -11,15 +11,15 @@
 
 module Hydrogen.GPU.ComputeKernel.Particle
   ( -- * Particle Types
-    ParticleKernel(..)
-  , ParticleBounds(..)
+    ParticleKernel(ParticlePhysics, ParticleEmit, ParticleSort)
+  , ParticleBounds(BoundsNone, BoundsWrap, BoundsBounce, BoundsKill)
   , ParticleForce
-  , SortAxis(..)
+  , SortAxis(SortAxisZ, SortAxisDistance)
   
   -- * Specific Kernels
-  , ParticlePhysicsKernel(..)
-  , ParticleEmitKernel(..)
-  , ParticleSortKernel(..)
+  , ParticlePhysicsKernel(ParticlePhysicsKernel)
+  , ParticleEmitKernel(ParticleEmitKernel)
+  , ParticleSortKernel(ParticleSortKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

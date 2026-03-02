@@ -28,34 +28,34 @@
 
 module Hydrogen.GPU.EffectEvent.Trigger
   ( -- * Core Types
-    EffectTrigger(..)
-  , TriggerCondition(..)
-  , TriggerCombinator(..)
+    EffectTrigger(TriggerMouse, TriggerKeyboard, TriggerFocus, TriggerTime, TriggerScroll, TriggerViewport, TriggerAnimation, TriggerCombined, TriggerAlways, TriggerNever)
+  , TriggerCondition(ConditionMet, ConditionNotMet, ConditionUnknown)
+  , TriggerCombinator(TriggerAnd, TriggerOr, TriggerNot, TriggerXor)
   
   -- * Mouse Triggers
-  , MouseTrigger(..)
+  , MouseTrigger(MouseHover, MouseNotHover, MouseEnter, MouseLeave, MouseDown, MouseUp, MouseDragging, MouseIdle, MouseInRegion)
   
   -- * Keyboard Triggers
-  , KeyboardTrigger(..)
-  , Modifier(..)
+  , KeyboardTrigger(KeyDown, KeyUp, KeyHeld, ModifierActive)
+  , Modifier(ModShift, ModCtrl, ModAlt, ModMeta)
   
   -- * Focus Triggers
-  , FocusTrigger(..)
+  , FocusTrigger(FocusGained, FocusLost, FocusWithin, FocusVisible)
   
   -- * Time Triggers
-  , TimeTrigger(..)
+  , TimeTrigger(AfterDelay, AtTime, Interval, FrameCount, Elapsed)
   
   -- * Scroll Triggers
-  , ScrollTrigger(..)
-  , ScrollDir(..)
+  , ScrollTrigger(ScrollPosition, ScrollProgress, ScrollDirection, ScrollVelocity)
+  , ScrollDir(ScrollUp, ScrollDown, ScrollLeft, ScrollRight)
   
   -- * Viewport Triggers
-  , ViewportTrigger(..)
-  , Orientation(..)
+  , ViewportTrigger(ViewportWidth, ViewportHeight, ViewportVisible, ViewportOrientation)
+  , Orientation(Portrait, Landscape)
   
   -- * Animation Triggers
-  , AnimationTrigger(..)
-  , AnimPhase(..)
+  , AnimationTrigger(AnimationProgress, AnimationComplete, AnimationPhaseIs, SpringAtRest)
+  , AnimPhase(PhaseIdle, PhaseRunning, PhaseComplete, PhasePaused)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

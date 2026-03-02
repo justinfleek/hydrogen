@@ -10,8 +10,8 @@
 
 module Hydrogen.GPU.RenderEffect.Core
   ( -- * Core Effect Type
-    RenderEffect(..)
-  
+    RenderEffect(EffectBlur, EffectGlow, EffectShadow, EffectBorder, EffectMaterial, EffectTemporal, EffectParticle, EffectSequence, EffectParallel, EffectConditional, EffectAnimated, EffectNone)
+   
   -- * Effect Composition
   , effectSequence
   , effectParallel

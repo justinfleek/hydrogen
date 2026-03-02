@@ -28,27 +28,19 @@
 module Hydrogen.Schema.Game.Entity
   ( -- * Entity Identity
     EntityId
-      ( EntityId
-      )
   , mkEntityId
   , unwrapEntityId
   
   -- * Delta Time (bounded 0-1 seconds, prevents time dilation attacks)
   , DeltaTime
-      ( DeltaTime
-      )
   , deltaTimeBounds
   , mkDeltaTime
   , unwrapDeltaTime
   
   -- * Position and Velocity (bounded 0-10000 px, -10000 to 10000 px/s)
   , Position2D
-      ( Position2D
-      )
   , positionBounds
   , Velocity2D
-      ( Velocity2D
-      )
   , velocityBounds
   , mkPosition
   , mkVelocity
@@ -57,9 +49,6 @@ module Hydrogen.Schema.Game.Entity
   
   -- * Game Shapes (dimensions bounded 1-10000 px)
   , GameShape
-      ( GameRectangle
-      , GameEllipse
-      )
   , shapeDimensionBounds
   , rectangleShape
   , ellipseShape
@@ -184,9 +173,9 @@ derive instance ordEntityId :: Ord EntityId
 instance showEntityId :: Show EntityId where
   show (EntityId n) = "(EntityId " <> show n <> ")"
 
--- | Create an EntityId (used by World when adding entities)
+-- | Create an EntityId (used by World when adding entities, clamps to 0-65535)
 mkEntityId :: Int -> EntityId
-mkEntityId = EntityId
+mkEntityId n = EntityId (Bounded.clampInt 0 65535 n)
 
 -- | Extract the raw ID value
 unwrapEntityId :: EntityId -> Int

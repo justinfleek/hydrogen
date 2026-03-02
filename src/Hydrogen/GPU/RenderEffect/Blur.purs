@@ -12,14 +12,14 @@
 
 module Hydrogen.GPU.RenderEffect.Blur
   ( -- * Blur Effect Type
-    BlurEffect(..)
-  
+    BlurEffect(BlurGaussian, BlurDirectional, BlurRadial, BlurZoom)
+   
   -- * Blur Variants
-  , GaussianBlur(..)
-  , DirectionalBlur(..)
-  , RadialBlur(..)
-  , ZoomBlur(..)
-  
+  , GaussianBlur(GaussianBlur)
+  , DirectionalBlur(DirectionalBlur)
+  , RadialBlur(RadialBlur)
+  , ZoomBlur(ZoomBlur)
+   
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

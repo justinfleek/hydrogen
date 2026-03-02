@@ -18,7 +18,9 @@
 
 module Hydrogen.Element.Compound.Card.Media.Config
   ( -- * Media Config
-    MediaConfig(..)
+    MediaConfig
+        ( MediaConfig
+        )
   , mediaConfig
   , defaultMediaConfig
   ) where

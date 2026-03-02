@@ -17,7 +17,9 @@
 
 module Hydrogen.Element.Compound.Card.Hover.Types
   ( -- * Card Hover Config
-    CardHoverConfig(..)
+    CardHoverConfig
+        ( CardHoverConfig
+        )
   , cardHoverConfig
   , defaultCardHover
   , noHover

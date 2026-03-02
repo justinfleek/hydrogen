@@ -12,14 +12,14 @@
 
 module Hydrogen.GPU.ComputeKernel.Noise
   ( -- * Noise Types
-    NoiseKernel(..)
-  , WorleyDistance(..)
+    NoiseKernel(NoisePerlin, NoiseSimplex, NoiseFBM, NoiseWorley)
+  , WorleyDistance(WorleyEuclidean, WorleyManhattan, WorleyChebyshev)
   
   -- * Specific Kernels
-  , PerlinNoiseKernel(..)
-  , SimplexNoiseKernel(..)
-  , FBMNoiseKernel(..)
-  , WorleyNoiseKernel(..)
+  , PerlinNoiseKernel(PerlinNoiseKernel)
+  , SimplexNoiseKernel(SimplexNoiseKernel)
+  , FBMNoiseKernel(FBMNoiseKernel)
+  , WorleyNoiseKernel(WorleyNoiseKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

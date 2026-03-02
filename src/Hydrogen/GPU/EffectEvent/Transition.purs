@@ -16,8 +16,8 @@
 
 module Hydrogen.GPU.EffectEvent.Transition
   ( -- * Transition Types
-    StateTransition(..)
-  , TransitionResult(..)
+    StateTransition(TransitionStart, TransitionProgress, TransitionComplete, TransitionCancel, TransitionReset)
+  , TransitionResult(TransitionApplied, TransitionRejected, TransitionQueued)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

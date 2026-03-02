@@ -38,7 +38,17 @@ module Hydrogen.Element.Compound.Motion.Timeline.Timeline
   , defaultColors
   
   -- * Messages
-  , TimelineMsg(..)
+  , TimelineMsg
+      ( SeekToFrame
+      , SelectLayer
+      , DeselectLayer
+      , DragLayerStart
+      , DragLayerEnd
+      , SetZoom
+      , SetScroll
+      , ToggleLayerEnabled
+      , SelectKeyframe
+      )
   
   -- * Component
   , timeline
@@ -51,7 +61,12 @@ module Hydrogen.Element.Compound.Motion.Timeline.Timeline
   , workArea
   
   -- * Zoom
-  , ZoomLevel(..)
+  , ZoomLevel
+      ( ZoomFrame
+      , ZoomBeat
+      , ZoomSecond
+      , Zoom10Second
+      )
   , zoomToPixelsPerFrame
   
   -- * Layer Info

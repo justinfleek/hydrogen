@@ -11,14 +11,14 @@
 
 module Hydrogen.GPU.ComputeKernel.Glow
   ( -- * Glow Types
-    GlowKernel(..)
+    GlowKernel(GlowBloom, GlowOuter, GlowInner)
   , GlowTint
-  , GlowFalloff(..)
+  , GlowFalloff(FalloffLinear, FalloffQuadratic, FalloffExponential, FalloffGaussian)
   
   -- * Specific Kernels
-  , BloomKernel(..)
-  , OuterGlowKernel(..)
-  , InnerGlowKernel(..)
+  , BloomKernel(BloomKernel)
+  , OuterGlowKernel(OuterGlowKernel)
+  , InnerGlowKernel(InnerGlowKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

@@ -12,15 +12,15 @@
 
 module Hydrogen.GPU.ComputeKernel.Blur
   ( -- * Blur Types
-    BlurKernel(..)
-  , BlurQuality(..)
-  , RadialBlurType(..)
+    BlurKernel(BlurGaussian, BlurDirectional, BlurRadial, BlurBox)
+  , BlurQuality(BlurQualityLow, BlurQualityMedium, BlurQualityHigh)
+  , RadialBlurType(RadialTypeSpin, RadialTypeZoom)
   
   -- * Specific Kernels
-  , GaussianBlurKernel(..)
-  , DirectionalBlurKernel(..)
-  , RadialBlurKernel(..)
-  , BoxBlurKernel(..)
+  , GaussianBlurKernel(GaussianBlurKernel)
+  , DirectionalBlurKernel(DirectionalBlurKernel)
+  , RadialBlurKernel(RadialBlurKernel)
+  , BoxBlurKernel(BoxBlurKernel)
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
