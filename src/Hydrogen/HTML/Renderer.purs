@@ -4,6 +4,29 @@
 
 -- | Static HTML string renderer for Halogen
 -- |
+-- | ══════════════════════════════════════════════════════════════════════════
+-- | HALOGEN COMPATIBILITY LAYER
+-- | ══════════════════════════════════════════════════════════════════════════
+-- |
+-- | This module renders Halogen's `HH.HTML w i` to HTML strings.
+-- |
+-- | **WHY unsafeCoerce EXISTS HERE:**
+-- |
+-- | Halogen's VDom passes props as an opaque polymorphic `a` type, but the
+-- | actual runtime value is always `Array (Prop i)`. We coerce to extract
+-- | attribute data for static rendering. This is safe because:
+-- |
+-- | 1. VDom guarantees the structure is `Array (Prop i)`
+-- | 2. We only read Attribute/Property string data
+-- | 3. Handler and Ref constructors are ignored (return Nothing)
+-- |
+-- | **PURE ALTERNATIVE:**
+-- |
+-- | If you want zero unsafeCoerce, use `Hydrogen.Target.Static` which renders
+-- | Hydrogen's pure `Element msg` type. That path has no escape hatches.
+-- |
+-- | ══════════════════════════════════════════════════════════════════════════
+-- |
 -- | Renders `HH.HTML w i` to a plain HTML string, suitable for:
 -- | - Server-side rendering (SSR)
 -- | - Static site generation (SSG)
@@ -139,16 +162,28 @@ isSelfClosing = case _ of
   _ -> false
 
 -- | Render props (attributes/properties) to a string.
--- | This uses unsafe coercion because props is an opaque Array (Prop i).
--- | The VDom always passes props as Array (Prop i), so coercion to
--- | Array (Prop Void) is safe for static rendering (handlers are ignored).
+-- |
+-- | ─────────────────────────────────────────────────────────────────────────
+-- | HALOGEN BOUNDARY: unsafeCoerce
+-- | ─────────────────────────────────────────────────────────────────────────
+-- |
+-- | Halogen's VDom type is: `VDom a w` where `a` is the props type.
+-- | At runtime, `a` is always `Array (Prop i)` but the type is opaque.
+-- |
+-- | We coerce to `Array (Prop Void)` to read attribute strings.
+-- |
+-- | SAFETY ARGUMENT:
+-- | 1. Halogen's Elem constructor always stores props as Array (Prop i)
+-- | 2. We pattern match on Attribute/Property (which contain strings)
+-- | 3. We return Nothing for Handler/Ref (which contain functions)
+-- | 4. Void in the type param means handlers can't be invoked anyway
+-- |
+-- | This is the ONLY unsafeCoerce in Hydrogen's renderer pipeline.
+-- | For a pure alternative, use Hydrogen.Target.Static with Element.
+-- | ─────────────────────────────────────────────────────────────────────────
 renderPropsUnsafe :: forall a. a -> String
 renderPropsUnsafe props = renderPropArray (unsafeToProps props)
   where
-  -- | Coerce props to Array (Prop Void) for rendering.
-  -- | Safe because: (1) VDom guarantees Array (Prop i) structure,
-  -- | (2) We only extract Attribute/Property string data,
-  -- | (3) Handler and Ref constructors are ignored (return Nothing).
   unsafeToProps :: forall x. x -> Array (Prop Void)
   unsafeToProps = unsafeCoerce
 

@@ -49,6 +49,10 @@ module Hydrogen.Serialize.CBOR
   , class CBOREncode
   , encode
   
+  -- * Decoding Typeclass
+  , class CBORDecode
+  , decode
+  
   -- * Byte Array
   , Bytes
   , emptyBytes
@@ -72,6 +76,11 @@ module Hydrogen.Serialize.CBOR
   , encodeArray
   , encodeMap
   , encodePair
+  
+  -- * Map Field Decoders
+  , decodeField
+  , decodeFieldMaybe
+  , lookupField
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -104,10 +113,13 @@ import Prelude
   )
 
 import Data.Array as Array
+import Data.Either (Either(Left, Right))
 import Data.Enum (fromEnum)
 import Data.Foldable (foldl)
 import Data.Int (toNumber, floor)
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Int.Bits (shr, shl, and)
+
 
 import Data.Number (abs, log, ln2)
 import Data.String as String
@@ -216,6 +228,10 @@ instance showCBORValue :: Show CBORValue where
 class CBOREncode a where
   encode :: a -> CBORValue
 
+-- | Typeclass for decoding values from CBOR.
+class CBORDecode a where
+  decode :: CBORValue -> Either String a
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // primitive // encoders
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -281,6 +297,87 @@ instance cborEncodeBool :: CBOREncode Boolean where
 
 instance cborEncodeArray :: CBOREncode a => CBOREncode (Array a) where
   encode = encodeArray
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // traverse // either
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Traverse an array with an Either-returning function.
+-- |
+-- | Returns Right with all results if all succeed, Left with first error if any fail.
+traverseEither :: forall a b. (a -> Either String b) -> Array a -> Either String (Array b)
+traverseEither f arr = foldl go (Right []) arr
+  where
+  go :: Either String (Array b) -> a -> Either String (Array b)
+  go (Left err) _ = Left err
+  go (Right acc) x = case f x of
+    Left err -> Left err
+    Right y -> Right (acc <> [y])
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // primitive // decoders
+-- ═════════════════════════════════════════════════════════════════════════════
+
+instance cborDecodeInt :: CBORDecode Int where
+  decode (CBORUInt n) = Right n
+  decode (CBORNInt n) = Right (negate (n + 1))
+  decode _ = Left "Expected integer"
+
+instance cborDecodeNumber :: CBORDecode Number where
+  decode (CBORFloat32 n) = Right n
+  decode (CBORFloat64 n) = Right n
+  decode (CBORUInt n) = Right (toNumber n)
+  decode (CBORNInt n) = Right (toNumber (negate (n + 1)))
+  decode _ = Left "Expected number"
+
+instance cborDecodeString :: CBORDecode String where
+  decode (CBORText s) = Right s
+  decode _ = Left "Expected string"
+
+instance cborDecodeBool :: CBORDecode Boolean where
+  decode (CBORBool b) = Right b
+  decode _ = Left "Expected boolean"
+
+instance cborDecodeArray :: CBORDecode a => CBORDecode (Array a) where
+  decode (CBORArray arr) = traverseEither decode arr
+  decode _ = Left "Expected array"
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // map // field // decoders
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Look up a field in a CBOR map by string key.
+-- |
+-- | Returns Nothing if the key is not present.
+lookupField :: String -> CBORValue -> Maybe CBORValue
+lookupField key (CBORMap pairs) = findInPairs pairs
+  where
+  findInPairs :: Array (Tuple CBORValue CBORValue) -> Maybe CBORValue
+  findInPairs arr = case Array.uncons arr of
+    Nothing -> Nothing
+    Just { head: Tuple (CBORText k) v, tail } ->
+      if k == key then Just v else findInPairs tail
+    Just { head: _, tail } -> findInPairs tail
+lookupField _ _ = Nothing
+
+-- | Decode a required field from a CBOR map.
+-- |
+-- | Returns Left if the field is missing or cannot be decoded.
+decodeField :: forall a. CBORDecode a => String -> CBORValue -> Either String a
+decodeField key cbor = case lookupField key cbor of
+  Nothing -> Left ("Missing required field: " <> key)
+  Just v -> decode v
+
+-- | Decode an optional field from a CBOR map.
+-- |
+-- | Returns Right Nothing if the field is missing, Right (Just a) if present
+-- | and decodable, Left if present but not decodable.
+decodeFieldMaybe :: forall a. CBORDecode a => String -> CBORValue -> Either String (Maybe a)
+decodeFieldMaybe key cbor = case lookupField key cbor of
+  Nothing -> Right Nothing
+  Just v -> case decode v of
+    Left err -> Left ("Field '" <> key <> "': " <> err)
+    Right a -> Right (Just a)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // serialization

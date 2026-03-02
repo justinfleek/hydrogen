@@ -16,7 +16,7 @@
 -- |
 -- | ## Dependencies
 -- | - Prelude
--- | - WebGPU.Types (GPUTextureDescriptor, GPUTextureViewDescriptor)
+-- | - Hydrogen.GPU.WebGPU.Types.Texture (GPUTextureDescriptor)
 -- |
 -- | ## Dependents
 -- | - Shader.* (bindless sampling)
@@ -50,11 +50,14 @@ module Hydrogen.GPU.WebGPU.TextureArray
   , loadPage
   , isPageReady
   
-    -- * Types
-  , GPUTextureDescriptor
+    -- * Types (re-exported)
+  , module Texture
   ) where
 
 import Prelude
+
+import Hydrogen.GPU.WebGPU.Types.Texture (GPUTextureDescriptor)
+import Hydrogen.GPU.WebGPU.Types.Texture (GPUTextureDescriptor) as Texture
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // texture // array
@@ -182,9 +185,4 @@ loadPage p = p { state = PageLoaded }
 isPageReady :: VirtualTexturePage -> Boolean
 isPageReady p = p.state == PageLoaded
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                        // type // placeholder
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Placeholder for GPUTextureDescriptor (import from Types in full implementation)
-type GPUTextureDescriptor = Unit

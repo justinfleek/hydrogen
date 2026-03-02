@@ -79,12 +79,9 @@ import Prelude
   , bind
   , (+)
   , (-)
-  , (*)
   , (/)
   , (<)
   , (>)
-  , (<=)
-  , (>=)
   , (==)
   , (/=)
   , (&&)
@@ -106,27 +103,30 @@ import Hydrogen.Schema.Game.Entity
   ( Entity
   , EntityConfig
   , EntityId
-  , EntityState(Active, Destroyed, Frozen)
+  , EntityState(Active, Destroyed)
   , Position2D(Position2D)
   , Velocity2D(Velocity2D)
-  , GameShape(GameRectangle, GameEllipse)
+  , DeltaTime  -- Type only, constructor not needed (use mkDeltaTime)
   , Behavior(OnCollision, OnBounds, OnKeyPress)
   , CollisionResponse(Bounce, BounceAndScore, DestroyOther, DestroyBoth, DestroySelf)
   , BoundsResponse(BounceOffWalls, WrapAround, DestroyOnExit, GameOverOnBottom)
-  , KeyCode(ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Space)
+  , KeyCode
   , KeyResponse(MoveBy, SetVelocityResponse, Fire)
   , mkEntity
   , mkEntityId
+  , mkPosition
+  , mkDeltaTime
   , applyVelocity
   , moveEntity
   , setVelocity
   , setState
   , shapeWidth
   , shapeHeight
-  , reflectVelocityX
-  , reflectVelocityY
   , mkVelocity
+  , rectangleShape
   )
+
+import Hydrogen.Schema.Color.OKLCH (OKLCH, oklch)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // world // bounds
@@ -205,6 +205,12 @@ emptyWorld = mkWorld (WorldBounds { width: 640, height: 192 })
 -- | THE CORE GAME LOOP. Pure function.
 -- |
 -- | `dt` is delta time in seconds (e.g., 0.016 for 60fps).
+-- | Raw Number is accepted but immediately converted to bounded DeltaTime.
+-- |
+-- | ## Time Dilation Attack Prevention
+-- |
+-- | DeltaTime is clamped to 0-1 second. A malicious actor passing dt=1e308
+-- | would be clamped to 1.0 second, preventing position explosion.
 -- |
 -- | Tick phases:
 -- | 1. Move all entities by their velocity
@@ -214,10 +220,11 @@ emptyWorld = mkWorld (WorldBounds { width: 640, height: 192 })
 -- | 5. Check win condition
 -- | 6. Increment frame counter
 tick :: Number -> World -> World
-tick dt world
+tick rawDt world
   | world.state /= Playing = world
   | otherwise =
-      world
+      let dt = mkDeltaTime rawDt  -- Clamps to 0-1 second
+      in world
         # moveAllEntities dt
         # checkAllBounds
         # checkAllCollisions
@@ -226,11 +233,11 @@ tick dt world
         # incrementFrame
 
 -- | Move all active entities by their velocity.
-moveAllEntities :: Number -> World -> World
+moveAllEntities :: DeltaTime -> World -> World
 moveAllEntities dt world =
   world { entities = map (moveIfActive dt) world.entities }
   where
-    moveIfActive :: Number -> Entity -> Entity
+    moveIfActive :: DeltaTime -> Entity -> Entity
     moveIfActive deltaT entity
       | entity.state == Active = applyVelocity deltaT entity
       | otherwise = entity
@@ -459,33 +466,99 @@ instance showInputEvent :: Show InputEvent where
   show (KeyUp k) = "(KeyUp " <> show k <> ")"
 
 -- | Handle an input event, updating all entities with matching behaviors.
+-- |
+-- | This function processes KeyDown events for all entities, collecting both
+-- | the updated entities and any newly spawned entities (e.g., projectiles from Fire).
 handleInput :: InputEvent -> World -> World
 handleInput event world =
-  world { entities = map (handleEntityInput event) world.entities }
+  let
+    entities = Array.fromFoldable (Map.values world.entities)
+    results = map (handleEntityInput event) entities
+    updatedEntities = map extractEntity results
+    spawnedConfigs = Array.concatMap extractSpawned results
+    worldWithUpdates = world { entities = arrayToEntityMap updatedEntities }
+  in
+    foldl (\w cfg -> addEntity cfg w) worldWithUpdates spawnedConfigs
+  where
+    extractEntity :: Tuple Entity (Array EntityConfig) -> Entity
+    extractEntity (Tuple e _) = e
+    
+    extractSpawned :: Tuple Entity (Array EntityConfig) -> Array EntityConfig
+    extractSpawned (Tuple _ spawned) = spawned
+    
+    arrayToEntityMap :: Array Entity -> Map EntityId Entity
+    arrayToEntityMap arr = foldl insertEntity Map.empty arr
+    
+    insertEntity :: Map EntityId Entity -> Entity -> Map EntityId Entity
+    insertEntity m e = Map.insert e.id e m
 
 -- | Handle input for a single entity.
-handleEntityInput :: InputEvent -> Entity -> Entity
+-- |
+-- | Returns a tuple of (updated entity, spawned entities).
+-- | Most key responses return no spawned entities, but Fire spawns a projectile.
+handleEntityInput :: InputEvent -> Entity -> Tuple Entity (Array EntityConfig)
 handleEntityInput event entity =
   case event of
-    KeyDown key -> foldl (applyKeyBehavior key) entity entity.behaviors
-    KeyUp _ -> entity  -- Currently no KeyUp handling
+    KeyDown key -> foldl (applyKeyBehavior key) (Tuple entity []) entity.behaviors
+    KeyUp _ -> Tuple entity []  -- Currently no KeyUp handling
 
 -- | Apply a key press behavior to an entity.
-applyKeyBehavior :: KeyCode -> Entity -> Behavior -> Entity
-applyKeyBehavior key entity behavior =
+-- |
+-- | Accumulates both entity updates and spawned entity configs.
+applyKeyBehavior :: KeyCode -> Tuple Entity (Array EntityConfig) -> Behavior -> Tuple Entity (Array EntityConfig)
+applyKeyBehavior key (Tuple entity spawned) behavior =
   case behavior of
     OnKeyPress behaviorKey response
-      | key == behaviorKey -> applyKeyResponse response entity
-      | otherwise -> entity
-    _ -> entity
+      | key == behaviorKey -> 
+          let Tuple newEntity newSpawned = applyKeyResponse response entity
+          in Tuple newEntity (spawned <> newSpawned)
+      | otherwise -> Tuple entity spawned
+    _ -> Tuple entity spawned
 
 -- | Apply a key response action.
-applyKeyResponse :: KeyResponse -> Entity -> Entity
+-- |
+-- | Returns (updated entity, spawned entities).
+-- | Fire spawns a projectile; other responses just update the entity.
+applyKeyResponse :: KeyResponse -> Entity -> Tuple Entity (Array EntityConfig)
 applyKeyResponse response entity =
   case response of
-    MoveBy dx dy -> moveEntity dx dy entity
-    SetVelocityResponse vx vy -> setVelocity (mkVelocity vx vy) entity
-    Fire -> entity  -- Fire not implemented yet
+    MoveBy dx dy -> Tuple (moveEntity dx dy entity) []
+    SetVelocityResponse vx vy -> Tuple (setVelocity (mkVelocity vx vy) entity) []
+    Fire -> Tuple entity [mkProjectileConfig entity]
+
+-- | Create a projectile configuration spawned from the firing entity.
+-- |
+-- | The projectile:
+-- | - Spawns at the top-center of the firing entity
+-- | - Moves upward at 300 pixels/second
+-- | - Is a small 2x8 pixel rectangle (bullet shape)
+-- | - Has bright cyan color for visibility
+-- | - Destroys targets on collision, destroys itself on world exit
+mkProjectileConfig :: Entity -> EntityConfig
+mkProjectileConfig firingEntity =
+  let
+    Position2D pos = firingEntity.position
+    firingWidth = shapeWidth firingEntity.shape
+    -- Center the projectile horizontally above the firing entity
+    projectileX = pos.x + (firingWidth / 2.0) - 1.0  -- 1.0 = half projectile width
+    projectileY = pos.y - 8.0  -- Spawn above the entity
+  in
+    { shape: rectangleShape 2.0 8.0  -- 2x8 pixel bullet
+    , position: mkPosition projectileX projectileY
+    , velocity: mkVelocity 0.0 (-300.0)  -- Upward at 300 px/sec
+    , color: projectileColor
+    , behaviors:
+        [ OnCollision DestroyOther  -- Destroy what it hits
+        , OnCollision DestroySelf   -- Destroy self on any collision
+        , OnBounds DestroyOnExit    -- Remove when leaving world
+        ]
+    }
+
+-- | Bright cyan color for projectiles (high visibility).
+-- |
+-- | OKLCH: L=0.8 (bright), C=0.2 (vivid), H=195 (cyan)
+projectileColor :: OKLCH
+projectileColor = oklch 0.8 0.2 195
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // entity // ops

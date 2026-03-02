@@ -25,6 +25,9 @@ module Hydrogen.Schema.Motion.TimeRemap.Utilities
   ( -- * Constants
     defaultSpeed
   
+  -- * Re-exports from Internal (speed bounds)
+  , module Internal
+  
   -- * Validation
   , isValidRemap
   
@@ -75,7 +78,8 @@ import Hydrogen.Schema.Motion.TimeRemap.Types
   )
 import Hydrogen.Schema.Motion.TimeRemap.Construction (identity)
 import Hydrogen.Schema.Motion.TimeRemap.Composition (averageSpeed)
-import Hydrogen.Schema.Motion.TimeRemap.Internal (epsilon, infinity)
+import Hydrogen.Schema.Motion.TimeRemap.Internal (epsilon, infinity, clampSpeed, maxSpeedFactor, minSpeedFactor) as Internal
+import Hydrogen.Schema.Motion.TimeRemap.Internal (epsilon, infinity, clampSpeed)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // constants
@@ -103,21 +107,31 @@ isValidRemap (TimeRemap tr) =
 --                                                              // normalization
 -- ═════════════════════════════════════════════════════════════════════════════
 
+-- Note: Speed bounds (maxSpeedFactor, minSpeedFactor, clampSpeed) are imported
+-- from Internal.purs and re-exported via `module Internal` above.
+
 -- | Normalize remap to have average speed of 1.0.
+-- |
+-- | **BOUNDED**: All speed values are clamped after multiplication to prevent
+-- | exponential compounding at billion-agent scale.
 normalizeRemap :: TimeRemap -> TimeRemap
 normalizeRemap remap =
   let 
     avg = averageSpeed remap
     (TimeRemap tr) = remap
     scaleFactor = if avg < epsilon then 1.0 else 1.0 / avg
+    -- CRITICAL: Clamp all speed values after multiplication
+    clampedSpeedFactor = clampSpeed (tr.speedFactor * scaleFactor)
+    clampedStartSpeed = clampSpeed (tr.startSpeed * scaleFactor)
+    clampedEndSpeed = clampSpeed (tr.endSpeed * scaleFactor)
   in TimeRemap
     { mode: tr.mode
-    , speedFactor: tr.speedFactor * scaleFactor
-    , startSpeed: tr.startSpeed * scaleFactor
-    , endSpeed: tr.endSpeed * scaleFactor
+    , speedFactor: clampedSpeedFactor
+    , startSpeed: clampedStartSpeed
+    , endSpeed: clampedEndSpeed
     , originalDuration: tr.originalDuration
     , keyframes: map (\(SpeedKeyframe k) -> 
-        SpeedKeyframe (k { speed = k.speed * scaleFactor })) tr.keyframes
+        SpeedKeyframe (k { speed = clampSpeed (k.speed * scaleFactor) })) tr.keyframes
     }
 
 -- ═════════════════════════════════════════════════════════════════════════════

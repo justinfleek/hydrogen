@@ -329,14 +329,19 @@ subDim (Dim a) (Dim b) =
 -- |
 -- | Powers of 2 are common in neural network architectures for
 -- | efficient memory alignment and hardware optimization.
+-- |
+-- | Uses repeated division since PureScript doesn't have bitwise AND.
+-- | The classic bitwise check would be: n > 0 && (n .&. (n - 1)) == 0
 isPowerOf2 :: Dim -> Boolean
-isPowerOf2 (Dim n) = n > 0 && (n - 1) == 0
+isPowerOf2 (Dim n) = isPow2 n
   where
-    -- n & (n - 1) == 0 for powers of 2, but we don't have bitwise ops
-    -- So we check by repeated division
+    -- Check by repeated division by 2
     isPow2 :: Int -> Boolean
-    isPow2 1 = true
-    isPow2 x = if mod x 2 == 0 then isPow2 (x / 2) else false
+    isPow2 x 
+      | x <= 0 = false
+      | x == 1 = true
+      | mod x 2 == 0 = isPow2 (x / 2)
+      | true = false
 
 -- | Log base 2 of dimension (returns Nothing if not power of 2)
 log2Dim :: Dim -> Maybe Int

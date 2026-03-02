@@ -40,7 +40,7 @@ module Hydrogen.Schema.Color.Space
   , cmyk
   , xyz
   
-  -- * Conversions (placeholder signatures)
+  -- * Conversions
   , toLinear
   , fromLinear
   , toXYZ

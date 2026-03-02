@@ -88,9 +88,12 @@ derive instance ordSpacingValue :: Ord SpacingValue
 instance showSpacingValue :: Show SpacingValue where
   show (SpacingValue n) = "(SpacingValue " <> show n <> ")"
 
--- | Create a spacing value, clamping to non-negative.
+-- | Create a spacing value, clamped to 0-1000 pixels.
+-- |
+-- | Upper bound prevents runaway layouts at billion-agent scale.
+-- | 1000px is far beyond any reasonable single-edge spacing.
 spacingValue :: Number -> SpacingValue
-spacingValue n = SpacingValue (max 0.0 n)
+spacingValue n = SpacingValue (Bounded.clampNumber 0.0 1000.0 n)
 
 -- | Zero spacing
 spacingZero :: SpacingValue

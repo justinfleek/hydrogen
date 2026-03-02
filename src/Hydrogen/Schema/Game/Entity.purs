@@ -27,34 +27,112 @@
 
 module Hydrogen.Schema.Game.Entity
   ( -- * Entity Identity
-    EntityId(..)
+    EntityId
+      ( EntityId
+      )
   , mkEntityId
   , unwrapEntityId
   
-  -- * Position and Velocity
-  , Position2D(..)
-  , Velocity2D(..)
+  -- * Delta Time (bounded 0-1 seconds, prevents time dilation attacks)
+  , DeltaTime
+      ( DeltaTime
+      )
+  , deltaTimeBounds
+  , mkDeltaTime
+  , unwrapDeltaTime
+  
+  -- * Position and Velocity (bounded 0-10000 px, -10000 to 10000 px/s)
+  , Position2D
+      ( Position2D
+      )
+  , positionBounds
+  , Velocity2D
+      ( Velocity2D
+      )
+  , velocityBounds
   , mkPosition
   , mkVelocity
   , unwrapPosition
   , unwrapVelocity
   
-  -- * Game Shapes
-  , GameShape(..)
+  -- * Game Shapes (dimensions bounded 1-10000 px)
+  , GameShape
+      ( GameRectangle
+      , GameEllipse
+      )
+  , shapeDimensionBounds
   , rectangleShape
   , ellipseShape
   , shapeWidth
   , shapeHeight
   
   -- * Entity State
-  , EntityState(..)
+  , EntityState
+      ( Active
+      , Destroyed
+      , Frozen
+      )
   
-  -- * Behaviors
-  , Behavior(..)
-  , CollisionResponse(..)
-  , BoundsResponse(..)
-  , KeyCode(..)
-  , KeyResponse(..)
+  -- * Collision Response
+  , CollisionResponse
+      ( Bounce
+      , BounceAndScore
+      , DestroyOther
+      , DestroyBoth
+      , DestroySelf
+      )
+  
+  -- * Bounds Response
+  , BoundsResponse
+      ( BounceOffWalls
+      , WrapAround
+      , DestroyOnExit
+      , GameOverOnBottom
+      )
+  
+  -- * Key Codes (70+ keys for comprehensive input)
+  , KeyCode
+      ( ArrowLeft, ArrowRight, ArrowUp, ArrowDown
+      , KeyA, KeyB, KeyC, KeyD, KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ
+      , KeyK, KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ, KeyR, KeyS, KeyT
+      , KeyU, KeyV, KeyW, KeyX, KeyY, KeyZ
+      , Digit0, Digit1, Digit2, Digit3, Digit4
+      , Digit5, Digit6, Digit7, Digit8, Digit9
+      , F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12
+      , ShiftLeft, ShiftRight
+      , ControlLeft, ControlRight
+      , AltLeft, AltRight
+      , MetaLeft, MetaRight
+      , Space, Enter, Escape, Tab, Backspace
+      , Delete, Insert, Home, End, PageUp, PageDown
+      , Comma, Period, Slash, Backslash
+      , BracketLeft, BracketRight
+      , Semicolon, Quote, Backquote
+      , Minus, Equal
+      )
+  
+  -- * Key Response
+  , KeyResponse
+      ( MoveBy
+      , SetVelocityResponse
+      , Fire
+      )
+  
+  -- * Tilt Response (accelerometer input)
+  , TiltResponse
+      ( TiltToVelocity
+      , TiltToPosition
+      , TiltThreshold
+      )
+  , tiltToVelocity
+  
+  -- * Behavior (declarative event responses)
+  , Behavior
+      ( OnCollision
+      , OnBounds
+      , OnKeyPress
+      , OnTilt
+      )
   
   -- * Entity Type
   , Entity
@@ -87,6 +165,8 @@ import Prelude
   )
 
 import Hydrogen.Schema.Color.OKLCH (OKLCH)
+import Hydrogen.Schema.Brush.Tilt.Atoms (TiltX, TiltY, unwrapTiltX, unwrapTiltY)
+import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // entity // id
@@ -113,13 +193,59 @@ unwrapEntityId :: EntityId -> Int
 unwrapEntityId (EntityId n) = n
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // delta // time
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Delta time in seconds.
+-- |
+-- | Bounded: 0 to 1 second (clamped).
+-- |
+-- | ## Time Dilation Attack Prevention
+-- |
+-- | A malicious actor could pass dt=1e308 to cause position explosion.
+-- | Even with position clamping, this would cause erratic behavior.
+-- | By clamping dt to 1 second maximum:
+-- | - Normal gameplay (60fps): dt = 0.016
+-- | - Slow gameplay (10fps): dt = 0.1
+-- | - Frame skip recovery: dt = 1.0 (capped)
+-- |
+-- | Anything claiming > 1 second between frames is either:
+-- | - A lie (malicious input)
+-- | - A freeze (should be handled by pausing, not physics explosion)
+newtype DeltaTime = DeltaTime Number
+
+derive instance eqDeltaTime :: Eq DeltaTime
+derive instance ordDeltaTime :: Ord DeltaTime
+
+instance showDeltaTime :: Show DeltaTime where
+  show (DeltaTime dt) = "(DeltaTime " <> show dt <> "s)"
+
+-- | Bounds for delta time (0 to 1 second, clamps).
+deltaTimeBounds :: Bounded.NumberBounds
+deltaTimeBounds = Bounded.numberBounds 0.0 1.0 Bounded.Clamps
+  "deltaTime" "Frame delta time in seconds (0-1)"
+
+-- | Create a DeltaTime (clamped to 0-1 second).
+-- |
+-- | NaN and Infinity are treated as 0 (no movement this frame).
+mkDeltaTime :: Number -> DeltaTime
+mkDeltaTime dt = DeltaTime (Bounded.clampNumber 0.0 1.0 dt)
+
+-- | Extract the raw DeltaTime value.
+unwrapDeltaTime :: DeltaTime -> Number
+unwrapDeltaTime (DeltaTime dt) = dt
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // position // 2d
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Position in world space (pixels).
 -- |
+-- | Bounded: 0 to 10000 pixels on each axis (clamped).
 -- | Sub-pixel precision for smooth motion. Position is the top-left corner
 -- | of the entity's bounding box.
+-- |
+-- | 10000px allows for scrolling game worlds while preventing runaway values.
 newtype Position2D = Position2D { x :: Number, y :: Number }
 
 derive instance eqPosition2D :: Eq Position2D
@@ -127,9 +253,17 @@ derive instance eqPosition2D :: Eq Position2D
 instance showPosition2D :: Show Position2D where
   show (Position2D { x, y }) = "(Position2D " <> show x <> " " <> show y <> ")"
 
--- | Create a position
+-- | Bounds for position coordinates (0 to 10000 pixels, clamps).
+positionBounds :: Bounded.NumberBounds
+positionBounds = Bounded.numberBounds 0.0 10000.0 Bounded.Clamps
+  "position" "World position in pixels (0-10000)"
+
+-- | Create a position (clamped to 0-10000 on each axis).
 mkPosition :: Number -> Number -> Position2D
-mkPosition x y = Position2D { x, y }
+mkPosition x y = Position2D 
+  { x: Bounded.clampNumber 0.0 10000.0 x
+  , y: Bounded.clampNumber 0.0 10000.0 y
+  }
 
 -- | Extract position components
 unwrapPosition :: Position2D -> { x :: Number, y :: Number }
@@ -141,7 +275,11 @@ unwrapPosition (Position2D p) = p
 
 -- | Velocity in pixels per second.
 -- |
+-- | Bounded: -10000 to 10000 px/s on each axis (clamped).
 -- | Applied each tick by multiplying with delta time.
+-- |
+-- | 10000 px/s is extremely fast (crosses a 1920px screen in 0.2s).
+-- | Clamping prevents runaway values from compounding.
 newtype Velocity2D = Velocity2D { vx :: Number, vy :: Number }
 
 derive instance eqVelocity2D :: Eq Velocity2D
@@ -149,9 +287,17 @@ derive instance eqVelocity2D :: Eq Velocity2D
 instance showVelocity2D :: Show Velocity2D where
   show (Velocity2D { vx, vy }) = "(Velocity2D " <> show vx <> " " <> show vy <> ")"
 
--- | Create a velocity
+-- | Bounds for velocity components (-10000 to 10000 px/s, clamps).
+velocityBounds :: Bounded.NumberBounds
+velocityBounds = Bounded.numberBounds (-10000.0) 10000.0 Bounded.Clamps
+  "velocity" "Velocity in pixels per second (-10000 to 10000)"
+
+-- | Create a velocity (clamped to -10000 to 10000 on each axis).
 mkVelocity :: Number -> Number -> Velocity2D
-mkVelocity vx vy = Velocity2D { vx, vy }
+mkVelocity vx vy = Velocity2D 
+  { vx: Bounded.clampNumber (-10000.0) 10000.0 vx
+  , vy: Bounded.clampNumber (-10000.0) 10000.0 vy
+  }
 
 -- | Extract velocity components
 unwrapVelocity :: Velocity2D -> { vx :: Number, vy :: Number }
@@ -163,12 +309,13 @@ unwrapVelocity (Velocity2D v) = v
 
 -- | Game shapes with embedded dimensions.
 -- |
+-- | Bounded: All dimensions 1-10000 pixels (clamped).
 -- | Unlike Schema.Geometry.Shape.ShapePrimitive (which is just an enum),
 -- | GameShape includes the actual dimensions needed for collision detection
 -- | and rendering.
 -- |
--- | For Terminal Breakout, we only need rectangles and ellipses.
--- | More shapes can be added as needed.
+-- | Minimum of 1px prevents zero-area shapes (collision/rendering undefined).
+-- | Maximum of 10000px matches world position bounds.
 data GameShape
   = GameRectangle { width :: Number, height :: Number }
   | GameEllipse { radiusX :: Number, radiusY :: Number }
@@ -179,13 +326,24 @@ instance showGameShape :: Show GameShape where
   show (GameRectangle r) = "(GameRectangle " <> show r.width <> "x" <> show r.height <> ")"
   show (GameEllipse e) = "(GameEllipse " <> show e.radiusX <> "x" <> show e.radiusY <> ")"
 
--- | Create a rectangle shape
-rectangleShape :: Number -> Number -> GameShape
-rectangleShape width height = GameRectangle { width, height }
+-- | Bounds for shape dimensions (1 to 10000 pixels, clamps).
+shapeDimensionBounds :: Bounded.NumberBounds
+shapeDimensionBounds = Bounded.numberBounds 1.0 10000.0 Bounded.Clamps
+  "shapeDimension" "Shape dimension in pixels (1-10000)"
 
--- | Create an ellipse shape
+-- | Create a rectangle shape (dimensions clamped to 1-10000).
+rectangleShape :: Number -> Number -> GameShape
+rectangleShape width height = GameRectangle 
+  { width: Bounded.clampNumber 1.0 10000.0 width
+  , height: Bounded.clampNumber 1.0 10000.0 height
+  }
+
+-- | Create an ellipse shape (radii clamped to 1-10000).
 ellipseShape :: Number -> Number -> GameShape
-ellipseShape radiusX radiusY = GameEllipse { radiusX, radiusY }
+ellipseShape radiusX radiusY = GameEllipse 
+  { radiusX: Bounded.clampNumber 1.0 10000.0 radiusX
+  , radiusY: Bounded.clampNumber 1.0 10000.0 radiusY
+  }
 
 -- | Get bounding width of a shape
 shapeWidth :: GameShape -> Number
@@ -225,14 +383,45 @@ instance showEntityState :: Show EntityState where
 
 -- | Input key codes.
 -- |
--- | Matches browser KeyboardEvent.key values for common game controls.
+-- | Comprehensive keyboard support matching browser KeyboardEvent.key values.
 -- | Terminal translates ANSI escape sequences to these.
 data KeyCode
+  -- Arrow keys
   = ArrowLeft
   | ArrowRight
   | ArrowUp
   | ArrowDown
+  -- Letters (for WASD and other controls)
+  | KeyA | KeyB | KeyC | KeyD | KeyE | KeyF | KeyG | KeyH | KeyI | KeyJ
+  | KeyK | KeyL | KeyM | KeyN | KeyO | KeyP | KeyQ | KeyR | KeyS | KeyT
+  | KeyU | KeyV | KeyW | KeyX | KeyY | KeyZ
+  -- Numbers
+  | Digit0 | Digit1 | Digit2 | Digit3 | Digit4
+  | Digit5 | Digit6 | Digit7 | Digit8 | Digit9
+  -- Function keys
+  | F1 | F2 | F3 | F4 | F5 | F6 | F7 | F8 | F9 | F10 | F11 | F12
+  -- Modifiers
+  | ShiftLeft | ShiftRight
+  | ControlLeft | ControlRight
+  | AltLeft | AltRight
+  | MetaLeft | MetaRight
+  -- Special keys
   | Space
+  | Enter
+  | Escape
+  | Tab
+  | Backspace
+  | Delete
+  | Insert
+  | Home
+  | End
+  | PageUp
+  | PageDown
+  -- Punctuation (common in games)
+  | Comma | Period | Slash | Backslash
+  | BracketLeft | BracketRight
+  | Semicolon | Quote | Backquote
+  | Minus | Equal
 
 derive instance eqKeyCode :: Eq KeyCode
 derive instance ordKeyCode :: Ord KeyCode
@@ -242,7 +431,84 @@ instance showKeyCode :: Show KeyCode where
   show ArrowRight = "ArrowRight"
   show ArrowUp = "ArrowUp"
   show ArrowDown = "ArrowDown"
+  show KeyA = "KeyA"
+  show KeyB = "KeyB"
+  show KeyC = "KeyC"
+  show KeyD = "KeyD"
+  show KeyE = "KeyE"
+  show KeyF = "KeyF"
+  show KeyG = "KeyG"
+  show KeyH = "KeyH"
+  show KeyI = "KeyI"
+  show KeyJ = "KeyJ"
+  show KeyK = "KeyK"
+  show KeyL = "KeyL"
+  show KeyM = "KeyM"
+  show KeyN = "KeyN"
+  show KeyO = "KeyO"
+  show KeyP = "KeyP"
+  show KeyQ = "KeyQ"
+  show KeyR = "KeyR"
+  show KeyS = "KeyS"
+  show KeyT = "KeyT"
+  show KeyU = "KeyU"
+  show KeyV = "KeyV"
+  show KeyW = "KeyW"
+  show KeyX = "KeyX"
+  show KeyY = "KeyY"
+  show KeyZ = "KeyZ"
+  show Digit0 = "Digit0"
+  show Digit1 = "Digit1"
+  show Digit2 = "Digit2"
+  show Digit3 = "Digit3"
+  show Digit4 = "Digit4"
+  show Digit5 = "Digit5"
+  show Digit6 = "Digit6"
+  show Digit7 = "Digit7"
+  show Digit8 = "Digit8"
+  show Digit9 = "Digit9"
+  show F1 = "F1"
+  show F2 = "F2"
+  show F3 = "F3"
+  show F4 = "F4"
+  show F5 = "F5"
+  show F6 = "F6"
+  show F7 = "F7"
+  show F8 = "F8"
+  show F9 = "F9"
+  show F10 = "F10"
+  show F11 = "F11"
+  show F12 = "F12"
+  show ShiftLeft = "ShiftLeft"
+  show ShiftRight = "ShiftRight"
+  show ControlLeft = "ControlLeft"
+  show ControlRight = "ControlRight"
+  show AltLeft = "AltLeft"
+  show AltRight = "AltRight"
+  show MetaLeft = "MetaLeft"
+  show MetaRight = "MetaRight"
   show Space = "Space"
+  show Enter = "Enter"
+  show Escape = "Escape"
+  show Tab = "Tab"
+  show Backspace = "Backspace"
+  show Delete = "Delete"
+  show Insert = "Insert"
+  show Home = "Home"
+  show End = "End"
+  show PageUp = "PageUp"
+  show PageDown = "PageDown"
+  show Comma = "Comma"
+  show Period = "Period"
+  show Slash = "Slash"
+  show Backslash = "Backslash"
+  show BracketLeft = "BracketLeft"
+  show BracketRight = "BracketRight"
+  show Semicolon = "Semicolon"
+  show Quote = "Quote"
+  show Backquote = "Backquote"
+  show Minus = "Minus"
+  show Equal = "Equal"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // behaviors
@@ -293,6 +559,40 @@ instance showKeyResponse :: Show KeyResponse where
   show (SetVelocityResponse vx vy) = "(SetVelocity " <> show vx <> " " <> show vy <> ")"
   show Fire = "Fire"
 
+-- | Response to device tilt (accelerometer input).
+-- |
+-- | Tilt input enables mobile game controls and accessibility features.
+-- | Uses TiltX (-90 to 90) and TiltY (-90 to 90) from Brush.Tilt.Atoms.
+data TiltResponse
+  = TiltToVelocity Number         -- ^ Map tilt angle to velocity (sensitivity multiplier)
+  | TiltToPosition Number         -- ^ Map tilt angle to position offset
+  | TiltThreshold Number Number   -- ^ Only respond if tilt exceeds threshold (deadzone, sensitivity)
+
+derive instance eqTiltResponse :: Eq TiltResponse
+
+instance showTiltResponse :: Show TiltResponse where
+  show (TiltToVelocity s) = "(TiltToVelocity " <> show s <> ")"
+  show (TiltToPosition s) = "(TiltToPosition " <> show s <> ")"
+  show (TiltThreshold d s) = "(TiltThreshold deadzone:" <> show d <> " sensitivity:" <> show s <> ")"
+
+-- | Convert tilt angles to velocity.
+-- |
+-- | Maps TiltX/TiltY to horizontal/vertical velocity with sensitivity multiplier.
+-- | Sensitivity is clamped to 0-200 (max tilt 90° × 200 = 18000, then velocity clamped to 10000).
+-- | Velocity is always bounded by mkVelocity (-10000 to 10000 px/s).
+-- |
+-- | Example: tiltToVelocity 5.0 (TiltX 30) (TiltY 0) = Velocity2D { vx: 150.0, vy: 0.0 }
+tiltToVelocity :: Number -> TiltX -> TiltY -> Velocity2D
+tiltToVelocity sensitivity tx ty =
+  let
+    -- Clamp sensitivity to prevent velocity explosion
+    -- Max: 90° × 200 = 18000, which clamps to 10000 (velocity max)
+    clampedSensitivity = Bounded.clampNumber 0.0 200.0 sensitivity
+    vx = unwrapTiltX tx * clampedSensitivity
+    vy = unwrapTiltY ty * clampedSensitivity
+  in
+    mkVelocity vx vy  -- mkVelocity clamps to -10000..10000
+
 -- | Declarative behavior specification.
 -- |
 -- | Behaviors are DATA, not functions. They describe what should happen
@@ -303,6 +603,7 @@ data Behavior
   = OnCollision CollisionResponse     -- ^ Response when colliding with any entity
   | OnBounds BoundsResponse           -- ^ Response when hitting world bounds
   | OnKeyPress KeyCode KeyResponse    -- ^ Response to key press
+  | OnTilt TiltResponse               -- ^ Response to device tilt (accelerometer)
 
 derive instance eqBehavior :: Eq Behavior
 
@@ -310,6 +611,7 @@ instance showBehavior :: Show Behavior where
   show (OnCollision r) = "(OnCollision " <> show r <> ")"
   show (OnBounds r) = "(OnBounds " <> show r <> ")"
   show (OnKeyPress k r) = "(OnKeyPress " <> show k <> " " <> show r <> ")"
+  show (OnTilt r) = "(OnTilt " <> show r <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // entity
@@ -360,24 +662,35 @@ mkEntity entityId cfg =
 
 -- | Apply velocity to position over delta time.
 -- |
+-- | DeltaTime is bounded (0-1 second), preventing time dilation attacks.
+-- | Position is clamped to world bounds (0-10000) after update.
+-- |
 -- | ```purescript
--- | applyVelocity 0.016 entity  -- Move by velocity * 16ms
+-- | applyVelocity (mkDeltaTime 0.016) entity  -- Move by velocity * 16ms
 -- | ```
-applyVelocity :: Number -> Entity -> Entity
+applyVelocity :: DeltaTime -> Entity -> Entity
 applyVelocity dt entity =
   let
     Position2D pos = entity.position
     Velocity2D vel = entity.velocity
-    newX = pos.x + vel.vx * dt
-    newY = pos.y + vel.vy * dt
+    dtVal = unwrapDeltaTime dt
+    newX = pos.x + vel.vx * dtVal
+    newY = pos.y + vel.vy * dtVal
   in
-    entity { position = Position2D { x: newX, y: newY } }
+    entity { position = mkPosition newX newY }
 
--- | Move entity by offset.
+-- | Move entity by offset (offsets clamped to velocity bounds).
+-- |
+-- | Position is clamped to world bounds (0-10000) after update.
+-- | Offsets are clamped to -10000 to 10000 to prevent teleportation attacks.
 moveEntity :: Number -> Number -> Entity -> Entity
 moveEntity dx dy entity =
-  let Position2D pos = entity.position
-  in entity { position = Position2D { x: pos.x + dx, y: pos.y + dy } }
+  let 
+    Position2D pos = entity.position
+    -- Clamp offsets to prevent teleportation beyond world bounds
+    clampedDx = Bounded.clampNumber (-10000.0) 10000.0 dx
+    clampedDy = Bounded.clampNumber (-10000.0) 10000.0 dy
+  in entity { position = mkPosition (pos.x + clampedDx) (pos.y + clampedDy) }
 
 -- | Set entity position.
 setPosition :: Position2D -> Entity -> Entity
@@ -392,13 +705,17 @@ setState :: EntityState -> Entity -> Entity
 setState s entity = entity { state = s }
 
 -- | Reflect velocity on X axis (horizontal bounce).
+-- |
+-- | Velocity remains within bounds (-10000 to 10000) after reflection.
 reflectVelocityX :: Entity -> Entity
 reflectVelocityX entity =
   let Velocity2D vel = entity.velocity
-  in entity { velocity = Velocity2D { vx: negate vel.vx, vy: vel.vy } }
+  in entity { velocity = mkVelocity (negate vel.vx) vel.vy }
 
 -- | Reflect velocity on Y axis (vertical bounce).
+-- |
+-- | Velocity remains within bounds (-10000 to 10000) after reflection.
 reflectVelocityY :: Entity -> Entity
 reflectVelocityY entity =
   let Velocity2D vel = entity.velocity
-  in entity { velocity = Velocity2D { vx: vel.vx, vy: negate vel.vy } }
+  in entity { velocity = mkVelocity vel.vx (negate vel.vy) }

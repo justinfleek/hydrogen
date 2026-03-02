@@ -191,9 +191,19 @@ clampInt minVal maxVal n
   | n > maxVal = maxVal
   | otherwise = n
 
--- | Clamp a number to bounds
+-- | Clamp a number to bounds (NaN/Infinity-safe).
+-- |
+-- | If the input is NaN or Infinity, returns minVal (safe fallback).
+-- | This prevents non-finite values from propagating through the system.
+-- |
+-- | ## At Billion-Agent Scale
+-- |
+-- | NaN is the escape hatch for all bounds checks. A malicious actor
+-- | could craft `0.0 / 0.0` to bypass validation. This function closes
+-- | that vector by treating non-finite values as out-of-bounds.
 clampNumber :: Number -> Number -> Number -> Number
 clampNumber minVal maxVal n
+  | not (isFiniteNumber n) = minVal  -- NaN/Infinity → safe fallback
   | n < minVal = minVal
   | n > maxVal = maxVal
   | otherwise = n
@@ -238,24 +248,33 @@ wrapInt minVal maxVal n =
   in
     minVal + wrapped
 
--- | Wrap a number to bounds using modular arithmetic.
+-- | Wrap a number to bounds using modular arithmetic (NaN/Infinity-safe).
 -- |
 -- | The range is [min, max), meaning max wraps to min.
+-- | If input is NaN or Infinity, returns minVal (safe fallback).
 -- |
 -- | ```purescript
 -- | wrapNumber 0.0 360.0 370.0   -- 10.0
 -- | wrapNumber 0.0 360.0 (-10.0) -- 350.0
 -- | wrapNumber 0.0 1.0 1.5       -- 0.5
+-- | wrapNumber 0.0 360.0 Infinity -- 0.0 (safe fallback)
 -- | ```
+-- |
+-- | ## At Billion-Agent Scale
+-- |
+-- | `Infinity / range` produces Infinity, and `Infinity - Infinity` produces NaN.
+-- | Without this guard, Infinity input becomes NaN output, poisoning the system.
 wrapNumber :: Number -> Number -> Number -> Number
-wrapNumber minVal maxVal n =
-  let
-    range = maxVal - minVal
-    offset = n - minVal
-    -- Use floor-based modulo for Numbers
-    wrapped = offset - range * Number.floor (offset / range)
-  in
-    minVal + wrapped
+wrapNumber minVal maxVal n
+  | not (isFiniteNumber n) = minVal  -- NaN/Infinity → safe fallback
+  | otherwise =
+      let
+        range = maxVal - minVal
+        offset = n - minVal
+        -- Use floor-based modulo for Numbers
+        wrapped = offset - range * Number.floor (offset / range)
+      in
+        minVal + wrapped
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // validation

@@ -59,8 +59,10 @@ module Hydrogen.Schema.Storage.Local
   
   -- * Storage Result
   , StorageResult
+  , WriteResult
   , storageSuccess
   , storageFailure
+  , writeSuccess
   , isStorageSuccess
   ) where
 
@@ -73,6 +75,7 @@ import Prelude
   , class Ord
   , class Show
   , Unit
+  , unit
   , show
   , otherwise
   , not
@@ -82,7 +85,7 @@ import Prelude
 
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Either (Either(Left, Right))
-import Data.String (length, null) as String
+import Data.String (length, null, indexOf, take, Pattern(..)) as String
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // storage key
@@ -127,12 +130,12 @@ isValidStorageKey s = not (String.null s)
 -- | "nonamespace" -> Nothing
 storageKeyNamespace :: StorageKey -> Maybe String
 storageKeyNamespace (StorageKey k) =
-  findNamespace k 0 (String.length k)
-  where
-    findNamespace :: String -> Int -> Int -> Maybe String
-    findNamespace _ idx len
-      | idx == len = Nothing
-      | otherwise = Nothing  -- Simplified: would need charAt
+  case String.indexOf (String.Pattern ":") k of
+    Nothing -> Nothing
+    Just idx -> 
+      if idx == 0
+        then Nothing  -- Empty namespace (key starts with colon)
+        else Just (String.take idx k)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // storage value
@@ -303,6 +306,11 @@ isSecurityError _ = false
 -- | StorageResult — either success with value or failure with error.
 type StorageResult a = Either LocalStorageError a
 
+-- | WriteResult — result for operations that don't return data.
+-- |
+-- | SetItem, RemoveItem, and Clear operations return Unit on success.
+type WriteResult = StorageResult Unit
+
 -- | Create a successful storage result.
 storageSuccess :: forall a. a -> StorageResult a
 storageSuccess = Right
@@ -310,6 +318,12 @@ storageSuccess = Right
 -- | Create a failed storage result.
 storageFailure :: forall a. LocalStorageError -> StorageResult a
 storageFailure = Left
+
+-- | Create a successful write result.
+-- |
+-- | Use for SetItem, RemoveItem, and Clear operations.
+writeSuccess :: WriteResult
+writeSuccess = Right unit
 
 -- | Check if storage result is successful.
 isStorageSuccess :: forall a. StorageResult a -> Boolean

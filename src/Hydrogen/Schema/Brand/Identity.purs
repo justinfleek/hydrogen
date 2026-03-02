@@ -20,13 +20,14 @@ module Hydrogen.Schema.Brand.Identity
     Domain
   , domain
   , unDomain
-  , mkDomainUnsafe
+  , domainFromValidated
   
   -- * Brand Name  
   , BrandName
   , brandName
   , unBrandName
-  , mkBrandNameUnsafe
+  , brandNameFromValidated
+  , isValidBrandNameChar
   
   -- * UUID
   , UUID
@@ -46,17 +47,21 @@ import Prelude
   , class Show
   , (==)
   , (&&)
+  , (||)
   , (>=)
   , (<=)
   , (>)
   , (<>)
+  , (<<<)
+  , not
   , show
   , compare
   )
 
+import Data.Array (filter, length) as Array
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
-import Data.String.CodeUnits (charAt) as String
+import Data.String.CodeUnits (charAt, toCharArray) as String
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // domain
@@ -96,11 +101,12 @@ domain s =
 unDomain :: Domain -> String
 unDomain (Domain d) = d
 
--- | Unsafe constructor for deserialization from trusted sources.
+-- | Create domain from pre-validated value.
 -- |
--- | WARNING: Only use when data comes from a validated source (e.g., Haskell backend).
-mkDomainUnsafe :: String -> Domain
-mkDomainUnsafe = Domain
+-- | Use when value comes from a trusted source (e.g., Haskell backend, database).
+-- | Caller guarantees the value is valid.
+domainFromValidated :: String -> Domain
+domainFromValidated = Domain
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // brand name
@@ -108,10 +114,24 @@ mkDomainUnsafe = Domain
 
 -- | Brand name atom.
 -- |
--- | A validated brand name: 1-256 characters, trimmed.
--- | Examples: "J. Breen Consulting", "Nike", "Apple Inc."
+-- | A validated brand name with strict character whitelist:
+-- | - 1-256 characters
+-- | - Allowed: letters (a-z, A-Z), digits (0-9), spaces, dots, hyphens,
+-- |   apostrophes, ampersands, commas, parentheses
+-- | - Forbidden: control characters, NULL bytes, angle brackets, quotes,
+-- |   backslashes, path separators, newlines
 -- |
--- | Invariant: brand_name_bounded (1 <= length <= 256)
+-- | Examples: "J. Breen Consulting", "Nike", "Apple Inc.", "Johnson & Johnson"
+-- |
+-- | ## Security
+-- |
+-- | At billion-agent scale, brand names flow into:
+-- | - UUID5 seeds (deterministic, no injection possible)
+-- | - File paths (blocked by no / or \ allowed)
+-- | - HTML output (blocked by no < or > allowed)
+-- | - SQL queries (parameterized at boundary, but defense in depth)
+-- |
+-- | Invariant: brand_name_bounded ∧ brand_name_safe
 newtype BrandName = BrandName String
 
 derive instance eqBrandName :: Eq BrandName
@@ -120,18 +140,61 @@ derive instance ordBrandName :: Ord BrandName
 instance showBrandName :: Show BrandName where
   show (BrandName n) = "BrandName(" <> n <> ")"
 
--- | Smart constructor with validation.
+-- | Check if a character is valid for brand names.
+-- |
+-- | Whitelist approach - only explicitly allowed characters pass.
+-- | This prevents NULL bytes, control characters, and injection vectors.
+isValidBrandNameChar :: Char -> Boolean
+isValidBrandNameChar c =
+  isLetter c || isDigit c || isAllowedPunctuation c
+  where
+    isLetter :: Char -> Boolean
+    isLetter ch = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+    
+    isDigit :: Char -> Boolean
+    isDigit ch = ch >= '0' && ch <= '9'
+    
+    isAllowedPunctuation :: Char -> Boolean
+    isAllowedPunctuation ch = case ch of
+      ' '  -> true  -- Space
+      '.'  -> true  -- Dot (for "Inc.", "Ltd.", etc.)
+      '-'  -> true  -- Hyphen (for "Coca-Cola", etc.)
+      '\'' -> true  -- Apostrophe (for "McDonald's", etc.)
+      '&'  -> true  -- Ampersand (for "Johnson & Johnson", etc.)
+      ','  -> true  -- Comma (for "Company, Inc.", etc.)
+      '('  -> true  -- Open paren (for "Company (UK)", etc.)
+      ')'  -> true  -- Close paren
+      _    -> false -- Everything else is forbidden
+
+-- | Smart constructor with strict validation.
 -- |
 -- | Returns Nothing if:
 -- |   - Trimmed string is empty
 -- |   - Trimmed string exceeds 256 characters
+-- |   - Contains any character not in the whitelist
+-- |   - Contains consecutive spaces (normalization failure)
+-- |
+-- | ## Blocked Vectors
+-- |
+-- | - XSS: `<script>` blocked (< and > not in whitelist)
+-- | - Path traversal: `../` blocked (/ not in whitelist)
+-- | - NULL injection: `\x00` blocked (control chars not in whitelist)
+-- | - Log poisoning: `\n` blocked (newlines not in whitelist)
+-- | - SQL injection: `'; DROP TABLE` blocked (' allowed but ; and semicolons not)
 brandName :: String -> Maybe BrandName
 brandName s =
   let 
     trimmed = String.trim s
     len = String.length trimmed
+    chars = String.toCharArray trimmed
+    
+    -- All characters must be in whitelist
+    allCharsValid = Array.length (Array.filter (not <<< isValidBrandNameChar) chars) == 0
+    
+    -- No consecutive spaces (prevents "Brand    Name" weirdness)
+    hasConsecutiveSpaces = String.contains (String.Pattern "  ") trimmed
   in 
-    if len >= 1 && len <= 256
+    if len >= 1 && len <= 256 && allCharsValid && not hasConsecutiveSpaces
     then Just (BrandName trimmed)
     else Nothing
 
@@ -139,9 +202,12 @@ brandName s =
 unBrandName :: BrandName -> String
 unBrandName (BrandName n) = n
 
--- | Unsafe constructor for deserialization from trusted sources.
-mkBrandNameUnsafe :: String -> BrandName
-mkBrandNameUnsafe = BrandName
+-- | Create brand name from pre-validated value.
+-- |
+-- | Use when value comes from a trusted source (e.g., database with validated data).
+-- | Caller guarantees the value passed validation.
+brandNameFromValidated :: String -> BrandName
+brandNameFromValidated = BrandName
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // uuid

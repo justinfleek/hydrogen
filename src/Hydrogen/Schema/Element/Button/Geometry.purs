@@ -28,10 +28,13 @@ import Prelude
   ( class Eq
   , class Show
   , show
+  , map
   , (<>)
   )
 
 import Data.Maybe (Maybe(Just, Nothing))
+
+import Hydrogen.Schema.Bounded as Bounded
 
 import Hydrogen.Schema.Geometry.CornerRadii
   ( CornerRadii
@@ -40,8 +43,10 @@ import Hydrogen.Schema.Geometry.CornerRadii
 
 import Hydrogen.Schema.Geometry.Spacing
   ( Padding
+  , SpacingValue
   , padding
   , spacingValue
+  , unwrapSpacing
   ) as Spacing
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -51,20 +56,27 @@ import Hydrogen.Schema.Geometry.Spacing
 -- | Geometry atoms for button layout.
 -- |
 -- | All spatial properties a button needs for layout calculation.
+-- |
+-- | ## Bounds
+-- |
+-- | - Dimensions: 1-10000 pixels when specified (Nothing = auto)
+-- | - Padding: 0-1000 pixels per edge (via SpacingValue)
+-- | - Gap: 0-1000 pixels (via SpacingValue)
+-- | - Corner radii: 0-1000 pixels per corner (via CornerRadii)
 type ButtonGeometry =
-  { -- Dimensions
+  { -- Dimensions (bounded 1-10000 when specified)
     width :: Maybe Number           -- ^ Explicit width (Nothing = auto)
   , height :: Maybe Number          -- ^ Explicit height (Nothing = auto)
   , minWidth :: Maybe Number        -- ^ Minimum width constraint
   , maxWidth :: Maybe Number        -- ^ Maximum width constraint
   , minHeight :: Maybe Number       -- ^ Minimum height constraint
   , maxHeight :: Maybe Number       -- ^ Maximum height constraint
-    -- Spacing
-  , paddingTop :: Number            -- ^ Top padding
-  , paddingRight :: Number          -- ^ Right padding
-  , paddingBottom :: Number         -- ^ Bottom padding
-  , paddingLeft :: Number           -- ^ Left padding
-  , gap :: Number                   -- ^ Gap between icon and label
+    -- Spacing (bounded via SpacingValue 0-1000)
+  , paddingTop :: Spacing.SpacingValue     -- ^ Top padding
+  , paddingRight :: Spacing.SpacingValue   -- ^ Right padding
+  , paddingBottom :: Spacing.SpacingValue  -- ^ Bottom padding
+  , paddingLeft :: Spacing.SpacingValue    -- ^ Left padding
+  , gap :: Spacing.SpacingValue            -- ^ Gap between icon and label
     -- Shape
   , cornerRadii :: Corner.CornerRadii  -- ^ Per-corner radius
   }
@@ -80,34 +92,44 @@ defaultGeometry =
   , maxWidth: Nothing
   , minHeight: Just 36.0
   , maxHeight: Nothing
-  , paddingTop: 8.0
-  , paddingRight: 12.0
-  , paddingBottom: 8.0
-  , paddingLeft: 12.0
-  , gap: 8.0
+  , paddingTop: Spacing.spacingValue 8.0
+  , paddingRight: Spacing.spacingValue 12.0
+  , paddingBottom: Spacing.spacingValue 8.0
+  , paddingLeft: Spacing.spacingValue 12.0
+  , gap: Spacing.spacingValue 8.0
   , cornerRadii: Corner.uniform 8.0
   }
 
--- | Create custom geometry.
+-- | Clamp a dimension to valid button size range (1-10000 pixels).
+-- |
+-- | Nothing remains Nothing (auto sizing).
+-- | Just values are clamped to 1-10000.
+clampDimension :: Maybe Number -> Maybe Number
+clampDimension = map (Bounded.clampNumber 1.0 10000.0)
+
+-- | Create custom geometry with bounded values.
+-- |
+-- | All dimensions are clamped to 1-10000 pixels.
+-- | All spacing is clamped to 0-1000 pixels via SpacingValue.
 mkGeometry
-  :: Maybe Number          -- ^ Width
-  -> Maybe Number          -- ^ Height
-  -> Number                -- ^ Padding X
-  -> Number                -- ^ Padding Y
-  -> Number                -- ^ Corner radius (uniform)
+  :: Maybe Number          -- ^ Width (clamped 1-10000)
+  -> Maybe Number          -- ^ Height (clamped 1-10000)
+  -> Number                -- ^ Padding X (clamped 0-1000)
+  -> Number                -- ^ Padding Y (clamped 0-1000)
+  -> Number                -- ^ Corner radius (uniform, clamped via CornerRadii)
   -> ButtonGeometry
 mkGeometry w h px py r =
-  { width: w
-  , height: h
+  { width: clampDimension w
+  , height: clampDimension h
   , minWidth: Nothing
   , maxWidth: Nothing
   , minHeight: Just 36.0
   , maxHeight: Nothing
-  , paddingTop: py
-  , paddingRight: px
-  , paddingBottom: py
-  , paddingLeft: px
-  , gap: 8.0
+  , paddingTop: Spacing.spacingValue py
+  , paddingRight: Spacing.spacingValue px
+  , paddingBottom: Spacing.spacingValue py
+  , paddingLeft: Spacing.spacingValue px
+  , gap: Spacing.spacingValue 8.0
   , cornerRadii: Corner.uniform r
   }
 
@@ -126,10 +148,10 @@ geoHeight g = g.height
 -- | Get padding as Spacing.Padding.
 geoPadding :: ButtonGeometry -> Spacing.Padding
 geoPadding g = Spacing.padding
-  (Spacing.spacingValue g.paddingTop)
-  (Spacing.spacingValue g.paddingRight)
-  (Spacing.spacingValue g.paddingBottom)
-  (Spacing.spacingValue g.paddingLeft)
+  g.paddingTop
+  g.paddingRight
+  g.paddingBottom
+  g.paddingLeft
 
 -- | Get corner radii.
 geoCornerRadii :: ButtonGeometry -> Corner.CornerRadii

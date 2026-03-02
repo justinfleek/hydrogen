@@ -53,7 +53,7 @@ module Hydrogen.Schema.Navigation.Index
   -- * Index (Position)
   , Index(Index)
   , index
-  , unsafeIndex
+  , indexFromValidated
   , unwrapIndex
   , indexBounds
   , isFirst
@@ -84,6 +84,12 @@ module Hydrogen.Schema.Navigation.Index
   , remaining
   , distanceToEnd
   , distanceToStart
+  
+  -- * Range Operations
+  , indexAtPercent
+  , isInRange
+  , isAtOrAfter
+  , isAtOrBefore
   ) where
 
 import Prelude
@@ -107,7 +113,7 @@ import Prelude
   , (<>)
   )
 
-import Data.Int (toNumber)
+import Data.Int (toNumber, floor)
 import Hydrogen.Schema.Bounded (IntBounds, intBounds, clampInt, BoundsBehavior(Clamps)) as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -198,11 +204,18 @@ instance showIndex :: Show Index where
 index :: Int -> Index
 index n = Index (Bounded.clampInt 0 9999 n)
 
--- | Create an index without bounds checking
+-- | Create an index from a pre-validated value.
 -- |
--- | Only use when you've already validated the value.
-unsafeIndex :: Int -> Index
-unsafeIndex = Index
+-- | Use when the value has already been validated (e.g., from IndexedPosition
+-- | operations that maintain invariants). Prefer `index` for user input.
+-- |
+-- | ## Why Not "unsafe"
+-- |
+-- | The name "unsafeX" implies undefined behavior or crashes. This function
+-- | doesn't crash — it just skips redundant validation. The name "fromValidated"
+-- | makes the contract clear: caller guarantees validity.
+indexFromValidated :: Int -> Index
+indexFromValidated = Index
 
 -- | Extract raw index value
 unwrapIndex :: Index -> Int
@@ -367,6 +380,64 @@ distanceToEnd = remaining
 -- | Distance to start (same as current index)
 distanceToStart :: IndexedPosition -> Int
 distanceToStart = position
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // range operations
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Get index at given percentage through the sequence.
+-- |
+-- | ```purescript
+-- | indexAtPercent 0.0 (indexedPosition 0 10 Clamp)   -- 0
+-- | indexAtPercent 0.5 (indexedPosition 0 10 Clamp)   -- 5
+-- | indexAtPercent 1.0 (indexedPosition 0 10 Clamp)   -- 9
+-- | indexAtPercent 0.33 (indexedPosition 0 100 Clamp) -- 33
+-- | ```
+-- |
+-- | Percentage is clamped to [0.0, 1.0].
+-- | Returns 0 for empty sequences.
+-- | NaN and Infinity return 0 (safe fallback from Data.Int.floor).
+indexAtPercent :: Number -> IndexedPosition -> Int
+indexAtPercent percent ip =
+  let
+    cnt = total ip
+    -- Clamp percentage to valid range
+    clampedPercent = if percent < 0.0 then 0.0 
+                     else if percent > 1.0 then 1.0 
+                     else percent
+  in
+    if cnt <= 0 
+      then 0
+      else 
+        -- Multiply last valid index by percentage
+        let lastIdx = cnt - 1
+            scaled = toNumber lastIdx * clampedPercent
+            -- floor handles NaN/Infinity safely (returns 0)
+        in Bounded.clampInt 0 lastIdx (floor scaled)
+
+-- | Is current position within an inclusive range?
+-- |
+-- | ```purescript
+-- | isInRange 2 5 (indexedPosition 3 10 Clamp)  -- true (3 is in [2,5])
+-- | isInRange 2 5 (indexedPosition 1 10 Clamp)  -- false (1 is not in [2,5])
+-- | isInRange 2 5 (indexedPosition 6 10 Clamp)  -- false (6 is not in [2,5])
+-- | ```
+isInRange :: Int -> Int -> IndexedPosition -> Boolean
+isInRange minIdx maxIdx ip =
+  let idx = position ip
+  in idx >= minIdx && idx <= maxIdx
+
+-- | Is current position at or after a target index?
+-- |
+-- | Useful for progress indicators: "have we reached step N yet?"
+isAtOrAfter :: Int -> IndexedPosition -> Boolean
+isAtOrAfter target ip = position ip >= target
+
+-- | Is current position at or before a target index?
+-- |
+-- | Useful for guards: "are we still before the dangerous section?"
+isAtOrBefore :: Int -> IndexedPosition -> Boolean
+isAtOrBefore target ip = position ip <= target
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // internal

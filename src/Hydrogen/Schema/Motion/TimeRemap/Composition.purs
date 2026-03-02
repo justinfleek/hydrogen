@@ -81,6 +81,7 @@ import Hydrogen.Schema.Motion.TimeRemap.Evaluation
   )
 import Hydrogen.Schema.Motion.TimeRemap.Internal 
   ( clamp01
+  , clampSpeed
   , epsilon
   , infinity
   , buildArray
@@ -91,16 +92,20 @@ import Hydrogen.Schema.Motion.TimeRemap.Internal
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Compose two remaps (apply first, then second).
+-- |
+-- | **BOUNDED**: All speed values are clamped after multiplication to prevent
+-- | exponential compounding at billion-agent scale. Without this, repeated
+-- | composition could overflow numeric bounds.
 compose :: TimeRemap -> TimeRemap -> TimeRemap
 compose first second =
-  -- Simplified: multiply speed factors
+  -- Multiply speed factors with clamping for swarm safety
   let (TimeRemap f) = first
       (TimeRemap s) = second
   in TimeRemap
     { mode: LinearRemap
-    , speedFactor: f.speedFactor * s.speedFactor
-    , startSpeed: f.startSpeed * s.startSpeed
-    , endSpeed: f.endSpeed * s.endSpeed
+    , speedFactor: clampSpeed (f.speedFactor * s.speedFactor)
+    , startSpeed: clampSpeed (f.startSpeed * s.startSpeed)
+    , endSpeed: clampSpeed (f.endSpeed * s.endSpeed)
     , originalDuration: f.originalDuration
     , keyframes: []
     }

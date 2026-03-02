@@ -86,6 +86,12 @@ module Hydrogen.Render.Element.HTML
   
   -- * Script Elements
   , script_
+  
+  -- * Document Structure Elements
+  , html_
+  , head_
+  , body_
+  , title_
   ) where
 
 import Hydrogen.Render.Element.Types (Attribute, Element)
@@ -302,3 +308,23 @@ link_ attrs = element "link" attrs []
 -- | Script element
 script_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
 script_ = element "script"
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // document // structure
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | HTML root element
+html_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
+html_ = element "html"
+
+-- | Head element (contains meta, title, link, script)
+head_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
+head_ = element "head"
+
+-- | Body element (contains visible content)
+body_ :: forall msg. Array (Attribute msg) -> Array (Element msg) -> Element msg
+body_ = element "body"
+
+-- | Title element (document title in head)
+title_ :: forall msg. Array (Element msg) -> Element msg
+title_ = element "title" []

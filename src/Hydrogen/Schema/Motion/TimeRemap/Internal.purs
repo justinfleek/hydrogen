@@ -28,6 +28,11 @@ module Hydrogen.Schema.Motion.TimeRemap.Internal
   , epsilon
   , infinity
   
+  -- * Speed Bounds (CRITICAL for billion-agent scale)
+  , maxSpeedFactor
+  , minSpeedFactor
+  , clampSpeed
+  
   -- * Array Utilities
   , buildArray
   , buildIntArray
@@ -56,9 +61,11 @@ import Prelude
   , (<=)
   , (>=)
   , (==)
+  , (&&)
   , otherwise
   , min
   , max
+  , negate
   )
 
 import Data.Array (length, index, snoc, foldl, sortBy)
@@ -116,6 +123,37 @@ epsilon = 1.0e-10
 -- | Large number for min comparisons
 infinity :: Number
 infinity = 1.0e308
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                              // speed bounds // billion agent
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Maximum speed value to prevent exponential blowup at billion-agent scale.
+-- |
+-- | At 1000x playback, a 1-hour video plays in 3.6 seconds.
+-- | At 10000x, it's 360ms — beyond useful. Clamp here.
+maxSpeedFactor :: Number
+maxSpeedFactor = 1000.0
+
+-- | Minimum speed value (prevents division-by-zero and near-infinite durations).
+-- |
+-- | At 0.001x speed, a 1-second clip takes 1000 seconds (16+ minutes).
+-- | Below this is effectively a freeze frame — use FreezeRemap instead.
+minSpeedFactor :: Number
+minSpeedFactor = 0.001
+
+-- | Clamp a speed value to valid bounds.
+-- |
+-- | **CRITICAL**: All speed multiplications MUST go through this function.
+-- | Without clamping, repeated normalizations can compound exponentially,
+-- | causing numeric overflow at swarm scale.
+clampSpeed :: Number -> Number
+clampSpeed s
+  | s > maxSpeedFactor = maxSpeedFactor
+  | s < negate maxSpeedFactor = negate maxSpeedFactor
+  | s > 0.0 && s < minSpeedFactor = minSpeedFactor
+  | s < 0.0 && s > negate minSpeedFactor = negate minSpeedFactor
+  | otherwise = s
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // array utilities

@@ -15,6 +15,21 @@
 -- | 3. Iteratively pivoting to improve the objective
 -- | 4. Terminating at optimality or detecting unboundedness
 -- |
+-- | ## Two-Phase Method
+-- |
+-- | For general problems with ≥ constraints, = constraints, or negative RHS:
+-- |
+-- | Phase 1: Find a basic feasible solution
+-- |   - Add artificial variables for infeasible constraints
+-- |   - Minimize sum of artificial variables
+-- |   - If minimum = 0, original problem is feasible
+-- |   - If minimum > 0, original problem is infeasible
+-- |
+-- | Phase 2: Optimize original objective
+-- |   - Remove artificial variables from tableau
+-- |   - Replace Phase 1 objective with original objective
+-- |   - Run standard simplex to optimality
+-- |
 -- | ## Why Pure Simplex?
 -- |
 -- | At billion-agent scale, we need deterministic, auditable solving.
@@ -26,6 +41,7 @@ module Hydrogen.Layout.ILP.Simplex
   ( -- * Tableau
     Tableau
   , initTableau
+  , initTableauTwoPhase
   
     -- * Solving
   , SimplexResult
@@ -36,6 +52,8 @@ module Hydrogen.Layout.ILP.Simplex
       )
   , solveSimplex
   , solveLP
+  , solvePhaseOne
+  , solvePhaseTwo
   
     -- * Tableau Operations
   , pivot
@@ -49,6 +67,7 @@ module Hydrogen.Layout.ILP.Simplex
   , constraintMultiplier
   , extractVariableValues
   , getObjectiveValue
+  , needsTwoPhase
   
     -- * Validation
   , isValidTableau
@@ -81,7 +100,7 @@ import Prelude
   , not
   )
 
-import Data.Array (length, index, updateAt, snoc, replicate, filter, all, mapWithIndex) as Array
+import Data.Array (length, index, updateAt, snoc, replicate, filter, all, any, mapWithIndex, take) as Array
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Foldable (foldl)
@@ -92,6 +111,7 @@ import Hydrogen.Layout.ILP.Problem
   , SolveStatus(..)
   , Sense(..)
   , ConstraintSense(..)
+  , ConstraintRow
   , VarId
   , numVariables
   , numConstraints
@@ -148,7 +168,7 @@ derive instance eqSimplexResult :: Eq SimplexResult
 -- |
 -- | Converts to standard form by adding slack variables.
 -- | Assumes all constraints are ≤ with non-negative RHS.
--- | For general problems, use the two-phase method (not implemented here).
+-- | For general problems, use `initTableauTwoPhase` instead.
 initTableau :: ILPProblem -> Tableau
 initTableau prob =
   let
@@ -209,6 +229,409 @@ buildConstraintRows prob n m =
     in
       withRHS
   ) prob.constraints
+
+-- | Check if problem requires two-phase method.
+-- |
+-- | Two-phase is needed when:
+-- | 1. Any constraint has negative RHS (after converting to standard form)
+-- | 2. Any constraint is ≥ type (requires surplus variable, no initial basic)
+-- | 3. Any constraint is = type (no slack variable, needs artificial)
+needsTwoPhase :: ILPProblem -> Boolean
+needsTwoPhase prob =
+  Array.any constraintNeedsTwoPhase prob.constraints
+  where
+    constraintNeedsTwoPhase :: ConstraintRow -> Boolean
+    constraintNeedsTwoPhase constraint =
+      case constraint.sense of
+        Le -> constraint.rhs < 0.0  -- Negative RHS makes slack negative
+        Ge -> true                   -- ≥ constraints always need artificial
+        Eq -> true                   -- = constraints always need artificial
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                           // two-phase method
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Initialize tableau for two-phase method.
+-- |
+-- | Handles general constraints by:
+-- | 1. Converting ≥ constraints: ax ≥ b → ax - s + a = b (surplus + artificial)
+-- | 2. Converting = constraints: ax = b → ax + a = b (artificial only)
+-- | 3. Converting ≤ with negative RHS: multiply by -1 to get ≥ form
+-- | 4. Building Phase 1 objective: minimize sum of artificial variables
+-- |
+-- | Structure of Phase 1 tableau:
+-- | ```
+-- |   | x₁ ... xₙ | s₁ ... sₘ | a₁ ... aₖ | RHS |
+-- | --|-----------|-----------|-----------|-----|
+-- | w | 0  ...  0 | 0  ...  0 | 1  ...  1 | 0   |  <- Phase 1 objective
+-- | --|-----------|-----------|-----------|-----|
+-- |   |           |           |           |     |  <- Constraint rows
+-- | ```
+-- |
+-- | Returns tableau with numOrigVars = n, numSlackVars = m + k (slack + artificial)
+initTableauTwoPhase :: ILPProblem -> Tableau
+initTableauTwoPhase prob =
+  let
+    minProb = toMinimization prob
+    n = numVariables minProb
+    m = numConstraints minProb
+    
+    -- Count artificial variables needed
+    numArtificial = countArtificialVars minProb
+    
+    -- Total columns: n original + m slack/surplus + numArtificial + 1 RHS
+    totalCols = n + m + numArtificial + 1
+    
+    -- Build constraint rows with slack/surplus and artificial variables
+    constraintRowsWithInfo = buildTwoPhaseConstraintRows minProb n m numArtificial
+    constraintRows = mapArray fst constraintRowsWithInfo
+    basicVarsRaw = mapArray snd constraintRowsWithInfo
+    
+    -- Build Phase 1 objective: minimize sum of artificial variables
+    -- Initially all zeros, then make artificial vars basic by elimination
+    phase1Obj = buildPhase1Objective n m numArtificial totalCols constraintRows basicVarsRaw
+  in
+    { rows: Array.snoc constraintRows phase1Obj
+    , numOrigVars: n
+    , numSlackVars: m + numArtificial  -- Include artificial in "slack" count
+    , basicVars: basicVarsRaw
+    }
+
+-- | Count how many artificial variables are needed.
+countArtificialVars :: ILPProblem -> Int
+countArtificialVars prob =
+  foldl (\count constraint ->
+    case constraint.sense of
+      Le -> if constraint.rhs < 0.0 then count + 1 else count
+      Ge -> count + 1
+      Eq -> count + 1
+  ) 0 prob.constraints
+
+-- | Build constraint rows for two-phase method.
+-- |
+-- | Returns array of (row, basicVarIndex) pairs.
+-- | Handles each constraint type appropriately:
+-- | - Le with positive RHS: slack variable is basic
+-- | - Le with negative RHS: multiply by -1, add artificial
+-- | - Ge: add surplus (negative slack), add artificial
+-- | - Eq: add artificial only
+buildTwoPhaseConstraintRows :: ILPProblem -> Int -> Int -> Int -> Array (Tuple (Array Number) Int)
+buildTwoPhaseConstraintRows prob n m numArt =
+  let
+    totalCols = n + m + numArt + 1
+    rhsCol = n + m + numArt
+  in
+    snd $ foldl (\(Tuple artIdx acc) (Tuple constraintIdx constraint) ->
+      buildOneConstraintRow n m totalCols rhsCol artIdx constraintIdx constraint acc
+    ) (Tuple 0 []) (indexedConstraints prob.constraints)
+
+-- | Index constraints with their position.
+indexedConstraints :: Array ConstraintRow -> Array (Tuple Int ConstraintRow)
+indexedConstraints constraints = 
+  Array.mapWithIndex (\i c -> Tuple i c) constraints
+
+-- | Build a single constraint row for two-phase tableau.
+buildOneConstraintRow 
+  :: Int                                    -- n: original vars
+  -> Int                                    -- m: constraints (slack vars)
+  -> Int                                    -- total columns
+  -> Int                                    -- RHS column index
+  -> Int                                    -- current artificial variable index
+  -> Int                                    -- constraint index
+  -> ConstraintRow                          -- the constraint
+  -> Array (Tuple (Array Number) Int)       -- accumulated rows
+  -> Tuple Int (Array (Tuple (Array Number) Int))
+buildOneConstraintRow n m totalCols rhsCol artIdx constraintIdx constraint acc =
+  let
+    -- Base row with zeros
+    baseRow = Array.replicate totalCols 0.0
+    
+    -- Slack/surplus variable position for this constraint
+    slackPos = n + constraintIdx
+    
+    -- Artificial variable position (if needed)
+    artificialPos = n + m + artIdx
+  in
+    case constraint.sense of
+      Le ->
+        if constraint.rhs >= 0.0
+          then
+            -- Standard ≤: add slack variable
+            let
+              row = fillConstraintCoeffs constraint.coeffs baseRow
+              withSlack = setAt slackPos 1.0 row
+              withRHS = setAt rhsCol constraint.rhs withSlack
+            in
+              Tuple artIdx (Array.snoc acc (Tuple withRHS slackPos))
+          else
+            -- Negative RHS: multiply by -1 to get ≥ form, add artificial
+            let
+              -- Negate coefficients and RHS
+              row = fillNegatedConstraintCoeffs constraint.coeffs baseRow
+              -- Surplus variable (negative slack)
+              withSurplus = setAt slackPos (negate 1.0) row
+              -- Artificial variable
+              withArtificial = setAt artificialPos 1.0 withSurplus
+              withRHS = setAt rhsCol (negate constraint.rhs) withArtificial
+            in
+              Tuple (artIdx + 1) (Array.snoc acc (Tuple withRHS artificialPos))
+      
+      Ge ->
+        -- ax ≥ b: add surplus (-s) and artificial (+a)
+        let
+          row = fillConstraintCoeffs constraint.coeffs baseRow
+          -- Surplus variable (coefficient -1)
+          withSurplus = setAt slackPos (negate 1.0) row
+          -- Artificial variable (coefficient +1)
+          withArtificial = setAt artificialPos 1.0 withSurplus
+          withRHS = setAt rhsCol constraint.rhs withArtificial
+        in
+          Tuple (artIdx + 1) (Array.snoc acc (Tuple withRHS artificialPos))
+      
+      Eq ->
+        -- ax = b: add artificial only
+        let
+          row = fillConstraintCoeffs constraint.coeffs baseRow
+          -- No slack variable for equality
+          -- Artificial variable
+          withArtificial = setAt artificialPos 1.0 row
+          withRHS = setAt rhsCol constraint.rhs withArtificial
+        in
+          Tuple (artIdx + 1) (Array.snoc acc (Tuple withRHS artificialPos))
+
+-- | Fill constraint coefficients into row.
+fillConstraintCoeffs :: Array (Tuple VarId Number) -> Array Number -> Array Number
+fillConstraintCoeffs coeffs row =
+  foldl (\r (Tuple varId c) -> setAt varId c r) row coeffs
+
+-- | Fill negated constraint coefficients into row.
+fillNegatedConstraintCoeffs :: Array (Tuple VarId Number) -> Array Number -> Array Number
+fillNegatedConstraintCoeffs coeffs row =
+  foldl (\r (Tuple varId c) -> setAt varId (negate c) r) row coeffs
+
+-- | Build Phase 1 objective row.
+-- |
+-- | Phase 1 minimizes sum of artificial variables.
+-- | Initial objective: [0...0, 1...1, 0] for artificial vars
+-- | Then eliminate artificial vars from objective using constraint rows.
+buildPhase1Objective :: Int -> Int -> Int -> Int -> Array (Array Number) -> Array Int -> Array Number
+buildPhase1Objective n m numArt totalCols constraintRows basicVars =
+  let
+    -- Start with zeros
+    baseObj = Array.replicate totalCols 0.0
+    
+    -- Set coefficient 1 for each artificial variable
+    artStart = n + m
+    withArtCoeffs = foldl (\obj i ->
+      setAt (artStart + i) 1.0 obj
+    ) baseObj (range 0 (numArt - 1))
+    
+    -- Eliminate artificial variables from objective row
+    -- For each basic artificial variable, subtract its row from objective
+    eliminated = eliminateArtificialFromObjective withArtCoeffs constraintRows basicVars artStart (n + m + numArt)
+  in
+    eliminated
+
+-- | Eliminate artificial variables from Phase 1 objective.
+-- |
+-- | For each row where an artificial variable is basic,
+-- | subtract that row from the objective to make the artificial's
+-- | coefficient zero (standard simplex form requirement).
+eliminateArtificialFromObjective :: Array Number -> Array (Array Number) -> Array Int -> Int -> Int -> Array Number
+eliminateArtificialFromObjective obj constraintRows basicVars artStart artEnd =
+  foldl (\currentObj (Tuple rowIdx basicVar) ->
+    if basicVar >= artStart && basicVar < artEnd
+      then
+        -- This row has an artificial as basic, eliminate it
+        case Array.index constraintRows rowIdx of
+          Nothing -> currentObj
+          Just row -> subtractRow currentObj row
+      else
+        currentObj
+  ) obj (indexedArray basicVars)
+
+-- | Index an array with positions.
+indexedArray :: forall a. Array a -> Array (Tuple Int a)
+indexedArray arr = Array.mapWithIndex (\i x -> Tuple i x) arr
+
+-- | Subtract row from objective.
+subtractRow :: Array Number -> Array Number -> Array Number
+subtractRow obj row = zipWithArray (\o r -> o - r) obj row
+
+-- | Solve Phase 1 of two-phase simplex.
+-- |
+-- | Minimizes sum of artificial variables.
+-- | If optimal value is 0 (within tolerance), original problem is feasible.
+-- | If optimal value > 0, original problem is infeasible.
+solvePhaseOne :: Tableau -> SimplexResult
+solvePhaseOne tab =
+  let
+    result = solveSimplex tab
+  in
+    case result of
+      SimplexOptimal optTab ->
+        -- Check if Phase 1 objective is zero (feasible original problem)
+        let
+          rhsCol = optTab.numOrigVars + optTab.numSlackVars
+          phase1Value = getPhase1ObjectiveValue optTab rhsCol
+        in
+          if phase1Value <= tolerance
+            then SimplexOptimal optTab
+            else SimplexInfeasible
+      SimplexUnbounded -> 
+        -- Phase 1 unbounded means something went wrong
+        -- (sum of non-negative variables can't be unbounded below)
+        SimplexInfeasible
+      SimplexInfeasible -> SimplexInfeasible
+      SimplexMaxIter partialTab -> SimplexMaxIter partialTab
+
+-- | Get Phase 1 objective value (not negated like regular objective).
+getPhase1ObjectiveValue :: Tableau -> Int -> Number
+getPhase1ObjectiveValue tab rhsCol =
+  let
+    objRowIdx = Array.length tab.rows - 1
+  in
+    case Array.index tab.rows objRowIdx of
+      Nothing -> 0.0
+      Just objRow -> 
+        -- Phase 1 objective is stored without negation
+        negate (fromMaybe 0.0 (Array.index objRow rhsCol))
+
+-- | Solve Phase 2 of two-phase simplex.
+-- |
+-- | Takes the feasible tableau from Phase 1 and optimizes the original objective.
+-- | Steps:
+-- | 1. Remove artificial variable columns from tableau
+-- | 2. Replace Phase 1 objective with original problem objective
+-- | 3. Eliminate basic variables from objective row
+-- | 4. Run standard simplex
+solvePhaseTwo :: Tableau -> ILPProblem -> Solution
+solvePhaseTwo phase1Tab prob =
+  let
+    minProb = toMinimization prob
+    n = numVariables minProb
+    m = numConstraints minProb
+    
+    -- Count artificial variables to remove
+    numArt = countArtificialVars minProb
+    
+    -- Build Phase 2 tableau: remove artificial columns, set original objective
+    phase2Tab = buildPhase2Tableau phase1Tab minProb n m numArt
+    
+    -- Run standard simplex on Phase 2 tableau
+    result = solveSimplex phase2Tab
+  in
+    case result of
+      SimplexOptimal optTab -> extractSolution optTab prob
+      SimplexUnbounded -> 
+        { status: Unbounded
+        , values: []
+        , objectiveValue: Nothing
+        }
+      SimplexInfeasible -> infeasibleSolution
+      SimplexMaxIter partialTab ->
+        let
+          values = extractVariableValues partialTab partialTab.numOrigVars
+                     (partialTab.numOrigVars + partialTab.numSlackVars)
+          objVal = getObjectiveValue partialTab
+                     (partialTab.numOrigVars + partialTab.numSlackVars)
+        in
+          feasibleSolution values objVal
+
+-- | Build Phase 2 tableau from Phase 1 result.
+-- |
+-- | Removes artificial variable columns and replaces objective.
+buildPhase2Tableau :: Tableau -> ILPProblem -> Int -> Int -> Int -> Tableau
+buildPhase2Tableau phase1Tab prob n m numArt =
+  let
+    -- New dimensions: remove artificial columns
+    newTotalCols = n + m + 1
+    
+    -- Remove artificial columns from each row
+    newConstraintRows = mapArray (removeArtificialColumns n m numArt) 
+                          (Array.take (Array.length phase1Tab.rows - 1) phase1Tab.rows)
+    
+    -- Build new objective row
+    newObjRow = buildPhase2Objective prob newTotalCols
+    
+    -- Eliminate basic variables from objective
+    eliminatedObj = eliminateBasicsFromObjective newObjRow newConstraintRows phase1Tab.basicVars n m
+    
+    -- Update basic variables: any that pointed to artificial need updating
+    -- (They should have been pivoted out in Phase 1, but verify)
+    newBasics = updateBasicVarsForPhase2 phase1Tab.basicVars n m
+  in
+    { rows: Array.snoc newConstraintRows eliminatedObj
+    , numOrigVars: n
+    , numSlackVars: m
+    , basicVars: newBasics
+    }
+
+-- | Remove artificial variable columns from a row.
+removeArtificialColumns :: Int -> Int -> Int -> Array Number -> Array Number
+removeArtificialColumns n m numArt row =
+  let
+    -- Keep columns 0 to (n + m - 1) and the last column (RHS)
+    firstPart = Array.take (n + m) row
+    lastCol = fromMaybe 0.0 (Array.index row (n + m + numArt))
+  in
+    Array.snoc firstPart lastCol
+
+-- | Build Phase 2 objective row (original problem objective).
+buildPhase2Objective :: ILPProblem -> Int -> Array Number
+buildPhase2Objective prob totalCols =
+  let
+    -- Start with zeros
+    coeffs = Array.replicate totalCols 0.0
+    -- Fill in objective coefficients (negated for minimization form)
+    withObj = foldl (\arr (Tuple varId c) ->
+      setAt varId (negate c) arr
+    ) coeffs prob.objective
+  in
+    withObj
+
+-- | Eliminate basic variables from Phase 2 objective row.
+-- |
+-- | For each basic variable, ensure its coefficient in objective is zero.
+eliminateBasicsFromObjective :: Array Number -> Array (Array Number) -> Array Int -> Int -> Int -> Array Number
+eliminateBasicsFromObjective obj constraintRows basicVars n m =
+  foldl (\currentObj (Tuple rowIdx basicVar) ->
+    if basicVar < n + m
+      then
+        -- Only process if basic var is original or slack (not artificial)
+        let
+          coeff = fromMaybe 0.0 (Array.index currentObj basicVar)
+        in
+          if coeff /= 0.0
+            then
+              case Array.index constraintRows rowIdx of
+                Nothing -> currentObj
+                Just row -> 
+                  -- Subtract coeff * row from objective
+                  zipWithArray (\o r -> o - coeff * r) currentObj row
+            else
+              currentObj
+      else
+        currentObj
+  ) obj (indexedArray basicVars)
+
+-- | Update basic variables for Phase 2.
+-- |
+-- | Any basic variable that was artificial needs to be handled.
+-- | In a properly executed Phase 1, artificials should have been pivoted out.
+-- | If any remain (degenerate case), they stay at zero value.
+updateBasicVarsForPhase2 :: Array Int -> Int -> Int -> Array Int
+updateBasicVarsForPhase2 basicVars n m =
+  mapArray (\basicVar ->
+    if basicVar >= n + m
+      then
+        -- Artificial variable - should have been pivoted out
+        -- Mark as invalid (will cause issues if not handled)
+        -- In practice, Phase 1 should have removed these
+        basicVar  -- Keep as-is, extractSolution will handle
+      else
+        basicVar
+  ) basicVars
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                // pivot selection
@@ -391,8 +814,19 @@ simplexLoop tab iter
               in simplexLoop newTab (iter + 1)
 
 -- | Solve LP relaxation of an ILP problem.
+-- |
+-- | Automatically selects between single-phase and two-phase method:
+-- | - Single-phase: Used when all constraints are ≤ with non-negative RHS
+-- | - Two-phase: Used for ≥, =, or negative RHS constraints
 solveLP :: ILPProblem -> Solution
 solveLP prob =
+  if needsTwoPhase prob
+    then solveLPTwoPhase prob
+    else solveLPSinglePhase prob
+
+-- | Solve LP using single-phase simplex (simple case).
+solveLPSinglePhase :: ILPProblem -> Solution
+solveLPSinglePhase prob =
   let
     tab = initTableau prob
     result = solveSimplex tab
@@ -414,6 +848,26 @@ solveLP prob =
                      (partialTab.numOrigVars + partialTab.numSlackVars)
         in
           feasibleSolution values objVal
+
+-- | Solve LP using two-phase simplex (general case).
+solveLPTwoPhase :: ILPProblem -> Solution
+solveLPTwoPhase prob =
+  let
+    -- Phase 1: Find basic feasible solution
+    phase1Tab = initTableauTwoPhase prob
+    phase1Result = solvePhaseOne phase1Tab
+  in
+    case phase1Result of
+      SimplexOptimal feasibleTab ->
+        -- Phase 1 succeeded, run Phase 2 with original objective
+        solvePhaseTwo feasibleTab prob
+      SimplexInfeasible -> infeasibleSolution
+      SimplexUnbounded ->
+        -- Phase 1 unbounded is an internal error (shouldn't happen)
+        infeasibleSolution
+      SimplexMaxIter _ ->
+        -- Hit iteration limit in Phase 1
+        infeasibleSolution
 
 -- | Check if problem sense requires negation for standard form.
 needsNegation :: Sense -> Boolean
