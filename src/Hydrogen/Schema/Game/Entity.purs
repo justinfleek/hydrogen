@@ -146,6 +146,15 @@ module Hydrogen.Schema.Game.Entity
   , setState
   , reflectVelocityX
   , reflectVelocityY
+  
+  -- * Convenience Aliases
+  , entity
+  , position2D
+  , velocity2D
+  , gameRectangle
+  , isActive
+  , isDestroyed
+  , isFrozen
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -164,7 +173,7 @@ import Prelude
   , (#)
   )
 
-import Hydrogen.Schema.Color.OKLCH (OKLCH)
+import Hydrogen.Schema.Color.OKLCH (OKLCH, oklch)
 import Hydrogen.Schema.Brush.Tilt.Atoms (TiltX, TiltY, unwrapTiltX, unwrapTiltY)
 import Hydrogen.Schema.Bounded as Bounded
 
@@ -821,3 +830,56 @@ applyPhysics dt entity =
   entity
     # applyAcceleration dt
     # applyVelocity dt
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                       // convenience // aliases
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Default entity color (neutral gray).
+-- |
+-- | L=0.5 (middle lightness), C=0 (no chroma/gray), H=0 (arbitrary when gray).
+defaultEntityColor :: OKLCH
+defaultEntityColor = oklch 0.5 0.0 0
+
+-- | Create an entity (simplified constructor for test compatibility).
+-- |
+-- | Uses default color (gray) and no behaviors.
+entity :: Int -> Position2D -> Velocity2D -> GameShape -> Entity
+entity eid pos vel shape = mkEntity (mkEntityId eid)
+  { position: pos
+  , velocity: vel
+  , acceleration: zeroAcceleration
+  , shape: shape
+  , color: defaultEntityColor
+  , behaviors: []
+  }
+
+-- | Create a 2D position (alias for mkPosition).
+position2D :: Number -> Number -> Position2D
+position2D = mkPosition
+
+-- | Create a 2D velocity (alias for mkVelocity).
+velocity2D :: Number -> Number -> Velocity2D
+velocity2D = mkVelocity
+
+-- | Create a rectangle shape (alias for rectangleShape).
+gameRectangle :: Number -> Number -> GameShape
+gameRectangle = rectangleShape
+
+-- | Check if entity is in Active state.
+isActive :: Entity -> Boolean
+isActive e = case e.state of
+  Active -> true
+  _ -> false
+
+-- | Check if entity is in Destroyed state.
+isDestroyed :: Entity -> Boolean
+isDestroyed e = case e.state of
+  Destroyed -> true
+  _ -> false
+
+-- | Check if entity is in Frozen state.
+isFrozen :: Entity -> Boolean
+isFrozen e = case e.state of
+  Frozen -> true
+  _ -> false

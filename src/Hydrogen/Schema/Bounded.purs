@@ -43,6 +43,8 @@ module Hydrogen.Schema.Bounded
   -- * Finite Number Handling
   , ensureFinite
   , isFiniteNumber
+  , requireFinite
+  , rejectNonFinite
   
   -- * Validation
   , inBoundsInt
@@ -91,6 +93,7 @@ import Prelude
   , (<>)
   )
 
+import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (floor) as Number
 
@@ -310,6 +313,41 @@ ensureFinite :: Number -> Number -> Number
 ensureFinite n fallback
   | isFiniteNumber n = n
   | otherwise = fallback
+
+-- | Require a number to be finite, returning Nothing for NaN/Infinity.
+-- |
+-- | This is the **correct** approach for input validation:
+-- | ```purescript
+-- | requireFinite 42.0         -- Just 42.0
+-- | requireFinite (1.0 / 0.0)  -- Nothing (Infinity rejected)
+-- | requireFinite (0.0 / 0.0)  -- Nothing (NaN rejected)
+-- | ```
+-- |
+-- | ## Security Model
+-- |
+-- | NaN and Infinity are **attack vectors**. A malicious actor crafting
+-- | `0.0 / 0.0` or `1.0 / 0.0` can bypass bounds checks (NaN fails all
+-- | comparisons, Infinity exceeds all bounds but may slip through).
+-- |
+-- | **Rejecting** these values at the boundary is the only safe approach.
+-- | Silent clamping masks the attack; rejection surfaces it.
+requireFinite :: Number -> Maybe Number
+requireFinite n
+  | isFiniteNumber n = Just n
+  | otherwise = Nothing
+
+-- | Reject non-finite numbers, returning an error message.
+-- |
+-- | For APIs that need to report WHY a value was rejected:
+-- | ```purescript
+-- | rejectNonFinite "fps" (1.0 / 0.0)  
+-- |   -- Left "fps: Infinity is not a valid finite number"
+-- | ```
+rejectNonFinite :: String -> Number -> Either String Number
+rejectNonFinite fieldName n
+  | isFiniteNumber n = Right n
+  | n /= n = Left (fieldName <> ": NaN is not a valid number")
+  | otherwise = Left (fieldName <> ": Infinity is not a valid finite number")
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // common bounds

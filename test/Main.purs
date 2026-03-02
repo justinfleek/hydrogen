@@ -35,6 +35,11 @@ import Test.Schema.Property as SchemaProperty
 import Test.Sensation.Property as SensationProperty
 import Test.Cache.Property as CacheProperty
 import Test.Element.Property as ElementProperty
+import Test.Adversarial.Numeric as AdversarialNumeric
+import Test.Adversarial.Temporal as AdversarialTemporal
+import Test.Adversarial.State as AdversarialState
+import Test.Adversarial.Identity as AdversarialIdentity
+import Test.Adversarial.Bounds as AdversarialBounds
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
@@ -72,6 +77,12 @@ main = launchAff_ $ runSpec [consoleReporter] do
     CacheProperty.cachePropertyTests
   describe "Element Property Tests" do
     ElementProperty.elementPropertyTests
+  describe "Adversarial Security Tests" do
+    AdversarialNumeric.numericAdversarialTests
+    AdversarialTemporal.temporalAdversarialTests
+    AdversarialState.stateAdversarialTests
+    AdversarialIdentity.identityAdversarialTests
+    AdversarialBounds.boundsAdversarialTests
 
 -- =============================================================================
 --                                                              // format tests

@@ -23,6 +23,7 @@
 module Hydrogen.Schema.Temporal.FPS
   ( FPS
   , fps
+  , safeFps
   , unsafeFPS
   , unwrap
   , toNumber
@@ -49,24 +50,33 @@ import Prelude
   , class Ord
   , class Show
   , show
+  , not
+  , negate
   , otherwise
   , (*)
   , (/)
   , (<>)
   , (<)
+  , (>)
+  , (/=)
   )
 
 import Data.Int (floor) as Int
+import Data.Maybe (Maybe(Just, Nothing))
 import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                        // fps
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Frames per second (> 0)
+-- | Frames per second [1, 240]
 -- |
--- | Bounded by construction. Zero or negative FPS cannot exist.
--- | Minimum is 0.01 fps (one frame per 100 seconds).
+-- | Bounded by construction. Invalid FPS cannot exist.
+-- | - Minimum: 1 fps (one frame per second)
+-- | - Maximum: 240 fps (practical display limit)
+-- |
+-- | Frames are atomic units — you cannot have a fractional frame.
+-- | FPS represents how many complete frames render per second.
 newtype FPS = FPS Number
 
 derive instance eqFPS :: Eq FPS
@@ -79,17 +89,58 @@ instance showFPS :: Show FPS where
 --                                                               // constructors
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Create FPS, clamping to minimum of 0.01
+-- | Create FPS, clamping to valid range [1, 240].
+-- |
+-- | Handles special values:
+-- | - **+Infinity** → 240 (maximum, "as fast as possible")
+-- | - **-Infinity** → 1 (minimum, "as slow as possible")
+-- | - **NaN** → 1 (invalid input, safe fallback)
+-- |
+-- | For explicit rejection of invalid values, use `safeFps`.
 -- |
 -- | ```purescript
--- | fps 60.0    -- FPS 60.0
--- | fps 0.0     -- FPS 0.01 (clamped)
--- | fps (-24.0) -- FPS 0.01 (clamped)
+-- | fps 60.0         -- FPS 60.0
+-- | fps 0.0          -- FPS 1.0 (clamped to minimum)
+-- | fps (-24.0)      -- FPS 1.0 (clamped to minimum)
+-- | fps 1000.0       -- FPS 240.0 (clamped to maximum)
+-- | fps (1.0 / 0.0)  -- FPS 240.0 (+Infinity → maximum)
+-- | fps ((-1.0)/0.0) -- FPS 1.0 (-Infinity → minimum)
+-- | fps (0.0 / 0.0)  -- FPS 1.0 (NaN → minimum)
 -- | ```
 fps :: Number -> FPS
 fps f
-  | f < 0.01 = FPS 0.01
+  | f /= f = FPS 1.0             -- NaN → minimum (NaN /= NaN is true)
+  | f > 1.0e308 = FPS 240.0      -- +Infinity → maximum
+  | f < (-1.0e308) = FPS 1.0     -- -Infinity → minimum
+  | f < 1.0 = FPS 1.0            -- Below minimum
+  | f > 240.0 = FPS 240.0        -- Above maximum
   | otherwise = FPS f
+
+-- | Create FPS with explicit validation, rejecting invalid values.
+-- |
+-- | Returns Nothing for NaN, Infinity, or values outside [1, 240].
+-- | This is the **secure** constructor — use it at system boundaries.
+-- |
+-- | ```purescript
+-- | safeFps 60.0         -- Just (FPS 60.0)
+-- | safeFps 0.0          -- Nothing (below minimum)
+-- | safeFps (-24.0)      -- Nothing (negative)
+-- | safeFps (1.0 / 0.0)  -- Nothing (Infinity rejected)
+-- | safeFps (0.0 / 0.0)  -- Nothing (NaN rejected)
+-- | safeFps 1000.0       -- Nothing (exceeds maximum)
+-- | ```
+-- |
+-- | ## Security Model
+-- |
+-- | NaN and Infinity are attack vectors. A malicious actor crafting
+-- | `0.0 / 0.0` or `1.0 / 0.0` can bypass naive bounds checks.
+-- | This function explicitly rejects these values at the boundary.
+safeFps :: Number -> Maybe FPS
+safeFps f
+  | not (Bounded.isFiniteNumber f) = Nothing  -- NaN/Infinity rejected
+  | f < 1.0 = Nothing                         -- Below minimum
+  | f > 240.0 = Nothing                       -- Above maximum
+  | otherwise = Just (FPS f)
 
 -- | Create FPS without bounds checking
 -- |
@@ -178,8 +229,8 @@ gaming120 = FPS 120.0
 
 -- | Bounds for FPS
 -- |
--- | Min: 0.01 (one frame per 100 seconds)
--- | Max: practical limit around 1000 fps for most displays
+-- | Min: 1 (one frame per second — the atomic unit)
+-- | Max: 240 (practical limit of high-refresh displays)
 bounds :: Bounded.NumberBounds
-bounds = Bounded.numberBounds 0.01 1000.0 Bounded.Clamps "fps" 
-  "Frames per second (0.01 minimum, practical max ~1000)"
+bounds = Bounded.numberBounds 1.0 240.0 Bounded.Clamps "fps" 
+  "Frames per second (1-240, practical display range)"

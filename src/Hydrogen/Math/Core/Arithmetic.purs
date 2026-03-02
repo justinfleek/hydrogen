@@ -109,9 +109,28 @@ minArray arr = foldl min infinity arr
 maxArray :: Array Number -> Number
 maxArray arr = foldl max negativeInfinity arr
 
--- | Clamp value to range [minVal, maxVal]
+-- | Clamp value to range [minVal, maxVal] (NaN/Infinity-safe).
+-- |
+-- | If input is NaN or Infinity, returns minVal (safe fallback).
+-- | This prevents non-finite values from propagating through the system.
+-- |
+-- | ## At Billion-Agent Scale
+-- |
+-- | NaN is the escape hatch for all bounds checks. A malicious actor
+-- | could craft `0.0 / 0.0` to bypass validation. This function closes
+-- | that vector by treating non-finite values as out-of-bounds.
+-- |
+-- | ```purescript
+-- | clamp 0.0 100.0 50.0      -- 50.0
+-- | clamp 0.0 100.0 150.0     -- 100.0
+-- | clamp 0.0 100.0 (-10.0)   -- 0.0
+-- | clamp 0.0 100.0 (0.0/0.0) -- 0.0 (NaN → minVal)
+-- | clamp 0.0 100.0 (1.0/0.0) -- 0.0 (Infinity → minVal)
+-- | ```
 clamp :: Number -> Number -> Number -> Number
-clamp minVal maxVal x = min maxVal (max minVal x)
+clamp minVal maxVal x
+  | not (isFinite x) = minVal  -- NaN/Infinity → safe fallback
+  | otherwise = min maxVal (max minVal x)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // powers & roots

@@ -32,6 +32,7 @@ module Hydrogen.Render.Element.SVG
   , path_
   , line_
   , polyline_
+  , polygon_
   
   -- * Container Elements
   , g_
@@ -112,6 +113,15 @@ line_ attrs = svgElement "line" attrs []
 -- | Attributes: points
 polyline_ :: forall msg. Array (Attribute msg) -> Element msg
 polyline_ attrs = svgElement "polyline" attrs []
+
+-- | Polygon element (void - no children)
+-- |
+-- | A closed shape defined by a list of points. Like polyline, but automatically
+-- | closes the path from the last point back to the first.
+-- |
+-- | Attributes: points
+polygon_ :: forall msg. Array (Attribute msg) -> Element msg
+polygon_ attrs = svgElement "polygon" attrs []
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // container // elements

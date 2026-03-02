@@ -62,6 +62,9 @@ module Hydrogen.Schema.Compute.Dispatch
   , defaultWorkgroupSize
   , totalThreads
   , isValidWorkgroupSize
+  , getWorkgroupDimX
+  , getWorkgroupDimY
+  , getWorkgroupDimZ
   
   -- * Grid Dimensions
   , GridDimX(GridDimX)
@@ -85,6 +88,9 @@ module Hydrogen.Schema.Compute.Dispatch
   , gridSize3D
   , gridSizeForElements
   , totalWorkgroups
+  , getGridDimX
+  , getGridDimY
+  , getGridDimZ
   
   -- * Shared Memory
   , SharedMemoryBytes(SharedMemoryBytes)
@@ -314,6 +320,18 @@ totalThreads wg =
 isValidWorkgroupSize :: WorkgroupSize -> Boolean
 isValidWorkgroupSize wg = totalThreads wg <= 1024
 
+-- | Get X dimension from workgroup size
+getWorkgroupDimX :: WorkgroupSize -> WorkgroupDimX
+getWorkgroupDimX wg = wg.x
+
+-- | Get Y dimension from workgroup size
+getWorkgroupDimY :: WorkgroupSize -> WorkgroupDimY
+getWorkgroupDimY wg = wg.y
+
+-- | Get Z dimension from workgroup size
+getWorkgroupDimZ :: WorkgroupSize -> WorkgroupDimZ
+getWorkgroupDimZ wg = wg.z
+
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // grid dimensions
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -438,6 +456,18 @@ gridSizeForElements elements threadsPerWorkgroup =
 totalWorkgroups :: GridSize -> Int
 totalWorkgroups g = 
   unwrapGridDimX g.x * unwrapGridDimY g.y * unwrapGridDimZ g.z
+
+-- | Get X dimension from grid size
+getGridDimX :: GridSize -> GridDimX
+getGridDimX g = g.x
+
+-- | Get Y dimension from grid size
+getGridDimY :: GridSize -> GridDimY
+getGridDimY g = g.y
+
+-- | Get Z dimension from grid size
+getGridDimZ :: GridSize -> GridDimZ
+getGridDimZ g = g.z
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // shared memory

@@ -16,8 +16,8 @@ UI as data, not framework-specific code. Pure PureScript describing interfaces t
 | | |
 |---|---|
 | **Build** | 0 errors, 0 warnings |
-| **Schema** | 1,021 files across 38 pillars |
-| **Proofs** | 102 Lean files, 1,420 theorems, **0 sorry** |
+| **Schema** | 1,107 files across 38 pillars |
+| **Proofs** | 110 Lean files, 1,694 theorems, **0 sorry** |
 
 ---
 
@@ -123,7 +123,7 @@ theorem continuous_greedy_guarantee (F : Set V → ℝ) (k : ℕ) :
   F(solution) ≥ (1 - 1/e) * F(optimal)
 ```
 
-**102 proof files. 1,420 theorems. 0 sorry.**
+**110 proof files. 1,694 theorems. 0 sorry.**
 
 The type system encodes invariants. The proofs verify properties. Invalid states don't compile.
 
@@ -166,7 +166,7 @@ let dashboard = ado
 | Module | Purpose |
 |--------|---------|
 | `Hydrogen.Render.Element` | Pure data UI elements |
-| `Hydrogen.Schema.*` | 1,021 design system atoms |
+| `Hydrogen.Schema.*` | 1,107 design system atoms |
 | `Hydrogen.Query` | Data fetching, caching, deduplication |
 | `Hydrogen.Data.RemoteData` | Lawful Monad for async state |
 | `Hydrogen.Router` | Type-safe ADT routing |
