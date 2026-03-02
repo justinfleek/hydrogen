@@ -30,7 +30,13 @@
 module Hydrogen.Offline.ServiceWorker
   ( -- * Types
     Registration
-  , ServiceWorkerState(..)
+  , ServiceWorkerState
+      ( Installing
+      , Installed
+      , Activating
+      , Activated
+      , Redundant
+      )
   , UpdateFoundHandler
     -- * Registration
   , register

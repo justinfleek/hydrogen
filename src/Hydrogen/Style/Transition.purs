@@ -47,7 +47,25 @@ module Hydrogen.Style.Transition
   , transitionsStyle
   
   -- * Transition Properties
-  , Property(..)
+  , Property
+      ( PropAll
+      , PropNone
+      , PropTransform
+      , PropOpacity
+      , PropColor
+      , PropBackgroundColor
+      , PropBorderColor
+      , PropBoxShadow
+      , PropWidth
+      , PropHeight
+      , PropTop
+      , PropLeft
+      , PropRight
+      , PropBottom
+      , PropMargin
+      , PropPadding
+      , PropCustom
+      )
   , propertyToCss
   
   -- * Animation Config
@@ -56,13 +74,31 @@ module Hydrogen.Style.Transition
   , animationStyle
   
   -- * Animation Values
-  , Iteration(..)
+  , Iteration
+      ( Once
+      , Twice
+      , Times
+      , Infinite
+      )
   , iterationToCss
-  , Direction(..)
+  , Direction
+      ( Normal
+      , Reverse
+      , Alternate
+      , AlternateReverse
+      )
   , directionToCss
-  , FillMode(..)
+  , FillMode
+      ( FillNone
+      , Forwards
+      , Backwards
+      , Both
+      )
   , fillModeToCss
-  , PlayState(..)
+  , PlayState
+      ( Running
+      , Paused
+      )
   , playStateToCss
   
   -- * Transform Utilities

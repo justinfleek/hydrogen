@@ -35,7 +35,17 @@
 -- | ```
 module Hydrogen.Offline.Storage
   ( -- * Storage Command (Pure Data)
-    StorageCommand(..)
+    StorageCommand
+      ( Put
+      , Get
+      , GetAll
+      , GetAllByIndex
+      , Delete
+      , Clear
+      , Count
+      , Keys
+      , Exists
+      )
   , StoreName
   , StoreKey
     -- * Store Configuration (Pure Data)
@@ -45,8 +55,24 @@ module Hydrogen.Offline.Storage
   , storeWithKeyPath
   , storeWithAutoIncrement
     -- * Storage Result (Pure Data)
-  , StorageResult(..)
-  , StorageError(..)
+  , StorageResult
+      ( Found
+      , Success
+      , CountResult
+      , KeysResult
+      , ExistsResult
+      , AllFound
+      , Error
+      )
+  , StorageError
+      ( NotFound
+      , StoreNotFound
+      , KeyError
+      , SerializationError
+      , QuotaExceeded
+      , TransactionAborted
+      , UnknownError
+      )
     -- * Command Builders (Pure Functions)
   , put
   , get
@@ -64,7 +90,10 @@ module Hydrogen.Offline.Storage
   , addStore
   , addStoreWithIndexes
     -- * Transaction Mode (Pure Data)
-  , TransactionMode(..)
+  , TransactionMode
+      ( ReadOnly
+      , ReadWrite
+      )
   , Transaction
   , transaction
   , addCommand

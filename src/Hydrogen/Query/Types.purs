@@ -11,7 +11,9 @@
 -- | - CacheEntry: Internal cache storage format
 module Hydrogen.Query.Types
   ( -- * Client
-    QueryClient(..)
+    QueryClient
+      ( QueryClient
+      )
   , ClientOptions
   , defaultClientOptions
   , newClient

@@ -30,11 +30,49 @@
 -- | ```
 module Hydrogen.Style.Token
   ( -- * Spacing
-    Spacing(..)
+    Spacing
+      ( S0
+      , S0_5
+      , S1
+      , S1_5
+      , S2
+      , S2_5
+      , S3
+      , S3_5
+      , S4
+      , S5
+      , S6
+      , S7
+      , S8
+      , S9
+      , S10
+      , S11
+      , S12
+      , S14
+      , S16
+      , S20
+      , S24
+      , S28
+      , S32
+      , S36
+      , S40
+      , S44
+      , S48
+      , S52
+      , S56
+      , S60
+      , S64
+      , S72
+      , S80
+      , S96
+      , SAuto
+      )
   , spacing
   , spacingPx
     -- * Padding
-  , Padding(..)
+  , Padding
+      ( Padding
+      )
   , padding
   , paddingX
   , paddingY
@@ -43,7 +81,9 @@ module Hydrogen.Style.Token
   , paddingL
   , paddingR
     -- * Margin
-  , Margin(..)
+  , Margin
+      ( Margin
+      )
   , margin
   , marginX
   , marginY
@@ -52,21 +92,60 @@ module Hydrogen.Style.Token
   , marginL
   , marginR
     -- * Gap
-  , Gap(..)
+  , Gap
+      ( Gap
+      )
   , gap
   , gapX
   , gapY
     -- * Border Radius
-  , Radius(..)
+  , Radius
+      ( RoundedNone
+      , RoundedSm
+      , Rounded
+      , RoundedMd
+      , RoundedLg
+      , RoundedXl
+      , Rounded2xl
+      , Rounded3xl
+      , RoundedFull
+      )
   , radius
     -- * Shadow
-  , Shadow(..)
+  , Shadow
+      ( ShadowNone
+      , ShadowSm
+      , Shadow
+      , ShadowMd
+      , ShadowLg
+      , ShadowXl
+      , Shadow2xl
+      , ShadowInner
+      )
   , shadow
     -- * Z-Index
-  , ZIndex(..)
+  , ZIndex
+      ( Z0
+      , Z10
+      , Z20
+      , Z30
+      , Z40
+      , Z50
+      , ZAuto
+      )
   , zIndex
     -- * Size
-  , Size(..)
+  , Size
+      ( SizeSpacing
+      , SizeFull
+      , SizeScreen
+      , SizeMin
+      , SizeMax
+      , SizeFit
+      , SizeAuto
+      , SizeFraction
+      , SizePx
+      )
   , width
   , height
   , size

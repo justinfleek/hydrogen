@@ -39,7 +39,17 @@
 -- | ```
 module Hydrogen.Portal.Layer
   ( -- * Layer Levels (Pure Data)
-    LayerLevel(..)
+    LayerLevel
+      ( Base
+      , Dropdown
+      , Sticky
+      , Popover
+      , Modal
+      , Toast
+      , Tooltip
+      , Overlay
+      , Custom
+      )
   , layerZIndex
   , compareLayerLevel
     -- * Portal Content (Pure Data)

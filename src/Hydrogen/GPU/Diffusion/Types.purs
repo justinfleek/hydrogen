@@ -19,37 +19,135 @@
 
 module Hydrogen.GPU.Diffusion.Types
   ( -- * Scheduler Types
-    SchedulerType(..)
+    SchedulerType
+      ( SchedulerNormal
+      , SchedulerKarras
+      , SchedulerExponential
+      , SchedulerSGMUniform
+      , SchedulerSimple
+      , SchedulerDDIMUniform
+      , SchedulerBeta
+      , SchedulerLinearQuadratic
+      , SchedulerBeta57
+      , SchedulerPolyExponential
+      , SchedulerVPSDE
+      , SchedulerLCMSD
+      , SchedulerLCMSDXL
+      , SchedulerAYS
+      , SchedulerGITS
+      , SchedulerConstant
+      )
   
   -- * Noise Types
-  , NoiseType(..)
-  , NoiseMode(..)
+  , NoiseType
+      ( NoiseGaussian
+      , NoiseBrownian
+      , NoiseUniform
+      , NoiseLaplacian
+      , NoiseStudentT
+      , NoisePerlin
+      , NoiseWavelet
+      , NoiseFractalBrown
+      , NoiseFractalPink
+      , NoiseFractalWhite
+      , NoiseFractalBlue
+      , NoiseFractalViolet
+      , NoisePyramidBilinear
+      , NoisePyramidBicubic
+      , NoisePyramidNearest
+      , NoiseHiresPyramidBilinear
+      , NoiseHiresPyramidBicubic
+      , NoiseSimplex
+      , NoiseNone
+      )
+  , NoiseMode
+      ( NoiseModeNone
+      , NoiseModeHard
+      , NoiseModeLorentzian
+      , NoiseModeSoft
+      , NoiseModeSoftLinear
+      , NoiseModeSofter
+      , NoiseModeEpsilon
+      , NoiseModeSinusoidal
+      , NoiseModeExp
+      , NoiseModeVPSDE
+      , NoiseModeER4
+      , NoiseModeHardVar
+      )
   
   -- * Guidance Types
-  , GuideMode(..)
-  , ImplicitType(..)
+  , GuideMode
+      ( GuideModeFlow
+      , GuideModeSync
+      , GuideModeLure
+      , GuideModeData
+      , GuideModeEpsilon
+      , GuideModeInversion
+      , GuideModePseudoimplicit
+      , GuideModeFullyPseudoimplicit
+      , GuideModeNone
+      )
+  , ImplicitType
+      ( ImplicitRebound
+      , ImplicitRetroEta
+      , ImplicitBongmath
+      , ImplicitPredictorCorrector
+      )
   
   -- * Tensor Types
   , LatentTensor
   , LatentShape
-  , TensorDtype(..)
-  , TensorDevice(..)
+  , TensorDtype
+      ( DtypeFloat16
+      , DtypeFloat32
+      , DtypeBFloat16
+      )
+  , TensorDevice
+      ( DeviceCPU
+      , DeviceCUDA
+      , DeviceWebGPU
+      )
   
   -- * Conditioning Types
-  , Conditioning(..)
+  , Conditioning
+      ( ConditioningText
+      , ConditioningImage
+      , ConditioningComposite
+      , ConditioningNone
+      )
   , TextConditioning
   , ImageConditioning
-  , ImageConditionType(..)
+  , ImageConditionType
+      ( ConditionControlNet
+      , ConditionIPAdapter
+      , ConditionReference
+      , ConditionT2IAdapter
+      )
   , NoiseSchedule
   , SigmaSchedule
   
   -- * Blend Mode
-  , DiffusionBlendMode(..)
+  , DiffusionBlendMode
+      ( BlendLinear
+      , BlendSoftmax
+      , BlendMultiply
+      , BlendFeathered
+      )
   
   -- * Step Strategy
-  , StepStrategy(..)
+  , StepStrategy
+      ( StrategyStandard
+      , StrategySubstep
+      , StrategyAncestral
+      , StrategySDE
+      )
   , SubstepConfig
-  , SubstepMethod(..)
+  , SubstepMethod
+      ( SubstepEuler
+      , SubstepHeun
+      , SubstepRK4
+      , SubstepDPMSolver
+      )
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════

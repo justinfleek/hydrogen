@@ -56,45 +56,100 @@
 -- | ```
 module Hydrogen.Style.Motion
   ( -- * Duration
-    Duration(..)
+    Duration
+      ( Instant
+      , Fast
+      , Quick
+      , Normal
+      , Slow
+      , Slower
+      , Slowest
+      , DurationMs
+      )
   , duration
   , durationMs
   , durationValue
   
   -- * Easing
-  , Easing(..)
+  , Easing
+      ( Linear
+      , EaseIn
+      , EaseOut
+      , EaseInOut
+      )
   , easing
   , easingCss
   
   -- * Transition Property
-  , TransitionProperty(..)
+  , TransitionProperty
+      ( None
+      , All
+      , Colors
+      , Opacity
+      , Shadow
+      , Transform
+      )
   , transition
   , transitionNone
   
   -- * Animation
-  , Animation(..)
+  , Animation
+      ( NoAnimation
+      , Spin
+      , Ping
+      , Pulse
+      , Bounce
+      )
   , animate
   , animateNone
   
   -- * Delay
-  , Delay(..)
+  , Delay
+      ( NoDelay
+      , Delay75
+      , Delay100
+      , Delay150
+      , Delay200
+      , Delay300
+      , Delay500
+      , Delay700
+      , Delay1000
+      , DelayMs
+      )
   , delay
   , delayMs
   
   -- * Animation Iteration
-  , Iteration(..)
+  , Iteration
+      ( Once
+      , Twice
+      , Infinite
+      )
   , iteration
   
   -- * Animation Direction
-  , Direction(..)
+  , Direction
+      ( DirectionNormal
+      , DirectionReverse
+      , DirectionAlternate
+      , DirectionAlternateReverse
+      )
   , direction
   
   -- * Animation Fill Mode
-  , FillMode(..)
+  , FillMode
+      ( FillNone
+      , FillForwards
+      , FillBackwards
+      , FillBoth
+      )
   , fillMode
   
   -- * Animation Play State
-  , PlayState(..)
+  , PlayState
+      ( Playing
+      , Paused
+      )
   , playState
   
   -- * Combined Utilities

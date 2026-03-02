@@ -53,7 +53,25 @@
 -- | ```
 module Hydrogen.Runtime.Cmd
   ( -- * Command Type
-    Cmd(..)
+    Cmd
+      ( None
+      , Batch
+      , Delay
+      , Interval
+      , AnimationFrame
+      , Http
+      , Focus
+      , Blur
+      , PushUrl
+      , ReplaceUrl
+      , Back
+      , Forward
+      , GetStorage
+      , SetStorage
+      , RemoveStorage
+      , CopyToClipboard
+      , Log
+      )
   
   -- * Transition Type
   , Transition
@@ -81,10 +99,29 @@ module Hydrogen.Runtime.Cmd
   
   -- * HTTP Types
   , HttpRequest
-  , HttpMethod(..)
-  , HttpResult(..)
+  , HttpMethod
+      ( GET
+      , POST
+      , PUT
+      , PATCH
+      , DELETE
+      , HEAD
+      , OPTIONS
+      )
+  , HttpResult
+      ( HttpOk
+      , HttpErr
+      )
   , HttpSuccess
-  , HttpError(..)
+  , HttpError
+      ( TimeoutError
+      , NetworkError
+      , CorsError
+      , MixedContentError
+      , InvalidUrlError
+      , AbortedError
+      , UnknownError
+      )
   , HttpErrorContext
   
   -- * HTTP Result Constructors (for FFI)

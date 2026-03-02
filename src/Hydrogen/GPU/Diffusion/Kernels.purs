@@ -23,13 +23,34 @@
 
 module Hydrogen.GPU.Diffusion.Kernels
   ( -- * Diffusion Kernel ADT
-    DiffusionKernel(..)
-  , EncodeKernel(..)
-  , DecodeKernel(..)
-  , DenoiseKernel(..)
-  , NoiseScheduleKernel(..)
-  , LatentBlendKernel(..)
-  , CFGKernel(..)
+    DiffusionKernel
+      ( KernelEncode
+      , KernelDecode
+      , KernelDenoise
+      , KernelNoiseSchedule
+      , KernelLatentBlend
+      , KernelCFG
+      , KernelSequence
+      , KernelNoop
+      )
+  , EncodeKernel
+      ( EncodeKernel
+      )
+  , DecodeKernel
+      ( DecodeKernel
+      )
+  , DenoiseKernel
+      ( DenoiseKernel
+      )
+  , NoiseScheduleKernel
+      ( NoiseScheduleKernel
+      )
+  , LatentBlendKernel
+      ( LatentBlendKernel
+      )
+  , CFGKernel
+      ( CFGKernel
+      )
   
   -- * Re-exported for DenoiseKernel
   , DiffusionConfig

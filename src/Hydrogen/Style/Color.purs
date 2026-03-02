@@ -32,7 +32,33 @@
 -- | ```
 module Hydrogen.Style.Color
   ( -- * Semantic Colors
-    SemanticColor(..)
+    SemanticColor
+      ( Background
+      , Foreground
+      , Card
+      , CardForeground
+      , Popover
+      , PopoverForeground
+      , Primary
+      , PrimaryForeground
+      , Secondary
+      , SecondaryForeground
+      , Muted
+      , MutedForeground
+      , Accent
+      , AccentForeground
+      , Destructive
+      , DestructiveForeground
+      , Border
+      , Input
+      , Ring
+      , Success
+      , SuccessForeground
+      , Warning
+      , WarningForeground
+      , Info
+      , InfoForeground
+      )
   , bg
   , text
   , border
@@ -41,11 +67,50 @@ module Hydrogen.Style.Color
   , textOpacity
   , borderOpacity
     -- * Palette Colors
-  , PaletteColor(..)
-  , ColorShade(..)
+  , PaletteColor
+      ( Slate
+      , Gray
+      , Zinc
+      , Neutral
+      , Stone
+      , Red
+      , Orange
+      , Amber
+      , Yellow
+      , Lime
+      , Green
+      , Emerald
+      , Teal
+      , Cyan
+      , Sky
+      , Blue
+      , Indigo
+      , Violet
+      , Purple
+      , Fuchsia
+      , Pink
+      , Rose
+      , White
+      , Black
+      , Transparent
+      , Current
+      )
+  , ColorShade
+      ( C50
+      , C100
+      , C200
+      , C300
+      , C400
+      , C500
+      , C600
+      , C700
+      , C800
+      , C900
+      , C950
+      )
   , palette
     -- * HSL Color Type
-  , HSL(..)
+  , HSL
   , hsl
   , toHslString
   , toLegacyCssVar

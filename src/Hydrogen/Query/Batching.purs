@@ -12,7 +12,9 @@
 -- | - loadMany: Load multiple values in a single batch
 module Hydrogen.Query.Batching
   ( -- * Batching types
-    Batcher(..)
+    Batcher
+      ( Batcher
+      )
   , BatchOptions
   
     -- * Batching operations
