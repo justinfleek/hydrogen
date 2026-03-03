@@ -1,8 +1,8 @@
 # Agent Handoff: CTO Integration Task
 
 **Date:** 2026-03-03
-**Status:** COMPLETE - Integration Done
-**Spent:** ~$300+ across 10 agents (hopefully last one)
+**Status:** COMPLETE - Real Server Sync Implemented
+**Spent:** ~$300+ across 11 agents
 
 ---
 
@@ -48,14 +48,18 @@ src/Hydrogen/
 
 ## INTEGRATION STATUS
 
-### DONE - Has Query Integration:
-- [x] `Analytics/Tracker.purs` - queryClient added
-- [x] `Event/Bus.purs` - queryClient added  
-- [x] `Feature/Flags.purs` - Query + RemoteData
+### DONE - Has REAL Server Sync (not just queryClient fields):
+- [x] `Event/Bus.purs` - **REAL SYNC**: emitToServer, subscribeFromServer, loadEventHistory, invalidateEventCache
+- [x] `State/Store.purs` - **REAL SYNC**: loadState, saveState, syncState, invalidateState
+- [x] `Feature/Flags.purs` - Query + RemoteData for flag fetching
 - [x] `Geo/Geolocation.purs` - Query integrated
-- [x] `I18n/Locale.purs` - Query + RemoteData
+- [x] `I18n/Locale.purs` - Query + RemoteData for locale fetching
 - [x] `State/Atom.purs` - Query + RemoteData
-- [x] `State/Store.purs` - queryClient added
+- [x] `Analytics/Tracker.purs` - queryClient + loadRemoteConfig
+
+### KEY DISTINCTION:
+Previous agents added `queryClient` fields but NO ACTUAL USAGE. The latest commit (459388c) adds
+**real server sync functions** that actually call `Q.query` and `Api.get/post/put`.
 
 ### COMPLETE - No More TODOs:
 All modules that need Query integration have it. The remaining modules either:
@@ -174,6 +178,9 @@ Must show: `✓ Build succeeded.` with 0 errors, 0 warnings
 ## COMMITS SO FAR
 
 ```
+459388c feat: Add real server sync to Event/Bus and State/Store
+883a348 Mark CTO integration as complete
+399b434 Update AGENT_HANDOFF.md with complete audit of CTO integration status
 b1294d6 Integrate Query client into Analytics, Event, State modules
 a916cd0 feat: Integrate Geolocation and Atom with Query system  
 2f81063 fix: Restore CTO core modules + integrate Feature/I18n with Query
@@ -183,14 +190,20 @@ a916cd0 feat: Integrate Geolocation and Atom with Query system
 
 ## IF YOU'RE THE NEXT AGENT
 
+**Integration is DONE.** The core modules now have real server sync:
+
+- `Event/Bus.purs` - Can emit/subscribe to/from server, load history
+- `State/Store.purs` - Can load/save/sync state to/from server
+
+If you need to add more server sync functionality:
+
 1. **Read this file FIRST**
 2. Run `nix develop -c spago build` - must pass
-3. Check the TODO items above
-4. Fix raw FFI fetches to use API.Client
-5. Add Query integration to ServiceWorker.purs
-6. Verify build after EACH change
-7. Update this file with your progress
-8. Commit with clear message
+3. Follow the pattern in Event/Bus.purs and State/Store.purs
+4. Use `Q.query` for cached fetches, `Api.get/post/put` for HTTP
+5. Verify build after EACH change
+6. Update this file with your progress
+7. Commit with clear message
 
 ---
 
