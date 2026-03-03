@@ -20,18 +20,14 @@ final: prev: {
           # zeromq4-haskell may be marked broken in some nixpkgs versions
           zeromq4-haskell = prev.haskell.lib.markUnbroken hprev.zeromq4-haskell;
 
+          # sandwich has flaky tests in nixpkgs - disable them
+          sandwich = prev.haskell.lib.dontCheck hprev.sandwich;
+
           # Add foundry packages here when building via Nix
           # foundry-core = hfinal.callCabal2nix "foundry-core" ../../haskell/foundry-core { };
           # foundry-extract = hfinal.callCabal2nix "foundry-extract" ../../haskell/foundry-extract { };
           # foundry-scraper = hfinal.callCabal2nix "foundry-scraper" ../../haskell/foundry-scraper { };
           # foundry-storage = hfinal.callCabal2nix "foundry-storage" ../../haskell/foundry-storage { };
-        };
-      };
-
-      # GHC 9.10 fallback (some deps like zeromq4-haskell may work better here)
-      ghc910 = prev.haskell.packages.ghc910.override {
-        overrides = hfinal: hprev: {
-          zeromq4-haskell = prev.haskell.lib.markUnbroken hprev.zeromq4-haskell;
         };
       };
     };
