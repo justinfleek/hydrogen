@@ -68,6 +68,11 @@ module Hydrogen.Geo.Geolocation
   , watchPosition
   , clearWatch
   , WatchId
+    -- * Query Integration
+  , GeoClient
+  , newGeoClient
+  , getPositionCached
+  , invalidatePosition
     -- * Distance Calculations
   , haversineDistance
   , calculateBearing
@@ -96,12 +101,13 @@ import Prelude
 
 import Data.Array (foldl)
 import Data.Either (Either(Left, Right))
+import Data.Int (toNumber)
 import Data.Maybe (Maybe(Nothing, Just))
+import Data.Number (abs, acos, asin, atan2, cos, pi, pow, sin, sqrt)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
-import Data.Int (toNumber)
-import Data.Number (abs, acos, asin, atan2, cos, pi, pow, sin, sqrt)
+import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -254,6 +260,45 @@ clearWatch :: WatchId -> Effect Unit
 clearWatch = clearWatchImpl
 
 foreign import clearWatchImpl :: WatchId -> Effect Unit
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                         // query integration
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Geolocation client with Query-backed caching
+-- |
+-- | Multiple components requesting position will share cached results,
+-- | reducing battery usage and API calls.
+type GeoClient =
+  { queryClient :: Q.QueryClient
+  , options :: PositionOptions
+  }
+
+-- | Create a new geolocation client
+newGeoClient :: PositionOptions -> Effect GeoClient
+newGeoClient options = do
+  queryClient <- Q.newClient
+  pure { queryClient, options }
+
+-- | Get position with Query caching and deduplication
+-- |
+-- | Uses the Query system to cache position data. Multiple simultaneous
+-- | requests are deduplicated. Stale data is returned while refreshing.
+getPositionCached :: GeoClient -> Aff (Q.QueryState String Position)
+getPositionCached client = do
+  Q.query client.queryClient 
+    (Q.defaultQueryOptions ["geo", "position"] fetchPosition)
+  where
+  fetchPosition :: Aff (Either String Position)
+  fetchPosition = do
+    result <- fromEffectFnAff $ getCurrentPositionImpl client.options
+    pure $ case result of
+      Left err -> Left (errorMessage err)
+      Right pos -> Right pos
+
+-- | Invalidate cached position (forces refresh on next request)
+invalidatePosition :: GeoClient -> Effect Unit
+invalidatePosition client = Q.invalidate client.queryClient ["geo", "position"]
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // distance calculations

@@ -41,6 +41,8 @@ module Hydrogen.State.Atom
   , derivedFrom2
   , derivedFrom3
   , asyncAtom
+  , queryAtom
+  , refreshAtom
     -- * Atom Operations
   , get
   , set
@@ -60,7 +62,10 @@ module Hydrogen.State.Atom
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Array as Array
+import Data.Either (Either(Right))
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Tuple (Tuple(Tuple))
@@ -69,6 +74,8 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.Data.RemoteData (RemoteData(Success))
+import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -239,6 +246,54 @@ asyncAtom initial fetchFn = do
     result <- fetchFn
     liftEffect $ set atomRef result
   pure atomRef
+
+-- | Create an atom backed by Query for caching and deduplication
+-- |
+-- | Multiple atoms with the same key share cached data. The Query system
+-- | handles stale-while-revalidate, deduplication of concurrent requests,
+-- | and automatic cache invalidation.
+-- |
+-- | ```purescript
+-- | -- Create atom with Query caching
+-- | userAtom <- Atom.queryAtom client ["user", id] defaultUser fetchUser
+-- |
+-- | -- Multiple components using same key share the cached result
+-- | profileAtom <- Atom.queryAtom client ["user", id] defaultUser fetchUser
+-- | ```
+queryAtom 
+  :: forall a
+   . DecodeJson a
+  => EncodeJson a
+  => Q.QueryClient 
+  -> Q.QueryKey 
+  -> a 
+  -> Aff (Either String a) 
+  -> Effect (Atom a)
+queryAtom client key initial fetchFn = do
+  atomRef <- atomWithKey (keyToString key) initial
+  -- Kick off the query
+  launchAff_ do
+    state <- Q.query client (Q.defaultQueryOptions key fetchFn)
+    case state.data of
+      Success val -> liftEffect $ set atomRef val
+      _ -> pure unit
+  pure atomRef
+  where
+  -- Convert query key to string for atom key
+  keyToString :: Q.QueryKey -> String
+  keyToString = joinWith ":"
+  
+  joinWith :: String -> Array String -> String
+  joinWith sep arr = case Array.uncons arr of
+    Nothing -> ""
+    Just { head, tail } -> 
+      Array.foldl (\acc s -> acc <> sep <> s) head tail
+
+-- | Refresh a query-backed atom by invalidating its cache
+-- |
+-- | Forces the next read to fetch fresh data from the source.
+refreshAtom :: Q.QueryClient -> Q.QueryKey -> Effect Unit
+refreshAtom client key = Q.invalidate client key
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // atom operations
