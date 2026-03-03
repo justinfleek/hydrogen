@@ -92,11 +92,13 @@ import Data.Array as Array
 import Data.Int (toNumber) as Int
 import Data.Map (Map)
 import Data.Map as Map
+import Data.Either (Either)
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Effect.Aff as Aff
+import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData (RemoteData(Success))
 import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
@@ -163,6 +165,7 @@ type FlagProvider =
   , context :: Ref TargetingContext
   , subscribers :: Ref (Array (Flag -> FlagValue -> Effect Unit))
   , config :: ProviderConfig
+  , queryClient :: Q.QueryClient
   }
 
 -- | Provider configuration
@@ -194,12 +197,13 @@ createProviderWithConfig defs config = do
   overrides <- Ref.new Map.empty
   context <- Ref.new emptyContext
   subscribers <- Ref.new []
+  queryClient <- Q.newClient
   
   -- Load persisted overrides
   when config.persistOverrides do
     loadPersistedOverrides overrides
   
-  pure { definitions, overrides, context, subscribers, config }
+  pure { definitions, overrides, context, subscribers, config, queryClient }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Flag Operations
@@ -478,9 +482,9 @@ subscribe provider handler = do
 
 foreign import unsafeRefEq :: forall a. a -> a -> Boolean
 
--- | Refresh flags from remote source
-refresh :: FlagProvider -> Aff Unit
-refresh provider = pure unit  -- Implementation would fetch from remote
+-- | Refresh flags from remote source (invalidates cached flags in Query)
+refresh :: FlagProvider -> Effect Unit
+refresh provider = Q.invalidate provider.queryClient ["flags"]
 
 -- | Set a local override for a flag
 setOverride :: FlagProvider -> Flag -> FlagValue -> Effect Unit
@@ -531,13 +535,16 @@ loadFromJson provider json = do
 
 foreign import parseJsonFlags :: String -> Effect (Map Flag FlagDefinition)
 
--- | Load flags from a URL
-loadFromUrl :: FlagProvider -> String -> Aff Unit
+-- | Load flags from a URL (uses Query for caching)
+loadFromUrl :: FlagProvider -> String -> Aff (Q.QueryState String String)
 loadFromUrl provider url = do
-  json <- fetchJson url
-  liftEffect $ loadFromJson provider json
+  state <- Q.query provider.queryClient (Q.defaultQueryOptions ["flags", url] (fetchJson url))
+  case state.data of
+    Success json -> liftEffect $ loadFromJson provider json
+    _ -> pure unit
+  pure state
 
-foreign import fetchJson :: String -> Aff String
+foreign import fetchJson :: String -> Aff (Either String String)
 
 -- | Load persisted overrides from localStorage
 foreign import loadPersistedOverrides :: Ref (Map Flag FlagValue) -> Effect Unit

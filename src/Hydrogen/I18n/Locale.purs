@@ -43,6 +43,7 @@ module Hydrogen.I18n.Locale
     -- * Initialization
   , create
   , createWithLoader
+  , defaultConfig
     -- * Translation
   , t
   , t'
@@ -52,6 +53,8 @@ module Hydrogen.I18n.Locale
     -- * Locale Management
   , getLocale
   , setLocale
+  , setLocaleAsync
+  , loadLocale
   , getAvailableLocales
   , onLocaleChange
     -- * Formatting
@@ -68,18 +71,21 @@ module Hydrogen.I18n.Locale
 import Prelude
 
 import Data.Array as Array
+import Data.Either (Either, hush)
 import Data.Int (toNumber)
 import Data.Map as Map
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.String as String
 import Data.String.Regex (Regex, regex, replace)
 import Data.String.Regex.Flags (global)
-import Data.Either (hush)
 import Effect (Effect)
 import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 import Foreign.Object as Object
+import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData (RemoteData(Success))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -91,6 +97,8 @@ newtype I18n = I18n
   , config :: I18nConfig
   , translations :: Ref Translations
   , listeners :: Ref (Array { id :: Int, callback :: Locale -> Effect Unit })
+  , queryClient :: Q.QueryClient
+  , loader :: Maybe (Locale -> Aff (Either String (Map.Map TranslationKey String)))
   }
 
 -- | I18n configuration
@@ -129,21 +137,47 @@ create config translations = do
   localeRef <- Ref.new config.defaultLocale
   translationsRef <- Ref.new translations
   listenersRef <- Ref.new []
+  queryClient <- Q.newClient
   pure $ I18n
     { locale: localeRef
     , config
     , translations: translationsRef
     , listeners: listenersRef
+    , queryClient
+    , loader: Nothing
     }
 
--- | Create with async translation loader
+-- | Create with async translation loader (uses Query for caching)
 createWithLoader 
   :: I18nConfig 
-  -> (Locale -> Aff (Map.Map TranslationKey String))
+  -> (Locale -> Aff (Either String (Map.Map TranslationKey String)))
   -> Effect I18n
-createWithLoader config _loader = do
-  -- Start with empty translations, load on demand
-  create config Map.empty
+createWithLoader config loader = do
+  localeRef <- Ref.new config.defaultLocale
+  translationsRef <- Ref.new Map.empty
+  listenersRef <- Ref.new []
+  queryClient <- Q.newClient
+  pure $ I18n
+    { locale: localeRef
+    , config
+    , translations: translationsRef
+    , listeners: listenersRef
+    , queryClient
+    , loader: Just loader
+    }
+
+-- | Load translations for a locale using Query (cached)
+loadLocale :: I18n -> Locale -> Aff (Q.QueryState String (Map.Map TranslationKey String))
+loadLocale (I18n i18n) locale = do
+  case i18n.loader of
+    Nothing -> pure Q.initialQueryState
+    Just loader -> do
+      state <- Q.query i18n.queryClient 
+        (Q.defaultQueryOptions ["i18n", locale] (loader locale))
+      case state.data of
+        Success trans -> liftEffect $ Ref.modify_ (Map.insert locale trans) i18n.translations
+        _ -> pure unit
+      pure state
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // translation
@@ -216,12 +250,28 @@ interpolate prefix suffix template values =
 getLocale :: I18n -> Effect Locale
 getLocale (I18n { locale }) = Ref.read locale
 
--- | Set current locale
+-- | Set current locale (synchronous, does not load translations)
 setLocale :: I18n -> Locale -> Effect Unit
 setLocale (I18n { locale, listeners }) newLocale = do
   Ref.write newLocale locale
   subs <- Ref.read listeners
   for_ subs \listener -> listener.callback newLocale
+  where
+  for_ arr f = void $ Array.foldM (\_ x -> f x) unit arr
+
+-- | Set locale and load translations using Query (async, cached)
+-- |
+-- | Use this when you have a loader configured via `createWithLoader`.
+-- | The Query system will cache translations, so switching back to a
+-- | previously loaded locale will be instant.
+setLocaleAsync :: I18n -> Locale -> Aff (Q.QueryState String (Map.Map TranslationKey String))
+setLocaleAsync i18n@(I18n inner) newLocale = do
+  state <- loadLocale i18n newLocale
+  liftEffect $ do
+    Ref.write newLocale inner.locale
+    subs <- Ref.read inner.listeners
+    for_ subs \listener -> listener.callback newLocale
+  pure state
   where
   for_ arr f = void $ Array.foldM (\_ x -> f x) unit arr
 
