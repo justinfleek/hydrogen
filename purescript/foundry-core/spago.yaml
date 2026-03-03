@@ -1,0 +1,56 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                                                        // foundry // core
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# FOUNDRY - Behavioral Observation Engine
+#
+# Two-phase scraping:
+#   1. Fast initial scrape (< 2 seconds) - static snapshot
+#   2. Live recording (10-20 seconds) - interactions visible in dashboard
+#
+# This package provides:
+#   - Foundry.Observe.Live - Live observation with dashboard streaming
+#   - Foundry.Observe.Protocol - Observation protocol implementation
+#
+# All types imported from Hydrogen:
+#   - Hydrogen.Scraper.* - Extraction types
+#   - Hydrogen.Playwright - Browser automation
+#   - Hydrogen.Schema.* - Atoms (Color, Dimension, Motion, etc.)
+#
+# Build: nix develop /home/justin/jpyxal/hydrogen --command spago build
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+package:
+  name: foundry-core
+  dependencies:
+    # Core
+    - prelude
+    - effect
+    - aff
+    - maybe
+    - either
+    - tuples
+    - arrays
+    - foldable-traversable
+    - refs
+    - exceptions
+    
+    # Data
+    - numbers
+    - integers
+    - strings
+    - newtype
+    
+    # Hydrogen (all scraper + schema types)
+    - hydrogen
+    
+  build:
+    strict: true
+
+workspace:
+  packageSet:
+    registry: 73.2.0
+  extraPackages:
+    hydrogen:
+      path: /home/justin/jpyxal/hydrogen

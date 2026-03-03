@@ -1,3 +1,5 @@
+{-# LANGUAGE QualifiedDo #-}
+{-# LANGUAGE DataKinds #-}
 {- |
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                                                  // foundry // storage // duckdb
@@ -65,6 +67,13 @@ import Data.ByteString qualified as BS
 import Data.Text (Text)
 import Data.Text.Encoding qualified as T
 import Data.UUID qualified as UUID
+import Foundry.Core.Effects.Graded
+  ( FoundryM
+  , GradeLabel (..)
+  , liftNet
+  , liftConfig
+  )
+import Foundry.Core.Effects.Do qualified as F
 import Foundry.Storage.Types 
   ( StorageKey (..)
   , StorageResult (..)
@@ -109,45 +118,52 @@ defaultConfig = DuckDBConfig
 --------------------------------------------------------------------------------
 
 -- | Connect to DuckDB
---
--- Returns connection handle or error message.
-connect :: DuckDBConfig -> IO (Either Text DuckDBConn)
-connect cfg = pure $ Right DuckDBConn
-  { ddbPath = ddbcPath cfg
-  , ddbReadOnly = ddbcReadOnly cfg
-  }
+-- Grade: '[Net, Config] - reads config, performs connection
+connect :: DuckDBConfig -> FoundryM '[ 'Net, 'Config ] (Either Text DuckDBConn)
+connect cfg = F.do
+  _ <- liftNet (pure ())
+  liftConfig $ pure $ Right DuckDBConn
+    { ddbPath = ddbcPath cfg
+    , ddbReadOnly = ddbcReadOnly cfg
+    }
 
 -- | Disconnect from DuckDB
-disconnect :: DuckDBConn -> IO ()
-disconnect _ = pure ()
+-- Grade: '[Net]
+disconnect :: DuckDBConn -> FoundryM '[ 'Net ] ()
+disconnect _ = liftNet $ pure ()
 
 --------------------------------------------------------------------------------
 -- Storage Operations
 --------------------------------------------------------------------------------
 
 -- | Store brand data
-storeBrand :: DuckDBConn -> StoredBrand -> IO (StorageResult ())
-storeBrand _conn _brand = pure $ StorageOk ()
+-- Grade: '[Net]
+storeBrand :: DuckDBConn -> StoredBrand -> FoundryM '[ 'Net ] (StorageResult ())
+storeBrand _conn _brand = liftNet $ pure $ StorageOk ()
 
 -- | Fetch brand by key
-fetchBrand :: DuckDBConn -> StorageKey -> IO (StorageResult StoredBrand)
-fetchBrand _conn key = pure $ StorageNotFound key
+-- Grade: '[Net]
+fetchBrand :: DuckDBConn -> StorageKey -> FoundryM '[ 'Net ] (StorageResult StoredBrand)
+fetchBrand _conn key = liftNet $ pure $ StorageNotFound key
 
 -- | Query brands with filter
-queryBrands :: DuckDBConn -> Text -> IO (StorageResult [StoredBrand])
-queryBrands _conn _query = pure $ StorageOk []
+-- Grade: '[Net]
+queryBrands :: DuckDBConn -> Text -> FoundryM '[ 'Net ] (StorageResult [StoredBrand])
+queryBrands _conn _query = liftNet $ pure $ StorageOk []
 
 --------------------------------------------------------------------------------
 -- Analytics
 --------------------------------------------------------------------------------
 
 -- | Count total brands
-countBrands :: DuckDBConn -> IO (StorageResult Int)
-countBrands _conn = pure $ StorageOk 0
+-- Grade: '[Net]
+countBrands :: DuckDBConn -> FoundryM '[ 'Net ] (StorageResult Int)
+countBrands _conn = liftNet $ pure $ StorageOk 0
 
 -- | Aggregate palette data across brands
-aggregatePalettes :: DuckDBConn -> IO (StorageResult [(Text, Int)])
-aggregatePalettes _conn = pure $ StorageOk []
+-- Grade: '[Net]
+aggregatePalettes :: DuckDBConn -> FoundryM '[ 'Net ] (StorageResult [(Text, Int)])
+aggregatePalettes _conn = liftNet $ pure $ StorageOk []
 
 -- | Serialize brand data to binary format for bulk operations.
 --
@@ -256,14 +272,17 @@ data ComponentSchema = ComponentSchema
 --   created_at TIMESTAMP DEFAULT NOW()
 -- );
 -- @
-createComponentTables :: DuckDBConn -> IO (StorageResult ComponentSchema)
-createComponentTables _conn = pure $ StorageOk ComponentSchema
+-- | Create component registry tables
+-- Grade: '[Net]
+createComponentTables :: DuckDBConn -> FoundryM '[ 'Net ] (StorageResult ComponentSchema)
+createComponentTables _conn = liftNet $ pure $ StorageOk ComponentSchema
   { csAtomsTable     = "atoms"
   , csMoleculesTable = "molecules"
   , csCompoundsTable = "compounds"
   }
 
 -- | Store an atom in the registry
+-- Grade: '[Net]
 storeAtom
   :: DuckDBConn
   -> Text      -- ^ UUID (as text)
@@ -271,10 +290,11 @@ storeAtom
   -> Text      -- ^ Atom type
   -> Text      -- ^ Name
   -> ByteString -- ^ JSON data
-  -> IO (StorageResult ())
-storeAtom _conn _uuid _domain _atomType _name _jsonData = pure $ StorageOk ()
+  -> FoundryM '[ 'Net ] (StorageResult ())
+storeAtom _conn _uuid _domain _atomType _name _jsonData = liftNet $ pure $ StorageOk ()
 
 -- | Store a molecule in the registry
+-- Grade: '[Net]
 storeMolecule
   :: DuckDBConn
   -> Text      -- ^ UUID
@@ -283,10 +303,11 @@ storeMolecule
   -> Text      -- ^ Variant
   -> [Text]    -- ^ Atom references (UUIDs)
   -> ByteString -- ^ JSON data
-  -> IO (StorageResult ())
-storeMolecule _conn _uuid _domain _molType _variant _atomRefs _jsonData = pure $ StorageOk ()
+  -> FoundryM '[ 'Net ] (StorageResult ())
+storeMolecule _conn _uuid _domain _molType _variant _atomRefs _jsonData = liftNet $ pure $ StorageOk ()
 
 -- | Store a compound in the registry
+-- Grade: '[Net]
 storeCompound
   :: DuckDBConn
   -> Text      -- ^ UUID
@@ -295,13 +316,15 @@ storeCompound
   -> [Text]    -- ^ Molecule references
   -> [Text]    -- ^ Direct atom references
   -> ByteString -- ^ JSON data
-  -> IO (StorageResult ())
-storeCompound _conn _uuid _domain _compType _molRefs _atomRefs _jsonData = pure $ StorageOk ()
+  -> FoundryM '[ 'Net ] (StorageResult ())
+storeCompound _conn _uuid _domain _compType _molRefs _atomRefs _jsonData = liftNet $ pure $ StorageOk ()
 
 -- | Query atoms by domain
-queryAtomsByDomain :: DuckDBConn -> Text -> IO (StorageResult [(Text, Text, ByteString)])
-queryAtomsByDomain _conn _domain = pure $ StorageOk []
+-- Grade: '[Net]
+queryAtomsByDomain :: DuckDBConn -> Text -> FoundryM '[ 'Net ] (StorageResult [(Text, Text, ByteString)])
+queryAtomsByDomain _conn _domain = liftNet $ pure $ StorageOk []
 
 -- | Query molecules by domain
-queryMoleculesByDomain :: DuckDBConn -> Text -> IO (StorageResult [(Text, Text, ByteString)])
-queryMoleculesByDomain _conn _domain = pure $ StorageOk []
+-- Grade: '[Net]
+queryMoleculesByDomain :: DuckDBConn -> Text -> FoundryM '[ 'Net ] (StorageResult [(Text, Text, ByteString)])
+queryMoleculesByDomain _conn _domain = liftNet $ pure $ StorageOk []

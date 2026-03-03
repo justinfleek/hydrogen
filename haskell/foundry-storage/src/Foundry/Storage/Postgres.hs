@@ -1,3 +1,4 @@
+{-# LANGUAGE QualifiedDo #-}
 {- |
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                                                 // foundry // storage // postgres
@@ -41,7 +42,7 @@ module Foundry.Storage.Postgres
   , connect
   , disconnect
 
-    -- * Operations
+    -- * Operations (graded)
   , storeBrand
   , fetchBrand
   , fetchBrandByDomain
@@ -53,6 +54,13 @@ module Foundry.Storage.Postgres
 
 import Data.Text (Text)
 import Foundry.Core.Text (tshow)
+import Foundry.Core.Effects.Graded
+  ( FoundryM
+  , GradeLabel (..)
+  , liftNet
+  , liftConfig
+  )
+import Foundry.Core.Effects.Do qualified as F
 import Foundry.Storage.Types (StorageKey, StorageResult (..), StoredBrand)
 
 --------------------------------------------------------------------------------
@@ -99,10 +107,15 @@ defaultConfig = PostgresConfig
 --------------------------------------------------------------------------------
 
 -- | Connect to PostgreSQL
-connect :: PostgresConfig -> IO (Either Text PostgresConn)
-connect cfg = pure $ Right PostgresConn
-  { pgConnString = buildConnString cfg
-  }
+-- Grade: '[Net, Config] - network connection + config access
+connect :: PostgresConfig -> FoundryM '[ 'Net, 'Config ] (Either Text PostgresConn)
+connect cfg = F.do
+  -- Network connection
+  _ <- liftNet (pure ())
+  -- Config access for connection params
+  liftConfig $ pure $ Right PostgresConn
+    { pgConnString = buildConnString cfg
+    }
   where
     buildConnString :: PostgresConfig -> Text
     buildConnString c = mconcat
@@ -113,33 +126,40 @@ connect cfg = pure $ Right PostgresConn
       ]
 
 -- | Disconnect from PostgreSQL
-disconnect :: PostgresConn -> IO ()
-disconnect _ = pure ()
+-- Grade: '[Net] - network operation
+disconnect :: PostgresConn -> FoundryM '[ 'Net ] ()
+disconnect _ = liftNet $ pure ()
 
 --------------------------------------------------------------------------------
 -- Storage Operations
 --------------------------------------------------------------------------------
 
 -- | Store brand data
-storeBrand :: PostgresConn -> StoredBrand -> IO (StorageResult ())
-storeBrand _conn _brand = pure $ StorageOk ()
+-- Grade: '[Net] - network write operation
+storeBrand :: PostgresConn -> StoredBrand -> FoundryM '[ 'Net ] (StorageResult ())
+storeBrand _conn _brand = liftNet $ pure $ StorageOk ()
 
 -- | Fetch brand by storage key
-fetchBrand :: PostgresConn -> StorageKey -> IO (StorageResult StoredBrand)
-fetchBrand _conn key = pure $ StorageNotFound key
+-- Grade: '[Net] - network read operation
+fetchBrand :: PostgresConn -> StorageKey -> FoundryM '[ 'Net ] (StorageResult StoredBrand)
+fetchBrand _conn key = liftNet $ pure $ StorageNotFound key
 
 -- | Fetch brand by domain
-fetchBrandByDomain :: PostgresConn -> Text -> IO (StorageResult StoredBrand)
-fetchBrandByDomain _conn _domain = pure $ StorageError "Not found"
+-- Grade: '[Net] - network read operation
+fetchBrandByDomain :: PostgresConn -> Text -> FoundryM '[ 'Net ] (StorageResult StoredBrand)
+fetchBrandByDomain _conn _domain = liftNet $ pure $ StorageError "Not found"
 
 -- | Delete brand
-deleteBrand :: PostgresConn -> StorageKey -> IO (StorageResult ())
-deleteBrand _conn _key = pure $ StorageOk ()
+-- Grade: '[Net] - network write operation
+deleteBrand :: PostgresConn -> StorageKey -> FoundryM '[ 'Net ] (StorageResult ())
+deleteBrand _conn _key = liftNet $ pure $ StorageOk ()
 
 --------------------------------------------------------------------------------
 -- Transactions
 --------------------------------------------------------------------------------
 
 -- | Run action in a transaction
-withTransaction :: PostgresConn -> IO a -> IO a
+-- Note: withTransaction takes an already-graded action and wraps it
+-- The grade of the wrapped action flows through
+withTransaction :: PostgresConn -> FoundryM es a -> FoundryM es a
 withTransaction _conn action = action

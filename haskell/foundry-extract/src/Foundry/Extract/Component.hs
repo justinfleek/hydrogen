@@ -29,8 +29,23 @@ Required by: Demo pipeline
 -- ===========================================================================
 -}
 module Foundry.Extract.Component
-  ( -- * Atom Extraction
-    extractColorAtoms
+  ( -- * Atom Types
+    ColorAtomRec (..)
+  , FontAtomRec (..)
+  , SpacingAtomRec (..)
+
+    -- * Molecule Types
+  , ButtonMoleculeRec (..)
+
+    -- * Compound Types
+  , HeroCompoundRec (..)
+  , CardCompoundRec (..)
+
+    -- * Registry Type
+  , ExtractedRegistry (..)
+
+    -- * Atom Extraction
+  , extractColorAtoms
   , extractFontAtoms
   , extractSpacingAtoms
 
@@ -130,7 +145,7 @@ extractColorAtoms sr = V.fromList $ deduplicateColors $ concatMap extractFromSty
 
 -- | Extract color from a CSS property
 extractColorProp :: Text -> Text -> CSSProperty -> Maybe ColorAtomRec
-extractColorProp domain selector prop = case cssValue prop of
+extractColorProp domain selector prop = case cssPropValue prop of
   CSSColor hexColor -> Just ColorAtomRec
     { carId = mkComponentUUID domain "atom" "color" (hashContent hexColor)
     , carName = inferColorName selector (cssPropName prop)

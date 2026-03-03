@@ -107,8 +107,10 @@ library
     Foundry.Core.Effect
     Foundry.Core.Effect.Graded
     Foundry.Core.Effect.CoEffect
-    -- Graded monad (from straylight-llm production)
+    -- Graded monad (Orchard & Petricek effect-monad integration)
+    Foundry.Core.Effects.Grade
     Foundry.Core.Effects.Graded
+    Foundry.Core.Effects.Do
     -- Coeffect types and discharge proofs (from straylight-llm production)
     Foundry.Core.Coeffect.Types
     Foundry.Core.Coeffect.Discharge
@@ -143,6 +145,7 @@ library
   build-depends:
     , aeson             >= 2.0   && < 3
     , base              >= 4.18  && < 5
+    , effect-monad      >= 0.9   && < 1
     , base16-bytestring >= 1.0   && < 2
     , bytestring        >= 0.11  && < 1
     , case-insensitive  >= 1.2   && < 2
@@ -185,6 +188,7 @@ test-suite foundry-core-test
     Test.Foundry.Core.Brand.UIElements
     Test.Foundry.Core.Brand.GraphicElements
     Test.Foundry.Core.Effect
+    Test.Foundry.Core.Effects.Graded
     Foundry.Core.Evring.TestSigil
   build-depends:
     , base            >= 4.18  && < 5

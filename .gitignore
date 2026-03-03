@@ -74,3 +74,8 @@ Thumbs.db
 *.key
 credentials.json
 secrets/
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Internal Documentation (not for public repos)
+# ══════════════════════════════════════════════════════════════════════════════
+docs/INTERNAL/
