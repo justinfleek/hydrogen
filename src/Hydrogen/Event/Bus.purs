@@ -48,6 +48,11 @@ module Hydrogen.Event.Bus
   , emit
   , emitAsync
   , emitDelayed
+    -- * Server Sync (Query Integration)
+  , emitToServer
+  , subscribeFromServer
+  , loadEventHistory
+  , invalidateEventCache
     -- * Channels
   , Channel
   , channel
@@ -74,8 +79,11 @@ module Hydrogen.Event.Bus
 import Prelude hiding (map, when)
 
 import Control.Monad (unless, when)
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Array as Array
 import Data.DateTime.Instant (unInstant) as Instant
+import Data.Either (Either)
 import Data.Functor (map) as Functor
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Time.Duration (Milliseconds(Milliseconds)) as Duration
@@ -86,6 +94,8 @@ import Effect.Class (liftEffect)
 import Effect.Now (now) as Now
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.API.Client as Api
+import Hydrogen.Data.RemoteData (RemoteData(Success))
 import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -400,6 +410,103 @@ subscribeTyped bus (TypedChannel name) handler =
 emitTyped :: forall a. EventBus AnyEvent -> TypedChannel a -> a -> Effect Unit
 emitTyped bus (TypedChannel name) event =
   emit bus (wrapEvent name event)
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- Server Sync (Query Integration)
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Emit an event to the server with Query caching
+-- |
+-- | ```purescript
+-- | result <- Bus.emitToServer bus apiConfig "/api/events/room123" event
+-- | case result of
+-- |   Right _ -> Console.log "Event sent to server"
+-- |   Left err -> Console.error err
+-- | ```
+emitToServer 
+  :: forall a
+   . EncodeJson a
+  => DecodeJson a
+  => EventBus a 
+  -> Api.ApiConfig 
+  -> String 
+  -> a 
+  -> Aff (Either String a)
+emitToServer bus apiConfig path event = do
+  -- Emit locally first
+  liftEffect $ emit bus event
+  -- Send to server
+  Api.post apiConfig path event
+
+-- | Subscribe to events from a server endpoint (via polling)
+-- |
+-- | ```purescript
+-- | unsub <- Bus.subscribeFromServer bus apiConfig "/api/events/room123" 5000
+-- | ```
+subscribeFromServer 
+  :: forall a
+   . DecodeJson a
+  => EncodeJson a
+  => EventBus a 
+  -> Api.ApiConfig 
+  -> String 
+  -> Duration.Milliseconds
+  -> Aff (Effect Unit)
+subscribeFromServer bus apiConfig path pollInterval = do
+  -- Initial fetch
+  result <- Q.query bus.queryClient
+    { key: ["event", "bus", path]
+    , fetch: Api.get apiConfig path
+    , staleTime: Just pollInterval
+    , retry: 1
+    , retryDelay: Duration.Milliseconds 1000.0
+    }
+  
+  -- Process fetched events
+  case result.data of
+    Success events -> liftEffect $ emitFetchedEvents bus events
+    _ -> pure unit
+  
+  -- Return invalidation function (caller can use for cleanup)
+  pure $ Q.invalidate bus.queryClient ["event", "bus", path]
+
+-- | Helper to emit fetched events locally
+emitFetchedEvents :: forall a. EventBus a -> Array a -> Effect Unit
+emitFetchedEvents bus events = 
+  for_ events \event -> emit bus event
+  where
+  for_ arr f = void $ Traversable.traverse f arr
+
+-- | Load event history from server with Query caching
+-- |
+-- | ```purescript
+-- | state <- Bus.loadEventHistory bus apiConfig "/api/events/room123/history"
+-- | case state.data of
+-- |   Success history -> Console.log $ "Loaded " <> show (Array.length history) <> " events"
+-- |   Failure e -> Console.error e
+-- |   _ -> pure unit
+-- | ```
+loadEventHistory 
+  :: forall a
+   . DecodeJson (Array a)
+  => EncodeJson (Array a)
+  => EventBus a 
+  -> Api.ApiConfig 
+  -> String 
+  -> Aff (Q.QueryState String (Array a))
+loadEventHistory bus apiConfig path = 
+  Q.query bus.queryClient
+    { key: ["event", "history", path]
+    , fetch: Api.get apiConfig path
+    , staleTime: Nothing
+    , retry: 1
+    , retryDelay: Duration.Milliseconds 1000.0
+    }
+
+-- | Invalidate cached event history (forces fresh fetch on next load)
+invalidateEventCache :: forall a. EventBus a -> String -> Effect Unit
+invalidateEventCache bus path = 
+  Q.invalidate bus.queryClient ["event", "history", path]
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Utilities

@@ -52,6 +52,11 @@ module Hydrogen.State.Store
   , getState
   , subscribe
   , replaceReducer
+    -- * Server Sync (Query Integration)
+  , loadState
+  , saveState
+  , syncState
+  , invalidateState
     -- * Middleware
   , loggerMiddleware
   , thunkMiddleware
@@ -64,14 +69,20 @@ module Hydrogen.State.Store
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Array as Array
+import Data.Either (Either(Right))
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Time.Duration (Milliseconds(Milliseconds)) as Duration
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.API.Client as Api
+import Hydrogen.Data.RemoteData (RemoteData(Success))
 import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -239,3 +250,77 @@ combineReducers
   -> Reducer state action
 combineReducers reducers state action = 
   Array.foldl (\s r -> r s action) state reducers
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // server sync (Query)
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Load state from server with Query caching
+-- |
+-- | ```purescript
+-- | state <- Store.loadState store apiConfig "/api/state/user123"
+-- | case state.data of
+-- |   Success s -> dispatch store (SetState s)
+-- |   Failure e -> Console.error e
+-- |   _ -> pure unit
+-- | ```
+loadState 
+  :: forall state action
+   . DecodeJson state
+  => EncodeJson state
+  => Store state action 
+  -> Api.ApiConfig 
+  -> String 
+  -> Aff (Q.QueryState String state)
+loadState (Store store) apiConfig path = do
+  Q.query store.queryClient
+    { key: ["store", "state", path]
+    , fetch: Api.get apiConfig path
+    , staleTime: Nothing
+    , retry: 1
+    , retryDelay: Duration.Milliseconds 1000.0
+    }
+
+-- | Save current state to server
+-- |
+-- | ```purescript
+-- | result <- Store.saveState store apiConfig "/api/state/user123"
+-- | case result of
+-- |   Right _ -> Console.log "State saved"
+-- |   Left err -> Console.error err
+-- | ```
+saveState 
+  :: forall state action
+   . EncodeJson state
+  => DecodeJson state
+  => Store state action 
+  -> Api.ApiConfig 
+  -> String 
+  -> Aff (Either String state)
+saveState (Store store) apiConfig path = do
+  currentState <- liftEffect $ Ref.read store.state
+  Api.put apiConfig path currentState
+
+-- | Load state from server and update store
+-- |
+-- | ```purescript
+-- | Store.syncState store apiConfig "/api/state/user123"
+-- | ```
+syncState 
+  :: forall state action
+   . DecodeJson state
+  => EncodeJson state
+  => Store state action 
+  -> Api.ApiConfig 
+  -> String 
+  -> Aff Unit
+syncState store@(Store s) apiConfig path = do
+  result <- loadState store apiConfig path
+  case result.data of
+    Success newState -> liftEffect $ Ref.write newState s.state
+    _ -> pure unit
+
+-- | Invalidate cached state (forces fresh fetch on next load)
+invalidateState :: forall state action. Store state action -> String -> Effect Unit
+invalidateState (Store store) path = 
+  Q.invalidate store.queryClient ["store", "state", path]
