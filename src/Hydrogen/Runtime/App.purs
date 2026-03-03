@@ -29,8 +29,31 @@
 module Hydrogen.Runtime.App
   ( -- * App Definition
     App
-  , Sub(OnAnimationFrame, OnKeyDown, OnKeyUp, OnMouseMove, OnResize, OnVisibilityChange, OnInterval)
+  , Sub
+      ( OnAnimationFrame
+      , OnKeyDown
+      , OnKeyUp
+      , OnMouseMove
+      , OnMouseDown
+      , OnMouseUp
+      , OnTouchStart
+      , OnTouchMove
+      , OnTouchEnd
+      , OnTouchCancel
+      , OnDeviceOrientation
+      , OnDeviceMotion
+      , OnResize
+      , OnVisibilityChange
+      , OnInterval
+      )
+  
+  -- * Event Types
   , MousePos
+  , MouseEvent
+  , TouchPoint
+  , TouchEvent
+  , DeviceOrientationEvent
+  , DeviceMotionEvent
   , Dimensions
   , app
   
@@ -43,7 +66,21 @@ module Hydrogen.Runtime.App
   , initialRuntime
   
   -- * Event Loop (Pure)
-  , DomEvent(MouseMoved, KeyPressed, KeyReleased, WindowResized, VisibilityChanged)
+  , DomEvent
+      ( MouseMoved
+      , MousePressed
+      , MouseReleased
+      , KeyPressed
+      , KeyReleased
+      , WindowResized
+      , VisibilityChanged
+      , TouchStarted
+      , TouchMoved
+      , TouchEnded
+      , TouchCancelled
+      , DeviceOrientationChanged
+      , DeviceMotionChanged
+      )
   , processMessage
   , processTick
   , processEvent
@@ -117,24 +154,125 @@ type App state msg element =
 -- | Subscription type — describes ongoing event sources
 -- |
 -- | Subscriptions are declarative: "while this state holds, listen for X"
+-- |
+-- | ## Event Categories
+-- |
+-- | - **Animation**: Frame timing for smooth animations
+-- | - **Keyboard**: Key press/release events
+-- | - **Mouse**: Mouse position and button events
+-- | - **Touch**: Multi-touch gesture events with coordinates
+-- | - **Device Sensors**: Orientation, motion, accelerometer
+-- | - **Haptic**: Vibration feedback triggers
+-- | - **Window**: Resize, visibility changes
+-- | - **Timer**: Interval-based updates
 data Sub msg
   = OnAnimationFrame (Number -> msg)
-    -- ^ Request animation frames
+    -- ^ Request animation frames (delta time in ms)
+  
+  -- Keyboard events
   | OnKeyDown (String -> msg)
-    -- ^ Keyboard events
+    -- ^ Key pressed (key code string)
   | OnKeyUp (String -> msg)
-    -- ^ Keyboard events
+    -- ^ Key released (key code string)
+  
+  -- Mouse events
   | OnMouseMove (MousePos -> msg)
     -- ^ Mouse position updates
+  | OnMouseDown (MouseEvent -> msg)
+    -- ^ Mouse button pressed with position
+  | OnMouseUp (MouseEvent -> msg)
+    -- ^ Mouse button released with position
+  
+  -- Touch events (multi-touch with coordinates)
+  | OnTouchStart (TouchEvent -> msg)
+    -- ^ Touch began (array of touch points)
+  | OnTouchMove (TouchEvent -> msg)
+    -- ^ Touch moved (array of touch points)
+  | OnTouchEnd (TouchEvent -> msg)
+    -- ^ Touch ended (array of touch points)
+  | OnTouchCancel (TouchEvent -> msg)
+    -- ^ Touch cancelled (array of touch points)
+  
+  -- Device sensor events
+  | OnDeviceOrientation (DeviceOrientationEvent -> msg)
+    -- ^ Device orientation changed (alpha, beta, gamma in degrees)
+  | OnDeviceMotion (DeviceMotionEvent -> msg)
+    -- ^ Device motion/acceleration (includes gravity)
+  
+  -- Window events
   | OnResize (Dimensions -> msg)
     -- ^ Window resize events
   | OnVisibilityChange (Boolean -> msg)
-    -- ^ Page visibility changes
+    -- ^ Page visibility changes (true = visible)
+  
+  -- Timer events
   | OnInterval Number msg
     -- ^ Timer at interval (ms)
 
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // event types
+-- ═════════════════════════════════════════════════════════════════════════════
+
 -- | Mouse position
 type MousePos = { x :: Number, y :: Number }
+
+-- | Mouse event with position and button info
+type MouseEvent =
+  { x :: Number           -- ^ X coordinate relative to target
+  , y :: Number           -- ^ Y coordinate relative to target
+  , button :: Int         -- ^ Button index (0=left, 1=middle, 2=right)
+  , buttons :: Int        -- ^ Bitmask of pressed buttons
+  , clientX :: Number     -- ^ X relative to viewport
+  , clientY :: Number     -- ^ Y relative to viewport
+  }
+
+-- | Single touch point
+type TouchPoint =
+  { identifier :: Int     -- ^ Unique touch ID
+  , x :: Number           -- ^ X coordinate relative to target
+  , y :: Number           -- ^ Y coordinate relative to target
+  , clientX :: Number     -- ^ X relative to viewport
+  , clientY :: Number     -- ^ Y relative to viewport
+  , force :: Number       -- ^ Pressure (0.0 to 1.0, if supported)
+  , radiusX :: Number     -- ^ Touch area X radius
+  , radiusY :: Number     -- ^ Touch area Y radius
+  }
+
+-- | Touch event with array of touch points
+type TouchEvent =
+  { touches :: Array TouchPoint          -- ^ All current touches
+  , changedTouches :: Array TouchPoint   -- ^ Touches that changed
+  , targetTouches :: Array TouchPoint    -- ^ Touches on target element
+  }
+
+-- | Device orientation event (gyroscope/compass)
+-- |
+-- | Uses Euler angles (degrees):
+-- | - alpha: Compass heading (0-360)
+-- | - beta: Front-back tilt (-180 to 180)
+-- | - gamma: Left-right tilt (-90 to 90)
+type DeviceOrientationEvent =
+  { alpha :: Number       -- ^ Compass heading (degrees)
+  , beta :: Number        -- ^ Front-back tilt (degrees)
+  , gamma :: Number       -- ^ Left-right tilt (degrees)
+  , absolute :: Boolean   -- ^ True if absolute orientation
+  }
+
+-- | Device motion event (accelerometer)
+-- |
+-- | All acceleration values in m/s squared.
+type DeviceMotionEvent =
+  { accelerationX :: Number           -- ^ X acceleration (excluding gravity)
+  , accelerationY :: Number           -- ^ Y acceleration (excluding gravity)
+  , accelerationZ :: Number           -- ^ Z acceleration (excluding gravity)
+  , accelerationIncludingGravityX :: Number  -- ^ X with gravity
+  , accelerationIncludingGravityY :: Number  -- ^ Y with gravity
+  , accelerationIncludingGravityZ :: Number  -- ^ Z with gravity
+  , rotationAlpha :: Number           -- ^ Rotation rate alpha (deg/s)
+  , rotationBeta :: Number            -- ^ Rotation rate beta (deg/s)
+  , rotationGamma :: Number           -- ^ Rotation rate gamma (deg/s)
+  , interval :: Number                -- ^ Time interval (ms)
+  }
 
 -- | Window/element dimensions
 type Dimensions = { width :: Number, height :: Number }
@@ -190,7 +328,7 @@ defaultConfig =
 -- | Runtime state maintained by the Hydrogen runtime
 -- |
 -- | This is internal to the runtime — application code doesn't touch this.
--- | It tracks timing, triggers, and frame scheduling.
+-- | It tracks timing, triggers, input state, and device sensors.
 type RuntimeState state =
   { appState :: state
     -- ^ Current application state
@@ -202,12 +340,27 @@ type RuntimeState state =
     -- ^ Total frames rendered
   , mousePos :: MousePos
     -- ^ Current mouse position
+  , mouseDown :: Boolean
+    -- ^ Is mouse button currently pressed
   , windowSize :: Dimensions
     -- ^ Current window dimensions
   , activeKeys :: Array String
     -- ^ Currently pressed keys
+  , activeTouches :: Array TouchPoint
+    -- ^ Currently active touch points
+  , deviceOrientation :: DeviceOrientationEvent
+    -- ^ Current device orientation (tilt)
   , pendingCmds :: Array (Cmd Unit)
     -- ^ Commands waiting to execute (type-erased for batching)
+  }
+
+-- | Default device orientation (flat)
+defaultOrientation :: DeviceOrientationEvent
+defaultOrientation =
+  { alpha: 0.0
+  , beta: 0.0
+  , gamma: 0.0
+  , absolute: false
   }
 
 -- | Create initial runtime state from app's init
@@ -218,8 +371,11 @@ initialRuntime initTransition =
   , lastFrameTime: 0.0
   , frameCount: 0
   , mousePos: { x: 0.0, y: 0.0 }
+  , mouseDown: false
   , windowSize: { width: 0.0, height: 0.0 }
   , activeKeys: []
+  , activeTouches: []
+  , deviceOrientation: defaultOrientation
   , pendingCmds: []
   }
 
@@ -272,11 +428,21 @@ processTick config application timestamp runtime =
 
 -- | Process a DOM event
 -- |
--- | Updates runtime state based on event type (mouse move, key press, etc.)
+-- | Updates runtime state based on event type.
+-- |
+-- | Covers mouse, keyboard, touch, device sensors, and window events.
 data DomEvent
   = MouseMoved MousePos
+  | MousePressed MouseEvent
+  | MouseReleased MouseEvent
   | KeyPressed String
   | KeyReleased String
+  | TouchStarted TouchEvent
+  | TouchMoved TouchEvent
+  | TouchEnded TouchEvent
+  | TouchCancelled TouchEvent
+  | DeviceOrientationChanged DeviceOrientationEvent
+  | DeviceMotionChanged DeviceMotionEvent
   | WindowResized Dimensions
   | VisibilityChanged Boolean
 
@@ -288,10 +454,26 @@ processEvent
 processEvent event runtime = case event of
   MouseMoved pos ->
     runtime { mousePos = pos }
+  MousePressed me ->
+    runtime { mousePos = { x: me.x, y: me.y }, mouseDown = true }
+  MouseReleased me ->
+    runtime { mousePos = { x: me.x, y: me.y }, mouseDown = false }
   KeyPressed key ->
     runtime { activeKeys = Array.snoc runtime.activeKeys key }
   KeyReleased key ->
     runtime { activeKeys = Array.filter (\k -> notEq k key) runtime.activeKeys }
+  TouchStarted te ->
+    runtime { activeTouches = te.touches }
+  TouchMoved te ->
+    runtime { activeTouches = te.touches }
+  TouchEnded te ->
+    runtime { activeTouches = te.touches }
+  TouchCancelled _ ->
+    runtime { activeTouches = [] }
+  DeviceOrientationChanged oe ->
+    runtime { deviceOrientation = oe }
+  DeviceMotionChanged _ ->
+    runtime  -- Motion tracked separately if needed
   WindowResized dims ->
     runtime { windowSize = dims }
   VisibilityChanged _ ->

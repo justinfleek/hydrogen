@@ -1,6 +1,8 @@
 // Playwright FFI bindings for PureScript
 // Requires: npm install playwright
 
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const pw = require("playwright");
 
 // =============================================================================
