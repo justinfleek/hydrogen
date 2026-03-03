@@ -72,6 +72,7 @@ import Effect.Class (liftEffect)
 import Effect.Class.Console as Console
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
@@ -84,6 +85,7 @@ newtype Store state action = Store
   , listeners :: Ref (Array (StoreListener state))
   , middleware :: Array (Middleware state action)
   , nextListenerId :: Ref Int
+  , queryClient :: Q.QueryClient
   }
 
 -- | A reducer takes state and action, returns new state
@@ -121,12 +123,14 @@ createStoreWithMiddleware initialState reducer middleware = do
   reducerRef <- Ref.new reducer
   listenersRef <- Ref.new []
   nextListenerIdRef <- Ref.new 0
+  queryClient <- Q.newClient
   pure $ Store 
     { state: stateRef
     , reducer: reducerRef
     , listeners: listenersRef
     , middleware
     , nextListenerId: nextListenerIdRef
+    , queryClient
     }
 
 -- ═════════════════════════════════════════════════════════════════════════════

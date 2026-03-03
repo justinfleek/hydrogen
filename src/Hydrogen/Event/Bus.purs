@@ -86,6 +86,7 @@ import Effect.Class (liftEffect)
 import Effect.Now (now) as Now
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Event Bus Core
@@ -98,6 +99,7 @@ type EventBus a =
   , nextId :: Ref Int
   , history :: Maybe (History a)
   , debugMode :: Ref Boolean
+  , queryClient :: Q.QueryClient
   }
 
 -- | A subscriber with metadata
@@ -114,12 +116,14 @@ create = do
   subscribers <- Ref.new []
   nextId <- Ref.new 0
   debugMode <- Ref.new false
+  queryClient <- Q.newClient
   pure
     { name: Nothing
     , subscribers
     , nextId
     , history: Nothing
     , debugMode
+    , queryClient
     }
 
 -- | Create a named event bus (useful for debugging)

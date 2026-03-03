@@ -77,6 +77,9 @@ module Hydrogen.Analytics.Tracker
     -- * Batching
   , flush
   , setBufferSize
+    -- * Query Integration
+  , loadRemoteConfig
+  , invalidateConfig
     -- * Debug
   , enableDebug
   , getQueue
@@ -92,6 +95,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(Tuple))
+import Data.Either (Either(Right, Left))
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
@@ -99,6 +103,7 @@ import Effect.Ref (Ref)
 import Effect.Ref as Ref
 import Foreign.Object (Object)
 import Foreign.Object as Object
+import Hydrogen.Query as Q
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Core Types
@@ -114,6 +119,7 @@ type Tracker =
   , userProperties :: Ref (Map String String)
   , sessionId :: String
   , debug :: Ref Boolean
+  , queryClient :: Q.QueryClient
   }
 
 -- | Tracker configuration
@@ -169,8 +175,9 @@ createWithConfig config = do
   userProperties <- Ref.new Map.empty
   sessionId <- generateSessionId
   debug <- Ref.new false
+  queryClient <- Q.newClient
   
-  let tracker = { providers, queue, config, isEnabled, userId, userProperties, sessionId, debug }
+  let tracker = { providers, queue, config, isEnabled, userId, userProperties, sessionId, debug, queryClient }
   
   -- Set up flush interval if configured
   case config.flushInterval of
@@ -568,6 +575,26 @@ flush tracker = do
 -- | Set the buffer size
 setBufferSize :: Tracker -> Int -> Effect Unit
 setBufferSize tracker size = pure unit -- Would update config
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- Query Integration
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Load remote analytics configuration via Query (cached)
+-- |
+-- | Fetches tracking rules, sampling rates, or provider settings from server.
+-- | Uses Query for caching and deduplication. Returns raw config string
+-- | that can be parsed by the caller.
+loadRemoteConfig :: Tracker -> String -> Aff (Q.QueryState String String)
+loadRemoteConfig tracker url = do
+  Q.query tracker.queryClient
+    (Q.defaultQueryOptions ["analytics", "config", url] (fetchConfigImpl url))
+
+foreign import fetchConfigImpl :: String -> Aff (Either String String)
+
+-- | Invalidate cached analytics config (forces refresh on next load)
+invalidateConfig :: Tracker -> Effect Unit
+invalidateConfig tracker = Q.invalidate tracker.queryClient ["analytics", "config"]
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Debug
