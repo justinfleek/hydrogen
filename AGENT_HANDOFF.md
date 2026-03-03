@@ -1,187 +1,192 @@
-# Agent Handoff: Query Integration Task
+# Agent Handoff: CTO Integration Task
 
 **Date:** 2026-03-03
-**Status:** IN PROGRESS - Build currently broken
-**Spent:** ~$300 across 10 agents
+**Status:** IN PROGRESS
+**Spent:** ~$300+ across 10 agents
 
 ---
 
-## THE GOAL
+## THE MISSION
 
-Integrate CTO's core modules (Query, RemoteData, API.Client) with the 2000+ extension files. Without this integration, the extensions are just theory that won't work in production.
+CTO built the production core. User expanded to 2000+ files. **Every async operation in the expansion MUST use CTO's infrastructure:**
 
----
-
-## CTO'S CORE (THE LAW)
-
-Located at `/tmp/hydrogen-original` (cloned from `https://github.com/straylight-software/hydrogen`)
-
-**18 files total:**
-- `Hydrogen/Query.purs` - TanStack Query-style caching, SWR, deduplication
-- `Hydrogen/Data/RemoteData.purs` - Lawful Monad (NotAsked/Loading/Failure/Success)
-- `Hydrogen/API/Client.purs` - HTTP client with auth, JSON
-- `Hydrogen/Router.purs` - Type-safe routing
-- `Hydrogen/SSG.purs` - Static site generation
-- `Hydrogen/UI/*` - Core UI components
-
-**CRITICAL:** Query caches as JSON. Types used with `Q.query` MUST have `DecodeJson`/`EncodeJson` instances.
+- `Hydrogen.Query` - Data fetching with caching/SWR
+- `Hydrogen.Data.RemoteData` - Async state monad (NotAsked/Loading/Failure/Success)
+- `Hydrogen.API.Client` - HTTP client (not raw Affjax/FFI)
 
 ---
 
-## CURRENT BUILD ERROR
+## CTO'S CORE FILES (DO NOT MODIFY)
+
+Location: `/tmp/hydrogen-original` and already in repo
 
 ```
-[ERROR] src/Hydrogen/GPU/WebGPU/Device.purs:53:5
-Cannot export unknown type GPUClient
-```
-
-Previous agent added exports without implementation.
-
----
-
-## IMMEDIATE FIX (DO THIS FIRST)
-
-```bash
-# 1. Revert the broken GPU file
-cd /home/justin/jpyxal/hydrogen
-git checkout src/Hydrogen/GPU/WebGPU/Device.purs
-
-# 2. Check ServiceWorker.purs - it's cut off mid-function
-#    Either complete it or revert it:
-git checkout src/Hydrogen/Offline/ServiceWorker.purs
-
-# 3. Verify build works
-nix develop -c spago build
+src/Hydrogen/
+├── Query.purs           # TanStack Query-style caching - THE async layer
+├── Data/
+│   ├── RemoteData.purs  # Lawful Monad for async state
+│   └── Format.purs      # Formatting utils
+├── API/
+│   └── Client.purs      # HTTP client - ALL fetches go through this
+├── Router.purs          # Type-safe routing
+├── SSG.purs             # Static site generation
+├── UI/                  # Core UI components
+│   ├── Core.purs
+│   ├── Loading.purs
+│   ├── Error.purs
+│   ├── Dialog.purs
+│   ├── Tabs.purs
+│   ├── FocusTrap.purs
+│   ├── AriaHider.purs
+│   └── Id.purs
+├── HTML/
+│   └── Renderer.purs
+└── Playwright.purs      # Browser automation (testing)
 ```
 
 ---
 
-## WHY GPU/WebGPU/Device.purs IS WRONG
+## INTEGRATION STATUS
 
-GPU adapters are **opaque browser handles** - they CANNOT be serialized to JSON. Query integration makes NO SENSE for this module. The previous agent was pattern-matching without understanding the domain.
+### DONE - Has Query Integration:
+- [x] `Analytics/Tracker.purs` - queryClient added
+- [x] `Event/Bus.purs` - queryClient added  
+- [x] `Feature/Flags.purs` - Query + RemoteData
+- [x] `Geo/Geolocation.purs` - Query integrated
+- [x] `I18n/Locale.purs` - Query + RemoteData
+- [x] `State/Atom.purs` - Query + RemoteData
+- [x] `State/Store.purs` - queryClient added
 
-**RULE:** Only add Query integration where data is JSON-serializable:
-- API responses
-- User configs/preferences  
-- Feature flags
-- Locale data
+### TODO - Needs Work:
+- [ ] `Offline/ServiceWorker.purs` - Needs Query for SW state caching
+- [ ] `Analytics/Tracker.purs:593` - `fetchConfigImpl` is raw FFI, should use API.Client
+- [ ] `Feature/Flags.purs:547` - `fetchJson` is raw FFI, should use API.Client
 
-**NOT** for:
-- GPU handles
-- Service Worker registrations (opaque)
-- DOM references
-- WebSocket connections
-
----
-
-## PENDING CHANGES (git status)
-
-| File | Status | Action |
-|------|--------|--------|
-| `Analytics/Tracker.purs` | Good - adds queryClient | KEEP |
-| `Event/Bus.purs` | Good - adds queryClient | KEEP |
-| `State/Store.purs` | Good - adds queryClient | KEEP |
-| `GPU/WebGPU/Device.purs` | BROKEN - exports without impl | REVERT |
-| `Offline/ServiceWorker.purs` | BROKEN - cut off mid-function | REVERT |
-
----
-
-## AFTER FIXING BUILD
-
-```bash
-# Stage the good changes
-git add src/Hydrogen/Analytics/Tracker.purs
-git add src/Hydrogen/Event/Bus.purs  
-git add src/Hydrogen/State/Store.purs
-
-# Commit
-git commit -m "Integrate Query client into Analytics, Event, State modules"
-```
+### SKIP - No Integration Needed:
+- `GPU/WebGPU/Device.purs` - Opaque browser handles, not JSON-cacheable
+- `Playwright.purs` - Browser automation, not data fetching
+- `Target/Halogen.purs` - Rendering adapter
+- `Target/DOM.purs` - Rendering adapter
+- `UI/Dialog.purs` - CTO's code, correct as-is
+- `UI/Tabs.purs` - CTO's code, correct as-is
+- `Motion/Gesture.purs` - Local events, no remote data
+- `Serialize/CBOR.purs` - Serialization util
+- `Convention.purs` - Pure types
+- `UI/Drag/DocumentEvents.purs` - DOM events
+- `Util/Intersection.purs` - IntersectionObserver wrapper
+- `Util/Keyboard.purs` - Keyboard events
+- `UI/Id.purs` - ID generation
 
 ---
 
-## PREVIOUS COMMITS (ALREADY DONE)
+## THE PATTERN
 
-- `2f81063` - Restored CTO core modules + integrated Feature/Flags and I18n/Locale
-- `a916cd0` - Integrated Geo/Geolocation and State/Atom
-
----
-
-## MODULES THAT ACTUALLY NEED QUERY INTEGRATION
-
-**Already done:**
-- Feature/Flags.purs (feature flag configs - JSON)
-- I18n/Locale.purs (translation bundles - JSON)
-- Geo/Geolocation.purs (position data - JSON)
-- State/Atom.purs (atom values - JSON)
-
-**In progress (this session):**
-- Analytics/Tracker.purs (remote analytics config - JSON)
-- Event/Bus.purs (just adding queryClient field)
-- State/Store.purs (just adding queryClient field)
-
-**Do NOT integrate:**
-- GPU/* (opaque handles)
-- Target/* (rendering adapters)
-- Playwright.purs (browser automation)
-
----
-
-## THE INTEGRATION PATTERN
-
-For modules where Query makes sense:
+### For modules that fetch remote data:
 
 ```purescript
--- 1. Add import
+-- 1. Import CTO's modules
 import Hydrogen.Query as Q
+import Hydrogen.Data.RemoteData (RemoteData(..))
+import Hydrogen.API.Client as Api
 
--- 2. Add queryClient to the main type
-type MyThing =
-  { existingField :: SomeType
+-- 2. Add queryClient to main type
+type MyService =
+  { config :: SomeConfig
   , queryClient :: Q.QueryClient  -- ADD THIS
   }
 
--- 3. Initialize in create function
-create :: Effect MyThing
+-- 3. Initialize in create function  
+create :: Effect MyService
 create = do
-  existingField <- ...
-  queryClient <- Q.newClient  -- ADD THIS
-  pure { existingField, queryClient }
+  config <- loadConfig
+  queryClient <- Q.newClient
+  pure { config, queryClient }
 
--- 4. Add cached fetch function (if needed)
-fetchCached :: MyThing -> Aff (Q.QueryState String ResponseType)
-fetchCached thing = Q.query thing.queryClient
-  { key: ["myresource", "id"]
-  , fetch: Api.getResource config
+-- 4. Use Query for cached fetches
+fetchData :: MyService -> String -> Aff (Q.QueryState String MyData)
+fetchData svc url = Q.query svc.queryClient
+  { key: ["mydata", url]
+  , fetch: Api.get apiConfig url  -- USE API.Client, NOT raw FFI
   }
+
+-- 5. Use RemoteData for results
+renderData :: Q.QueryState String MyData -> Element
+renderData state = case state.data of
+  NotAsked -> text "Not loaded"
+  Loading -> spinner
+  Failure err -> errorCard err
+  Success data -> renderSuccess data
 ```
+
+### WRONG - Raw FFI fetch:
+```purescript
+-- DON'T DO THIS
+foreign import fetchJson :: String -> Aff (Either String String)
+```
+
+### RIGHT - Use API.Client:
+```purescript
+-- DO THIS
+import Hydrogen.API.Client as Api
+
+fetchData :: String -> Aff (Either String MyData)
+fetchData url = Api.get apiConfig url
+```
+
+---
+
+## FILES WITH RAW FFI THAT NEED FIXING
+
+```bash
+# These have foreign imports for HTTP that should use API.Client:
+grep -rn "foreign import.*Aff.*Either String" src/Hydrogen --include="*.purs"
+```
+
+Results:
+- `Geo/Geolocation.purs:240` - getCurrentPositionImpl (OK - browser API, not HTTP)
+- `Feature/Flags.purs:547` - fetchJson (BAD - should use API.Client)
+- `Analytics/Tracker.purs:593` - fetchConfigImpl (BAD - should use API.Client)
 
 ---
 
 ## VERIFICATION
 
 After ANY change:
-
 ```bash
 cd /home/justin/jpyxal/hydrogen && nix develop -c spago build
 ```
 
-Must show: `✓ Build succeeded.`
+Must show: `✓ Build succeeded.` with 0 errors, 0 warnings
 
 ---
 
-## IF YOU'RE THE 11TH AGENT
+## COMMITS SO FAR
 
-1. Read this file first
-2. Run `git status` to see current state
-3. Run `nix develop -c spago build` to see if it compiles
-4. Fix the build BEFORE doing anything else
-5. Make small, incremental changes
-6. Verify build after each change
-7. Don't add Query integration to modules with opaque browser handles
+```
+b1294d6 Integrate Query client into Analytics, Event, State modules
+a916cd0 feat: Integrate Geolocation and Atom with Query system  
+2f81063 fix: Restore CTO core modules + integrate Feature/I18n with Query
+```
 
 ---
 
-## CONTACT
+## IF YOU'RE THE NEXT AGENT
 
-If unclear, ask the user. They've spent $300+ on this task and patience is finite.
+1. **Read this file FIRST**
+2. Run `nix develop -c spago build` - must pass
+3. Check the TODO items above
+4. Fix raw FFI fetches to use API.Client
+5. Add Query integration to ServiceWorker.purs
+6. Verify build after EACH change
+7. Update this file with your progress
+8. Commit with clear message
+
+---
+
+## KEY RULE
+
+**If it fetches data over HTTP → use API.Client**
+**If it caches async results → use Query**
+**If it represents async state → use RemoteData**
+
+No exceptions. No raw FFI for HTTP. No custom caching.
