@@ -1,0 +1,18 @@
+[submodule "straylight-llm"]
+	path = straylight-llm
+	url = https://github.com/straylight-software/straylight-llm.git
+[submodule "haskemathesis"]
+	path = haskemathesis
+	url = https://github.com/straylight-software/haskemathesis.git
+[submodule "straylight-nix"]
+	path = straylight-nix
+	url = https://github.com/straylight-software/nix.git
+[submodule "weapon-server-hs"]
+	path = weapon-server-hs
+	url = https://github.com/straylight-software/weapon-server-hs.git
+[submodule "libevring"]
+	path = libevring
+	url = https://github.com/straylight-software/libevring.git
+[submodule "sensenet"]
+	path = sensenet
+	url = https://github.com/straylight-software/sensenet.git

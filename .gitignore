@@ -74,6 +74,3 @@ Thumbs.db
 *.key
 credentials.json
 secrets/
-hydrogen
-libevring
-weapon-server-hs
