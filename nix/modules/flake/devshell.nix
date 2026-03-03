@@ -174,6 +174,7 @@
         pkgs.curl
         pkgs.ripgrep
         pkgs.fd
+        pkgs.librsvg # SVG to PNG conversion (rsvg-convert)
       ];
 
       # ════════════════════════════════════════════════════════════════════════

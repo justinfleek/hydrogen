@@ -1,0 +1,34 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                                              // foundry // extension // spago
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+package:
+  name: foundry-extension
+  dependencies:
+    # Core dependencies
+    - aff
+    - arrays
+    - console
+    - effect
+    - either
+    - exceptions
+    - foldable-traversable
+    - foreign
+    - halogen
+    - halogen-vdom
+    - maybe
+    - nullable
+    - prelude
+    - transformers
+    - tuples
+    - web-dom
+    - web-html
+    # Hydrogen dependency - gives access to Schema atoms and ToElement
+    - hydrogen
+
+workspace:
+  packageSet:
+    registry: 73.2.0
+  extraPackages:
+    hydrogen:
+      path: ../../hydrogen
