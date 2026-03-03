@@ -11,6 +11,7 @@ packages:
   foundry-extract/
   foundry-storage/
   foundry-scraper/
+  effect-monad/
 
 -- Use GHC 9.10 for stability
 -- with-compiler: ghc-9.10

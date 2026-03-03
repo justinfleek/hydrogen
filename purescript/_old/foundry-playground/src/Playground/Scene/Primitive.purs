@@ -58,8 +58,9 @@ import Prelude
   , max
   )
 
-import Data.Array (foldl)
-import Data.Maybe (Maybe(..))
+import Data.Array (foldl, uncons)
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.String (length) as String
 
 import Playground.Render.Geometry
   ( Vec2
@@ -306,10 +307,10 @@ primitiveBounds prim = case prim of
            (position.y + spec.fontSize)
   
   GroupPrimitive { children } ->
-    case children of
-      [] -> mkRect 0.0 0.0 0.0 0.0
-      _ -> foldl rectUnion (primitiveBounds (unsafeHead children)) 
-                           (map primitiveBounds (unsafeTail children))
+    case uncons children of
+      Nothing -> mkRect 0.0 0.0 0.0 0.0
+      Just { head: first, tail: rest } -> 
+        foldl rectUnion (primitiveBounds first) (map primitiveBounds rest)
 
 -- | Min of four numbers.
 min4 :: Number -> Number -> Number -> Number -> Number
@@ -320,12 +321,14 @@ max4 :: Number -> Number -> Number -> Number -> Number
 max4 a b c d = max (max a b) (max c d)
 
 -- | Estimate text width (very rough — real measurement needs font metrics).
+-- |
+-- | Uses 0.6 * fontSize * character count as approximation.
+-- | Real measurement requires font metrics from the GPU/browser.
 estimateTextWidth :: TextSpec -> Number
 estimateTextWidth spec =
-  -- Rough estimate: 0.6 * fontSize * character count
-  0.6 * spec.fontSize * toNumber (stringLength spec.content)
+  0.6 * spec.fontSize * intToNumber (String.length spec.content)
 
-foreign import stringLength :: String -> Int
-foreign import toNumber :: Int -> Number
-foreign import unsafeHead :: forall a. Array a -> a
-foreign import unsafeTail :: forall a. Array a -> Array a
+-- | Convert Int to Number (safe, total function).
+-- |
+-- | PureScript Int -> Number conversion via JS coercion.
+foreign import intToNumber :: Int -> Number

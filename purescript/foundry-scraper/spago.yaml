@@ -1,0 +1,83 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                                                      // foundry // scraper
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# FOUNDRY Brand Scraper Dashboard
+#
+# WebGPU-powered A:B visual comparison tool for brand extraction.
+# Scrape any website, extract components with z-indexed layers,
+# rebuild pixel-perfect using Hydrogen Element composition.
+#
+# Architecture:
+#   Haskell (Playwright scraper, graded monads)
+#       ↓ ZMQ protocol
+#   PureScript (Dashboard UI, Hydrogen Elements)
+#       ↓ renders to
+#   WebGPU (Pixel-perfect comparison)
+#
+# Build: spago build
+# Bundle: spago bundle-app --main Scraper.Main --to dist/scraper.js
+# Dev: spago bundle-app --main Scraper.Main --watch --to dist/scraper.js
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+package:
+  name: foundry-scraper
+  dependencies:
+    # Core
+    - prelude
+    - effect
+    - aff
+    - console
+    - maybe
+    - either
+    - tuples
+    - arrays
+    - foldable-traversable
+    - transformers
+    
+    # Data
+    - numbers
+    - integers
+    - strings
+    - newtype
+    - foreign
+    - refs
+    - ordered-collections
+    
+    # UI - Halogen (for initial scaffolding, Hydrogen renders to it)
+    - halogen
+    - halogen-vdom
+    
+    # Web APIs
+    - web-dom
+    - web-html
+    - web-events
+    - web-uievents
+    
+    # HTTP
+    - affjax
+    - affjax-web
+    - http-methods
+    
+    # FFI (for WebGPU, ZMQ bridge)
+    - aff-promise
+    - nullable
+    - arraybuffer-types
+    
+    # Hydrogen framework
+    - hydrogen
+    
+  build:
+    strict: true
+
+workspace:
+  packageSet:
+    registry: 73.2.0
+  extraPackages:
+    # Hydrogen framework - pure Element composition
+    hydrogen:
+      path: ../../../hydrogen
+    # Brand schema types
+    foundry-brand:
+      path: ../../src

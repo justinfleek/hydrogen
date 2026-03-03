@@ -1,0 +1,78 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                                                     // foundry // dashboard
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# FOUNDRY Dashboard - Brand Ingestion UI
+#
+# WebGL2-powered visual comparison tool for brand extraction.
+# Scrape any website, extract components with z-index layers,
+# rebuild pixel-perfect in Hydrogen.
+#
+# Build: spago build
+# Bundle: spago bundle-app --main Dashboard.Main --to dist/dashboard.js
+# Dev: spago bundle-app --main Dashboard.Main --watch --to dist/dashboard.js
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+package:
+  name: foundry-dashboard
+  dependencies:
+    # Core
+    - prelude
+    - effect
+    - aff
+    - console
+    - maybe
+    - either
+    - tuples
+    - arrays
+    - foldable-traversable
+    - transformers
+    
+    # Data
+    - numbers
+    - integers
+    - strings
+    - newtype
+    - foreign
+    - argonaut-core
+    - argonaut-codecs
+    - refs
+    - ordered-collections
+    
+    # UI - Halogen
+    - halogen
+    - halogen-vdom
+    
+    # Web APIs
+    - web-dom
+    - web-html
+    - web-events
+    - web-uievents
+    
+    # HTTP
+    - affjax
+    - affjax-web
+    - http-methods
+    
+    # FFI (for legitimate browser API interaction)
+    - aff-promise
+    - nullable
+    
+    # Hydrogen (pure functional UI framework)
+    - hydrogen
+    
+  build:
+    strict: true
+
+workspace:
+  packageSet:
+    registry: 73.2.0
+  extraPackages:
+    # The REAL Hydrogen - in parent directory, not the stub in foundry
+    hydrogen:
+      path: ../../../hydrogen
+    foundry-playground:
+      path: ../foundry-playground
+    foundry-brand:
+      path: ../../src

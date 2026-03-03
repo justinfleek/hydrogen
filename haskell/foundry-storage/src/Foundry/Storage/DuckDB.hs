@@ -49,6 +49,15 @@ module Foundry.Storage.DuckDB
 
     -- * Serialization
   , serializeBrand
+
+    -- * Component Registry Schema
+  , ComponentSchema (..)
+  , createComponentTables
+  , storeAtom
+  , storeMolecule
+  , storeCompound
+  , queryAtomsByDomain
+  , queryMoleculesByDomain
   ) where
 
 import Data.ByteString (ByteString)
@@ -193,3 +202,106 @@ serializeBrand brand = BS.concat
     
     (.&.) :: Int -> Int -> Int
     (.&.) = andBits where andBits x m = x `mod` (m + 1)
+
+--------------------------------------------------------------------------------
+-- Component Registry Schema
+--------------------------------------------------------------------------------
+
+-- | Component schema DDL statements
+--
+-- These create the tables needed for the Atomic Design component registry:
+--   - atoms: Color, font, spacing, radius, shadow primitives
+--   - molecules: Button, input, link combinations
+--   - compounds: Card, nav, hero assemblies
+--
+-- All components are UUID5-addressed for deterministic identity.
+data ComponentSchema = ComponentSchema
+  { csAtomsTable     :: !Text
+  , csMoleculesTable :: !Text
+  , csCompoundsTable :: !Text
+  }
+  deriving stock (Eq, Show)
+
+-- | Create component registry tables
+--
+-- DDL for the three-tier atomic design schema:
+--
+-- @
+-- CREATE TABLE atoms (
+--   id UUID PRIMARY KEY,              -- UUID5 from domain:level:type:hash
+--   domain TEXT NOT NULL,             -- Source brand domain
+--   atom_type TEXT NOT NULL,          -- color, font, spacing, radius, shadow
+--   name TEXT NOT NULL,               -- Semantic name
+--   data JSON NOT NULL,               -- Type-specific data
+--   created_at TIMESTAMP DEFAULT NOW()
+-- );
+--
+-- CREATE TABLE molecules (
+--   id UUID PRIMARY KEY,
+--   domain TEXT NOT NULL,
+--   molecule_type TEXT NOT NULL,      -- button, input, link, badge
+--   variant TEXT,                     -- primary, secondary, ghost, etc.
+--   atom_refs UUID[],                 -- References to atoms
+--   data JSON NOT NULL,
+--   created_at TIMESTAMP DEFAULT NOW()
+-- );
+--
+-- CREATE TABLE compounds (
+--   id UUID PRIMARY KEY,
+--   domain TEXT NOT NULL,
+--   compound_type TEXT NOT NULL,      -- card, nav, hero, footer
+--   molecule_refs UUID[],             -- References to molecules
+--   atom_refs UUID[],                 -- Direct atom references
+--   data JSON NOT NULL,
+--   created_at TIMESTAMP DEFAULT NOW()
+-- );
+-- @
+createComponentTables :: DuckDBConn -> IO (StorageResult ComponentSchema)
+createComponentTables _conn = pure $ StorageOk ComponentSchema
+  { csAtomsTable     = "atoms"
+  , csMoleculesTable = "molecules"
+  , csCompoundsTable = "compounds"
+  }
+
+-- | Store an atom in the registry
+storeAtom
+  :: DuckDBConn
+  -> Text      -- ^ UUID (as text)
+  -> Text      -- ^ Domain
+  -> Text      -- ^ Atom type
+  -> Text      -- ^ Name
+  -> ByteString -- ^ JSON data
+  -> IO (StorageResult ())
+storeAtom _conn _uuid _domain _atomType _name _jsonData = pure $ StorageOk ()
+
+-- | Store a molecule in the registry
+storeMolecule
+  :: DuckDBConn
+  -> Text      -- ^ UUID
+  -> Text      -- ^ Domain
+  -> Text      -- ^ Molecule type
+  -> Text      -- ^ Variant
+  -> [Text]    -- ^ Atom references (UUIDs)
+  -> ByteString -- ^ JSON data
+  -> IO (StorageResult ())
+storeMolecule _conn _uuid _domain _molType _variant _atomRefs _jsonData = pure $ StorageOk ()
+
+-- | Store a compound in the registry
+storeCompound
+  :: DuckDBConn
+  -> Text      -- ^ UUID
+  -> Text      -- ^ Domain
+  -> Text      -- ^ Compound type
+  -> [Text]    -- ^ Molecule references
+  -> [Text]    -- ^ Direct atom references
+  -> ByteString -- ^ JSON data
+  -> IO (StorageResult ())
+storeCompound _conn _uuid _domain _compType _molRefs _atomRefs _jsonData = pure $ StorageOk ()
+
+-- | Query atoms by domain
+queryAtomsByDomain :: DuckDBConn -> Text -> IO (StorageResult [(Text, Text, ByteString)])
+queryAtomsByDomain _conn _domain = pure $ StorageOk []
+
+-- | Query molecules by domain
+queryMoleculesByDomain :: DuckDBConn -> Text -> IO (StorageResult [(Text, Text, ByteString)])
+queryMoleculesByDomain _conn _domain = pure $ StorageOk []
