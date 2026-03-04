@@ -111,6 +111,7 @@ import Prelude
   ( (<>)
   , (==)
   , ($)
+  , compare
   , not
   , map
   , (&&)

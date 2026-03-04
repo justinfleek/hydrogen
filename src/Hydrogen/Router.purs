@@ -2,11 +2,25 @@
 --                                                         // hydrogen // router
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Client-side routing infrastructure
+-- | Client-side Routing Infrastructure
 -- |
 -- | This module provides a typeclass-based routing system that allows
 -- | applications to define their own route ADTs while using shared
 -- | routing infrastructure.
+-- |
+-- | ## Design Philosophy
+-- |
+-- | Navigation commands are **pure data** (Cmd values) instead of direct
+-- | effects. The Rust/WASM runtime interprets these commands and executes
+-- | the actual History API manipulation.
+-- |
+-- | At billion-agent scale, commands are encoded as SIGIL frames:
+-- |   - `PushUrl` → opcode 0xD2 (ROUTE_PUSH)
+-- |   - `ReplaceUrl` → opcode 0xD3 (ROUTE_REPLACE)
+-- |   - `Back` → opcode 0xD4 (ROUTE_BACK)
+-- |   - `Forward` → opcode 0xD5 (ROUTE_FORWARD)
+-- |
+-- | straylight-llm consumes these frames via ZMQ4 at 10,000 tokens/second.
 -- |
 -- | ## Usage
 -- |
@@ -15,9 +29,9 @@
 -- | data Route = Home | About | Dashboard | NotFound
 -- | ```
 -- |
--- | 2. Implement the Route class:
+-- | 2. Implement the IsRoute class:
 -- | ```purescript
--- | instance routeMyRoute :: Route Route where
+-- | instance isRouteMyRoute :: IsRoute Route where
 -- |   parseRoute "/" = Home
 -- |   parseRoute "/about" = About
 -- |   parseRoute "/dashboard" = Dashboard
@@ -29,97 +43,193 @@
 -- |   routeToPath NotFound = "/"
 -- | ```
 -- |
--- | 3. Use the routing helpers:
+-- | 3. Use navigation commands in your update function:
 -- | ```purescript
--- | handleAction Initialize = do
--- |   path <- liftEffect getPathname
--- |   let route = parseRoute path
--- |   ...
+-- | import Hydrogen.Router (navigate)
+-- | import Hydrogen.Runtime.Cmd (pushUrl, back)
+-- |
+-- | update :: Msg -> State -> Transition State Msg
+-- | update msg state = case msg of
+-- |   GoToAbout ->
+-- |     transition state (navigate About)
+-- |   
+-- |   GoBack ->
+-- |     transition state back
 -- | ```
+-- |
+-- | ## Initial Route
+-- |
+-- | For the initial route, pass it as part of your application's flags:
+-- |
+-- | ```purescript
+-- | type Flags = { initialPath :: String }
+-- |
+-- | init :: Flags -> Transition State Msg
+-- | init flags =
+-- |   let route = parseRoute flags.initialPath
+-- |   in noCmd { currentRoute: route, ... }
+-- | ```
+-- |
+-- | The runtime provides the initial path when starting the application.
+
 module Hydrogen.Router
   ( -- * Route typeclass
     class IsRoute
   , parseRoute
   , routeToPath
-    -- * Route metadata
+  
+  -- * Route metadata
   , class RouteMetadata
   , isProtected
   , isStaticRoute
   , routeTitle
   , routeDescription
   , routeOgImage
-    -- * Browser integration (FFI)
-  , getPathname
-  , getHostname
-  , getOrigin
-  , pushState
-  , replaceState
-  , onPopState
-  , interceptLinks
-    -- * Utilities
+  
+  -- * Navigation commands (re-exported from Cmd)
+  -- | Use these in your update functions
+  , module CmdReExports
+  
+  -- * Route-typed navigation
   , navigate
+  , navigateReplace
+  
+  -- * Utilities
   , normalizeTrailingSlash
+  
+  -- * SIGIL Frame Encoding (advanced)
+  , encodeRoutePushFrame
+  , encodeRouteReplaceFrame
+  , encodeRouteBackFrame
+  , encodeRouteForwardFrame
   ) where
 
 import Prelude
   ( class Eq
-  , Unit
+  , ($)
   , (==)
   )
 
 import Data.Maybe (Maybe)
 import Data.String.CodeUnits as SCU
-import Effect (Effect)
 
--- ============================================================
--- ROUTE TYPECLASS
--- ============================================================
+import Hydrogen.Runtime.Cmd 
+  ( Cmd
+  , pushUrl
+  , replaceUrl
+  , back
+  , forward
+  ) as CmdReExports
 
--- | Typeclass for route types that can be parsed from and serialized to paths
+import Hydrogen.Runtime.Cmd (Cmd, pushUrl, replaceUrl)
+import Hydrogen.Scraper.Wire.Types (Frame)
+import Hydrogen.Scraper.Wire.Encode 
+  ( encodeRoutePush
+  , encodeRouteReplace
+  , encodeRouteBack
+  , encodeRouteForward
+  )
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                             // route typeclass
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Typeclass for route types that can be parsed from and serialized to paths.
 -- |
 -- | Laws:
 -- | - `parseRoute (routeToPath r) == r` for all valid routes
 -- | - `routeToPath` should produce paths starting with "/"
+-- |
+-- | This typeclass enables type-safe routing where the compiler ensures
+-- | all routes are handled and navigation uses valid paths.
 class IsRoute route where
-  -- | Parse a URL path into a route
+  -- | Parse a URL path into a route.
+  -- |
+  -- | The parser should handle all possible paths, including invalid ones.
+  -- | A common pattern is to return a `NotFound` route for unrecognized paths.
   parseRoute :: String -> route
   
-  -- | Convert a route back to a URL path
+  -- | Convert a route back to a URL path.
+  -- |
+  -- | The resulting path should always start with "/" and be valid for
+  -- | use with the History API.
   routeToPath :: route -> String
 
--- | Optional metadata for routes
+-- | Optional metadata for routes.
 -- |
 -- | Implement this typeclass if your routes have protection or SSG semantics.
 -- | This enables the "write once, SSG or dynamic" pattern where route metadata
 -- | is defined once and used for both static generation and runtime rendering.
 class RouteMetadata route where
-  -- | Whether the route requires authentication
+  -- | Whether the route requires authentication.
+  -- |
+  -- | Protected routes should redirect to login if the user is not authenticated.
   isProtected :: route -> Boolean
   
-  -- | Whether the route should be statically generated (SSG)
-  -- | Returns true for public pages, false for SPA-only routes
+  -- | Whether the route should be statically generated (SSG).
+  -- |
+  -- | Returns true for public pages that benefit from static generation,
+  -- | false for SPA-only routes that require client-side data.
   isStaticRoute :: route -> Boolean
   
-  -- | Page title for the route (used in <title> and og:title)
+  -- | Page title for the route.
+  -- |
+  -- | Used in `<title>` tag and OpenGraph `og:title` meta tag.
   routeTitle :: route -> String
   
-  -- | Meta description for the route (used in description and og:description)
+  -- | Meta description for the route.
+  -- |
+  -- | Used in description meta tag and OpenGraph `og:description`.
   routeDescription :: route -> String
   
-  -- | Optional OpenGraph image URL for the route
+  -- | Optional OpenGraph image URL for the route.
+  -- |
+  -- | Used in `og:image` meta tag for social media previews.
   routeOgImage :: route -> Maybe String
 
--- ============================================================
--- UTILITIES
--- ============================================================
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // navigation commands
+-- ═══════════════════════════════════════════════════════════════════════════════
 
--- | Normalize paths by removing trailing slashes (except for root)
+-- | Navigate to a route programmatically (push to history).
+-- |
+-- | This is a type-safe wrapper around `pushUrl` that uses your route type.
+-- |
+-- | ```purescript
+-- | update GoToAbout state =
+-- |   transition state (navigate About)
+-- | ```
+-- |
+-- | SIGIL opcode: 0xD2 (ROUTE_PUSH)
+navigate :: forall route msg. IsRoute route => route -> Cmd msg
+navigate route = pushUrl (routeToPath route)
+
+-- | Navigate to a route by replacing current history entry.
+-- |
+-- | Use this for redirects that shouldn't appear in browser history.
+-- |
+-- | ```purescript
+-- | update (AuthSuccess user) state =
+-- |   transition state { user = Just user } (navigateReplace Dashboard)
+-- | ```
+-- |
+-- | SIGIL opcode: 0xD3 (ROUTE_REPLACE)
+navigateReplace :: forall route msg. IsRoute route => route -> Cmd msg
+navigateReplace route = replaceUrl (routeToPath route)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                                   // utilities
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Normalize paths by removing trailing slashes (except for root).
 -- |
 -- | ```purescript
 -- | normalizeTrailingSlash "/" == "/"
 -- | normalizeTrailingSlash "/about/" == "/about"
 -- | normalizeTrailingSlash "/about" == "/about"
 -- | ```
+-- |
+-- | Use this in your `parseRoute` implementation for consistent path handling.
 normalizeTrailingSlash :: String -> String
 normalizeTrailingSlash "/" = "/"
 normalizeTrailingSlash path =
@@ -127,39 +237,36 @@ normalizeTrailingSlash path =
     then SCU.dropRight 1 path
     else path
 
--- | Navigate to a route programmatically
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                        // sigil frame encoding
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Encode a route push command as a SIGIL frame.
 -- |
--- | This pushes the new path to browser history and can trigger
--- | your app's routing logic.
-navigate :: forall route. IsRoute route => route -> Effect Unit
-navigate route = pushState (routeToPath route)
+-- | SIGIL opcode: 0xD2 (ROUTE_PUSH)
+-- | Payload: varint-prefixed UTF-8 URL
+-- |
+-- | For advanced usage (testing, custom transport). Normal apps use `navigate`.
+encodeRoutePushFrame :: String -> Frame
+encodeRoutePushFrame = encodeRoutePush
 
--- ============================================================
--- BROWSER INTEGRATION (FFI)
--- ============================================================
+-- | Encode a route replace command as a SIGIL frame.
+-- |
+-- | SIGIL opcode: 0xD3 (ROUTE_REPLACE)
+-- | Payload: varint-prefixed UTF-8 URL
+encodeRouteReplaceFrame :: String -> Frame
+encodeRouteReplaceFrame = encodeRouteReplace
 
--- | Get the current pathname from the browser location
-foreign import getPathname :: Effect String
+-- | Encode a back navigation command as a SIGIL frame.
+-- |
+-- | SIGIL opcode: 0xD4 (ROUTE_BACK)
+-- | Payload: none
+encodeRouteBackFrame :: Frame
+encodeRouteBackFrame = encodeRouteBack
 
--- | Get the current hostname
-foreign import getHostname :: Effect String
-
--- | Get the current origin (protocol + hostname + port)
-foreign import getOrigin :: Effect String
-
--- | Push a new path to browser history
--- | This changes the URL without triggering a page reload
-foreign import pushState :: String -> Effect Unit
-
--- | Replace the current history entry
--- | Useful for redirects that shouldn't be in browser history
-foreign import replaceState :: String -> Effect Unit
-
--- | Subscribe to browser back/forward navigation events
--- | The callback receives the new pathname
-foreign import onPopState :: (String -> Effect Unit) -> Effect Unit
-
--- | Intercept link clicks for SPA navigation
--- | Calls the callback with the href instead of navigating
--- | Only intercepts internal links (same origin, not target="_blank")
-foreign import interceptLinks :: (String -> Effect Unit) -> Effect Unit
+-- | Encode a forward navigation command as a SIGIL frame.
+-- |
+-- | SIGIL opcode: 0xD5 (ROUTE_FORWARD)
+-- | Payload: none
+encodeRouteForwardFrame :: Frame
+encodeRouteForwardFrame = encodeRouteForward

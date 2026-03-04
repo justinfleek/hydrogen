@@ -69,6 +69,30 @@ pub fn router_replace_state(path: &str) -> Result<(), JsValue> {
     Ok(())
 }
 
+/// Navigate back in history.
+/// SIGIL opcode: 0xD4 (ROUTE_BACK)
+#[wasm_bindgen]
+pub fn router_back() -> Result<(), JsValue> {
+    let win = window().ok_or_else(|| JsValue::from_str("No window"))?;
+    let history = win.history()?;
+
+    history.back()?;
+
+    Ok(())
+}
+
+/// Navigate forward in history.
+/// SIGIL opcode: 0xD5 (ROUTE_FORWARD)
+#[wasm_bindgen]
+pub fn router_forward() -> Result<(), JsValue> {
+    let win = window().ok_or_else(|| JsValue::from_str("No window"))?;
+    let history = win.history()?;
+
+    history.forward()?;
+
+    Ok(())
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //                                                                  // listeners
 // ═══════════════════════════════════════════════════════════════════════════════

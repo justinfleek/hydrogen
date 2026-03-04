@@ -71,7 +71,13 @@ module Hydrogen.Runtime.Cmd
       , RemoveStorage
       , CopyToClipboard
       , Log
+      -- ARIA accessibility commands
+      , AriaHide
+      , AriaRestore
       )
+  
+  -- * ARIA State Token
+  , AriaStateToken(AriaStateToken)
   
   -- * Transition Type
   , Transition
@@ -96,6 +102,9 @@ module Hydrogen.Runtime.Cmd
   , removeStorage
   , copyToClipboard
   , log
+  -- ARIA commands
+  , ariaHide
+  , ariaRestore
   
   -- * HTTP Types
   , HttpRequest
@@ -139,7 +148,8 @@ module Hydrogen.Runtime.Cmd
   ) where
 
 import Prelude
-  ( class Functor
+  ( class Eq
+  , class Functor
   , class Show
   , map
   , show
@@ -152,6 +162,25 @@ import Data.Tuple (Tuple)
 import Foreign (Foreign)
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                            // aria state token
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Opaque token representing ARIA hider state.
+-- |
+-- | When `ariaHide` is executed, the runtime returns a token that can be
+-- | passed to `ariaRestore` to undo the hiding. The token is an opaque
+-- | integer that the Rust runtime uses to look up the saved state.
+-- |
+-- | This type is intentionally opaque to prevent misuse. Tokens are only
+-- | valid for the lifetime of the page and cannot be serialized.
+newtype AriaStateToken = AriaStateToken Int
+
+derive instance eqAriaStateToken :: Eq AriaStateToken
+
+instance showAriaStateToken :: Show AriaStateToken where
+  show (AriaStateToken n) = "AriaStateToken(" <> show n <> ")"
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // command type
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -160,6 +189,9 @@ import Foreign (Foreign)
 -- | Commands are data. They don't do anything until the runtime interprets them.
 -- | The `msg` type parameter is the message type that will be dispatched when
 -- | the effect completes.
+-- |
+-- | At billion-agent scale, commands are encoded as SIGIL frames (0xD0-0xDF)
+-- | and consumed by straylight-llm via ZMQ4 at 10,000 tokens/second.
 data Cmd msg
   = None
     -- ^ No effect
@@ -212,6 +244,20 @@ data Cmd msg
   
   | Log String
     -- ^ Log to console (for debugging)
+  
+  -- ─────────────────────────────────────────────────────────────────────────────
+  --                                                          // aria commands
+  -- ─────────────────────────────────────────────────────────────────────────────
+  
+  | AriaHide String (AriaStateToken -> msg)
+    -- ^ Hide siblings of element from screen readers.
+    -- ^ Takes element selector, returns state token via callback.
+    -- ^ SIGIL opcode: 0xD0
+  
+  | AriaRestore AriaStateToken
+    -- ^ Restore previously hidden elements.
+    -- ^ Takes state token returned from AriaHide.
+    -- ^ SIGIL opcode: 0xD1
 
 instance functorCmd :: Functor Cmd where
   map f = case _ of
@@ -232,6 +278,9 @@ instance functorCmd :: Functor Cmd where
     RemoveStorage key -> RemoveStorage key
     CopyToClipboard text -> CopyToClipboard text
     Log text -> Log text
+    -- ARIA commands
+    AriaHide selector g -> AriaHide selector (f <<< g)
+    AriaRestore token -> AriaRestore token
 
 instance showCmd :: Show (Cmd msg) where
   show = case _ of
@@ -252,6 +301,9 @@ instance showCmd :: Show (Cmd msg) where
     RemoveStorage key -> "RemoveStorage " <> show key
     CopyToClipboard _ -> "CopyToClipboard"
     Log text -> "Log " <> show text
+    -- ARIA commands
+    AriaHide selector _ -> "AriaHide " <> show selector
+    AriaRestore token -> "AriaRestore " <> show token
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // transition type
@@ -353,6 +405,49 @@ copyToClipboard = CopyToClipboard
 -- | Log a message to console (for debugging)
 log :: forall msg. String -> Cmd msg
 log = Log
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                                     // aria command builders
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- | Hide siblings of an element from screen readers.
+-- |
+-- | When a modal dialog opens, all other content should be hidden from
+-- | assistive technologies. This command walks up the DOM tree and sets
+-- | `aria-hidden="true"` on all siblings at each level.
+-- |
+-- | Returns an `AriaStateToken` via callback that must be passed to
+-- | `ariaRestore` when the modal closes.
+-- |
+-- | SIGIL opcode: 0xD0 (ARIA_HIDE)
+-- |
+-- | ```purescript
+-- | -- Open modal: hide everything else
+-- | update ShowModal state =
+-- |   transition state { modalOpen = true }
+-- |     (ariaHide "#modal-root" AriaStateReceived)
+-- |
+-- | -- On token received: store it
+-- | update (AriaStateReceived token) state =
+-- |   noCmd state { ariaToken = Just token }
+-- |
+-- | -- Close modal: restore visibility
+-- | update CloseModal state =
+-- |   case state.ariaToken of
+-- |     Just token -> transition state { modalOpen = false } (ariaRestore token)
+-- |     Nothing -> noCmd state { modalOpen = false }
+-- | ```
+ariaHide :: forall msg. String -> (AriaStateToken -> msg) -> Cmd msg
+ariaHide = AriaHide
+
+-- | Restore elements hidden by `ariaHide`.
+-- |
+-- | Takes the `AriaStateToken` returned from a previous `ariaHide` call
+-- | and restores the original `aria-hidden` values for all affected elements.
+-- |
+-- | SIGIL opcode: 0xD1 (ARIA_RESTORE)
+ariaRestore :: forall msg. AriaStateToken -> Cmd msg
+ariaRestore = AriaRestore
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // http types
