@@ -7,7 +7,9 @@
 use gloo_timers::callback::Timeout;
 use std::cell::RefCell;
 use std::rc::Rc;
+use wasm_bindgen::closure::Closure;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //                                                                  // debounce
@@ -228,4 +230,112 @@ impl Throttler {
 
         *this_timer_ref.borrow_mut() = Some(timeout);
     }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                    // purescript ffi wrappers
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Create a debounced function matching PureScript FFI signature.
+///
+/// Returns a JS object with { call, cancel, flush } methods.
+///
+/// PureScript signature:
+/// ```purescript
+/// foreign import debounceImpl
+///   :: forall a. Number -> Boolean -> Boolean -> (a -> Effect Unit)
+///   -> Effect { call :: a -> Effect Unit, cancel :: Effect Unit, flush :: Effect Unit }
+/// ```
+#[wasm_bindgen(js_name = "debounceImpl")]
+pub fn debounce_impl(
+    wait_ms: f64,
+    leading: bool,
+    trailing: bool,
+    callback: js_sys::Function,
+) -> JsValue {
+    let debouncer = Debouncer::new(wait_ms as u32, leading, trailing, callback);
+    let debouncer = Rc::new(RefCell::new(debouncer));
+
+    let obj = js_sys::Object::new();
+
+    // call method
+    let debouncer_call = Rc::clone(&debouncer);
+    let call_fn = Closure::wrap(Box::new(move |args: JsValue| {
+        debouncer_call.borrow().call(args);
+    }) as Box<dyn Fn(JsValue)>);
+    js_sys::Reflect::set(&obj, &"call".into(), call_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    call_fn.forget();
+
+    // cancel method
+    let debouncer_cancel = Rc::clone(&debouncer);
+    let cancel_fn = Closure::wrap(Box::new(move || {
+        debouncer_cancel.borrow().cancel();
+    }) as Box<dyn Fn()>);
+    js_sys::Reflect::set(&obj, &"cancel".into(), cancel_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    cancel_fn.forget();
+
+    // flush method
+    let debouncer_flush = Rc::clone(&debouncer);
+    let flush_fn = Closure::wrap(Box::new(move || {
+        debouncer_flush.borrow().flush();
+    }) as Box<dyn Fn()>);
+    js_sys::Reflect::set(&obj, &"flush".into(), flush_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    flush_fn.forget();
+
+    obj.into()
+}
+
+/// Create a throttled function matching PureScript FFI signature.
+///
+/// Returns a JS object with { call, cancel, flush } methods.
+///
+/// PureScript signature:
+/// ```purescript
+/// foreign import throttleImpl
+///   :: forall a. Number -> Boolean -> Boolean -> (a -> Effect Unit)
+///   -> Effect { call :: a -> Effect Unit, cancel :: Effect Unit, flush :: Effect Unit }
+/// ```
+#[wasm_bindgen(js_name = "throttleImpl")]
+pub fn throttle_impl(
+    wait_ms: f64,
+    leading: bool,
+    trailing: bool,
+    callback: js_sys::Function,
+) -> JsValue {
+    let throttler = Throttler::new(wait_ms as u32, leading, trailing, callback);
+    let throttler = Rc::new(RefCell::new(throttler));
+
+    let obj = js_sys::Object::new();
+
+    // call method
+    let throttler_call = Rc::clone(&throttler);
+    let call_fn = Closure::wrap(Box::new(move |args: JsValue| {
+        throttler_call.borrow().call(args);
+    }) as Box<dyn Fn(JsValue)>);
+    js_sys::Reflect::set(&obj, &"call".into(), call_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    call_fn.forget();
+
+    // cancel method
+    let throttler_cancel = Rc::clone(&throttler);
+    let cancel_fn = Closure::wrap(Box::new(move || {
+        throttler_cancel.borrow().cancel();
+    }) as Box<dyn Fn()>);
+    js_sys::Reflect::set(&obj, &"cancel".into(), cancel_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    cancel_fn.forget();
+
+    // flush method
+    let throttler_flush = Rc::clone(&throttler);
+    let flush_fn = Closure::wrap(Box::new(move || {
+        throttler_flush.borrow().flush();
+    }) as Box<dyn Fn()>);
+    js_sys::Reflect::set(&obj, &"flush".into(), flush_fn.as_ref().unchecked_ref())
+        .unwrap_or_default();
+    flush_fn.forget();
+
+    obj.into()
 }

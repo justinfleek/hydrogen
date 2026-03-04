@@ -39,6 +39,7 @@ module Hydrogen.Event.Bus
   , Subscriber
   , create
   , createNamed
+  , createWithDebug
     -- * Subscriptions
   , subscribe
   , subscribeOnce
@@ -62,21 +63,35 @@ module Hydrogen.Event.Bus
     -- * History
   , History
   , withHistory
+  , withHistoryAndDebug
   , getHistory
   , clearHistory
   , replay
     -- * Debugging
-  , debugBus
   , getSubscriberCount
-    -- * Typed Channels
-  , TypedChannel
-  , AnyEvent
-  , typedChannel
-  , subscribeTyped
-  , emitTyped
   ) where
 
-import Prelude hiding (map, when)
+import Prelude 
+  ( class Eq
+  , class Ord
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , flip
+  , not
+  , pure
+  , show
+  , unit
+  , void
+  , ($)
+  , (<$>)
+  , (<>)
+  , (+)
+  , (==)
+  , (/=)
+  , (>)
+  )
 
 import Control.Monad (unless, when)
 import Data.Argonaut.Decode (class DecodeJson)
@@ -91,6 +106,7 @@ import Data.Traversable (traverse) as Traversable
 import Effect (Effect)
 import Effect.Aff (Aff, Milliseconds(Milliseconds), delay)
 import Effect.Class (liftEffect)
+import Effect.Console as Console
 import Effect.Now (now) as Now
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
@@ -103,12 +119,16 @@ import Hydrogen.Query as Q
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | An event bus for type-safe pub/sub
+-- |
+-- | The debugHandler field enables structured debug output following
+-- | SHOW_DEBUG_CONVENTION. When set, every emitted event is logged
+-- | in format: `(EventBus:name event:value)`
 type EventBus a =
   { name :: Maybe String
   , subscribers :: Ref (Array (Subscriber a))
   , nextId :: Ref Int
   , history :: Maybe (History a)
-  , debugMode :: Ref Boolean
+  , debugHandler :: Maybe (a -> Effect Unit)
   , queryClient :: Q.QueryClient
   }
 
@@ -125,22 +145,48 @@ create :: forall a. Effect (EventBus a)
 create = do
   subscribers <- Ref.new []
   nextId <- Ref.new 0
-  debugMode <- Ref.new false
   queryClient <- Q.newClient
   pure
     { name: Nothing
     , subscribers
     , nextId
     , history: Nothing
-    , debugMode
+    , debugHandler: Nothing
     , queryClient
     }
 
 -- | Create a named event bus (useful for debugging)
 createNamed :: forall a. String -> Effect (EventBus a)
-createNamed name = do
+createNamed busName = do
   bus <- create
-  pure bus { name = Just name }
+  pure bus { name = Just busName }
+
+-- | Create a named event bus with debug logging enabled
+-- |
+-- | Requires Show constraint because debug output follows SHOW_DEBUG_CONVENTION:
+-- | `(EventBus:busName event:eventValue)`
+-- |
+-- | ## Example
+-- |
+-- | ```purescript
+-- | bus <- Bus.createWithDebug "user-events"
+-- | Bus.emit bus (UserLoggedIn { name: "Alice" })
+-- | -- Console: (EventBus:user-events event:(UserLoggedIn {name:"Alice"}))
+-- | ```
+createWithDebug :: forall a. Show a => String -> Effect (EventBus a)
+createWithDebug busName = do
+  bus <- create
+  pure bus 
+    { name = Just busName
+    , debugHandler = Just (logEventDebug busName)
+    }
+
+-- | Pure debug logger following SHOW_DEBUG_CONVENTION
+-- |
+-- | Format: `(EventBus:busName event:eventValue)`
+logEventDebug :: forall a. Show a => String -> a -> Effect Unit
+logEventDebug busName event =
+  Console.log $ "(EventBus:" <> busName <> " event:" <> show event <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Subscriptions
@@ -208,9 +254,10 @@ emit bus event = do
     Just h -> recordEvent h event
     Nothing -> pure unit
   
-  -- Debug logging
-  isDebug <- Ref.read bus.debugMode
-  when isDebug $ logEvent bus.name event
+  -- Debug logging (pure, uses Show constraint captured at bus creation)
+  case bus.debugHandler of
+    Just handler -> handler event
+    Nothing -> pure unit
   
   -- Get current subscribers
   subs <- Ref.read bus.subscribers
@@ -238,11 +285,6 @@ emit bus event = do
   
   traverse :: forall b c. (b -> Effect c) -> Array b -> Effect (Array c)
   traverse = Traversable.traverse
-
--- | Log an event to the console (for debugging)
--- | Uses FFI because event type may not have Show instance
--- | JavaScript console.log can display any value
-foreign import logEvent :: forall a. Maybe String -> a -> Effect Unit
 
 -- | Emit an event asynchronously (non-blocking)
 emitAsync :: forall a. EventBus a -> a -> Aff Unit
@@ -315,6 +357,16 @@ withHistory maxSize = do
   events <- Ref.new []
   pure bus { history = Just { events, maxSize } }
 
+-- | Create a bus with history tracking and debug logging
+-- |
+-- | Combines history tracking with SHOW_DEBUG_CONVENTION output.
+-- | Useful for debugging event sequences over time.
+withHistoryAndDebug :: forall a. Show a => String -> Int -> Effect (EventBus a)
+withHistoryAndDebug busName maxSize = do
+  bus <- createWithDebug busName
+  events <- Ref.new []
+  pure bus { history = Just { events, maxSize } }
+
 -- | Record an event in history
 recordEvent :: forall a. History a -> a -> Effect Unit
 recordEvent history event = do
@@ -358,58 +410,9 @@ replay bus handler = do
 -- Debugging
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Enable debug mode for a bus
-debugBus :: forall a. EventBus a -> Boolean -> Effect Unit
-debugBus bus enabled = Ref.write enabled bus.debugMode
-
 -- | Get the number of active subscribers
 getSubscriberCount :: forall a. EventBus a -> Effect Int
 getSubscriberCount bus = Array.length <$> Ref.read bus.subscribers
-
--- ═════════════════════════════════════════════════════════════════════════════
--- Typed Channels (Heterogeneous Events)
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | A typed channel that carries a specific event type
--- | Used for heterogeneous event buses
-newtype TypedChannel :: Type -> Type
-newtype TypedChannel a = TypedChannel String
-
-derive instance eqTypedChannel :: Eq (TypedChannel a)
-derive instance ordTypedChannel :: Ord (TypedChannel a)
-
--- | Create a typed channel
-typedChannel :: forall a. String -> TypedChannel a
-typedChannel = TypedChannel
-
--- | Wrapper for heterogeneous events
-foreign import data AnyEvent :: Type
-
-foreign import wrapEvent :: forall a. String -> a -> AnyEvent
-foreign import unwrapEventImpl :: forall a. (a -> Maybe a) -> Maybe a -> String -> AnyEvent -> Maybe a
-
--- | Unwrap an event if it matches the expected type
-unwrapEvent :: forall a. String -> AnyEvent -> Maybe a
-unwrapEvent = unwrapEventImpl Just Nothing
-
--- | Subscribe to a typed channel on a heterogeneous bus
-subscribeTyped
-  :: forall a
-   . EventBus AnyEvent
-  -> TypedChannel a
-  -> (a -> Effect Unit)
-  -> Effect (Effect Unit)
-subscribeTyped bus (TypedChannel name) handler =
-  subscribeWithFilter bus
-    (\_ -> true) -- Let the handler filter
-    (\anyEvent -> case unwrapEvent name anyEvent of
-      Just event -> handler event
-      Nothing -> pure unit)
-
--- | Emit to a typed channel
-emitTyped :: forall a. EventBus AnyEvent -> TypedChannel a -> a -> Effect Unit
-emitTyped bus (TypedChannel name) event =
-  emit bus (wrapEvent name event)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Server Sync (Query Integration)

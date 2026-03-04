@@ -5,25 +5,57 @@
 -- | Static HTML string renderer for Halogen
 -- |
 -- | ══════════════════════════════════════════════════════════════════════════
--- | HALOGEN COMPATIBILITY LAYER
+-- | HALOGEN COMPATIBILITY LAYER — DEPRECATED PATH
 -- | ══════════════════════════════════════════════════════════════════════════
 -- |
 -- | This module renders Halogen's `HH.HTML w i` to HTML strings.
 -- |
--- | **WHY unsafeCoerce EXISTS HERE:**
+-- | ## Deprecation Notice
+-- |
+-- | This module exists for **Halogen interoperability only**. It contains
+-- | unavoidable FFI (`propValueToString`) and `unsafeCoerce` because Halogen's
+-- | `PropValue` is an opaque foreign type with no pure unwrapping mechanism.
+-- |
+-- | **For new code, use `Hydrogen.Target.Static` instead.**
+-- |
+-- | ## Migration Path to Pure Hydrogen
+-- |
+-- | The Hydrogen project is moving toward a pure language stack:
+-- |
+-- | ```
+-- | Lean4 CIC (proofs) → Haskell (backend) → PureScript (types) → Rust/WebGPU (runtime)
+-- | ```
+-- |
+-- | Halogen is being phased out in favor of Hydrogen's pure `Element msg` type.
+-- |
+-- | **To migrate:**
+-- |
+-- | 1. Replace `Halogen.HTML` imports with `Hydrogen.Render.Element`
+-- | 2. Replace `Hydrogen.HTML.Renderer.render` with `Hydrogen.Target.Static.render`
+-- | 3. Convert Halogen components to pure view functions: `State → Element Msg`
+-- |
+-- | **Timeline:** Halogen support will be removed when all `Hydrogen.UI.*`
+-- | components have been migrated to pure `Element msg`.
+-- |
+-- | ## Why This Module Has FFI
 -- |
 -- | Halogen's VDom passes props as an opaque polymorphic `a` type, but the
 -- | actual runtime value is always `Array (Prop i)`. We coerce to extract
--- | attribute data for static rendering. This is safe because:
+-- | attribute data for static rendering. Additionally, `PropValue` is a
+-- | foreign opaque type that can only be inspected via JavaScript FFI.
 -- |
--- | 1. VDom guarantees the structure is `Array (Prop i)`
--- | 2. We only read Attribute/Property string data
--- | 3. Handler and Ref constructors are ignored (return Nothing)
+-- | This is **not a Hydrogen design flaw** — it's a Halogen boundary.
 -- |
--- | **PURE ALTERNATIVE:**
+-- | ## Pure Alternative (Recommended)
 -- |
--- | If you want zero unsafeCoerce, use `Hydrogen.Target.Static` which renders
--- | Hydrogen's pure `Element msg` type. That path has no escape hatches.
+-- | ```purescript
+-- | import Hydrogen.Render.Element as E
+-- | import Hydrogen.Target.Static as Static
+-- |
+-- | html :: String
+-- | html = Static.render (E.div_ [ E.class_ "foo" ] [ E.text "Hello" ])
+-- | -- => "<div class=\"foo\">Hello</div>"
+-- | ```
 -- |
 -- | ══════════════════════════════════════════════════════════════════════════
 -- |
@@ -238,6 +270,23 @@ renderPropertyToAttr name value =
     -- Standard properties become attributes
     _ -> Just $ name <> "=\"" <> escapeAttr strVal <> "\""
 
+-- | Convert PropValue to String for static rendering.
+-- |
+-- | ─────────────────────────────────────────────────────────────────────────
+-- | HALOGEN BOUNDARY FFI
+-- | ─────────────────────────────────────────────────────────────────────────
+-- |
+-- | This FFI exists because Halogen's `PropValue` is a foreign opaque type.
+-- | There is NO pure PureScript way to inspect its contents.
+-- |
+-- | PropValue can be: String, Boolean, Int, Number, or Object at runtime.
+-- | This function inspects the JavaScript type and converts to String.
+-- |
+-- | **This FFI will be removed when Halogen is fully phased out.**
+-- | Use `Hydrogen.Target.Static` with `Element msg` to avoid this entirely.
+-- |
+-- | Implementation: DEPRECATED_JS_REFERENCE/Hydrogen_HTML_Renderer.js
+-- | ─────────────────────────────────────────────────────────────────────────
 foreign import propValueToString :: PropValue -> String
 
 -- ============================================================

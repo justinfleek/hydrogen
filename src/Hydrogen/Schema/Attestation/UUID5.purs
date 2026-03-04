@@ -79,6 +79,8 @@ import Hydrogen.Schema.Attestation.UUID5.Namespaces
   , nsContact
   , nsButton
   , nsToggle
+  , nsSlider
+  , nsKnob
   , nsTab
   , nsTabPanel
   , nsAccordionTrigger

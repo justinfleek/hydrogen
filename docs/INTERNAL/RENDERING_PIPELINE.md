@@ -265,6 +265,71 @@ At billion-agent scale:
 The browser is treated as a dumb display server. The real computation
 happens in pure PureScript, serialized to binary, interpreted by Rust.
 
+────────────────────────────────────────────────────────────────────────────────
+                                                        // chart // rendering
+────────────────────────────────────────────────────────────────────────────────
+
+## Chart-Specific Rendering
+
+**Charts have two paths:**
+
+### Legacy SVG Path (DEPRECATED - uses DOM)
+
+- `src/Hydrogen/Element/Compound/Widget/Chart/Cartesian.purs`
+- `src/Hydrogen/Chart/LineChart.purs` (FFI-dependent)
+- `src/Hydrogen/Chart/PieChart.purs` (FFI-dependent)
+- Uses `Hydrogen.Render.Element` (string-based)
+- Outputs SVG elements - **THIS IS WRONG, NEEDS MIGRATION**
+
+### GPU Compute Kernels (correct path)
+
+- `src/Hydrogen/GPU/Kernel/Chart/Kernel.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/Types.purs`
+- Waveform, Sparkline, LinePlot, AreaFill, BarChart, Overlay kernels
+- GPU-native chart rendering (100K+ samples at 60fps)
+
+**Chart kernel files:**
+- `src/Hydrogen/GPU/Kernel/Chart/Waveform.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/Sparkline.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/LinePlot.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/AreaFill.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/BarChart.purs`
+- `src/Hydrogen/GPU/Kernel/Chart/Overlay.purs`
+
+────────────────────────────────────────────────────────────────────────────────
+                                                    // ffi // elimination
+────────────────────────────────────────────────────────────────────────────────
+
+## NO FFI FOR VISUAL OPERATIONS
+
+**"Tooltip"** = DrawRect + DrawGlyph at computed coordinates
+**"Highlight"** = Change color field in DrawCommand
+**"Animation"** = AnimationPhase changing over frames → different DrawCommand params
+**"Crosshair"** = DrawPath with coordinates from mouse position
+
+The `LineChart.purs` and `PieChart.purs` FFI functions assume DOM manipulation.
+**They should not exist.** Charts are pure `Element` → `DrawCommand` → GPU.
+
+Interaction comes from:
+1. `Sub` (subscriptions) for input events (OnMouseMove, OnAnimationFrame)
+2. Pure state machine updates
+3. New `Element` with updated visual state
+4. Re-flatten → new DrawCommands → re-render
+
+## Rust Runtime Chart Support
+
+The Rust runtime at `runtime/src/chart/` provides:
+- `core/chart.rs` - Pure geometry state machines (1008 lines)
+- `chart/line.rs` - Line chart state (515 lines)
+- `chart/pie.rs` - Pie chart state (619 lines)
+
+These use the **step function** pattern:
+```rust
+step :: State -> Input -> (State, [Action])
+```
+
+Actions become DrawCommands, not DOM mutations.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                                                             — Opus 4.5 // 2026
+                                                      — Updated 2026-03-04
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

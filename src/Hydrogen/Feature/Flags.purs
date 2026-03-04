@@ -37,6 +37,7 @@ module Hydrogen.Feature.Flags
     -- * Provider
   , FlagProvider
   , ProviderConfig
+  , defaultConfig
   , createProvider
   , createProviderWithConfig
     -- * Flag Operations
@@ -55,6 +56,7 @@ module Hydrogen.Feature.Flags
   , TargetingRule
   , TargetingCondition(Percentage, UserIds, UserAttribute, Environment, Always, Never, AllOf, AnyOf)
   , TargetingContext
+  , emptyContext
   , percentage
   , userIds
   , userAttribute
@@ -76,33 +78,52 @@ module Hydrogen.Feature.Flags
   , setOverride
   , clearOverride
   , clearAllOverrides
-    -- * Persistence
-  , loadFromJson
-  , loadFromUrl
     -- * DevTools
   , getAllFlags
   , getFlagState
   , FlagState
   ) where
 
-import Prelude hiding (when)
+import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , Unit
+  , bind
+  , discard
+  , flip
+  , map
+  , mod
+  , not
+  , pure
+  , show
+  , unit
+  , void
+  , ($)
+  , (*)
+  , (+)
+  , (/)
+  , (<)
+  , (<>)
+  , (<$>)
+  , (==)
+  , (>>=)
+  , (#)
+  )
 
 import Control.Monad (when)
 import Data.Array as Array
 import Data.Int (toNumber) as Int
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Either (Either)
 import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
+import Data.Traversable (traverse) as Traversable
 import Data.Tuple (Tuple(Tuple))
 import Effect (Effect)
-import Effect.Aff (Aff)
-import Hydrogen.Query as Q
-import Hydrogen.Data.RemoteData (RemoteData(Success))
-import Effect.Class (liftEffect)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 import Foreign.Object (Object)
+import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Core Types
@@ -159,30 +180,38 @@ type FlagDefinition =
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Feature flag provider that manages flag state
+-- |
+-- | Subscribers are stored with IDs for pure unsubscription (no reference equality).
 type FlagProvider =
   { definitions :: Ref (Map Flag FlagDefinition)
   , overrides :: Ref (Map Flag FlagValue)
   , context :: Ref TargetingContext
-  , subscribers :: Ref (Array (Flag -> FlagValue -> Effect Unit))
+  , subscribers :: Ref (Array { id :: Int, handler :: Flag -> FlagValue -> Effect Unit })
+  , nextSubscriberId :: Ref Int
   , config :: ProviderConfig
-  , queryClient :: Q.QueryClient
   }
 
 -- | Provider configuration
+-- |
+-- | Persistence and refresh are handler-based: provide handlers for
+-- | loading/saving overrides and refreshing definitions. This keeps
+-- | the module pure — no direct localStorage or HTTP FFI.
 type ProviderConfig =
-  { persistOverrides :: Boolean     -- ^ Save overrides to localStorage
-  , refreshInterval :: Maybe Int    -- ^ Auto-refresh interval in ms
-  , trackExposures :: Boolean       -- ^ Track when flags are evaluated
+  { trackExposures :: Boolean       -- ^ Track when flags are evaluated
   , onExposure :: Maybe (Flag -> FlagValue -> Effect Unit)
+  , loadOverrides :: Maybe (Effect (Map Flag FlagValue))  -- ^ Load persisted overrides
+  , saveOverrides :: Maybe (Map Flag FlagValue -> Effect Unit)  -- ^ Save overrides
+  , onRefresh :: Maybe (Effect (Array FlagDefinition))  -- ^ Reload flag definitions
   }
 
--- | Default provider configuration
+-- | Default provider configuration (no persistence, no tracking, no refresh)
 defaultConfig :: ProviderConfig
 defaultConfig =
-  { persistOverrides: true
-  , refreshInterval: Nothing
-  , trackExposures: false
+  { trackExposures: false
   , onExposure: Nothing
+  , loadOverrides: Nothing
+  , saveOverrides: Nothing
+  , onRefresh: Nothing
   }
 
 -- | Create a flag provider with default config
@@ -194,16 +223,17 @@ createProviderWithConfig :: Array FlagDefinition -> ProviderConfig -> Effect Fla
 createProviderWithConfig defs config = do
   let defMap = Map.fromFoldable $ map (\d -> d.flag /\ d) defs
   definitions <- Ref.new defMap
-  overrides <- Ref.new Map.empty
   context <- Ref.new emptyContext
   subscribers <- Ref.new []
-  queryClient <- Q.newClient
+  nextSubscriberId <- Ref.new 0
   
-  -- Load persisted overrides
-  when config.persistOverrides do
-    loadPersistedOverrides overrides
+  -- Load persisted overrides if handler provided
+  initialOverrides <- case config.loadOverrides of
+    Just loadFn -> loadFn
+    Nothing -> pure Map.empty
+  overrides <- Ref.new initialOverrides
   
-  pure { definitions, overrides, context, subscribers, config, queryClient }
+  pure { definitions, overrides, context, subscribers, nextSubscriberId, config }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- Flag Operations
@@ -475,24 +505,56 @@ defineJsonFlag name defaultVal rules =
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Subscribe to flag changes
+-- |
+-- | Returns an unsubscribe function. Uses ID-based tracking (no reference equality).
 subscribe :: FlagProvider -> (Flag -> FlagValue -> Effect Unit) -> Effect (Effect Unit)
 subscribe provider handler = do
-  Ref.modify_ (flip Array.snoc handler) provider.subscribers
-  pure $ Ref.modify_ (Array.filter (\h -> unsafeRefEq h handler # not)) provider.subscribers
+  subId <- Ref.read provider.nextSubscriberId
+  Ref.write (subId + 1) provider.nextSubscriberId
+  
+  let subscriber = { id: subId, handler }
+  Ref.modify_ (flip Array.snoc subscriber) provider.subscribers
+  
+  -- Return unsubscribe function
+  pure $ Ref.modify_ (Array.filter (\s -> s.id == subId # not)) provider.subscribers
 
-foreign import unsafeRefEq :: forall a. a -> a -> Boolean
-
--- | Refresh flags from remote source (invalidates cached flags in Query)
+-- | Refresh flag definitions from source
+-- |
+-- | If onRefresh handler was provided at construction, calls it to
+-- | reload flag definitions. This is how you wire up remote flag
+-- | fetching, polling, or any other refresh mechanism.
+-- |
+-- | ## Example
+-- |
+-- | ```purescript
+-- | config = defaultConfig
+-- |   { onRefresh = Just do
+-- |       response <- fetchFlagsFromServer "/api/flags"
+-- |       pure $ parseFlagDefinitions response
+-- |   }
+-- | provider <- createProviderWithConfig [] config
+-- | -- Later...
+-- | refresh provider  -- Reloads from server
+-- | ```
 refresh :: FlagProvider -> Effect Unit
-refresh provider = Q.invalidate provider.queryClient ["flags"]
+refresh provider = case provider.config.onRefresh of
+  Just refreshFn -> do
+    newDefs <- refreshFn
+    let defMap = Map.fromFoldable $ map (\d -> d.flag /\ d) newDefs
+    Ref.write defMap provider.definitions
+  Nothing -> pure unit
 
 -- | Set a local override for a flag
 setOverride :: FlagProvider -> Flag -> FlagValue -> Effect Unit
 setOverride provider f value = do
   Ref.modify_ (Map.insert f value) provider.overrides
   notifySubscribers provider f value
-  when provider.config.persistOverrides do
-    persistOverrides provider.overrides
+  -- Persist if handler provided
+  case provider.config.saveOverrides of
+    Just saveFn -> do
+      current <- Ref.read provider.overrides
+      saveFn current
+    Nothing -> pure unit
 
 -- | Clear an override
 clearOverride :: FlagProvider -> Flag -> Effect Unit
@@ -502,55 +564,32 @@ clearOverride provider f = do
   case maybeVal of
     Just val -> notifySubscribers provider f val
     Nothing -> pure unit
-  when provider.config.persistOverrides do
-    persistOverrides provider.overrides
+  -- Persist if handler provided
+  case provider.config.saveOverrides of
+    Just saveFn -> do
+      current <- Ref.read provider.overrides
+      saveFn current
+    Nothing -> pure unit
 
 -- | Clear all overrides
 clearAllOverrides :: FlagProvider -> Effect Unit
 clearAllOverrides provider = do
   Ref.write Map.empty provider.overrides
-  when provider.config.persistOverrides do
-    persistOverrides provider.overrides
+  -- Persist if handler provided
+  case provider.config.saveOverrides of
+    Just saveFn -> saveFn Map.empty
+    Nothing -> pure unit
 
 -- | Notify subscribers of a flag change
 notifySubscribers :: FlagProvider -> Flag -> FlagValue -> Effect Unit
 notifySubscribers provider f value = do
   subs <- Ref.read provider.subscribers
-  for_ subs \handler -> handler f value
+  for_ subs \sub -> sub.handler f value
   where
   for_ :: forall a. Array a -> (a -> Effect Unit) -> Effect Unit
-  for_ arr fn = void $ traverseImpl fn arr
+  for_ arr fn = void $ Traversable.traverse fn arr
 
-foreign import traverseImpl :: forall a b. (a -> Effect b) -> Array a -> Effect (Array b)
 
--- ═════════════════════════════════════════════════════════════════════════════
--- Persistence
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Load flags from JSON string
-loadFromJson :: FlagProvider -> String -> Effect Unit
-loadFromJson provider json = do
-  definitions <- parseJsonFlags json
-  Ref.write definitions provider.definitions
-
-foreign import parseJsonFlags :: String -> Effect (Map Flag FlagDefinition)
-
--- | Load flags from a URL (uses Query for caching)
-loadFromUrl :: FlagProvider -> String -> Aff (Q.QueryState String String)
-loadFromUrl provider url = do
-  state <- Q.query provider.queryClient (Q.defaultQueryOptions ["flags", url] (fetchJson url))
-  case state.data of
-    Success json -> liftEffect $ loadFromJson provider json
-    _ -> pure unit
-  pure state
-
-foreign import fetchJson :: String -> Aff (Either String String)
-
--- | Load persisted overrides from localStorage
-foreign import loadPersistedOverrides :: Ref (Map Flag FlagValue) -> Effect Unit
-
--- | Persist overrides to localStorage
-foreign import persistOverrides :: Ref (Map Flag FlagValue) -> Effect Unit
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- DevTools
@@ -596,7 +635,36 @@ getFlagState provider f = do
 -- Utilities
 -- ═════════════════════════════════════════════════════════════════════════════
 
-foreign import hashString :: String -> Int
+-- | Deterministic string hash using UUID5
+-- |
+-- | Uses the UUID5 namespace for feature flags to generate a deterministic
+-- | hash. Returns an Int suitable for percentage-based targeting.
+-- |
+-- | Same string always produces same hash. Guaranteed.
+hashString :: String -> Int
+hashString str =
+  let
+    -- Use nsEvent namespace (could create nsFeatureFlag if needed)
+    uuid = UUID5.uuid5 UUID5.nsEvent str
+    bytes = UUID5.toBytes uuid
+    -- Take first 4 bytes as Int (big-endian)
+    b0 :: Int
+    b0 = fromMaybe 0 $ Array.index bytes 0
+    b1 :: Int
+    b1 = fromMaybe 0 $ Array.index bytes 1
+    b2 :: Int
+    b2 = fromMaybe 0 $ Array.index bytes 2
+    b3 :: Int
+    b3 = fromMaybe 0 $ Array.index bytes 3
+    -- Constants as Int
+    c256 :: Int
+    c256 = 256
+    maxInt :: Int
+    maxInt = 2147483647
+  in
+    -- Combine bytes into positive Int
+    -- Using mod to ensure positive and reasonable range
+    ((b0 * c256 * c256 * c256) + (b1 * c256 * c256) + (b2 * c256) + b3) `mod` maxInt
 
 -- | Int to Number (pure)
 toNumber :: Int -> Number

@@ -92,7 +92,9 @@ import Prelude
   , (==)
   )
 
+import Data.Int (floor)
 import Data.Maybe (Maybe(Just, Nothing))
+import Hydrogen.Schema.Bounded (clampNumber)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // easing high-level
@@ -486,11 +488,11 @@ instance showAnimationPhase :: Show AnimationPhase where
   show (AnimationPhase p) = "phase(" <> show p <> ")"
 
 -- | Create a phase, clamping to [0.0, 1.0].
+-- |
+-- | Handles NaN and Infinity safely via clampNumber - both become 0.0.
+-- | This is the only safe entry point for external Number values.
 phase :: Number -> AnimationPhase
-phase n
-  | n < 0.0 = AnimationPhase 0.0
-  | n > 1.0 = AnimationPhase 1.0
-  | otherwise = AnimationPhase n
+phase n = AnimationPhase (clampNumber 0.0 1.0 n)
 
 -- | Extract raw number from phase.
 unwrapPhase :: AnimationPhase -> Number
@@ -505,15 +507,17 @@ phaseComplete :: AnimationPhase -> Boolean
 phaseComplete (AnimationPhase p) = p >= 1.0
 
 -- | Get progress as percentage (0-100).
+-- |
+-- | The internal value is guaranteed to be in [0.0, 1.0] by the smart
+-- | constructor, so no additional clamping is needed here.
 phaseProgress :: AnimationPhase -> Int
 phaseProgress (AnimationPhase p) = 
-  let clamped = if p < 0.0 then 0.0 else if p > 1.0 then 1.0 else p
-      -- Direct calculation: multiply by 100, then extract integer part
-      -- Since p is in [0,1], result is in [0,100]
-      scaled = clamped * 100.0
-  in numberToInt scaled
+  let scaled = p * 100.0
+  in floor scaled
 
 -- | Convert a number to an integer by truncation toward zero.
--- | Uses the fact that PureScript compiles to JS where bitwise OR 
--- | with 0 truncates to 32-bit integer.
-foreign import numberToInt :: Number -> Int
+-- | 
+-- | Pure implementation using Data.Int.floor. For non-negative inputs
+-- | (which is the only use case in this module), floor and trunc are equivalent.
+numberToInt :: Number -> Int
+numberToInt = floor

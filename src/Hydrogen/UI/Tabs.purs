@@ -20,6 +20,7 @@ module Hydrogen.UI.Tabs
   , Orientation(..)
   , ActivationMode(..)
   , defaultInput
+  , getElementByIdHtml
   ) where
 
 import Prelude
@@ -27,7 +28,6 @@ import Prelude
 import Data.Array as Array
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
-import Data.Nullable (Nullable, toMaybe)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
@@ -36,6 +36,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties.ARIA as ARIA
+import Web.DOM.NonElementParentNode (getElementById)
 import Web.Event.Event as Event
 import Web.HTML as HTML
 import Web.HTML.HTMLDocument as HTMLDocument
@@ -265,7 +266,7 @@ handleAction = case _ of
           -- Focus the tab
           doc <- liftEffect $ HTML.window >>= Window.document
           let tabId = state.baseId <> "-tab-" <> tab.value
-          mEl <- liftEffect $ getElementById tabId doc
+          mEl <- liftEffect $ getElementByIdHtml tabId doc
           for_ mEl \el -> liftEffect $ HTMLElement.focus el
           
           -- If automatic activation, select it too
@@ -295,11 +296,14 @@ prevEnabledTab indices mCurrent loop =
          then if loop then Array.last indices else Nothing
          else Array.index indices prev
 
--- FFI for getElementById
-foreign import getElementByIdImpl :: String -> HTMLDocument.HTMLDocument -> Effect (Nullable HTMLElement.HTMLElement)
-
-getElementById :: String -> HTMLDocument.HTMLDocument -> Effect (Maybe HTMLElement.HTMLElement)
-getElementById id doc = toMaybe <$> getElementByIdImpl id doc
+-- | Get an HTMLElement by ID from a document.
+-- |
+-- | Pure implementation using Web.DOM.NonElementParentNode.getElementById.
+-- | This replaces the former FFI implementation.
+getElementByIdHtml :: String -> HTMLDocument.HTMLDocument -> Effect (Maybe HTMLElement.HTMLElement)
+getElementByIdHtml eid doc = do
+  mEl <- getElementById eid (HTMLDocument.toNonElementParentNode doc)
+  pure (mEl >>= HTMLElement.fromElement)
 
 handleQuery :: forall m a. MonadAff m => Query a -> H.HalogenM State Action () Output m (Maybe a)
 handleQuery = case _ of
