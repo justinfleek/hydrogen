@@ -9,10 +9,11 @@
 use bytemuck::from_bytes;
 
 use crate::commands::{
-    AnimationStateHeader, AnimationTarget, AnimationTargetType, CommandBuffer, CommandType,
+    AnimationStateHeader, AnimationTarget, AnimationTargetType, Color4, CommandBuffer, CommandType,
     Contour, ContourHeader, DrawCommand, EasingFunction, GlyphInstancePayload, GlyphPathHeader,
-    GlyphPayload, Header, ParticlePayload, PathCommand, PathCommandType, PathDataHeader, Point3D,
-    QuadPayload, Radii4, RectPayload, StaggerDirection, UpdateMode, WordHeader, HEADER_SIZE,
+    GlyphPayload, Header, ImagePayload, Model3DPayload, ParticlePayload, PathCommand,
+    PathCommandType, PathDataHeader, PathPayload, Point3D, QuadPayload, Radii4, RectPayload,
+    StaggerDirection, UpdateMode, VideoPayload, WordHeader, HEADER_SIZE,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -35,8 +36,10 @@ pub fn parse_command_buffer(bytes: &[u8]) -> Result<CommandBuffer, &'static str>
     let mut commands = Vec::with_capacity(header.count as usize);
     let mut offset = HEADER_SIZE;
 
-    for _ in 0..header.count {
+    for command_index in 0..header.count {
         if offset >= bytes.len() {
+            // command_index identifies which command failed
+            log::trace!("Buffer ended at command {}", command_index);
             return Err("Unexpected end of buffer");
         }
 
@@ -91,10 +94,7 @@ fn parse_command(bytes: &[u8]) -> Result<(DrawCommand, usize), &'static str> {
             Ok((DrawCommand::Glyph(glyph), 4 + PAYLOAD_SIZE))
         }
 
-        CommandType::DrawPath => {
-            // Path is variable-length, skip for now
-            Ok((DrawCommand::Noop, 4))
-        }
+        CommandType::DrawPath => parse_draw_path(payload),
 
         CommandType::DrawParticle => {
             const PAYLOAD_SIZE: usize = 32;
@@ -105,48 +105,114 @@ fn parse_command(bytes: &[u8]) -> Result<(DrawCommand, usize), &'static str> {
             Ok((DrawCommand::Particle(particle), 4 + PAYLOAD_SIZE))
         }
 
+        CommandType::DrawImage => {
+            const PAYLOAD_SIZE: usize = 56;
+            if payload.len() < PAYLOAD_SIZE {
+                return Err("Buffer too small for DrawImage payload");
+            }
+            let image: ImagePayload = *from_bytes(&payload[..PAYLOAD_SIZE]);
+            Ok((DrawCommand::Image(image), 4 + PAYLOAD_SIZE))
+        }
+
+        CommandType::DrawVideo => {
+            const PAYLOAD_SIZE: usize = 44;
+            if payload.len() < PAYLOAD_SIZE {
+                return Err("Buffer too small for DrawVideo payload");
+            }
+            let video: VideoPayload = *from_bytes(&payload[..PAYLOAD_SIZE]);
+            Ok((DrawCommand::Video(video), 4 + PAYLOAD_SIZE))
+        }
+
+        CommandType::Draw3D => {
+            const PAYLOAD_SIZE: usize = 60;
+            if payload.len() < PAYLOAD_SIZE {
+                return Err("Buffer too small for Draw3D payload");
+            }
+            let model: Model3DPayload = *from_bytes(&payload[..PAYLOAD_SIZE]);
+            Ok((DrawCommand::Model3D(model), 4 + PAYLOAD_SIZE))
+        }
+
         CommandType::PushClip => {
-            // Rect clip subtype
+            // Check subtype byte
             if payload.is_empty() {
                 return Err("Buffer too small for PushClip");
             }
 
             let subtype = payload[0];
-            if subtype == 0x00 {
-                // Rect clip: 36 bytes
-                const CLIP_SIZE: usize = 36;
-                if payload.len() < 4 + CLIP_SIZE {
-                    return Err("Buffer too small for clip rect");
+            match subtype {
+                0x00 => {
+                    // Rect clip: 36 bytes after 4-byte subtype header
+                    const CLIP_SIZE: usize = 36;
+                    if payload.len() < 4 + CLIP_SIZE {
+                        return Err("Buffer too small for clip rect");
+                    }
+
+                    let clip_data = &payload[4..4 + CLIP_SIZE];
+                    let x = f32::from_le_bytes([
+                        clip_data[0],
+                        clip_data[1],
+                        clip_data[2],
+                        clip_data[3],
+                    ]);
+                    let y = f32::from_le_bytes([
+                        clip_data[4],
+                        clip_data[5],
+                        clip_data[6],
+                        clip_data[7],
+                    ]);
+                    let width = f32::from_le_bytes([
+                        clip_data[8],
+                        clip_data[9],
+                        clip_data[10],
+                        clip_data[11],
+                    ]);
+                    let height = f32::from_le_bytes([
+                        clip_data[12],
+                        clip_data[13],
+                        clip_data[14],
+                        clip_data[15],
+                    ]);
+                    let radii: Radii4 = *from_bytes(&clip_data[16..32]);
+
+                    Ok((
+                        DrawCommand::PushClipRect {
+                            x,
+                            y,
+                            width,
+                            height,
+                            radii,
+                        },
+                        4 + 4 + CLIP_SIZE,
+                    ))
                 }
+                0x01 => {
+                    // Path clip: segment_count + variable segments
+                    if payload.len() < 8 {
+                        return Err("Buffer too small for clip path header");
+                    }
 
-                let clip_data = &payload[4..4 + CLIP_SIZE];
-                let x =
-                    f32::from_le_bytes([clip_data[0], clip_data[1], clip_data[2], clip_data[3]]);
-                let y =
-                    f32::from_le_bytes([clip_data[4], clip_data[5], clip_data[6], clip_data[7]]);
-                let width =
-                    f32::from_le_bytes([clip_data[8], clip_data[9], clip_data[10], clip_data[11]]);
-                let height = f32::from_le_bytes([
-                    clip_data[12],
-                    clip_data[13],
-                    clip_data[14],
-                    clip_data[15],
-                ]);
-                let radii: Radii4 = *from_bytes(&clip_data[16..32]);
+                    let segment_count =
+                        u32::from_le_bytes([payload[4], payload[5], payload[6], payload[7]]);
 
-                Ok((
-                    DrawCommand::PushClipRect {
-                        x,
-                        y,
-                        width,
-                        height,
-                        radii,
-                    },
-                    4 + 4 + CLIP_SIZE,
-                ))
-            } else {
-                // Unknown clip subtype
-                Ok((DrawCommand::Noop, 4))
+                    let mut offset = 8; // After subtype+padding (4) + segment_count (4)
+                    let mut segments = Vec::with_capacity(segment_count as usize);
+
+                    for segment_index in 0..segment_count {
+                        let (cmd, size) =
+                            parse_path_command(&payload[offset..]).inspect_err(|_| {
+                                log::trace!("Failed at clip path segment {}", segment_index)
+                            })?;
+                        segments.push(cmd);
+                        offset += size;
+                    }
+
+                    Ok((DrawCommand::PushClipPath { segments }, 4 + offset))
+                }
+                _ => {
+                    // Unknown clip subtype — return Noop rather than error
+                    // to allow forward compatibility with future clip types
+                    Ok((DrawCommand::Noop, 4))
+                }
             }
         }
 
@@ -173,6 +239,108 @@ fn parse_command(bytes: &[u8]) -> Result<(DrawCommand, usize), &'static str> {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+//                                                         // v1 path parsing
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Parse a DrawPath command (variable length).
+///
+/// Binary format:
+/// - segment_count: u32 (4 bytes)
+/// - flags: u8 (1 byte) - bit 0: has_fill, bit 1: has_stroke
+/// - padding: 3 bytes
+/// - fill: Color4 (16 bytes) if has_fill
+/// - stroke: Color4 (16 bytes) if has_stroke
+/// - stroke_width: f32 (4 bytes) if has_stroke
+/// - depth: f32 (4 bytes)
+/// - pick_id: u32 (4 bytes)
+/// - segments: [PathCommand] (variable)
+fn parse_draw_path(payload: &[u8]) -> Result<(DrawCommand, usize), &'static str> {
+    // Minimum header: segment_count (4) + flags (4) + depth (4) + pick_id (4) = 16 bytes
+    const MIN_HEADER: usize = 16;
+    if payload.len() < MIN_HEADER {
+        return Err("Buffer too small for DrawPath header");
+    }
+
+    let segment_count = u32::from_le_bytes([payload[0], payload[1], payload[2], payload[3]]);
+    let flags = payload[4];
+    let has_fill = (flags & 0x01) != 0;
+    let has_stroke = (flags & 0x02) != 0;
+
+    let mut offset = 8; // After segment_count and flags+padding
+
+    // Parse fill color if present
+    let fill = if has_fill {
+        if payload.len() < offset + 16 {
+            return Err("Buffer too small for DrawPath fill color");
+        }
+        let color: Color4 = *from_bytes(&payload[offset..offset + 16]);
+        offset += 16;
+        Some(color)
+    } else {
+        None
+    };
+
+    // Parse stroke color and width if present
+    let (stroke, stroke_width) = if has_stroke {
+        if payload.len() < offset + 20 {
+            return Err("Buffer too small for DrawPath stroke");
+        }
+        let color: Color4 = *from_bytes(&payload[offset..offset + 16]);
+        offset += 16;
+        let width = f32::from_le_bytes([
+            payload[offset],
+            payload[offset + 1],
+            payload[offset + 2],
+            payload[offset + 3],
+        ]);
+        offset += 4;
+        (Some(color), width)
+    } else {
+        (None, 0.0)
+    };
+
+    // Parse depth and pick_id
+    if payload.len() < offset + 8 {
+        return Err("Buffer too small for DrawPath depth/pick_id");
+    }
+    let depth = f32::from_le_bytes([
+        payload[offset],
+        payload[offset + 1],
+        payload[offset + 2],
+        payload[offset + 3],
+    ]);
+    offset += 4;
+    let pick_id = u32::from_le_bytes([
+        payload[offset],
+        payload[offset + 1],
+        payload[offset + 2],
+        payload[offset + 3],
+    ]);
+    offset += 4;
+
+    // Parse path segments
+    let mut segments = Vec::with_capacity(segment_count as usize);
+    for segment_index in 0..segment_count {
+        let (cmd, size) = parse_path_command(&payload[offset..])
+            .inspect_err(|_| log::trace!("Failed at segment {}", segment_index))?;
+        segments.push(cmd);
+        offset += size;
+    }
+
+    Ok((
+        DrawCommand::Path(PathPayload {
+            segments,
+            fill,
+            stroke,
+            stroke_width,
+            depth,
+            pick_id,
+        }),
+        4 + offset, // +4 for command type header
+    ))
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 //                                                           // v2 parsing helpers
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -187,8 +355,9 @@ fn parse_glyph_path(payload: &[u8]) -> Result<(DrawCommand, usize), &'static str
     let mut offset = HEADER_SIZE;
     let mut contours = Vec::with_capacity(header.contour_count as usize);
 
-    for _ in 0..header.contour_count {
-        let (contour, size) = parse_contour(&payload[offset..])?;
+    for contour_index in 0..header.contour_count {
+        let (contour, size) = parse_contour(&payload[offset..])
+            .inspect_err(|_| log::trace!("Failed at contour {}", contour_index))?;
         contours.push(contour);
         offset += size;
     }
@@ -210,8 +379,9 @@ fn parse_contour(payload: &[u8]) -> Result<(Contour, usize), &'static str> {
     let mut offset = CONTOUR_HEADER_SIZE;
     let mut commands = Vec::with_capacity(header.command_count as usize);
 
-    for _ in 0..header.command_count {
-        let (cmd, size) = parse_path_command(&payload[offset..])?;
+    for command_index in 0..header.command_count {
+        let (cmd, size) = parse_path_command(&payload[offset..])
+            .inspect_err(|_| log::trace!("Failed at path command {}", command_index))?;
         commands.push(cmd);
         offset += size;
     }
@@ -355,8 +525,9 @@ fn parse_path_data(payload: &[u8]) -> Result<(DrawCommand, usize), &'static str>
     let mut offset = HEADER_SIZE;
     let mut commands = Vec::with_capacity(header.command_count as usize);
 
-    for _ in 0..header.command_count {
-        let (cmd, size) = parse_path_command(&payload[offset..])?;
+    for command_index in 0..header.command_count {
+        let (cmd, size) = parse_path_command(&payload[offset..])
+            .inspect_err(|_| log::trace!("Failed at PathData command {}", command_index))?;
         commands.push(cmd);
         offset += size;
     }

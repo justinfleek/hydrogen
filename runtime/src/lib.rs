@@ -6,37 +6,47 @@
 //!
 //! Pure Rust runtime for Hydrogen. **Zero JavaScript.**
 //!
-//! This crate provides:
-//!
-//! 1. **High-level rendering** - Binary command buffer → WebGPU rendering
-//! 2. **Low-level WebGPU FFI** - Direct WebGPU API for PureScript
-//! 3. **Browser APIs** - DOM, events, storage, etc. (replacing all .js files)
-//!
 //! ## Architecture
 //!
+//! The runtime is split into two layers:
+//!
 //! ```text
-//! PureScript (Hydrogen)
-//!     ↓
-//! ┌───────────────────────────────────────────────────┐
-//! │  Rust WASM (this crate)                           │
-//! │  ┌─────────────────┐  ┌─────────────────────────┐ │
-//! │  │ High-level API  │  │ Low-level WebGPU FFI   │ │
-//! │  │ (Runtime)       │  │ (webgpu module)        │ │
-//! │  └────────┬────────┘  └───────────┬────────────┘ │
-//! │           │                       │              │
-//! │           └───────────┬───────────┘              │
-//! │                       ↓                          │
-//! │               Browser WebGPU                     │
-//! └───────────────────────────────────────────────────┘
+//! ┌─────────────────────────────────────────────────────────────────┐
+//! │                        PURE CORE                                │
+//! │  (core::commands, core::binary, core::easing, core::spring,    │
+//! │   core::chart, core::input)                                     │
+//! │                                                                 │
+//! │  step :: State -> Input -> (State, Output)                     │
+//! │  No JS imports. Deterministic. Testable.                       │
+//! └─────────────────────────────────────────────────────────────────┘
+//!                               ↑ ↓
+//!                          Pure Data
+//!                               ↑ ↓
+//! ┌─────────────────────────────────────────────────────────────────┐
+//! │                      HOST ADAPTERS                              │
+//! │  Browser: webgpu, dom, events, storage, router, etc.           │
+//! │  (All modules with wasm_bindgen/web_sys dependencies)          │
+//! └─────────────────────────────────────────────────────────────────┘
 //! ```
 //!
-//! ## Modules
+//! ## Module Categories
 //!
-//! - `webgpu` - Raw WebGPU API (replaces Device.js)
-//! - `dom` - DOM manipulation (replaces DOM.js, Target/DOM.js)
-//! - `events` - Event listeners (replaces Input.js, Gesture.js)
-//! - `storage` - localStorage/sessionStorage (replaces LocalStorage.js)
-//! - `router` - History API (replaces Router.js)
+//! ### Pure Core (0 JS dependencies)
+//!
+//! - `core::commands` — DrawCommand types (DrawRect, DrawQuad, etc.)
+//! - `core::binary` — HYDG command buffer parsing
+//! - `core::easing` — Pure easing function evaluation
+//! - `core::spring` — Pure spring physics simulation
+//! - `core::chart` — Chart geometry and state machines
+//! - `core::input` — Pure input event types
+//!
+//! ### Host Adapters (browser-specific)
+//!
+//! - `webgpu` — Raw WebGPU API
+//! - `dom` — DOM manipulation
+//! - `events` — Event listeners
+//! - `storage` — localStorage/sessionStorage
+//! - `router` — History API navigation
 //!
 //! ## Usage from PureScript
 //!
@@ -48,11 +58,22 @@
 //! import Hydrogen.GPU.WebGPU.Device (requestAdapter, requestDevice)
 //! ```
 
+// ═══════════════════════════════════════════════════════════════════════════════
+//                                                                   // pure core
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Pure computation core — no JS dependencies
+pub mod core;
+
+// These are re-exported through core:: but also available at crate root for
+// backwards compatibility
 mod binary;
 mod commands;
 mod renderer;
 mod shaders;
-mod tessellate;
+
+// Tessellation is public for native tools (SVG export, offline tessellation, CLI)
+pub mod tessellate;
 
 // New modules replacing JavaScript
 pub mod webgpu;
@@ -129,9 +150,23 @@ pub mod keyboard;
 // Replaces DEPRECATED_JS_REFERENCE/Hydrogen_UI_FocusTrap.js
 pub mod focus_trap;
 
+// Geo — Geolocation API with bounded coordinates
+// Replaces Hydrogen_Geo_Geolocation.js
+// Lean4: proofs/Hydrogen/Browser/Invariants.lean (Geolocation section)
+pub mod geo;
+
+// Intl — Internationalization API (number, currency, date, relative time)
+// Replaces Hydrogen_I18n_Locale.js FFI
+pub mod intl;
+
 // AriaHider — ARIA hiding for modal dialogs
 // Replaces DEPRECATED_JS_REFERENCE/Hydrogen_UI_AriaHider.js
 pub mod aria_hider;
+
+// Chart — SVG chart interactions (line, pie)
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Chart_LineChart.js (274 lines)
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Chart_PieChart.js (358 lines)
+pub mod chart;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -139,7 +174,8 @@ use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
 pub use binary::parse_command_buffer;
-pub use commands::{CommandBuffer, DrawCommand, Header};
+pub use commands::{CommandBuffer, DrawCommand, Header, PathCommand, PathPayload};
+pub use tessellate::{tessellate_contours, tessellate_path_commands, TessellatedPath};
 #[cfg(target_arch = "wasm32")]
 pub use renderer::Renderer;
 

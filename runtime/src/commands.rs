@@ -59,13 +59,18 @@ impl Header {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum CommandType {
-    // v1 commands
+    // v1 commands - primitives
     Noop = 0x00,
     DrawRect = 0x01,
     DrawQuad = 0x02,
     DrawGlyph = 0x03,
     DrawPath = 0x04,
     DrawParticle = 0x05,
+    // v1 commands - media
+    DrawImage = 0x06,
+    DrawVideo = 0x07,
+    Draw3D = 0x08,
+    // v1 commands - clipping
     PushClip = 0x10,
     PopClip = 0x11,
     // v2 typography as geometry
@@ -87,6 +92,9 @@ impl TryFrom<u8> for CommandType {
             0x03 => Ok(CommandType::DrawGlyph),
             0x04 => Ok(CommandType::DrawPath),
             0x05 => Ok(CommandType::DrawParticle),
+            0x06 => Ok(CommandType::DrawImage),
+            0x07 => Ok(CommandType::DrawVideo),
+            0x08 => Ok(CommandType::Draw3D),
             0x10 => Ok(CommandType::PushClip),
             0x11 => Ok(CommandType::PopClip),
             0x20 => Ok(CommandType::DrawGlyphPath),
@@ -181,6 +189,120 @@ pub struct ParticlePayload {
     pub z: f32,
     pub size: f32,
     pub color: Color4,
+    pub pick_id: u32,
+}
+
+/// DrawImage payload (56 bytes).
+///
+/// Renders a texture or image region. The texture_id references a pre-loaded
+/// texture in the runtime's texture registry. URLs are resolved at a higher
+/// layer; by the time we reach binary format, we have numeric IDs.
+#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+#[repr(C)]
+pub struct ImagePayload {
+    /// Pre-loaded texture reference (from texture registry)
+    pub texture_id: u32,
+    /// Left edge (pixels)
+    pub x: f32,
+    /// Top edge (pixels)
+    pub y: f32,
+    /// Width (pixels)
+    pub width: f32,
+    /// Height (pixels)
+    pub height: f32,
+    /// UV rect for texture atlases: [u_min, v_min, u_max, v_max]
+    pub uv_rect: [f32; 4],
+    /// Multiply tint color (1,1,1,1 = no tint)
+    pub tint: Color4,
+    /// Z-depth for painter's algorithm
+    pub depth: f32,
+    /// Pick buffer ID for hit testing (0 = non-interactive)
+    pub pick_id: u32,
+}
+
+/// DrawVideo payload (44 bytes).
+///
+/// Renders a video frame. The video_id references a pre-loaded video resource
+/// in the runtime's media registry. Playback state (currentTime, playing) is
+/// managed by the runtime; this command specifies the desired frame.
+#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+#[repr(C)]
+pub struct VideoPayload {
+    /// Pre-loaded video reference (from media registry)
+    pub video_id: u32,
+    /// Left edge (pixels)
+    pub x: f32,
+    /// Top edge (pixels)
+    pub y: f32,
+    /// Width (pixels)
+    pub width: f32,
+    /// Height (pixels)
+    pub height: f32,
+    /// Current playback time in seconds
+    pub current_time: f32,
+    /// Playback rate (1.0 = normal, 0.5 = half speed, 2.0 = double)
+    pub playback_rate: f32,
+    /// Volume [0.0, 1.0]
+    pub volume: f32,
+    /// Z-depth for painter's algorithm
+    pub depth: f32,
+    /// Pick buffer ID for hit testing (0 = non-interactive)
+    pub pick_id: u32,
+}
+
+/// Draw3D payload (60 bytes).
+///
+/// Renders a 3D model (GLTF) into a 2D viewport region. The model_id
+/// references a pre-loaded 3D model in the runtime's asset registry.
+/// Camera parameters define the view into the 3D scene.
+#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+#[repr(C)]
+pub struct Model3DPayload {
+    /// Pre-loaded GLTF model reference (from asset registry)
+    pub model_id: u32,
+    /// Viewport x (pixels)
+    pub viewport_x: f32,
+    /// Viewport y (pixels)
+    pub viewport_y: f32,
+    /// Viewport width (pixels)
+    pub viewport_width: f32,
+    /// Viewport height (pixels)
+    pub viewport_height: f32,
+    /// Camera position in model space
+    pub camera_x: f32,
+    pub camera_y: f32,
+    pub camera_z: f32,
+    /// Camera look-at target in model space
+    pub target_x: f32,
+    pub target_y: f32,
+    pub target_z: f32,
+    /// Camera field of view (degrees)
+    pub camera_fov: f32,
+    /// Animation progress [0.0, 1.0]
+    pub animation_progress: f32,
+    /// Z-depth for painter's algorithm (2D compositing order)
+    pub depth: f32,
+    /// Pick buffer ID for hit testing (0 = non-interactive)
+    pub pick_id: u32,
+}
+
+/// DrawPath payload.
+///
+/// Vector path with fill and/or stroke. Segments are variable-length.
+/// Matches PureScript `PathParams msg` from Hydrogen.GPU.DrawCommand.Types.
+#[derive(Debug, Clone)]
+pub struct PathPayload {
+    /// Path segments (MoveTo, LineTo, QuadTo, CubicTo, Close)
+    pub segments: Vec<PathCommand>,
+    /// Fill color (None = no fill)
+    pub fill: Option<Color4>,
+    /// Stroke color (None = no stroke)
+    pub stroke: Option<Color4>,
+    /// Stroke width in pixels
+    pub stroke_width: f32,
+    /// Z-depth for painter's algorithm
+    pub depth: f32,
+    /// Pick buffer ID for hit testing (0 = non-interactive)
     pub pick_id: u32,
 }
 
@@ -525,18 +647,27 @@ pub struct AnimationTarget {
 /// A parsed draw command.
 #[derive(Debug, Clone)]
 pub enum DrawCommand {
-    // v1 commands
+    // v1 commands - primitives
     Noop,
     Rect(RectPayload),
     Quad(QuadPayload),
     Glyph(GlyphPayload),
+    Path(PathPayload),
     Particle(ParticlePayload),
+    // v1 commands - media
+    Image(ImagePayload),
+    Video(VideoPayload),
+    Model3D(Model3DPayload),
+    // v1 commands - clipping
     PushClipRect {
         x: f32,
         y: f32,
         width: f32,
         height: f32,
         radii: Radii4,
+    },
+    PushClipPath {
+        segments: Vec<PathCommand>,
     },
     PopClip,
     // v2 typography as geometry
@@ -564,13 +695,20 @@ impl DrawCommand {
     /// Get the depth of this command for sorting.
     pub fn depth(&self) -> f32 {
         match self {
-            // v1 commands
+            // v1 commands - primitives
             DrawCommand::Noop => 0.0,
             DrawCommand::Rect(p) => p.depth,
             DrawCommand::Quad(p) => p.depth,
             DrawCommand::Glyph(p) => p.depth,
+            DrawCommand::Path(p) => p.depth,
             DrawCommand::Particle(p) => p.z,
+            // v1 commands - media
+            DrawCommand::Image(p) => p.depth,
+            DrawCommand::Video(p) => p.depth,
+            DrawCommand::Model3D(p) => p.depth,
+            // v1 commands - clipping
             DrawCommand::PushClipRect { .. } => 0.0,
+            DrawCommand::PushClipPath { .. } => 0.0,
             DrawCommand::PopClip => 0.0,
             // v2 typography commands
             DrawCommand::GlyphPath { header, .. } => header.depth,
@@ -584,13 +722,20 @@ impl DrawCommand {
     /// Get the pick ID if this command is interactive.
     pub fn pick_id(&self) -> Option<u32> {
         let id = match self {
-            // v1 commands
+            // v1 commands - primitives
             DrawCommand::Noop => 0,
             DrawCommand::Rect(p) => p.pick_id,
             DrawCommand::Quad(p) => p.pick_id,
             DrawCommand::Glyph(p) => p.pick_id,
+            DrawCommand::Path(p) => p.pick_id,
             DrawCommand::Particle(p) => p.pick_id,
+            // v1 commands - media
+            DrawCommand::Image(p) => p.pick_id,
+            DrawCommand::Video(p) => p.pick_id,
+            DrawCommand::Model3D(p) => p.pick_id,
+            // v1 commands - clipping
             DrawCommand::PushClipRect { .. } => 0,
+            DrawCommand::PushClipPath { .. } => 0,
             DrawCommand::PopClip => 0,
             // v2 typography commands
             DrawCommand::GlyphPath { header, .. } => header.pick_id,

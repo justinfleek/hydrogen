@@ -68,14 +68,21 @@ impl IntersectionHandle {
 }
 
 /// Observe an element for intersection changes.
+///
+/// # Arguments
+/// * `element` - The element to observe
+/// * `threshold` - Visibility ratio (0.0 to 1.0) at which to trigger callback
+/// * `root_margin` - Margin around the root (CSS margin syntax, e.g., "10px 20px")
+/// * `root` - Optional root element to use as viewport (null = browser viewport)
+/// * `callback` - Function called when intersection changes
 #[wasm_bindgen]
 pub fn intersection_observe(
     element: &Element,
     threshold: f64,
     root_margin: &str,
+    root: Option<Element>,
     callback: js_sys::Function,
 ) -> Result<IntersectionHandle, JsValue> {
-    let element_clone = element.clone();
     let callback_clone = callback.clone();
 
     let closure = Closure::new(move |entries: Array, _observer: IntersectionObserver| {
@@ -92,8 +99,9 @@ pub fn intersection_observe(
         }
     });
 
-    let mut init = IntersectionObserverInit::new();
+    let init = IntersectionObserverInit::new();
     init.set_root_margin(root_margin);
+    init.set_root(root.as_ref());
 
     let threshold_array = Array::new();
     threshold_array.push(&JsValue::from_f64(threshold));
@@ -111,11 +119,19 @@ pub fn intersection_observe(
 }
 
 /// Observe an element once (disconnect after first intersection).
+///
+/// # Arguments
+/// * `element` - The element to observe
+/// * `threshold` - Visibility ratio (0.0 to 1.0) at which to trigger callback
+/// * `root_margin` - Margin around the root (CSS margin syntax, e.g., "10px 20px")
+/// * `root` - Optional root element to use as viewport (null = browser viewport)
+/// * `callback` - Function called when element first intersects, then observer disconnects
 #[wasm_bindgen]
 pub fn intersection_observe_once(
     element: &Element,
     threshold: f64,
     root_margin: &str,
+    root: Option<Element>,
     callback: js_sys::Function,
 ) -> Result<IntersectionHandle, JsValue> {
     let callback_clone = callback.clone();
@@ -140,8 +156,9 @@ pub fn intersection_observe_once(
         }
     });
 
-    let mut init = IntersectionObserverInit::new();
+    let init = IntersectionObserverInit::new();
     init.set_root_margin(root_margin);
+    init.set_root(root.as_ref());
 
     let threshold_array = Array::new();
     threshold_array.push(&JsValue::from_f64(threshold));

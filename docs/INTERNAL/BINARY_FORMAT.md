@@ -93,12 +93,15 @@ Value   Name           Payload Size   Description
 0x03    DrawGlyph      40 bytes       SDF text glyph
 0x04    DrawPath       variable       Vector path (see below)
 0x05    DrawParticle   32 bytes       Point sprite particle
+0x06    DrawImage      56 bytes       Texture/image rendering
+0x07    DrawVideo      44 bytes       Video frame rendering
+0x08    Draw3D         60 bytes       3D model (GLTF) rendering
 0x10    PushClip       variable       Push clipping region
 0x11    PopClip        0 bytes        Pop clipping region
 
 v2 Typography as Geometry:
 0x20    DrawGlyphPath         variable   Character as vector bezier paths
-0x21    DrawGlyphInstance     64 bytes   Animated glyph with transform
+0x21    DrawGlyphInstance     76 bytes   Animated glyph with transform
 0x22    DrawWord              variable   Collection of glyphs with stagger
 0x23    DefinePathData        variable   Shared path data for instancing
 0x24    UpdateAnimationState  variable   Per-frame animation deltas
@@ -293,6 +296,114 @@ Offset  Size  Type    Name           Description
 - Fill uses even-odd or non-zero winding rule (implementation-defined)
 - Stroke is rendered with round joins and caps
 - Both fill and stroke can be present simultaneously
+
+────────────────────────────────────────────────────────────────────────────────
+                                                         // command: DrawImage
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x06**
+**Payload Size: 56 bytes**
+**Total Size: 60 bytes (including 4-byte header)**
+
+Draws a texture or image region. The texture_id references a pre-loaded texture
+in the runtime's texture registry. URLs are resolved at a higher layer; by the
+time we reach binary format, we have numeric resource IDs.
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       4     u32     textureId    Pre-loaded texture reference
+4       4     f32     x            Left edge (pixels)
+8       4     f32     y            Top edge (pixels)
+12      4     f32     width        Width (pixels)
+16      4     f32     height       Height (pixels)
+20      4     f32     uvMinU       UV rect minimum U (texture atlases)
+24      4     f32     uvMinV       UV rect minimum V
+28      4     f32     uvMaxU       UV rect maximum U
+32      4     f32     uvMaxV       UV rect maximum V
+36      4     f32     tintR        Tint red channel [0.0, 1.0]
+40      4     f32     tintG        Tint green channel [0.0, 1.0]
+44      4     f32     tintB        Tint blue channel [0.0, 1.0]
+48      4     f32     tintA        Tint alpha channel [0.0, 1.0]
+52      4     f32     depth        Z-order
+56      4     u32     pickId       Hit-test ID
+```
+
+**Rendering Notes:**
+- Tint color multiplies with texture color (1,1,1,1 = no tint)
+- UV rect enables texture atlases and sprite sheets
+- For full texture, use uvRect = [0.0, 0.0, 1.0, 1.0]
+
+────────────────────────────────────────────────────────────────────────────────
+                                                         // command: DrawVideo
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x07**
+**Payload Size: 44 bytes**
+**Total Size: 48 bytes (including 4-byte header)**
+
+Renders a video frame. The video_id references a pre-loaded video resource
+in the runtime's media registry. Playback state is managed by the runtime;
+this command specifies the desired render frame.
+
+```
+Offset  Size  Type    Name         Description
+──────  ────  ────    ────         ───────────
+0       4     u32     videoId      Pre-loaded video reference
+4       4     f32     x            Left edge (pixels)
+8       4     f32     y            Top edge (pixels)
+12      4     f32     width        Width (pixels)
+16      4     f32     height       Height (pixels)
+20      4     f32     currentTime  Playback time (seconds)
+24      4     f32     playbackRate Playback rate (1.0 = normal)
+28      4     f32     volume       Audio volume [0.0, 1.0]
+32      4     f32     depth        Z-order
+36      4     u32     pickId       Hit-test ID
+```
+
+**Rendering Notes:**
+- Runtime decodes video frame at currentTime
+- playbackRate affects internal playback, not frame selection
+- Volume controls audio output (0.0 = muted)
+- Video aspect ratio may differ from width/height (letterbox/stretch)
+
+────────────────────────────────────────────────────────────────────────────────
+                                                           // command: Draw3D
+────────────────────────────────────────────────────────────────────────────────
+
+**Type: 0x08**
+**Payload Size: 60 bytes**
+**Total Size: 64 bytes (including 4-byte header)**
+
+Renders a 3D model (GLTF) into a 2D viewport region. The model_id references
+a pre-loaded 3D model in the runtime's asset registry. Camera parameters
+define the view into the 3D scene.
+
+```
+Offset  Size  Type    Name              Description
+──────  ────  ────    ────              ───────────
+0       4     u32     modelId           Pre-loaded GLTF model reference
+4       4     f32     viewportX         Viewport left edge (pixels)
+8       4     f32     viewportY         Viewport top edge (pixels)
+12      4     f32     viewportWidth     Viewport width (pixels)
+16      4     f32     viewportHeight    Viewport height (pixels)
+20      4     f32     cameraX           Camera position X (model space)
+24      4     f32     cameraY           Camera position Y (model space)
+28      4     f32     cameraZ           Camera position Z (model space)
+32      4     f32     targetX           Look-at target X (model space)
+36      4     f32     targetY           Look-at target Y (model space)
+40      4     f32     targetZ           Look-at target Z (model space)
+44      4     f32     cameraFov         Field of view (degrees)
+48      4     f32     animationProgress Animation progress [0.0, 1.0]
+52      4     f32     depth             Z-order (2D compositing)
+56      4     u32     pickId            Hit-test ID
+```
+
+**Rendering Notes:**
+- 3D rendering uses a separate WebGPU pipeline
+- Camera uses perspective projection with specified FOV
+- animationProgress controls GLTF animation playback
+- depth is for 2D compositing order, not 3D scene depth
 
 ────────────────────────────────────────────────────────────────────────────────
                                                         // command: PushClip

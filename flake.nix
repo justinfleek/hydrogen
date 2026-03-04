@@ -5,6 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     purescript-overlay.url = "github:thomashoneyman/purescript-overlay";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
   outputs =
@@ -13,13 +14,27 @@
       nixpkgs,
       flake-utils,
       purescript-overlay,
+      rust-overlay,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ purescript-overlay.overlays.default ];
+          overlays = [
+            purescript-overlay.overlays.default
+            rust-overlay.overlays.default
+          ];
+        };
+
+        # Rust toolchain with WASM target
+        rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+          targets = [ "wasm32-unknown-unknown" ];
+          extensions = [
+            "rust-src"
+            "rust-analyzer"
+            "clippy"
+          ];
         };
 
         # Common build inputs
@@ -29,6 +44,11 @@
           pkgs.spago-unstable
           pkgs.esbuild
           pkgs.elan
+
+          # Rust toolchain with WASM target (for runtime)
+          rustToolchain
+          pkgs.wasm-pack
+          pkgs.wasm-bindgen-cli
         ];
 
       in
@@ -42,6 +62,8 @@
             echo "  HYDROGEN // dev shell"
             echo ""
             echo "  PureScript: $(purs --version)"
+            echo "  Rust: $(rustc --version)"
+            echo "  WASM target: wasm32-unknown-unknown"
             echo "  Lean4: via elan (see lean-toolchain)"
             echo ""
           '';

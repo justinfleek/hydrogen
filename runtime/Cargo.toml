@@ -35,6 +35,21 @@ bytemuck = { version = "1.14", features = ["derive"] }
 # Utilities
 gloo-timers = "0.3"
 
+# Serialization (for chart callback data)
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# INTERNATIONALIZATION (pure Rust, zero JS)
+# ICU4X: International Components for Unicode by Unicode Consortium + Mozilla
+# ═══════════════════════════════════════════════════════════════════════════════
+icu = { version = "2.1", features = ["compiled_data"] }
+icu_decimal = { version = "2.1", features = ["compiled_data"] }
+icu_datetime = { version = "2.1", features = ["compiled_data"] }
+icu_locale = "2.1"
+fixed_decimal = "0.7"
+writeable = "0.6"
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CRYPTOGRAPHY (for auth layer)
 # All pure-Rust, WASM-compatible, side-channel resistant
@@ -270,6 +285,26 @@ features = [
     "HtmlScriptElement",
     "HtmlStyleElement",
     "HtmlCollection",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # SVG (chart module requirements)
+    # ═══════════════════════════════════════════════════════════════════════════
+    "SvgElement",
+    "SvgsvgElement",
+    "SvgPathElement",
+    "SvgGraphicsElement",
+    "SvgAnimatedRect",
+    "SvgRect",
+    "SvgPoint",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # GEOLOCATION (geo module requirements)
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Geolocation",
+    "GeolocationCoordinates",
+    "GeolocationPosition",
+    "GeolocationPositionError",
+    "PositionOptions",
 ]
 
 [dev-dependencies]

@@ -50,7 +50,7 @@ pub fn router_push_state(path: &str) -> Result<(), JsValue> {
     history.push_state_with_url(&JsValue::NULL, "", Some(path))?;
 
     // Dispatch custom event for route change
-    let mut init = CustomEventInit::new();
+    let init = CustomEventInit::new();
     init.set_detail(&JsValue::from_str(path));
     let event = CustomEvent::new_with_event_init_dict("hydrogen:routechange", &init)?;
     win.dispatch_event(&event)?;

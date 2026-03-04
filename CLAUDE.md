@@ -306,6 +306,50 @@ That's not a dangerous request. That's epistemics.
 ────────────────────────────────────────────────────────────────────────────────
 
 ════════════════════════════════════════════════════════════════════════════════
+                                                    // search // before // edit
+════════════════════════════════════════════════════════════════════════════════
+
+**SEARCH IS CHEAP. EDITS ARE EXPENSIVE.**
+
+Sub-agents cost tokens. Storage costs bytes. Your focus and concentration on
+this codebase costs *correctness*. The economics are clear:
+
+| Operation              | Cost      | Risk                              |
+|------------------------|-----------|-----------------------------------|
+| Spin up search agents  | Cheap     | None                              |
+| Read documentation     | Cheap     | None                              |
+| Gather context first   | Cheap     | None                              |
+| Uninformed edit        | Expensive | Technical debt, broken invariants |
+| Edit without full understanding | Catastrophic | Cascading failures at scale |
+
+**Before making ANY edit to this codebase:**
+
+1. **Spin up sub-agents** to gather information in parallel
+2. **Read the relevant files** completely — not just the section you're changing
+3. **Understand the architectural context** — how does this fit the larger system?
+4. **Check for existing patterns** — is there prior art in the codebase?
+5. **Verify your understanding** — can you explain WHY the code is this way?
+
+**Only then** — with full understanding — make the edit.
+
+An edit that introduces technical debt because you didn't search first is a
+**failure mode**. The debt compounds. Future agents hit the same confusion.
+The codebase degrades. At billion-agent scale, your "quick fix" becomes a
+systemic bottleneck.
+
+**The rule is simple:**
+
+```
+SEARCH FIRST. DOCUMENT FINDINGS. EDIT LAST.
+```
+
+When in doubt, spin up another search agent. When uncertain, read another file.
+When the architecture isn't clear, explore more. The cost of searching is
+negligible. The cost of uninformed edits is catastrophic.
+
+────────────────────────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════════════════════
                                                          // current // mission
 ════════════════════════════════════════════════════════════════════════════════
 
