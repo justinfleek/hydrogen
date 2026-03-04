@@ -9,10 +9,10 @@
 use bytemuck::from_bytes;
 
 use crate::commands::{
-    AnimationStateHeader, AnimationTarget, CommandBuffer, CommandType, Contour, ContourHeader,
-    DrawCommand, GlyphInstancePayload, GlyphPathHeader, GlyphPayload, Header, ParticlePayload,
-    PathCommand, PathCommandType, PathDataHeader, Point3D, QuadPayload, Radii4, RectPayload,
-    WordHeader, HEADER_SIZE,
+    AnimationStateHeader, AnimationTarget, AnimationTargetType, CommandBuffer, CommandType,
+    Contour, ContourHeader, DrawCommand, EasingFunction, GlyphInstancePayload, GlyphPathHeader,
+    GlyphPayload, Header, ParticlePayload, PathCommand, PathCommandType, PathDataHeader, Point3D,
+    QuadPayload, Radii4, RectPayload, StaggerDirection, UpdateMode, WordHeader, HEADER_SIZE,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -295,6 +295,11 @@ fn parse_word(payload: &[u8]) -> Result<(DrawCommand, usize), &'static str> {
     }
 
     let header: WordHeader = *from_bytes(&payload[..HEADER_SIZE]);
+
+    // Validate stagger direction and easing function
+    let _stagger_dir = StaggerDirection::try_from(header.stagger_dir)?;
+    let _easing = EasingFunction::try_from(header.easing)?;
+
     let glyph_count = header.glyph_count as usize;
 
     // Calculate required size: header + (glyph_count * 4 for IDs) + (glyph_count * 12 for positions)
@@ -370,6 +375,10 @@ fn parse_animation_state(payload: &[u8]) -> Result<(DrawCommand, usize), &'stati
     }
 
     let header: AnimationStateHeader = *from_bytes(&payload[..HEADER_SIZE]);
+
+    // Validate update mode
+    let _mode = UpdateMode::try_from(header.mode)?;
+
     let target_count = header.target_count as usize;
 
     const TARGET_SIZE: usize = 52;
@@ -384,6 +393,10 @@ fn parse_animation_state(payload: &[u8]) -> Result<(DrawCommand, usize), &'stati
     for i in 0..target_count {
         let offset = HEADER_SIZE + i * TARGET_SIZE;
         let target: AnimationTarget = *from_bytes(&payload[offset..offset + TARGET_SIZE]);
+
+        // Validate target type
+        let _target_type = AnimationTargetType::try_from(target.target_type)?;
+
         targets.push(target);
     }
 
@@ -403,7 +416,7 @@ mod tests {
     use crate::commands::MAGIC;
 
     #[test]
-    fn test_parse_empty_buffer() {
+    fn test_parse_empty_buffer() -> Result<(), &'static str> {
         let bytes = [
             // Header
             0x47, 0x44, 0x59, 0x48, // magic: HYDG
@@ -412,14 +425,15 @@ mod tests {
             0x00, 0x00, 0x00, 0x00, // flags: 0
         ];
 
-        let buffer = parse_command_buffer(&bytes).unwrap();
+        let buffer = parse_command_buffer(&bytes)?;
         assert_eq!(buffer.header.magic, MAGIC);
         assert_eq!(buffer.header.count, 0);
         assert!(buffer.commands.is_empty());
+        Ok(())
     }
 
     #[test]
-    fn test_parse_noop() {
+    fn test_parse_noop() -> Result<(), &'static str> {
         let bytes = [
             // Header
             0x47, 0x44, 0x59, 0x48, // magic
@@ -430,9 +444,10 @@ mod tests {
             0x00, 0x00, 0x00, 0x00, // type + padding
         ];
 
-        let buffer = parse_command_buffer(&bytes).unwrap();
+        let buffer = parse_command_buffer(&bytes)?;
         assert_eq!(buffer.commands.len(), 1);
         assert!(matches!(buffer.commands[0], DrawCommand::Noop));
+        Ok(())
     }
 
     #[test]
@@ -451,7 +466,7 @@ mod tests {
     // ═══════════════════════════════════════════════════════════════════════════
 
     #[test]
-    fn test_parse_glyph_instance() {
+    fn test_parse_glyph_instance() -> Result<(), &'static str> {
         #[rustfmt::skip]
         let bytes = [
             // Header
@@ -483,61 +498,60 @@ mod tests {
             0x05, 0x00, 0x00, 0x00, // pickId: 5
         ];
 
-        let buffer = parse_command_buffer(&bytes).unwrap();
+        let buffer = parse_command_buffer(&bytes)?;
         assert_eq!(buffer.commands.len(), 1);
 
-        if let DrawCommand::GlyphInstance(payload) = &buffer.commands[0] {
-            assert_eq!(payload.path_data_id, 1);
-            assert_eq!(payload.pos_x, 100.0);
-            assert_eq!(payload.pos_y, 50.0);
-            assert_eq!(payload.scale_x, 1.0);
-            assert_eq!(payload.color.r, 255);
-            assert_eq!(payload.color.g, 0);
-            assert_eq!(payload.color.b, 0);
-            assert_eq!(payload.color.a, 255);
-            assert_eq!(payload.pick_id, 5);
-        } else {
-            panic!("Expected GlyphInstance command");
-        }
+        let DrawCommand::GlyphInstance(payload) = &buffer.commands[0] else {
+            return Err("Expected GlyphInstance command");
+        };
+        assert_eq!(payload.path_data_id, 1);
+        assert_eq!(payload.pos_x, 100.0);
+        assert_eq!(payload.pos_y, 50.0);
+        assert_eq!(payload.scale_x, 1.0);
+        assert_eq!(payload.color.r, 255);
+        assert_eq!(payload.color.g, 0);
+        assert_eq!(payload.color.b, 0);
+        assert_eq!(payload.color.a, 255);
+        assert_eq!(payload.pick_id, 5);
+        Ok(())
     }
 
     #[test]
-    fn test_parse_path_command_types() {
+    fn test_parse_path_command_types() -> Result<(), &'static str> {
         // Test MoveTo
         let move_bytes = [
             0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F, 0x00, 0x00, 0x00, 0x40,
         ];
-        let (cmd, size) = parse_path_command(&move_bytes).unwrap();
+        let (cmd, size) = parse_path_command(&move_bytes)?;
         assert_eq!(size, 12);
-        if let PathCommand::MoveTo { x, y } = cmd {
-            assert_eq!(x, 1.0);
-            assert_eq!(y, 2.0);
-        } else {
-            panic!("Expected MoveTo");
-        }
+        let PathCommand::MoveTo { x, y } = cmd else {
+            return Err("Expected MoveTo command");
+        };
+        assert_eq!(x, 1.0);
+        assert_eq!(y, 2.0);
 
         // Test LineTo
         let line_bytes = [
             0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x00, 0x00, 0x80, 0x40,
         ];
-        let (cmd, size) = parse_path_command(&line_bytes).unwrap();
+        let (cmd, size) = parse_path_command(&line_bytes)?;
         assert_eq!(size, 12);
-        if let PathCommand::LineTo { x, y } = cmd {
-            assert_eq!(x, 3.0);
-            assert_eq!(y, 4.0);
-        } else {
-            panic!("Expected LineTo");
-        }
+        let PathCommand::LineTo { x, y } = cmd else {
+            return Err("Expected LineTo command");
+        };
+        assert_eq!(x, 3.0);
+        assert_eq!(y, 4.0);
 
         // Test Close
         let close_bytes = [0x05, 0x00, 0x00, 0x00];
-        let (cmd, size) = parse_path_command(&close_bytes).unwrap();
+        let (cmd, size) = parse_path_command(&close_bytes)?;
         assert_eq!(size, 4);
         assert!(matches!(cmd, PathCommand::Close));
+        Ok(())
     }
 
     #[test]
-    fn test_parse_animation_state() {
+    fn test_parse_animation_state() -> Result<(), &'static str> {
         #[rustfmt::skip]
         let bytes = [
             // Header
@@ -569,20 +583,20 @@ mod tests {
             0xCD, 0xCC, 0xCC, 0x3D, // phaseAdvance: 0.1
         ];
 
-        let buffer = parse_command_buffer(&bytes).unwrap();
+        let buffer = parse_command_buffer(&bytes)?;
         assert_eq!(buffer.commands.len(), 1);
 
-        if let DrawCommand::AnimationState { header, targets } = &buffer.commands[0] {
-            assert_eq!(header.target_count, 1);
-            assert_eq!(header.mode, 1); // Additive
-            assert_eq!(header.frame_time, 64.0);
-            assert_eq!(targets.len(), 1);
-            assert_eq!(targets[0].target_id, 7);
-            assert_eq!(targets[0].target_type, 0); // GlyphInstance
-            assert_eq!(targets[0].delta_pos.x, 1.0);
-            assert_eq!(targets[0].delta_rot.z, 90.0);
-        } else {
-            panic!("Expected AnimationState command");
-        }
+        let DrawCommand::AnimationState { header, targets } = &buffer.commands[0] else {
+            return Err("Expected AnimationState command");
+        };
+        assert_eq!(header.target_count, 1);
+        assert_eq!(header.mode, 1); // Additive
+        assert_eq!(header.frame_time, 64.0);
+        assert_eq!(targets.len(), 1);
+        assert_eq!(targets[0].target_id, 7);
+        assert_eq!(targets[0].target_type, 0); // GlyphInstance
+        assert_eq!(targets[0].delta_pos.x, 1.0);
+        assert_eq!(targets[0].delta_rot.z, 90.0);
+        Ok(())
     }
 }

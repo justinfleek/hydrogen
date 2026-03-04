@@ -633,11 +633,19 @@ impl CommandBuffer {
     }
 
     /// Sort commands by depth for painter's algorithm.
-    pub fn sort_by_depth(&mut self) {
-        self.commands.sort_by(|a, b| {
-            a.depth()
-                .partial_cmp(&b.depth())
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+    /// Returns error if any command has NaN depth.
+    pub fn sort_by_depth(&mut self) -> Result<(), String> {
+        // First, validate no NaN depths exist
+        for (i, cmd) in self.commands.iter().enumerate() {
+            let d = cmd.depth();
+            if d.is_nan() {
+                return Err(format!("Command at index {} has NaN depth", i));
+            }
+        }
+
+        // Sort using total ordering (safe after NaN validation)
+        self.commands
+            .sort_by(|a, b| a.depth().total_cmp(&b.depth()));
+        Ok(())
     }
 }

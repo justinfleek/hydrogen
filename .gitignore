@@ -1,3 +1,7 @@
+# Override global gitignore for src/Hydrogen/Target/ directory
+# (global gitignore has `target/` which incorrectly matches this path)
+!src/Hydrogen/Target/
+
 # Spago
 .spago/
 output/

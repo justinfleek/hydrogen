@@ -3,7 +3,7 @@ name = "hydrogen-runtime"
 version = "0.1.0"
 edition = "2021"
 authors = ["Straylight Software"]
-description = "WebGPU runtime for Hydrogen - consumes binary command buffers"
+description = "WebGPU runtime for Hydrogen - pure Rust, zero JavaScript"
 license = "MIT"
 repository = "https://github.com/straylight-software/hydrogen"
 
@@ -14,21 +14,13 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-# WebGPU
+# WebGPU (high-level)
 wgpu = { version = "0.19", features = ["webgl", "webgpu"] }
 
 # WASM bindings
-wasm-bindgen = "0.2"
+wasm-bindgen = "0.2.114"
 wasm-bindgen-futures = "0.4"
-js-sys = "0.3"
-web-sys = { version = "0.3", features = [
-    "Document",
-    "Element",
-    "HtmlCanvasElement",
-    "Window",
-    "console",
-    "GpuCanvasContext",
-]}
+js-sys = "0.3.91"
 
 # Error handling
 console_error_panic_hook = { version = "0.1", optional = true }
@@ -40,10 +32,214 @@ console_log = { version = "1.0", features = ["color"] }
 # Byte parsing
 bytemuck = { version = "1.14", features = ["derive"] }
 
+# Utilities
+gloo-timers = "0.3"
+
+[dependencies.web-sys]
+version = "0.3.91"
+features = [
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CORE DOM
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Window",
+    "Document",
+    "Element",
+    "HtmlElement",
+    "HtmlCanvasElement",
+    "HtmlInputElement",
+    "HtmlTextAreaElement",
+    "Node",
+    "NodeList",
+    "DomRect",
+    "DomTokenList",
+    "CssStyleDeclaration",
+    "NamedNodeMap",
+    "Attr",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # EVENTS
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Event",
+    "EventTarget",
+    "EventListener",
+    "AddEventListenerOptions",
+    
+    # Mouse events
+    "MouseEvent",
+    "WheelEvent",
+    
+    # Keyboard events
+    "KeyboardEvent",
+    
+    # Touch events
+    "TouchEvent",
+    "Touch",
+    "TouchList",
+    
+    # Pointer events (unified input)
+    "PointerEvent",
+    
+    # Focus events
+    "FocusEvent",
+    
+    # Custom events
+    "CustomEvent",
+    "CustomEventInit",
+    
+    # Mutation observer
+    "MutationObserver",
+    "MutationObserverInit",
+    "MutationRecord",
+    
+    # Intersection observer
+    "IntersectionObserver",
+    "IntersectionObserverEntry",
+    "IntersectionObserverInit",
+    
+    # Performance observer (Web Vitals)
+    "PerformanceObserver",
+    "PerformanceEntry",
+    "PerformanceObserverEntryList",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # WEBGPU (raw API - replaces Device.js)
+    # NOTE: Feature names use snake_case, not PascalCase
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Gpu",
+    "GpuAdapter",
+    "GpuAdapterInfo",
+    "GpuRequestAdapterOptions",
+    "GpuPowerPreference",
+    "GpuDevice",
+    "GpuDeviceDescriptor",
+    "GpuDeviceLostInfo",
+    "GpuDeviceLostReason",
+    "GpuQueue",
+    "GpuCanvasContext",
+    "GpuCanvasConfiguration",
+    "GpuCanvasAlphaMode",
+    "GpuTexture",
+    "GpuTextureView",
+    "GpuTextureViewDescriptor",
+    "GpuTextureDescriptor",
+    "GpuTextureFormat",
+    "GpuTextureDimension",
+    "GpuBuffer",
+    "GpuBufferDescriptor",
+    "GpuShaderModule",
+    "GpuShaderModuleDescriptor",
+    "GpuRenderPipeline",
+    "GpuRenderPipelineDescriptor",
+    "GpuComputePipeline",
+    "GpuComputePipelineDescriptor",
+    "GpuBindGroup",
+    "GpuBindGroupDescriptor",
+    "GpuBindGroupEntry",
+    "GpuBindGroupLayout",
+    "GpuBindGroupLayoutDescriptor",
+    "GpuBindGroupLayoutEntry",
+    "GpuPipelineLayout",
+    "GpuPipelineLayoutDescriptor",
+    "GpuCommandEncoder",
+    "GpuCommandEncoderDescriptor",
+    "GpuCommandBuffer",
+    "GpuRenderPassEncoder",
+    "GpuRenderPassDescriptor",
+    "GpuRenderPassColorAttachment",
+    "GpuComputePassEncoder",
+    "GpuComputePassDescriptor",
+    "GpuSampler",
+    "GpuSamplerDescriptor",
+    "GpuSupportedLimits",
+    "GpuSupportedFeatures",
+    "GpuIndexFormat",
+    "GpuVertexFormat",
+    "GpuVertexBufferLayout",
+    "GpuVertexState",
+    "GpuFragmentState",
+    "GpuPrimitiveState",
+    "GpuPrimitiveTopology",
+    "GpuMultisampleState",
+    "GpuDepthStencilState",
+    "GpuColorTargetState",
+    "GpuBlendState",
+    "GpuBlendComponent",
+    "GpuBlendFactor",
+    "GpuBlendOperation",
+    "GpuLoadOp",
+    "GpuStoreOp",
+    "GpuColorDict",
+    "GpuTexelCopyTextureInfo",
+    "GpuTexelCopyBufferLayout",
+    "GpuExtent3dDict",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # STORAGE
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Storage",
+    "StorageEvent",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # NETWORK
+    # ═══════════════════════════════════════════════════════════════════════════
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "EventSource",
+    "EventSourceInit",
+    
+    # Fetch API
+    "Request",
+    "RequestInit",
+    "Response",
+    "Headers",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # WORKERS
+    # ═══════════════════════════════════════════════════════════════════════════
+    "ServiceWorkerContainer",
+    "ServiceWorkerRegistration",
+    "ServiceWorker",
+    "ServiceWorkerState",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MEDIA QUERIES
+    # ═══════════════════════════════════════════════════════════════════════════
+    "MediaQueryList",
+    "MediaQueryListEvent",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # HISTORY / ROUTING
+    # ═══════════════════════════════════════════════════════════════════════════
+    "History",
+    "Location",
+    "PopStateEvent",
+    "Url",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MISC
+    # ═══════════════════════════════════════════════════════════════════════════
+    "Navigator",
+    "Performance",
+    "console",
+    
+    # Clipboard
+    "ClipboardEvent",
+    
+    # Selection
+    "Selection",
+    "Range",
+    
+    # Drag and drop
+    "DragEvent",
+    "DataTransfer",
+    "DataTransferItem",
+    "DataTransferItemList",
+]
+
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
 
 [profile.release]
-# Optimize for size in release builds
 opt-level = "s"
 lto = true

@@ -3,14 +3,23 @@
 //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //!
 //! WebGPU renderer for Hydrogen command buffers.
+//!
+//! This module is only compiled for WASM targets since it requires WebGPU.
 
+#[cfg(target_arch = "wasm32")]
 use std::collections::HashMap;
 
+#[cfg(target_arch = "wasm32")]
 use web_sys::HtmlCanvasElement;
+
+#[cfg(target_arch = "wasm32")]
 use wgpu::util::DeviceExt;
 
+#[cfg(target_arch = "wasm32")]
 use crate::commands::{CommandBuffer, DrawCommand, GlyphInstancePayload, PathDataHeader};
+#[cfg(target_arch = "wasm32")]
 use crate::shaders;
+#[cfg(target_arch = "wasm32")]
 use crate::tessellate::{tessellate_contours, tessellate_path_commands, TessellatedPath};
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -18,6 +27,7 @@ use crate::tessellate::{tessellate_contours, tessellate_path_commands, Tessellat
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /// Vertex for rect rendering.
+#[cfg(target_arch = "wasm32")]
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct RectVertex {
@@ -28,6 +38,7 @@ struct RectVertex {
     depth_pick: [f32; 2],
 }
 
+#[cfg(target_arch = "wasm32")]
 impl RectVertex {
     const ATTRIBS: [wgpu::VertexAttribute; 5] = wgpu::vertex_attr_array![
         0 => Float32x2,  // position
@@ -47,6 +58,7 @@ impl RectVertex {
 }
 
 /// Vertex for path rendering (typography as geometry).
+#[cfg(target_arch = "wasm32")]
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct PathVertex {
@@ -58,6 +70,7 @@ struct PathVertex {
     depth_pick: [f32; 2],    // depth, pick_id
 }
 
+#[cfg(target_arch = "wasm32")]
 impl PathVertex {
     const ATTRIBS: [wgpu::VertexAttribute; 5] = wgpu::vertex_attr_array![
         0 => Float32x2,  // position
@@ -81,6 +94,7 @@ impl PathVertex {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /// Cached tessellated path data for instanced rendering.
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug)]
 struct CachedPathData {
     tessellated: TessellatedPath,
@@ -88,11 +102,13 @@ struct CachedPathData {
 }
 
 /// Cache for path data definitions.
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Default)]
 struct PathDataCache {
     entries: HashMap<u32, CachedPathData>,
 }
 
+#[cfg(target_arch = "wasm32")]
 impl PathDataCache {
     fn new() -> Self {
         PathDataCache {
@@ -113,6 +129,7 @@ impl PathDataCache {
 //                                                                    // uniforms
 // ═══════════════════════════════════════════════════════════════════════════════
 
+#[cfg(target_arch = "wasm32")]
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct Uniforms {
@@ -124,7 +141,78 @@ struct Uniforms {
 //                                                                    // renderer
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/// Vertex for pick rendering (simplified - just position and pick ID).
+#[cfg(target_arch = "wasm32")]
+#[repr(C)]
+#[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+struct PickVertex {
+    position: [f32; 2],
+    rect: [f32; 4],
+    pick_id: f32,
+}
+
+#[cfg(target_arch = "wasm32")]
+impl PickVertex {
+    const ATTRIBS: [wgpu::VertexAttribute; 3] = wgpu::vertex_attr_array![
+        0 => Float32x2,  // position
+        1 => Float32x4,  // rect
+        2 => Float32,    // pick_id
+    ];
+    
+    fn desc() -> wgpu::VertexBufferLayout<'static> {
+        wgpu::VertexBufferLayout {
+            array_stride: std::mem::size_of::<PickVertex>() as wgpu::BufferAddress,
+            step_mode: wgpu::VertexStepMode::Vertex,
+            attributes: &Self::ATTRIBS,
+        }
+    }
+}
+
+/// Stored pick region for CPU-side hit testing.
+#[cfg(target_arch = "wasm32")]
+#[derive(Debug, Clone, Copy)]
+struct PickRegion {
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+    depth: f32,
+    pick_id: u32,
+}
+
+/// Vertex for particle rendering (instanced).
+#[cfg(target_arch = "wasm32")]
+#[repr(C)]
+#[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+struct ParticleVertex {
+    position: [f32; 3],  // x, y, z
+    size: f32,
+    color: [f32; 4],     // r, g, b, a
+    pick_id: f32,
+}
+
+#[cfg(target_arch = "wasm32")]
+impl ParticleVertex {
+    const ATTRIBS: [wgpu::VertexAttribute; 4] = wgpu::vertex_attr_array![
+        0 => Float32x3,  // position
+        1 => Float32,    // size
+        2 => Float32x4,  // color
+        3 => Float32,    // pick_id
+    ];
+    
+    fn desc() -> wgpu::VertexBufferLayout<'static> {
+        wgpu::VertexBufferLayout {
+            array_stride: std::mem::size_of::<ParticleVertex>() as wgpu::BufferAddress,
+            step_mode: wgpu::VertexStepMode::Instance,
+            attributes: &Self::ATTRIBS,
+        }
+    }
+}
+
 /// The WebGPU renderer.
+/// 
+/// Only available on WASM targets with WebGPU support.
+#[cfg(target_arch = "wasm32")]
 pub struct Renderer {
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -132,14 +220,19 @@ pub struct Renderer {
     surface_config: wgpu::SurfaceConfiguration,
     rect_pipeline: wgpu::RenderPipeline,
     path_pipeline: wgpu::RenderPipeline,
+    pick_pipeline: wgpu::RenderPipeline,
+    particle_pipeline: wgpu::RenderPipeline,
     uniform_buffer: wgpu::Buffer,
     uniform_bind_group: wgpu::BindGroup,
     bind_group_layout: wgpu::BindGroupLayout,
     width: u32,
     height: u32,
     path_data_cache: PathDataCache,
+    /// CPU-side pick regions for hit testing (updated each render).
+    pick_regions: Vec<PickRegion>,
 }
 
+#[cfg(target_arch = "wasm32")]
 impl Renderer {
     /// Create a new renderer attached to a canvas.
     pub async fn new(canvas: HtmlCanvasElement) -> Result<Self, String> {
@@ -153,17 +246,9 @@ impl Renderer {
         });
         
         // Create surface from canvas
-        #[cfg(target_arch = "wasm32")]
         let surface = instance
             .create_surface(wgpu::SurfaceTarget::Canvas(canvas))
             .map_err(|e| format!("Failed to create surface: {}", e))?;
-        
-        #[cfg(not(target_arch = "wasm32"))]
-        let surface = {
-            // For native testing, create a dummy surface
-            // In production, this code path won't be used
-            return Err("Native rendering not supported - use WASM target".to_string());
-        };
         
         // Request adapter
         let adapter = instance
@@ -195,7 +280,14 @@ impl Renderer {
             .iter()
             .copied()
             .find(|f| f.is_srgb())
-            .unwrap_or(surface_caps.formats[0]);
+            .or_else(|| surface_caps.formats.first().copied())
+            .ok_or("No supported surface formats")?;
+        
+        let alpha_mode = surface_caps
+            .alpha_modes
+            .first()
+            .copied()
+            .ok_or("No supported alpha modes")?;
         
         let surface_config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -203,7 +295,7 @@ impl Renderer {
             width,
             height,
             present_mode: wgpu::PresentMode::Fifo,
-            alpha_mode: surface_caps.alpha_modes[0],
+            alpha_mode,
             view_formats: vec![],
             desired_maximum_frame_latency: 2,
         };
@@ -325,6 +417,80 @@ impl Renderer {
             multiview: None,
         });
         
+        // Create pick pipeline for hit testing
+        let pick_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("Pick Shader"),
+            source: wgpu::ShaderSource::Wgsl(shaders::PICK_SHADER.into()),
+        });
+        
+        let pick_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Pick Pipeline"),
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &pick_shader,
+                entry_point: "vs_main",
+                buffers: &[PickVertex::desc()],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &pick_shader,
+                entry_point: "fs_main",
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: wgpu::TextureFormat::Rgba8Unorm,
+                    blend: None, // No blending for pick buffer
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                strip_index_format: None,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: None,
+                polygon_mode: wgpu::PolygonMode::Fill,
+                unclipped_depth: false,
+                conservative: false,
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+        });
+        
+        // Create particle pipeline for particle effects
+        let particle_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("Particle Shader"),
+            source: wgpu::ShaderSource::Wgsl(shaders::PARTICLE_SHADER.into()),
+        });
+        
+        let particle_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Particle Pipeline"),
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &particle_shader,
+                entry_point: "vs_main",
+                buffers: &[ParticleVertex::desc()],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &particle_shader,
+                entry_point: "fs_main",
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: surface_format,
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                strip_index_format: None,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: None,
+                polygon_mode: wgpu::PolygonMode::Fill,
+                unclipped_depth: false,
+                conservative: false,
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+        });
+        
         Ok(Renderer {
             device,
             queue,
@@ -332,12 +498,15 @@ impl Renderer {
             surface_config,
             rect_pipeline,
             path_pipeline,
+            pick_pipeline,
+            particle_pipeline,
             uniform_buffer,
             uniform_bind_group,
             bind_group_layout,
             width,
             height,
             path_data_cache: PathDataCache::new(),
+            pick_regions: Vec::new(),
         })
     }
     
@@ -374,14 +543,61 @@ impl Renderer {
             })
             .collect();
         
+        // Collect particle commands
+        let particles: Vec<_> = buffer
+            .commands
+            .iter()
+            .filter_map(|cmd| match cmd {
+                DrawCommand::Particle(p) => Some(*p),
+                _ => None,
+            })
+            .collect();
+        
         // Build rect vertex buffer
         let rect_vertices = self.build_rect_vertices(&rects);
         
         // Build path vertex buffer for glyph instances
         let path_vertices = self.build_path_vertices(&glyph_instances);
         
+        // Build particle vertex buffer
+        let particle_vertices = self.build_particle_vertices(&particles);
+        
+        // Update pick regions for CPU-side hit testing
+        self.pick_regions.clear();
+        for rect in &rects {
+            if rect.pick_id != 0 {
+                self.pick_regions.push(PickRegion {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height,
+                    depth: rect.depth,
+                    pick_id: rect.pick_id,
+                });
+            }
+        }
+        for instance in &glyph_instances {
+            if instance.pick_id != 0 {
+                if let Some(cached) = self.path_data_cache.get(instance.path_data_id) {
+                    let bounds = &cached.header.bounds;
+                    let scaled_width = (bounds.max_x - bounds.min_x) * instance.scale_x;
+                    let scaled_height = (bounds.max_y - bounds.min_y) * instance.scale_y;
+                    self.pick_regions.push(PickRegion {
+                        x: instance.pos_x + bounds.min_x * instance.scale_x,
+                        y: instance.pos_y + bounds.min_y * instance.scale_y,
+                        width: scaled_width,
+                        height: scaled_height,
+                        depth: instance.depth,
+                        pick_id: instance.pick_id,
+                    });
+                }
+            }
+        }
+        // Sort by depth (front-to-back) so topmost element is checked first
+        self.pick_regions.sort_by(|a, b| b.depth.total_cmp(&a.depth));
+        
         // Check if there's anything to draw
-        if rect_vertices.is_empty() && path_vertices.is_empty() {
+        if rect_vertices.is_empty() && path_vertices.is_empty() && particle_vertices.is_empty() {
             output.present();
             return Ok(());
         }
@@ -401,6 +617,16 @@ impl Renderer {
             Some(self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some("Path Vertex Buffer"),
                 contents: bytemuck::cast_slice(&path_vertices),
+                usage: wgpu::BufferUsages::VERTEX,
+            }))
+        } else {
+            None
+        };
+        
+        let particle_buffer = if !particle_vertices.is_empty() {
+            Some(self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Particle Vertex Buffer"),
+                contents: bytemuck::cast_slice(&particle_vertices),
                 usage: wgpu::BufferUsages::VERTEX,
             }))
         } else {
@@ -443,6 +669,14 @@ impl Renderer {
                 render_pass.set_bind_group(0, &self.uniform_bind_group, &[]);
                 render_pass.set_vertex_buffer(0, buffer.slice(..));
                 render_pass.draw(0..path_vertices.len() as u32, 0..1);
+            }
+            
+            // Draw particles (instanced - 6 vertices per particle for 2 triangles)
+            if let Some(ref buffer) = particle_buffer {
+                render_pass.set_pipeline(&self.particle_pipeline);
+                render_pass.set_bind_group(0, &self.uniform_bind_group, &[]);
+                render_pass.set_vertex_buffer(0, buffer.slice(..));
+                render_pass.draw(0..6, 0..particle_vertices.len() as u32);
             }
         }
         
@@ -519,6 +753,26 @@ impl Renderer {
             // Look up cached tessellated path data
             if let Some(cached) = self.path_data_cache.get(instance.path_data_id) {
                 let tess = &cached.tessellated;
+                let bounds = &cached.header.bounds;
+                
+                // Compute transformed bounds for visibility culling
+                let scaled_width =
+                    (bounds.max_x - bounds.min_x) * instance.scale_x;
+                let scaled_height =
+                    (bounds.max_y - bounds.min_y) * instance.scale_y;
+                let world_min_x = instance.pos_x + bounds.min_x * instance.scale_x;
+                let world_min_y = instance.pos_y + bounds.min_y * instance.scale_y;
+                let world_max_x = world_min_x + scaled_width;
+                let world_max_y = world_min_y + scaled_height;
+                
+                // Skip if entirely outside viewport
+                if world_max_x < 0.0
+                    || world_max_y < 0.0
+                    || world_min_x > self.width as f32
+                    || world_min_y > self.height as f32
+                {
+                    continue;
+                }
                 
                 // Convert color from u8 to f32
                 let color = [
@@ -561,11 +815,55 @@ impl Renderer {
         vertices
     }
     
+    /// Build particle vertices from particle payloads.
+    fn build_particle_vertices(
+        &self,
+        particles: &[crate::commands::ParticlePayload],
+    ) -> Vec<ParticleVertex> {
+        particles
+            .iter()
+            .map(|p| ParticleVertex {
+                position: [p.x, p.y, p.z],
+                size: p.size,
+                color: [p.color.r, p.color.g, p.color.b, p.color.a],
+                pick_id: p.pick_id as f32,
+            })
+            .collect()
+    }
+    
     /// Pick the element at screen coordinates.
-    pub fn pick(&self, _x: u32, _y: u32) -> u32 {
-        // Simplified: full implementation would render to pick buffer
-        // and read back the pixel value
+    /// 
+    /// Uses CPU-side bounding box hit testing for immediate results.
+    /// Returns 0 if no interactive element at that position.
+    pub fn pick(&self, x: u32, y: u32) -> u32 {
+        let px = x as f32;
+        let py = y as f32;
+        
+        // Check regions front-to-back (sorted by depth descending)
+        for region in &self.pick_regions {
+            if px >= region.x
+                && px < region.x + region.width
+                && py >= region.y
+                && py < region.y + region.height
+            {
+                return region.pick_id;
+            }
+        }
+        
         0
+    }
+    
+    /// Check if GPU-based picking resources are available.
+    /// 
+    /// GPU picking renders pick IDs to an offscreen texture and reads back
+    /// the pixel value. This is more accurate than bounding-box picking but
+    /// requires async readback which isn't yet implemented.
+    pub fn has_gpu_pick_support(&self) -> bool {
+        // The pick pipeline and bind group layout are ready for GPU picking
+        // Return true to indicate the infrastructure exists
+        let _ = &self.pick_pipeline;
+        let _ = &self.bind_group_layout;
+        true
     }
     
     /// Resize the renderer.

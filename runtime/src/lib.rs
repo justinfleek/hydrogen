@@ -2,31 +2,50 @@
 //!                                              // hydrogen // runtime // wasm
 //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //!
-//! # Hydrogen WebGPU Runtime
+//! # Hydrogen WASM Runtime
 //!
-//! This is the WASM runtime that consumes Hydrogen's binary command format
-//! and renders via WebGPU. No JavaScript in the render path.
+//! Pure Rust runtime for Hydrogen. **Zero JavaScript.**
+//!
+//! This crate provides:
+//!
+//! 1. **High-level rendering** - Binary command buffer → WebGPU rendering
+//! 2. **Low-level WebGPU FFI** - Direct WebGPU API for PureScript
+//! 3. **Browser APIs** - DOM, events, storage, etc. (replacing all .js files)
 //!
 //! ## Architecture
 //!
 //! ```text
 //! PureScript (Hydrogen)
-//!     ↓ Binary.serialize
-//! Command Buffer (bytes)
-//!     ↓ WASM boundary
-//! Rust (this crate)
-//!     ↓ parse + render
-//! WebGPU
+//!     ↓
+//! ┌───────────────────────────────────────────────────┐
+//! │  Rust WASM (this crate)                           │
+//! │  ┌─────────────────┐  ┌─────────────────────────┐ │
+//! │  │ High-level API  │  │ Low-level WebGPU FFI   │ │
+//! │  │ (Runtime)       │  │ (webgpu module)        │ │
+//! │  └────────┬────────┘  └───────────┬────────────┘ │
+//! │           │                       │              │
+//! │           └───────────┬───────────┘              │
+//! │                       ↓                          │
+//! │               Browser WebGPU                     │
+//! └───────────────────────────────────────────────────┘
 //! ```
 //!
-//! ## Usage from JavaScript
+//! ## Modules
 //!
-//! ```javascript
-//! import init, { Runtime } from 'hydrogen-runtime';
+//! - `webgpu` - Raw WebGPU API (replaces Device.js)
+//! - `dom` - DOM manipulation (replaces DOM.js, Target/DOM.js)
+//! - `events` - Event listeners (replaces Input.js, Gesture.js)
+//! - `storage` - localStorage/sessionStorage (replaces LocalStorage.js)
+//! - `router` - History API (replaces Router.js)
 //!
-//! await init();
-//! const runtime = await Runtime.new(canvas);
-//! runtime.render(commandBytes);
+//! ## Usage from PureScript
+//!
+//! ```purescript
+//! -- High-level: binary command rendering
+//! import Hydrogen.Runtime (Runtime, render)
+//!
+//! -- Low-level: direct WebGPU calls
+//! import Hydrogen.GPU.WebGPU.Device (requestAdapter, requestDevice)
 //! ```
 
 mod binary;
@@ -35,11 +54,17 @@ mod renderer;
 mod shaders;
 mod tessellate;
 
+// New modules replacing JavaScript
+pub mod webgpu;
+
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+#[cfg(target_arch = "wasm32")]
 use web_sys::HtmlCanvasElement;
 
 pub use binary::parse_command_buffer;
 pub use commands::{CommandBuffer, DrawCommand, Header};
+#[cfg(target_arch = "wasm32")]
 pub use renderer::Renderer;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -47,26 +72,40 @@ pub use renderer::Renderer;
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /// Initialize panic hook for better error messages in browser console.
+/// Returns error if logger initialization fails.
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(start)]
-pub fn init() {
+pub fn init() -> Result<(), JsValue> {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
     
-    console_log::init_with_level(log::Level::Info).expect("Failed to init logger");
+    console_log::init_with_level(log::Level::Info)
+        .map_err(|e| JsValue::from_str(&format!("Failed to init logger: {}", e)))?;
     log::info!("Hydrogen Runtime initialized");
+    Ok(())
 }
 
 /// The main runtime interface exposed to JavaScript/PureScript.
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub struct Runtime {
     renderer: Renderer,
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl Runtime {
     /// Create a new runtime attached to a canvas element.
-    #[wasm_bindgen(constructor)]
-    pub async fn new(canvas: HtmlCanvasElement) -> Result<Runtime, JsValue> {
+    /// 
+    /// This is a factory method (not a constructor) because async constructors
+    /// produce invalid TypeScript definitions in wasm-bindgen.
+    /// 
+    /// Usage from JavaScript:
+    /// ```js
+    /// const runtime = await Runtime.create(canvas);
+    /// ```
+    #[wasm_bindgen(js_name = "create")]
+    pub async fn create(canvas: HtmlCanvasElement) -> Result<Runtime, JsValue> {
         let renderer = Renderer::new(canvas)
             .await
             .map_err(|e| JsValue::from_str(&e))?;
