@@ -80,6 +80,8 @@ module Hydrogen.Schema.Elevation.Shadow
   , insetShadow
   , layered
   , noShadow
+  , elevatedShadow
+  , shadow
   
   -- * Accessors
   , offsetX
@@ -116,11 +118,15 @@ import Prelude
   , show
   , map
   , not
+  , negate
   , (<>)
   , (==)
   , (*)
   , ($)
   , (<)
+  , (>)
+  , (+)
+  , (-)
   )
 
 import Data.Array (filter, null)
@@ -246,6 +252,71 @@ layered = LayeredShadow
 -- | Renders as "none" in CSS.
 noShadow :: LayeredShadow
 noShadow = LayeredShadow []
+
+-- | Simple shadow with default parameters.
+-- |
+-- | A single-layer shadow with typical drop-shadow appearance.
+shadow :: LayeredShadow
+shadow = LayeredShadow
+  [ boxShadow
+      { offsetX: 0.0
+      , offsetY: 1.0
+      , blur: 3.0
+      , spread: 0.0
+       , color: RGB.rgba 0 0 0 10
+      , inset: false
+      }
+  ]
+
+-- | Elevated shadow at a given level (1-24).
+-- |
+-- | Higher levels = more offset, more blur, deeper shadows.
+-- | Based on Material Design elevation scale.
+-- |
+-- | Level 1 = subtle lift
+-- | Level 4 = card/FAB level
+-- | Level 8 = modal/dialog level
+-- | Level 24 = maximum elevation
+elevatedShadow :: Int -> LayeredShadow
+elevatedShadow level =
+  let
+    -- Clamp level to 0-24
+    lvl = clampLevel level
+    -- Calculate shadow parameters based on level
+    -- Primary shadow (darker, closer)
+    y1 = Int.toNumber lvl * 0.5
+    blur1 = Int.toNumber lvl * 0.8 + 1.0
+    -- Alpha as 0-100 percentage (12% base + level scaling)
+    alpha1 = 12 + lvl  -- 12% base + level
+    -- Secondary shadow (softer, larger)
+    y2 = Int.toNumber lvl * 1.0
+    blur2 = Int.toNumber lvl * 2.0 + 2.0
+    -- Alpha as 0-100 percentage (8% base + level scaling)
+    alpha2 = 8 + lvl  -- 8% base + level
+  in LayeredShadow
+    [ boxShadow
+        { offsetX: 0.0
+        , offsetY: y1
+        , blur: blur1
+        , spread: 0.0
+        , color: RGB.rgba 0 0 0 alpha1
+        , inset: false
+        }
+    , boxShadow
+        { offsetX: 0.0
+        , offsetY: y2
+        , blur: blur2
+        , spread: Int.toNumber lvl * (negate 0.25)
+        , color: RGB.rgba 0 0 0 alpha2
+        , inset: false
+        }
+    ]
+  where
+    clampLevel :: Int -> Int
+    clampLevel n
+      | n < 0 = 0
+      | n > 24 = 24
+      | true = n
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors

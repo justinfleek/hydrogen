@@ -2,94 +2,121 @@
 --                                                       // hydrogen // keyboard
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Global keyboard shortcut management
--- |
--- | Register keyboard shortcuts with modifier keys, scopes, and sequences.
+-- | Keyboard shortcut configuration and parsing.
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Util.Keyboard as Keyboard
 -- |
--- | -- Simple shortcut
--- | unregister <- Keyboard.registerShortcut
--- |   (Keyboard.parseShortcut "Ctrl+K")
--- |   (Console.log "Ctrl+K pressed!")
+-- | saveShortcut :: ShortcutBinding
+-- | saveShortcut = Keyboard.parseBinding "Ctrl+S" "Save document"
 -- |
--- | -- With scope (only active in certain contexts)
--- | unregister <- Keyboard.registerScopedShortcut "editor"
--- |   (Keyboard.parseShortcut "Ctrl+S")
--- |   saveDocument
--- |
--- | -- Key sequence (vim-style)
--- | unregister <- Keyboard.registerSequence ["g", "i"]
--- |   (Console.log "Go to inbox!")
--- |
--- | -- Prevent default
--- | unregister <- Keyboard.registerShortcut
--- |   (Keyboard.parseShortcut "Ctrl+S" # Keyboard.preventDefault)
--- |   saveDocument
+-- | customShortcut :: ShortcutBinding
+-- | customShortcut = Keyboard.binding "K"
+-- |   # Keyboard.withCtrl
+-- |   # Keyboard.withDescription "Open command palette"
 -- | ```
+-- |
+-- | ## Dependencies
+-- | - Hydrogen.Schema.Gestural.Keyboard
+-- |
+-- | ## Dependents
+-- | - Element shortcut configuration
+-- | - Command palette
+-- | - Help dialog shortcut display
+
 module Hydrogen.Util.Keyboard
   ( -- * Types
-    Shortcut
-  , ShortcutConfig
+    ShortcutBinding
   , Modifier(Ctrl, Alt, Shift, Meta)
-  , Scope
-    -- * Shortcut Creation
-  , shortcut
-  , parseShortcut
+  , Scope(Scope)
+  , ShortcutConfig
+    -- * Binding Creation
+  , binding
+  , parseBinding
+    -- * Modifier Builders
+  , withCtrl
+  , withAlt
+  , withShift
+  , withMeta
   , withModifiers
-    -- * Shortcut Modifiers
-  , ctrl
-  , alt
-  , shift
-  , meta
-  , preventDefault
-  , stopPropagation
-    -- * Registration
-  , registerShortcut
-  , registerScopedShortcut
-  , unregisterAll
-    -- * Scope Management
-  , createScope
-  , activateScope
-  , deactivateScope
-  , isActiveScope
+    -- * Config Builders
+  , withDescription
+  , withPreventDefault
+  , withStopPropagation
+  , withIgnoreInputs
+    -- * Scope
   , globalScope
-    -- * Key Sequences
-  , registerSequence
-  , registerScopedSequence
-  , sequenceTimeout
-    -- * Help Integration
-  , ShortcutInfo
-  , getRegisteredShortcuts
-  , formatShortcut
-  , formatForPlatform
-    -- * Utilities
-  , isInputFocused
-  , shouldIgnore
+  , createScope
+    -- * Formatting
+  , formatBinding
+  , formatKey
+  , formatModifier
+    -- * Predicates
+  , hasCtrl
+  , hasAlt
+  , hasShift
+  , hasMeta
+  , hasModifier
+    -- * Re-exports from Schema
+  , module SchemaShortcut
   ) where
 
-import Prelude hiding (when)
+import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , map
+  , not
+  , show
+  , ($)
+  , (&&)
+  , (<>)
+  , (==)
+  )
 
-import Data.Array (filter, elem)
+import Data.Array (elem, filter)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.String as String
 import Data.String.Pattern (Pattern(Pattern))
-import Effect (Effect)
-import Effect.Ref (Ref)
-import Effect.Ref as Ref
+
+import Hydrogen.Schema.Gestural.Keyboard.Shortcut
+  ( Shortcut
+  , shortcut
+  , simpleShortcut
+  , ctrlShortcut
+  , ctrlShiftShortcut
+  , altShortcut
+  , altShiftShortcut
+  , metaShortcut
+  , metaShiftShortcut
+  , matchesShortcut
+  , matchesShortcutLoose
+  , shortcutCopy
+  , shortcutCut
+  , shortcutPaste
+  , shortcutUndo
+  , shortcutRedo
+  , shortcutSelectAll
+  , shortcutSave
+  , shortcutFind
+  , shortcutClose
+  , shortcutNew
+  , shortcutOpen
+  , shortcutRedoY
+  ) as SchemaShortcut
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | A keyboard shortcut
-type Shortcut =
+-- | A keyboard shortcut binding with metadata.
+type ShortcutBinding =
   { key :: String
   , modifiers :: Array Modifier
   , config :: ShortcutConfig
+  , scope :: Scope
   }
 
 -- | Shortcut configuration
@@ -105,7 +132,7 @@ data Modifier
   = Ctrl
   | Alt
   | Shift
-  | Meta  -- Cmd on Mac, Win on Windows
+  | Meta
 
 derive instance eqModifier :: Eq Modifier
 derive instance ordModifier :: Ord Modifier
@@ -125,71 +152,10 @@ derive instance ordScope :: Ord Scope
 instance showScope :: Show Scope where
   show (Scope s) = "Scope(" <> s <> ")"
 
--- | Shortcut info for help display
-type ShortcutInfo =
-  { shortcut :: Shortcut
-  , scope :: Scope
-  , description :: String
-  }
-
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                       // FFI
+--                                                                   // defaults
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- BROWSER BOUNDARY: document.addEventListener("keydown") is DOM event API
--- for capturing keyboard events globally.
-foreign import registerShortcutImpl
-  :: { key :: String
-     , ctrl :: Boolean
-     , alt :: Boolean
-     , shift :: Boolean
-     , meta :: Boolean
-     , preventDefault :: Boolean
-     , stopPropagation :: Boolean
-     , ignoreInputs :: Boolean
-     }
-  -> Effect Unit
-  -> Effect (Effect Unit)
-
--- BROWSER BOUNDARY: document.addEventListener("keydown") with setTimeout
--- for sequence tracking requires DOM event and timer APIs.
-foreign import registerSequenceImpl
-  :: Array String
-  -> Int  -- timeout
-  -> Effect Unit
-  -> Effect (Effect Unit)
-
--- BROWSER BOUNDARY: document.activeElement is DOM API for detecting focus state.
-foreign import isInputFocusedImpl :: Effect Boolean
-
--- BROWSER BOUNDARY: navigator.platform is Web API for platform detection.
-foreign import isMacPlatformImpl :: Effect Boolean
-
--- BROWSER BOUNDARY: Global registry maintained in JavaScript for shortcut help.
--- This could be pure PureScript with a Ref, but kept in JS for consistency
--- with the shortcut registration lifecycle.
-foreign import addToShortcutRegistry
-  :: { key :: String, scope :: String, description :: String }
-  -> Effect Unit
-
--- BROWSER BOUNDARY: Returns the global shortcut registry from JavaScript.
-foreign import getShortcutRegistry
-  :: Effect (Array { key :: String, scope :: String, description :: String })
-
--- BROWSER BOUNDARY: Clears the global shortcut registry in JavaScript.
-foreign import clearShortcutRegistry :: Effect Unit
-
--- Note: activeScopesRef uses JavaScript singleton pattern for global state.
--- This is necessary because PureScript cannot have module-level mutable state
--- without unsafePerformEffect. The JS implementation ensures a single Ref
--- instance is shared across all module usages.
-foreign import activeScopesRef :: Effect (Ref (Array String))
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                          // shortcut creation
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Default shortcut config
 defaultConfig :: ShortcutConfig
 defaultConfig =
   { preventDefault: true
@@ -198,27 +164,33 @@ defaultConfig =
   , description: ""
   }
 
--- | Create a shortcut from a key
-shortcut :: String -> Shortcut
-shortcut key =
+-- | Global scope (always active)
+globalScope :: Scope
+globalScope = Scope "global"
+
+-- | Create a named scope
+createScope :: String -> Scope
+createScope = Scope
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // binding creation
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Create a binding from a key
+binding :: String -> ShortcutBinding
+binding key =
   { key
   , modifiers: []
   , config: defaultConfig
+  , scope: globalScope
   }
 
--- | Parse a shortcut string
+-- | Parse a shortcut string into a binding
 -- |
--- | Supports formats like:
--- | - "Ctrl+K", "Cmd+Shift+P", "Alt+1"
--- | - Uses "Cmd" as alias for Meta (platform-aware)
--- |
--- | ```purescript
--- | parseShortcut "Ctrl+K"       -- Ctrl + K
--- | parseShortcut "Ctrl+Shift+P" -- Ctrl + Shift + P
--- | parseShortcut "Escape"       -- Escape (no modifiers)
--- | ```
-parseShortcut :: String -> Shortcut
-parseShortcut str =
+-- | Supports formats: "Ctrl+K", "Cmd+Shift+P", "Alt+1"
+-- | Uses "Cmd" as alias for Meta.
+parseBinding :: String -> String -> ShortcutBinding
+parseBinding str description =
   let
     parts = String.split (Pattern "+") str
     mods = filter isModifier parts
@@ -229,7 +201,8 @@ parseShortcut str =
   in
     { key
     , modifiers: parseModifiers mods
-    , config: defaultConfig
+    , config: defaultConfig { description = description }
+    , scope: globalScope
     }
   where
   isModifier :: String -> Boolean
@@ -253,216 +226,93 @@ parseShortcut str =
   
   unsafeFromJust :: forall a. Maybe a -> a
   unsafeFromJust (Just a) = a
-  unsafeFromJust Nothing = unsafeFromJust Nothing -- Will never hit
-
--- | Add modifiers to a shortcut
-withModifiers :: Array Modifier -> Shortcut -> Shortcut
-withModifiers mods s = s { modifiers = s.modifiers <> mods }
+  unsafeFromJust Nothing = unsafeFromJust Nothing
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                         // shortcut modifiers
+--                                                          // modifier builders
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Add Ctrl modifier
-ctrl :: Shortcut -> Shortcut
-ctrl s = s { modifiers = s.modifiers <> [Ctrl] }
+withCtrl :: ShortcutBinding -> ShortcutBinding
+withCtrl s = s { modifiers = s.modifiers <> [Ctrl] }
 
 -- | Add Alt modifier
-alt :: Shortcut -> Shortcut
-alt s = s { modifiers = s.modifiers <> [Alt] }
+withAlt :: ShortcutBinding -> ShortcutBinding
+withAlt s = s { modifiers = s.modifiers <> [Alt] }
 
 -- | Add Shift modifier
-shift :: Shortcut -> Shortcut
-shift s = s { modifiers = s.modifiers <> [Shift] }
+withShift :: ShortcutBinding -> ShortcutBinding
+withShift s = s { modifiers = s.modifiers <> [Shift] }
 
 -- | Add Meta modifier (Cmd on Mac)
-meta :: Shortcut -> Shortcut
-meta s = s { modifiers = s.modifiers <> [Meta] }
+withMeta :: ShortcutBinding -> ShortcutBinding
+withMeta s = s { modifiers = s.modifiers <> [Meta] }
 
--- | Set preventDefault
-preventDefault :: Shortcut -> Shortcut
-preventDefault s = s { config = s.config { preventDefault = true } }
-
--- | Set stopPropagation
-stopPropagation :: Shortcut -> Shortcut
-stopPropagation s = s { config = s.config { stopPropagation = true } }
+-- | Add multiple modifiers
+withModifiers :: Array Modifier -> ShortcutBinding -> ShortcutBinding
+withModifiers mods s = s { modifiers = s.modifiers <> mods }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                               // registration
+--                                                            // config builders
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Register a global keyboard shortcut
--- |
--- | Returns an unregister function.
-registerShortcut :: Shortcut -> Effect Unit -> Effect (Effect Unit)
-registerShortcut s callback = do
-  addToShortcutRegistry
-    { key: formatShortcut s
-    , scope: "global"
-    , description: s.config.description
-    }
-  registerShortcutImpl
-    { key: s.key
-    , ctrl: elem Ctrl s.modifiers
-    , alt: elem Alt s.modifiers
-    , shift: elem Shift s.modifiers
-    , meta: elem Meta s.modifiers
-    , preventDefault: s.config.preventDefault
-    , stopPropagation: s.config.stopPropagation
-    , ignoreInputs: s.config.ignoreInputs
-    }
-    callback
+-- | Set description
+withDescription :: String -> ShortcutBinding -> ShortcutBinding
+withDescription desc s = s { config = s.config { description = desc } }
 
--- | Register a scoped shortcut
--- |
--- | Only active when the scope is active.
-registerScopedShortcut :: Scope -> Shortcut -> Effect Unit -> Effect (Effect Unit)
-registerScopedShortcut (Scope scopeName) s callback = do
-  addToShortcutRegistry
-    { key: formatShortcut s
-    , scope: scopeName
-    , description: s.config.description
-    }
-  registerShortcutImpl
-    { key: s.key
-    , ctrl: elem Ctrl s.modifiers
-    , alt: elem Alt s.modifiers
-    , shift: elem Shift s.modifiers
-    , meta: elem Meta s.modifiers
-    , preventDefault: s.config.preventDefault
-    , stopPropagation: s.config.stopPropagation
-    , ignoreInputs: s.config.ignoreInputs
-    }
-    do
-      active <- isActiveScope (Scope scopeName)
-      when active callback
+-- | Enable preventDefault
+withPreventDefault :: ShortcutBinding -> ShortcutBinding
+withPreventDefault s = s { config = s.config { preventDefault = true } }
 
--- | Unregister all shortcuts
-unregisterAll :: Effect Unit
-unregisterAll = clearShortcutRegistry
+-- | Enable stopPropagation
+withStopPropagation :: ShortcutBinding -> ShortcutBinding
+withStopPropagation s = s { config = s.config { stopPropagation = true } }
+
+-- | Enable ignoreInputs
+withIgnoreInputs :: ShortcutBinding -> ShortcutBinding
+withIgnoreInputs s = s { config = s.config { ignoreInputs = true } }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                           // scope management
+--                                                                 // formatting
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Global scope (always active)
-globalScope :: Scope
-globalScope = Scope "global"
-
--- | Create a new scope
-createScope :: String -> Scope
-createScope = Scope
-
--- | Activate a scope
-activateScope :: Scope -> Effect Unit
-activateScope (Scope scopeName) = do
-  ref <- activeScopesRef
-  Ref.modify_ (\scopes -> if elem scopeName scopes then scopes else scopes <> [scopeName]) ref
-
--- | Deactivate a scope
-deactivateScope :: Scope -> Effect Unit
-deactivateScope (Scope scopeName) = do
-  ref <- activeScopesRef
-  Ref.modify_ (filter (_ /= scopeName)) ref
-
--- | Check if a scope is active
-isActiveScope :: Scope -> Effect Boolean
-isActiveScope (Scope scopeName) = do
-  if scopeName == "global"
-    then pure true
-    else do
-      ref <- activeScopesRef
-      scopes <- Ref.read ref
-      pure $ elem scopeName scopes
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                              // key sequences
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Default sequence timeout (1000ms)
-defaultSequenceTimeout :: Int
-defaultSequenceTimeout = 1000
-
--- | Register a key sequence (vim-style)
--- |
--- | ```purescript
--- | registerSequence ["g", "i"] (Console.log "Go to inbox")
--- | ```
-registerSequence :: Array String -> Effect Unit -> Effect (Effect Unit)
-registerSequence keys callback =
-  registerSequenceImpl keys defaultSequenceTimeout callback
-
--- | Register a scoped key sequence
-registerScopedSequence :: Scope -> Array String -> Effect Unit -> Effect (Effect Unit)
-registerScopedSequence scope keys callback = do
-  registerSequenceImpl keys defaultSequenceTimeout do
-    active <- isActiveScope scope
-    when active callback
-
--- | Set custom sequence timeout
-sequenceTimeout :: Int -> Int
-sequenceTimeout = identity
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                           // help integration
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Get all registered shortcuts
-getRegisteredShortcuts :: Effect (Array ShortcutInfo)
-getRegisteredShortcuts = do
-  registry <- getShortcutRegistry
-  pure $ map toShortcutInfo registry
-  where
-  toShortcutInfo r =
-    { shortcut: parseShortcut r.key
-    , scope: Scope r.scope
-    , description: r.description
-    }
-
--- | Format shortcut for display
-formatShortcut :: Shortcut -> String
-formatShortcut s =
+-- | Format binding for display
+formatBinding :: ShortcutBinding -> String
+formatBinding s =
   let
-    modStrs = map show s.modifiers
+    modStrs = map formatModifier s.modifiers
     parts = modStrs <> [s.key]
   in
     String.joinWith "+" parts
 
--- | Format shortcut for current platform
--- |
--- | Uses Cmd symbol on Mac, Ctrl on others.
-formatForPlatform :: Shortcut -> Effect String
-formatForPlatform s = do
-  isMac <- isMacPlatformImpl
-  let
-    formatMod :: Modifier -> String
-    formatMod = case _ of
-      Meta -> if isMac then "\x2318" else "Ctrl"  -- Cmd symbol
-      Ctrl -> if isMac then "\x2303" else "Ctrl"  -- Control symbol
-      Alt -> if isMac then "\x2325" else "Alt"    -- Option symbol
-      Shift -> if isMac then "\x21E7" else "Shift" -- Shift symbol
-    modStrs = map formatMod s.modifiers
-    parts = modStrs <> [s.key]
-  pure $ String.joinWith (if isMac then "" else "+") parts
+-- | Format a key for display
+formatKey :: String -> String
+formatKey = String.toUpper
+
+-- | Format a modifier for display
+formatModifier :: Modifier -> String
+formatModifier = show
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                  // utilities
+--                                                                 // predicates
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Check if an input element is focused
-isInputFocused :: Effect Boolean
-isInputFocused = isInputFocusedImpl
+-- | Check if binding has Ctrl modifier
+hasCtrl :: ShortcutBinding -> Boolean
+hasCtrl s = elem Ctrl s.modifiers
 
--- | Check if shortcut should be ignored
--- |
--- | Returns true if an input is focused and shortcut should respect that.
-shouldIgnore :: Shortcut -> Effect Boolean
-shouldIgnore s = 
-  if s.config.ignoreInputs
-    then isInputFocused
-    else pure false
+-- | Check if binding has Alt modifier
+hasAlt :: ShortcutBinding -> Boolean
+hasAlt s = elem Alt s.modifiers
 
--- Local when helper
-when :: Boolean -> Effect Unit -> Effect Unit
-when true action = action
-when false _ = pure unit
+-- | Check if binding has Shift modifier
+hasShift :: ShortcutBinding -> Boolean
+hasShift s = elem Shift s.modifiers
+
+-- | Check if binding has Meta modifier
+hasMeta :: ShortcutBinding -> Boolean
+hasMeta s = elem Meta s.modifiers
+
+-- | Check if binding has a specific modifier
+hasModifier :: Modifier -> ShortcutBinding -> Boolean
+hasModifier m s = elem m s.modifiers

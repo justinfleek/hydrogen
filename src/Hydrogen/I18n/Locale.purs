@@ -57,7 +57,11 @@ module Hydrogen.I18n.Locale
   , loadLocale
   , getAvailableLocales
   , onLocaleChange
-    -- * Formatting
+    -- * Format Requests (pure data for runtime)
+  , NumberFormatRequest
+  , CurrencyFormatRequest
+  , DateFormatRequest
+  , RelativeTimeFormatRequest
   , formatNumber
   , formatCurrency
   , formatDate
@@ -299,35 +303,60 @@ onLocaleChange (I18n { listeners }) callback = do
 --                                                                 // formatting
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Format a number according to locale
-formatNumber :: I18n -> Number -> Effect String
-formatNumber i18n n = do
-  locale <- getLocale i18n
-  pure $ formatNumberImpl locale n
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                              // format requests
+-- ═════════════════════════════════════════════════════════════════════════════
 
--- | Format currency
-formatCurrency :: I18n -> Number -> String -> Effect String
+-- | Number format request
+type NumberFormatRequest =
+  { locale :: Locale
+  , value :: Number
+  }
+
+-- | Currency format request
+type CurrencyFormatRequest =
+  { locale :: Locale
+  , amount :: Number
+  , currency :: String
+  }
+
+-- | Date format request
+type DateFormatRequest =
+  { locale :: Locale
+  , dateStr :: String
+  , format :: String
+  }
+
+-- | Relative time format request
+type RelativeTimeFormatRequest =
+  { locale :: Locale
+  , value :: Int
+  , unit :: String
+  }
+
+-- | Create a number format request
+formatNumber :: I18n -> Number -> Effect NumberFormatRequest
+formatNumber i18n num = do
+  locale <- getLocale i18n
+  pure { locale, value: num }
+
+-- | Create a currency format request
+formatCurrency :: I18n -> Number -> String -> Effect CurrencyFormatRequest
 formatCurrency i18n amount currency = do
   locale <- getLocale i18n
-  pure $ formatCurrencyImpl locale amount currency
+  pure { locale, amount, currency }
 
--- | Format a date
-formatDate :: I18n -> String -> String -> Effect String
+-- | Create a date format request
+formatDate :: I18n -> String -> String -> Effect DateFormatRequest
 formatDate i18n dateStr format = do
   locale <- getLocale i18n
-  pure $ formatDateImpl locale dateStr format
+  pure { locale, dateStr, format }
 
--- | Format relative time (e.g., "3 days ago")
-formatRelativeTime :: I18n -> Int -> String -> Effect String
+-- | Create a relative time format request
+formatRelativeTime :: I18n -> Int -> String -> Effect RelativeTimeFormatRequest
 formatRelativeTime i18n value unit = do
   locale <- getLocale i18n
-  pure $ formatRelativeTimeImpl locale value unit
-
--- FFI implementations (simplified - would use Intl API)
-foreign import formatNumberImpl :: Locale -> Number -> String
-foreign import formatCurrencyImpl :: Locale -> Number -> String -> String
-foreign import formatDateImpl :: Locale -> String -> String -> String
-foreign import formatRelativeTimeImpl :: Locale -> Int -> String -> String
+  pure { locale, value, unit }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // utilities

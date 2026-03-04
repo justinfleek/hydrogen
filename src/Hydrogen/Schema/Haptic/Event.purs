@@ -56,6 +56,12 @@ module Hydrogen.Schema.Haptic.Event
   , defaultAudioCue
   , quietAudioCue
   , loudAudioCue
+    -- * Semantic Audio Cue Presets
+  , clickCue
+  , confirmCue
+  , warnCue
+  , errorCue
+  , successCue
     -- * HapticPattern Molecule
   , HapticPattern
   , hapticPattern
@@ -328,6 +334,40 @@ loudAudioCue soundName =
   , pitch: normalPitch
   , pan: panCenter
   }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                     // semantic audio presets
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Click cue — standard button click sound.
+-- |
+-- | Used for general button presses and confirmations.
+clickCue :: AudioCue
+clickCue = defaultAudioCue "ui/click"
+
+-- | Confirm cue — positive confirmation sound.
+-- |
+-- | Used for successful actions, toggle on, selections.
+confirmCue :: AudioCue
+confirmCue = defaultAudioCue "ui/confirm"
+
+-- | Warn cue — warning/caution sound.
+-- |
+-- | Used for destructive actions, danger buttons.
+warnCue :: AudioCue
+warnCue = defaultAudioCue "ui/warn"
+
+-- | Error cue — error/failure sound.
+-- |
+-- | Used for validation failures, blocked actions.
+errorCue :: AudioCue
+errorCue = defaultAudioCue "ui/error"
+
+-- | Success cue — success/completion sound.
+-- |
+-- | Used for task completion, form submission success.
+successCue :: AudioCue
+successCue = defaultAudioCue "ui/success"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // haptic // pattern

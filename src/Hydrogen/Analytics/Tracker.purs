@@ -2,622 +2,643 @@
 --                                           // hydrogen // analytics // tracker
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Analytics and performance tracking
+-- | Analytics Tracker — Pure command-based analytics.
 -- |
--- | Provides a unified interface for tracking page views, custom events,
--- | and Core Web Vitals. Supports multiple analytics backends and
--- | respects user privacy preferences.
+-- | ## Architecture
+-- |
+-- | This module provides a **pure command interface** for analytics tracking.
+-- | Instead of calling FFI to execute tracking, we build up commands as data
+-- | that the Rust WASM runtime interprets.
+-- |
+-- | ```
+-- | PureScript (this module)      Rust WASM Runtime
+-- | ──────────────────────────    ──────────────────────
+-- | Build AnalyticsCommand   →    Interpret command
+-- | Pure data, no effects    →    Execute tracking
+-- | Schema.Analytics types   →    Emit Parquet/send to providers
+-- | ```
+-- |
+-- | ## Why No FFI
+-- |
+-- | 1. **Determinism** — Same commands produce same results
+-- | 2. **Testability** — Commands can be inspected without side effects
+-- | 3. **Security** — Bounded types prevent injection attacks
+-- | 4. **Portability** — Commands work on any runtime (browser, server, test)
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Analytics.Tracker as Analytics
 -- |
--- | -- Initialize tracker
--- | tracker <- Analytics.create
--- |   { providers: [ Analytics.console, Analytics.googleAnalytics "GA-123" ]
--- |   , respectDoNotTrack: true
+-- | -- Build a page view command
+-- | pageViewCmd = Analytics.pageView
+-- |   { path: "/home"
+-- |   , title: "Home"
+-- |   , referrer: Nothing
 -- |   }
 -- |
--- | -- Track page views
--- | Analytics.trackPageView tracker { path: "/home", title: "Home" }
+-- | -- Build an event command
+-- | eventCmd = Analytics.event "button_click"
+-- |   { button: "signup"
+-- |   , location: "header"
+-- |   }
 -- |
--- | -- Track custom events
--- | Analytics.trackEvent tracker "button_click"
--- |   { button: "signup", location: "header" }
--- |
--- | -- Track Core Web Vitals
--- | Analytics.trackWebVitals tracker
+-- | -- Commands are composed in your app's update function
+-- | -- and executed by the runtime
 -- | ```
+-- |
+-- | ## Re-exports
+-- |
+-- | This module re-exports all of `Hydrogen.Schema.Analytics` for convenience.
+-- | Prefer importing from here rather than the Schema directly.
+
 module Hydrogen.Analytics.Tracker
-  ( -- * Tracker
-    Tracker
-  , QueuedEvent
-  , TrackerConfig
-  , create
-  , createWithConfig
-    -- * Page Views
-  , PageViewData
-  , trackPageView
-  , trackPageViewWithData
-    -- * Events
-  , EventData
-  , trackEvent
-  , trackEventWithValue
-  , trackTiming
-    -- * User Identity
+  ( -- * Re-export Schema.Analytics
+    module Analytics
+  
+  -- * Analytics Commands
+  , AnalyticsCommand
+      ( CmdPageView
+      , CmdEvent
+      , CmdTiming
+      , CmdWebVital
+      , CmdPurchase
+      , CmdIdentify
+      , CmdSetUserProps
+      , CmdResetIdentity
+      , CmdFlush
+      , CmdSetPrivacy
+      , CmdBatch
+      )
+  
+  -- * Command Constructors
+  , pageView
+  , event
+  , eventWithValue
+  , timing
+  , webVital
+  , webVitalsSnapshot
+  , purchase
   , identify
-  , setUserProperties
-  , reset
-    -- * E-commerce
-  , trackPurchase
-  , trackAddToCart
-  , trackRemoveFromCart
-  , trackCheckout
-    -- * Core Web Vitals
-  , WebVitals
-  , WebVitalMetric(LCP, FID, CLS, FCP, TTFB, INP)
-  , trackWebVitals
-  , trackVital
-  , onVital
-    -- * Providers
-  , Provider
-  , ProviderConfig
-  , console
-  , googleAnalytics
-  , plausible
-  , mixpanel
-  , customProvider
-    -- * Privacy
-  , PrivacyMode(FullTracking, AnonymousOnly, NoTracking)
-  , setPrivacyMode
-  , optOut
-  , optIn
-  , isTracking
-    -- * Batching
+  , setUserProps
+  , resetIdentity
   , flush
-  , setBufferSize
-    -- * Query Integration
-  , loadRemoteConfig
-  , invalidateConfig
-    -- * Debug
-  , enableDebug
-  , getQueue
+  , setPrivacy
+  , batch
+  
+  -- * Page View Data
+  , PageViewData
+  , defaultPageView
+  
+  -- * Event Data
+  , EventData
+  , EventProperty
+  , eventProperty
+  , eventPropertyNumeric
+  
+  -- * Timing Data
+  , TimingData
+  
+  -- * Web Vital Data
+  , WebVitalData(VitalLCP, VitalFID, VitalCLS, VitalFCP, VitalTTFB, VitalINP, VitalSnapshot)
+  
+  -- * Purchase Data
+  , PurchaseData
+  , ProductData
+  , defaultProduct
+  
+  -- * User Properties
+  , UserProperty
+  , userProperty
+  
+  -- * Tracker Config (Pure Data)
+  , TrackerConfig
+  , defaultConfig
+  , configWithPrivacy
+  
+  -- * Provider Config (Pure Data)
+  , ProviderTarget(Console, GoogleAnalytics, Plausible, Mixpanel, Custom)
+  , providerTargetId
+  
+  -- * Command Inspection
+  , commandType
+  , commandEffect
+  , commandCoEffect
+  
+  -- * Tracker State (Pure Data)
+  , TrackerState
+  , QueuedEvent
+  , initState
+  , applyCommand
+  , stateIsEnabled
+  , stateUserId
+  , stateSessionId
+  , stateQueueLength
   ) where
 
-import Prelude hiding (when)
-
-import Control.Monad (when)
-import Data.Array as Array
-import Data.Foldable (for_)
-import Data.Map (Map)
-import Data.Map as Map
-import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
-import Data.Traversable (traverse)
-import Data.Tuple (Tuple(Tuple))
-import Data.Either (Either(Right, Left))
-import Effect (Effect)
-import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
-import Effect.Ref (Ref)
-import Effect.Ref as Ref
-import Foreign.Object (Object)
-import Foreign.Object as Object
-import Hydrogen.Query as Q
-
 -- ═════════════════════════════════════════════════════════════════════════════
--- Core Types
+--                                                                    // imports
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Analytics tracker instance
-type Tracker =
-  { providers :: Array Provider
-  , queue :: Ref (Array QueuedEvent)
-  , config :: TrackerConfig
-  , isEnabled :: Ref Boolean
-  , userId :: Ref (Maybe String)
-  , userProperties :: Ref (Map String String)
-  , sessionId :: String
-  , debug :: Ref Boolean
-  , queryClient :: Q.QueryClient
-  }
+import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , class Semigroup
+  , show
+  , map
+  , (<>)
+  , (==)
+  , (<<<)
+  )
 
--- | Tracker configuration
-type TrackerConfig =
-  { providers :: Array ProviderConfig
-  , respectDoNotTrack :: Boolean
-  , bufferSize :: Int
-  , flushInterval :: Maybe Int
-  , sessionTimeout :: Int
-  , anonymizeIp :: Boolean
-  , cookieDomain :: Maybe String
-  }
-
--- | Default configuration
-defaultConfig :: TrackerConfig
-defaultConfig =
-  { providers: []
-  , respectDoNotTrack: true
-  , bufferSize: 10
-  , flushInterval: Just 5000
-  , sessionTimeout: 1800000  -- 30 minutes
-  , anonymizeIp: true
-  , cookieDomain: Nothing
-  }
-
--- | A queued analytics event
-type QueuedEvent =
-  { eventType :: String
-  , data :: Object String
-  , timestamp :: Number
-  }
-
--- ═════════════════════════════════════════════════════════════════════════════
--- Tracker Creation
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Create a tracker with default config
-create :: Array ProviderConfig -> Effect Tracker
-create providerConfigs = createWithConfig defaultConfig { providers = providerConfigs }
-
--- | Create a tracker with custom config
-createWithConfig :: TrackerConfig -> Effect Tracker
-createWithConfig config = do
-  -- Check Do Not Track
-  shouldTrack <- if config.respectDoNotTrack
-    then not <$> getDoNotTrack
-    else pure true
+import Data.Array (length, foldr) as Array
+import Data.Maybe (Maybe(Just, Nothing))
+import Hydrogen.Schema.Analytics as Analytics
+import Hydrogen.Schema.Analytics
+  ( -- Effects and Co-Effects
+    AnalyticsEffect
+      ( EffectNone
+      , EffectEmitEvent
+      , EffectReadMetrics
+      , EffectModifyConfig
+      , EffectFlushBuffer
+      , EffectComposite
+      )
+  , AnalyticsCoEffect
+      ( CoEffectNone
+      , CoEffectTimestamp
+      , CoEffectStorage
+      , CoEffectNetwork
+      , CoEffectSessionContext
+      , CoEffectUserIdentity
+      , CoEffectComposite
+      )
+  , effectCombine
+  , coEffectCombine
   
-  providers <- traverse initProvider config.providers
-  queue <- Ref.new []
-  isEnabled <- Ref.new shouldTrack
-  userId <- Ref.new Nothing
-  userProperties <- Ref.new Map.empty
-  sessionId <- generateSessionId
-  debug <- Ref.new false
-  queryClient <- Q.newClient
+  -- Privacy
+  , PrivacyMode(FullTracking, AnonymousOnly, NoTracking)
   
-  let tracker = { providers, queue, config, isEnabled, userId, userProperties, sessionId, debug, queryClient }
+  -- Scores
+  , Score
   
-  -- Set up flush interval if configured
-  case config.flushInterval of
-    Just interval -> setupFlushInterval tracker interval
-    Nothing -> pure unit
+  -- Timestamps
+  , Timestamp
+  , SessionId
   
-  pure tracker
-
-foreign import getDoNotTrack :: Effect Boolean
-foreign import generateSessionId :: Effect String
-foreign import setupFlushInterval :: Tracker -> Int -> Effect Unit
+  -- Web Vitals
+  , WebVitalRating(Good, NeedsImprovement, Poor)
+  , LCP
+  , FID
+  , CLS
+  , FCP
+  , TTFB
+  , INP
+  , WebVitalsSnapshot
+  )
+import Hydrogen.Schema.Attestation.UUID5 as UUID5
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Page Views
+--                                                       // analytics commands
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Page view data
+-- | Analytics Command — Pure data describing an analytics action.
+-- |
+-- | Commands are interpreted by the Rust WASM runtime. No FFI is called
+-- | when constructing commands — they are pure values.
+-- |
+-- | ## Graded Effects
+-- |
+-- | Each command has a known effect (what it does) and co-effect (what it needs).
+-- | The runtime uses these grades to:
+-- |
+-- | - Enforce permission boundaries
+-- | - Track resource consumption
+-- | - Respect privacy mode
+data AnalyticsCommand
+  = CmdPageView PageViewData
+  | CmdEvent String EventData
+  | CmdTiming TimingData
+  | CmdWebVital WebVitalData
+  | CmdPurchase PurchaseData
+  | CmdIdentify String
+  | CmdSetUserProps (Array UserProperty)
+  | CmdResetIdentity
+  | CmdFlush
+  | CmdSetPrivacy PrivacyMode
+  | CmdBatch (Array AnalyticsCommand)
+
+derive instance eqAnalyticsCommand :: Eq AnalyticsCommand
+derive instance ordAnalyticsCommand :: Ord AnalyticsCommand
+
+instance showAnalyticsCommand :: Show AnalyticsCommand where
+  show (CmdPageView pv) = "PageView(" <> pv.path <> ")"
+  show (CmdEvent name _) = "Event(" <> name <> ")"
+  show (CmdTiming td) = "Timing(" <> td.category <> ")"
+  show (CmdWebVital wv) = "WebVital(" <> show wv <> ")"
+  show (CmdPurchase p) = "Purchase(" <> p.transactionId <> ")"
+  show (CmdIdentify uid) = "Identify(" <> uid <> ")"
+  show (CmdSetUserProps _) = "SetUserProps"
+  show CmdResetIdentity = "ResetIdentity"
+  show CmdFlush = "Flush"
+  show (CmdSetPrivacy mode) = "SetPrivacy(" <> show mode <> ")"
+  show (CmdBatch cmds) = "Batch(" <> show (Array.length cmds) <> " commands)"
+
+instance semigroupAnalyticsCommand :: Semigroup AnalyticsCommand where
+  append (CmdBatch a) (CmdBatch b) = CmdBatch (a <> b)
+  append (CmdBatch a) cmd = CmdBatch (a <> [cmd])
+  append cmd (CmdBatch b) = CmdBatch ([cmd] <> b)
+  append a b = CmdBatch [a, b]
+
+-- | Get the type of command as a string.
+commandType :: AnalyticsCommand -> String
+commandType (CmdPageView _) = "pageview"
+commandType (CmdEvent _ _) = "event"
+commandType (CmdTiming _) = "timing"
+commandType (CmdWebVital _) = "webvital"
+commandType (CmdPurchase _) = "purchase"
+commandType (CmdIdentify _) = "identify"
+commandType (CmdSetUserProps _) = "set_user_props"
+commandType CmdResetIdentity = "reset_identity"
+commandType CmdFlush = "flush"
+commandType (CmdSetPrivacy _) = "set_privacy"
+commandType (CmdBatch _) = "batch"
+
+-- | Get the effect grade of a command.
+commandEffect :: AnalyticsCommand -> AnalyticsEffect
+commandEffect (CmdPageView _) = EffectEmitEvent
+commandEffect (CmdEvent _ _) = EffectEmitEvent
+commandEffect (CmdTiming _) = EffectEmitEvent
+commandEffect (CmdWebVital _) = EffectEmitEvent
+commandEffect (CmdPurchase _) = EffectEmitEvent
+commandEffect (CmdIdentify _) = EffectModifyConfig
+commandEffect (CmdSetUserProps _) = EffectModifyConfig
+commandEffect CmdResetIdentity = EffectModifyConfig
+commandEffect CmdFlush = EffectFlushBuffer
+commandEffect (CmdSetPrivacy _) = EffectModifyConfig
+commandEffect (CmdBatch cmds) = combineEffects cmds
+  where
+    combineEffects :: Array AnalyticsCommand -> AnalyticsEffect
+    combineEffects = Array.foldr effectCombine EffectNone <<< map commandEffect
+
+-- | Get the co-effect grade of a command.
+commandCoEffect :: AnalyticsCommand -> AnalyticsCoEffect
+commandCoEffect (CmdPageView _) = 
+  coEffectCombine CoEffectTimestamp CoEffectSessionContext
+commandCoEffect (CmdEvent _ _) = 
+  coEffectCombine CoEffectTimestamp CoEffectSessionContext
+commandCoEffect (CmdTiming _) = 
+  coEffectCombine CoEffectTimestamp CoEffectSessionContext
+commandCoEffect (CmdWebVital _) = 
+  coEffectCombine CoEffectTimestamp CoEffectSessionContext
+commandCoEffect (CmdPurchase _) = 
+  coEffectCombine CoEffectTimestamp 
+    (coEffectCombine CoEffectSessionContext CoEffectUserIdentity)
+commandCoEffect (CmdIdentify _) = CoEffectUserIdentity
+commandCoEffect (CmdSetUserProps _) = CoEffectUserIdentity
+commandCoEffect CmdResetIdentity = CoEffectUserIdentity
+commandCoEffect CmdFlush = CoEffectStorage 0
+commandCoEffect (CmdSetPrivacy _) = CoEffectNone
+commandCoEffect (CmdBatch cmds) = combineCoEffects cmds
+  where
+    combineCoEffects :: Array AnalyticsCommand -> AnalyticsCoEffect
+    combineCoEffects = Array.foldr coEffectCombine CoEffectNone <<< map commandCoEffect
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // page view data
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Page view data — pure record describing a page view.
 type PageViewData =
   { path :: String
-  , title :: Maybe String
+  , title :: String
   , referrer :: Maybe String
-  , customData :: Object String
+  , customData :: Array EventProperty
   }
 
--- | Track a simple page view
-trackPageView :: Tracker -> { path :: String, title :: String } -> Effect Unit
-trackPageView tracker { path, title } =
-  trackPageViewWithData tracker
-    { path
-    , title: Just title
-    , referrer: Nothing
-    , customData: Object.empty
-    }
+-- | Default page view (empty values).
+defaultPageView :: PageViewData
+defaultPageView =
+  { path: ""
+  , title: ""
+  , referrer: Nothing
+  , customData: []
+  }
 
--- | Track a page view with full data
-trackPageViewWithData :: Tracker -> PageViewData -> Effect Unit
-trackPageViewWithData tracker pageData = do
-  enabled <- Ref.read tracker.isEnabled
-  when enabled do
-    let eventData = Object.fromFoldable
-          [ "path" /\ pageData.path
-          , "title" /\ fromMaybe "" pageData.title
-          , "referrer" /\ fromMaybe "" pageData.referrer
-          ]
-    queueEvent tracker "pageview" (Object.union eventData pageData.customData)
+-- | Create a page view command.
+pageView :: PageViewData -> AnalyticsCommand
+pageView = CmdPageView
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Custom Events
+--                                                              // event data
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Event data type
-type EventData = Object String
+-- | Event data — array of properties.
+type EventData = Array EventProperty
 
--- | Track a custom event
-trackEvent :: Tracker -> String -> EventData -> Effect Unit
-trackEvent tracker eventName eventData = do
-  enabled <- Ref.read tracker.isEnabled
-  when enabled do
-    let data' = Object.insert "event_name" eventName eventData
-    queueEvent tracker "event" data'
+-- | A single event property (key-value pair).
+type EventProperty =
+  { key :: String
+  , value :: String
+  }
 
--- | Track an event with a numeric value
-trackEventWithValue :: Tracker -> String -> Number -> EventData -> Effect Unit
-trackEventWithValue tracker eventName value eventData = do
-  let data' = Object.insert "value" (show value) eventData
-  trackEvent tracker eventName data'
+-- | Create a string property.
+eventProperty :: String -> String -> EventProperty
+eventProperty key value = { key, value }
 
--- | Track a timing event
-trackTiming :: Tracker -> String -> Int -> EventData -> Effect Unit
-trackTiming tracker category duration eventData = do
-  enabled <- Ref.read tracker.isEnabled
-  when enabled do
-    let data' = Object.fromFoldable
-          [ "category" /\ category
-          , "duration" /\ show duration
-          ]
-    queueEvent tracker "timing" (Object.union data' eventData)
+-- | Create a numeric property (converts to string).
+eventPropertyNumeric :: String -> Number -> EventProperty
+eventPropertyNumeric key value = { key, value: show value }
+
+-- | Create an event command.
+event :: String -> EventData -> AnalyticsCommand
+event name properties = CmdEvent name properties
+
+-- | Create an event with a numeric value.
+eventWithValue :: String -> Number -> EventData -> AnalyticsCommand
+eventWithValue name value properties =
+  CmdEvent name (properties <> [eventPropertyNumeric "value" value])
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- User Identity
+--                                                             // timing data
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Identify a user
-identify :: Tracker -> String -> Effect Unit
-identify tracker uid = do
-  Ref.write (Just uid) tracker.userId
-  for_ tracker.providers \provider ->
-    provider.identify uid
+-- | Timing data — measures duration of an operation.
+type TimingData =
+  { category :: String
+  , durationMs :: Int
+  , label :: Maybe String
+  , customData :: Array EventProperty
+  }
 
--- | Set user properties
-setUserProperties :: Tracker -> Map String String -> Effect Unit
-setUserProperties tracker props = do
-  Ref.modify_ (Map.union props) tracker.userProperties
-  let propsArray :: Array (Tuple String String)
-      propsArray = Map.toUnfoldable props
-      propsObj = Object.fromFoldable propsArray
-  for_ tracker.providers \provider ->
-    provider.setUserProperties propsObj
-
--- | Reset user identity (e.g., on logout)
-reset :: Tracker -> Effect Unit
-reset tracker = do
-  Ref.write Nothing tracker.userId
-  Ref.write Map.empty tracker.userProperties
-  for_ tracker.providers \provider ->
-    provider.reset
+-- | Create a timing command.
+timing :: TimingData -> AnalyticsCommand
+timing = CmdTiming
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- E-commerce Tracking
+--                                                           // web vital data
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Track a purchase
-trackPurchase
-  :: Tracker
-  -> { transactionId :: String, total :: Number, currency :: String, items :: Array ProductData }
-  -> Effect Unit
-trackPurchase tracker purchase = do
-  let data' = Object.fromFoldable
-        [ "transaction_id" /\ purchase.transactionId
-        , "total" /\ show purchase.total
-        , "currency" /\ purchase.currency
-        , "item_count" /\ show (Array.length purchase.items)
-        ]
-  trackEvent tracker "purchase" data'
+-- | Web vital data — a single Core Web Vital measurement.
+data WebVitalData
+  = VitalLCP LCP
+  | VitalFID FID
+  | VitalCLS CLS
+  | VitalFCP FCP
+  | VitalTTFB TTFB
+  | VitalINP INP
+  | VitalSnapshot WebVitalsSnapshot
 
--- | Product data for e-commerce
+derive instance eqWebVitalData :: Eq WebVitalData
+derive instance ordWebVitalData :: Ord WebVitalData
+
+instance showWebVitalData :: Show WebVitalData where
+  show (VitalLCP v) = "LCP(" <> show v <> ")"
+  show (VitalFID v) = "FID(" <> show v <> ")"
+  show (VitalCLS v) = "CLS(" <> show v <> ")"
+  show (VitalFCP v) = "FCP(" <> show v <> ")"
+  show (VitalTTFB v) = "TTFB(" <> show v <> ")"
+  show (VitalINP v) = "INP(" <> show v <> ")"
+  show (VitalSnapshot _) = "Snapshot"
+
+-- | Create a web vital command.
+webVital :: WebVitalData -> AnalyticsCommand
+webVital = CmdWebVital
+
+-- | Create a web vitals snapshot command.
+webVitalsSnapshot :: WebVitalsSnapshot -> AnalyticsCommand
+webVitalsSnapshot snap = CmdWebVital (VitalSnapshot snap)
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                           // purchase data
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Purchase data — e-commerce transaction.
+type PurchaseData =
+  { transactionId :: String
+  , totalCents :: Int        -- Amount in cents (bounded, no floats)
+  , currency :: String       -- ISO 4217 code
+  , items :: Array ProductData
+  }
+
+-- | Product data — item in a purchase.
 type ProductData =
-  { id :: String
+  { productId :: String
   , name :: String
-  , price :: Number
+  , priceCents :: Int        -- Price in cents
   , quantity :: Int
   , category :: Maybe String
   }
 
--- | Track adding item to cart
-trackAddToCart :: Tracker -> ProductData -> Effect Unit
-trackAddToCart tracker product = do
-  let data' = Object.fromFoldable
-        [ "product_id" /\ product.id
-        , "product_name" /\ product.name
-        , "price" /\ show product.price
-        , "quantity" /\ show product.quantity
-        ]
-  trackEvent tracker "add_to_cart" data'
-
--- | Track removing item from cart
-trackRemoveFromCart :: Tracker -> ProductData -> Effect Unit
-trackRemoveFromCart tracker product = do
-  let data' = Object.fromFoldable
-        [ "product_id" /\ product.id
-        , "product_name" /\ product.name
-        ]
-  trackEvent tracker "remove_from_cart" data'
-
--- | Track checkout step
-trackCheckout :: Tracker -> Int -> Maybe String -> Effect Unit
-trackCheckout tracker step paymentMethod = do
-  let data' = Object.fromFoldable
-        [ "step" /\ show step
-        , "payment_method" /\ fromMaybe "" paymentMethod
-        ]
-  trackEvent tracker "checkout" data'
-
--- ═════════════════════════════════════════════════════════════════════════════
--- Core Web Vitals
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Web Vitals metrics
-type WebVitals =
-  { lcp :: Maybe Number    -- Largest Contentful Paint
-  , fid :: Maybe Number    -- First Input Delay
-  , cls :: Maybe Number    -- Cumulative Layout Shift
-  , fcp :: Maybe Number    -- First Contentful Paint
-  , ttfb :: Maybe Number   -- Time to First Byte
-  , inp :: Maybe Number    -- Interaction to Next Paint
+-- | Default product (empty values).
+defaultProduct :: ProductData
+defaultProduct =
+  { productId: ""
+  , name: ""
+  , priceCents: 0
+  , quantity: 1
+  , category: Nothing
   }
 
--- | Individual web vital metric
-data WebVitalMetric
-  = LCP Number
-  | FID Number
-  | CLS Number
-  | FCP Number
-  | TTFB Number
-  | INP Number
-
-derive instance eqWebVitalMetric :: Eq WebVitalMetric
-
-instance showWebVitalMetric :: Show WebVitalMetric where
-  show = case _ of
-    LCP n -> "LCP(" <> show n <> "ms)"
-    FID n -> "FID(" <> show n <> "ms)"
-    CLS n -> "CLS(" <> show n <> ")"
-    FCP n -> "FCP(" <> show n <> "ms)"
-    TTFB n -> "TTFB(" <> show n <> "ms)"
-    INP n -> "INP(" <> show n <> "ms)"
-
--- | Track all Core Web Vitals automatically
-trackWebVitals :: Tracker -> Effect (Effect Unit)
-trackWebVitals tracker = do
-  observeWebVitals \metric -> do
-    enabled <- Ref.read tracker.isEnabled
-    when enabled do
-      trackVital tracker metric
-
-foreign import observeWebVitals :: (WebVitalMetric -> Effect Unit) -> Effect (Effect Unit)
-
--- | Track a single vital metric
-trackVital :: Tracker -> WebVitalMetric -> Effect Unit
-trackVital tracker metric = do
-  let (name /\ value) = case metric of
-        LCP n -> "lcp" /\ n
-        FID n -> "fid" /\ n
-        CLS n -> "cls" /\ n
-        FCP n -> "fcp" /\ n
-        TTFB n -> "ttfb" /\ n
-        INP n -> "inp" /\ n
-  let data' = Object.fromFoldable
-        [ "metric" /\ name
-        , "value" /\ show value
-        ]
-  queueEvent tracker "web_vital" data'
-
--- | Subscribe to vital metrics
-onVital :: Tracker -> (WebVitalMetric -> Effect Unit) -> Effect (Effect Unit)
-onVital _tracker handler = observeWebVitals handler
+-- | Create a purchase command.
+purchase :: PurchaseData -> AnalyticsCommand
+purchase = CmdPurchase
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Providers
+--                                                         // user properties
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | An analytics provider
-type Provider =
-  { name :: String
-  , track :: String -> Object String -> Effect Unit
-  , identify :: String -> Effect Unit
-  , setUserProperties :: Object String -> Effect Unit
-  , reset :: Effect Unit
-  , flush :: Effect Unit
+-- | User property — key-value pair for user attributes.
+type UserProperty =
+  { key :: String
+  , value :: String
   }
 
--- | Provider configuration
-type ProviderConfig =
-  { name :: String
-  , init :: Effect Provider
-  }
+-- | Create a user property.
+userProperty :: String -> String -> UserProperty
+userProperty key value = { key, value }
 
--- | Console provider (for development)
-console :: ProviderConfig
-console =
-  { name: "console"
-  , init: pure
-      { name: "console"
-      , track: \eventType eventData -> logAnalytics eventType eventData
-      , identify: \uid -> logIdentify uid
-      , setUserProperties: \props -> logUserProps props
-      , reset: logReset
-      , flush: pure unit
-      }
-  }
+-- | Create an identify command.
+identify :: String -> AnalyticsCommand
+identify = CmdIdentify
 
-foreign import logAnalytics :: String -> Object String -> Effect Unit
-foreign import logIdentify :: String -> Effect Unit
-foreign import logUserProps :: Object String -> Effect Unit
-foreign import logReset :: Effect Unit
+-- | Create a set user properties command.
+setUserProps :: Array UserProperty -> AnalyticsCommand
+setUserProps = CmdSetUserProps
 
--- | Google Analytics 4 provider
-googleAnalytics :: String -> ProviderConfig
-googleAnalytics measurementId =
-  { name: "google-analytics"
-  , init: initGoogleAnalytics measurementId
-  }
-
-foreign import initGoogleAnalytics :: String -> Effect Provider
-
--- | Plausible Analytics provider
-plausible :: String -> ProviderConfig
-plausible domain =
-  { name: "plausible"
-  , init: initPlausible domain
-  }
-
-foreign import initPlausible :: String -> Effect Provider
-
--- | Mixpanel provider
-mixpanel :: String -> ProviderConfig
-mixpanel token =
-  { name: "mixpanel"
-  , init: initMixpanel token
-  }
-
-foreign import initMixpanel :: String -> Effect Provider
-
--- | Create a custom provider
-customProvider
-  :: String
-  -> (String -> Object String -> Effect Unit)
-  -> ProviderConfig
-customProvider name trackFn =
-  { name
-  , init: pure
-      { name
-      , track: trackFn
-      , identify: \_ -> pure unit
-      , setUserProperties: \_ -> pure unit
-      , reset: pure unit
-      , flush: pure unit
-      }
-  }
-
--- | Initialize a provider from config
-initProvider :: ProviderConfig -> Effect Provider
-initProvider config = config.init
+-- | Create a reset identity command.
+resetIdentity :: AnalyticsCommand
+resetIdentity = CmdResetIdentity
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Privacy
+--                                                         // control commands
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Privacy mode settings
-data PrivacyMode
-  = FullTracking
-  | AnonymousOnly
-  | NoTracking
+-- | Create a flush command.
+flush :: AnalyticsCommand
+flush = CmdFlush
 
-derive instance eqPrivacyMode :: Eq PrivacyMode
+-- | Create a set privacy mode command.
+setPrivacy :: PrivacyMode -> AnalyticsCommand
+setPrivacy = CmdSetPrivacy
 
--- | Set privacy mode
-setPrivacyMode :: Tracker -> PrivacyMode -> Effect Unit
-setPrivacyMode tracker mode = case mode of
-  FullTracking -> Ref.write true tracker.isEnabled
-  AnonymousOnly -> do
-    Ref.write true tracker.isEnabled
-    reset tracker
-  NoTracking -> Ref.write false tracker.isEnabled
-
--- | Opt out of tracking
-optOut :: Tracker -> Effect Unit
-optOut tracker = do
-  Ref.write false tracker.isEnabled
-  persistOptOut true
-
--- | Opt back in to tracking
-optIn :: Tracker -> Effect Unit
-optIn tracker = do
-  Ref.write true tracker.isEnabled
-  persistOptOut false
-
-foreign import persistOptOut :: Boolean -> Effect Unit
-
--- | Check if tracking is enabled
-isTracking :: Tracker -> Effect Boolean
-isTracking tracker = Ref.read tracker.isEnabled
+-- | Create a batch command (multiple commands).
+batch :: Array AnalyticsCommand -> AnalyticsCommand
+batch = CmdBatch
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Event Queue & Batching
+--                                                         // tracker config
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Queue an event for sending
-queueEvent :: Tracker -> String -> Object String -> Effect Unit
-queueEvent tracker eventType eventData = do
-  timestamp <- now
-  userId <- Ref.read tracker.userId
-  userProps <- Ref.read tracker.userProperties
-  
-  let enrichedData = eventData
-        # Object.insert "session_id" tracker.sessionId
-        # Object.insert "timestamp" (show timestamp)
-        # maybeInsert "user_id" userId
-  
-  -- Debug logging
-  isDebug <- Ref.read tracker.debug
-  when isDebug do
-    logAnalytics eventType enrichedData
-  
-  Ref.modify_ (flip Array.snoc { eventType, data: enrichedData, timestamp }) tracker.queue
-  
-  -- Check if we should flush
-  queue <- Ref.read tracker.queue
-  when (Array.length queue >= tracker.config.bufferSize) do
-    flush tracker
-
--- | Flush queued events to providers
-flush :: Tracker -> Effect Unit
-flush tracker = do
-  queue <- Ref.read tracker.queue
-  Ref.write [] tracker.queue
-  
-  for_ queue \event ->
-    for_ tracker.providers \provider ->
-      provider.track event.eventType event.data
-  
-  for_ tracker.providers \provider ->
-    provider.flush
-
--- | Set the buffer size
-setBufferSize :: Tracker -> Int -> Effect Unit
-setBufferSize tracker size = pure unit -- Would update config
-
--- ═════════════════════════════════════════════════════════════════════════════
--- Query Integration
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Load remote analytics configuration via Query (cached)
+-- | Tracker configuration — pure data describing tracker settings.
 -- |
--- | Fetches tracking rules, sampling rates, or provider settings from server.
--- | Uses Query for caching and deduplication. Returns raw config string
--- | that can be parsed by the caller.
-loadRemoteConfig :: Tracker -> String -> Aff (Q.QueryState String String)
-loadRemoteConfig tracker url = do
-  Q.query tracker.queryClient
-    (Q.defaultQueryOptions ["analytics", "config", url] (fetchConfigImpl url))
+-- | This is not a stateful tracker — it's a description of how tracking
+-- | should be configured. The Rust runtime uses this to set up providers.
+type TrackerConfig =
+  { providers :: Array ProviderTarget
+  , privacyMode :: PrivacyMode
+  , respectDoNotTrack :: Boolean
+  , bufferSize :: Int
+  , flushIntervalMs :: Maybe Int
+  , sessionTimeoutMs :: Int
+  , anonymizeIp :: Boolean
+  }
 
-foreign import fetchConfigImpl :: String -> Aff (Either String String)
+-- | Default tracker configuration.
+defaultConfig :: TrackerConfig
+defaultConfig =
+  { providers: []
+  , privacyMode: FullTracking
+  , respectDoNotTrack: true
+  , bufferSize: 10
+  , flushIntervalMs: Just 5000
+  , sessionTimeoutMs: 1800000  -- 30 minutes
+  , anonymizeIp: true
+  }
 
--- | Invalidate cached analytics config (forces refresh on next load)
-invalidateConfig :: Tracker -> Effect Unit
-invalidateConfig tracker = Q.invalidate tracker.queryClient ["analytics", "config"]
+-- | Create a config with specific privacy mode.
+configWithPrivacy :: PrivacyMode -> TrackerConfig
+configWithPrivacy mode = defaultConfig { privacyMode = mode }
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Debug
+--                                                         // provider targets
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Enable debug mode
-enableDebug :: Tracker -> Boolean -> Effect Unit
-enableDebug tracker enabled = Ref.write enabled tracker.debug
+-- | Provider target — identifies an analytics backend.
+-- |
+-- | These are not provider implementations (no FFI). They're identifiers
+-- | that the Rust runtime uses to route events.
+data ProviderTarget
+  = Console                        -- ^ Log to console (development)
+  | GoogleAnalytics String         -- ^ GA4 with measurement ID
+  | Plausible String               -- ^ Plausible with domain
+  | Mixpanel String                -- ^ Mixpanel with token
+  | Custom String                  -- ^ Custom provider by name
 
--- | Get the current event queue (for debugging)
-getQueue :: Tracker -> Effect (Array QueuedEvent)
-getQueue tracker = Ref.read tracker.queue
+derive instance eqProviderTarget :: Eq ProviderTarget
+derive instance ordProviderTarget :: Ord ProviderTarget
+
+instance showProviderTarget :: Show ProviderTarget where
+  show Console = "console"
+  show (GoogleAnalytics id) = "google-analytics:" <> id
+  show (Plausible domain) = "plausible:" <> domain
+  show (Mixpanel token) = "mixpanel:" <> token
+  show (Custom name) = "custom:" <> name
+
+-- | Get the identifier for a provider target.
+providerTargetId :: ProviderTarget -> String
+providerTargetId Console = "console"
+providerTargetId (GoogleAnalytics id) = id
+providerTargetId (Plausible domain) = domain
+providerTargetId (Mixpanel token) = token
+providerTargetId (Custom name) = name
 
 -- ═════════════════════════════════════════════════════════════════════════════
--- Utilities
+--                                                          // tracker state
 -- ═════════════════════════════════════════════════════════════════════════════
 
-foreign import now :: Effect Number
+-- | Tracker state — pure data describing runtime tracker state.
+-- |
+-- | This type describes the state that the Rust WASM runtime manages.
+-- | PureScript does not hold this state — it only describes it.
+-- |
+-- | ## Why Pure State Description
+-- |
+-- | The runtime owns the actual state (refs, timers, network connections).
+-- | PureScript describes:
+-- | 1. What state shape exists
+-- | 2. How commands transform state (via `applyCommand`)
+-- | 3. What state can be queried
+-- |
+-- | This enables:
+-- | - Testing state transitions without runtime
+-- | - Serializing state for persistence
+-- | - Hydrating state on page load
+type TrackerState =
+  { config :: TrackerConfig
+  , queue :: Array QueuedEvent
+  , isEnabled :: Boolean
+  , userId :: Maybe String
+  , userProperties :: Array UserProperty
+  , sessionId :: SessionId
+  , debugMode :: Boolean
+  }
 
--- | Insert a value into an Object only if the Maybe contains a value
-maybeInsert :: String -> Maybe String -> Object String -> Object String
-maybeInsert key = case _ of
-  Just val -> Object.insert key val
-  Nothing -> identity
+-- | A queued analytics event — pure data waiting to be sent.
+type QueuedEvent =
+  { eventType :: String
+  , properties :: Array EventProperty
+  , timestamp :: Timestamp
+  }
 
-infixr 0 Tuple as /\
+-- | Initial tracker state from config.
+initState :: TrackerConfig -> SessionId -> TrackerState
+initState config sessionId =
+  { config
+  , queue: []
+  , isEnabled: true
+  , userId: Nothing
+  , userProperties: []
+  , sessionId
+  , debugMode: false
+  }
+
+-- | Apply a command to tracker state (pure state transition).
+-- |
+-- | This is the **reducer** for analytics state. Given current state
+-- | and a command, produces new state. No side effects.
+-- |
+-- | The runtime calls this to update state, then performs actual I/O.
+applyCommand :: AnalyticsCommand -> TrackerState -> TrackerState
+applyCommand cmd state = case cmd of
+  CmdPageView _ -> state  -- Events queue in runtime, not here
+  CmdEvent _ _ -> state
+  CmdTiming _ -> state
+  CmdWebVital _ -> state
+  CmdPurchase _ -> state
+  CmdIdentify uid -> state { userId = Just uid }
+  CmdSetUserProps props -> state { userProperties = state.userProperties <> props }
+  CmdResetIdentity -> state { userId = Nothing, userProperties = [] }
+  CmdFlush -> state { queue = [] }
+  CmdSetPrivacy mode -> case mode of
+    FullTracking -> state { isEnabled = true }
+    AnonymousOnly -> state { isEnabled = true, userId = Nothing, userProperties = [] }
+    NoTracking -> state { isEnabled = false }
+  CmdBatch cmds -> Array.foldr applyCommand state cmds
+
+-- | Check if tracking is enabled in state.
+stateIsEnabled :: TrackerState -> Boolean
+stateIsEnabled s = s.isEnabled
+
+-- | Get user ID from state.
+stateUserId :: TrackerState -> Maybe String
+stateUserId s = s.userId
+
+-- | Get session ID from state.
+stateSessionId :: TrackerState -> SessionId
+stateSessionId s = s.sessionId
+
+-- | Get queue length from state.
+stateQueueLength :: TrackerState -> Int
+stateQueueLength s = Array.length s.queue
