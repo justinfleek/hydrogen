@@ -35,6 +35,25 @@ bytemuck = { version = "1.14", features = ["derive"] }
 # Utilities
 gloo-timers = "0.3"
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# CRYPTOGRAPHY (for auth layer)
+# All pure-Rust, WASM-compatible, side-channel resistant
+# ═══════════════════════════════════════════════════════════════════════════════
+# BLAKE3 - fast hashing, KDF, MAC (matches hs-blake3 on backend)
+blake3 = "1.5"
+
+# Ed25519 signatures - request provenance, attestation signing
+# NOTE: No rand_core feature - runtime VERIFIES signatures, does not generate keys
+# Key generation happens on entity side (Haskell backend or entity's own system)
+ed25519-dalek = "2.1"
+
+# X25519 key exchange - encrypted channels (future)
+# x25519-dalek = "2.0"
+
+# NO getrandom, NO rand_core in WASM runtime
+# Entropy belongs to the ENTITY, not the experience runtime
+# The runtime is a VERIFIER, not a GENERATOR
+
 [dependencies.web-sys]
 version = "0.3.91"
 features = [
@@ -235,10 +254,28 @@ features = [
     "DataTransfer",
     "DataTransferItem",
     "DataTransferItemList",
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ADDITIONAL DOM (router, dom module requirements)
+    # ═══════════════════════════════════════════════════════════════════════════
+    "HtmlAnchorElement",
+    "Text",
+    "ErrorEvent",
+    "HtmlSelectElement",
+    "HtmlButtonElement",
+    "HtmlHeadElement",
+    "HtmlMetaElement",
+    "HtmlLinkElement",
+    "HtmlTitleElement",
+    "HtmlScriptElement",
+    "HtmlStyleElement",
+    "HtmlCollection",
 ]
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
+proptest = "1.4"
+criterion = "0.5"
 
 [profile.release]
 opt-level = "s"

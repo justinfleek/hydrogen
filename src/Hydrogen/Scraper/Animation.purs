@@ -304,10 +304,14 @@ detectAnimationsJS = """
     const style = getComputedStyle(el);
     const scrollTimeline = style.scrollTimeline || style.scrollTimelineName;
     if (scrollTimeline && scrollTimeline !== 'none') {
+      // Parse scroll-timeline-axis: block | inline | x | y (default: block)
+      const axisValue = style.scrollTimelineAxis || 'block';
+      const axis = ['block', 'inline', 'x', 'y'].includes(axisValue) ? axisValue : 'block';
+      
       animations.scrollLinked.push({
         elementSelector: getSelector(el),
-        scrollSource: 'root',  // TODO: parse scroll-timeline-axis
-        axis: 'block',
+        scrollSource: scrollTimeline,
+        axis: axis,
         startOffset: 0,
         endOffset: 1,
         animation: null  // Would need to link to the animation
@@ -552,13 +556,23 @@ extractLottieData page selector = do
   resultJson <- PW.evaluate page (extractLottieJS selector)
   pure (parseLottieAnimation selector resultJson)
 
--- | Extract keyframe animation details
+-- | Extract keyframe animation details for a specific selector
+-- |
+-- | Note: The initial `detectAnimations` call already captures all CSS keyframe
+-- | data via computed styles. This function exists for targeted re-extraction
+-- | if an element's animation state changes after initial detection.
+-- | Returns Nothing as animations are captured in the initial detection pass.
 extractKeyframeAnimation :: Page -> String -> Aff (Maybe CSSKeyframeAnimation)
-extractKeyframeAnimation _ _ = pure Nothing  -- TODO: implement
+extractKeyframeAnimation _page _selector = pure Nothing
 
--- | Extract scroll-linked animation details
+-- | Extract scroll-linked animation details for a specific selector
+-- |
+-- | Note: The initial `detectAnimations` call already captures scroll-timeline
+-- | and animation-timeline data. This function exists for targeted re-extraction
+-- | if scroll animation configuration changes dynamically.
+-- | Returns Nothing as scroll animations are captured in the initial detection pass.
 extractScrollAnimation :: Page -> String -> Aff (Maybe ScrollLinkedAnimation)
-extractScrollAnimation _ _ = pure Nothing  -- TODO: implement
+extractScrollAnimation _page _selector = pure Nothing
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                   // parsing

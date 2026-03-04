@@ -443,4 +443,208 @@ theorem escape_impossible (rawX rawY rawVx rawVy rawDt : ℝ) :
   exact ⟨(clampPosition_bounds _).1, (clampPosition_bounds _).2,
          (clampPosition_bounds _).1, (clampPosition_bounds _).2⟩
 
+-- ---------------------------------------------------------------------------
+-- SECTION 10: ELEVATION (Z-DEPTH)
+-- ---------------------------------------------------------------------------
+
+/-- Minimum elevation (ground level) -/
+def minElevation : ℝ := 0.0
+
+/-- Maximum elevation (ceiling) -/
+def maxElevation : ℝ := 10000.0
+
+/-- Maximum elevation velocity (prevents "thrown" sensation) -/
+def maxElevationVelocity : ℝ := 1000.0
+
+theorem minElevation_nonneg : minElevation ≥ 0 := by simp [minElevation]; norm_num
+theorem maxElevation_pos : maxElevation > 0 := by simp [maxElevation]; norm_num
+theorem maxElevationVelocity_pos : maxElevationVelocity > 0 := by simp [maxElevationVelocity]; norm_num
+
+/-- Clamp elevation to bounds -/
+def clampElevation (e : ℝ) : ℝ := clamp minElevation maxElevation e
+
+/-- Clamp elevation velocity to bounds -/
+def clampElevationVelocity (v : ℝ) : ℝ := clamp (-maxElevationVelocity) maxElevationVelocity v
+
+theorem clampElevation_bounds (e : ℝ) : 
+    minElevation ≤ clampElevation e ∧ clampElevation e ≤ maxElevation := by
+  apply clamp_bounds
+  simp [minElevation, maxElevation]; norm_num
+
+theorem clampElevationVelocity_bounds (v : ℝ) :
+    -maxElevationVelocity ≤ clampElevationVelocity v ∧ clampElevationVelocity v ≤ maxElevationVelocity := by
+  apply clamp_bounds
+  simp [maxElevationVelocity]; norm_num
+
+/-- A bounded elevation value -/
+structure BoundedElevation where
+  value : ℝ
+  lower_bound : minElevation ≤ value
+  upper_bound : value ≤ maxElevation
+
+/-- A bounded elevation velocity -/
+structure BoundedElevationVelocity where
+  value : ℝ
+  lower_bound : -maxElevationVelocity ≤ value
+  upper_bound : value ≤ maxElevationVelocity
+
+/-- Create bounded elevation by clamping -/
+def mkBoundedElevation (e : ℝ) : BoundedElevation :=
+  { value := clampElevation e
+  , lower_bound := (clampElevation_bounds e).1
+  , upper_bound := (clampElevation_bounds e).2 }
+
+/-- Create bounded elevation velocity by clamping -/
+def mkBoundedElevationVelocity (v : ℝ) : BoundedElevationVelocity :=
+  { value := clampElevationVelocity v
+  , lower_bound := (clampElevationVelocity_bounds v).1
+  , upper_bound := (clampElevationVelocity_bounds v).2 }
+
+/-- Apply elevation velocity -/
+def applyElevationVelocity (e : BoundedElevation) (v : BoundedElevationVelocity) 
+    (dt : BoundedDeltaTime) : BoundedElevation :=
+  mkBoundedElevation (e.value + v.value * dt.value)
+
+/-- THEOREM: Elevation change is always bounded.
+    Experience cannot "throw" an entity outside elevation bounds. -/
+theorem elevation_change_bounded (e : BoundedElevation) (v : BoundedElevationVelocity)
+    (dt : BoundedDeltaTime) :
+    let newE := applyElevationVelocity e v dt
+    minElevation ≤ newE.value ∧ newE.value ≤ maxElevation := by
+  simp only [applyElevationVelocity, mkBoundedElevation]
+  exact clampElevation_bounds _
+
+/-- THEOREM: Elevation escape is impossible -/
+theorem elevation_escape_impossible (rawE rawV rawDt : ℝ) :
+    let e := mkBoundedElevation rawE
+    let v := mkBoundedElevationVelocity rawV
+    let dt := mkBoundedDeltaTime rawDt
+    let newE := applyElevationVelocity e v dt
+    minElevation ≤ newE.value ∧ newE.value ≤ maxElevation := by
+  simp only [applyElevationVelocity, mkBoundedElevation]
+  exact clampElevation_bounds _
+
+-- ---------------------------------------------------------------------------
+-- SECTION 11: BEZIER EASING HANDLES
+-- ---------------------------------------------------------------------------
+
+/-- Minimum Y value for easing handles (small undershoot allowed).
+
+    Bezier easing handles define cubic Bezier curves for animations.
+    
+    ATTACK VECTORS:
+    - Extreme handles create motion sickness
+    - Rapid oscillation causes disorientation
+    - Unbounded overshoot creates jarring motion
+    
+    DEFENSE:
+    - X handles bounded to [0, 1] (time dimension)
+    - Y handles bounded to [-0.2, 1.2] (value dimension, small overshoot allowed)
+    - Maximum acceleration check prevents motion sickness curves -/
+def minEasingY : ℝ := -0.2
+
+/-- Maximum Y value for easing handles (small overshoot allowed) -/
+def maxEasingY : ℝ := 1.2
+
+/-- Clamp easing X coordinate to [0, 1] -/
+def clampEasingX (x : ℝ) : ℝ := clamp 0 1 x
+
+/-- Clamp easing Y coordinate to [-0.2, 1.2] -/
+def clampEasingY (y : ℝ) : ℝ := clamp minEasingY maxEasingY y
+
+theorem clampEasingX_bounds (x : ℝ) : 0 ≤ clampEasingX x ∧ clampEasingX x ≤ 1 := by
+  apply clamp_bounds
+  norm_num
+
+theorem clampEasingY_bounds (y : ℝ) : 
+    minEasingY ≤ clampEasingY y ∧ clampEasingY y ≤ maxEasingY := by
+  apply clamp_bounds
+  simp [minEasingY, maxEasingY]; norm_num
+
+/-- A bounded easing X coordinate (time dimension) -/
+structure BoundedEasingX where
+  value : ℝ
+  lower_bound : 0 ≤ value
+  upper_bound : value ≤ 1
+
+/-- A bounded easing Y coordinate (value dimension) -/
+structure BoundedEasingY where
+  value : ℝ
+  lower_bound : minEasingY ≤ value
+  upper_bound : value ≤ maxEasingY
+
+/-- Create bounded easing X by clamping -/
+def mkBoundedEasingX (x : ℝ) : BoundedEasingX :=
+  { value := clampEasingX x
+  , lower_bound := (clampEasingX_bounds x).1
+  , upper_bound := (clampEasingX_bounds x).2 }
+
+/-- Create bounded easing Y by clamping -/
+def mkBoundedEasingY (y : ℝ) : BoundedEasingY :=
+  { value := clampEasingY y
+  , lower_bound := (clampEasingY_bounds y).1
+  , upper_bound := (clampEasingY_bounds y).2 }
+
+/-- Bounded Bezier easing handles (cubic Bezier control points) -/
+structure BoundedEasingHandles where
+  x1 : BoundedEasingX
+  y1 : BoundedEasingY
+  x2 : BoundedEasingX
+  y2 : BoundedEasingY
+
+/-- Create bounded easing handles by clamping all components -/
+def mkBoundedEasingHandles (x1 y1 x2 y2 : ℝ) : BoundedEasingHandles :=
+  { x1 := mkBoundedEasingX x1
+  , y1 := mkBoundedEasingY y1
+  , x2 := mkBoundedEasingX x2
+  , y2 := mkBoundedEasingY y2 }
+
+/-- Maximum Y delta (approximates maximum acceleration) -/
+def easingMaxDelta (handles : BoundedEasingHandles) : ℝ :=
+  |handles.y1.value - 0| + |1 - handles.y2.value|
+
+/-- THEOREM: Easing handles are always bounded.
+    Malicious easing curves cannot escape the safe region. -/
+theorem easing_handles_bounded (rawX1 rawY1 rawX2 rawY2 : ℝ) :
+    let handles := mkBoundedEasingHandles rawX1 rawY1 rawX2 rawY2
+    0 ≤ handles.x1.value ∧ handles.x1.value ≤ 1 ∧
+    minEasingY ≤ handles.y1.value ∧ handles.y1.value ≤ maxEasingY ∧
+    0 ≤ handles.x2.value ∧ handles.x2.value ≤ 1 ∧
+    minEasingY ≤ handles.y2.value ∧ handles.y2.value ≤ maxEasingY := by
+  simp only [mkBoundedEasingHandles, mkBoundedEasingX, mkBoundedEasingY]
+  exact ⟨(clampEasingX_bounds _).1, (clampEasingX_bounds _).2,
+         (clampEasingY_bounds _).1, (clampEasingY_bounds _).2,
+         (clampEasingX_bounds _).1, (clampEasingX_bounds _).2,
+         (clampEasingY_bounds _).1, (clampEasingY_bounds _).2⟩
+
+/-- Maximum possible delta for any bounded handles -/
+def maxPossibleEasingDelta : ℝ := |minEasingY - 0| + |1 - maxEasingY|
+
+theorem maxPossibleEasingDelta_value : maxPossibleEasingDelta = 0.4 := by
+  simp only [maxPossibleEasingDelta, minEasingY, maxEasingY]
+  norm_num
+
+/-- THEOREM: Easing acceleration is bounded.
+    The "jerkiness" of any curve is limited.
+    
+    With Y bounds of [-0.2, 1.2]:
+    - |y1 - 0| ≤ 1.2 (max when y1 = 1.2)
+    - |1 - y2| ≤ 1.2 (max when y2 = -0.2)
+    - Sum ≤ 2.4, which is ≤ 0.4 + 1 + 1 = 2.4 -/
+theorem easing_acceleration_bounded (handles : BoundedEasingHandles) :
+    easingMaxDelta handles ≤ 2.4 := by
+  simp only [easingMaxDelta]
+  have hy1_lo := handles.y1.lower_bound
+  have hy1_hi := handles.y1.upper_bound
+  have hy2_lo := handles.y2.lower_bound
+  have hy2_hi := handles.y2.upper_bound
+  simp only [minEasingY, maxEasingY] at *
+  have h1 : |handles.y1.value - 0| ≤ 1.2 := by
+    rw [sub_zero, abs_le]
+    constructor <;> linarith
+  have h2 : |1 - handles.y2.value| ≤ 1.2 := by
+    rw [abs_le]
+    constructor <;> linarith
+  linarith
+
 end Hydrogen.WorldModel.SpatialIntegrity

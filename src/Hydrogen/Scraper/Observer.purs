@@ -64,9 +64,11 @@ import Effect.Exception (Error, message)
 import Hydrogen.Playwright as PW
 import Hydrogen.Playwright (BrowserType(Chromium), LoadState(NetworkIdle), Page, Locator)
 import Hydrogen.Scraper.Capture (CapturedState, captureElementState, captureAllElements)
-import Hydrogen.Scraper.Types.State (InteractionState)
+import Hydrogen.Scraper.Types.State (InteractionState(Default, Hover, Focus))
 import Hydrogen.Scraper.Wire.Parse as Parse
+import Data.DateTime.Instant (unInstant) as Instant
 import Data.Time.Duration (Milliseconds(Milliseconds))
+import Effect.Now (now) as Now
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                           // observe options
@@ -332,6 +334,9 @@ observe url = observeWithOptions url defaultObserveOptions
 -- | 6. Scroll and detect scroll-triggered changes
 observeWithOptions :: String -> ObserveOptions -> Aff PageObservation
 observeWithOptions url opts = do
+  -- Track start time
+  startInstant <- liftEffect Now.now
+  
   -- Launch browser
   browser <- PW.launch Chromium PW.defaultLaunchOptions
   page <- PW.newPage browser
@@ -346,7 +351,7 @@ observeWithOptions url opts = do
   
   -- Discover interactive elements
   discovered <- discoverInteractiveElements page
-  let limitedDiscovered = Array.filter (\_ -> true) discovered  -- TODO: limit
+  let limitedDiscovered = Array.take opts.maxElements discovered
   
   -- Capture all elements' initial state
   initialStates <- captureAllElements page
@@ -365,10 +370,16 @@ observeWithOptions url opts = do
   -- Close browser
   PW.close browser
   
+  -- Calculate elapsed time
+  endInstant <- liftEffect Now.now
+  let startMs = instantToMs startInstant
+      endMs = instantToMs endInstant
+      elapsedMs = endMs - startMs
+  
   pure
     { url: url
     , title: pageTitle
-    , observationTimeMs: opts.maxObservationTime  -- TODO: actual timing
+    , observationTimeMs: elapsedMs
     , viewportWidth: opts.viewportWidth
     , viewportHeight: opts.viewportHeight
     , pageHeight: parseIntOrZero pageHeightStr
@@ -377,6 +388,12 @@ observeWithOptions url opts = do
     , elements: observations
     , scrollTriggeredElements: scrollTriggered
     }
+  where
+    -- Convert Instant to milliseconds as Int
+    instantToMs :: _ -> Int
+    instantToMs instant = 
+      let (Milliseconds ms) = Instant.unInstant instant
+      in Int.floor ms
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                 // safe observation (no crash)
@@ -484,6 +501,9 @@ observeElement page opts discovered = do
       -- We don't click by default (could navigate away)
       -- activeState <- probeClick page loc opts sel
       
+      -- Compute transitions from state diffs
+      let transitions = computeTransitions sel defaultState hoverState focusState opts
+      
       pure
         { selector: sel
         , tagName: discovered.tagName
@@ -492,8 +512,61 @@ observeElement page opts discovered = do
         , hoverState: hoverState
         , focusState: focusState
         , activeState: Nothing
-        , transitions: []  -- TODO: compute from state diffs
+        , transitions: transitions
         }
+
+-- | Compute transitions from observed state changes
+-- |
+-- | Compares the default state with hover and focus states to detect
+-- | visual property changes. Each detected change creates an ObservedTransition.
+computeTransitions 
+  :: ElementSelector 
+  -> CapturedState 
+  -> Maybe CapturedState 
+  -> Maybe CapturedState 
+  -> ObserveOptions
+  -> Array ObservedTransition
+computeTransitions sel defaultState maybeHover maybeFocus opts =
+  hoverTransition <> focusTransition
+  where
+    -- Check if states differ (any visual property changed)
+    statesDiffer :: CapturedState -> CapturedState -> Boolean
+    statesDiffer a b =
+      -- Compare key visual properties
+      a.backgroundColor /= b.backgroundColor ||
+      a.color /= b.color ||
+      a.borderColor /= b.borderColor ||
+      a.opacity /= b.opacity ||
+      a.width /= b.width ||
+      a.height /= b.height
+    
+    -- Hover transition (default -> hover)
+    hoverTransition :: Array ObservedTransition
+    hoverTransition = case maybeHover of
+      Just hoverState | statesDiffer defaultState hoverState ->
+        [ { fromState: Default
+          , toState: Hover
+          , before: defaultState
+          , after: hoverState
+          , durationMs: opts.hoverDuration
+          , selector: sel
+          }
+        ]
+      _ -> []
+    
+    -- Focus transition (default -> focus)
+    focusTransition :: Array ObservedTransition
+    focusTransition = case maybeFocus of
+      Just focusState | statesDiffer defaultState focusState ->
+        [ { fromState: Default
+          , toState: Focus
+          , before: defaultState
+          , after: focusState
+          , durationMs: opts.focusWaitDuration
+          , selector: sel
+          }
+        ]
+      _ -> []
 
 -- | Probe hover state
 probeHover :: Page -> Locator -> ObserveOptions -> ElementSelector -> Aff (Maybe CapturedState)
@@ -529,30 +602,77 @@ probeFocus page loc opts sel tagName = do
     isFocusable t = t == "INPUT" || t == "TEXTAREA" || t == "SELECT" || t == "BUTTON" || t == "A"
 
 -- | Scroll through page and detect elements that change
+-- |
+-- | Scrolls through the page in increments, checking for elements that
+-- | have scroll-triggered animations (e.g., intersection observers, AOS library).
+-- | Returns selectors of elements that changed visual properties during scroll.
 scrollAndObserve :: Page -> ObserveOptions -> Aff (Array ElementSelector)
 scrollAndObserve page opts = do
   -- Get page height
   heightStr <- PW.evaluate page "document.documentElement.scrollHeight"
   let totalHeight = parseIntOrZero heightStr
-  let steps = totalHeight / opts.scrollIncrement
+  let scrollSteps = min (totalHeight / opts.scrollIncrement) 50  -- Cap at 50 steps
   
-  -- TODO: For each scroll position, check for elements entering viewport
-  -- and capture any scroll-triggered animations
+  -- Initialize scroll tracking by marking already-visible elements
+  _ <- PW.evaluate page detectVisibleElementsJs
   
-  -- For now, just scroll through
-  _ <- traverse (scrollToPosition page opts.scrollIncrement) (Array.range 0 (min steps 50))
+  -- Scroll through page, capturing elements that enter viewport
+  changedElements <- scrollAndCapture page opts scrollSteps
   
   -- Scroll back to top
   _ <- PW.evaluate page "window.scrollTo(0, 0)"
   
-  pure []  -- TODO: return elements that changed
+  -- Return selectors of elements that changed
+  pure changedElements
+  where
+    -- JavaScript to detect visible elements with scroll-triggered classes
+    detectVisibleElementsJs :: String
+    detectVisibleElementsJs = """
+      (function() {
+        const elements = document.querySelectorAll('[data-aos], [class*="animate-"], .aos-animate, .in-view, .visible');
+        return Array.from(elements).map(el => ({
+          selector: el.tagName + (el.id ? '#' + el.id : '') + (el.className ? '.' + el.className.split(' ')[0] : ''),
+          classList: Array.from(el.classList)
+        }));
+      })()
+    """
 
--- | Scroll to a position
-scrollToPosition :: Page -> Int -> Int -> Aff Unit
-scrollToPosition page increment step = do
-  let y = step * increment
+-- | Scroll through page and capture elements entering viewport
+scrollAndCapture :: Page -> ObserveOptions -> Int -> Aff (Array ElementSelector)
+scrollAndCapture page opts maxSteps = do
+  changedSelectors <- traverse (scrollStepAndCheck page opts) (Array.range 0 maxSteps)
+  pure (Array.filter (\s -> s /= "") changedSelectors)
+
+-- | Scroll to position and check for newly visible animated elements
+scrollStepAndCheck :: Page -> ObserveOptions -> Int -> Aff ElementSelector
+scrollStepAndCheck page opts step = do
+  let y = step * opts.scrollIncrement
+  
+  -- Scroll to position
   _ <- PW.evaluate page ("window.scrollTo(0, " <> show y <> ")")
-  delay (Milliseconds 100.0)  -- Brief pause to let animations trigger
+  
+  -- Brief pause for animations to trigger
+  delay (Milliseconds 100.0)
+  
+  -- Check for elements that just became visible and animated
+  result <- PW.evaluate page checkNewlyVisibleJs
+  
+  -- Return empty string if no new elements, otherwise return a selector
+  pure result
+  where
+    -- JavaScript to check for elements that just became visible
+    checkNewlyVisibleJs :: String
+    checkNewlyVisibleJs = """
+      (function() {
+        const animatedElements = document.querySelectorAll('.aos-animate:not([data-scroll-checked])');
+        if (animatedElements.length > 0) {
+          animatedElements.forEach(el => el.setAttribute('data-scroll-checked', 'true'));
+          const first = animatedElements[0];
+          return first.tagName + (first.id ? '#' + first.id : '');
+        }
+        return '';
+      })()
+    """
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                                  // helpers

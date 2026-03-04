@@ -61,7 +61,8 @@ import Data.Array as Array
 import Data.Enum (fromEnum)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Number (fromString)
-import Data.String (Pattern(Pattern), drop, dropWhile, indexOf, length, null, takeWhile)
+import Data.String (Pattern(Pattern), drop, dropWhile, indexOf, length, null, split, takeWhile, trim)
+import Data.String.CodePoints (codePointFromChar) as CP
 import Data.String.CodeUnits (charAt, singleton)
 import Data.String.CodePoints (CodePoint)
 import Data.Tuple (Tuple(Tuple))
@@ -538,8 +539,27 @@ parseEasingString str = case str of
       Nothing -> { name: "ease", cubicBezier: Just { x1: 0.25, y1: 0.1, x2: 0.25, y2: 1.0 }, steps: Nothing }
 
 -- | Parse cubic-bezier string
+-- |
+-- | Parses strings like "cubic-bezier(0.4, 0.0, 0.2, 1.0)" into control points.
+-- | Returns Nothing if the string doesn't match the expected format.
 parseCubicBezier :: String -> Maybe CubicBezierPoints
-parseCubicBezier _ = Nothing  -- TODO: implement with regex
+parseCubicBezier str =
+  -- Check if it starts with "cubic-bezier("
+  case indexOf (Pattern "cubic-bezier(") str of
+    Just 0 -> 
+      -- Extract the content between parentheses
+      let afterPrefix = drop 13 str  -- "cubic-bezier(" is 13 chars
+          closeParen = CP.codePointFromChar ')'
+          -- Find closing paren
+          content = takeWhile (\c -> c /= closeParen) afterPrefix
+          -- Split by comma
+          parts = split (Pattern ",") content
+          -- Parse each number
+          numbers = Array.mapMaybe (\s -> fromString (trim s)) parts
+      in case numbers of
+        [x1, y1, x2, y2] -> Just { x1, y1, x2, y2 }
+        _ -> Nothing
+    _ -> Nothing
 
 -- | Convert easing config to Hydrogen CubicBezierEasing
 easingToCubicBezier :: EasingConfig -> Maybe CubicBezierPoints

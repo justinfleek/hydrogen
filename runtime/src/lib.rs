@@ -56,6 +56,82 @@ mod tessellate;
 
 // New modules replacing JavaScript
 pub mod webgpu;
+pub mod capture;
+pub mod gesture;
+
+// WorldModel — The Trust Layer
+// Implements proofs from proofs/Hydrogen/WorldModel/*.lean
+// Exit guarantee, consent state machine, coercion detection
+pub mod worldmodel;
+
+// Auth — Bidirectional Authentication
+// System verifies entity (request provenance)
+// Entity verifies environment (code purity, mods, reputation)
+pub mod auth;
+
+// Crypto — BLAKE3 hashing, Ed25519 signatures
+// Pure Rust, WASM-compatible, matches hs-blake3 on Haskell backend
+pub mod crypto;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Browser API modules (replacing deprecated JavaScript FFI files)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// MediaQuery — Responsive breakpoints, user preferences, orientation
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Util_MediaQuery.js
+pub mod mediaquery;
+
+// Debounce — Rate limiting for events (resize, scroll, input)
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Util_Debounce.js
+pub mod debounce;
+
+// Storage — localStorage/sessionStorage with typed access
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Util_LocalStorage.js
+pub mod storage;
+
+// Router — History API navigation
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Router.js
+pub mod router;
+
+// SSE — Server-Sent Events
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Realtime_SSE.js
+pub mod sse;
+
+// WebSocket — Full-duplex communication
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Realtime_WebSocket.js
+pub mod websocket;
+
+// Intersection — Intersection Observer API
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Util_Intersection.js
+pub mod intersection;
+
+// Animation — requestAnimationFrame, timing functions
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Animation_Types.js
+pub mod animation;
+
+// Meta — Document head manipulation (title, meta tags, Open Graph)
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Head_Meta.js
+pub mod meta;
+
+// DOM — Element creation, manipulation, queries
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Target_DOM.js
+pub mod dom;
+
+// Events — Event listener management, event bus
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Event_Bus.js
+pub mod events;
+
+// Keyboard — Query functions and shortcut state machine
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_Util_Keyboard.js
+pub mod keyboard;
+
+// FocusTrap — Visibility/element query functions
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_UI_FocusTrap.js
+pub mod focus_trap;
+
+// AriaHider — ARIA hiding for modal dialogs
+// Replaces DEPRECATED_JS_REFERENCE/Hydrogen_UI_AriaHider.js
+pub mod aria_hider;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;

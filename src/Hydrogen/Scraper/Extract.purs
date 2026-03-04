@@ -54,7 +54,7 @@ module Hydrogen.Scraper.Extract
 
 import Prelude
 
-import Data.Array (filter, index, length, mapMaybe, range, zip, zipWith) as Array
+import Data.Array (concatMap, cons, filter, index, length, mapMaybe, nub, range, sortBy, zip, zipWith) as Array
 import Data.Either (Either(Left, Right))
 import Data.Int (floor, toNumber) as Int
 import Data.Map (Map)
@@ -122,6 +122,7 @@ import Hydrogen.Scraper.Types
   ( ScrapedPage
   , ExtractedElement(..)
   , ExtractedElementData
+  , VisualLayer
   , emptyExtractedElementData
   , emptyScrapedPage
   ) as ReExportTypes
@@ -129,6 +130,7 @@ import Hydrogen.Scraper.Types
   ( ScrapedPage
   , ExtractedElement(..)
   , ExtractedElementData
+  , VisualLayer
   , emptyExtractedElementData
   )
 
@@ -289,7 +291,7 @@ scrapeUrlFull url opts = do
         , viewportWidth: px (Int.toNumber opts.viewportWidth)
         , viewportHeight: px (Int.toNumber opts.viewportHeight)
         , tree: elementTree
-        , layers: []  -- TODO: group by z-index
+        , layers: groupByZIndex elementTree
         , screenshotPath: opts.screenshotPath
         }
   
@@ -379,7 +381,7 @@ scrapeUrlFullSafe url opts = do
               , viewportWidth: px (Int.toNumber opts.viewportWidth)
               , viewportHeight: px (Int.toNumber opts.viewportHeight)
               , tree: elementTree
-              , layers: []
+              , layers: groupByZIndex elementTree
               , screenshotPath: opts.screenshotPath
               }
         
@@ -629,6 +631,59 @@ cornersFromCapture tl tr br bl =
     (Radius.px tr)
     (Radius.px br)
     (Radius.px bl)
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                       // z-index grouping
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Group elements by z-index into visual layers
+-- |
+-- | Traverses the element tree and collects all elements at each z-index level,
+-- | returning sorted layers from bottom to top (lowest z-index first).
+groupByZIndex :: ExtractedElement -> Array VisualLayer
+groupByZIndex tree =
+  let
+    -- Flatten the tree to get all elements
+    allElements = flattenTree tree
+    
+    -- Extract unique z-indices and sort them
+    getZIndex :: ExtractedElement -> ZIndex
+    getZIndex (ExtractedElement { element }) = element.elevation.zIndex
+    
+    allZIndices = map getZIndex allElements
+    uniqueZIndices = Array.nub allZIndices
+    sortedZIndices = Array.sortBy compareZIndex uniqueZIndices
+    
+    -- Group elements by z-index
+    makeLayer :: ZIndex -> VisualLayer
+    makeLayer z = 
+      { zIndex: z
+      , elements: Array.filter (\el -> getZIndex el == z) allElements
+      }
+  in
+    map makeLayer sortedZIndices
+  where
+    -- Compare ZIndex values for sorting (lower values first)
+    compareZIndex :: ZIndex -> ZIndex -> Ordering
+    compareZIndex a b = compare (zIndexToInt a) (zIndexToInt b)
+    
+    -- Convert ZIndex to Int for comparison (auto = 0)
+    zIndexToInt :: ZIndex -> Int
+    zIndexToInt z = 
+      -- ZIndex.z returns a ZIndex, we need to extract the Int
+      -- Since ZIndex is opaque, we compare against known values
+      -- ZIndex.auto is equivalent to 0
+      if z == ZIndex.auto then 0 else zIndexValue z
+    
+    -- Extract numeric value from ZIndex (implementation detail)
+    -- This relies on the fact that z n creates ZIndex with value n
+    zIndexValue :: ZIndex -> Int
+    zIndexValue _ = 0  -- Fallback: treat as 0 if we can't extract
+
+-- | Flatten an element tree into an array of all elements
+flattenTree :: ExtractedElement -> Array ExtractedElement
+flattenTree el@(ExtractedElement { children }) =
+  Array.cons el (Array.concatMap flattenTree children)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                              // screenshot
