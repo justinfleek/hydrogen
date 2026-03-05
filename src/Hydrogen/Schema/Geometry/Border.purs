@@ -54,14 +54,13 @@
 -- | ```
 
 module Hydrogen.Schema.Geometry.Border
-  ( -- * Border Side (molecule)
+  (   -- * Border Side (molecule)
     BorderSide
   , side
   , sideNone
   , sideWidth
   , sideStyle
   , sideColor
-  , sideToCss
   
   -- * Border Edges (compound)
   , BorderEdges
@@ -73,7 +72,6 @@ module Hydrogen.Schema.Geometry.Border
   , edgesRight
   , edgesBottom
   , edgesLeft
-  , edgesToCss
   , edgesTopSide
   , edgesRightSide
   , edgesBottomSide
@@ -86,7 +84,6 @@ module Hydrogen.Schema.Geometry.Border
   , borderNone
   , borderEdges
   , borderCorners
-  , borderToCss
   
   -- * Operations
   , withWidth
@@ -112,19 +109,16 @@ import Hydrogen.Schema.Dimension.Stroke
   , strokeWidth
   , strokeWidthNone
   , strokeWidthValue
-  , strokeWidthToCss
   )
 import Hydrogen.Schema.Geometry.Stroke 
   ( StrokeStyle
       ( StyleNone
       )
-  , strokeStyleToCss
   )
 import Hydrogen.Schema.Geometry.Radius 
   ( Corners
   , cornersAll
   , none
-  , cornersToLegacyCss
   )
 import Hydrogen.Schema.Color.RGB as Color
 
@@ -168,19 +162,6 @@ sideStyle s = s.style
 -- | Get side color
 sideColor :: BorderSide -> Color.RGBA
 sideColor s = s.color
-
--- | Convert to legacy CSS shorthand: "width style color"
--- |
--- | NOT an FFI boundary - pure string generation.
-sideToLegacyCss :: BorderSide -> String
-sideToLegacyCss s =
-  if s.style == StyleNone
-    then "none"
-    else strokeWidthToCss s.width <> " " <> strokeStyleToCss s.style <> " " <> Color.toLegacyCssA s.color
-
--- | Legacy alias for sideToLegacyCss
-sideToCss :: BorderSide -> String
-sideToCss = sideToLegacyCss
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // border edges
@@ -279,43 +260,6 @@ edgesBottomSide e = e.bottom
 edgesLeftSide :: BorderEdges -> BorderSide
 edgesLeftSide e = e.left
 
--- | Convert to legacy CSS.
--- |
--- | Uses shorthand when possible:
--- | - All same: "1px solid black"
--- | - Top/bottom + left/right: "1px 2px"
--- | - Otherwise: individual properties
--- |
--- | NOT an FFI boundary - pure string generation.
-edgesToLegacyCss :: BorderEdges -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String }
-edgesToLegacyCss e =
-  let
-    topCss = sideToLegacyCss e.top
-    rightCss = sideToLegacyCss e.right
-    bottomCss = sideToLegacyCss e.bottom
-    leftCss = sideToLegacyCss e.left
-    allSame = topCss == rightCss && rightCss == bottomCss && bottomCss == leftCss
-  in
-    if allSame
-      then 
-        { border: topCss
-        , borderTop: ""
-        , borderRight: ""
-        , borderBottom: ""
-        , borderLeft: ""
-        }
-      else
-        { border: ""
-        , borderTop: topCss
-        , borderRight: rightCss
-        , borderBottom: bottomCss
-        , borderLeft: leftCss
-        }
-
--- | Legacy alias for edgesToLegacyCss
-edgesToCss :: BorderEdges -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String }
-edgesToCss = edgesToLegacyCss
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // border (full)
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -365,25 +309,6 @@ borderEdges b = b.edges
 -- | Get corners
 borderCorners :: Border -> Corners
 borderCorners b = b.corners
-
--- | Convert to legacy CSS properties.
--- |
--- | NOT an FFI boundary - pure string generation.
-borderToLegacyCss :: Border -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String, borderRadius :: String }
-borderToLegacyCss b =
-  let edgesCss = edgesToLegacyCss b.edges
-  in
-    { border: edgesCss.border
-    , borderTop: edgesCss.borderTop
-    , borderRight: edgesCss.borderRight
-    , borderBottom: edgesCss.borderBottom
-    , borderLeft: edgesCss.borderLeft
-    , borderRadius: cornersToLegacyCss b.corners
-    }
-
--- | Legacy alias for borderToLegacyCss
-borderToCss :: Border -> { border :: String, borderTop :: String, borderRight :: String, borderBottom :: String, borderLeft :: String, borderRadius :: String }
-borderToCss = borderToLegacyCss
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

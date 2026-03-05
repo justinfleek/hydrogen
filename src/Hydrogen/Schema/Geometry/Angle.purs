@@ -104,9 +104,7 @@ module Hydrogen.Schema.Geometry.Angle
   , isStraight
   , isReflex
   
-  -- * Conversion
-  , toLegacyCss
-  , toRotateCss
+
   
   -- * Bounds
   , degreesBounds
@@ -474,24 +472,6 @@ isStraight (Degrees d) = d == 180.0
 -- | Is angle reflex (> 180 degrees)?
 isReflex :: Degrees -> Boolean
 isReflex (Degrees d) = d > 180.0
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert angle to legacy CSS string.
--- |
--- | Returns degrees format for maximum compatibility.
-toLegacyCss :: Degrees -> String
-toLegacyCss (Degrees d) = show d <> "deg"
-
--- | Convert angle to CSS rotate() transform value.
--- |
--- | ```purescript
--- | toRotateCss (degrees 45.0) == "rotate(45deg)"
--- | ```
-toRotateCss :: Degrees -> String
-toRotateCss d = "rotate(" <> toLegacyCss d <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // bounds

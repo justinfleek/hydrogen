@@ -41,8 +41,8 @@
 -- | defaultZ :: ZIndex.ZIndex
 -- | defaultZ = ZIndex.auto
 -- |
--- | -- Convert to CSS
--- | css = ZIndex.toLegacyCss dropdownZ  -- "100"
+-- | -- Extract integer value
+-- | zValue = ZIndex.toInt dropdownZ  -- 100
 -- | ```
 
 module Hydrogen.Schema.Elevation.ZIndex
@@ -65,9 +65,7 @@ module Hydrogen.Schema.Elevation.ZIndex
   , increment
   , decrement
   
-  -- * Conversion (Legacy string generation, NOT FFI)
-  , toLegacyCss
-  , isolationToLegacyCss
+  -- * Conversion
   , toInt
   
   -- * Predicates
@@ -88,6 +86,7 @@ import Prelude
   , (-)
   , (<)
   , (>)
+  , (<>)
   )
 
 import Data.Ordering (Ordering(LT, GT, EQ))
@@ -127,7 +126,8 @@ instance ordZIndex :: Ord ZIndex where
   compare (ZIndexValue a) (ZIndexValue b) = compare a b
 
 instance showZIndex :: Show ZIndex where
-  show = toLegacyCss
+  show ZIndexAuto = "ZIndexAuto"
+  show (ZIndexValue n) = "ZIndexValue " <> show n
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -190,21 +190,7 @@ decrement delta = increment (negate delta)
 --                                                                 // conversion
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert to legacy CSS string.
--- |
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: ZIndex -> String
-toLegacyCss ZIndexAuto = "auto"
-toLegacyCss (ZIndexValue n) = show n
-
--- | Convert isolation mode to CSS string.
--- |
--- | NOT an FFI boundary - pure string generation.
-isolationToLegacyCss :: IsolationMode -> String
-isolationToLegacyCss Isolate = "isolate"
-isolationToLegacyCss IsolationAuto = "auto"
-
--- | Extract integer value (Nothing for auto)
+-- | Extract integer value (0 for auto)
 toInt :: ZIndex -> Int
 toInt ZIndexAuto = 0
 toInt (ZIndexValue n) = n

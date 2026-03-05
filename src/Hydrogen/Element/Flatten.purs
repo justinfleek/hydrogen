@@ -62,7 +62,7 @@ module Hydrogen.Element.Flatten
 
 -- Element.Core: the correct Element type
 import Hydrogen.Element.Core
-  ( Element(Rectangle, Ellipse, Path, Text, Image, Video, Audio, Model3D, Group, Transform, Empty)
+  ( Element(Rectangle, Ellipse, Path, Polygon, Star, Ring, Spiral, Arrow, Cross, Gear, Line, Text, Image, Video, Audio, Model3D, Group, Transform, Empty)
   )
 
 -- Submodules
@@ -76,6 +76,14 @@ import Hydrogen.Element.Flatten.Shape
   ( flattenRectangle
   , flattenEllipse
   , flattenPath
+  , flattenPolygon
+  , flattenStar
+  , flattenRing
+  , flattenSpiral
+  , flattenArrow
+  , flattenCross
+  , flattenGear
+  , flattenLine
   )
 
 import Hydrogen.Element.Flatten.Text
@@ -132,6 +140,30 @@ flattenWithState state element = case element of
   
   Path spec ->
     flattenPath state spec
+  
+  Polygon spec ->
+    flattenPolygon state spec
+  
+  Star spec ->
+    flattenStar state spec
+  
+  Ring spec ->
+    flattenRing state spec
+  
+  Spiral spec ->
+    flattenSpiral state spec
+  
+  Arrow spec ->
+    flattenArrow state spec
+  
+  Cross spec ->
+    flattenCross state spec
+  
+  Gear spec ->
+    flattenGear state spec
+  
+  Line spec ->
+    flattenLine state spec
   
   Text spec ->
     flattenText state spec

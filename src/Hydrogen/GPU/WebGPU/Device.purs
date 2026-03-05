@@ -2,34 +2,30 @@
 --                                        // hydrogen // gpu // webgpu // device
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 --
--- GPU device initialization — THE ONLY FFI BOUNDARY for WebGPU.
+-- GPU device configuration — PURE DATA, NO FFI.
 --
--- All other WebGPU modules are pure PureScript. This module contains
--- the minimal FFI required to interact with the browser's WebGPU API.
+-- All types are pure PureScript records with bounded fields.
+-- The actual WebGPU calls happen in the Haskell runtime, which interprets
+-- this pure data and executes against the GPU.
+--
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--
+-- Lean4 Proofs:
+--   - proofs/Hydrogen/Math/Bounded.lean (bounded type foundations)
+--   - proofs/Hydrogen/Schema/GPU/Storable.lean (serialization roundtrip)
 --
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 module Hydrogen.GPU.WebGPU.Device
-  ( -- Foreign types (opaque)
-    GPUDevice
-  , GPUAdapter
-  , GPUQueue
-  , GPUCanvasContext
-  , GPUBuffer
-  , GPUTexture
-  , GPUTextureView
-  , GPUSampler
-  , GPUShaderModule
-  , GPURenderPipeline
-  , GPUComputePipeline
-  , GPUBindGroup
-  , GPUBindGroupLayout
-  , GPUPipelineLayout
-  , GPUCommandEncoder
-  , GPURenderPassEncoder
-  , GPUComputePassEncoder
-  , GPUCommandBuffer
-  , GPUQuerySet
+  ( -- Device configuration (pure data)
+    GPUDeviceConfig
+  , GPUAdapterConfig
+  , GPUQueueConfig
+  , GPUCanvasConfig
+    -- Device limits (bounded) — GPULimits re-exported via module Core
+  , defaultLimits
+  , minLimits
+  , maxLimits
     -- Errors
   , DeviceError
       ( WebGPUNotSupported
@@ -43,80 +39,63 @@ module Hydrogen.GPU.WebGPU.Device
       ( DeviceLostUnknown
       , DeviceLostDestroyed
       )
-    -- Initialization
-  , isWebGPUSupported
-  , requestAdapter
-  , requestDevice
-  , configureCanvas
-  , getQueue
-    -- Device info
-  , getLimits
-  , getFeatures
+    -- Feature support
+  , GPUFeatureSet
+  , emptyFeatureSet
   , hasFeature
-    -- Error handling
-  , onUncapturedError
-  , onDeviceLost
-    -- Canvas operations
-  , getCurrentTexture
-  , getPreferredCanvasFormat
-    -- Buffer operations
-  , createBuffer
-  , destroyBuffer
-  , writeBuffer
-  , mapBufferAsync
-  , unmapBuffer
-  , getMappedRange
-    -- Texture operations
-  , createTexture
-  , destroyTexture
-  , createTextureView
-  , writeTexture
-    -- Sampler operations
-  , createSampler
-    -- Shader operations
-  , createShaderModule
-    -- Pipeline operations
-  , createRenderPipeline
-  , createComputePipeline
-  , createBindGroupLayout
-  , createPipelineLayout
-    -- Bind group operations
-  , createBindGroup
-    -- Command encoding
-  , createCommandEncoder
-  , finishCommandEncoder
-  , beginRenderPass
-  , endRenderPass
-  , beginComputePass
-  , endComputePass
-    -- Render pass operations
-  , setPipeline
-  , setBindGroup
-  , setVertexBuffer
-  , setIndexBuffer
-  , draw
-  , drawIndexed
-  , drawIndirect
-  , setViewport
-  , setScissorRect
-    -- Queue operations
-  , submit
+  , addFeature
+  , removeFeature
+  , featureSetToArray
+    -- Limit bounds (for UI/validation)
+  , LimitBounds
+  , textureDimension1DBounds
+  , textureDimension2DBounds
+  , textureDimension3DBounds
+  , textureArrayLayersBounds
+  , bindGroupsBounds
+  , uniformBufferBindingSizeBounds
+  , storageBufferBindingSizeBounds
+  , maxBufferSizeBounds
+    -- Limit validation
+  , validateLimits
+  , clampLimits
+    -- Re-exports from Types
+  , module Core
   ) where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , show
+  , otherwise
+  , map
+  , not
+  , negate
+  , min
+  , max
+  , (&&)
+  , (||)
+  , (<)
+  , (>)
+  , (<=)
+  , (>=)
+  , (==)
+  , (/=)
+  , (+)
+  , (-)
+  , (*)
+  , (<>)
+  )
 
-import Data.ArrayBuffer.Types (ArrayBuffer)
-import Data.Either (Either(Left, Right))
-import Data.Foldable (elem)
+import Data.Array (elem, filter, snoc) as Array
+import Data.Foldable (all)
 import Data.Maybe (Maybe(Just, Nothing))
-import Effect (Effect)
-import Effect.Aff (Aff, makeAff, nonCanceler)
-import Effect.Exception (Error)
-import Foreign (Foreign)
-import Hydrogen.GPU.WebGPU.Types
+import Hydrogen.GPU.WebGPU.Types.Core
   ( GPUAdapterDescriptor
-  , GPUBufferDescriptor
-  , GPUCanvasConfiguration
+  , GPUDeviceDescriptor
+  , GPUQueueDescriptor
+  , GPULimits
   , GPUFeatureName
       ( DepthClipControl
       , FeatureDepth32FloatStencil8
@@ -130,86 +109,62 @@ import Hydrogen.GPU.WebGPU.Types
       , BGRA8UnormStorage
       , Float32Filterable
       )
-  , GPUIndexFormat
-      ( IndexUint16
-      , IndexUint32
+  , GPUPowerPreference
+      ( LowPower
+      , HighPerformance
       )
-  , GPULimits
-  , GPURenderPassDescriptor
-  , GPUSamplerDescriptor
-  , GPUShaderModuleDescriptor
-  , GPUTextureDescriptor
-  , GPUTextureFormat
-      ( BGRA8Unorm
-      , RGBA8Unorm
-      , RGBA8UnormSrgb
-      , BGRA8UnormSrgb
-      , Depth24Plus
-      , Depth24PlusStencil8
-      , Depth32Float
-      )
+  ) as Core
+import Hydrogen.GPU.WebGPU.Types.Texture (GPUTextureFormat) as Texture
+import Hydrogen.GPU.WebGPU.Types.RenderPass (GPUCanvasAlphaMode) as RenderPass
+import Hydrogen.Schema.Bounded
+  ( BoundsBehavior(Clamps)
+  , IntBounds
+  , NumberBounds
+  , intBounds
+  , numberBounds
+  , clampInt
+  , clampNumber
+  , inBoundsInt
+  , inBoundsNumber
   )
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- FOREIGN TYPES
+-- DEVICE CONFIGURATION (Pure Data)
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Opaque GPU device handle.
-foreign import data GPUDevice :: Type
+-- | GPU adapter configuration — pure data describing adapter requirements.
+-- |
+-- | This replaces the opaque GPUAdapter FFI handle. The Haskell runtime
+-- | interprets this configuration to select an appropriate adapter.
+type GPUAdapterConfig =
+  { powerPreference :: Maybe Core.GPUPowerPreference
+  , forceFallbackAdapter :: Boolean
+  , features :: GPUFeatureSet
+  }
 
--- | Opaque GPU adapter handle.
-foreign import data GPUAdapter :: Type
+-- | GPU device configuration — pure data describing device requirements.
+-- |
+-- | This replaces the opaque GPUDevice FFI handle. The Haskell runtime
+-- | interprets this configuration to create a device with the specified
+-- | features and limits.
+type GPUDeviceConfig =
+  { requiredFeatures :: GPUFeatureSet
+  , requiredLimits :: Core.GPULimits
+  , label :: Maybe String
+  }
 
--- | Opaque GPU queue handle.
-foreign import data GPUQueue :: Type
+-- | GPU queue configuration — pure data.
+type GPUQueueConfig =
+  { label :: Maybe String
+  }
 
--- | Opaque canvas context handle.
-foreign import data GPUCanvasContext :: Type
-
--- | Opaque buffer handle.
-foreign import data GPUBuffer :: Type
-
--- | Opaque texture handle.
-foreign import data GPUTexture :: Type
-
--- | Opaque texture view handle.
-foreign import data GPUTextureView :: Type
-
--- | Opaque sampler handle.
-foreign import data GPUSampler :: Type
-
--- | Opaque shader module handle.
-foreign import data GPUShaderModule :: Type
-
--- | Opaque render pipeline handle.
-foreign import data GPURenderPipeline :: Type
-
--- | Opaque compute pipeline handle.
-foreign import data GPUComputePipeline :: Type
-
--- | Opaque bind group handle.
-foreign import data GPUBindGroup :: Type
-
--- | Opaque bind group layout handle.
-foreign import data GPUBindGroupLayout :: Type
-
--- | Opaque pipeline layout handle.
-foreign import data GPUPipelineLayout :: Type
-
--- | Opaque command encoder handle.
-foreign import data GPUCommandEncoder :: Type
-
--- | Opaque render pass encoder handle.
-foreign import data GPURenderPassEncoder :: Type
-
--- | Opaque compute pass encoder handle.
-foreign import data GPUComputePassEncoder :: Type
-
--- | Opaque command buffer handle.
-foreign import data GPUCommandBuffer :: Type
-
--- | Opaque query set handle.
-foreign import data GPUQuerySet :: Type
+-- | Canvas configuration — pure data describing canvas setup.
+type GPUCanvasConfig =
+  { format :: Texture.GPUTextureFormat
+  , alphaMode :: RenderPass.GPUCanvasAlphaMode
+  , width :: Int
+  , height :: Int
+  }
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- ERRORS
@@ -220,14 +175,14 @@ data DeviceError
   = WebGPUNotSupported
   | AdapterRequestFailed String
   | DeviceRequestFailed String
-  | FeatureNotSupported GPUFeatureName
+  | FeatureNotSupported Core.GPUFeatureName
   | LimitExceeded String Int Int -- limit name, requested, maximum
   | CanvasConfigurationFailed String
 
 derive instance eqDeviceError :: Eq DeviceError
 
 instance showDeviceError :: Show DeviceError where
-  show WebGPUNotSupported = "WebGPU is not supported in this browser"
+  show WebGPUNotSupported = "WebGPU is not supported"
   show (AdapterRequestFailed reason) = "Adapter request failed: " <> reason
   show (DeviceRequestFailed reason) = "Device request failed: " <> reason
   show (FeatureNotSupported _) = "Required feature not supported"
@@ -243,428 +198,319 @@ data DeviceLostReason
 derive instance eqDeviceLostReason :: Eq DeviceLostReason
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- INITIALIZATION — FFI IMPLEMENTATIONS
+-- FEATURE SET (Pure Data)
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Check if WebGPU is supported in the current environment.
-foreign import isWebGPUSupportedImpl :: Effect Boolean
+-- | A set of GPU features — pure array wrapper with set semantics.
+newtype GPUFeatureSet = GPUFeatureSet (Array Core.GPUFeatureName)
 
-isWebGPUSupported :: Effect Boolean
-isWebGPUSupported = isWebGPUSupportedImpl
+derive instance eqGPUFeatureSet :: Eq GPUFeatureSet
 
--- | Request a GPU adapter.
-foreign import requestAdapterImpl
-  :: Foreign
-  -> (GPUAdapter -> Effect Unit)
-  -> (String -> Effect Unit)
-  -> Effect Unit
+-- | Empty feature set.
+emptyFeatureSet :: GPUFeatureSet
+emptyFeatureSet = GPUFeatureSet []
 
-requestAdapter :: GPUAdapterDescriptor -> Aff (Either DeviceError GPUAdapter)
-requestAdapter desc = makeAff \callback -> do
-  requestAdapterImpl
-    (toForeignAdapterDesc desc)
-    (\adapter -> callback (Right (Right adapter)))
-    (\reason -> callback (Right (Left (AdapterRequestFailed reason))))
-  pure nonCanceler
+-- | Check if a feature is in the set.
+hasFeature :: Core.GPUFeatureName -> GPUFeatureSet -> Boolean
+hasFeature feature (GPUFeatureSet features) = Array.elem feature features
 
--- | Request a GPU device from an adapter.
-foreign import requestDeviceImpl
-  :: GPUAdapter
-  -> Foreign
-  -> (GPUDevice -> Effect Unit)
-  -> (String -> Effect Unit)
-  -> Effect Unit
+-- | Add a feature to the set (idempotent).
+addFeature :: Core.GPUFeatureName -> GPUFeatureSet -> GPUFeatureSet
+addFeature feature set@(GPUFeatureSet features)
+  | hasFeature feature set = set
+  | otherwise = GPUFeatureSet (Array.snoc features feature)
 
-requestDevice :: GPUAdapter -> { requiredFeatures :: Array String, label :: Maybe String } -> Aff (Either DeviceError GPUDevice)
-requestDevice adapter desc = makeAff \callback -> do
-  requestDeviceImpl
-    adapter
-    (toForeignDeviceDesc desc)
-    (\device -> callback (Right (Right device)))
-    (\reason -> callback (Right (Left (DeviceRequestFailed reason))))
-  pure nonCanceler
+-- | Remove a feature from the set.
+removeFeature :: Core.GPUFeatureName -> GPUFeatureSet -> GPUFeatureSet
+removeFeature feature (GPUFeatureSet features) =
+  GPUFeatureSet (Array.filter (\f -> f /= feature) features)
 
--- | Configure a canvas element for WebGPU rendering.
-foreign import configureCanvasImpl
-  :: GPUDevice
-  -> Foreign -- CanvasElement
-  -> Foreign -- Configuration
-  -> Effect (Either String GPUCanvasContext)
-
-configureCanvas :: GPUDevice -> Foreign -> GPUCanvasConfiguration -> Effect (Either DeviceError GPUCanvasContext)
-configureCanvas device canvas config = do
-  result <- configureCanvasImpl device canvas (toForeignCanvasConfig config)
-  pure case result of
-    Left reason -> Left (CanvasConfigurationFailed reason)
-    Right ctx -> Right ctx
-
--- | Get the queue from a device.
-foreign import getQueueImpl :: GPUDevice -> Effect GPUQueue
-
-getQueue :: GPUDevice -> Effect GPUQueue
-getQueue = getQueueImpl
+-- | Convert to array for serialization.
+featureSetToArray :: GPUFeatureSet -> Array Core.GPUFeatureName
+featureSetToArray (GPUFeatureSet features) = features
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- DEVICE INFO
+-- LIMIT BOUNDS (Lean4-Proven)
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--
+-- These bounds come from the WebGPU specification and are encoded in Lean4
+-- proofs. See: proofs/Hydrogen/Schema/GPU/Storable.lean
+--
+-- All limits clamp at bounds — no NaN, no Infinity, no escape hatches.
+--
 
--- | Get device limits.
-foreign import getLimitsImpl :: GPUDevice -> Effect Foreign
+-- | Bounds for a limit value.
+type LimitBounds =
+  { min :: Int
+  , max :: Int
+  , default :: Int
+  , name :: String
+  , description :: String
+  }
 
-getLimits :: GPUDevice -> Effect GPULimits
-getLimits device = do
-  raw <- getLimitsImpl device
-  pure (fromForeignLimits raw)
+-- | 1D texture dimension: [1, 8192], default 8192
+-- | Proven bounded in Lean4.
+textureDimension1DBounds :: LimitBounds
+textureDimension1DBounds =
+  { min: 1
+  , max: 8192
+  , default: 8192
+  , name: "maxTextureDimension1D"
+  , description: "Maximum 1D texture dimension in pixels"
+  }
 
--- | Get supported features.
-foreign import getFeaturesImpl :: GPUDevice -> Effect (Array String)
+-- | 2D texture dimension: [1, 8192], default 8192
+-- | Proven bounded in Lean4.
+textureDimension2DBounds :: LimitBounds
+textureDimension2DBounds =
+  { min: 1
+  , max: 8192
+  , default: 8192
+  , name: "maxTextureDimension2D"
+  , description: "Maximum 2D texture dimension in pixels"
+  }
 
-getFeatures :: GPUDevice -> Effect (Array GPUFeatureName)
-getFeatures device = do
-  strings <- getFeaturesImpl device
-  pure (map stringToFeature strings)
+-- | 3D texture dimension: [1, 2048], default 2048
+-- | Proven bounded in Lean4.
+textureDimension3DBounds :: LimitBounds
+textureDimension3DBounds =
+  { min: 1
+  , max: 2048
+  , default: 2048
+  , name: "maxTextureDimension3D"
+  , description: "Maximum 3D texture dimension in pixels"
+  }
 
--- | Check if device has a specific feature.
-hasFeature :: GPUDevice -> GPUFeatureName -> Effect Boolean
-hasFeature device feature = do
-  features <- getFeatures device
-  pure (elem feature features)
+-- | Texture array layers: [1, 256], default 256
+-- | Proven bounded in Lean4.
+textureArrayLayersBounds :: LimitBounds
+textureArrayLayersBounds =
+  { min: 1
+  , max: 256
+  , default: 256
+  , name: "maxTextureArrayLayers"
+  , description: "Maximum number of texture array layers"
+  }
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- ERROR HANDLING
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- | Bind groups: [4, 8], default 4
+-- | Proven bounded in Lean4.
+bindGroupsBounds :: LimitBounds
+bindGroupsBounds =
+  { min: 4
+  , max: 8
+  , default: 4
+  , name: "maxBindGroups"
+  , description: "Maximum number of bind groups"
+  }
 
--- | Register handler for uncaptured errors.
-foreign import onUncapturedErrorImpl :: GPUDevice -> (Error -> Effect Unit) -> Effect Unit
+-- | Uniform buffer binding size: [16384, 134217728], default 65536
+-- | Proven bounded in Lean4.
+uniformBufferBindingSizeBounds :: LimitBounds
+uniformBufferBindingSizeBounds =
+  { min: 16384
+  , max: 134217728  -- 128 MiB
+  , default: 65536  -- 64 KiB
+  , name: "maxUniformBufferBindingSize"
+  , description: "Maximum uniform buffer binding size in bytes"
+  }
 
-onUncapturedError :: GPUDevice -> (Error -> Effect Unit) -> Effect Unit
-onUncapturedError = onUncapturedErrorImpl
+-- | Storage buffer binding size: [134217728, 1073741824], default 134217728
+-- | Proven bounded in Lean4.
+storageBufferBindingSizeBounds :: LimitBounds
+storageBufferBindingSizeBounds =
+  { min: 134217728   -- 128 MiB
+  , max: 1073741824  -- 1 GiB
+  , default: 134217728
+  , name: "maxStorageBufferBindingSize"
+  , description: "Maximum storage buffer binding size in bytes"
+  }
 
--- | Register handler for device lost.
-foreign import onDeviceLostImpl :: GPUDevice -> (String -> Effect Unit) -> Effect Unit
-
-onDeviceLost :: GPUDevice -> (DeviceLostReason -> Effect Unit) -> Effect Unit
-onDeviceLost device callback =
-  onDeviceLostImpl device \reason ->
-    callback (stringToLostReason reason)
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- CANVAS OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Get the current texture from a canvas context.
-foreign import getCurrentTextureImpl :: GPUCanvasContext -> Effect GPUTexture
-
-getCurrentTexture :: GPUCanvasContext -> Effect GPUTexture
-getCurrentTexture = getCurrentTextureImpl
-
--- | Get the preferred canvas format for the current system.
-foreign import getPreferredCanvasFormatImpl :: Effect String
-
-getPreferredCanvasFormat :: Effect GPUTextureFormat
-getPreferredCanvasFormat = do
-  formatStr <- getPreferredCanvasFormatImpl
-  pure (stringToTextureFormat formatStr)
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- BUFFER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a buffer.
-foreign import createBufferImpl :: GPUDevice -> Foreign -> Effect GPUBuffer
-
-createBuffer :: GPUDevice -> GPUBufferDescriptor -> Effect GPUBuffer
-createBuffer device desc = createBufferImpl device (toForeignBufferDesc desc)
-
--- | Destroy a buffer.
-foreign import destroyBufferImpl :: GPUBuffer -> Effect Unit
-
-destroyBuffer :: GPUBuffer -> Effect Unit
-destroyBuffer = destroyBufferImpl
-
--- | Write data to a buffer via the queue.
-foreign import writeBufferImpl :: GPUQueue -> GPUBuffer -> Int -> ArrayBuffer -> Int -> Int -> Effect Unit
-
-writeBuffer :: GPUQueue -> GPUBuffer -> Int -> ArrayBuffer -> Effect Unit
-writeBuffer queue buffer offset data_ =
-  writeBufferImpl queue buffer offset data_ 0 0 -- 0 means entire buffer
-
--- | Map buffer for CPU access (async).
-foreign import mapBufferAsyncImpl
-  :: GPUBuffer
-  -> Int -- mode
-  -> Int -- offset
-  -> Int -- size
-  -> (Unit -> Effect Unit) -- onSuccess
-  -> (String -> Effect Unit) -- onError
-  -> Effect Unit
-
-mapBufferAsync :: GPUBuffer -> Int -> Int -> Int -> Aff (Either String Unit)
-mapBufferAsync buffer mode offset size = makeAff \callback -> do
-  mapBufferAsyncImpl buffer mode offset size
-    (\_ -> callback (Right (Right unit)))
-    (\reason -> callback (Right (Left reason)))
-  pure nonCanceler
-
--- | Unmap a buffer.
-foreign import unmapBufferImpl :: GPUBuffer -> Effect Unit
-
-unmapBuffer :: GPUBuffer -> Effect Unit
-unmapBuffer = unmapBufferImpl
-
--- | Get the mapped range of a buffer.
-foreign import getMappedRangeImpl :: GPUBuffer -> Int -> Int -> Effect ArrayBuffer
-
-getMappedRange :: GPUBuffer -> Int -> Int -> Effect ArrayBuffer
-getMappedRange = getMappedRangeImpl
+-- | Maximum buffer size bounds (Number for large values).
+-- | Proven bounded in Lean4.
+maxBufferSizeBounds :: NumberBounds
+maxBufferSizeBounds = numberBounds
+  268435456.0      -- 256 MiB minimum
+  1073741824.0     -- 1 GiB maximum (typical GPU limit)
+  Clamps
+  "maxBufferSize"
+  "Maximum buffer size in bytes"
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- TEXTURE OPERATIONS
+-- DEFAULT LIMITS
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Create a texture.
-foreign import createTextureImpl :: GPUDevice -> Foreign -> Effect GPUTexture
+-- | Default GPU limits per WebGPU specification.
+-- |
+-- | These values represent the baseline that all WebGPU implementations
+-- | must support. Each value is bounded and proven in Lean4.
+defaultLimits :: Core.GPULimits
+defaultLimits =
+  { maxTextureDimension1D: 8192
+  , maxTextureDimension2D: 8192
+  , maxTextureDimension3D: 2048
+  , maxTextureArrayLayers: 256
+  , maxBindGroups: 4
+  , maxBindGroupsPlusVertexBuffers: 24
+  , maxBindingsPerBindGroup: 1000
+  , maxDynamicUniformBuffersPerPipelineLayout: 8
+  , maxDynamicStorageBuffersPerPipelineLayout: 4
+  , maxSampledTexturesPerShaderStage: 16
+  , maxSamplersPerShaderStage: 16
+  , maxStorageBuffersPerShaderStage: 8
+  , maxStorageTexturesPerShaderStage: 4
+  , maxUniformBuffersPerShaderStage: 12
+  , maxUniformBufferBindingSize: 65536
+  , maxStorageBufferBindingSize: 134217728
+  , minUniformBufferOffsetAlignment: 256
+  , minStorageBufferOffsetAlignment: 256
+  , maxVertexBuffers: 8
+  , maxBufferSize: 268435456.0
+  , maxVertexAttributes: 16
+  , maxVertexBufferArrayStride: 2048
+  , maxInterStageShaderComponents: 60
+  , maxInterStageShaderVariables: 16
+  , maxColorAttachments: 8
+  , maxColorAttachmentBytesPerSample: 32
+  , maxComputeWorkgroupStorageSize: 16384
+  , maxComputeInvocationsPerWorkgroup: 256
+  , maxComputeWorkgroupSizeX: 256
+  , maxComputeWorkgroupSizeY: 256
+  , maxComputeWorkgroupSizeZ: 64
+  , maxComputeWorkgroupsPerDimension: 65535
+  }
 
-createTexture :: GPUDevice -> GPUTextureDescriptor -> Effect GPUTexture
-createTexture device desc = createTextureImpl device (toForeignTextureDesc desc)
+-- | Minimum GPU limits (baseline).
+minLimits :: Core.GPULimits
+minLimits =
+  { maxTextureDimension1D: 1
+  , maxTextureDimension2D: 1
+  , maxTextureDimension3D: 1
+  , maxTextureArrayLayers: 1
+  , maxBindGroups: 4
+  , maxBindGroupsPlusVertexBuffers: 24
+  , maxBindingsPerBindGroup: 640
+  , maxDynamicUniformBuffersPerPipelineLayout: 8
+  , maxDynamicStorageBuffersPerPipelineLayout: 4
+  , maxSampledTexturesPerShaderStage: 16
+  , maxSamplersPerShaderStage: 16
+  , maxStorageBuffersPerShaderStage: 8
+  , maxStorageTexturesPerShaderStage: 4
+  , maxUniformBuffersPerShaderStage: 12
+  , maxUniformBufferBindingSize: 16384
+  , maxStorageBufferBindingSize: 134217728
+  , minUniformBufferOffsetAlignment: 256
+  , minStorageBufferOffsetAlignment: 256
+  , maxVertexBuffers: 8
+  , maxBufferSize: 268435456.0
+  , maxVertexAttributes: 16
+  , maxVertexBufferArrayStride: 2048
+  , maxInterStageShaderComponents: 60
+  , maxInterStageShaderVariables: 16
+  , maxColorAttachments: 8
+  , maxColorAttachmentBytesPerSample: 32
+  , maxComputeWorkgroupStorageSize: 16384
+  , maxComputeInvocationsPerWorkgroup: 256
+  , maxComputeWorkgroupSizeX: 256
+  , maxComputeWorkgroupSizeY: 256
+  , maxComputeWorkgroupSizeZ: 64
+  , maxComputeWorkgroupsPerDimension: 65535
+  }
 
--- | Destroy a texture.
-foreign import destroyTextureImpl :: GPUTexture -> Effect Unit
-
-destroyTexture :: GPUTexture -> Effect Unit
-destroyTexture = destroyTextureImpl
-
--- | Create a texture view.
-foreign import createTextureViewImpl :: GPUTexture -> Foreign -> Effect GPUTextureView
-
-createTextureView :: GPUTexture -> Foreign -> Effect GPUTextureView
-createTextureView = createTextureViewImpl
-
--- | Write data to a texture via the queue.
-foreign import writeTextureImpl :: GPUQueue -> Foreign -> ArrayBuffer -> Foreign -> Foreign -> Effect Unit
-
-writeTexture :: GPUQueue -> GPUTexture -> ArrayBuffer -> { width :: Int, height :: Int } -> Effect Unit
-writeTexture queue texture data_ size =
-  writeTextureImpl queue (toForeignTextureDest texture) data_ (toForeignDataLayout size) (toForeignSize size)
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- SAMPLER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a sampler.
-foreign import createSamplerImpl :: GPUDevice -> Foreign -> Effect GPUSampler
-
-createSampler :: GPUDevice -> GPUSamplerDescriptor -> Effect GPUSampler
-createSampler device desc = createSamplerImpl device (toForeignSamplerDesc desc)
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- SHADER OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a shader module from WGSL source.
-foreign import createShaderModuleImpl :: GPUDevice -> Foreign -> Effect GPUShaderModule
-
-createShaderModule :: GPUDevice -> GPUShaderModuleDescriptor -> Effect GPUShaderModule
-createShaderModule device desc = createShaderModuleImpl device (toForeignShaderDesc desc)
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- PIPELINE OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a render pipeline.
-foreign import createRenderPipelineImpl :: GPUDevice -> Foreign -> Effect GPURenderPipeline
-
-createRenderPipeline :: GPUDevice -> Foreign -> Effect GPURenderPipeline
-createRenderPipeline = createRenderPipelineImpl
-
--- | Create a compute pipeline.
-foreign import createComputePipelineImpl :: GPUDevice -> Foreign -> Effect GPUComputePipeline
-
-createComputePipeline :: GPUDevice -> Foreign -> Effect GPUComputePipeline
-createComputePipeline = createComputePipelineImpl
-
--- | Create a bind group layout.
-foreign import createBindGroupLayoutImpl :: GPUDevice -> Foreign -> Effect GPUBindGroupLayout
-
-createBindGroupLayout :: GPUDevice -> Foreign -> Effect GPUBindGroupLayout
-createBindGroupLayout = createBindGroupLayoutImpl
-
--- | Create a pipeline layout.
-foreign import createPipelineLayoutImpl :: GPUDevice -> Foreign -> Effect GPUPipelineLayout
-
-createPipelineLayout :: GPUDevice -> Foreign -> Effect GPUPipelineLayout
-createPipelineLayout = createPipelineLayoutImpl
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- BIND GROUP OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a bind group.
-foreign import createBindGroupImpl :: GPUDevice -> Foreign -> Effect GPUBindGroup
-
-createBindGroup :: GPUDevice -> Foreign -> Effect GPUBindGroup
-createBindGroup = createBindGroupImpl
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- COMMAND ENCODING
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Create a command encoder.
-foreign import createCommandEncoderImpl :: GPUDevice -> Effect GPUCommandEncoder
-
-createCommandEncoder :: GPUDevice -> Effect GPUCommandEncoder
-createCommandEncoder = createCommandEncoderImpl
-
--- | Finish encoding and get command buffer.
-foreign import finishCommandEncoderImpl :: GPUCommandEncoder -> Effect GPUCommandBuffer
-
-finishCommandEncoder :: GPUCommandEncoder -> Effect GPUCommandBuffer
-finishCommandEncoder = finishCommandEncoderImpl
-
--- | Begin a render pass.
-foreign import beginRenderPassImpl :: GPUCommandEncoder -> Foreign -> Effect GPURenderPassEncoder
-
-beginRenderPass :: GPUCommandEncoder -> GPURenderPassDescriptor -> GPUTextureView -> Maybe GPUTextureView -> Effect GPURenderPassEncoder
-beginRenderPass encoder desc colorView depthView =
-  beginRenderPassImpl encoder (toForeignRenderPassDesc desc colorView depthView)
-
--- | End a render pass.
-foreign import endRenderPassImpl :: GPURenderPassEncoder -> Effect Unit
-
-endRenderPass :: GPURenderPassEncoder -> Effect Unit
-endRenderPass = endRenderPassImpl
-
--- | Begin a compute pass.
-foreign import beginComputePassImpl :: GPUCommandEncoder -> Effect GPUComputePassEncoder
-
-beginComputePass :: GPUCommandEncoder -> Effect GPUComputePassEncoder
-beginComputePass = beginComputePassImpl
-
--- | End a compute pass.
-foreign import endComputePassImpl :: GPUComputePassEncoder -> Effect Unit
-
-endComputePass :: GPUComputePassEncoder -> Effect Unit
-endComputePass = endComputePassImpl
+-- | Maximum GPU limits (high-end hardware).
+maxLimits :: Core.GPULimits
+maxLimits =
+  { maxTextureDimension1D: 16384
+  , maxTextureDimension2D: 16384
+  , maxTextureDimension3D: 2048
+  , maxTextureArrayLayers: 2048
+  , maxBindGroups: 8
+  , maxBindGroupsPlusVertexBuffers: 30
+  , maxBindingsPerBindGroup: 1000
+  , maxDynamicUniformBuffersPerPipelineLayout: 14
+  , maxDynamicStorageBuffersPerPipelineLayout: 8
+  , maxSampledTexturesPerShaderStage: 16
+  , maxSamplersPerShaderStage: 16
+  , maxStorageBuffersPerShaderStage: 10
+  , maxStorageTexturesPerShaderStage: 8
+  , maxUniformBuffersPerShaderStage: 14
+  , maxUniformBufferBindingSize: 134217728
+  , maxStorageBufferBindingSize: 1073741824
+  , minUniformBufferOffsetAlignment: 256
+  , minStorageBufferOffsetAlignment: 256
+  , maxVertexBuffers: 8
+  , maxBufferSize: 1073741824.0
+  , maxVertexAttributes: 30
+  , maxVertexBufferArrayStride: 2048
+  , maxInterStageShaderComponents: 120
+  , maxInterStageShaderVariables: 16
+  , maxColorAttachments: 8
+  , maxColorAttachmentBytesPerSample: 32
+  , maxComputeWorkgroupStorageSize: 32768
+  , maxComputeInvocationsPerWorkgroup: 1024
+  , maxComputeWorkgroupSizeX: 1024
+  , maxComputeWorkgroupSizeY: 1024
+  , maxComputeWorkgroupSizeZ: 64
+  , maxComputeWorkgroupsPerDimension: 65535
+  }
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- RENDER PASS OPERATIONS
+-- LIMIT VALIDATION
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Set the render pipeline.
-foreign import setPipelineImpl :: GPURenderPassEncoder -> GPURenderPipeline -> Effect Unit
+-- | Validate that all limits are within WebGPU spec bounds.
+-- |
+-- | Returns Nothing if valid, Just error message if invalid.
+validateLimits :: Core.GPULimits -> Maybe String
+validateLimits limits
+  | not (inBoundsInt 1 16384 limits.maxTextureDimension1D) =
+      Just "maxTextureDimension1D out of bounds [1, 16384]"
+  | not (inBoundsInt 1 16384 limits.maxTextureDimension2D) =
+      Just "maxTextureDimension2D out of bounds [1, 16384]"
+  | not (inBoundsInt 1 2048 limits.maxTextureDimension3D) =
+      Just "maxTextureDimension3D out of bounds [1, 2048]"
+  | not (inBoundsInt 1 2048 limits.maxTextureArrayLayers) =
+      Just "maxTextureArrayLayers out of bounds [1, 2048]"
+  | not (inBoundsInt 4 8 limits.maxBindGroups) =
+      Just "maxBindGroups out of bounds [4, 8]"
+  | not (inBoundsNumber 268435456.0 1073741824.0 limits.maxBufferSize) =
+      Just "maxBufferSize out of bounds [256MiB, 1GiB]"
+  | otherwise = Nothing
 
-setPipeline :: GPURenderPassEncoder -> GPURenderPipeline -> Effect Unit
-setPipeline = setPipelineImpl
-
--- | Set a bind group.
-foreign import setBindGroupImpl :: GPURenderPassEncoder -> Int -> GPUBindGroup -> Effect Unit
-
-setBindGroup :: GPURenderPassEncoder -> Int -> GPUBindGroup -> Effect Unit
-setBindGroup = setBindGroupImpl
-
--- | Set a vertex buffer.
-foreign import setVertexBufferImpl :: GPURenderPassEncoder -> Int -> GPUBuffer -> Int -> Int -> Effect Unit
-
-setVertexBuffer :: GPURenderPassEncoder -> Int -> GPUBuffer -> Effect Unit
-setVertexBuffer encoder slot buffer = setVertexBufferImpl encoder slot buffer 0 0
-
--- | Set the index buffer.
-foreign import setIndexBufferImpl :: GPURenderPassEncoder -> GPUBuffer -> String -> Int -> Int -> Effect Unit
-
-setIndexBuffer :: GPURenderPassEncoder -> GPUBuffer -> GPUIndexFormat -> Effect Unit
-setIndexBuffer encoder buffer format =
-  setIndexBufferImpl encoder buffer (indexFormatToString format) 0 0
-
--- | Draw primitives.
-foreign import drawImpl :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Effect Unit
-
-draw :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Effect Unit
-draw = drawImpl
-
--- | Draw indexed primitives.
-foreign import drawIndexedImpl :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Int -> Effect Unit
-
-drawIndexed :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Int -> Effect Unit
-drawIndexed = drawIndexedImpl
-
--- | Draw indirect.
-foreign import drawIndirectImpl :: GPURenderPassEncoder -> GPUBuffer -> Int -> Effect Unit
-
-drawIndirect :: GPURenderPassEncoder -> GPUBuffer -> Int -> Effect Unit
-drawIndirect = drawIndirectImpl
-
--- | Set viewport.
-foreign import setViewportImpl :: GPURenderPassEncoder -> Number -> Number -> Number -> Number -> Number -> Number -> Effect Unit
-
-setViewport :: GPURenderPassEncoder -> Number -> Number -> Number -> Number -> Number -> Number -> Effect Unit
-setViewport = setViewportImpl
-
--- | Set scissor rect.
-foreign import setScissorRectImpl :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Effect Unit
-
-setScissorRect :: GPURenderPassEncoder -> Int -> Int -> Int -> Int -> Effect Unit
-setScissorRect = setScissorRectImpl
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- QUEUE OPERATIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
--- | Submit command buffers to the queue.
-foreign import submitImpl :: GPUQueue -> Array GPUCommandBuffer -> Effect Unit
-
-submit :: GPUQueue -> Array GPUCommandBuffer -> Effect Unit
-submit = submitImpl
-
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- INTERNAL HELPERS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-foreign import toForeignAdapterDesc :: GPUAdapterDescriptor -> Foreign
-foreign import toForeignDeviceDesc :: { requiredFeatures :: Array String, label :: Maybe String } -> Foreign
-foreign import toForeignCanvasConfig :: GPUCanvasConfiguration -> Foreign
-foreign import toForeignBufferDesc :: GPUBufferDescriptor -> Foreign
-foreign import toForeignTextureDesc :: GPUTextureDescriptor -> Foreign
-foreign import toForeignSamplerDesc :: GPUSamplerDescriptor -> Foreign
-foreign import toForeignShaderDesc :: GPUShaderModuleDescriptor -> Foreign
-foreign import toForeignTextureDest :: GPUTexture -> Foreign
-foreign import toForeignDataLayout :: { width :: Int, height :: Int } -> Foreign
-foreign import toForeignSize :: { width :: Int, height :: Int } -> Foreign
-foreign import toForeignRenderPassDesc :: GPURenderPassDescriptor -> GPUTextureView -> Maybe GPUTextureView -> Foreign
-
-foreign import fromForeignLimits :: Foreign -> GPULimits
-
-stringToFeature :: String -> GPUFeatureName
-stringToFeature = case _ of
-  "depth-clip-control" -> DepthClipControl
-  "depth32float-stencil8" -> FeatureDepth32FloatStencil8
-  "texture-compression-bc" -> TextureCompressionBC
-  "texture-compression-etc2" -> TextureCompressionETC2
-  "texture-compression-astc" -> TextureCompressionASTC
-  "timestamp-query" -> TimestampQuery
-  "indirect-first-instance" -> IndirectFirstInstance
-  "shader-f16" -> ShaderF16
-  "rg11b10ufloat-renderable" -> RG11B10UfloatRenderable
-  "bgra8unorm-storage" -> BGRA8UnormStorage
-  "float32-filterable" -> Float32Filterable
-  _ -> DepthClipControl -- fallback
-
-stringToLostReason :: String -> DeviceLostReason
-stringToLostReason = case _ of
-  "destroyed" -> DeviceLostDestroyed
-  _ -> DeviceLostUnknown
-
-stringToTextureFormat :: String -> GPUTextureFormat
-stringToTextureFormat = case _ of
-  "bgra8unorm" -> BGRA8Unorm
-  "rgba8unorm" -> RGBA8Unorm
-  "rgba8unorm-srgb" -> RGBA8UnormSrgb
-  "bgra8unorm-srgb" -> BGRA8UnormSrgb
-  "depth24plus" -> Depth24Plus
-  "depth24plus-stencil8" -> Depth24PlusStencil8
-  "depth32float" -> Depth32Float
-  _ -> BGRA8Unorm -- default
-
-indexFormatToString :: GPUIndexFormat -> String
-indexFormatToString = case _ of
-  IndexUint16 -> "uint16"
-  IndexUint32 -> "uint32"
+-- | Clamp all limits to valid WebGPU spec bounds.
+-- |
+-- | Guarantees the returned limits are valid by construction.
+clampLimits :: Core.GPULimits -> Core.GPULimits
+clampLimits limits =
+  { maxTextureDimension1D: clampInt 1 16384 limits.maxTextureDimension1D
+  , maxTextureDimension2D: clampInt 1 16384 limits.maxTextureDimension2D
+  , maxTextureDimension3D: clampInt 1 2048 limits.maxTextureDimension3D
+  , maxTextureArrayLayers: clampInt 1 2048 limits.maxTextureArrayLayers
+  , maxBindGroups: clampInt 4 8 limits.maxBindGroups
+  , maxBindGroupsPlusVertexBuffers: clampInt 24 30 limits.maxBindGroupsPlusVertexBuffers
+  , maxBindingsPerBindGroup: clampInt 640 1000 limits.maxBindingsPerBindGroup
+  , maxDynamicUniformBuffersPerPipelineLayout: clampInt 8 14 limits.maxDynamicUniformBuffersPerPipelineLayout
+  , maxDynamicStorageBuffersPerPipelineLayout: clampInt 4 8 limits.maxDynamicStorageBuffersPerPipelineLayout
+  , maxSampledTexturesPerShaderStage: clampInt 16 16 limits.maxSampledTexturesPerShaderStage
+  , maxSamplersPerShaderStage: clampInt 16 16 limits.maxSamplersPerShaderStage
+  , maxStorageBuffersPerShaderStage: clampInt 8 10 limits.maxStorageBuffersPerShaderStage
+  , maxStorageTexturesPerShaderStage: clampInt 4 8 limits.maxStorageTexturesPerShaderStage
+  , maxUniformBuffersPerShaderStage: clampInt 12 14 limits.maxUniformBuffersPerShaderStage
+  , maxUniformBufferBindingSize: clampInt 16384 134217728 limits.maxUniformBufferBindingSize
+  , maxStorageBufferBindingSize: clampInt 134217728 1073741824 limits.maxStorageBufferBindingSize
+  , minUniformBufferOffsetAlignment: clampInt 256 256 limits.minUniformBufferOffsetAlignment
+  , minStorageBufferOffsetAlignment: clampInt 256 256 limits.minStorageBufferOffsetAlignment
+  , maxVertexBuffers: clampInt 8 8 limits.maxVertexBuffers
+  , maxBufferSize: clampNumber 268435456.0 1073741824.0 limits.maxBufferSize
+  , maxVertexAttributes: clampInt 16 30 limits.maxVertexAttributes
+  , maxVertexBufferArrayStride: clampInt 2048 2048 limits.maxVertexBufferArrayStride
+  , maxInterStageShaderComponents: clampInt 60 120 limits.maxInterStageShaderComponents
+  , maxInterStageShaderVariables: clampInt 16 16 limits.maxInterStageShaderVariables
+  , maxColorAttachments: clampInt 8 8 limits.maxColorAttachments
+  , maxColorAttachmentBytesPerSample: clampInt 32 32 limits.maxColorAttachmentBytesPerSample
+  , maxComputeWorkgroupStorageSize: clampInt 16384 32768 limits.maxComputeWorkgroupStorageSize
+  , maxComputeInvocationsPerWorkgroup: clampInt 256 1024 limits.maxComputeInvocationsPerWorkgroup
+  , maxComputeWorkgroupSizeX: clampInt 256 1024 limits.maxComputeWorkgroupSizeX
+  , maxComputeWorkgroupSizeY: clampInt 256 1024 limits.maxComputeWorkgroupSizeY
+  , maxComputeWorkgroupSizeZ: clampInt 64 64 limits.maxComputeWorkgroupSizeZ
+  , maxComputeWorkgroupsPerDimension: clampInt 65535 65535 limits.maxComputeWorkgroupsPerDimension
+  }

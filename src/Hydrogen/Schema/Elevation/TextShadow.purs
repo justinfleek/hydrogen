@@ -37,9 +37,6 @@
 -- |   , TS.textShadow { offsetX: -1.0, offsetY: -1.0, blur: 0.0
 -- |                   , color: RGB.rgba 0 0 0 30 }  -- shadow
 -- |   ]
--- |
--- | -- Convert to CSS
--- | css = TS.toLegacyCss glow  -- "0px 0px 10px rgba(59, 130, 246, 0.8)"
 -- | ```
 
 module Hydrogen.Schema.Elevation.TextShadow
@@ -73,10 +70,6 @@ module Hydrogen.Schema.Elevation.TextShadow
   , embossedText
   , letterpress
   
-  -- * Conversion (Legacy CSS, not FFI)
-  , toLegacyCss
-  , layeredToLegacyCss
-  
   -- * Predicates
   , hasTextShadow
   , isGlowEffect
@@ -99,8 +92,7 @@ import Prelude
 
 import Data.Array (null)
 import Data.Array as Array
-import Data.Int as Int
-import Data.String (joinWith)
+
 import Hydrogen.Schema.Color.RGB as RGB
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -125,7 +117,7 @@ newtype LayeredTextShadow = LayeredTextShadow (Array TextShadow)
 derive instance eqLayeredTextShadow :: Eq LayeredTextShadow
 
 instance showLayeredTextShadow :: Show LayeredTextShadow where
-  show = layeredToLegacyCss
+  show (LayeredTextShadow ls) = "LayeredTextShadow[" <> show (Array.length ls) <> " layers]"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -263,31 +255,8 @@ letterpress colors = layeredText
   ]
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert text shadow to CSS string.
--- |
--- | Format: "<offset-x> <offset-y> <blur-radius> <color>"
--- | NOT an FFI boundary — pure string generation.
-toLegacyCss :: TextShadow -> String
-toLegacyCss s =
-  showPx s.offsetX <> " " <> showPx s.offsetY <> " " 
-    <> showPx s.blur <> " " <> RGB.toLegacyCssA s.color
-
--- | Convert layered text shadow to CSS string.
--- |
--- | Returns "none" if empty, otherwise comma-separated shadows.
--- | NOT an FFI boundary — pure string generation.
-layeredToLegacyCss :: LayeredTextShadow -> String
-layeredToLegacyCss (LayeredTextShadow ls) =
-  if null ls
-    then "none"
-    else joinWith ", " (map toLegacyCss ls)
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // predicates
--- ═════════════════════════════════════════════════════════════════════════════
+-- ═══════════════════════════════════��═════════════════════════════════════════
 
 -- | Check if layered text shadow has any layers
 hasTextShadow :: LayeredTextShadow -> Boolean
@@ -304,15 +273,3 @@ isGlowEffect s = s.offsetX == 0.0 && s.offsetY == 0.0 && s.blur > 0.0
 -- | Clamp to non-negative
 clampPositive :: Number -> Number
 clampPositive n = if n < 0.0 then 0.0 else n
-
--- | Show number as CSS pixel value
-showPx :: Number -> String
-showPx n = showNumber n <> "px"
-
--- | Show number cleanly
-showNumber :: Number -> String
-showNumber n =
-  let rounded = Int.round n
-  in if Int.toNumber rounded == n
-    then show rounded
-    else show n

@@ -22,7 +22,6 @@ module Hydrogen.Schema.Typography.LineHeight
   , unsafeLineHeight
   , unwrap
   , toPixels
-  , toLegacyCss
   , bounds
   -- Common ratios
   , solid
@@ -263,11 +262,6 @@ unwrap (LineHeight h) = h
 -- | Calculate actual pixel height for a given font size
 toPixels :: FontSize -> LineHeight -> Number
 toPixels fs (LineHeight ratio) = FontSize.unwrap fs * ratio
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS line-height value (unitless)
-toLegacyCss :: LineHeight -> String
-toLegacyCss (LineHeight h) = show h
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds

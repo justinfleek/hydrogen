@@ -14,9 +14,9 @@
 -- | - Margin: Outer spacing (border to siblings)
 -- | - Inset: Shorthand for positioning offsets
 -- |
--- | ## CSS Mapping
+-- | ## Design Philosophy
 -- |
--- | All spacing types support `toLegacyCss` for CSS output.
+-- | Spacing values are pure data. Rendering is handled by target interpreters.
 
 module Hydrogen.Schema.Geometry.Spacing
   ( -- * Spacing Value
@@ -31,7 +31,6 @@ module Hydrogen.Schema.Geometry.Spacing
   , spacing2xl
   , spacing3xl
   , unwrapSpacing
-  , toLegacyCss
   -- * Padding (4-sided inner spacing)
   , Padding
   , padding
@@ -42,7 +41,6 @@ module Hydrogen.Schema.Geometry.Spacing
   , paddingBottom
   , paddingLeft
   , paddingNone
-  , paddingToLegacyCss
   -- * Margin (4-sided outer spacing)
   , Margin
   , margin
@@ -53,7 +51,6 @@ module Hydrogen.Schema.Geometry.Spacing
   , marginBottom
   , marginLeft
   , marginNone
-  , marginToLegacyCss
   
   -- * Bounds
   , spacingValueBounds
@@ -131,12 +128,6 @@ spacing3xl = SpacingValue 64.0
 unwrapSpacing :: SpacingValue -> Number
 unwrapSpacing (SpacingValue n) = n
 
--- | Convert spacing value to legacy CSS string.
--- |
--- | CSS is a legacy format. The atom is the source of truth.
-toLegacyCss :: SpacingValue -> String
-toLegacyCss (SpacingValue n) = show n <> "px"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // padding
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -186,27 +177,6 @@ paddingLeft p = p.left
 paddingNone :: Padding
 paddingNone = paddingAll spacingZero
 
--- | Convert padding to legacy CSS string.
--- |
--- | Uses shorthand when possible:
--- | - All same: "16px"
--- | - Vertical/horizontal: "16px 24px"
--- | - Different: "16px 24px 16px 24px"
-paddingToLegacyCss :: Padding -> String
-paddingToLegacyCss p =
-  let
-    t = toLegacyCss p.top
-    r = toLegacyCss p.right
-    b = toLegacyCss p.bottom
-    l = toLegacyCss p.left
-  in
-    if t == r && r == b && b == l then
-      t
-    else if t == b && r == l then
-      t <> " " <> r
-    else
-      t <> " " <> r <> " " <> b <> " " <> l
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // margin
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -255,27 +225,6 @@ marginLeft m = m.left
 -- | Zero margin on all sides.
 marginNone :: Margin
 marginNone = marginAll spacingZero
-
--- | Convert margin to legacy CSS string.
--- |
--- | Uses shorthand when possible:
--- | - All same: "16px"
--- | - Vertical/horizontal: "16px 24px"
--- | - Different: "16px 24px 16px 24px"
-marginToLegacyCss :: Margin -> String
-marginToLegacyCss m =
-  let
-    t = toLegacyCss m.top
-    r = toLegacyCss m.right
-    b = toLegacyCss m.bottom
-    l = toLegacyCss m.left
-  in
-    if t == r && r == b && b == l then
-      t
-    else if t == b && r == l then
-      t <> " " <> r
-    else
-      t <> " " <> r <> " " <> b <> " " <> l
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // bounds

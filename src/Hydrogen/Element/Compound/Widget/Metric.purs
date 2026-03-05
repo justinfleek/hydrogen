@@ -575,7 +575,7 @@ renderGoalProgress maybeGoal = case maybeGoal of
             [ E.class_ "h-2 bg-muted rounded-full overflow-hidden" ]
             [ E.div_
                 [ E.class_ ("h-full rounded-full " <> progressColor)
-                , E.style "width" progressWidth
+                , E.attr "data-progress" progressWidth
                 ]
                 []
             ]

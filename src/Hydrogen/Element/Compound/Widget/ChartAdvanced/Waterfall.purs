@@ -197,7 +197,7 @@ renderWaterfallBar cfg padding barWidth barGap scaleY cumulatives idx d =
   in
     E.g_
       []
-      [ -- Bar with glow
+      [ -- Bar
         E.rect_
           [ E.attr "x" (show x)
           , E.attr "y" (show yTop)
@@ -205,7 +205,6 @@ renderWaterfallBar cfg padding barWidth barGap scaleY cumulatives idx d =
           , E.attr "height" (show (Math.max 1.0 barHeight))
           , E.attr "fill" color
           , E.attr "rx" "2"
-          , E.style "filter" ("drop-shadow(0 0 6px " <> color <> "80)")
           ]
       -- Label
       , E.text_

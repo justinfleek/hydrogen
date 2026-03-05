@@ -44,10 +44,6 @@ module Hydrogen.Schema.Typography.OpenType.Fractions
   , isDiagonal
   , isStacked
   , isEnabled
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
@@ -131,24 +127,3 @@ isStacked _ = false
 isEnabled :: Fractions -> Boolean
 isEnabled (Fractions { style: FractionNormal }) = false
 isEnabled _ = true
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS font-variant-numeric value
-toLegacyCss :: Fractions -> String
-toLegacyCss (Fractions { style }) = case style of
-  FractionNormal -> "font-variant-numeric: normal;"
-  FractionDiagonal -> "font-variant-numeric: diagonal-fractions;"
-  FractionStacked -> "font-variant-numeric: stacked-fractions;"
-
--- | Convert to font-feature-settings value
--- |
--- | More explicit control using OpenType feature tags.
-toFontFeatureSettings :: Fractions -> String
-toFontFeatureSettings (Fractions { style }) = case style of
-  FractionNormal -> "font-feature-settings: \"frac\" 0, \"afrc\" 0;"
-  FractionDiagonal -> "font-feature-settings: \"frac\" 1;"
-  FractionStacked -> "font-feature-settings: \"afrc\" 1;"

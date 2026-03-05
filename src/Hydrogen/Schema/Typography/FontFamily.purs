@@ -20,7 +20,6 @@ module Hydrogen.Schema.Typography.FontFamily
   ( FontFamily
   , fontFamily
   , unwrap
-  , toLegacyCss
   -- Generic families (CSS keywords)
   , serif
   , sansSerif
@@ -38,8 +37,6 @@ module Hydrogen.Schema.Typography.FontFamily
   ) where
 
 import Prelude
-
-import Data.String (contains, Pattern(Pattern))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // font family
@@ -137,36 +134,3 @@ fangsong = FontFamily "fangsong"
 -- | Extract the raw String value
 unwrap :: FontFamily -> String
 unwrap (FontFamily f) = f
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS font-family value
--- |
--- | Adds quotes if the family name contains spaces or special characters.
--- | Generic family names (serif, sans-serif, etc.) are not quoted.
-toLegacyCss :: FontFamily -> String
-toLegacyCss (FontFamily f)
-  | isGenericFamily f = f
-  | needsQuotes f = "\"" <> f <> "\""
-  | otherwise = f
-
--- | Check if a font family name is a CSS generic family keyword
-isGenericFamily :: String -> Boolean
-isGenericFamily name = name == "serif"
-  || name == "sans-serif"
-  || name == "monospace"
-  || name == "cursive"
-  || name == "fantasy"
-  || name == "system-ui"
-  || name == "ui-serif"
-  || name == "ui-sans-serif"
-  || name == "ui-monospace"
-  || name == "ui-rounded"
-  || name == "emoji"
-  || name == "math"
-  || name == "fangsong"
-
--- | Check if a font family name needs quotes in CSS
-needsQuotes :: String -> Boolean
-needsQuotes name = contains (Pattern " ") name
-  || contains (Pattern "-") name
-  || contains (Pattern ".") name

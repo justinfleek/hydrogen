@@ -89,7 +89,9 @@ import Hydrogen.Schema.Gestural.Gesture.LongPress
   , noLongPress
   , updateLongPressDuration
   , longPressPosition
+  , longPressDuration
   , isLongPressTriggered
+  , isLongPressRecognized
   , isLongPressActive
   )
 import Hydrogen.Schema.Gestural.Gesture.Swipe

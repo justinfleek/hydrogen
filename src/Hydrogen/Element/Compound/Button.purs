@@ -2,309 +2,174 @@
 --                                  // hydrogen // element // compound // button
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Button — Schema-native interactive button component.
+-- | Button — Pure GPU drawable button component.
 -- |
 -- | ## Design Philosophy
 -- |
--- | This component accepts **concrete Schema atoms**, not semantic tokens.
--- | Every visual property maps directly to atoms from the 12 pillars:
+-- | This component emits **DrawCommand** arrays, NOT Element trees.
+-- | No CSS. No strings. Pure bounded Schema atoms → GPU commands.
 -- |
--- | - **Color**: Background, text, border, hover states, focus ring
--- | - **Geometry**: Border radius, border width
--- | - **Elevation**: Shadow
--- | - **Dimension**: Height, padding, min width
--- | - **Typography**: Font size, font weight
--- | - **Motion**: Transition duration, easing
+-- | The button is rendered as:
+-- | - DrawRect for the background (with corner radius, fill color)
+-- | - DrawWord for the label text
 -- |
--- | The **BrandSchema** defines what these atoms are for a given brand.
--- | This component just renders them faithfully.
+-- | ## Schema Atoms
 -- |
--- | ## Schema Atoms Accepted
+-- | All visual properties are Schema atoms that flow directly to GPU:
+-- | - Color.RGBA → DrawRect.fill
+-- | - Geometry.Corners → DrawRect.cornerRadius  
+-- | - Device.Pixel → DrawRect dimensions
 -- |
--- | | Property              | Pillar     | Type                      | CSS Output              |
--- | |-----------------------|------------|---------------------------|-------------------------|
--- | | backgroundColor       | Color      | Color.RGB                 | background-color        |
--- | | textColor             | Color      | Color.RGB                 | color                   |
--- | | borderColor           | Color      | Color.RGB                 | border-color            |
--- | | hoverBackgroundColor  | Color      | Color.RGB                 | :hover background       |
--- | | hoverTextColor        | Color      | Color.RGB                 | :hover color            |
--- | | hoverBorderColor      | Color      | Color.RGB                 | :hover border-color     |
--- | | focusRingColor        | Color      | Color.RGB                 | focus outline           |
--- | | borderRadius          | Geometry   | Geometry.Corners          | border-radius           |
--- | | borderWidth           | Dimension  | Device.Pixel              | border-width            |
--- | | shadow                | Elevation  | Shadow.LayeredShadow      | box-shadow              |
--- | | height                | Dimension  | Device.Pixel              | height                  |
--- | | paddingX              | Dimension  | Device.Pixel              | padding-left/right      |
--- | | paddingY              | Dimension  | Device.Pixel              | padding-top/bottom      |
--- | | minWidth              | Dimension  | Device.Pixel              | min-width               |
--- | | fontSize              | Typography | Typography.FontSize       | font-size               |
--- | | fontWeight            | Typography | Typography.FontWeight     | font-weight             |
--- | | transitionDuration    | Motion     | Temporal.Milliseconds     | transition-duration     |
--- | | transitionEasing      | Motion     | Easing.Easing             | transition-timing       |
+-- | ## Architecture
 -- |
--- | ## Usage
--- |
--- | ```purescript
--- | import Hydrogen.Element.Compound.Button as Button
--- | import Hydrogen.Schema.Color.RGB as Color
--- | import Hydrogen.Schema.Geometry.Radius as Geometry
--- | import Hydrogen.Schema.Dimension.Device as Device
--- | import Hydrogen.Render.Element as E
--- |
--- | -- Minimal usage with children
--- | Button.button
--- |   [ Button.onClick SubmitForm ]
--- |   [ E.text "Submit" ]
--- |
--- | -- With brand atoms
--- | Button.button
--- |   [ Button.onClick SubmitForm
--- |   , Button.backgroundColor brand.primaryColor
--- |   , Button.textColor brand.onPrimaryColor
--- |   , Button.borderRadius brand.buttonRadius
--- |   , Button.height brand.buttonHeight
--- |   , Button.paddingX brand.buttonPaddingX
--- |   , Button.shadow brand.buttonShadow
--- |   ]
--- |   [ E.text "Submit" ]
--- |
--- | -- Disabled state
--- | Button.button
--- |   [ Button.disabled true
--- |   , Button.backgroundColor (Color.rgb 200 200 200)
--- |   ]
--- |   [ E.text "Disabled" ]
--- |
--- | -- Loading state
--- | Button.button
--- |   [ Button.loading true ]
--- |   [ E.text "Saving..." ]
 -- | ```
--- |
--- | ## Companion Components
--- |
--- | - `buttonLink` — Button-styled anchor element
--- | - `iconButton` — Button optimized for icon-only content
--- | - `loadingSpinner` — Spinner element for loading states
+-- | ButtonProps → button → Array (DrawCommand msg)
+-- |                              ↓
+-- |                         GPU interpreter
+-- |                              ↓
+-- |                         Pick buffer → msg dispatch
+-- | ```
 
 module Hydrogen.Element.Compound.Button
   ( -- * Main Component
     button
   
-  -- * Companion Components
-  , buttonLink
-  , iconButton
-  , loadingSpinner
-  
   -- * Types
-  , ButtonType(TypeButton, TypeSubmit, TypeReset)
-  
-  -- * Props
   , ButtonProps
   , ButtonProp
   , defaultProps
   
-  -- * Content Props
-  , buttonType
+  -- * Behavior Props
   , disabled
   , loading
+  , onClick
+  
+  -- * Position/Size Props (required for GPU rendering)
+  , x
+  , y
+  , width
+  , height
   
   -- * Color Atoms
   , backgroundColor
   , textColor
   , borderColor
-  , hoverBackgroundColor
-  , hoverTextColor
-  , hoverBorderColor
-  , activeBackgroundColor
-  , focusRingColor
   
   -- * Geometry Atoms
   , borderRadius
   , borderWidth
   
-  -- * Elevation Atoms
-  , shadow
-  , hoverShadow
-  
-  -- * Dimension Atoms
-  , height
-  , paddingX
-  , paddingY
-  , minWidth
-  , iconSize
-  , gap
-  
   -- * Typography Atoms
   , fontSize
-  , fontWeight
+  , fontId
   
-  -- * Motion Atoms
-  , transitionDuration
-  , transitionEasing
-  
-  -- * Behavior Props
-  , onClick
-  
-  -- * Escape Hatch
-  , extraAttributes
+  -- * Label
+  , label
   ) where
 
 import Prelude
-  ( class Eq
-  , class Show
-  , show
-  , (<>)
+  ( (<>)
   , (||)
-  , not
+  , (==)
+  , (/)
+  , (*)
+  , (+)
+  , (-)
   )
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(Nothing, Just), maybe)
+import Data.Int (toNumber) as Int
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.String.CodeUnits (length) as String
 
-import Hydrogen.Render.Element as E
-import Hydrogen.Schema.Color.RGB as Color
-import Hydrogen.Schema.Geometry.Radius as Geometry
-import Hydrogen.Schema.Elevation.Shadow as Shadow
+import Hydrogen.GPU.DrawCommand as DC
+import Hydrogen.GPU.DrawCommand.Types (DrawCommand, CommandBuffer)
+import Hydrogen.GPU.Coordinates as Coord
+import Hydrogen.GPU.Text as Text
+import Hydrogen.Schema.Color.RGB as RGB
+import Hydrogen.Schema.Geometry.Radius as Radius
 import Hydrogen.Schema.Dimension.Device as Device
-import Hydrogen.Schema.Dimension.Temporal as Temporal
-import Hydrogen.Schema.Typography.FontSize as FontSize
-import Hydrogen.Schema.Typography.FontWeight as FontWeight
-import Hydrogen.Schema.Motion.Easing as Easing
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // types
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | HTML button type attribute
+-- | Button properties — pure Schema atoms for GPU rendering.
 -- |
--- | - `TypeButton`: Standard button (default)
--- | - `TypeSubmit`: Form submission button
--- | - `TypeReset`: Form reset button
-data ButtonType
-  = TypeButton
-  | TypeSubmit
-  | TypeReset
-
-derive instance eqButtonType :: Eq ButtonType
-
-instance showButtonType :: Show ButtonType where
-  show TypeButton = "button"
-  show TypeSubmit = "submit"
-  show TypeReset = "reset"
-
--- | Convert ButtonType to HTML attribute value
-buttonTypeToString :: ButtonType -> String
-buttonTypeToString TypeButton = "button"
-buttonTypeToString TypeSubmit = "submit"
-buttonTypeToString TypeReset = "reset"
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                      // props
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Button properties
--- |
--- | All visual properties accept concrete Schema atoms.
--- | `Maybe` indicates optional — `Nothing` uses inherited/default styles.
+-- | Position (x, y) and size (width, height) are REQUIRED for GPU rendering.
+-- | There is no layout engine — coordinates must be explicit.
 type ButtonProps msg =
   { -- Behavior
-    buttonType :: ButtonType
-  , disabled :: Boolean
+    disabled :: Boolean
   , loading :: Boolean
   , onClick :: Maybe msg
   
+  -- Position (required)
+  , x :: Number
+  , y :: Number
+  
+  -- Size (required)
+  , width :: Number
+  , height :: Number
+  
   -- Color atoms
-  , backgroundColor :: Maybe Color.RGB
-  , textColor :: Maybe Color.RGB
-  , borderColor :: Maybe Color.RGB
-  , hoverBackgroundColor :: Maybe Color.RGB
-  , hoverTextColor :: Maybe Color.RGB
-  , hoverBorderColor :: Maybe Color.RGB
-  , activeBackgroundColor :: Maybe Color.RGB
-  , focusRingColor :: Maybe Color.RGB
+  , backgroundColor :: RGB.RGBA
+  , textColor :: RGB.RGBA
+  , borderColor :: Maybe RGB.RGBA
   
   -- Geometry atoms
-  , borderRadius :: Maybe Geometry.Corners
-  , borderWidth :: Maybe Device.Pixel
-  
-  -- Elevation atoms
-  , shadow :: Maybe Shadow.LayeredShadow
-  , hoverShadow :: Maybe Shadow.LayeredShadow
-  
-  -- Dimension atoms
-  , height :: Maybe Device.Pixel
-  , paddingX :: Maybe Device.Pixel
-  , paddingY :: Maybe Device.Pixel
-  , minWidth :: Maybe Device.Pixel
-  , iconSize :: Maybe Device.Pixel
-  , gap :: Maybe Device.Pixel
+  , borderRadius :: Radius.Corners
+  , borderWidth :: Device.Pixel
   
   -- Typography atoms
-  , fontSize :: Maybe FontSize.FontSize
-  , fontWeight :: Maybe FontWeight.FontWeight
+  , fontSize :: Number
+  , fontId :: Int
   
-  -- Motion atoms
-  , transitionDuration :: Maybe Temporal.Milliseconds
-  , transitionEasing :: Maybe Easing.Easing
-  
-  -- Escape hatch
-  , extraAttributes :: Array (E.Attribute msg)
+  -- Content
+  , label :: String
   }
 
 -- | Property modifier
 type ButtonProp msg = ButtonProps msg -> ButtonProps msg
 
--- | Default properties
+-- | Default properties with sensible fallbacks.
 -- |
--- | Visual atoms default to `Nothing` (inherit from context/brand).
--- | This ensures the component works with any BrandSchema.
+-- | Position defaults to origin. Size defaults to typical button dimensions.
+-- | Colors default to blue button with white text.
 defaultProps :: forall msg. ButtonProps msg
 defaultProps =
-  { buttonType: TypeButton
-  , disabled: false
+  { disabled: false
   , loading: false
   , onClick: Nothing
-  , backgroundColor: Nothing
-  , textColor: Nothing
+  -- Position
+  , x: 0.0
+  , y: 0.0
+  -- Size
+  , width: 120.0
+  , height: 40.0
+  -- Colors (blue primary button)
+  , backgroundColor: RGB.rgba 59 130 246 100   -- Blue
+  , textColor: RGB.rgba 255 255 255 100        -- White
   , borderColor: Nothing
-  , hoverBackgroundColor: Nothing
-  , hoverTextColor: Nothing
-  , hoverBorderColor: Nothing
-  , activeBackgroundColor: Nothing
-  , focusRingColor: Nothing
-  , borderRadius: Nothing
-  , borderWidth: Nothing
-  , shadow: Nothing
-  , hoverShadow: Nothing
-  , height: Nothing
-  , paddingX: Nothing
-  , paddingY: Nothing
-  , minWidth: Nothing
-  , iconSize: Nothing
-  , gap: Nothing
-  , fontSize: Nothing
-  , fontWeight: Nothing
-  , transitionDuration: Nothing
-  , transitionEasing: Nothing
-  , extraAttributes: []
+  -- Geometry
+  , borderRadius: Radius.cornersAll (Radius.px 6.0)
+  , borderWidth: Device.px 0.0
+  -- Typography
+  , fontSize: 14.0
+  , fontId: 0
+  -- Content
+  , label: ""
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: behavior
+--                                                             // prop builders
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set button type (button, submit, reset)
-buttonType :: forall msg. ButtonType -> ButtonProp msg
-buttonType t props = props { buttonType = t }
 
 -- | Set disabled state
 disabled :: forall msg. Boolean -> ButtonProp msg
 disabled d props = props { disabled = d }
 
--- | Set loading state
--- |
--- | When loading, the button is also disabled and shows a spinner.
+-- | Set loading state (also disables the button)
 loading :: forall msg. Boolean -> ButtonProp msg
 loading l props = props { loading = l }
 
@@ -312,370 +177,118 @@ loading l props = props { loading = l }
 onClick :: forall msg. msg -> ButtonProp msg
 onClick handler props = props { onClick = Just handler }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: color
--- ═════════════════════════════════════════════════════════════════════════════
+-- | Set X position
+x :: forall msg. Number -> ButtonProp msg
+x val props = props { x = val }
 
--- | Set button background color (Color.RGB atom)
-backgroundColor :: forall msg. Color.RGB -> ButtonProp msg
-backgroundColor c props = props { backgroundColor = Just c }
+-- | Set Y position  
+y :: forall msg. Number -> ButtonProp msg
+y val props = props { y = val }
 
--- | Set button text color (Color.RGB atom)
-textColor :: forall msg. Color.RGB -> ButtonProp msg
-textColor c props = props { textColor = Just c }
+-- | Set width
+width :: forall msg. Number -> ButtonProp msg
+width val props = props { width = val }
 
--- | Set button border color (Color.RGB atom)
-borderColor :: forall msg. Color.RGB -> ButtonProp msg
+-- | Set height
+height :: forall msg. Number -> ButtonProp msg
+height val props = props { height = val }
+
+-- | Set background color (RGBA atom)
+backgroundColor :: forall msg. RGB.RGBA -> ButtonProp msg
+backgroundColor c props = props { backgroundColor = c }
+
+-- | Set text color (RGBA atom)
+textColor :: forall msg. RGB.RGBA -> ButtonProp msg
+textColor c props = props { textColor = c }
+
+-- | Set border color (RGBA atom)
+borderColor :: forall msg. RGB.RGBA -> ButtonProp msg
 borderColor c props = props { borderColor = Just c }
 
--- | Set hover background color (Color.RGB atom)
-hoverBackgroundColor :: forall msg. Color.RGB -> ButtonProp msg
-hoverBackgroundColor c props = props { hoverBackgroundColor = Just c }
+-- | Set corner radius (Corners atom)
+borderRadius :: forall msg. Radius.Corners -> ButtonProp msg
+borderRadius r props = props { borderRadius = r }
 
--- | Set hover text color (Color.RGB atom)
-hoverTextColor :: forall msg. Color.RGB -> ButtonProp msg
-hoverTextColor c props = props { hoverTextColor = Just c }
-
--- | Set hover border color (Color.RGB atom)
-hoverBorderColor :: forall msg. Color.RGB -> ButtonProp msg
-hoverBorderColor c props = props { hoverBorderColor = Just c }
-
--- | Set active/pressed background color (Color.RGB atom)
-activeBackgroundColor :: forall msg. Color.RGB -> ButtonProp msg
-activeBackgroundColor c props = props { activeBackgroundColor = Just c }
-
--- | Set focus ring color (Color.RGB atom)
-focusRingColor :: forall msg. Color.RGB -> ButtonProp msg
-focusRingColor c props = props { focusRingColor = Just c }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: geometry
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set border radius (Geometry.Corners atom)
--- |
--- | Supports per-corner radius for asymmetric buttons.
-borderRadius :: forall msg. Geometry.Corners -> ButtonProp msg
-borderRadius r props = props { borderRadius = Just r }
-
--- | Set border width (Device.Pixel atom)
+-- | Set border width (Pixel atom)
 borderWidth :: forall msg. Device.Pixel -> ButtonProp msg
-borderWidth w props = props { borderWidth = Just w }
+borderWidth w props = props { borderWidth = w }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: elevation
--- ═════════════════════════════════════════════════════════════════════════════
+-- | Set font size in pixels
+fontSize :: forall msg. Number -> ButtonProp msg
+fontSize s props = props { fontSize = s }
 
--- | Set box shadow (Shadow.LayeredShadow atom)
--- |
--- | Supports multiple shadow layers for depth effects.
-shadow :: forall msg. Shadow.LayeredShadow -> ButtonProp msg
-shadow s props = props { shadow = Just s }
+-- | Set font ID (references loaded font atlas)
+fontId :: forall msg. Int -> ButtonProp msg
+fontId id props = props { fontId = id }
 
--- | Set hover box shadow (Shadow.LayeredShadow atom)
-hoverShadow :: forall msg. Shadow.LayeredShadow -> ButtonProp msg
-hoverShadow s props = props { hoverShadow = Just s }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: dimension
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set button height (Device.Pixel atom)
-height :: forall msg. Device.Pixel -> ButtonProp msg
-height h props = props { height = Just h }
-
--- | Set horizontal padding (Device.Pixel atom)
-paddingX :: forall msg. Device.Pixel -> ButtonProp msg
-paddingX p props = props { paddingX = Just p }
-
--- | Set vertical padding (Device.Pixel atom)
-paddingY :: forall msg. Device.Pixel -> ButtonProp msg
-paddingY p props = props { paddingY = Just p }
-
--- | Set minimum width (Device.Pixel atom)
-minWidth :: forall msg. Device.Pixel -> ButtonProp msg
-minWidth w props = props { minWidth = Just w }
-
--- | Set icon size for icon buttons (Device.Pixel atom)
-iconSize :: forall msg. Device.Pixel -> ButtonProp msg
-iconSize s props = props { iconSize = Just s }
-
--- | Set gap between icon and text (Device.Pixel atom)
-gap :: forall msg. Device.Pixel -> ButtonProp msg
-gap g props = props { gap = Just g }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: typography
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set font size (FontSize atom)
-fontSize :: forall msg. FontSize.FontSize -> ButtonProp msg
-fontSize s props = props { fontSize = Just s }
-
--- | Set font weight (FontWeight atom)
-fontWeight :: forall msg. FontWeight.FontWeight -> ButtonProp msg
-fontWeight w props = props { fontWeight = Just w }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: motion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set transition duration (Temporal.Milliseconds atom)
-transitionDuration :: forall msg. Temporal.Milliseconds -> ButtonProp msg
-transitionDuration d props = props { transitionDuration = Just d }
-
--- | Set transition easing (Easing.Easing atom)
-transitionEasing :: forall msg. Easing.Easing -> ButtonProp msg
-transitionEasing e props = props { transitionEasing = Just e }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                // prop builders: escape hatch
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Add extra attributes (escape hatch)
-extraAttributes :: forall msg. Array (E.Attribute msg) -> ButtonProp msg
-extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
+-- | Set button label text
+label :: forall msg. String -> ButtonProp msg
+label txt props = props { label = txt }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Render a button
+-- | Render a button as GPU draw commands.
 -- |
--- | Pure Element — renders to DOM, Halogen, Static HTML, or any target.
--- | All visual properties come from Schema atoms passed via props.
-button :: forall msg. Array (ButtonProp msg) -> Array (E.Element msg) -> E.Element msg
-button propMods children =
+-- | Returns an array of DrawCommands ready for the GPU interpreter:
+-- | - DrawRect for the background
+-- | - Text commands for the label
+-- |
+-- | The button is interactive via pick buffer when onClick is set.
+button :: forall msg. Array (ButtonProp msg) -> CommandBuffer msg
+button propMods =
   let
     props = foldl (\p f -> f p) defaultProps propMods
     isDisabled = props.disabled || props.loading
-  in
-    E.button_
-      (buildButtonAttrs isDisabled props)
-      (buildButtonContent props children)
-
--- | Build button attributes from props
-buildButtonAttrs :: forall msg. Boolean -> ButtonProps msg -> Array (E.Attribute msg)
-buildButtonAttrs isDisabled props =
-  let
-    -- Core attributes
-    coreAttrs =
-      [ E.type_ (buttonTypeToString props.buttonType)
-      , E.disabled isDisabled
-      ]
     
-    -- Click handler
-    clickAttr = case props.onClick of
-      Just handler -> 
-        if isDisabled
-          then []
-          else [ E.onClick handler ]
-      Nothing -> []
-    
-    -- Style attributes
-    styleAttrs = buildButtonStyles isDisabled props
-  in
-    coreAttrs <> clickAttr <> styleAttrs <> props.extraAttributes
-
--- | Build button styles from Schema atoms
-buildButtonStyles :: forall msg. Boolean -> ButtonProps msg -> Array (E.Attribute msg)
-buildButtonStyles isDisabled props =
-  let
-    -- Default values (fallback if no atom provided)
-    defaultBgColor = Color.rgb 59 130 246      -- Blue
-    defaultTextColor = Color.rgb 255 255 255   -- White
-    
-    -- Apply atoms or defaults
-    bgColor = maybe defaultBgColor (\c -> c) props.backgroundColor
-    txtColor = maybe defaultTextColor (\c -> c) props.textColor
-    
-    -- Core layout styles
-    layoutStyles =
-      [ E.style "display" "inline-flex"
-      , E.style "align-items" "center"
-      , E.style "justify-content" "center"
-      , E.style "white-space" "nowrap"
-      , E.style "cursor" (if isDisabled then "not-allowed" else "pointer")
-      , E.style "user-select" "none"
-      , E.style "box-sizing" "border-box"
-      ]
-    
-    -- Color styles
-    colorStyles =
-      [ E.style "background-color" (Color.toLegacyCss bgColor)
-      , E.style "color" (Color.toLegacyCss txtColor)
-      ]
-    
-    -- Border styles
-    borderColorStyle = case props.borderColor of
-      Nothing -> [ E.style "border" "none" ]
-      Just bc -> 
-        let bw = maybe "1px" show props.borderWidth
-        in [ E.style "border-style" "solid"
-           , E.style "border-width" bw
-           , E.style "border-color" (Color.toLegacyCss bc)
-           ]
-    
-    -- Border radius
-    radiusStyle = case props.borderRadius of
-      Nothing -> [ E.style "border-radius" "6px" ]  -- Default rounded
-      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
-    
-    -- Dimension styles
-    heightStyle = case props.height of
-      Nothing -> [ E.style "height" "40px" ]  -- Default height
-      Just h -> [ E.style "height" (show h) ]
-    
-    paddingStyle =
-      let
-        px = maybe "16px" show props.paddingX
-        py = maybe "8px" show props.paddingY
-      in
-        [ E.style "padding" (py <> " " <> px) ]
-    
-    minWidthStyle = case props.minWidth of
-      Nothing -> []
-      Just w -> [ E.style "min-width" (show w) ]
-    
-    gapStyle = case props.gap of
-      Nothing -> [ E.style "gap" "8px" ]  -- Default gap
-      Just g -> [ E.style "gap" (show g) ]
-    
-    -- Typography styles
-    fontSizeStyle = case props.fontSize of
-      Nothing -> [ E.style "font-size" "14px" ]  -- Default
-      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
-    
-    fontWeightStyle = case props.fontWeight of
-      Nothing -> [ E.style "font-weight" "500" ]  -- Medium
-      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
-    
-    -- Shadow styles
-    shadowStyle = case props.shadow of
-      Nothing -> []
-      Just s -> 
-        if Shadow.isNoShadow s
-          then []
-          else [ E.style "box-shadow" (Shadow.layeredToLegacyCss s) ]
-    
-    -- Transition styles
-    transitionStyle =
-      let
-        dur = maybe "150ms" show props.transitionDuration
-        ease = maybe "ease-out" Easing.toLegacyCssString props.transitionEasing
-        transitionValue = "background-color " <> dur <> " " <> ease 
-                       <> ", color " <> dur <> " " <> ease
-                       <> ", border-color " <> dur <> " " <> ease
-                       <> ", box-shadow " <> dur <> " " <> ease
-                       <> ", transform " <> dur <> " " <> ease
-      in
-        [ E.style "transition" transitionValue ]
-    
-    -- Disabled/loading opacity
-    opacityStyle = 
+    -- Adjust fill opacity if disabled
+    fillColor = 
       if isDisabled
-        then [ E.style "opacity" "0.5" ]
-        else []
+        then applyDisabledOpacity props.backgroundColor
+        else props.backgroundColor
     
-    -- Focus visible styles (accessibility)
-    focusStyles =
-      [ E.style "outline" "none"
-      ]
+    -- Background rectangle
+    bgRect = DC.drawRect
+      { x: Coord.screenX props.x
+      , y: Coord.screenY props.y
+      , width: Coord.pixelWidth props.width
+      , height: Coord.pixelHeight props.height
+      , fill: fillColor
+      , cornerRadius: props.borderRadius
+      , depth: Coord.depthValue 0.0
+      , pickId: Nothing  -- Assigned by runtime if onClick present
+      , onClick: if isDisabled then Nothing else props.onClick
+      }
+    
+    -- Text label (centered in button)
+    labelCommands = 
+      if props.label == ""
+        then []
+        else buildLabelCommands props
   in
-    layoutStyles 
-    <> colorStyles 
-    <> borderColorStyle 
-    <> radiusStyle 
-    <> heightStyle 
-    <> paddingStyle 
-    <> minWidthStyle 
-    <> gapStyle
-    <> fontSizeStyle 
-    <> fontWeightStyle 
-    <> shadowStyle 
-    <> transitionStyle 
-    <> opacityStyle
-    <> focusStyles
+    [ bgRect ] <> labelCommands
 
--- | Build button content with optional loading spinner
-buildButtonContent :: forall msg. ButtonProps msg -> Array (E.Element msg) -> Array (E.Element msg)
-buildButtonContent props children =
-  if props.loading
-    then [ loadingSpinner, E.span_ [ E.style "margin-left" "8px" ] children ]
-    else children
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                       // companion components
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Render a button-styled link
+-- | Build text commands for the button label.
 -- |
--- | For navigation that should look like a button.
-buttonLink :: forall msg. Array (ButtonProp msg) -> String -> Array (E.Element msg) -> E.Element msg
-buttonLink propMods href children =
+-- | Centers text within the button bounds.
+buildLabelCommands :: forall msg. ButtonProps msg -> CommandBuffer msg
+buildLabelCommands props =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
-    styleAttrs = buildButtonStyles false props
+    -- Simple centering: offset from button position
+    -- Real centering requires text measurement from font atlas
+    textX = props.x + props.width / 2.0 - (textWidth / 2.0)
+    textY = props.y + props.height / 2.0 + (props.fontSize / 3.0)  -- Baseline adjust
+    
+    -- Approximate text width (proper measurement needs font metrics)
+    textWidth = props.fontSize * 0.6 * Int.toNumber (String.length props.label)
+    
+    fontConfig = Text.fontConfig props.fontId props.fontSize
   in
-    E.a_
-      ([ E.href href, E.style "text-decoration" "none" ] <> styleAttrs <> props.extraAttributes)
-      children
+    Text.textToCommands fontConfig Text.emptyAtlas textX textY props.label
 
--- | Render an icon button
--- |
--- | Square button optimized for icon-only content.
-iconButton :: forall msg. Array (ButtonProp msg) -> Array (E.Element msg) -> E.Element msg
-iconButton propMods children =
-  let
-    -- Override padding to be square
-    squareProps = 
-      [ paddingX (Device.px 0.0)
-      , paddingY (Device.px 0.0)
-      ]
-    allProps = propMods <> squareProps
-    props = foldl (\p f -> f p) defaultProps allProps
-    isDisabled = props.disabled || props.loading
-    
-    -- Get size (height determines width for square)
-    size = maybe "40px" show props.height
-    
-    -- Build custom styles
-    baseStyles = buildButtonStyles isDisabled props
-    
-    -- Override for square dimensions
-    squareStyles =
-      [ E.style "width" size
-      , E.style "height" size
-      , E.style "padding" "0"
-      ]
-    
-    coreAttrs =
-      [ E.type_ (buttonTypeToString props.buttonType)
-      , E.disabled isDisabled
-      ]
-    
-    clickAttr = case props.onClick of
-      Just handler -> 
-        if not isDisabled
-          then [ E.onClick handler ]
-          else []
-      Nothing -> []
-  in
-    E.button_
-      (coreAttrs <> clickAttr <> baseStyles <> squareStyles <> props.extraAttributes)
-      children
-
--- | Loading spinner for button loading state
--- |
--- | Renders a circular spinning indicator.
-loadingSpinner :: forall msg. E.Element msg
-loadingSpinner =
-  E.div_
-    [ E.style "width" "16px"
-    , E.style "height" "16px"
-    , E.style "border" "2px solid currentColor"
-    , E.style "border-top-color" "transparent"
-    , E.style "border-radius" "50%"
-    , E.style "animation" "button-spin 0.6s linear infinite"
-    ]
-    []
+-- | Apply 50% opacity for disabled state.
+applyDisabledOpacity :: RGB.RGBA -> RGB.RGBA
+applyDisabledOpacity color =
+  let rec = RGB.rgbaToRecord color
+  in RGB.rgba rec.r rec.g rec.b (rec.a / 2)

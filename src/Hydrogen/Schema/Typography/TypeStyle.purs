@@ -42,28 +42,19 @@ module Hydrogen.Schema.Typography.TypeStyle
   , withLetterSpacing
   , withTransform
   , scale
-  -- CSS
-  , toLegacyCss
-  , toInlineStyle
   ) where
 
 import Prelude
 
-import Data.Array (intercalate)
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NEA
 import Hydrogen.Schema.Typography.FontFamily (FontFamily)
-import Hydrogen.Schema.Typography.FontFamily as FontFamily
 import Hydrogen.Schema.Typography.FontSize (FontSize)
 import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight (FontWeight)
-import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Typography.LetterSpacing (LetterSpacing)
-import Hydrogen.Schema.Typography.LetterSpacing as LetterSpacing
 import Hydrogen.Schema.Typography.LineHeight (LineHeight)
-import Hydrogen.Schema.Typography.LineHeight as LineHeight
 import Hydrogen.Schema.Typography.TextTransform (TextTransform)
-import Hydrogen.Schema.Typography.TextTransform as TextTransform
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // font stack
@@ -97,11 +88,6 @@ stackFamilies (FontStack fs) = fs
 -- | Get the primary (first) font in the stack
 primaryFont :: FontStack -> FontFamily
 primaryFont (FontStack fs) = NEA.head fs
-
--- | Convert font stack to CSS font-family value
-fontStackToLegacyCss :: FontStack -> String
-fontStackToLegacyCss (FontStack fs) = 
-  intercalate ", " (map FontFamily.toLegacyCss (NEA.toArray fs))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // type style
@@ -237,28 +223,3 @@ withTransform tt (TypeStyle ts) = TypeStyle ts { transform = tt }
 -- | Used for type scale calculations. Other properties remain unchanged.
 scale :: Number -> TypeStyle -> TypeStyle
 scale factor (TypeStyle ts) = TypeStyle ts { size = FontSize.scale factor ts.size }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS declarations (for stylesheet)
-toLegacyCss :: TypeStyle -> String
-toLegacyCss (TypeStyle ts) = 
-  "font-family: " <> fontStackToLegacyCss ts.families <> ";\n" <>
-  "font-weight: " <> FontWeight.toLegacyCss ts.weight <> ";\n" <>
-  "font-size: " <> FontSize.toLegacyCss ts.size <> ";\n" <>
-  "line-height: " <> LineHeight.toLegacyCss ts.lineHeight <> ";\n" <>
-  "letter-spacing: " <> LetterSpacing.toLegacyCss ts.letterSpacing <> ";\n" <>
-  "text-transform: " <> TextTransform.toLegacyCss ts.transform <> ";"
-
--- | Convert to inline style attribute value
-toInlineStyle :: TypeStyle -> String
-toInlineStyle (TypeStyle ts) = 
-  "font-family: " <> fontStackToLegacyCss ts.families <> "; " <>
-  "font-weight: " <> FontWeight.toLegacyCss ts.weight <> "; " <>
-  "font-size: " <> FontSize.toLegacyCss ts.size <> "; " <>
-  "line-height: " <> LineHeight.toLegacyCss ts.lineHeight <> "; " <>
-  "letter-spacing: " <> LetterSpacing.toLegacyCss ts.letterSpacing <> "; " <>
-  "text-transform: " <> TextTransform.toLegacyCss ts.transform <> ";"

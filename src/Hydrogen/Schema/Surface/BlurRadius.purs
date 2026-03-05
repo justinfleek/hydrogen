@@ -33,7 +33,6 @@ module Hydrogen.Schema.Surface.BlurRadius
   , scale
   , add
   , subtract
-  , toLegacyCss
   -- Predicates
   , isSharp
   , isSubtle
@@ -77,7 +76,7 @@ derive instance eqBlurRadius :: Eq BlurRadius
 derive instance ordBlurRadius :: Ord BlurRadius
 
 instance showBlurRadius :: Show BlurRadius where
-  show (BlurRadius r) = show r <> "px"
+  show (BlurRadius r) = "(BlurRadius " <> show r <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -148,17 +147,7 @@ add amount (BlurRadius r) = blurRadius (r + amount)
 subtract :: Number -> BlurRadius -> BlurRadius
 subtract amount (BlurRadius r) = blurRadius (r - amount)
 
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS blur() filter value
--- |
--- | For use in CSS filter property:
--- | ```purescript
--- | toLegacyCss subtle  -- "blur(10px)"
--- | ```
-toLegacyCss :: BlurRadius -> String
-toLegacyCss (BlurRadius r) = "blur(" <> show r <> "px)"
-
--- ═════════════════════════════════════════════════════════════════════════════
+-- ═══════════════════════════════════════════��═════════════════════════════════
 --                                                                 // predicates
 -- ═════════════════════════════════════════════════════════════════════════════
 

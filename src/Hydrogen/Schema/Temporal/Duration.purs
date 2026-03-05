@@ -50,9 +50,6 @@ module Hydrogen.Schema.Temporal.Duration
   , isZero
   , isPositive
   
-  -- * CSS Export
-  , toLegacyCss
-  
   -- * Common Durations
   , zero
   , instant
@@ -235,23 +232,6 @@ isZero (Duration ms') = ms' == 0.0
 -- | Check if duration is positive (non-zero)
 isPositive :: Duration -> Boolean
 isPositive (Duration ms') = ms' > 0.0
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css export
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
--- |
--- | Returns milliseconds for short durations, seconds for longer:
--- | - < 1000ms: "250ms"
--- | - >= 1000ms: "1.5s"
-toLegacyCss :: Duration -> String
-toLegacyCss (Duration ms')
-  | ms' < 1000.0 = show ms' <> "ms"
-  | otherwise = show (ms' / 1000.0) <> "s"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // common durations

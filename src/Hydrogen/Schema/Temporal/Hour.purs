@@ -16,7 +16,6 @@ module Hydrogen.Schema.Temporal.Hour
   , to12Hour
   , isAM
   , isPM
-  , toLegacyCss
   , bounds
   ) where
 
@@ -94,17 +93,6 @@ isAM (Hour h) = h < 12
 -- | Check if hour is PM (noon or after)
 isPM :: Hour -> Boolean
 isPM (Hour h) = h >= 12
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // formatting
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCss :: Hour -> String
-toLegacyCss (Hour h) = show h
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

@@ -159,7 +159,7 @@ tourOverlay props =
   in
     E.div_
       ( [ E.class_ "tour-overlay fixed inset-0 bg-black transition-opacity"
-        , E.style "opacity" (show opacityValue)
+        , E.dataAttr "overlay-opacity" (show opacityValue)
         , E.ariaHidden true
         , E.dataAttr "tour-overlay" "true"
         ] <> clickHandler

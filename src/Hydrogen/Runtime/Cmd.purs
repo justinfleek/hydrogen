@@ -74,6 +74,9 @@ module Hydrogen.Runtime.Cmd
       -- ARIA accessibility commands
       , AriaHide
       , AriaRestore
+      -- Body scroll commands
+      , LockBodyScroll
+      , UnlockBodyScroll
       )
   
   -- * ARIA State Token
@@ -105,6 +108,9 @@ module Hydrogen.Runtime.Cmd
   -- ARIA commands
   , ariaHide
   , ariaRestore
+  -- Body scroll commands
+  , lockBodyScroll
+  , unlockBodyScroll
   
   -- * HTTP Types
   , HttpRequest
@@ -258,6 +264,20 @@ data Cmd msg
     -- ^ Restore previously hidden elements.
     -- ^ Takes state token returned from AriaHide.
     -- ^ SIGIL opcode: 0xD1
+  
+  -- ─────────────────────────────────────────────────────────────────────────────
+  --                                                    // body scroll commands
+  -- ─────────────────────────────────────────────────────────────────────────────
+  
+  | LockBodyScroll
+    -- ^ Lock body scroll (prevent scrolling while modal is open).
+    -- ^ Sets overflow: hidden on document body.
+    -- ^ SIGIL opcode: 0xD2
+  
+  | UnlockBodyScroll
+    -- ^ Unlock body scroll (restore scrolling).
+    -- ^ Restores original overflow on document body.
+    -- ^ SIGIL opcode: 0xD3
 
 instance functorCmd :: Functor Cmd where
   map f = case _ of
@@ -281,6 +301,9 @@ instance functorCmd :: Functor Cmd where
     -- ARIA commands
     AriaHide selector g -> AriaHide selector (f <<< g)
     AriaRestore token -> AriaRestore token
+    -- Body scroll commands
+    LockBodyScroll -> LockBodyScroll
+    UnlockBodyScroll -> UnlockBodyScroll
 
 instance showCmd :: Show (Cmd msg) where
   show = case _ of
@@ -304,6 +327,9 @@ instance showCmd :: Show (Cmd msg) where
     -- ARIA commands
     AriaHide selector _ -> "AriaHide " <> show selector
     AriaRestore token -> "AriaRestore " <> show token
+    -- Body scroll commands
+    LockBodyScroll -> "LockBodyScroll"
+    UnlockBodyScroll -> "UnlockBodyScroll"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // transition type
@@ -448,6 +474,28 @@ ariaHide = AriaHide
 -- | SIGIL opcode: 0xD1 (ARIA_RESTORE)
 ariaRestore :: forall msg. AriaStateToken -> Cmd msg
 ariaRestore = AriaRestore
+
+-- ─────────────────────────────────────────────────────────────────────────────
+--                                               // body scroll command builders
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- | Lock body scroll to prevent scrolling while modal is open.
+-- |
+-- | Sets `overflow: hidden` on the document body. Use when opening
+-- | modal dialogs, drawers, or full-screen overlays.
+-- |
+-- | SIGIL opcode: 0xD2 (LOCK_BODY_SCROLL)
+lockBodyScroll :: forall msg. Cmd msg
+lockBodyScroll = LockBodyScroll
+
+-- | Unlock body scroll to restore scrolling.
+-- |
+-- | Restores the original overflow value on the document body.
+-- | Call when closing modal dialogs.
+-- |
+-- | SIGIL opcode: 0xD3 (UNLOCK_BODY_SCROLL)
+unlockBodyScroll :: forall msg. Cmd msg
+unlockBodyScroll = UnlockBodyScroll
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // http types

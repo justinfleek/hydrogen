@@ -120,7 +120,6 @@ scatterPlot propMods points =
         , E.attr "cy" (show (scaleY p.y))
         , E.attr "r" (show (fromMaybe props.pointSize p.size))
         , E.attr "fill" (fromMaybe props.defaultColor p.color)
-        , E.style "transition" "r 0.2s ease"
         ]
     ) points
   in

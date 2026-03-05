@@ -55,9 +55,6 @@ module Hydrogen.Schema.Color.HSL
   , decreaseSaturation
   , grayscale
   
-  -- * CSS Output (Legacy string generation, NOT FFI)
-  , toLegacyCss
-  
   -- * Interop
   , fromLegacy
   , toLegacy
@@ -87,7 +84,9 @@ derive instance eqHSL :: Eq HSL
 derive instance ordHSL :: Ord HSL
 
 instance showHSL :: Show HSL where
-  show = toLegacyCss
+  show (HSL c) = "HSL " <> show (Hue.unwrap c.hue) 
+    <> " " <> show (Sat.unwrap c.saturation)
+    <> " " <> show (Light.unwrap c.lightness)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -261,24 +260,6 @@ grayscale (HSL c) = HSL
   , saturation: Sat.saturation 0
   , lightness: c.lightness
   }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to legacy CSS hsl() function string.
--- |
--- | This generates a CSS-compatible string for use with legacy rendering.
--- | NOT an FFI boundary - pure string generation.
--- |
--- | ```purescript
--- | toLegacyCss (hsl 210 80 50)  -- "hsl(210, 80%, 50%)"
--- | ```
-toLegacyCss :: HSL -> String
-toLegacyCss (HSL c) =
-  "hsl(" <> show (Hue.unwrap c.hue) 
-  <> ", " <> show (Sat.unwrap c.saturation) <> "%"
-  <> ", " <> show (Light.unwrap c.lightness) <> "%)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // interop

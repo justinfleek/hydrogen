@@ -64,15 +64,9 @@ module Hydrogen.Schema.Typography.OpenType.Kerning
   , hasOpticalSizing
   , hasCaseSensitive
   , hasCapitalSpacing
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
-
-import Data.Array (intercalate)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // kerning mode
@@ -94,12 +88,6 @@ instance showKerningMode :: Show KerningMode where
   show KerningOn = "KerningOn"
   show KerningOff = "KerningOff"
 
--- | Convert kerning mode to CSS value
-kerningToLegacyCss :: KerningMode -> String
-kerningToLegacyCss KerningAuto = "auto"
-kerningToLegacyCss KerningOn = "normal"
-kerningToLegacyCss KerningOff = "none"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // optical sizing
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -117,11 +105,6 @@ derive instance ordOpticalSizing :: Ord OpticalSizing
 instance showOpticalSizing :: Show OpticalSizing where
   show OpticalAuto = "OpticalAuto"
   show OpticalNone = "OpticalNone"
-
--- | Convert optical sizing to CSS value
-opticalToLegacyCss :: OpticalSizing -> String
-opticalToLegacyCss OpticalAuto = "auto"
-opticalToLegacyCss OpticalNone = "none"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // kerning
@@ -281,45 +264,3 @@ hasCaseSensitive _ = false
 hasCapitalSpacing :: Kerning -> Boolean
 hasCapitalSpacing (Kerning { capitalSpacing: true }) = true
 hasCapitalSpacing _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS declarations
-toLegacyCss :: Kerning -> String
-toLegacyCss (Kerning k) =
-  "font-kerning: " <> kerningToLegacyCss k.kerning <> ";\n" <>
-  "font-optical-sizing: " <> opticalToLegacyCss k.opticalSizing <> ";" <>
-  featureSettingsIfNeeded k
-  where
-  featureSettingsIfNeeded :: { caseSensitive :: Boolean, capitalSpacing :: Boolean | _ } -> String
-  featureSettingsIfNeeded cfg
-    | cfg.caseSensitive || cfg.capitalSpacing =
-        "\n" <> toFontFeatureSettingsInner cfg.caseSensitive cfg.capitalSpacing
-    | otherwise = ""
-
-  toFontFeatureSettingsInner :: Boolean -> Boolean -> String
-  toFontFeatureSettingsInner cs cpsp =
-    let features =
-          (if cs then ["\"case\" 1"] else []) <>
-          (if cpsp then ["\"cpsp\" 1"] else [])
-    in "font-feature-settings: " <> intercalate ", " features <> ";"
-
--- | Convert to font-feature-settings value
--- |
--- | Complete control via OpenType feature tags.
-toFontFeatureSettings :: Kerning -> String
-toFontFeatureSettings (Kerning k) =
-  let
-    features =
-      (case k.kerning of
-        KerningAuto -> []
-        KerningOn -> ["\"kern\" 1"]
-        KerningOff -> ["\"kern\" 0"]) <>
-      (if k.caseSensitive then ["\"case\" 1"] else []) <>
-      (if k.capitalSpacing then ["\"cpsp\" 1"] else [])
-  in case features of
-    [] -> "font-feature-settings: normal;"
-    _ -> "font-feature-settings: " <> intercalate ", " features <> ";"

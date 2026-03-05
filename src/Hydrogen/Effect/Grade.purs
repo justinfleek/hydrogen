@@ -57,7 +57,7 @@ module Hydrogen.Effect.Grade
 -- | Kind for effect labels. Each label corresponds to a category of side
 -- effect that a computation may perform.
 -- 
--- The labels form a total order: Net < Auth < Config < Log < Crypto < Fs
+-- The labels form a total order: Net < Auth < Config < Log < Crypto < Fs < Db
 -- This ordering is used to maintain sorted grade lists for canonical form.
 data GradeLabel
 
@@ -78,6 +78,19 @@ foreign import data Crypto :: GradeLabel
 
 -- | Filesystem access outside sandbox
 foreign import data Fs :: GradeLabel
+
+-- | Database operations (DuckDB — the Straylight state machine)
+-- |
+-- | DuckDB is the central source of truth. Everything routes through it:
+-- |   - UUID5 identifiers (deterministic, content-addressed)
+-- |   - Attestation events (provenance, coeffects, discharge proofs)
+-- |   - Tour state, user preferences, brand data
+-- |   - All persistent state for the billion-agent swarm
+-- |
+-- | The tiered cache (L1 HAMT → L2 DuckDB → L3 PostgreSQL) is an
+-- | implementation detail. From the grade perspective, Db means
+-- | "touches the Straylight state machine."
+foreign import data Db :: GradeLabel
 
 -- ════════════════════════════════════════════════════════════════════════════
 --                                                              // grade type

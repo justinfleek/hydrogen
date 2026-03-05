@@ -53,6 +53,8 @@
 -- |   - Hydrogen.Element.Core.Specs — Shape and text specifications
 -- |   - Hydrogen.Element.Core.Media — Image, video, audio, 3D specs
 -- |   - Hydrogen.Element.Core.Element — Element type, instances, constructors
+-- |   - Hydrogen.Element.Core.Effect — Graded effects/co-effects for Elements
+-- |   - Hydrogen.Element.Core.Constraint — Presburger constraints for resources
 -- |
 -- | ## Dependencies (Schema atoms only)
 -- |
@@ -79,6 +81,12 @@ module Hydrogen.Element.Core
   -- * Stroke Configuration (LineCap, LineJoin)
   , module ReExportLineCap
   , module ReExportLineJoin
+  
+  -- * Graded Effects and Co-Effects
+  , module ReExportEffect
+  
+  -- * Presburger Constraints
+  , module ReExportConstraint
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -87,12 +95,20 @@ module Hydrogen.Element.Core
 
 -- Element type, composition specs, instances, and smart constructors
 import Hydrogen.Element.Core.Element
-  ( Element(Rectangle, Ellipse, Path, Text, Image, Video, Audio, Model3D, Group, Transform, Empty)
+  ( Element(Rectangle, Ellipse, Path, Polygon, Star, Ring, Spiral, Arrow, Cross, Gear, Line, Text, Image, Video, Audio, Model3D, Group, Transform, Empty)
   , GroupSpec
   , TransformSpec
   , rectangle
   , ellipse
   , path
+  , polygon
+  , star
+  , ring
+  , spiral
+  , arrow
+  , cross
+  , gear
+  , line
   , text
   , image
   , video
@@ -108,6 +124,14 @@ import Hydrogen.Element.Core.Specs
   ( RectangleSpec
   , EllipseSpec
   , PathSpec
+  , PolygonSpec
+  , StarSpec
+  , RingSpec
+  , SpiralSpec
+  , ArrowSpec
+  , CrossSpec
+  , GearSpec
+  , LineSpec
   , GlyphSpec
   , TextSpec
   ) as ReExportSpecs
@@ -142,3 +166,101 @@ import Hydrogen.Schema.Geometry.Stroke
 import Hydrogen.Schema.Geometry.Stroke
   ( LineJoin(JoinMiter, JoinRound, JoinBevel)
   ) as ReExportLineJoin
+
+-- Graded effects and co-effects for Element
+import Hydrogen.Element.Core.Effect
+  ( -- Effects
+    ElementEffect
+      ( EffectPure
+      , EffectCanClick
+      , EffectCanHover
+      , EffectCanFocus
+      , EffectCanDrag
+      , EffectCanAnimate
+      , EffectCanEmitSound
+      , EffectCanRequestData
+      , EffectComposite
+      )
+  , effectCombine
+  , effectPure
+  , effectCanInteract
+  , effectCanAnimate
+    -- Co-Effects
+  , ElementCoEffect
+      ( CoEffectNone
+      , CoEffectNeedsFont
+      , CoEffectNeedsIcon
+      , CoEffectNeedsImage
+      , CoEffectNeedsData
+      , CoEffectNeedsAudio
+      , CoEffectNeedsVideo
+      , CoEffectNeeds3DModel
+      , CoEffectComposite
+      )
+  , coEffectCombine
+  , coEffectNone
+    -- Graded Element
+  , GradedElement
+  , gradeElement
+  , elementEffect
+  , elementCoEffect
+  , elementUUID
+    -- Event Binding
+  , EventBinding
+  , EventBindingMap
+  , emptyBindingMap
+  , bindEvent
+  , lookupBinding
+  ) as ReExportEffect
+
+-- Presburger constraints for Element resources
+import Hydrogen.Element.Core.Constraint
+  ( -- Resource Bounds
+    ResourceBound
+  , fontBound
+  , iconBound
+  , imageBound
+  , dataBound
+  , audioBound
+  , videoBound
+  , model3DBound
+  , memoryBound
+    -- Element Constraints
+  , ElementConstraint
+      ( ConstraintResourceBound
+      , ConstraintMemoryBudget
+      , ConstraintEffectPurity
+      , ConstraintCoEffectProvided
+      , ConstraintAnd
+      , ConstraintOr
+      , ConstraintTrue
+      , ConstraintFalse
+      )
+  , constraintSatisfied
+  , constraintSimplify
+    -- Constraint Builders
+  , resourceBoundConstraint
+  , memoryBudgetConstraint
+  , effectPurityConstraint
+  , coEffectProvidedConstraint
+  , conjConstraints
+  , disjConstraints
+    -- Resource Environment
+  , ResourceEnvironment
+  , emptyEnvironment
+  , environmentWithFonts
+  , environmentWithImages
+  , environmentWithMemory
+  , environmentSatisfies
+    -- Optimization Objective
+  , OptimizationMetric
+      ( MetricLoadTime
+      , MetricMemoryUsage
+      , MetricPreloadCount
+      , MetricCacheHits
+      )
+  , ElementObjective
+  , minimizeLoadTime
+  , minimizeMemory
+  , maximizePreload
+  ) as ReExportConstraint

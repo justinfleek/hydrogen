@@ -37,8 +37,6 @@ module Hydrogen.Schema.Typography.TypeHierarchy
   -- Generation
   , generate
   , GenerateConfig
-  -- CSS
-  , toLegacyCss
   ) where
 
 import Prelude
@@ -52,7 +50,7 @@ import Hydrogen.Schema.Typography.TextTransform (TextTransform(None, Uppercase))
 import Hydrogen.Schema.Typography.TypeScale (TypeScale)
 import Hydrogen.Schema.Typography.TypeScale as TypeScale
 import Hydrogen.Schema.Typography.TypeStyle (TypeStyle, FontStack)
-import Hydrogen.Schema.Typography.TypeStyle as TypeStyle
+import Hydrogen.Schema.Typography.TypeStyle (typeStyleWithStack) as TypeStyle
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // hierarchy level
@@ -301,23 +299,3 @@ generate cfg = TypeHierarchy
     cfg.bodyLineHeight
     LetterSpacing.uppercase
     Uppercase
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary - pure string generation.
--- | Generate CSS custom properties for the hierarchy
-toLegacyCss :: TypeHierarchy -> String
-toLegacyCss th = 
-  ".hero {\n" <> TypeStyle.toLegacyCss (hero th) <> "\n}\n\n" <>
-  "h1, .h1 {\n" <> TypeStyle.toLegacyCss (h1 th) <> "\n}\n\n" <>
-  "h2, .h2 {\n" <> TypeStyle.toLegacyCss (h2 th) <> "\n}\n\n" <>
-  "h3, .h3 {\n" <> TypeStyle.toLegacyCss (h3 th) <> "\n}\n\n" <>
-  "h4, .h4 {\n" <> TypeStyle.toLegacyCss (h4 th) <> "\n}\n\n" <>
-  "h5, .h5 {\n" <> TypeStyle.toLegacyCss (h5 th) <> "\n}\n\n" <>
-  "h6, .h6 {\n" <> TypeStyle.toLegacyCss (h6 th) <> "\n}\n\n" <>
-  "body, .body {\n" <> TypeStyle.toLegacyCss (body th) <> "\n}\n\n" <>
-  ".small {\n" <> TypeStyle.toLegacyCss (small th) <> "\n}\n\n" <>
-  ".caption {\n" <> TypeStyle.toLegacyCss (caption th) <> "\n}\n\n" <>
-  ".overline {\n" <> TypeStyle.toLegacyCss (overline th) <> "\n}"

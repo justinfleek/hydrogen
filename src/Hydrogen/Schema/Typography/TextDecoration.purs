@@ -56,10 +56,6 @@ module Hydrogen.Schema.Typography.TextDecoration
   , hasOverline
   , hasLineThrough
   , isVisible
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toShorthand
   ) where
 
 import Prelude
@@ -90,14 +86,6 @@ instance showDecorationLine :: Show DecorationLine where
   show LineThrough = "LineThrough"
   show UnderlineOverline = "UnderlineOverline"
 
--- | Convert line to CSS value
-lineToLegacyCss :: DecorationLine -> String
-lineToLegacyCss LineNone = "none"
-lineToLegacyCss Underline = "underline"
-lineToLegacyCss Overline = "overline"
-lineToLegacyCss LineThrough = "line-through"
-lineToLegacyCss UnderlineOverline = "underline overline"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // decoration style
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -121,14 +109,6 @@ instance showDecorationStyle :: Show DecorationStyle where
   show StyleDotted = "StyleDotted"
   show StyleDashed = "StyleDashed"
   show StyleWavy = "StyleWavy"
-
--- | Convert style to CSS value
-styleToLegacyCss :: DecorationStyle -> String
-styleToLegacyCss StyleSolid = "solid"
-styleToLegacyCss StyleDouble = "double"
-styleToLegacyCss StyleDotted = "dotted"
-styleToLegacyCss StyleDashed = "dashed"
-styleToLegacyCss StyleWavy = "wavy"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // decoration thickness
@@ -154,14 +134,6 @@ instance showDecorationThickness :: Show DecorationThickness where
   show (ThicknessEm n) = "ThicknessEm " <> show n
   show (ThicknessPercent n) = "ThicknessPercent " <> show n
 
--- | Convert thickness to CSS value
-thicknessToLegacyCss :: DecorationThickness -> String
-thicknessToLegacyCss ThicknessAuto = "auto"
-thicknessToLegacyCss ThicknessFromFont = "from-font"
-thicknessToLegacyCss (ThicknessPixels n) = show n <> "px"
-thicknessToLegacyCss (ThicknessEm n) = show n <> "em"
-thicknessToLegacyCss (ThicknessPercent n) = show n <> "%"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // underline offset
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -184,13 +156,6 @@ instance showUnderlineOffset :: Show UnderlineOffset where
   show (OffsetPixels n) = "OffsetPixels " <> show n
   show (OffsetEm n) = "OffsetEm " <> show n
   show (OffsetPercent n) = "OffsetPercent " <> show n
-
--- | Convert offset to CSS value
-offsetToLegacyCss :: UnderlineOffset -> String
-offsetToLegacyCss OffsetAuto = "auto"
-offsetToLegacyCss (OffsetPixels n) = show n <> "px"
-offsetToLegacyCss (OffsetEm n) = show n <> "em"
-offsetToLegacyCss (OffsetPercent n) = show n <> "%"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                            // text decoration
@@ -362,36 +327,3 @@ hasLineThrough _ = false
 isVisible :: TextDecoration -> Boolean
 isVisible (TextDecoration { line: LineNone }) = false
 isVisible _ = true
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to full CSS declarations
-toLegacyCss :: TextDecoration -> String
-toLegacyCss (TextDecoration td) = case td.line of
-  LineNone -> "text-decoration: none;"
-  _ ->
-    "text-decoration-line: " <> lineToLegacyCss td.line <> ";\n" <>
-    "text-decoration-style: " <> styleToLegacyCss td.style <> ";\n" <>
-    "text-decoration-thickness: " <> thicknessToLegacyCss td.thickness <> ";\n" <>
-    "text-underline-offset: " <> offsetToLegacyCss td.offset <> ";" <>
-    case td.color of
-      Nothing -> ""
-      Just c -> "\ntext-decoration-color: " <> c <> ";"
-
--- | Convert to text-decoration shorthand
--- |
--- | Returns the shorthand form: `text-decoration: line style color;`
--- | Note: thickness and offset require separate properties.
-toShorthand :: TextDecoration -> String
-toShorthand (TextDecoration td) = case td.line of
-  LineNone -> "text-decoration: none;"
-  _ ->
-    "text-decoration: " <> 
-    lineToLegacyCss td.line <> " " <>
-    styleToLegacyCss td.style <>
-    case td.color of
-      Nothing -> ";"
-      Just c -> " " <> c <> ";"

@@ -203,5 +203,4 @@ renderGroupedBar cfg catX barWidth scaleY baseline seriesIdx value =
       , E.attr "height" (show (Math.abs barHeight))
       , E.attr "fill" color
       , E.attr "rx" "2"
-      , E.style "filter" ("drop-shadow(0 0 8px " <> color <> "60)")
       ]

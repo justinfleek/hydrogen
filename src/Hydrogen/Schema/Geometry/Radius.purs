@@ -51,9 +51,6 @@ module Hydrogen.Schema.Geometry.Radius
   , double
   , half
   
-  -- * Conversion
-  , toLegacyCss
-  , cornersToLegacyCss
   ) where
 
 import Prelude
@@ -66,7 +63,7 @@ import Prelude
   , (*)
   )
 
-import Data.Int as Int
+
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // core types
@@ -216,44 +213,4 @@ double = scale 2.0
 half :: Radius -> Radius
 half = scale 0.5
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert radius to legacy CSS string
--- |
--- | This generates a CSS-compatible string for use with legacy rendering.
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: Radius -> String
-toLegacyCss = case _ of
-  RadiusPx n -> showNum n <> "px"
-  RadiusPercent n -> showNum n <> "%"
-  RadiusRem n -> showNum n <> "rem"
-  RadiusFull -> "9999px"
-  RadiusNone -> "0"
-
--- | Convert corners to legacy CSS border-radius string
--- |
--- | This generates a CSS-compatible string for use with legacy rendering.
--- | NOT an FFI boundary - pure string generation.
-cornersToLegacyCss :: Corners -> String
-cornersToLegacyCss { topLeft, topRight, bottomRight, bottomLeft } =
-  if allSame then toLegacyCss topLeft
-  else if topSame && bottomSame then toLegacyCss topLeft <> " " <> toLegacyCss bottomRight
-  else toLegacyCss topLeft <> " " <> toLegacyCss topRight <> " " <> toLegacyCss bottomRight <> " " <> toLegacyCss bottomLeft
-  where
-    allSame = topLeft == topRight && topRight == bottomRight && bottomRight == bottomLeft
-    topSame = topLeft == topRight
-    bottomSame = bottomRight == bottomLeft
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // helpers
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Show number cleanly
-showNum :: Number -> String
-showNum n =
-  let rounded = Int.round n
-  in if Int.toNumber rounded == n
-    then show rounded
-    else show n

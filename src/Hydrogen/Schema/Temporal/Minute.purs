@@ -12,7 +12,6 @@ module Hydrogen.Schema.Temporal.Minute
   , unsafeMinute
   , unwrap
   , toInt
-  , toLegacyCss
   , bounds
   ) where
 
@@ -72,17 +71,6 @@ unwrap (Minute m) = m
 -- | Alias for unwrap
 toInt :: Minute -> Int
 toInt = unwrap
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // formatting
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCss :: Minute -> String
-toLegacyCss (Minute m) = show m
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

@@ -101,10 +101,6 @@ module Hydrogen.Schema.Geometry.Point
   , areCollinear2D
   , areCollinear3D
   
-  -- * CSS Conversion
-  , toLegacyCss2D
-  , toTranslate2D
-  , toTranslate3D
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -452,20 +448,4 @@ areCollinear3D (Point3D a) (Point3D b) (Point3D c) =
 epsilon :: Number
 epsilon = 0.0000001
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                             // css conversion
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert 2D point to CSS coordinate string
-toLegacyCss2D :: Point2D -> String
-toLegacyCss2D (Point2D p) = show p.x <> "px " <> show p.y <> "px"
-
--- | Convert 2D point to CSS translate() transform
-toTranslate2D :: Point2D -> String
-toTranslate2D (Point2D p) =
-  "translate(" <> show p.x <> "px, " <> show p.y <> "px)"
-
--- | Convert 3D point to CSS translate3d() transform
-toTranslate3D :: Point3D -> String
-toTranslate3D (Point3D p) =
-  "translate3d(" <> show p.x <> "px, " <> show p.y <> "px, " <> show p.z <> "px)"

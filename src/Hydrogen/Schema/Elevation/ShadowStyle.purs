@@ -35,8 +35,8 @@
 -- | -- Get a colored shadow based on element color
 -- | coloredShadow = SS.shadowColored (RGB.rgb 59 130 246) 3
 -- |
--- | -- Convert to CSS
--- | css = SS.toLegacyCss cardShadow
+-- | -- Access underlying shadow data
+-- | shadow = SS.getShadow cardShadow
 -- | ```
 
 module Hydrogen.Schema.Elevation.ShadowStyle
@@ -72,9 +72,6 @@ module Hydrogen.Schema.Elevation.ShadowStyle
   , getIntensity
   , getShadow
   
-  -- * Conversion (Legacy CSS, not FFI)
-  , toLegacyCss
-  
   -- * Predicates
   , isNone
   , isSoft
@@ -89,16 +86,11 @@ import Prelude
   , class Ord
   , class Show
   , show
-  , compare
   , negate
   , (+)
   , (-)
   , (*)
-  , (<)
-  , (>)
   , (<>)
-  , (==)
-  , ($)
   , max
   , min
   )
@@ -112,7 +104,6 @@ import Hydrogen.Schema.Elevation.Shadow
   , boxShadow
   , layered
   , noShadow
-  , layeredToLegacyCss
   )
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -422,16 +413,6 @@ getShadow (Colored _ _ s) = s
 getShadow (Long _ s) = s
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert shadow style to CSS box-shadow string.
--- |
--- | NOT an FFI boundary — pure string generation.
-toLegacyCss :: ShadowStyle -> String
-toLegacyCss = layeredToLegacyCss <<< getShadow
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // predicates
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -468,12 +449,6 @@ isLong _ = false
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Function composition
-infixr 9 composeFlipped as <<<
-
-composeFlipped :: forall a b c. (b -> c) -> (a -> b) -> a -> c
-composeFlipped f g x = f (g x)
 
 -- | Create shadow with black color
 mkShadow :: Number -> Number -> Number -> Number -> RGBA -> BoxShadow

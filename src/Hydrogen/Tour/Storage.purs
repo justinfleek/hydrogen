@@ -2,37 +2,36 @@
 --                                                // hydrogen // tour // storage
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Persistence for Product Tours
+-- | Persistence Operations for Product Tours — Pure ADT representation.
 -- |
--- | This module handles storing tour state in localStorage for:
--- | - "Don't show again" functionality
--- | - Snooze with expiration
--- | - Tour completion tracking
+-- | This module generates pure ADT operations for tour state persistence.
+-- | Operations are pure data that can be interpreted by a runtime.
 -- |
--- | All storage is namespaced under "hydrogen:tour:" to avoid conflicts.
+-- | ## Design Philosophy
 -- |
--- | ## Usage
+-- | Following Hydrogen's "UI as data" principle, storage operations are
+-- | represented as algebraic data types. The runtime interprets these
+-- | against the actual localStorage API. This enables:
+-- | - Testability without browser dependencies
+-- | - Deterministic operation sequencing
+-- | - Serialization of storage intents
 -- |
--- | ```purescript
--- | import Hydrogen.Tour.Storage as Storage
--- | import Hydrogen.Tour.Types as T
+-- | ## Storage Keys
 -- |
--- | -- Check if tour should be shown
--- | shouldShow <- Storage.shouldShowTour (T.mkTourId "onboarding")
--- |
--- | -- Mark tour as completed
--- | Storage.markCompleted (T.mkTourId "onboarding")
--- |
--- | -- Snooze for 24 hours
--- | Storage.snooze (T.mkTourId "onboarding") (T.Milliseconds (24 * 60 * 60 * 1000))
--- | ```
+-- | All keys are namespaced under "hydrogen:tour:" to avoid conflicts:
+-- | - "hydrogen:tour:{id}:completed" — completion timestamp
+-- | - "hydrogen:tour:{id}:dismissed" — dismissal timestamp
+-- | - "hydrogen:tour:{id}:snoozed-until" — snooze expiration timestamp
+
 module Hydrogen.Tour.Storage
-  ( -- * Query State
-    shouldShowTour
-  , hasCompleted
-  , hasDismissed
-  , isSnoozed
-    -- * Persistence
+  ( -- * Query Operations
+    TourStorageQuery(CheckCompleted, CheckDismissed, CheckSnoozed, CheckShouldShow)
+  , checkCompleted
+  , checkDismissed
+  , checkSnoozed
+  , checkShouldShow
+    -- * Mutation Operations
+  , TourStorageMutation(MarkCompleted, MarkDismissed, Snooze, ClearSnooze, ClearTourState)
   , markCompleted
   , markDismissed
   , snooze
@@ -42,143 +41,188 @@ module Hydrogen.Tour.Storage
   , completedKey
   , dismissedKey
   , snoozeKey
+  , storagePrefix
+    -- * Query Results (for runtime to construct)
+  , TourQueryResult(Completed, NotCompleted, Dismissed, NotDismissed, Snoozed, NotSnoozed, ShouldShow, ShouldNotShow)
   ) where
 
-import Prelude
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
 
-import Data.DateTime.Instant (unInstant)
-import Data.Int (toNumber)
-import Data.Maybe (Maybe(Just, Nothing), isJust)
-import Data.Newtype (unwrap)
-import Data.Number as Number
-import Effect (Effect)
-import Effect.Now (now)
-import Hydrogen.Tour.Types (Milliseconds(Milliseconds), TourId(TourId))
-import Hydrogen.Util.LocalStorage as LS
+import Prelude
+  ( class Eq
+  , class Ord
+  , class Show
+  , (<>)
+  , show
+  )
+
+import Data.Maybe (Maybe(Just, Nothing))
+import Hydrogen.Tour.Types (Milliseconds, TourId(TourId))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // storage keys
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Namespace prefix for all tour storage
+-- | Namespace prefix for all tour storage.
 storagePrefix :: String
 storagePrefix = "hydrogen:tour:"
 
--- | Key for tour completion state
+-- | Key for tour completion state.
+-- |
+-- | Returns: "hydrogen:tour:{id}:completed"
 completedKey :: TourId -> String
 completedKey (TourId id) = storagePrefix <> id <> ":completed"
 
--- | Key for tour dismissal state
+-- | Key for tour dismissal state.
+-- |
+-- | Returns: "hydrogen:tour:{id}:dismissed"
 dismissedKey :: TourId -> String
 dismissedKey (TourId id) = storagePrefix <> id <> ":dismissed"
 
--- | Key for snooze expiration timestamp
+-- | Key for snooze expiration timestamp.
+-- |
+-- | Returns: "hydrogen:tour:{id}:snoozed-until"
 snoozeKey :: TourId -> String
 snoozeKey (TourId id) = storagePrefix <> id <> ":snoozed-until"
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                // query state
+--                                                            // query operations
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Check if a tour should be shown to the user
+-- | TourStorageQuery — ADT representing read operations for tour state.
 -- |
--- | Returns false if:
--- | - Tour has been completed
--- | - Tour has been dismissed (if persistent dismiss is enabled)
--- | - Tour is currently snoozed
-shouldShowTour :: TourId -> Effect Boolean
-shouldShowTour tourId = do
-  completed <- hasCompleted tourId
-  dismissed <- hasDismissed tourId
-  snoozed <- isSnoozed tourId
-  pure $ not completed && not dismissed && not snoozed
+-- | These are pure data structures that the runtime interprets against
+-- | localStorage. Each query specifies what information is needed.
+data TourStorageQuery
+  = CheckCompleted TourId      -- ^ Has tour been completed?
+  | CheckDismissed TourId      -- ^ Has tour been dismissed?
+  | CheckSnoozed TourId        -- ^ Is tour currently snoozed?
+  | CheckShouldShow TourId     -- ^ Should tour be shown? (composite query)
 
--- | Check if tour has been completed
-hasCompleted :: TourId -> Effect Boolean
-hasCompleted tourId = do
-  maybeValue <- LS.getItemRaw (completedKey tourId)
-  pure $ isJust maybeValue
+derive instance eqTourStorageQuery :: Eq TourStorageQuery
+derive instance ordTourStorageQuery :: Ord TourStorageQuery
 
--- | Check if tour has been dismissed
-hasDismissed :: TourId -> Effect Boolean
-hasDismissed tourId = do
-  maybeValue <- LS.getItemRaw (dismissedKey tourId)
-  pure $ isJust maybeValue
+instance showTourStorageQuery :: Show TourStorageQuery where
+  show (CheckCompleted t) = "(CheckCompleted " <> show t <> ")"
+  show (CheckDismissed t) = "(CheckDismissed " <> show t <> ")"
+  show (CheckSnoozed t) = "(CheckSnoozed " <> show t <> ")"
+  show (CheckShouldShow t) = "(CheckShouldShow " <> show t <> ")"
 
--- | Check if tour is currently snoozed
+-- | Query for tour completion state.
+checkCompleted :: TourId -> TourStorageQuery
+checkCompleted = CheckCompleted
+
+-- | Query for tour dismissal state.
+checkDismissed :: TourId -> TourStorageQuery
+checkDismissed = CheckDismissed
+
+-- | Query for tour snooze state.
+checkSnoozed :: TourId -> TourStorageQuery
+checkSnoozed = CheckSnoozed
+
+-- | Composite query: should tour be shown?
 -- |
--- | Returns true if a snooze is active and hasn't expired.
--- | Automatically clears expired snoozes.
-isSnoozed :: TourId -> Effect Boolean
-isSnoozed tourId = do
-  maybeUntilStr <- LS.getItemRaw (snoozeKey tourId)
-  case maybeUntilStr >>= parseNumber of
-    Nothing -> pure false
-    Just until -> do
-      nowMs <- currentTimeMs
-      if nowMs < until
-        then pure true
-        else do
-          -- Snooze expired, clear it
-          clearSnooze tourId
-          pure false
-  where
-  -- Parse a string to a Number, returning Nothing on failure
-  parseNumber :: String -> Maybe Number
-  parseNumber = Number.fromString
+-- | Returns true if tour is not completed, not dismissed, and not snoozed.
+checkShouldShow :: TourId -> TourStorageQuery
+checkShouldShow = CheckShouldShow
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                // persistence
+--                                                          // mutation operations
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Mark a tour as completed
+-- | TourStorageMutation — ADT representing write operations for tour state.
 -- |
--- | This prevents the tour from being shown again (until cleared).
-markCompleted :: TourId -> Effect Unit
-markCompleted tourId = do
-  nowMs <- currentTimeMs
-  LS.setItemRaw (completedKey tourId) (show nowMs)
+-- | These are pure data structures that the runtime interprets against
+-- | localStorage. Each mutation specifies what change should be made.
+data TourStorageMutation
+  = MarkCompleted TourId                -- ^ Mark tour as completed
+  | MarkDismissed TourId                -- ^ Mark tour as dismissed
+  | Snooze TourId Milliseconds          -- ^ Snooze tour for duration
+  | ClearSnooze TourId                  -- ^ Clear active snooze
+  | ClearTourState TourId               -- ^ Clear all state for tour
 
--- | Mark a tour as dismissed
+derive instance eqTourStorageMutation :: Eq TourStorageMutation
+derive instance ordTourStorageMutation :: Ord TourStorageMutation
+
+instance showTourStorageMutation :: Show TourStorageMutation where
+  show (MarkCompleted t) = "(MarkCompleted " <> show t <> ")"
+  show (MarkDismissed t) = "(MarkDismissed " <> show t <> ")"
+  show (Snooze t ms) = "(Snooze " <> show t <> " " <> show ms <> ")"
+  show (ClearSnooze t) = "(ClearSnooze " <> show t <> ")"
+  show (ClearTourState t) = "(ClearTourState " <> show t <> ")"
+
+-- | Create a MarkCompleted mutation.
 -- |
--- | For persistent "don't show again" functionality.
-markDismissed :: TourId -> Effect Unit
-markDismissed tourId = do
-  nowMs <- currentTimeMs
-  LS.setItemRaw (dismissedKey tourId) (show nowMs)
+-- | When interpreted, stores the current timestamp at the completed key.
+markCompleted :: TourId -> TourStorageMutation
+markCompleted = MarkCompleted
 
--- | Snooze a tour for a duration
+-- | Create a MarkDismissed mutation.
 -- |
--- | The tour will not be shown until the snooze expires.
-snooze :: TourId -> Milliseconds -> Effect Unit
-snooze tourId (Milliseconds duration) = do
-  nowMs <- currentTimeMs
-  let expiresAt = nowMs + toNumber duration
-  LS.setItemRaw (snoozeKey tourId) (show expiresAt)
+-- | When interpreted, stores the current timestamp at the dismissed key.
+markDismissed :: TourId -> TourStorageMutation
+markDismissed = MarkDismissed
 
--- | Clear an active snooze
-clearSnooze :: TourId -> Effect Unit
-clearSnooze tourId = LS.removeItem (snoozeKey tourId)
-
--- | Clear all state for a tour
+-- | Create a Snooze mutation.
 -- |
--- | Removes completion, dismissal, and snooze state.
--- | Useful for testing or resetting tours.
-clearTourState :: TourId -> Effect Unit
-clearTourState tourId = do
-  LS.removeItem (completedKey tourId)
-  LS.removeItem (dismissedKey tourId)
-  LS.removeItem (snoozeKey tourId)
+-- | When interpreted, stores (now + duration) at the snoozed-until key.
+snooze :: TourId -> Milliseconds -> TourStorageMutation
+snooze = Snooze
+
+-- | Create a ClearSnooze mutation.
+-- |
+-- | When interpreted, removes the snoozed-until key.
+clearSnooze :: TourId -> TourStorageMutation
+clearSnooze = ClearSnooze
+
+-- | Create a ClearTourState mutation.
+-- |
+-- | When interpreted, removes completed, dismissed, and snoozed-until keys.
+clearTourState :: TourId -> TourStorageMutation
+clearTourState = ClearTourState
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // helpers
+--                                                              // query results
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Get current time in milliseconds since epoch
+-- | TourQueryResult — ADT representing results of storage queries.
 -- |
--- | Uses Effect.Now.now to get the current Instant, then extracts
--- | the milliseconds value as a Number.
-currentTimeMs :: Effect Number
-currentTimeMs = do
-  instant <- now
-  pure $ unwrap $ unInstant instant
+-- | The runtime constructs these after interpreting queries against
+-- | localStorage. Application code pattern matches on results.
+data TourQueryResult
+  = Completed                   -- ^ Tour has been completed
+  | NotCompleted                -- ^ Tour has not been completed
+  | Dismissed                   -- ^ Tour has been dismissed
+  | NotDismissed                -- ^ Tour has not been dismissed
+  | Snoozed                     -- ^ Tour is currently snoozed
+  | NotSnoozed                  -- ^ Tour is not snoozed (or snooze expired)
+  | ShouldShow                  -- ^ Tour should be shown
+  | ShouldNotShow               -- ^ Tour should not be shown
+
+derive instance eqTourQueryResult :: Eq TourQueryResult
+derive instance ordTourQueryResult :: Ord TourQueryResult
+
+instance showTourQueryResult :: Show TourQueryResult where
+  show Completed = "Completed"
+  show NotCompleted = "NotCompleted"
+  show Dismissed = "Dismissed"
+  show NotDismissed = "NotDismissed"
+  show Snoozed = "Snoozed"
+  show NotSnoozed = "NotSnoozed"
+  show ShouldShow = "ShouldShow"
+  show ShouldNotShow = "ShouldNotShow"
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                          // query key helpers
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Get the localStorage key for a query operation.
+-- |
+-- | Used by runtime to know which key to read.
+queryKey :: TourStorageQuery -> Maybe String
+queryKey (CheckCompleted tid) = Just (completedKey tid)
+queryKey (CheckDismissed tid) = Just (dismissedKey tid)
+queryKey (CheckSnoozed tid) = Just (snoozeKey tid)
+queryKey (CheckShouldShow _) = Nothing  -- Composite: needs multiple keys

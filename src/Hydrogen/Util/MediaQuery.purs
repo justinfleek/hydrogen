@@ -66,10 +66,10 @@ import Hydrogen.Schema.Dimension.MediaQuery
   , isHighResolution
   , isPrint
   , matches
-  , ScreenOrientation(PortraitOrientation, LandscapeOrientation)
-  , ColorScheme(Light, Dark)
-  , PointerType(NoPointer, Coarse, Fine)
-  , HoverCapability(NoHover, CanHover)
+  , ScreenOrientation(Portrait, Landscape)
+  , ColorScheme(Light, Dark, NoPreference)
+  , PointerType(PointerNone, PointerCoarse, PointerFine)
+  , HoverCapability(HoverNone, HoverOnDemand, Hover)
   , DisplayMode(Fullscreen, Standalone, MinimalUI, Browser)
   , MediaType(Screen, Print, All)
   , MediaEnvironment

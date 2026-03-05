@@ -64,10 +64,6 @@ module Hydrogen.Schema.Typography.TextEmphasis
   , isOpen
   , isOverText
   , isUnderText
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toShorthand
   ) where
 
 import Prelude
@@ -100,15 +96,6 @@ instance showEmphasisShape :: Show EmphasisShape where
   show ShapeTriangle = "ShapeTriangle"
   show ShapeSesame = "ShapeSesame"
 
--- | Convert shape to CSS value
-shapeToLegacyCss :: EmphasisShape -> String
-shapeToLegacyCss ShapeNone = "none"
-shapeToLegacyCss ShapeDot = "dot"
-shapeToLegacyCss ShapeCircle = "circle"
-shapeToLegacyCss ShapeDoubleCircle = "double-circle"
-shapeToLegacyCss ShapeTriangle = "triangle"
-shapeToLegacyCss ShapeSesame = "sesame"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // emphasis fill
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -126,11 +113,6 @@ derive instance ordEmphasisFill :: Ord EmphasisFill
 instance showEmphasisFill :: Show EmphasisFill where
   show Filled = "Filled"
   show Open = "Open"
-
--- | Convert fill to CSS value
-fillToLegacyCss :: EmphasisFill -> String
-fillToLegacyCss Filled = "filled"
-fillToLegacyCss Open = "open"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // emphasis position
@@ -155,14 +137,6 @@ derive instance ordEmphasisPosition :: Ord EmphasisPosition
 instance showEmphasisPosition :: Show EmphasisPosition where
   show PositionOver = "PositionOver"
   show PositionUnder = "PositionUnder"
-
--- | Convert position to CSS value
--- |
--- | Note: CSS also requires writing mode context (over right, under left)
--- | but for simplicity we default to standard horizontal mode positions.
-positionToLegacyCss :: EmphasisPosition -> String
-positionToLegacyCss PositionOver = "over right"
-positionToLegacyCss PositionUnder = "under left"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // text emphasis
@@ -356,31 +330,3 @@ isOverText _ = false
 isUnderText :: TextEmphasis -> Boolean
 isUnderText (TextEmphasis { position: PositionUnder }) = true
 isUnderText _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to full CSS declarations
-toLegacyCss :: TextEmphasis -> String
-toLegacyCss (TextEmphasis te) = case te.shape of
-  ShapeNone -> "text-emphasis: none;"
-  _ ->
-    "text-emphasis-style: " <> fillToLegacyCss te.fill <> " " <> shapeToLegacyCss te.shape <> ";\n" <>
-    "text-emphasis-position: " <> positionToLegacyCss te.position <> ";" <>
-    case te.color of
-      Nothing -> ""
-      Just c -> "\ntext-emphasis-color: " <> c <> ";"
-
--- | Convert to text-emphasis shorthand
-toShorthand :: TextEmphasis -> String
-toShorthand (TextEmphasis te) = case te.shape of
-  ShapeNone -> "text-emphasis: none;"
-  _ ->
-    "text-emphasis: " <>
-    fillToLegacyCss te.fill <> " " <>
-    shapeToLegacyCss te.shape <>
-    case te.color of
-      Nothing -> ";"
-      Just c -> " " <> c <> ";"

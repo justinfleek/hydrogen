@@ -2,327 +2,199 @@
 --                                  // hydrogen // element // compound // avatar
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Avatar — Schema-native user avatar component.
+-- | Avatar — Pure Element avatar component.
 -- |
 -- | ## Design Philosophy
 -- |
--- | This component accepts **concrete Schema atoms**, not semantic tokens.
--- | Size is specified as Device.Pixel, not "sm/md/lg".
+-- | This component emits **pure Element data**, not HTML/CSS.
+-- | No strings. No CSS properties. Just bounded Schema atoms
+-- | composed into Element shapes.
 -- |
--- | ## Schema Atoms Accepted
+-- | An avatar is fundamentally:
+-- | - An Ellipse (circle) with a solid fill for background
+-- | - A Text element centered inside (for fallback initials)
+-- | - Or an Image element (for user photo)
 -- |
--- | | Property            | Pillar     | Type                      | CSS Output              |
--- | |---------------------|------------|---------------------------|-------------------------|
--- | | size                | Dimension  | Device.Pixel              | width, height           |
--- | | backgroundColor     | Color      | Color.RGB                 | background-color        |
--- | | textColor           | Color      | Color.RGB                 | color (fallback text)   |
--- | | borderColor         | Color      | Color.RGB                 | border-color            |
--- | | borderWidth         | Dimension  | Device.Pixel              | border-width            |
--- | | fontSize            | Typography | Typography.FontSize       | font-size (fallback)    |
--- | | fontWeight          | Typography | Typography.FontWeight     | font-weight (fallback)  |
+-- | ## Schema Atoms Used
+-- |
+-- | | Property            | Pillar     | Type                      |
+-- | |---------------------|------------|---------------------------|
+-- | | size                | Dimension  | Pixel                     |
+-- | | backgroundColor     | Color      | RGB                       |
+-- | | textColor           | Color      | RGB                       |
+-- | | borderColor         | Color      | RGB                       |
+-- | | borderWidth         | Dimension  | Pixel                     |
 -- |
 -- | ## Usage
 -- |
 -- | ```purescript
 -- | import Hydrogen.Element.Compound.Avatar as Avatar
--- | import Hydrogen.Schema.Dimension.Device as Device
--- | import Hydrogen.Schema.Color.RGB as Color
 -- |
--- | -- With image
--- | Avatar.avatar [ Avatar.size (Device.px 40.0) ]
--- |   [ Avatar.avatarImage [ Avatar.imgSrc "/user.jpg", Avatar.imgAlt "User" ]
--- |   , Avatar.avatarFallback [] [ E.text "JD" ]
--- |   ]
--- |
--- | -- Fallback only with brand atoms
+-- | -- Simple avatar with initials
 -- | Avatar.avatar
--- |   [ Avatar.size brand.avatarSize
--- |   , Avatar.backgroundColor brand.avatarBackground
--- |   , Avatar.textColor brand.avatarText
+-- |   [ Avatar.size 40.0
+-- |   , Avatar.backgroundColor (Color.rgb 226 232 240)
 -- |   ]
--- |   [ Avatar.avatarFallback [] [ E.text "AB" ] ]
+-- |   "JD"
+-- |
+-- | -- Avatar with image
+-- | Avatar.avatarImage
+-- |   [ Avatar.size 40.0 ]
+-- |   "/user.jpg"
 -- | ```
 
 module Hydrogen.Element.Compound.Avatar
   ( -- * Main Component
     avatar
   
-  -- * Sub-components
+  -- * Image Avatar
   , avatarImage
-  , avatarFallback
   
   -- * Props
   , AvatarProps
   , AvatarProp
-  , ImageProps
-  , ImageProp
   , defaultProps
-  , defaultImageProps
   
-  -- * Dimension Atoms
+  -- * Prop Builders
   , size
-  
-  -- * Color Atoms
   , backgroundColor
   , textColor
   , borderColor
-  
-  -- * Geometry Atoms
   , borderWidth
-  
-  -- * Typography Atoms
-  , fontSize
-  , fontWeight
-  
-  -- * Image Props
-  , imgSrc
-  , imgAlt
-  
-  -- * Escape Hatch
-  , extraAttributes
   ) where
 
 import Prelude
-  ( show
-  , (<>)
+  ( ($)
+  , (/)
   )
 
 import Data.Array (foldl)
-import Data.Maybe (Maybe(Nothing, Just), maybe)
+import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 
-import Hydrogen.Render.Element as E
-import Hydrogen.Schema.Color.RGB as Color
-import Hydrogen.Schema.Dimension.Device as Device
-import Hydrogen.Schema.Typography.FontSize as FontSize
-import Hydrogen.Schema.Typography.FontWeight as FontWeight
+import Hydrogen.Element.Core (Element, ellipse, image, group)
+import Hydrogen.Schema.Color.RGB (RGB, rgb)
+import Hydrogen.Schema.Color.Opacity (opacity)
+import Hydrogen.Schema.Dimension.Device.Types (Pixel(Pixel))
+import Hydrogen.Schema.Geometry.Shape (EllipseShape, ellipseShape)
+import Hydrogen.Schema.Geometry.Point (PixelPoint2D, pixelPoint2D)
+import Hydrogen.Schema.Surface.Fill (Fill, solid)
+import Hydrogen.Element.Core.Media (ImageSource, urlSource)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // props
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Avatar properties
-type AvatarProps msg =
-  { -- Dimension atoms
-    size :: Maybe Device.Pixel
-  
-  -- Color atoms
-  , backgroundColor :: Maybe Color.RGB
-  , textColor :: Maybe Color.RGB
-  , borderColor :: Maybe Color.RGB
-  
-  -- Geometry atoms
-  , borderWidth :: Maybe Device.Pixel
-  
-  -- Typography atoms
-  , fontSize :: Maybe FontSize.FontSize
-  , fontWeight :: Maybe FontWeight.FontWeight
-  
-  -- Escape hatch
-  , extraAttributes :: Array (E.Attribute msg)
+-- | Avatar properties — pure bounded data, no CSS.
+type AvatarProps =
+  { size :: Maybe Pixel            -- ^ Circle diameter in pixels
+  , backgroundColor :: Maybe RGB   -- ^ Fill color for fallback
+  , textColor :: Maybe RGB         -- ^ Text color for initials (reserved)
+  , borderColor :: Maybe RGB       -- ^ Stroke color
+  , borderWidth :: Maybe Pixel     -- ^ Stroke width
   }
 
 -- | Property modifier
-type AvatarProp msg = AvatarProps msg -> AvatarProps msg
+type AvatarProp = AvatarProps -> AvatarProps
 
 -- | Default properties
-defaultProps :: forall msg. AvatarProps msg
+defaultProps :: AvatarProps
 defaultProps =
   { size: Nothing
   , backgroundColor: Nothing
   , textColor: Nothing
   , borderColor: Nothing
   , borderWidth: Nothing
-  , fontSize: Nothing
-  , fontWeight: Nothing
-  , extraAttributes: []
-  }
-
--- | Image properties
-type ImageProps =
-  { imgSrc :: String
-  , imgAlt :: String
-  }
-
--- | Image property modifier
-type ImageProp = ImageProps -> ImageProps
-
--- | Default image properties
-defaultImageProps :: ImageProps
-defaultImageProps =
-  { imgSrc: ""
-  , imgAlt: ""
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: dimension
+--                                                              // prop builders
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Set avatar size (Device.Pixel atom)
--- |
--- | Controls both width and height for a square avatar.
-size :: forall msg. Device.Pixel -> AvatarProp msg
-size s props = props { size = Just s }
+-- | Set avatar size (diameter in pixels)
+size :: Number -> AvatarProp
+size s props = props { size = Just (Pixel s) }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: color
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set fallback background color (Color.RGB atom)
-backgroundColor :: forall msg. Color.RGB -> AvatarProp msg
+-- | Set fallback background color
+backgroundColor :: RGB -> AvatarProp
 backgroundColor c props = props { backgroundColor = Just c }
 
--- | Set fallback text color (Color.RGB atom)
-textColor :: forall msg. Color.RGB -> AvatarProp msg
+-- | Set fallback text color (for initials)
+textColor :: RGB -> AvatarProp
 textColor c props = props { textColor = Just c }
 
--- | Set border color (Color.RGB atom)
-borderColor :: forall msg. Color.RGB -> AvatarProp msg
+-- | Set border color
+borderColor :: RGB -> AvatarProp
 borderColor c props = props { borderColor = Just c }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: geometry
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set border width (Device.Pixel atom)
-borderWidth :: forall msg. Device.Pixel -> AvatarProp msg
-borderWidth w props = props { borderWidth = Just w }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: typography
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set fallback font size (FontSize atom)
-fontSize :: forall msg. FontSize.FontSize -> AvatarProp msg
-fontSize s props = props { fontSize = Just s }
-
--- | Set fallback font weight (FontWeight atom)
-fontWeight :: forall msg. FontWeight.FontWeight -> AvatarProp msg
-fontWeight w props = props { fontWeight = Just w }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: image
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set image source URL
-imgSrc :: String -> ImageProp
-imgSrc s props = props { imgSrc = s }
-
--- | Set image alt text
-imgAlt :: String -> ImageProp
-imgAlt a props = props { imgAlt = a }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                // prop builders: escape hatch
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Add extra attributes (escape hatch)
-extraAttributes :: forall msg. Array (E.Attribute msg) -> AvatarProp msg
-extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
+-- | Set border width
+borderWidth :: Number -> AvatarProp
+borderWidth w props = props { borderWidth = Just (Pixel w) }
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                             // main component
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Render an avatar container
+-- | Render an avatar as a pure Element (circle with fill).
 -- |
--- | Pure Element — renders to DOM, Halogen, Static HTML, or any target.
-avatar :: forall msg. Array (AvatarProp msg) -> Array (E.Element msg) -> E.Element msg
-avatar propMods children =
-  let
-    props = foldl (\p f -> f p) defaultProps propMods
-  in
-    E.span_
-      (buildAvatarAttrs props)
-      children
-
--- | Build avatar attributes from props
-buildAvatarAttrs :: forall msg. AvatarProps msg -> Array (E.Attribute msg)
-buildAvatarAttrs props =
-  let
-    -- Size (default 40px)
-    sizeValue = maybe "40px" show props.size
-    
-    -- Core styles
-    coreStyles =
-      [ E.style "position" "relative"
-      , E.style "display" "inline-flex"
-      , E.style "flex-shrink" "0"
-      , E.style "overflow" "hidden"
-      , E.style "border-radius" "50%"
-      , E.style "width" sizeValue
-      , E.style "height" sizeValue
-      ]
-    
-    -- Border styles
-    borderStyle = case props.borderColor of
-      Nothing -> []
-      Just bc ->
-        let bw = maybe "2px" show props.borderWidth
-        in [ E.style "border-style" "solid"
-           , E.style "border-width" bw
-           , E.style "border-color" (Color.toLegacyCss bc)
-           ]
-  in
-    coreStyles <> borderStyle <> props.extraAttributes
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                             // sub-components
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Avatar image
+-- | This emits an Ellipse element — no CSS, no HTML, just pure data
+-- | that can be rendered to any target (WebGPU, Canvas, SVG, etc).
 -- |
--- | Renders the user's image. Falls back to avatarFallback when image fails.
-avatarImage :: forall msg. Array ImageProp -> E.Element msg
-avatarImage propMods =
-  let
-    props = foldl (\p f -> f p) defaultImageProps propMods
-  in
-    E.img_
-      [ E.src props.imgSrc
-      , E.alt props.imgAlt
-      , E.style "aspect-ratio" "1"
-      , E.style "width" "100%"
-      , E.style "height" "100%"
-      , E.style "object-fit" "cover"
-      ]
-
--- | Avatar fallback
--- |
--- | Shown when image fails to load or isn't provided.
--- | Typically contains user initials.
-avatarFallback :: forall msg. Array (AvatarProp msg) -> Array (E.Element msg) -> E.Element msg
-avatarFallback propMods children =
+-- | For text initials, the caller should compose with a Text element.
+-- | This function provides the circular background.
+avatar :: Array AvatarProp -> Element
+avatar propMods =
   let
     props = foldl (\p f -> f p) defaultProps propMods
     
-    -- Default colors
-    defaultBgColor = Color.rgb 226 232 240  -- Light gray
-    defaultTextColor = Color.rgb 71 85 105  -- Dark gray
+    -- Defaults
+    defaultSize = Pixel 40.0
+    defaultBg = rgb 226 232 240  -- Light gray
     
-    bgColor = maybe defaultBgColor (\c -> c) props.backgroundColor
-    txtColor = maybe defaultTextColor (\c -> c) props.textColor
+    -- Resolved values
+    (Pixel diameterN) = fromMaybe defaultSize props.size
+    radius = Pixel (diameterN / 2.0)
+    bgColor = fromMaybe defaultBg props.backgroundColor
     
-    -- Font styles
-    fontSizeStyle = case props.fontSize of
-      Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
+    -- Center point (avatar is positioned at origin, caller can transform)
+    center = pixelPoint2D radius radius
     
-    fontWeightStyle = case props.fontWeight of
-      Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
+    -- Build ellipse shape (circle when radiusX == radiusY)
+    shape = ellipseShape center radius radius
+    
+    -- Build fill from background color
+    fill = solid bgColor
   in
-    E.span_
-      ( [ E.style "display" "flex"
-        , E.style "width" "100%"
-        , E.style "height" "100%"
-        , E.style "align-items" "center"
-        , E.style "justify-content" "center"
-        , E.style "border-radius" "50%"
-        , E.style "background-color" (Color.toLegacyCss bgColor)
-        , E.style "color" (Color.toLegacyCss txtColor)
-        , E.style "text-transform" "uppercase"
-        ]
-        <> fontSizeStyle
-        <> fontWeightStyle
-      )
-      children
+    ellipse
+      { shape: shape
+      , fill: fill
+      , stroke: Nothing  -- TODO: add stroke from borderColor/borderWidth
+      , opacity: opacity 100
+      }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                               // image avatar
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Render an avatar with an image.
+-- |
+-- | Emits an Image element with the specified URL.
+-- | The image is not automatically clipped to a circle — that's handled
+-- | by the rendering target or by compositing with a clip mask.
+avatarImage :: Array AvatarProp -> String -> Element
+avatarImage propMods url =
+  let
+    props = foldl (\p f -> f p) defaultProps propMods
+    
+    -- Defaults
+    defaultSize = Pixel 40.0
+    diameter = fromMaybe defaultSize props.size
+    
+    -- Image source
+    source = urlSource url
+  in
+    image
+      { source: source
+      , width: diameter
+      , height: diameter
+      , opacity: opacity 100
+      }

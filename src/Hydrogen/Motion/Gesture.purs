@@ -77,7 +77,8 @@ module Hydrogen.Motion.Gesture
 -- ═════════════════════════════════════════════════════════════════════════════
 
 import Hydrogen.Schema.Gestural.Gesture
-  ( GesturePhase(Possible, Began, Changed, Ended, Cancelled, Failed)
+  ( -- * Gesture Phase
+    GesturePhase(Possible, Began, Changed, Ended, Cancelled, Failed)
   , isPossible
   , isBegan
   , isChanged
@@ -86,6 +87,7 @@ import Hydrogen.Schema.Gestural.Gesture
   , isFailed
   , isActive
   , isTerminal
+    -- * Tap
   , TapCount(TapCount)
   , tapCount
   , singleTap
@@ -100,41 +102,65 @@ import Hydrogen.Schema.Gestural.Gesture
   , noTap
   , tapPosition
   , isTapRecognized
+    -- * Long Press
   , LongPressState
   , longPressState
   , noLongPress
   , longPressPosition
   , longPressDuration
   , isLongPressRecognized
+    -- * Swipe (from Schema.Gestural.Gesture.Swipe)
   , SwipeDirection(SwipeLeft, SwipeRight, SwipeUp, SwipeDown)
   , SwipeState
   , swipeState
   , noSwipe
-  , swipeDirection
   , swipeVelocity
   , isSwipeRecognized
+  , swipeDirectionFromDelta
+    -- * Pan (from Schema.Gestural.Gesture.Pan)
   , PanState
   , panState
   , noPan
-  , panDelta
+  , panTranslation
   , panVelocity
-  , panPosition
-  , panStartPosition
-  , isPanActive
-  , PinchState
-  , pinchState
-  , noPinch
-  , pinchScale
-  , pinchVelocity
-  , pinchCenter
+  , panDistance
+  , isPanning
+  , updatePanPosition
+    -- * Pinch (from Schema.Gestural.Gesture.Pinch)
+  , PinchConfig
+  , pinchConfig
+  , defaultPinchConfig
+  , PinchGesture
+  , pinchGesture
+  , noPinchGesture
+  , beginPinch
+  , updatePinch
+  , endPinch
+  , cancelPinch
+  , pinchGestureScale
+  , pinchGestureCenter
+  , pinchGestureVelocity
   , isPinchActive
-  , RotateState
-  , rotateState
-  , noRotation
-  , rotateAngle
-  , rotateVelocity
-  , rotateCenter
+  , isPinchEnded
+    -- * Rotate (from Schema.Gestural.Gesture.Rotate)
+  , RotateConfig
+  , rotateConfig
+  , defaultRotateConfig
+  , RotateGesture
+  , rotateGesture
+  , noRotateGesture
+  , beginRotate
+  , updateRotate
+  , endRotate
+  , cancelRotate
+  , rotateGestureAngle
+  , rotateGestureAngleDegrees
+  , rotateGestureDelta
+  , rotateGestureCenter
+  , rotateGestureVelocity
   , isRotateActive
+  , isRotateEnded
+    -- * Combined Gesture State
   , GestureState
   , initialGestureState
   , resetGestures

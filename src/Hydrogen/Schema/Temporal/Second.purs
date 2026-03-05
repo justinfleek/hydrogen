@@ -15,7 +15,6 @@ module Hydrogen.Schema.Temporal.Second
   , unsafeSecond
   , unwrap
   , toInt
-  , toLegacyCss
   , bounds
   ) where
 
@@ -76,17 +75,6 @@ unwrap (Second s) = s
 -- | Alias for unwrap
 toInt :: Second -> Int
 toInt = unwrap
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // formatting
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCss :: Second -> String
-toLegacyCss (Second s) = show s
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

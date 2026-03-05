@@ -92,13 +92,13 @@ module Hydrogen.Schema.Dimension.MediaQuery
   , isHighResolution
   , isPrint
   
-  -- * Serialization
-  , toCSS
-  
   -- * Evaluation
   , matches
   , MediaEnvironment
   , defaultMediaEnvironment
+  
+  -- * Re-exports from Device (for convenience)
+  , module DeviceTypes
   ) where
 
 import Prelude
@@ -109,19 +109,22 @@ import Prelude
   , otherwise
   , (&&)
   , (||)
-  , (+)
-  , (-)
-  , (*)
-  , (/)
-  , (<)
   , (<=)
-  , (>)
   , (>=)
   , (==)
   , (<>)
   )
 import Prelude (not) as P
 
+-- For re-export via module syntax
+import Hydrogen.Schema.Dimension.Device 
+  ( Pixel(Pixel)
+  , unwrapPixel
+  , PixelsPerInch(PixelsPerInch)
+  , unwrapPpi
+  ) as DeviceTypes
+
+-- For internal use (unqualified)
 import Hydrogen.Schema.Dimension.Device (Pixel(Pixel), unwrapPixel, PixelsPerInch(PixelsPerInch), unwrapPpi)
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -288,7 +291,27 @@ derive instance eqMediaQuery :: Eq MediaQuery
 derive instance ordMediaQuery :: Ord MediaQuery
 
 instance showMediaQuery :: Show MediaQuery where
-  show q = "MediaQuery(" <> toCSS q <> ")"
+  show (MinWidth p) = "MinWidth " <> show p
+  show (MaxWidth p) = "MaxWidth " <> show p
+  show (MinHeight p) = "MinHeight " <> show p
+  show (MaxHeight p) = "MaxHeight " <> show p
+  show (Orientation o) = "Orientation " <> show o
+  show (PrefersColorScheme cs) = "PrefersColorScheme " <> show cs
+  show (PrefersReducedMotion b) = "PrefersReducedMotion " <> show b
+  show (PrefersReducedTransparency b) = "PrefersReducedTransparency " <> show b
+  show (PrefersContrast b) = "PrefersContrast " <> show b
+  show (Pointer pt) = "Pointer " <> show pt
+  show (AnyPointer pt) = "AnyPointer " <> show pt
+  show (HoverMedia hc) = "HoverMedia " <> show hc
+  show (AnyHover hc) = "AnyHover " <> show hc
+  show (DisplayModeQuery dm) = "DisplayModeQuery " <> show dm
+  show (Resolution ppi) = "Resolution " <> show ppi
+  show (MinResolution ppi) = "MinResolution " <> show ppi
+  show (ColorGamut g) = "ColorGamut " <> g
+  show (Type mt) = "Type " <> show mt
+  show (And q1 q2) = "And (" <> show q1 <> ") (" <> show q2 <> ")"
+  show (Or q1 q2) = "Or (" <> show q1 <> ") (" <> show q2 <> ")"
+  show (Not q) = "Not (" <> show q <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -423,45 +446,6 @@ isPrint :: MediaQuery
 isPrint = Type Print
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                              // serialization
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert MediaQuery to CSS string.
--- |
--- | ```purescript
--- | toCSS (MinWidth (Pixel 768.0))
--- | -- "(min-width: 768px)"
--- |
--- | toCSS (And (MinWidth (Pixel 768.0)) (MaxWidth (Pixel 1023.0)))
--- | -- "(min-width: 768px) and (max-width: 1023px)"
--- | ```
-toCSS :: MediaQuery -> String
-toCSS (MinWidth p) = "(min-width: " <> showPx p <> ")"
-toCSS (MaxWidth p) = "(max-width: " <> showPx p <> ")"
-toCSS (MinHeight p) = "(min-height: " <> showPx p <> ")"
-toCSS (MaxHeight p) = "(max-height: " <> showPx p <> ")"
-toCSS (Orientation o) = "(orientation: " <> show o <> ")"
-toCSS (PrefersColorScheme cs) = "(prefers-color-scheme: " <> show cs <> ")"
-toCSS (PrefersReducedMotion true) = "(prefers-reduced-motion: reduce)"
-toCSS (PrefersReducedMotion false) = "(prefers-reduced-motion: no-preference)"
-toCSS (PrefersReducedTransparency true) = "(prefers-reduced-transparency: reduce)"
-toCSS (PrefersReducedTransparency false) = "(prefers-reduced-transparency: no-preference)"
-toCSS (PrefersContrast true) = "(prefers-contrast: more)"
-toCSS (PrefersContrast false) = "(prefers-contrast: no-preference)"
-toCSS (Pointer pt) = "(pointer: " <> show pt <> ")"
-toCSS (AnyPointer pt) = "(any-pointer: " <> show pt <> ")"
-toCSS (HoverMedia hc) = "(hover: " <> hoverToCSS hc <> ")"
-toCSS (AnyHover hc) = "(any-hover: " <> hoverToCSS hc <> ")"
-toCSS (DisplayModeQuery dm) = "(display-mode: " <> show dm <> ")"
-toCSS (Resolution ppi) = "(resolution: " <> showDpi ppi <> ")"
-toCSS (MinResolution ppi) = "(min-resolution: " <> showDpi ppi <> ")"
-toCSS (ColorGamut g) = "(color-gamut: " <> g <> ")"
-toCSS (Type mt) = show mt
-toCSS (And q1 q2) = toCSS q1 <> " and " <> toCSS q2
-toCSS (Or q1 q2) = toCSS q1 <> ", " <> toCSS q2
-toCSS (Not q) = "not " <> toCSS q
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // evaluation
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -527,21 +511,3 @@ matches env (Type mt) = env.mediaType == mt || mt == All
 matches env (And q1 q2) = matches env q1 && matches env q2
 matches env (Or q1 q2) = matches env q1 || matches env q2
 matches env (Not q) = P.not (matches env q)
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                   // internal
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format Pixel for CSS output.
-showPx :: Pixel -> String
-showPx (Pixel n) = show n <> "px"
-
--- | Format PixelsPerInch for CSS output.
-showDpi :: PixelsPerInch -> String
-showDpi (PixelsPerInch n) = show n <> "dpi"
-
--- | Convert HoverCapability to CSS value.
-hoverToCSS :: HoverCapability -> String
-hoverToCSS HoverNone = "none"
-hoverToCSS HoverOnDemand = "none"
-hoverToCSS Hover = "hover"

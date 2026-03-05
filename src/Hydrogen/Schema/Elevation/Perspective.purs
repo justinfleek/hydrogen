@@ -30,9 +30,9 @@
 -- |   , y: P.perspOrigY 25.0  -- vanishing point in upper half
 -- |   }
 -- |
--- | -- Convert to CSS
--- | css = P.toLegacyCss distance  -- "1000px"
--- | originCss = P.originToLegacyCss origin  -- "50% 25%"
+-- | -- Extract values
+-- | distanceValue = P.getPerspective distance  -- 1000.0
+-- | originX = P.getPerspOrigX origin.x         -- 50.0
 -- | ```
 
 module Hydrogen.Schema.Elevation.Perspective
@@ -62,10 +62,6 @@ module Hydrogen.Schema.Elevation.Perspective
   , withOriginX
   , withOriginY
   
-  -- * Conversion (Legacy CSS, not FFI)
-  , toLegacyCss
-  , originToLegacyCss
-  
   -- * Predicates
   , hasPerspective
   , isDefaultOrigin
@@ -76,7 +72,6 @@ import Prelude
   , class Ord
   , class Show
   , show
-  , compare
   , (&&)
   , (==)
   , (<)
@@ -233,30 +228,6 @@ withOriginY :: PerspOrigY -> PerspectiveOrigin -> PerspectiveOrigin
 withOriginY y o = o { y = y }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert perspective distance to CSS string.
--- |
--- | Returns "none" for noPerspective, otherwise "<value>px".
--- | NOT an FFI boundary — pure string generation.
-toLegacyCss :: Perspective -> String
-toLegacyCss (Perspective 0.0) = "none"
-toLegacyCss (Perspective n) = showNumber n <> "px"
-
--- | Convert perspective origin to CSS string.
--- |
--- | Format: "<x>% <y>%"
--- | NOT an FFI boundary — pure string generation.
-originToLegacyCss :: PerspectiveOrigin -> String
-originToLegacyCss o =
-  let
-    PerspOrigX x = o.x
-    PerspOrigY y = o.y
-  in
-    showNumber x <> "% " <> showNumber y <> "%"
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // predicates
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -291,7 +262,3 @@ clampPercentage n
   | n < 0.0 = 0.0
   | n > 100.0 = 100.0
   | true = n
-
--- | Show number cleanly for CSS output
-showNumber :: Number -> String
-showNumber n = show n

@@ -26,7 +26,6 @@ module Hydrogen.Schema.Typography.LetterSpacing
   , fromEm
   , unwrap
   , toEm
-  , toLegacyCss
   , bounds
   -- Common values
   , none
@@ -259,13 +258,6 @@ unwrap (LetterSpacing s) = s
 -- | 25 per mille → 0.025em
 toEm :: LetterSpacing -> Number
 toEm (LetterSpacing s) = Int.toNumber s / 1000.0
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS letter-spacing value
--- |
--- | Outputs in em units for proper scaling with font size.
-toLegacyCss :: LetterSpacing -> String
-toLegacyCss ls = show (toEm ls) <> "em"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds

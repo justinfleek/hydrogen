@@ -192,7 +192,7 @@ cellType t col = col { cellType = t }
 -- | ```purescript
 -- | Col.cellRenderer \ctx ->
 -- |   E.span_
--- |     [ E.style "font-weight" "bold" ]
+-- |     [ E.class_ "font-bold" ]
 -- |     [ E.text ctx.value ]
 -- | ```
 cellRenderer :: forall msg. (CellContext -> E.Element msg) -> ColumnProp msg

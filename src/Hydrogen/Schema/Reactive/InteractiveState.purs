@@ -36,7 +36,6 @@ module Hydrogen.Schema.Reactive.InteractiveState
   , isInteractable
   , isEngaged
   , toAriaAttributes
-  , toLegacyCssClasses
   -- * Pointer Device
   , PointerDevice(Mouse, Touch, Pen, Unknown)
   , pointerDevice
@@ -243,18 +242,3 @@ toAriaAttributes s =
   [ { key: "aria-disabled", value: if s.disabled then "true" else "false" }
   , { key: "aria-busy", value: if s.loading then "true" else "false" }
   ]
-
--- | Generate CSS class names from state
-toLegacyCssClasses :: InteractiveState -> Array String
-toLegacyCssClasses s = 
-  (if isPointerOver s.pointer then ["hover"] else []) <>
-  (if hasFocus s.focus then ["focus"] else []) <>
-  (if showFocusRing s.focus then ["focus-visible"] else []) <>
-  (if isPointerDown s.pointer then ["active", "pressed"] else []) <>
-  (if s.disabled then ["disabled"] else []) <>
-  (if s.loading then ["loading"] else []) <>
-  (case s.activation of
-    Inactive -> []
-    Activating -> ["activating", "entering"]
-    Active -> ["active"]
-    Deactivating -> ["deactivating", "exiting"])

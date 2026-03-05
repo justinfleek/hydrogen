@@ -40,7 +40,7 @@
 -- |
 -- | ```purescript
 -- | import Hydrogen.Schema.Elevation.Shadow as Shadow
--- | import Hydrogen.Schema.Color as Color
+-- | import Hydrogen.Schema.Color.RGB as Color
 -- |
 -- | -- Create a shadow with explicit parameters
 -- | cardShadow :: Shadow.BoxShadow
@@ -49,21 +49,17 @@
 -- |   , offsetY: 4.0
 -- |   , blur: 6.0
 -- |   , spread: -1.0
--- |   , color: Color.rgba 0 0 0 0.1
+-- |   , color: Color.rgba 0 0 0 10
 -- |   , inset: false
 -- |   }
--- |
--- | -- Convert to CSS
--- | css = Shadow.toLegacyCss cardShadow
--- | -- "0px 4px 6px -1px rgba(0, 0, 0, 0.1)"
 -- |
 -- | -- Layered shadows for depth
 -- | elevatedShadow :: Shadow.LayeredShadow
 -- | elevatedShadow = Shadow.layered
 -- |   [ Shadow.boxShadow { offsetX: 0.0, offsetY: 1.0, blur: 3.0, spread: 0.0
--- |                      , color: Color.rgba 0 0 0 0.1, inset: false }
+-- |                      , color: Color.rgba 0 0 0 10, inset: false }
 -- |   , Shadow.boxShadow { offsetX: 0.0, offsetY: 4.0, blur: 6.0, spread: -1.0
--- |                      , color: Color.rgba 0 0 0 0.1, inset: false }
+-- |                      , color: Color.rgba 0 0 0 10, inset: false }
 -- |   ]
 -- | ```
 
@@ -102,11 +98,6 @@ module Hydrogen.Schema.Elevation.Shadow
   , scaleBlur
   , scaleShadow
   
-  -- * Conversion (Legacy string generation, NOT FFI)
-  , toLegacyCss
-  , dropShadowToLegacyCss
-  , layeredToLegacyCss
-  
   -- * Predicates
   , isNoShadow
   , hasInset
@@ -132,7 +123,7 @@ import Prelude
 import Data.Array (filter, null)
 import Data.Array as Array
 import Data.Int as Int
-import Data.String (joinWith)
+
 import Hydrogen.Schema.Color.RGB as RGB
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -182,7 +173,7 @@ newtype LayeredShadow = LayeredShadow (Array BoxShadow)
 derive instance eqLayeredShadow :: Eq LayeredShadow
 
 instance showLayeredShadow :: Show LayeredShadow where
-  show = layeredToLegacyCss
+  show (LayeredShadow ls) = "LayeredShadow[" <> show (Array.length ls) <> " layers]"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -394,46 +385,6 @@ scaleShadow factor s = s
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert box shadow to legacy CSS string.
--- |
--- | Format: "[inset] <offset-x> <offset-y> <blur> <spread> <color>"
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: BoxShadow -> String
-toLegacyCss s =
-  let
-    insetStr = if s.inset then "inset " else ""
-    offsetXStr = showPx s.offsetX
-    offsetYStr = showPx s.offsetY
-    blurStr = showPx s.blur
-    spreadStr = showPx s.spread
-    colorStr = RGB.toLegacyCssA s.color
-  in
-    insetStr <> offsetXStr <> " " <> offsetYStr <> " " <> blurStr <> " " <> spreadStr <> " " <> colorStr
-
--- | Convert drop shadow to legacy CSS filter string.
--- |
--- | Format: "drop-shadow(<offset-x> <offset-y> <blur> <color>)"
--- | NOT an FFI boundary - pure string generation.
-dropShadowToLegacyCss :: DropShadow -> String
-dropShadowToLegacyCss s =
-  "drop-shadow(" <> showPx s.offsetX <> " " <> showPx s.offsetY <> " " 
-    <> showPx s.blur <> " " <> RGB.toLegacyCssA s.color <> ")"
-
--- | Convert layered shadow to legacy CSS string.
--- |
--- | Multiple shadows are comma-separated.
--- | Returns "none" if no layers.
--- | NOT an FFI boundary - pure string generation.
-layeredToLegacyCss :: LayeredShadow -> String
-layeredToLegacyCss (LayeredShadow ls) =
-  if null ls
-    then "none"
-    else joinWith ", " (map toLegacyCss ls)
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // predicates
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -453,15 +404,3 @@ hasInset (LayeredShadow ls) =
 -- | Clamp value to non-negative
 clampPositive :: Number -> Number
 clampPositive n = if n < 0.0 then 0.0 else n
-
--- | Show number as CSS pixel value
-showPx :: Number -> String
-showPx n = showNumber n <> "px"
-
--- | Show number cleanly (no trailing .0 for integers)
-showNumber :: Number -> String
-showNumber n =
-  let rounded = Int.round n
-  in if Int.toNumber rounded == n
-    then show rounded
-    else show n

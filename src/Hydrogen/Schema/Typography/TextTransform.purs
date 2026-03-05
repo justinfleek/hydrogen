@@ -15,7 +15,6 @@
 
 module Hydrogen.Schema.Typography.TextTransform
   ( TextTransform(None, Uppercase, Lowercase, Capitalize)
-  , toLegacyCss
   , requiresTracking
   ) where
 
@@ -47,14 +46,6 @@ instance showTextTransform :: Show TextTransform where
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // accessors
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS text-transform value
-toLegacyCss :: TextTransform -> String
-toLegacyCss None = "none"
-toLegacyCss Uppercase = "uppercase"
-toLegacyCss Lowercase = "lowercase"
-toLegacyCss Capitalize = "capitalize"
 
 -- | Does this transform require additional letter-spacing?
 -- |

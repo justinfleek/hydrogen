@@ -44,8 +44,8 @@
 -- | -- Get shadow for a specific elevation
 -- | cardShadow = SE.shadowForLevel SE.Raised
 -- |
--- | -- Convert to CSS
--- | css = SE.toLegacyCss SE.Modal
+-- | -- Get z-index base for a level
+-- | modalZ = SE.zIndexBase SE.Modal  -- 400
 -- | ```
 
 module Hydrogen.Schema.Elevation.SemanticElevation
@@ -71,10 +71,6 @@ module Hydrogen.Schema.Elevation.SemanticElevation
   , zIndexBase
   , zIndexRange
   
-  -- * Conversion (Legacy string generation)
-  , toLegacyCss
-  , toLegacyCssDark
-  
   -- * Comparison
   , isAbove
   , isBelow
@@ -91,10 +87,8 @@ import Prelude
   , class Ord
   , class Show
   , Ordering(LT, GT)
-  , show
   , compare
   , negate
-  , ($)
   , (==)
   , (<)
   , (>)
@@ -110,7 +104,6 @@ import Hydrogen.Schema.Elevation.Shadow
   , boxShadow
   , layered
   , noShadow
-  , layeredToLegacyCss
   )
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -263,22 +256,6 @@ zIndexRange level =
   in { min: base, max: base + 99 }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert elevation level to CSS box-shadow string (light theme).
--- |
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: ElevationLevel -> String
-toLegacyCss = layeredToLegacyCss <<< shadowForLevel
-
--- | Convert elevation level to CSS box-shadow string (dark theme).
--- |
--- | NOT an FFI boundary - pure string generation.
-toLegacyCssDark :: ElevationLevel -> String
-toLegacyCssDark = layeredToLegacyCss <<< shadowForLevelDark
-
--- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // comparison
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -313,12 +290,6 @@ clampLevel = levelFromInt
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Function composition helper
-infixr 9 composeFlipped as <<<
-
-composeFlipped :: forall a b c. (b -> c) -> (a -> b) -> a -> c
-composeFlipped f g x = f (g x)
 
 -- | Create shadow with standard parameters
 mkShadow :: Number -> Number -> Number -> Number -> RGBA -> BoxShadow

@@ -26,3 +26,7 @@ lean_exe conversions where
 
 lean_exe math where
   root := `Hydrogen.Math
+
+lean_exe cdp where
+  root := `Hydrogen.CDP.Main
+  srcDir := "proofs"

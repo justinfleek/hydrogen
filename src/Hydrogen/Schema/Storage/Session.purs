@@ -41,6 +41,7 @@ module Hydrogen.Schema.Storage.Session
   , cookieOptions
   , defaultCookieOptions
   , secureCookieOptions
+  , sessionCookieOptions
   , cookiePath
   , cookieDomain
   , cookieSecure
@@ -204,6 +205,19 @@ defaultCookieOptions =
 -- | Secure cookie options: HTTPS required, SameSite=Strict, HttpOnly.
 secureCookieOptions :: CookieOptions
 secureCookieOptions =
+  { path: "/"
+  , domain: Nothing
+  , secure: true
+  , sameSite: SameSiteStrict
+  , httpOnly: true
+  }
+
+-- | Session cookie options: secure, SameSite=Strict, HttpOnly, expires with session.
+-- |
+-- | These are appropriate for session-scoped authentication and sensitive data.
+-- | The cookie is automatically cleared when the browser closes.
+sessionCookieOptions :: CookieOptions
+sessionCookieOptions =
   { path: "/"
   , domain: Nothing
   , secure: true

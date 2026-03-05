@@ -105,7 +105,6 @@ module Hydrogen.Schema.Motion.Easing
   , p1y
   , p2x
   , p2y
-  , toLegacyCssString
   , name
   ) where
 
@@ -424,19 +423,6 @@ p2x easing = (toControlPoints easing).x2
 -- | Extract second control point y coordinate
 p2y :: Easing -> Number
 p2y easing = (toControlPoints easing).y2
-
--- | Get CSS animation-timing-function value for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
-toLegacyCssString :: Easing -> String
-toLegacyCssString Linear = "linear"
-toLegacyCssString (Bezier (CubicBezier p) _) =
-  "cubic-bezier(" <> show p.x1 <> ", " <> show p.y1 <> 
-  ", " <> show p.x2 <> ", " <> show p.y2 <> ")"
-toLegacyCssString (Steps n jumpStart) =
-  "steps(" <> show n <> ", " <> 
-  (if jumpStart then "jump-start" else "jump-end") <> ")"
 
 -- | Get easing name
 name :: Easing -> String

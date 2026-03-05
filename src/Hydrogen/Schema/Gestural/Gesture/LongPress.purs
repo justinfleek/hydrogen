@@ -27,7 +27,9 @@ module Hydrogen.Schema.Gestural.Gesture.LongPress
   , noLongPress
   , updateLongPressDuration
   , longPressPosition
+  , longPressDuration
   , isLongPressTriggered
+  , isLongPressRecognized
   , isLongPressActive
     -- * Bounds
   , longPressThresholdBounds
@@ -144,9 +146,17 @@ updateLongPressDuration currentTime lps =
 longPressPosition :: LongPressState -> { x :: Number, y :: Number }
 longPressPosition lps = { x: lps.x, y: lps.y }
 
+-- | Get current long press duration in milliseconds
+longPressDuration :: LongPressState -> Number
+longPressDuration lps = lps.currentDuration
+
 -- | Has long press threshold been reached?
 isLongPressTriggered :: LongPressState -> Boolean
 isLongPressTriggered lps = lps.progress >= 1.0
+
+-- | Alias for isLongPressTriggered for API compatibility
+isLongPressRecognized :: LongPressState -> Boolean
+isLongPressRecognized = isLongPressTriggered
 
 -- | Is long press currently active (held but not yet triggered)?
 isLongPressActive :: LongPressState -> Boolean

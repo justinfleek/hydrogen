@@ -49,11 +49,6 @@ module Hydrogen.Schema.Surface.BlendMode
   , blendModeFormula
   , blendCategoryDescription
   
-  -- * CSS Compatibility
-  , toCSSBlendMode
-  , fromCSSBlendMode
-  , isCSSSupported
-  
   -- * Queries
   , isDarkeningMode
   , isLighteningMode
@@ -81,7 +76,7 @@ import Prelude
   , (==)
   )
 
-import Data.Maybe (Maybe(Just, Nothing))
+
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // blend // mode
@@ -381,68 +376,6 @@ blendCategoryDescription CategoryInversion =
   "Modes based on color differences and mathematical inversion"
 blendCategoryDescription CategoryComponent = 
   "Modes that transfer specific HSL components between layers"
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                          // css // compatibility
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS mix-blend-mode value.
--- | Returns Nothing for modes not supported in CSS.
-toCSSBlendMode :: BlendMode -> Maybe String
-toCSSBlendMode BlendNormal = Just "normal"
-toCSSBlendMode BlendMultiply = Just "multiply"
-toCSSBlendMode BlendScreen = Just "screen"
-toCSSBlendMode BlendOverlay = Just "overlay"
-toCSSBlendMode BlendDarken = Just "darken"
-toCSSBlendMode BlendLighten = Just "lighten"
-toCSSBlendMode BlendColorDodge = Just "color-dodge"
-toCSSBlendMode BlendColorBurn = Just "color-burn"
-toCSSBlendMode BlendHardLight = Just "hard-light"
-toCSSBlendMode BlendSoftLight = Just "soft-light"
-toCSSBlendMode BlendDifference = Just "difference"
-toCSSBlendMode BlendExclusion = Just "exclusion"
-toCSSBlendMode BlendHue = Just "hue"
-toCSSBlendMode BlendSaturation = Just "saturation"
-toCSSBlendMode BlendColor = Just "color"
-toCSSBlendMode BlendLuminosity = Just "luminosity"
--- Not supported in CSS
-toCSSBlendMode BlendDissolve = Nothing
-toCSSBlendMode BlendLinearBurn = Nothing
-toCSSBlendMode BlendDarkerColor = Nothing
-toCSSBlendMode BlendLinearDodge = Nothing
-toCSSBlendMode BlendLighterColor = Nothing
-toCSSBlendMode BlendVividLight = Nothing
-toCSSBlendMode BlendLinearLight = Nothing
-toCSSBlendMode BlendPinLight = Nothing
-toCSSBlendMode BlendHardMix = Nothing
-toCSSBlendMode BlendSubtract = Nothing
-toCSSBlendMode BlendDivide = Nothing
-
--- | Parse from CSS mix-blend-mode value.
-fromCSSBlendMode :: String -> Maybe BlendMode
-fromCSSBlendMode "normal" = Just BlendNormal
-fromCSSBlendMode "multiply" = Just BlendMultiply
-fromCSSBlendMode "screen" = Just BlendScreen
-fromCSSBlendMode "overlay" = Just BlendOverlay
-fromCSSBlendMode "darken" = Just BlendDarken
-fromCSSBlendMode "lighten" = Just BlendLighten
-fromCSSBlendMode "color-dodge" = Just BlendColorDodge
-fromCSSBlendMode "color-burn" = Just BlendColorBurn
-fromCSSBlendMode "hard-light" = Just BlendHardLight
-fromCSSBlendMode "soft-light" = Just BlendSoftLight
-fromCSSBlendMode "difference" = Just BlendDifference
-fromCSSBlendMode "exclusion" = Just BlendExclusion
-fromCSSBlendMode "hue" = Just BlendHue
-fromCSSBlendMode "saturation" = Just BlendSaturation
-fromCSSBlendMode "color" = Just BlendColor
-fromCSSBlendMode "luminosity" = Just BlendLuminosity
-fromCSSBlendMode _ = Nothing
-
--- | Is this blend mode supported in CSS?
-isCSSSupported :: BlendMode -> Boolean
-isCSSSupported mode = case toCSSBlendMode mode of
-  Just _ -> true
-  Nothing -> false
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // queries

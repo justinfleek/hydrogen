@@ -56,15 +56,9 @@ module Hydrogen.Schema.Typography.OpenType.Ligatures
   , hasHistorical
   , isNone
   , isAll
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
-
-import Data.Array (intercalate)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // ligature set
@@ -261,44 +255,3 @@ isNone l = not (hasCommon l) && not (hasDiscretionary l) &&
 isAll :: Ligatures -> Boolean
 isAll l = hasCommon l && hasDiscretionary l && 
           hasContextual l && hasHistorical l
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS font-variant-ligatures value
-toLegacyCss :: Ligatures -> String
-toLegacyCss l
-  | isNone l = "font-variant-ligatures: none;"
-  | isAll l = "font-variant-ligatures: common-ligatures discretionary-ligatures contextual historical-ligatures;"
-  | otherwise = "font-variant-ligatures: " <> buildValue l <> ";"
-  where
-  buildValue :: Ligatures -> String
-  buildValue (Ligatures lig) =
-    let 
-      parts = 
-        (if lig.common == LigatureOn then ["common-ligatures"] else ["no-common-ligatures"]) <>
-        (if lig.discretionary == LigatureOn then ["discretionary-ligatures"] else []) <>
-        (if lig.contextual == LigatureOn then ["contextual"] else []) <>
-        (if lig.historical == LigatureOn then ["historical-ligatures"] else [])
-    in joinParts parts
-
-  joinParts :: Array String -> String
-  joinParts [] = "normal"
-  joinParts xs = intercalate " " xs
-
--- | Convert to font-feature-settings value
--- |
--- | More explicit control using OpenType feature tags.
-toFontFeatureSettings :: Ligatures -> String
-toFontFeatureSettings (Ligatures l) =
-  "font-feature-settings: " <>
-  "\"liga\" " <> toggleToString l.common <> ", " <>
-  "\"dlig\" " <> toggleToString l.discretionary <> ", " <>
-  "\"clig\" " <> toggleToString l.contextual <> ", " <>
-  "\"hlig\" " <> toggleToString l.historical <> ";"
-  where
-  toggleToString :: LigatureSet -> String
-  toggleToString LigatureOn = "1"
-  toggleToString LigatureOff = "0"

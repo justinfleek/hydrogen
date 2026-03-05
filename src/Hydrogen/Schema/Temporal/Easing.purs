@@ -50,9 +50,6 @@ module Hydrogen.Schema.Temporal.Easing
   , isSteps
   , isSpring
   , isProcedural
-  
-  -- * CSS Export
-  , toLegacyCss
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -69,7 +66,6 @@ import Prelude
 
 import Hydrogen.Schema.Temporal.CubicBezierEasing 
   ( CubicBezierEasing
-  , toLegacyCss
   , linear
   , ease
   , easeIn
@@ -80,8 +76,6 @@ import Hydrogen.Schema.Temporal.CubicBezierEasing
 import Hydrogen.Schema.Temporal.StepEasing 
   ( Steps
   , StepPosition
-  , unwrapSteps
-  , stepPositionToString
   ) as Step
 
 import Hydrogen.Schema.Temporal.SpringConfig 
@@ -232,27 +226,3 @@ isSpring _ = false
 isProcedural :: Easing -> Boolean
 isProcedural (Procedural _) = true
 isProcedural _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css export
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
--- |
--- | Spring easing cannot be represented in CSS — falls back to ease-out.
-toLegacyCss :: Easing -> String
-toLegacyCss Linear = "linear"
-toLegacyCss (CubicBezier cb) = Bezier.toLegacyCss cb
-toLegacyCss (Steps n pos) = 
-  "steps(" <> show (Step.unwrapSteps n) <> ", " <> Step.stepPositionToString pos <> ")"
-toLegacyCss (Spring _) = 
-  -- Spring physics cannot be represented in legacy CSS
-  -- Fall back to ease-out as closest approximation
-  "ease-out"
-toLegacyCss (Procedural _) = 
-  -- Elastic/Bounce cannot be represented in legacy CSS
-  -- Fall back to ease-out as closest approximation
-  "ease-out"

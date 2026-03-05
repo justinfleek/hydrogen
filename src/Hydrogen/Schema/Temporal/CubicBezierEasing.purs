@@ -30,9 +30,6 @@ module Hydrogen.Schema.Temporal.CubicBezierEasing
   , getX2
   , getY2
   
-  -- * CSS Export
-  , toLegacyCss
-  
   -- * Standard Presets
   , linear
   , ease
@@ -171,24 +168,6 @@ getX2 (CubicBezierEasing c) = unwrapCubicX2 c.x2
 -- | Get y2 coordinate
 getY2 :: CubicBezierEasing -> Number
 getY2 (CubicBezierEasing c) = unwrapCubicY2 c.y2
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css export
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Format for CSS for legacy system interop.
--- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
--- |
--- | Returns: "cubic-bezier(0.25, 0.1, 0.25, 1)"
-toLegacyCss :: CubicBezierEasing -> String
-toLegacyCss (CubicBezierEasing c) =
-  "cubic-bezier(" 
-  <> show (unwrapCubicX1 c.x1) <> ", "
-  <> show (unwrapCubicY1 c.y1) <> ", "
-  <> show (unwrapCubicX2 c.x2) <> ", "
-  <> show (unwrapCubicY2 c.y2) <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // standard presets

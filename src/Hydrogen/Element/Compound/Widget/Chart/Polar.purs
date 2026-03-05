@@ -149,9 +149,7 @@ renderDonutChart props chartData =
     [ E.class_ "relative" ]
     [ renderPieChart props chartData
     , E.div_
-        [ E.class_ "absolute inset-0 flex items-center justify-center"
-        , E.style "pointer-events" "none"
-        ]
+        [ E.class_ "absolute inset-0 flex items-center justify-center pointer-events-none" ]
         [ E.div_
             [ E.class_ "w-1/2 h-1/2 rounded-full bg-background" ]
             []

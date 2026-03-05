@@ -49,8 +49,6 @@ module Hydrogen.Schema.Color.HWB
   , increaseWhiteness
   , increaseBlackness
   
-  -- * CSS Output (Legacy string generation, NOT FFI)
-  , toLegacyCss
   ) where
 
 import Prelude
@@ -110,7 +108,9 @@ derive instance eqHWB :: Eq HWB
 derive instance ordHWB :: Ord HWB
 
 instance showHWB :: Show HWB where
-  show = toLegacyCss
+  show (HWB c) = "HWB " <> show (Hue.unwrap c.h) 
+    <> " " <> show (unwrapWhiteness c.w)
+    <> " " <> show (unwrapBlackness c.b)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -172,16 +172,4 @@ increaseWhiteness amount (HWB c) = HWB c { w = whiteness (unwrapWhiteness c.w + 
 increaseBlackness :: Int -> HWB -> HWB
 increaseBlackness amount (HWB c) = HWB c { b = blackness (unwrapBlackness c.b + amount) }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert to legacy CSS hwb() function string.
--- |
--- | This generates a CSS-compatible string for use with legacy rendering.
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: HWB -> String
-toLegacyCss (HWB c) = 
-  "hwb(" <> show (Hue.unwrap c.h) <> "deg " 
-         <> show (unwrapWhiteness c.w) <> "% " 
-         <> show (unwrapBlackness c.b) <> "%)"

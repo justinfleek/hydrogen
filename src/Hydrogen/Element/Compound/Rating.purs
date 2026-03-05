@@ -311,8 +311,7 @@ ratingItem props idx displayValue isInteractive =
               [ renderIcon props.icon Full ]
           Half ->
             E.div_
-              [ E.classes [ "absolute inset-0 overflow-hidden", props.activeColor ]
-              , E.style "width" "50%"
+              [ E.classes [ "absolute inset-0 overflow-hidden w-1/2", props.activeColor ]
               ]
               [ renderIcon props.icon Full ]
         -- Click zones for half-star support

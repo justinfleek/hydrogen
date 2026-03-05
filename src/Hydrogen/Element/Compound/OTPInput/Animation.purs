@@ -357,7 +357,7 @@ encodeAnimationAttrs (OTPAnimation anim) =
   , E.dataAttr "animation-duration" (show (Temporal.unwrapMilliseconds anim.duration))
   , E.dataAttr "animation-iterations" (iterationsToString anim.iterations)
   , E.dataAttr "animation-fill-mode" (fillModeToString anim.fillMode)
-  , E.dataAttr "animation-easing" (Easing.toLegacyCssString anim.easing)
+  , E.dataAttr "animation-easing" (Easing.name anim.easing)
   ]
 
 -- | Convert animation property to string

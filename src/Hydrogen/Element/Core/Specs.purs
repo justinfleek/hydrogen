@@ -31,6 +31,14 @@ module Hydrogen.Element.Core.Specs
     RectangleSpec
   , EllipseSpec
   , PathSpec
+  , PolygonSpec
+  , StarSpec
+  , RingSpec
+  , SpiralSpec
+  , ArrowSpec
+  , CrossSpec
+  , GearSpec
+  , LineSpec
   
   -- * Text Specs
   , GlyphSpec
@@ -48,6 +56,16 @@ import Hydrogen.Schema.Geometry.Shape
   ( RectangleShape
   , EllipseShape
   , PathShape
+  )
+import Hydrogen.Schema.Geometry.Shape.Primitives
+  ( PolygonShape
+  , StarShape
+  , RingShape
+  , SpiralShape
+  , ArrowShape
+  , CrossShape
+  , GearShape
+  , LineShape
   )
 import Hydrogen.Schema.Geometry.Transform (Transform2D)
 
@@ -108,6 +126,93 @@ type PathSpec =
   { shape :: PathShape            -- ^ Geometry (commands, winding rule)
   , fill :: Fill                  -- ^ Interior fill
   , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for polygon elements.
+-- |
+-- | Regular polygons (triangle, pentagon, hexagon, etc.) with N sides.
+-- | Bounded by number of sides (3 minimum).
+type PolygonSpec =
+  { shape :: PolygonShape         -- ^ Geometry (center, radius, sides, rotation)
+  , fill :: Fill                  -- ^ Interior fill
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for star elements.
+-- |
+-- | N-pointed stars with configurable inner/outer radii.
+-- | Enables classic 5-point stars, sheriff badges, sunbursts, etc.
+type StarSpec =
+  { shape :: StarShape            -- ^ Geometry (center, inner/outer radii, points)
+  , fill :: Fill                  -- ^ Interior fill
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for ring/donut elements.
+-- |
+-- | Circular ring with inner and outer radius (donut shape).
+-- | Used for progress indicators, pie charts, loading spinners.
+type RingSpec =
+  { shape :: RingShape            -- ^ Geometry (center, inner/outer radii, angles)
+  , fill :: Fill                  -- ^ Interior fill
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for spiral elements.
+-- |
+-- | Archimedean spiral with configurable turns and growth.
+-- | Used for decorative elements, loading animations, abstract art.
+type SpiralSpec =
+  { shape :: SpiralShape          -- ^ Geometry (center, start/end radii, turns)
+  , fill :: Fill                  -- ^ Interior fill (if closed)
+  , stroke :: Maybe StrokeSpec    -- ^ Spiral stroke
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for arrow elements.
+-- |
+-- | Lines with arrow heads at one or both ends.
+-- | Configurable head styles: triangle, stealth, diamond, circle, square.
+type ArrowSpec =
+  { shape :: ArrowShape           -- ^ Geometry (start, end, head styles)
+  , fill :: Fill                  -- ^ Arrow head fill
+  , stroke :: Maybe StrokeSpec    -- ^ Arrow shaft stroke
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for cross/plus elements.
+-- |
+-- | Cross or plus sign shape with configurable arm thickness.
+-- | Used for icons, medical symbols, addition indicators.
+type CrossSpec =
+  { shape :: CrossShape           -- ^ Geometry (center, size, arm thickness)
+  , fill :: Fill                  -- ^ Interior fill
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for gear/cog elements.
+-- |
+-- | Mechanical gear shape with configurable teeth count and dimensions.
+-- | Used for settings icons, mechanical illustrations, steampunk aesthetics.
+type GearSpec =
+  { shape :: GearShape            -- ^ Geometry (center, radii, teeth count)
+  , fill :: Fill                  -- ^ Interior fill
+  , stroke :: Maybe StrokeSpec    -- ^ Optional outline
+  , opacity :: Opacity            -- ^ Overall element opacity
+  }
+
+-- | Specification for line elements.
+-- |
+-- | Simple line segment from point A to point B.
+-- | Lines have no fill — only stroke is meaningful.
+type LineSpec =
+  { shape :: LineShape            -- ^ Geometry (start point, end point)
+  , stroke :: Maybe StrokeSpec    -- ^ Line stroke (required for visibility)
   , opacity :: Opacity            -- ^ Overall element opacity
   }
 

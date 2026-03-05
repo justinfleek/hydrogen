@@ -70,15 +70,10 @@ module Hydrogen.Schema.Typography.OpenType.CJK
   , hasRuby
   , isTraditional
   , isSimplified
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
 
-import Data.Array (intercalate)
 import Data.Maybe (Maybe(Just, Nothing))
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -101,12 +96,6 @@ instance showWritingMode :: Show WritingMode where
   show VerticalRL = "VerticalRL"
   show VerticalLR = "VerticalLR"
 
--- | Convert writing mode to CSS value
-writingModeToLegacyCss :: WritingMode -> String
-writingModeToLegacyCss HorizontalTB = "horizontal-tb"
-writingModeToLegacyCss VerticalRL = "vertical-rl"
-writingModeToLegacyCss VerticalLR = "vertical-lr"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // text orientation
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -127,12 +116,6 @@ instance showTextOrientation :: Show TextOrientation where
   show Upright = "Upright"
   show Sideways = "Sideways"
 
--- | Convert text orientation to CSS value
-orientationToLegacyCss :: TextOrientation -> String
-orientationToLegacyCss Mixed = "mixed"
-orientationToLegacyCss Upright = "upright"
-orientationToLegacyCss Sideways = "sideways"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                              // ruby position
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -152,12 +135,6 @@ instance showRubyPosition :: Show RubyPosition where
   show RubyOver = "RubyOver"
   show RubyUnder = "RubyUnder"
   show RubyInterCharacter = "RubyInterCharacter"
-
--- | Convert ruby position to CSS value
-rubyPositionToLegacyCss :: RubyPosition -> String
-rubyPositionToLegacyCss RubyOver = "over"
-rubyPositionToLegacyCss RubyUnder = "under"
-rubyPositionToLegacyCss RubyInterCharacter = "inter-character"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // east asian variant
@@ -191,30 +168,6 @@ instance showEastAsianVariant :: Show EastAsianVariant where
   show VariantExpert = "VariantExpert"
   show VariantRuby = "VariantRuby"
 
--- | Convert variant to CSS font-variant-east-asian value
-variantToLegacyCss :: EastAsianVariant -> String
-variantToLegacyCss VariantNormal = "normal"
-variantToLegacyCss VariantTraditional = "traditional"
-variantToLegacyCss VariantSimplified = "simplified"
-variantToLegacyCss VariantJIS78 = "jis78"
-variantToLegacyCss VariantJIS83 = "jis83"
-variantToLegacyCss VariantJIS90 = "jis90"
-variantToLegacyCss VariantJIS04 = "jis04"
-variantToLegacyCss VariantExpert = "expert"
-variantToLegacyCss VariantRuby = "ruby"
-
--- | Convert variant to OpenType tag
-variantToTag :: EastAsianVariant -> Maybe String
-variantToTag VariantNormal = Nothing
-variantToTag VariantTraditional = Just "trad"
-variantToTag VariantSimplified = Just "smpl"
-variantToTag VariantJIS78 = Just "jp78"
-variantToTag VariantJIS83 = Just "jp83"
-variantToTag VariantJIS90 = Just "jp90"
-variantToTag VariantJIS04 = Just "jp04"
-variantToTag VariantExpert = Just "expt"
-variantToTag VariantRuby = Just "ruby"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // east asian width
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -234,18 +187,6 @@ instance showEastAsianWidth :: Show EastAsianWidth where
   show WidthNormal = "WidthNormal"
   show WidthFullWidth = "WidthFullWidth"
   show WidthProportional = "WidthProportional"
-
--- | Convert width to CSS font-variant-east-asian value
-widthToLegacyCss :: EastAsianWidth -> String
-widthToLegacyCss WidthNormal = ""
-widthToLegacyCss WidthFullWidth = "full-width"
-widthToLegacyCss WidthProportional = "proportional-width"
-
--- | Convert width to OpenType tag
-widthToTag :: EastAsianWidth -> Maybe String
-widthToTag WidthNormal = Nothing
-widthToTag WidthFullWidth = Just "fwid"
-widthToTag WidthProportional = Just "pwid"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // cjk features
@@ -410,52 +351,3 @@ isTraditional _ = false
 isSimplified :: CJKFeatures -> Boolean
 isSimplified (CJKFeatures { variant: VariantSimplified }) = true
 isSimplified _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS declarations
-toLegacyCss :: CJKFeatures -> String
-toLegacyCss (CJKFeatures c) =
-  "writing-mode: " <> writingModeToLegacyCss c.writingMode <> ";\n" <>
-  "text-orientation: " <> orientationToLegacyCss c.textOrientation <> ";" <>
-  rubyLine <>
-  variantLine
-  where
-  rubyLine :: String
-  rubyLine = case c.rubyPosition of
-    Nothing -> ""
-    Just rp -> "\nruby-position: " <> rubyPositionToLegacyCss rp <> ";"
-
-  variantLine :: String
-  variantLine =
-    let
-      variantPart = variantToLegacyCss c.variant
-      widthPart = widthToLegacyCss c.width
-      combined = case variantPart, widthPart of
-        "normal", "" -> ""
-        v, "" -> v
-        "normal", w -> w
-        v, w -> v <> " " <> w
-    in case combined of
-      "" -> ""
-      val -> "\nfont-variant-east-asian: " <> val <> ";"
-
--- | Convert to font-feature-settings value
--- |
--- | Complete control via OpenType feature tags.
-toFontFeatureSettings :: CJKFeatures -> String
-toFontFeatureSettings (CJKFeatures c) =
-  let
-    features =
-      (case variantToTag c.variant of
-        Nothing -> []
-        Just tag -> ["\"" <> tag <> "\" 1"]) <>
-      (case widthToTag c.width of
-        Nothing -> []
-        Just tag -> ["\"" <> tag <> "\" 1"])
-  in case features of
-    [] -> "font-feature-settings: normal;"
-    _ -> "font-feature-settings: " <> intercalate ", " features <> ";"

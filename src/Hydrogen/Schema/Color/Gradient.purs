@@ -60,11 +60,6 @@ module Hydrogen.Schema.Color.Gradient
   , sampleConicAt
   , sampleMeshAt
   
-  -- * CSS Output (Legacy string generation, NOT FFI)
-  , toLegacyCss
-  , linearToLegacyCss
-  , radialToLegacyCss
-  , conicToLegacyCss
   ) where
 
 import Prelude
@@ -76,7 +71,7 @@ import Data.Number (max, min) as Number
 import Hydrogen.Schema.Bounded as Bounded
 import Hydrogen.Schema.Color.Channel (channel)
 import Hydrogen.Schema.Color.Channel (toNumber) as Channel
-import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbFromChannels, rgbToLegacyCss, red, green, blue)
+import Hydrogen.Schema.Color.RGB (RGB, rgb, rgbFromChannels, red, green, blue)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // ratio
@@ -271,61 +266,6 @@ data Gradient
   | Mesh MeshGradient
 
 derive instance eqGradient :: Eq Gradient
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert gradient to legacy CSS string.
--- |
--- | This generates a CSS-compatible string for use with legacy rendering.
--- | NOT an FFI boundary - pure string generation.
-toLegacyCss :: Gradient -> String
-toLegacyCss (Linear g) = linearToLegacyCss g
-toLegacyCss (Radial g) = radialToLegacyCss g
-toLegacyCss (Conic g) = conicToLegacyCss g
-toLegacyCss (Mesh _) = "/* Mesh gradients require Canvas API or SVG - no CSS equivalent */"
-
--- | Convert linear gradient to legacy CSS string.
--- |
--- | NOT an FFI boundary - pure string generation.
-linearToLegacyCss :: LinearGradient -> String
-linearToLegacyCss (LinearGradient g) =
-  "linear-gradient(" <> show g.angle <> "deg, " <> stopsToLegacyCSS g.stops <> ")"
-
--- | Convert radial gradient to legacy CSS string.
--- |
--- | NOT an FFI boundary - pure string generation.
-radialToLegacyCss :: RadialGradient -> String
-radialToLegacyCss (RadialGradient g) =
-  "radial-gradient(circle at " 
-    <> show (ratioToPercent g.centerX) <> "% " 
-    <> show (ratioToPercent g.centerY) <> "%, " 
-    <> stopsToLegacyCSS g.stops <> ")"
-
--- | Convert conic gradient to legacy CSS string.
--- |
--- | NOT an FFI boundary - pure string generation.
-conicToLegacyCss :: ConicGradient -> String
-conicToLegacyCss (ConicGradient g) =
-  "conic-gradient(from " <> show g.startAngle <> "deg at "
-    <> show (ratioToPercent g.centerX) <> "% "
-    <> show (ratioToPercent g.centerY) <> "%, "
-    <> stopsToLegacyCSS g.stops <> ")"
-
--- | Convert array of color stops to legacy CSS format
-stopsToLegacyCSS :: Array ColorStop -> String
-stopsToLegacyCSS stops = 
-  let stopStrings = map stopToLegacyCSS stops
-  in joinWith ", " stopStrings
-  where
-  stopToLegacyCSS (ColorStop cs) = 
-    rgbToLegacyCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
-  
-  joinWith :: String -> Array String -> String
-  joinWith sep arr = case uncons arr of
-    Nothing -> ""
-    Just { head: x, tail: xs } -> foldl (\acc y -> acc <> sep <> y) x xs
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // gradient manipulation

@@ -32,17 +32,18 @@
 -- | -- Define a container that can be queried
 -- | container = CQ.queryContainer "card-container" InlineSize
 -- |
--- | -- Define styles that respond to container size
--- | cardStyles = CQ.containerStyles
+-- | -- Create responsive values for container sizes
+-- | cardLayout = CQ.containerResponsive
 -- |   { base: compactLayout
 -- |   , sm: Just standardLayout
 -- |   , lg: Just expandedLayout
+-- |   , md: Nothing
+-- |   , xl: Nothing
+-- |   , xxl: Nothing
 -- |   }
 -- |
--- | -- Generate CSS
--- | CQ.toLegacyCss container cardStyles
--- | -- container-type: inline-size;
--- | -- @container (min-width: 640px) { ... }
+-- | -- Resolve at runtime based on container width
+-- | resolved = CQ.resolveAtWidth cardLayout containerWidth
 -- | ```
 -- |
 -- | ## Browser Support
@@ -53,7 +54,6 @@
 module Hydrogen.Schema.Reactive.ContainerQuery
   ( -- * Container Type
     ContainerType(InlineSize, BlockSize, Size, Normal)
-  , containerTypeToLegacyCss
   
   -- * Container Definition
   , Container
@@ -81,7 +81,6 @@ module Hydrogen.Schema.Reactive.ContainerQuery
   , containerQuery
   , containerQueryNamed
   , queryCondition
-  , queryToLegacyCss
   
   -- * Container-Responsive Values
   , ContainerResponsiveSpec
@@ -96,10 +95,6 @@ module Hydrogen.Schema.Reactive.ContainerQuery
   , isAtLeastBreakpoint
   , isBelowBreakpoint
   
-  -- * CSS Generation
-  , containerStylesLegacyCss
-  , containerTypeLegacyCss
-  , containerNameLegacyCss
   ) where
 
 import Prelude
@@ -145,17 +140,10 @@ data ContainerType
 derive instance eqContainerType :: Eq ContainerType
 
 instance showContainerType :: Show ContainerType where
-  show InlineSize = "inline-size"
-  show BlockSize = "block-size"
-  show Size = "size"
-  show Normal = "normal"
-
--- | Convert container type to CSS value.
-containerTypeToLegacyCss :: ContainerType -> String
-containerTypeToLegacyCss InlineSize = "inline-size"
-containerTypeToLegacyCss BlockSize = "block-size"
-containerTypeToLegacyCss Size = "size"
-containerTypeToLegacyCss Normal = "normal"
+  show InlineSize = "InlineSize"
+  show BlockSize = "BlockSize"
+  show Size = "Size"
+  show Normal = "Normal"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // container definition
@@ -224,16 +212,16 @@ data QueryCondition
 derive instance eqQueryCondition :: Eq QueryCondition
 
 instance showQueryCondition :: Show QueryCondition where
-  show (MinWidth w) = "(min-width: " <> show w <> "px)"
-  show (MaxWidth w) = "(max-width: " <> show w <> "px)"
-  show (MinHeight h) = "(min-height: " <> show h <> "px)"
-  show (MaxHeight h) = "(max-height: " <> show h <> "px)"
-  show (WidthRange minW maxW) = "(min-width: " <> show minW <> "px) and (max-width: " <> show maxW <> "px)"
-  show (HeightRange minH maxH) = "(min-height: " <> show minH <> "px) and (max-height: " <> show maxH <> "px)"
-  show (OrientationQuery o) = "(orientation: " <> orientationToCss o <> ")"
-  show (AspectRatio r) = "(aspect-ratio: " <> show r <> ")"
-  show (AspectRatioMin r) = "(min-aspect-ratio: " <> show r <> ")"
-  show (AspectRatioMax r) = "(max-aspect-ratio: " <> show r <> ")"
+  show (MinWidth w) = "MinWidth " <> show w
+  show (MaxWidth w) = "MaxWidth " <> show w
+  show (MinHeight h) = "MinHeight " <> show h
+  show (MaxHeight h) = "MaxHeight " <> show h
+  show (WidthRange minW maxW) = "WidthRange " <> show minW <> " " <> show maxW
+  show (HeightRange minH maxH) = "HeightRange " <> show minH <> " " <> show maxH
+  show (OrientationQuery o) = "OrientationQuery " <> show o
+  show (AspectRatio r) = "AspectRatio " <> show r
+  show (AspectRatioMin r) = "AspectRatioMin " <> show r
+  show (AspectRatioMax r) = "AspectRatioMax " <> show r
 
 -- | Minimum width condition.
 minWidth :: Int -> QueryCondition
@@ -258,12 +246,6 @@ widthRange = WidthRange
 -- | Height range condition (inclusive).
 heightRange :: Int -> Int -> QueryCondition
 heightRange = HeightRange
-
--- | Convert Orientation to CSS value.
-orientationToCss :: Orientation -> String
-orientationToCss Portrait = "portrait"
-orientationToCss Landscape = "landscape"
-orientationToCss Square = "square"
 
 -- | Orientation condition.
 -- |
@@ -312,12 +294,6 @@ containerQueryNamed name cond =
 -- | Get the condition from a query.
 queryCondition :: ContainerQuery -> QueryCondition
 queryCondition cq = cq.condition
-
--- | Convert container query to CSS @container rule.
-queryToLegacyCss :: ContainerQuery -> String
-queryToLegacyCss cq = case cq.containerName of
-  Nothing -> "@container " <> show cq.condition
-  Just name -> "@container " <> name <> " " <> show cq.condition
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                // container-responsive values
@@ -416,20 +392,3 @@ isAtLeastBreakpoint width bp = width >= breakpointMin bp
 -- | Check if container width is below a given breakpoint.
 isBelowBreakpoint :: Int -> Breakpoint -> Boolean
 isBelowBreakpoint width bp = width < breakpointMin bp
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                             // css generation
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Generate CSS for container-type property.
-containerTypeLegacyCss :: QueryContainer -> String
-containerTypeLegacyCss qc = "container-type: " <> containerTypeToLegacyCss qc.containerType <> ";"
-
--- | Generate CSS for container-name property.
-containerNameLegacyCss :: QueryContainer -> String
-containerNameLegacyCss qc = "container-name: " <> qc.name <> ";"
-
--- | Generate complete container CSS (type + name).
-containerStylesLegacyCss :: QueryContainer -> String
-containerStylesLegacyCss qc =
-  containerTypeLegacyCss qc <> " " <> containerNameLegacyCss qc

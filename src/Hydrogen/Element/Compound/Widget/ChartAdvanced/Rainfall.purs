@@ -183,5 +183,4 @@ renderRainfallLine color centerX halfWidth plotHeight padding numLines maxVal is
       , E.attr "stroke" color
       , E.attr "stroke-width" "1.5"
       , E.attr "stroke-opacity" "0.7"
-      , E.style "filter" ("drop-shadow(0 0 3px " <> color <> "60)")
       ]

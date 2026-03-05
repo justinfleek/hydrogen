@@ -24,7 +24,6 @@ module Hydrogen.Schema.Typography.FontWeight
   , unsafeFontWeight
   , unwrap
   , toNumber
-  , toLegacyCss
   , bounds
   -- Named weights
   , thin
@@ -160,11 +159,6 @@ unwrap (FontWeight w) = w
 -- | Convert to Number for calculations
 toNumber :: FontWeight -> Number
 toNumber (FontWeight w) = Int.toNumber w
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS font-weight value
-toLegacyCss :: FontWeight -> String
-toLegacyCss (FontWeight w) = show w
 
 -- | Bounds documentation for this type
 bounds :: Bounded.IntBounds

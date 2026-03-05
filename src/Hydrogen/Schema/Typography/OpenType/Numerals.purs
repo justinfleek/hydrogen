@@ -65,15 +65,9 @@ module Hydrogen.Schema.Typography.OpenType.Numerals
   , isProportional
   , isTabular
   , hasSlashedZero
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
-
-import Data.Array (intercalate)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // figure style
@@ -295,60 +289,3 @@ isTabular _ = false
 hasSlashedZero :: Numerals -> Boolean
 hasSlashedZero (Numerals { slashedZero: ZeroSlashed }) = true
 hasSlashedZero _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS font-variant-numeric value
-toLegacyCss :: Numerals -> String
-toLegacyCss (Numerals n) =
-  let
-    parts = styleToValue n.figureStyle <>
-            spacingToValue n.figureSpacing <>
-            zeroToValue n.slashedZero
-  in case parts of
-    [] -> "font-variant-numeric: normal;"
-    _ -> "font-variant-numeric: " <> intercalate " " parts <> ";"
-  where
-  styleToValue :: FigureStyle -> Array String
-  styleToValue StyleDefault = []
-  styleToValue StyleLining = ["lining-nums"]
-  styleToValue StyleOldstyle = ["oldstyle-nums"]
-
-  spacingToValue :: FigureSpacing -> Array String
-  spacingToValue SpacingDefault = []
-  spacingToValue SpacingProportional = ["proportional-nums"]
-  spacingToValue SpacingTabular = ["tabular-nums"]
-
-  zeroToValue :: SlashedZero -> Array String
-  zeroToValue ZeroDefault = []
-  zeroToValue ZeroSlashed = ["slashed-zero"]
-  zeroToValue ZeroNormal = []
-
--- | Convert to font-feature-settings value
--- |
--- | More explicit control using OpenType feature tags.
-toFontFeatureSettings :: Numerals -> String
-toFontFeatureSettings (Numerals n) =
-  "font-feature-settings: " <>
-  intercalate ", " (styleFeatures <> spacingFeatures <> zeroFeatures) <> ";"
-  where
-  styleFeatures :: Array String
-  styleFeatures = case n.figureStyle of
-    StyleDefault -> []
-    StyleLining -> ["\"lnum\" 1"]
-    StyleOldstyle -> ["\"onum\" 1"]
-
-  spacingFeatures :: Array String
-  spacingFeatures = case n.figureSpacing of
-    SpacingDefault -> []
-    SpacingProportional -> ["\"pnum\" 1"]
-    SpacingTabular -> ["\"tnum\" 1"]
-
-  zeroFeatures :: Array String
-  zeroFeatures = case n.slashedZero of
-    ZeroDefault -> []
-    ZeroSlashed -> ["\"zero\" 1"]
-    ZeroNormal -> ["\"zero\" 0"]

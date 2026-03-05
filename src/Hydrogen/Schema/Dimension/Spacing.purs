@@ -87,9 +87,6 @@ module Hydrogen.Schema.Dimension.Spacing
   , space48
   , space64
   
-  -- * Output
-  , toLegacyCss
-  
   -- * Bounds
   , bounds
   ) where
@@ -111,7 +108,6 @@ import Prelude
   , (&&)
   )
 
-import Data.Int (round, toNumber) as Int
 import Hydrogen.Schema.Bounded as Bounded
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -142,17 +138,6 @@ instance showUnit :: Show Unit where
   show Vmin = "vmin"
   show Vmax = "vmax"
 
--- | Convert unit to CSS suffix string
-unitToCss :: Unit -> String
-unitToCss Px = "px"
-unitToCss Rem = "rem"
-unitToCss Em = "em"
-unitToCss Percent = "%"
-unitToCss Vw = "vw"
-unitToCss Vh = "vh"
-unitToCss Vmin = "vmin"
-unitToCss Vmax = "vmax"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // spacing
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -169,7 +154,7 @@ instance ordSpacing :: Ord Spacing where
   compare (Spacing a) (Spacing b) = compare a.value b.value
 
 instance showSpacing :: Show Spacing where
-  show = toLegacyCss
+  show (Spacing s) = "(Spacing " <> show s.value <> " " <> show s.unit <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -358,34 +343,6 @@ space48 = px 192.0
 -- | 256px - maximum spacing
 space64 :: Spacing
 space64 = px 256.0
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                     // output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to legacy CSS string
--- |
--- | Generates CSS-compatible length value.
--- | NOT an FFI boundary - pure string generation.
--- |
--- | ```purescript
--- | toLegacyCss (px 16.0)      -- "16px"
--- | toLegacyCss (rem 1.5)      -- "1.5rem"
--- | toLegacyCss (percent 50.0) -- "50%"
--- | toLegacyCss zero           -- "0"
--- | ```
-toLegacyCss :: Spacing -> String
-toLegacyCss (Spacing s)
-  | s.value == 0.0 = "0"
-  | isWholeNumber s.value = show (Int.round s.value) <> unitToCss s.unit
-  | true = show s.value <> unitToCss s.unit
-
--- | Check if a number is effectively a whole number (within floating point tolerance)
-isWholeNumber :: Number -> Boolean
-isWholeNumber n = 
-  let rounded = Int.round n
-      diff = n - Int.toNumber rounded
-  in diff > (-0.0001) && diff < 0.0001
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // bounds

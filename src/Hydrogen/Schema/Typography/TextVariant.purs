@@ -44,10 +44,6 @@ module Hydrogen.Schema.Typography.TextVariant
   , usesPetiteCaps
   , affectsLowercase
   , affectsUppercase
-  
-  -- * CSS Output
-  , toLegacyCss
-  , toFontFeatureSettings
   ) where
 
 import Prelude
@@ -175,33 +171,3 @@ affectsUppercase (TextVariant { caps: AllPetiteCaps }) = true
 affectsUppercase (TextVariant { caps: Unicase }) = true
 affectsUppercase (TextVariant { caps: TitlingCaps }) = true
 affectsUppercase _ = false
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- NOT an FFI boundary — pure string generation.
--- | Convert to CSS font-variant-caps value
-toLegacyCss :: TextVariant -> String
-toLegacyCss (TextVariant { caps }) = case caps of
-  CapsNormal -> "font-variant-caps: normal;"
-  SmallCaps -> "font-variant-caps: small-caps;"
-  AllSmallCaps -> "font-variant-caps: all-small-caps;"
-  PetiteCaps -> "font-variant-caps: petite-caps;"
-  AllPetiteCaps -> "font-variant-caps: all-petite-caps;"
-  Unicase -> "font-variant-caps: unicase;"
-  TitlingCaps -> "font-variant-caps: titling-caps;"
-
--- | Convert to font-feature-settings value
--- |
--- | For browsers that don't support font-variant-caps, or when you need
--- | explicit OpenType feature control.
-toFontFeatureSettings :: TextVariant -> String
-toFontFeatureSettings (TextVariant { caps }) = case caps of
-  CapsNormal -> "font-feature-settings: normal;"
-  SmallCaps -> "font-feature-settings: \"smcp\" 1;"
-  AllSmallCaps -> "font-feature-settings: \"smcp\" 1, \"c2sc\" 1;"
-  PetiteCaps -> "font-feature-settings: \"pcap\" 1;"
-  AllPetiteCaps -> "font-feature-settings: \"pcap\" 1, \"c2pc\" 1;"
-  Unicase -> "font-feature-settings: \"unic\" 1;"
-  TitlingCaps -> "font-feature-settings: \"titl\" 1;"

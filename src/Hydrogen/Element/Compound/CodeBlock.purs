@@ -305,9 +305,8 @@ codeBlock propMods =
       <> " " <> themeClasses props.theme
       <> " " <> props.className
     
-    containerStyle = case props.maxHeight of
-      Just h -> [ E.style "max-height" h, E.style "overflow-y" "auto" ]
-      Nothing -> []
+    -- maxHeight is stored as pure data in props; runtime interprets it
+    _ = props.maxHeight
     
     renderLine :: Int -> String -> E.Element msg
     renderLine idx lineContent =
@@ -359,7 +358,7 @@ codeBlock propMods =
       [ E.classes [ containerCls, "group" ] ]
       [ header
       , E.div_
-          ( [ E.class_ codeContainerClasses ] <> containerStyle )
+          [ E.class_ codeContainerClasses ]
           [ E.pre_
               [ E.class_ preClasses ]
               [ E.code_

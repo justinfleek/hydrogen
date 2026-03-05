@@ -33,6 +33,14 @@ module Hydrogen.Element.Core.Element
       ( Rectangle
       , Ellipse
       , Path
+      , Polygon
+      , Star
+      , Ring
+      , Spiral
+      , Arrow
+      , Cross
+      , Gear
+      , Line
       , Text
       , Image
       , Video
@@ -51,6 +59,14 @@ module Hydrogen.Element.Core.Element
   , rectangle
   , ellipse
   , path
+  , polygon
+  , star
+  , ring
+  , spiral
+  , arrow
+  , cross
+  , gear
+  , line
   , text
   , image
   , video
@@ -91,6 +107,14 @@ import Hydrogen.Element.Core.Specs
   ( RectangleSpec
   , EllipseSpec
   , PathSpec
+  , PolygonSpec
+  , StarSpec
+  , RingSpec
+  , SpiralSpec
+  , ArrowSpec
+  , CrossSpec
+  , GearSpec
+  , LineSpec
   , TextSpec
   , GlyphSpec
   )
@@ -147,6 +171,14 @@ type TransformSpec =
 -- | - `Rectangle` — Axis-aligned rectangles with optional corner radius
 -- | - `Ellipse` — Ellipses and circles
 -- | - `Path` — Arbitrary vector paths (beziers, lines, arcs)
+-- | - `Polygon` — Regular polygons (triangle, pentagon, hexagon, N-gon)
+-- | - `Star` — N-pointed stars with inner/outer radii
+-- | - `Ring` — Circular rings/donuts with inner/outer radii
+-- | - `Spiral` — Archimedean spirals
+-- | - `Arrow` — Lines with arrow heads
+-- | - `Cross` — Cross/plus shapes
+-- | - `Gear` — Mechanical gear/cog shapes
+-- | - `Line` — Simple line segments
 -- | - `Text` — Pre-laid-out text with positioned glyphs
 -- |
 -- | **Media**:
@@ -179,6 +211,14 @@ data Element
   = Rectangle RectangleSpec
   | Ellipse EllipseSpec
   | Path PathSpec
+  | Polygon PolygonSpec
+  | Star StarSpec
+  | Ring RingSpec
+  | Spiral SpiralSpec
+  | Arrow ArrowSpec
+  | Cross CrossSpec
+  | Gear GearSpec
+  | Line LineSpec
   | Text TextSpec
   | Image ImageSpec
   | Video VideoSpec
@@ -196,6 +236,14 @@ instance showElement :: Show Element where
   show (Rectangle _) = "(Element Rectangle)"
   show (Ellipse _) = "(Element Ellipse)"
   show (Path _) = "(Element Path)"
+  show (Polygon _) = "(Element Polygon)"
+  show (Star _) = "(Element Star)"
+  show (Ring _) = "(Element Ring)"
+  show (Spiral _) = "(Element Spiral)"
+  show (Arrow _) = "(Element Arrow)"
+  show (Cross _) = "(Element Cross)"
+  show (Gear _) = "(Element Gear)"
+  show (Line _) = "(Element Line)"
   show (Text _) = "(Element Text)"
   show (Image i) = "(Element Image " <> show i.source <> ")"
   show (Video v) = "(Element Video " <> show v.source <> ")"
@@ -224,6 +272,14 @@ instance eqElement :: Eq Element where
   eq (Rectangle r1) (Rectangle r2) = eqRectangleSpec r1 r2
   eq (Ellipse e1) (Ellipse e2) = eqEllipseSpec e1 e2
   eq (Path p1) (Path p2) = eqPathSpec p1 p2
+  eq (Polygon p1) (Polygon p2) = eqPolygonSpec p1 p2
+  eq (Star s1) (Star s2) = eqStarSpec s1 s2
+  eq (Ring r1) (Ring r2) = eqRingSpec r1 r2
+  eq (Spiral s1) (Spiral s2) = eqSpiralSpec s1 s2
+  eq (Arrow a1) (Arrow a2) = eqArrowSpec a1 a2
+  eq (Cross c1) (Cross c2) = eqCrossSpec c1 c2
+  eq (Gear g1) (Gear g2) = eqGearSpec g1 g2
+  eq (Line l1) (Line l2) = eqLineSpec l1 l2
   eq (Text t1) (Text t2) = eqTextSpec t1 t2
   eq (Image i1) (Image i2) = eqImageSpec i1 i2
   eq (Video v1) (Video v2) = eqVideoSpec v1 v2
@@ -260,6 +316,69 @@ eqPathSpec p1 p2 =
   p1.fill == p2.fill &&
   p1.stroke == p2.stroke &&
   p1.opacity == p2.opacity
+
+-- | Compare PolygonSpec for equality
+eqPolygonSpec :: PolygonSpec -> PolygonSpec -> Boolean
+eqPolygonSpec p1 p2 =
+  p1.shape == p2.shape &&
+  p1.fill == p2.fill &&
+  p1.stroke == p2.stroke &&
+  p1.opacity == p2.opacity
+
+-- | Compare StarSpec for equality
+eqStarSpec :: StarSpec -> StarSpec -> Boolean
+eqStarSpec s1 s2 =
+  s1.shape == s2.shape &&
+  s1.fill == s2.fill &&
+  s1.stroke == s2.stroke &&
+  s1.opacity == s2.opacity
+
+-- | Compare RingSpec for equality
+eqRingSpec :: RingSpec -> RingSpec -> Boolean
+eqRingSpec r1 r2 =
+  r1.shape == r2.shape &&
+  r1.fill == r2.fill &&
+  r1.stroke == r2.stroke &&
+  r1.opacity == r2.opacity
+
+-- | Compare SpiralSpec for equality
+eqSpiralSpec :: SpiralSpec -> SpiralSpec -> Boolean
+eqSpiralSpec s1 s2 =
+  s1.shape == s2.shape &&
+  s1.fill == s2.fill &&
+  s1.stroke == s2.stroke &&
+  s1.opacity == s2.opacity
+
+-- | Compare ArrowSpec for equality
+eqArrowSpec :: ArrowSpec -> ArrowSpec -> Boolean
+eqArrowSpec a1 a2 =
+  a1.shape == a2.shape &&
+  a1.fill == a2.fill &&
+  a1.stroke == a2.stroke &&
+  a1.opacity == a2.opacity
+
+-- | Compare CrossSpec for equality
+eqCrossSpec :: CrossSpec -> CrossSpec -> Boolean
+eqCrossSpec c1 c2 =
+  c1.shape == c2.shape &&
+  c1.fill == c2.fill &&
+  c1.stroke == c2.stroke &&
+  c1.opacity == c2.opacity
+
+-- | Compare GearSpec for equality
+eqGearSpec :: GearSpec -> GearSpec -> Boolean
+eqGearSpec g1 g2 =
+  g1.shape == g2.shape &&
+  g1.fill == g2.fill &&
+  g1.stroke == g2.stroke &&
+  g1.opacity == g2.opacity
+
+-- | Compare LineSpec for equality
+eqLineSpec :: LineSpec -> LineSpec -> Boolean
+eqLineSpec l1 l2 =
+  l1.shape == l2.shape &&
+  l1.stroke == l2.stroke &&
+  l1.opacity == l2.opacity
 
 -- | Compare GlyphSpec for equality
 eqGlyphSpec :: GlyphSpec -> GlyphSpec -> Boolean
@@ -421,6 +540,54 @@ ellipse = Ellipse
 -- | Create a path element.
 path :: PathSpec -> Element
 path = Path
+
+-- | Create a polygon element.
+-- |
+-- | Regular polygons with N sides (triangle = 3, pentagon = 5, hexagon = 6, etc).
+polygon :: PolygonSpec -> Element
+polygon = Polygon
+
+-- | Create a star element.
+-- |
+-- | N-pointed stars with configurable inner/outer radii.
+star :: StarSpec -> Element
+star = Star
+
+-- | Create a ring element.
+-- |
+-- | Circular ring/donut with inner and outer radii.
+ring :: RingSpec -> Element
+ring = Ring
+
+-- | Create a spiral element.
+-- |
+-- | Archimedean spiral with configurable turns.
+spiral :: SpiralSpec -> Element
+spiral = Spiral
+
+-- | Create an arrow element.
+-- |
+-- | Line with arrow heads at one or both ends.
+arrow :: ArrowSpec -> Element
+arrow = Arrow
+
+-- | Create a cross element.
+-- |
+-- | Cross/plus shape with configurable arm thickness.
+cross :: CrossSpec -> Element
+cross = Cross
+
+-- | Create a gear element.
+-- |
+-- | Mechanical gear/cog with configurable teeth.
+gear :: GearSpec -> Element
+gear = Gear
+
+-- | Create a line element.
+-- |
+-- | Simple line segment from point A to point B.
+line :: LineSpec -> Element
+line = Line
 
 -- | Create a text element.
 -- |

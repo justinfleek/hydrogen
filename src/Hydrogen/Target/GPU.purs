@@ -2,55 +2,55 @@
 --                                                    // hydrogen // target // gpu
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | GPU Target Adapter — Unified rendering interface with automatic fallback.
+-- | GPU Target Adapter — Pure data rendering configuration.
 -- |
 -- | ## Design Philosophy
 -- |
--- | Provides a single API that works across GPU backends:
+-- | Provides pure data types describing GPU rendering configuration.
+-- | The actual GPU execution happens in the Haskell runtime, which
+-- | interprets this pure data and executes against WebGPU.
 -- |
 -- | ```
--- | WebGPU (preferred, 100K+ particles)
--- |    ↓ fallback
--- | WebGL2 (wide support, 10K+ particles)
--- |    ↓ fallback
--- | Canvas2D (universal, 1K particles)
+-- | PureScript (pure data)
+-- |    ↓ serialization
+-- | Haskell Runtime
+-- |    ↓ interpretation
+-- | WebGPU API
 -- | ```
 -- |
 -- | ## Architecture
 -- |
--- | Wraps Hydrogen.GPU.WebGPU.Device with:
--- | - Automatic capability detection
--- | - Backend fallback chain
--- | - Unified render/clear/dispose API
--- |
--- | ## Grade
--- |
--- | All operations are GPU-graded (require GPU effect permission).
+-- | No FFI. No effects. Pure data structures that describe:
+-- | - Backend preferences
+-- | - Device configuration
+-- | - Render commands
 -- |
 -- | ## Dependencies
 -- | - Prelude
--- | - Hydrogen.GPU.WebGPU.Device
+-- | - Hydrogen.GPU.WebGPU.Device (pure data)
 -- | - Hydrogen.GPU.DrawCommand.Types
 
 module Hydrogen.Target.GPU
-  ( -- * Backend Detection
+  ( -- * Backend Selection
     Backend(..)
-  , detectCapabilities
   , Capabilities
+  , defaultCapabilities
   
-  -- * Renderer
-  , Renderer
-  , createRenderer
-  , dispose
-  , getBackend
+  -- * Renderer Configuration
+  , RendererConfig
+  , defaultRendererConfig
+  , webgpuRendererConfig
+  , webgl2RendererConfig
+  , canvas2dRendererConfig
   
-  -- * Rendering
-  , render
-  , clear
+  -- * Render Requests (Pure Data)
+  , RenderRequest(..)
+  , ClearRequest
+  , DrawRequest
   
   -- * Info
   , GPUInfo
-  , getGPUInfo
+  , defaultGPUInfo
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -60,73 +60,20 @@ module Hydrogen.Target.GPU
 import Prelude
   ( class Eq
   , class Show
-  , Unit
-  , bind
-  , discard
-  , map
-  , pure
   , show
-  , unit
-  , ($)
+  , otherwise
   , (<>)
-  , (>)
-  , (>>=)
+  , (==)
   )
 
-import Data.Array as Array
-import Data.Either (Either(Left, Right))
-import Data.Foldable (for_)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Traversable (traverse_)
-import Effect (Effect)
-import Effect.Aff (Aff, attempt, makeAff)
-import Effect.Class (liftEffect)
-import Effect.Console as Console
 
-import Foreign (Foreign, unsafeToForeign)
-
-import Hydrogen.GPU.WebGPU.Device as WebGPU
-import Hydrogen.GPU.DrawCommand.Types (DrawCommand)
-import Hydrogen.GPU.WebGPU.Types 
-  ( GPUAdapterDescriptor
-  , GPUCanvasAlphaMode(AlphaOpaque)
-  , GPUCanvasConfiguration
+import Hydrogen.GPU.WebGPU.Device as Device
+import Hydrogen.GPU.WebGPU.Types
+  ( GPUCanvasAlphaMode(AlphaOpaque)
   , GPUTextureFormat(BGRA8Unorm)
-  , GPUTextureUsage(RenderAttachment)
   )
-import Hydrogen.GPU.WebGPU.Types.RenderPass
-  ( GPULoadOp(LoadOpClear, LoadOpLoad)
-  , GPURenderPassDescriptor
-  , GPUStoreOp(StoreOpStore, StoreOpDiscard)
-  )
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                              // default configs
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Default adapter descriptor (no power preference, no fallback).
-defaultAdapterDescriptor :: GPUAdapterDescriptor
-defaultAdapterDescriptor =
-  { powerPreference: Nothing
-  , forceFallbackAdapter: false
-  }
-
--- | Default device descriptor (no required features).
-defaultDeviceDescriptor :: { requiredFeatures :: Array String, label :: Maybe String }
-defaultDeviceDescriptor =
-  { requiredFeatures: []
-  , label: Nothing
-  }
-
--- | Default canvas configuration (BGRA8 format, opaque alpha).
-defaultCanvasConfig :: GPUCanvasConfiguration
-defaultCanvasConfig =
-  { format: BGRA8Unorm
-  , usage: [ RenderAttachment ]
-  , viewFormats: []
-  , colorSpace: "srgb"
-  , alphaMode: AlphaOpaque
-  }
+import Hydrogen.GPU.DrawCommand.Types (DrawCommand)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // backend
@@ -145,7 +92,14 @@ instance showBackend :: Show Backend where
   show WebGL2 = "WebGL2"
   show Canvas2D = "Canvas2D"
 
--- | GPU capabilities detected at runtime.
+-- | GPU capabilities — pure data describing what's available.
+-- |
+-- | In the pure data model, capabilities are either:
+-- | 1. Provided by the Haskell runtime after probing
+-- | 2. Assumed based on target platform
+-- |
+-- | This type is serializable and can be transmitted between
+-- | agents as pure data.
 type Capabilities =
   { webgpu :: Boolean      -- ^ WebGPU supported
   , webgl2 :: Boolean      -- ^ WebGL2 supported
@@ -155,209 +109,115 @@ type Capabilities =
   , bestBackend :: Backend -- ^ Recommended backend based on capabilities
   }
 
--- | Detect available GPU capabilities.
+-- | Default capabilities assuming WebGPU is available.
 -- |
--- | Checks browser support for each backend and returns
--- | capability information for runtime decisions.
-detectCapabilities :: Effect Capabilities
-detectCapabilities = do
-  webgpuSupported <- WebGPU.isWebGPUSupported
-  -- WebGL2 and Canvas2D detection would need additional FFI
-  -- For now, assume WebGL2 available if not WebGPU, Canvas2D always
-  let best = if webgpuSupported then WebGPU else WebGL2
-  pure
-    { webgpu: webgpuSupported
-    , webgl2: true           -- Assume available (actual detection requires FFI)
-    , canvas2d: true         -- Always available in browsers
-    , maxTextureSize: if webgpuSupported then 8192 else 4096
-    , maxParticles: if webgpuSupported then 100000 else 10000
-    , bestBackend: best
-    }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                   // renderer
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Opaque renderer handle.
--- |
--- | Wraps the underlying GPU context (WebGPU device, WebGL context, etc.)
--- | and provides a unified interface for rendering.
-type Renderer =
-  { backend :: Backend
-  , canvasId :: String
-  , device :: Maybe WebGPU.GPUDevice
-  , context :: Maybe WebGPU.GPUCanvasContext
-  , queue :: Maybe WebGPU.GPUQueue
+-- | The Haskell runtime overrides this with actual detected values.
+defaultCapabilities :: Capabilities
+defaultCapabilities =
+  { webgpu: true
+  , webgl2: true
+  , canvas2d: true
+  , maxTextureSize: 8192
+  , maxParticles: 100000
+  , bestBackend: WebGPU
   }
 
--- | Create a renderer attached to a canvas element.
--- |
--- | The canvas element must be provided as a Foreign value (from DOM).
--- | Attempts backends in order: WebGPU → WebGL2 → Canvas2D
--- | Returns Left with error message on failure.
--- |
--- | The canvasId is stored for debugging/logging only.
-createRenderer :: Foreign -> String -> Aff (Either String Renderer)
-createRenderer canvas canvasId = do
-  caps <- liftEffect detectCapabilities
-  
-  if caps.webgpu
-    then createWebGPURenderer canvas canvasId
-    else if caps.webgl2
-      then createWebGL2Renderer canvas canvasId
-      else createCanvas2DRenderer canvas canvasId
-
--- | Create WebGPU-backed renderer.
-createWebGPURenderer :: Foreign -> String -> Aff (Either String Renderer)
-createWebGPURenderer canvas canvasId = do
-  -- Request adapter
-  adapterResult <- WebGPU.requestAdapter defaultAdapterDescriptor
-  case adapterResult of
-    Left err -> pure $ Left $ "WebGPU adapter request failed: " <> show err
-    Right adapter -> do
-      -- Request device
-      deviceResult <- WebGPU.requestDevice adapter defaultDeviceDescriptor
-      case deviceResult of
-        Left err -> pure $ Left $ "WebGPU device request failed: " <> show err
-        Right device -> do
-          -- Configure canvas
-          contextResult <- liftEffect $ WebGPU.configureCanvas device canvas defaultCanvasConfig
-          case contextResult of
-            Left err -> pure $ Left $ "Canvas configuration failed: " <> show err
-            Right context -> do
-                  queue <- liftEffect $ WebGPU.getQueue device
-                  pure $ Right
-                    { backend: WebGPU
-                    , canvasId: canvasId
-                    , device: Just device
-                    , context: Just context
-                    , queue: Just queue
-                    }
-
--- | Create WebGL2-backed renderer.
--- |
--- | WebGL2 backend not yet implemented. Returns stub renderer.
-createWebGL2Renderer :: Foreign -> String -> Aff (Either String Renderer)
-createWebGL2Renderer _canvas canvasId = do
-  pure $ Right
-    { backend: WebGL2
-    , canvasId: canvasId
-    , device: Nothing
-    , context: Nothing
-    , queue: Nothing
-    }
-
--- | Create Canvas2D-backed renderer.
--- |
--- | Canvas2D backend not yet implemented. Returns stub renderer.
-createCanvas2DRenderer :: Foreign -> String -> Aff (Either String Renderer)
-createCanvas2DRenderer _canvas canvasId = do
-  pure $ Right
-    { backend: Canvas2D
-    , canvasId: canvasId
-    , device: Nothing
-    , context: Nothing
-    , queue: Nothing
-    }
-
--- | Get the active backend for a renderer.
-getBackend :: Renderer -> Backend
-getBackend r = r.backend
-
--- | Dispose of renderer resources.
--- |
--- | For WebGPU, device destruction happens automatically when references are dropped.
--- | We log disposal for debugging purposes.
-dispose :: Renderer -> Effect Unit
-dispose renderer = do
-  Console.log $ "Disposing " <> show renderer.backend <> " renderer for canvas: " <> renderer.canvasId
-
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                  // rendering
+--                                                        // renderer configuration
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Render an array of draw commands.
+-- | Renderer configuration — pure data describing how to set up rendering.
 -- |
--- | Dispatches to the appropriate backend based on renderer type.
-render :: forall msg. Renderer -> Array (DrawCommand msg) -> Effect Unit
-render renderer commands = case renderer.backend of
-  WebGPU -> renderWebGPU renderer commands
-  WebGL2 -> renderWebGL2 renderer commands
-  Canvas2D -> renderCanvas2D renderer commands
+-- | This replaces the old opaque Renderer type. Instead of holding
+-- | FFI handles to GPU objects, it holds pure data that describes
+-- | the desired configuration. The Haskell runtime interprets this.
+type RendererConfig =
+  { backend :: Backend
+  , canvasId :: String
+  , deviceConfig :: Device.GPUDeviceConfig
+  , canvasConfig :: Device.GPUCanvasConfig
+  , label :: Maybe String
+  }
 
--- | WebGPU render implementation.
--- |
--- | Creates a render pass that clears to transparent black, then processes
--- | each DrawCommand. Currently logs command count for debugging - full
--- | command interpretation requires pipeline setup in the interpreter layer.
-renderWebGPU :: forall msg. Renderer -> Array (DrawCommand msg) -> Effect Unit
-renderWebGPU renderer commands = do
-  case { device: renderer.device, context: renderer.context, queue: renderer.queue } of
-    { device: Just device, context: Just context, queue: Just queue } -> do
-      -- Get current texture from canvas context
-      texture <- WebGPU.getCurrentTexture context
-      textureView <- WebGPU.createTextureView texture (unsafeToForeign {})
-      
-      -- Create command encoder
-      encoder <- WebGPU.createCommandEncoder device
-      
-      -- Begin render pass with clear
-      let passDesc :: GPURenderPassDescriptor
-          passDesc =
-            { colorAttachments:
-                [ { loadOp: LoadOpClear
-                  , storeOp: StoreOpStore
-                  , clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 }
-                  }
-                ]
-            , depthStencilAttachment: Nothing
-            , timestampWrites: Nothing
-            , label: Just "hydrogen-render-pass"
-            }
-      
-      pass <- WebGPU.beginRenderPass encoder passDesc textureView Nothing
-      
-      -- Process draw commands
-      -- Note: Full DrawCommand interpretation requires render pipelines,
-      -- bind groups, and vertex buffers which are managed by the interpreter.
-      -- Here we log command count; the interpreter layer handles the rest.
-      let commandCount = Array.length commands
-      when (commandCount > 0) do
-        Console.log $ "Processing " <> show commandCount <> " draw commands"
-      
-      -- End render pass
-      WebGPU.endRenderPass pass
-      
-      -- Finish encoding and submit
-      commandBuffer <- WebGPU.finishCommandEncoder encoder
-      WebGPU.submit queue [ commandBuffer ]
-      
-    _ -> do
-      Console.warn "WebGPU renderer not fully initialized - skipping render"
-  where
-    when :: Boolean -> Effect Unit -> Effect Unit
-    when true action = action
-    when false _ = pure unit
+-- | Default renderer configuration using WebGPU.
+defaultRendererConfig :: String -> RendererConfig
+defaultRendererConfig canvasId =
+  { backend: WebGPU
+  , canvasId: canvasId
+  , deviceConfig:
+      { requiredFeatures: Device.emptyFeatureSet
+      , requiredLimits: Device.defaultLimits
+      , label: Just "hydrogen-device"
+      }
+  , canvasConfig:
+      { format: BGRA8Unorm
+      , alphaMode: AlphaOpaque
+      , width: 800
+      , height: 600
+      }
+  , label: Just "hydrogen-renderer"
+  }
 
--- | WebGL2 render implementation.
--- |
--- | WebGL2 fallback for browsers without WebGPU support.
--- | Logs a warning indicating the backend is not yet implemented.
-renderWebGL2 :: forall msg. Renderer -> Array (DrawCommand msg) -> Effect Unit
-renderWebGL2 renderer commands = do
-  let commandCount = Array.length commands
-  Console.warn $ "WebGL2 backend not yet implemented - " 
-    <> show commandCount <> " commands for canvas: " <> renderer.canvasId
+-- | WebGPU-specific renderer configuration.
+webgpuRendererConfig :: String -> Int -> Int -> RendererConfig
+webgpuRendererConfig canvasId width height =
+  { backend: WebGPU
+  , canvasId: canvasId
+  , deviceConfig:
+      { requiredFeatures: Device.emptyFeatureSet
+      , requiredLimits: Device.defaultLimits
+      , label: Just "hydrogen-webgpu-device"
+      }
+  , canvasConfig:
+      { format: BGRA8Unorm
+      , alphaMode: AlphaOpaque
+      , width: width
+      , height: height
+      }
+  , label: Just "hydrogen-webgpu-renderer"
+  }
 
--- | Canvas2D render implementation.
--- |
--- | Universal fallback using 2D canvas context.
--- | Logs a warning indicating the backend is not yet implemented.
-renderCanvas2D :: forall msg. Renderer -> Array (DrawCommand msg) -> Effect Unit
-renderCanvas2D renderer commands = do
-  let commandCount = Array.length commands
-  Console.warn $ "Canvas2D backend not yet implemented - "
-    <> show commandCount <> " commands for canvas: " <> renderer.canvasId
+-- | WebGL2 fallback renderer configuration.
+webgl2RendererConfig :: String -> Int -> Int -> RendererConfig
+webgl2RendererConfig canvasId width height =
+  { backend: WebGL2
+  , canvasId: canvasId
+  , deviceConfig:
+      { requiredFeatures: Device.emptyFeatureSet
+      , requiredLimits: Device.minLimits  -- Lower limits for WebGL2
+      , label: Just "hydrogen-webgl2-device"
+      }
+  , canvasConfig:
+      { format: BGRA8Unorm
+      , alphaMode: AlphaOpaque
+      , width: width
+      , height: height
+      }
+  , label: Just "hydrogen-webgl2-renderer"
+  }
+
+-- | Canvas2D fallback renderer configuration.
+canvas2dRendererConfig :: String -> Int -> Int -> RendererConfig
+canvas2dRendererConfig canvasId width height =
+  { backend: Canvas2D
+  , canvasId: canvasId
+  , deviceConfig:
+      { requiredFeatures: Device.emptyFeatureSet
+      , requiredLimits: Device.minLimits  -- Minimal limits for Canvas2D
+      , label: Just "hydrogen-canvas2d-device"
+      }
+  , canvasConfig:
+      { format: BGRA8Unorm
+      , alphaMode: AlphaOpaque
+      , width: width
+      , height: height
+      }
+  , label: Just "hydrogen-canvas2d-renderer"
+  }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                // render requests
+-- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Clear color type (RGBA 0-1).
 type ClearColor =
@@ -367,98 +227,48 @@ type ClearColor =
   , a :: Number
   }
 
--- | Clear the canvas with a color.
-clear :: Renderer -> ClearColor -> Effect Unit
-clear renderer color = case renderer.backend of
-  WebGPU -> clearWebGPU renderer color
-  WebGL2 -> clearWebGL2 renderer color
-  Canvas2D -> clearCanvas2D renderer color
+-- | A request to clear the canvas.
+type ClearRequest =
+  { color :: ClearColor
+  }
 
--- | WebGPU clear implementation.
--- |
--- | Creates a render pass with the specified clear color, then immediately
--- | ends and submits it. This is the standard WebGPU pattern for clearing.
-clearWebGPU :: Renderer -> ClearColor -> Effect Unit
-clearWebGPU renderer color = do
-  case { device: renderer.device, context: renderer.context, queue: renderer.queue } of
-    { device: Just device, context: Just context, queue: Just queue } -> do
-      -- Get current texture from canvas context
-      texture <- WebGPU.getCurrentTexture context
-      textureView <- WebGPU.createTextureView texture (unsafeToForeign {})
-      
-      -- Create command encoder
-      encoder <- WebGPU.createCommandEncoder device
-      
-      -- Begin render pass with specified clear color
-      let passDesc :: GPURenderPassDescriptor
-          passDesc =
-            { colorAttachments:
-                [ { loadOp: LoadOpClear
-                  , storeOp: StoreOpStore
-                  , clearValue: { r: color.r, g: color.g, b: color.b, a: color.a }
-                  }
-                ]
-            , depthStencilAttachment: Nothing
-            , timestampWrites: Nothing
-            , label: Just "hydrogen-clear-pass"
-            }
-      
-      pass <- WebGPU.beginRenderPass encoder passDesc textureView Nothing
-      
-      -- Immediately end (clear only, no drawing)
-      WebGPU.endRenderPass pass
-      
-      -- Finish encoding and submit
-      commandBuffer <- WebGPU.finishCommandEncoder encoder
-      WebGPU.submit queue [ commandBuffer ]
-      
-    _ -> do
-      Console.warn "WebGPU renderer not fully initialized - skipping clear"
+-- | A request to draw commands.
+type DrawRequest msg =
+  { commands :: Array (DrawCommand msg)
+  }
 
--- | WebGL2 clear implementation.
+-- | Render request — pure data describing what to render.
 -- |
--- | WebGL2 fallback for clearing. Logs a warning indicating not implemented.
-clearWebGL2 :: Renderer -> ClearColor -> Effect Unit
-clearWebGL2 renderer _color = do
-  Console.warn $ "WebGL2 clear not yet implemented for canvas: " <> renderer.canvasId
-
--- | Canvas2D clear implementation.
--- |
--- | Canvas2D fallback for clearing. Logs a warning indicating not implemented.
-clearCanvas2D :: Renderer -> ClearColor -> Effect Unit
-clearCanvas2D renderer _color = do
-  Console.warn $ "Canvas2D clear not yet implemented for canvas: " <> renderer.canvasId
+-- | The Haskell runtime interprets these requests and executes
+-- | the appropriate GPU commands.
+data RenderRequest msg
+  = ClearCanvas ClearRequest
+  | DrawCommands (DrawRequest msg)
+  | ClearAndDraw ClearRequest (DrawRequest msg)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // info
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | GPU information for debugging and telemetry.
--- |
--- | Provides details about the active GPU backend, useful for:
--- | - Performance monitoring
--- | - Bug reports
--- | - Adaptive quality settings
+-- | GPU information — pure data for debugging and telemetry.
 type GPUInfo =
   { backend :: Backend          -- ^ Active rendering backend
-  , capabilities :: Capabilities -- ^ Detected GPU capabilities
+  , capabilities :: Capabilities -- ^ GPU capabilities
   , vendor :: String            -- ^ GPU vendor (if available)
   , renderer :: String          -- ^ GPU renderer string (if available)
   , maxTextureSize :: Int       -- ^ Maximum texture dimension
   , supportsCompute :: Boolean  -- ^ Compute shader support
   }
 
--- | Get GPU information from a renderer.
+-- | Default GPU info assuming WebGPU.
 -- |
--- | Returns details about the active backend and capabilities.
-getGPUInfo :: Renderer -> Effect GPUInfo
-getGPUInfo r = do
-  caps <- detectCapabilities
-  pure
-    { backend: r.backend
-    , capabilities: caps
-    , vendor: "Unknown"        -- Would need WebGPU adapter info
-    , renderer: "Unknown"      -- Would need WebGPU adapter info
-    , maxTextureSize: caps.maxTextureSize
-    , supportsCompute: caps.webgpu  -- Only WebGPU has compute shaders
-    }
+-- | The Haskell runtime populates actual values.
+defaultGPUInfo :: GPUInfo
+defaultGPUInfo =
+  { backend: WebGPU
+  , capabilities: defaultCapabilities
+  , vendor: "Unknown"
+  , renderer: "Unknown"
+  , maxTextureSize: 8192
+  , supportsCompute: true
+  }
