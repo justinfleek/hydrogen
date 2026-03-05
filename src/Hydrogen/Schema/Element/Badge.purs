@@ -120,6 +120,7 @@ import Prelude
   , class Show
   , show
   , (<>)
+  , (>)
   )
 
 import Data.Maybe (Maybe)

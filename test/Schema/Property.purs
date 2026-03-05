@@ -686,8 +686,11 @@ transform2DPropertyTests = describe "Transform2D" do
     it "identity transform has no components" do
       let t = Transform.identityTransform
       -- Check that all optional components are Nothing
-      -- We verify by checking the CSS output is empty
-      Transform.transform2DToLegacyCss t `shouldEqual` ""
+      let Transform.Transform2D rec = t
+      rec.translate `shouldEqual` Nothing
+      rec.scale `shouldEqual` Nothing
+      rec.rotate `shouldEqual` Nothing
+      rec.skew `shouldEqual` Nothing
     
     it "composeTransform with identity is original" do
       Spec.quickCheck propComposeWithIdentity
@@ -777,9 +780,10 @@ propComposeWithIdentity = do
   ty <- chooseFloat (-100.0) 100.0
   let t = Transform.withTranslate (Transform.translate tx ty) Transform.identityTransform
   let composed = Transform.composeTransform t Transform.identityTransform
-  let css1 = Transform.transform2DToLegacyCss t
-  let css2 = Transform.transform2DToLegacyCss composed
-  pure $ css1 == css2
+  -- Compare the translate components directly (pure data, not CSS)
+  let Transform.Transform2D rec1 = t
+  let Transform.Transform2D rec2 = composed
+  pure $ rec1.translate == rec2.translate
     <?> "Composing with identity should preserve transform"
 
 -- | Property: translations accumulate when composed

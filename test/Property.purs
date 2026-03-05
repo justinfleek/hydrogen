@@ -31,7 +31,11 @@ import Hydrogen.Data.Format as Format
 import Hydrogen.Data.RemoteData (RemoteData(NotAsked, Loading, Failure, Success))
 import Hydrogen.Data.RemoteData as RD
 import Hydrogen.Form.Validation as V
-import Hydrogen.Style.Color as Color
+import Hydrogen.Schema.Color.HSLA as HSLA
+import Hydrogen.Schema.Color.Hue as Hue
+import Hydrogen.Schema.Color.Saturation as Sat
+import Hydrogen.Schema.Color.Lightness as Light
+import Hydrogen.Schema.Color.Opacity as Op
 import Test.QuickCheck (class Arbitrary, Result, arbitrary, quickCheck, quickCheckGen, (<?>), (===))
 import Test.QuickCheck.Gen (Gen, chooseInt, elements, frequency, oneOf, resize, sized, vectorOf)
 
@@ -114,49 +118,49 @@ genKleisli = elements $ NEA.cons'
   , \x -> if x == 0 then Loading else Success (x + 1)
   ]
 
--- | HSL color generator with realistic distribution
-genHSL :: Gen Color.HSL
-genHSL = do
-  -- Hue: any value 0-360, but bias toward common values
+-- | HSLA color generator with realistic distribution
+genHSLA :: Gen HSLA.HSLA
+genHSLA = do
+  -- Hue: any value 0-359, but bias toward common values
   h <- frequency $ NEA.cons'
-    (Tuple 20.0 (pure 0.0))  -- Red
-    [ Tuple 10.0 (pure 60.0)   -- Yellow
-    , Tuple 10.0 (pure 120.0)  -- Green
-    , Tuple 10.0 (pure 180.0)  -- Cyan
-    , Tuple 10.0 (pure 240.0)  -- Blue
-    , Tuple 10.0 (pure 300.0)  -- Magenta
-    , Tuple 30.0 (toNumber <$> chooseInt 0 360)  -- Any hue
+    (Tuple 20.0 (pure 0))  -- Red
+    [ Tuple 10.0 (pure 60)   -- Yellow
+    , Tuple 10.0 (pure 120)  -- Green
+    , Tuple 10.0 (pure 180)  -- Cyan
+    , Tuple 10.0 (pure 240)  -- Blue
+    , Tuple 10.0 (pure 300)  -- Magenta
+    , Tuple 30.0 (chooseInt 0 359)  -- Any hue
     ]
   -- Saturation: bias toward 0, 50, 100
   s <- frequency $ NEA.cons'
-    (Tuple 15.0 (pure 0.0))
-    [ Tuple 15.0 (pure 50.0)
-    , Tuple 15.0 (pure 100.0)
-    , Tuple 55.0 (toNumber <$> chooseInt 0 100)
+    (Tuple 15.0 (pure 0))
+    [ Tuple 15.0 (pure 50)
+    , Tuple 15.0 (pure 100)
+    , Tuple 55.0 (chooseInt 0 100)
     ]
   -- Lightness: bias toward usable range (20-80)
   l <- frequency $ NEA.cons'
-    (Tuple 10.0 (pure 0.0))
-    [ Tuple 10.0 (pure 100.0)
-    , Tuple 10.0 (pure 50.0)
-    , Tuple 70.0 (toNumber <$> chooseInt 0 100)
+    (Tuple 10.0 (pure 0))
+    [ Tuple 10.0 (pure 100)
+    , Tuple 10.0 (pure 50)
+    , Tuple 70.0 (chooseInt 0 100)
     ]
   -- Alpha: usually 100, sometimes partial
   a <- frequency $ NEA.cons'
-    (Tuple 70.0 (pure 100.0))
-    [ Tuple 10.0 (pure 0.0)
-    , Tuple 20.0 (toNumber <$> chooseInt 0 100)
+    (Tuple 70.0 (pure 100))
+    [ Tuple 10.0 (pure 0)
+    , Tuple 20.0 (chooseInt 0 100)
     ]
-  pure { h, s, l, a }
+  pure (HSLA.hsla h s l a)
 
--- | Adversarial HSL - edge cases and boundaries
-genHSLAdversarial :: Gen Color.HSL
-genHSLAdversarial = do
-  h <- elements $ NEA.cons' 0.0 [360.0, (-1.0), 361.0, 180.0]
-  s <- elements $ NEA.cons' 0.0 [100.0, (-1.0), 101.0, 50.0]
-  l <- elements $ NEA.cons' 0.0 [100.0, (-1.0), 101.0, 50.0]
-  a <- elements $ NEA.cons' 0.0 [100.0, (-1.0), 101.0, 50.0]
-  pure { h, s, l, a }
+-- | Adversarial HSLA - edge cases and boundaries
+genHSLAAdversarial :: Gen HSLA.HSLA
+genHSLAAdversarial = do
+  h <- elements $ NEA.cons' 0 [359, (-1), 360, 180]
+  s <- elements $ NEA.cons' 0 [100, (-1), 101, 50]
+  l <- elements $ NEA.cons' 0 [100, (-1), 101, 50]
+  a <- elements $ NEA.cons' 0 [100, (-1), 101, 50]
+  pure (HSLA.hsla h s l a)
 
 -- | Byte values with realistic distribution
 genBytes :: Gen Number
@@ -437,69 +441,62 @@ remoteDataInvariants = describe "RemoteData Invariants" do
 colorProperties :: Spec Unit
 colorProperties = describe "Color Properties" do
   
-  describe "HSL manipulation bounds" do
+  describe "HSLA manipulation bounds" do
     it "lighten never exceeds 100" do
       Spec.quickCheck do
-        c <- genHSL
-        amount <- toNumber <$> chooseInt 0 200
-        let result = Color.lighten amount c
-        pure $ (result.l <= 100.0) <?> ("Lightness exceeded 100: " <> show result.l)
+        c <- genHSLA
+        amount <- chooseInt 0 200
+        let result = HSLA.lighten amount c
+        let rec = HSLA.hslaToRecord result
+        pure $ (rec.l <= 100) <?> ("Lightness exceeded 100: " <> show rec.l)
     
     it "darken never goes below 0" do
       Spec.quickCheck do
-        c <- genHSL
-        amount <- toNumber <$> chooseInt 0 200
-        let result = Color.darken amount c
-        pure $ (result.l >= 0.0) <?> ("Lightness went below 0: " <> show result.l)
+        c <- genHSLA
+        amount <- chooseInt 0 200
+        let result = HSLA.darken amount c
+        let rec = HSLA.hslaToRecord result
+        pure $ (rec.l >= 0) <?> ("Lightness went below 0: " <> show rec.l)
     
     it "saturate never exceeds 100" do
       Spec.quickCheck do
-        c <- genHSL
-        amount <- toNumber <$> chooseInt 0 200
-        let result = Color.saturate amount c
-        pure $ (result.s <= 100.0) <?> ("Saturation exceeded 100: " <> show result.s)
+        c <- genHSLA
+        amount <- chooseInt 0 200
+        let result = HSLA.saturate amount c
+        let rec = HSLA.hslaToRecord result
+        pure $ (rec.s <= 100) <?> ("Saturation exceeded 100: " <> show rec.s)
     
     it "desaturate never goes below 0" do
       Spec.quickCheck do
-        c <- genHSL
-        amount <- toNumber <$> chooseInt 0 200
-        let result = Color.desaturate amount c
-        pure $ (result.s >= 0.0) <?> ("Saturation went below 0: " <> show result.s)
+        c <- genHSLA
+        amount <- chooseInt 0 200
+        let result = HSLA.desaturate amount c
+        let rec = HSLA.hslaToRecord result
+        pure $ (rec.s >= 0) <?> ("Saturation went below 0: " <> show rec.s)
     
-    it "opacity is clamped to 0-100" do
+    it "fadeIn clamps alpha to 0-100" do
       Spec.quickCheck do
-        c <- genHSL
-        a <- elements $ NEA.cons' (-50.0) [0.0, 50.0, 100.0, 150.0, 200.0]
-        let result = Color.opacity a c
-        pure $ (result.a >= 0.0 && result.a <= 100.0)
-          <?> ("Alpha out of bounds: " <> show result.a)
+        c <- genHSLA
+        amount <- elements $ NEA.cons' (-50) [0, 50, 100, 150, 200]
+        let result = HSLA.fadeIn amount c
+        let rec = HSLA.hslaToRecord result
+        pure $ (rec.a >= 0 && rec.a <= 100)
+          <?> ("Alpha out of bounds: " <> show rec.a)
   
   describe "Metamorphic properties" do
     it "lighten then darken by same amount returns original (within bounds)" do
       Spec.quickCheck do
-        c <- genHSL
-        -- Only test colors where we won't hit bounds
-        let c' = c { l = 50.0 }  -- Start in middle
-        amount <- toNumber <$> chooseInt 0 40  -- Stay within bounds
-        let result = Color.darken amount (Color.lighten amount c')
-        -- Allow small floating point error
-        pure $ ((result.l - c'.l) < 0.001 && (result.l - c'.l) > (-0.001))
-          <?> ("Expected " <> show c'.l <> " got " <> show result.l)
-    
-    it "contrastColor returns black or white" do
-      Spec.quickCheck do
-        c <- genHSL
-        let contrast = Color.contrastColor c
-        pure $ (contrast.l == 0.0 || contrast.l == 100.0)
-          <?> ("Contrast color should be black or white, got l=" <> show contrast.l)
-    
-    it "contrastColor threshold at l=55" do
-      Spec.quickCheck do
-        l <- toNumber <$> chooseInt 0 100
-        let c = Color.hsl 0.0 0.0 l
-        let contrast = Color.contrastColor c
-        let expected = if l > 55.0 then 0.0 else 100.0
-        pure $ contrast.l === expected
+        -- Start with lightness in middle to avoid hitting bounds
+        h <- chooseInt 0 359
+        s <- chooseInt 0 100
+        a <- chooseInt 0 100
+        let c = HSLA.hsla h s 50 a  -- Start at l=50
+        amount <- chooseInt 0 40  -- Stay within bounds
+        let result = HSLA.darken amount (HSLA.lighten amount c)
+        let rec = HSLA.hslaToRecord result
+        -- With Ints, should be exact
+        pure $ (rec.l == 50)
+          <?> ("Expected 50 got " <> show rec.l)
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 --                                                        // Format property tests
@@ -781,11 +778,12 @@ stressTests = describe "Stress Tests" do
     
     it "HSL with adversarial values" do
       Spec.quickCheck do
-        c <- genHSLAdversarial
-        -- Operations should still work
-        let _ = Color.lighten 10.0 c
-        let _ = Color.darken 10.0 c
-        let _ = Color.contrastColor c
+        c <- genHSLAAdversarial
+        -- Operations should still work with adversarial inputs
+        let _ = HSLA.lighten 10 c
+        let _ = HSLA.darken 10 c
+        let _ = HSLA.saturate 10 c
+        let _ = HSLA.desaturate 10 c
         pure $ true === true
 
 -- ═══════════════════════════════════════════════════════════════════════════════

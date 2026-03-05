@@ -73,12 +73,14 @@ import Data.Maybe (Maybe(Nothing, Just), fromMaybe)
 
 import Hydrogen.Element.Core (Element, ellipse, image, group)
 import Hydrogen.Schema.Color.RGB (RGB, rgb)
-import Hydrogen.Schema.Color.Opacity (opacity)
+import Hydrogen.Schema.Color.Opacity (Opacity, opacity)
 import Hydrogen.Schema.Dimension.Device.Types (Pixel(Pixel))
-import Hydrogen.Schema.Geometry.Shape (EllipseShape, ellipseShape)
-import Hydrogen.Schema.Geometry.Point (PixelPoint2D, pixelPoint2D)
-import Hydrogen.Schema.Surface.Fill (Fill, solid)
-import Hydrogen.Element.Core.Media (ImageSource, urlSource)
+import Hydrogen.Schema.Dimension.ObjectFit (ObjectFit(Cover))
+import Hydrogen.Schema.Geometry.Shape (EllipseShape, ellipseShape, RectangleShape, rectangleShape)
+import Hydrogen.Schema.Geometry.Shape.Types (PixelPoint2D, pixelPoint2D)
+import Hydrogen.Schema.Geometry.Radius (cornersAll, px)
+import Hydrogen.Schema.Surface.Fill (Fill, fillSolid)
+import Hydrogen.Element.Core.Media (ImageSource(ImageUrl))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // props
@@ -162,7 +164,7 @@ avatar propMods =
     shape = ellipseShape center radius radius
     
     -- Build fill from background color
-    fill = solid bgColor
+    fill = fillSolid bgColor
   in
     ellipse
       { shape: shape
@@ -190,11 +192,19 @@ avatarImage propMods url =
     diameter = fromMaybe defaultSize props.size
     
     -- Image source
-    source = urlSource url
+    source = ImageUrl url
+    
+    -- Image bounds (square centered at origin)
+    bounds :: RectangleShape
+    bounds = rectangleShape
+      (pixelPoint2D (Pixel 0.0) (Pixel 0.0))
+      diameter
+      diameter
+      (cornersAll (px 0.0))
   in
     image
       { source: source
-      , width: diameter
-      , height: diameter
+      , bounds: bounds
+      , fit: Cover
       , opacity: opacity 100
       }

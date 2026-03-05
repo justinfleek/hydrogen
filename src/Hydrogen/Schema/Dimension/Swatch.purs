@@ -58,7 +58,6 @@ module Hydrogen.Schema.Dimension.Swatch
   , swatchSizeLg
   , swatchSizeXl
   , swatchSizeValue
-  , swatchSizeToCss
   , swatchSizeBounds
   , addSwatchSize
   , subtractSwatchSize
@@ -74,7 +73,6 @@ module Hydrogen.Schema.Dimension.Swatch
   , checkerboardSizeMd
   , checkerboardSizeLg
   , checkerboardSizeValue
-  , checkerboardSizeToCss
   , checkerboardSizeBounds
   , isCheckerboardSizeMin
   ) where
@@ -152,10 +150,6 @@ swatchSizeXl = SwatchSize 64.0
 swatchSizeValue :: SwatchSize -> Number
 swatchSizeValue (SwatchSize n) = n
 
--- | Convert to CSS string
-swatchSizeToCss :: SwatchSize -> String
-swatchSizeToCss (SwatchSize n) = show n <> "px"
-
 -- | Add two swatch sizes (result clamped to bounds)
 addSwatchSize :: SwatchSize -> SwatchSize -> SwatchSize
 addSwatchSize (SwatchSize a) (SwatchSize b) = swatchSize (a + b)
@@ -227,10 +221,6 @@ checkerboardSizeLg = CheckerboardSize 16.0
 -- | Extract the numeric value
 checkerboardSizeValue :: CheckerboardSize -> Number
 checkerboardSizeValue (CheckerboardSize n) = n
-
--- | Convert to CSS string
-checkerboardSizeToCss :: CheckerboardSize -> String
-checkerboardSizeToCss (CheckerboardSize n) = show n <> "px"
 
 -- | Check if checkerboard is at minimum size
 -- |

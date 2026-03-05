@@ -59,7 +59,6 @@ module Hydrogen.Schema.Geometry.CornerRadii
   
   -- * Display
   , showCornerRadii
-  , toCssString
   ) where
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -296,13 +295,3 @@ showCornerRadii (CornerRadii r) =
   <> ", tr: " <> show r.topRight 
   <> ", br: " <> show r.bottomRight 
   <> ", bl: " <> show r.bottomLeft <> " }"
-
--- | Convert to CSS border-radius string.
--- |
--- | Format: "tl tr br bl" (e.g., "8px 8px 0 0")
-toCssString :: CornerRadii -> String
-toCssString (CornerRadii r) =
-  show r.topLeft <> "px " 
-  <> show r.topRight <> "px " 
-  <> show r.bottomRight <> "px " 
-  <> show r.bottomLeft <> "px"

@@ -2,382 +2,304 @@
 --                                              // hydrogen // element // switch
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Switch — Schema-native toggle switch component.
+-- | Switch — Pure Element.Core rendering for toggle switch components.
 -- |
 -- | ## Design Philosophy
 -- |
--- | This component accepts **concrete Schema atoms**, not semantic tokens.
+-- | This module emits **pure Element data**, not HTML/CSS.
+-- | No strings. No CSS properties. Just bounded Schema atoms
+-- | composed into Element.Core shapes (Rectangle, Ellipse, Group).
 -- |
--- | ## Schema Atoms Accepted
+-- | ## Architecture
 -- |
--- | | Property             | Pillar     | Type                      | CSS Output              |
--- | |----------------------|------------|---------------------------|-------------------------|
--- | | trackColorOff        | Color      | Color.RGB                 | background (unchecked)  |
--- | | trackColorOn         | Color      | Color.RGB                 | background (checked)    |
--- | | thumbColor           | Color      | Color.RGB                 | thumb background        |
--- | | width                | Dimension  | Device.Pixel              | track width             |
--- | | height               | Dimension  | Device.Pixel              | track height            |
--- | | thumbSize            | Dimension  | Device.Pixel              | thumb diameter          |
--- | | transitionDuration   | Motion     | Temporal.Milliseconds     | transition-duration     |
--- |
--- | ## Usage
--- |
--- | ```purescript
--- | import Hydrogen.Element.Compound.Switch as Switch
--- | import Hydrogen.Schema.Color.RGB as Color
--- |
--- | -- Basic switch
--- | Switch.switch
--- |   [ Switch.isChecked true
--- |   , Switch.onToggle ToggleHandler
--- |   ]
--- |
--- | -- With brand atoms
--- | Switch.switch
--- |   [ Switch.isChecked state.enabled
--- |   , Switch.onToggle ToggleNotifs
--- |   , Switch.trackColorOn brand.primaryColor
--- |   , Switch.trackColorOff brand.switchTrack
--- |   , Switch.thumbColor brand.switchThumb
--- |   ]
--- |
--- | -- With label
--- | Switch.switchWithLabel "Enable notifications"
--- |   [ Switch.isChecked state.enabled
--- |   , Switch.onToggle ToggleNotifs
--- |   ]
 -- | ```
+-- | SwitchConfig (Schema atoms)
+-- |    ↓
+-- | This module (render functions)
+-- |    ↓
+-- | Element.Core (Rectangle, Ellipse, Group)
+-- |    ↓
+-- | Flatten → DrawCommand → Binary → GPU
+-- | ```
+-- |
+-- | ## Compositor Model
+-- |
+-- | A switch renders as:
+-- | - Track: Rectangle with pill shape (full corner radius)
+-- | - Thumb: Ellipse (circle) positioned left or right based on state
+-- |
+-- | Composed in a Group with the track as background, thumb on top.
 
 module Hydrogen.Element.Compound.Switch
-  ( -- * Main Components
-    switch
-  , switchWithLabel
+  ( -- * Main Render Function
+    renderSwitch
   
-  -- * Props
-  , SwitchProps
-  , SwitchProp
-  , defaultProps
+  -- * Configuration
+  , SwitchConfig
+  , defaultConfig
   
-  -- * State Props
-  , isChecked
-  , isDisabled
-  
-  -- * Color Atoms
-  , trackColorOff
-  , trackColorOn
-  , thumbColor
-  , labelColor
-  
-  -- * Dimension Atoms
-  , width
-  , height
-  , thumbSize
-  
-  -- * Typography Atoms
-  , labelFontSize
-  , labelFontWeight
-  
-  -- * Motion Atoms
-  , transitionDuration
-  
-  -- * Behavior Props
-  , onToggle
-  
-  -- * Escape Hatch
-  , extraAttributes
+  -- * Config Builders
+  , withChecked
+  , withDisabled
+  , withTrackColorOn
+  , withTrackColorOff
+  , withThumbColor
+  , withWidth
+  , withHeight
+  , withThumbSize
   ) where
 
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
+
 import Prelude
-  ( show
-  , (<>)
-  , not
+  ( ($)
+  , (+)
+  , (-)
+  , (/)
+  , (*) 
   )
 
-import Data.Array (foldl)
-import Data.Maybe (Maybe(Nothing, Just), maybe)
+import Data.Maybe (Maybe(Just, Nothing))
 
-import Hydrogen.Render.Element as E
-import Hydrogen.Schema.Color.RGB as Color
-import Hydrogen.Schema.Dimension.Device as Device
-import Hydrogen.Schema.Dimension.Temporal as Temporal
-import Hydrogen.Schema.Typography.FontSize as FontSize
-import Hydrogen.Schema.Typography.FontWeight as FontWeight
+-- Element.Core — pure data shapes
+import Hydrogen.Element.Core
+  ( Element
+  , rectangle
+  , ellipse
+  , group
+  )
+
+-- Schema atoms: Geometry — Rectangle and Ellipse
+import Hydrogen.Schema.Geometry.Shape.Primitives
+  ( RectangleShape
+  , rectangleShape
+  , EllipseShape
+  , circleShape
+  )
+import Hydrogen.Schema.Geometry.Shape.Types
+  ( PixelPoint2D
+  , pixelPoint2D
+  )
+import Hydrogen.Schema.Geometry.Radius
+  ( Radius
+  , cornersAll
+  , full
+  )
+
+-- Schema atoms: Dimension
+import Hydrogen.Schema.Dimension.Device.Types
+  ( Pixel(Pixel)
+  )
+
+-- Schema atoms: Surface
+import Hydrogen.Schema.Surface.Fill
+  ( fillSolid
+  )
+
+-- Schema atoms: Color
+import Hydrogen.Schema.Color.RGB
+  ( RGB
+  , rgb
+  )
+import Hydrogen.Schema.Color.Opacity
+  ( Opacity
+  , opacity
+  )
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                      // props
+--                                                                // config type
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Switch properties
-type SwitchProps msg =
+-- | Configuration for rendering a switch toggle.
+-- |
+-- | All fields use bounded Schema atoms. No strings. No CSS.
+type SwitchConfig =
   { -- State
     checked :: Boolean
   , disabled :: Boolean
   
-  -- Color atoms
-  , trackColorOff :: Maybe Color.RGB
-  , trackColorOn :: Maybe Color.RGB
-  , thumbColor :: Maybe Color.RGB
-  , labelColor :: Maybe Color.RGB
+  -- Colors
+  , trackColorOn :: RGB        -- Track fill when ON
+  , trackColorOff :: RGB       -- Track fill when OFF
+  , thumbColor :: RGB          -- Thumb fill
   
-  -- Dimension atoms
-  , width :: Maybe Device.Pixel
-  , height :: Maybe Device.Pixel
-  , thumbSize :: Maybe Device.Pixel
+  -- Geometry
+  , width :: Pixel             -- Track width
+  , height :: Pixel            -- Track height
+  , thumbSize :: Pixel         -- Thumb diameter
   
-  -- Typography atoms
-  , labelFontSize :: Maybe FontSize.FontSize
-  , labelFontWeight :: Maybe FontWeight.FontWeight
-  
-  -- Motion atoms
-  , transitionDuration :: Maybe Temporal.Milliseconds
-  
-  -- Behavior
-  , onToggle :: Maybe msg
-  
-  -- Escape hatch
-  , extraAttributes :: Array (E.Attribute msg)
+  -- Position (center-based for the track)
+  , center :: PixelPoint2D
   }
 
--- | Property modifier
-type SwitchProp msg = SwitchProps msg -> SwitchProps msg
-
--- | Default properties
-defaultProps :: forall msg. SwitchProps msg
-defaultProps =
+-- | Default switch configuration.
+-- |
+-- | Uses common defaults:
+-- | - 44px × 24px track
+-- | - 20px thumb
+-- | - Blue ON color
+-- | - Gray OFF color
+-- | - White thumb
+defaultConfig :: SwitchConfig
+defaultConfig =
   { checked: false
   , disabled: false
-  , trackColorOff: Nothing
-  , trackColorOn: Nothing
-  , thumbColor: Nothing
-  , labelColor: Nothing
-  , width: Nothing
-  , height: Nothing
-  , thumbSize: Nothing
-  , labelFontSize: Nothing
-  , labelFontWeight: Nothing
-  , transitionDuration: Nothing
-  , onToggle: Nothing
-  , extraAttributes: []
+  , trackColorOn: rgb 59 130 246    -- Blue
+  , trackColorOff: rgb 203 213 225  -- Gray
+  , thumbColor: rgb 255 255 255     -- White
+  , width: Pixel 44.0
+  , height: Pixel 24.0
+  , thumbSize: Pixel 20.0
+  , center: pixelPoint2D (Pixel 0.0) (Pixel 0.0)
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: state
+--                                                             // config builders
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checked state
-isChecked :: forall msg. Boolean -> SwitchProp msg
-isChecked c props = props { checked = c }
+withChecked :: Boolean -> SwitchConfig -> SwitchConfig
+withChecked c cfg = cfg { checked = c }
 
 -- | Set disabled state
-isDisabled :: forall msg. Boolean -> SwitchProp msg
-isDisabled d props = props { disabled = d }
+withDisabled :: Boolean -> SwitchConfig -> SwitchConfig
+withDisabled d cfg = cfg { disabled = d }
+
+-- | Set track color when ON
+withTrackColorOn :: RGB -> SwitchConfig -> SwitchConfig
+withTrackColorOn color cfg = cfg { trackColorOn = color }
+
+-- | Set track color when OFF
+withTrackColorOff :: RGB -> SwitchConfig -> SwitchConfig
+withTrackColorOff color cfg = cfg { trackColorOff = color }
+
+-- | Set thumb color
+withThumbColor :: RGB -> SwitchConfig -> SwitchConfig
+withThumbColor color cfg = cfg { thumbColor = color }
+
+-- | Set track width
+withWidth :: Pixel -> SwitchConfig -> SwitchConfig
+withWidth w cfg = cfg { width = w }
+
+-- | Set track height
+withHeight :: Pixel -> SwitchConfig -> SwitchConfig
+withHeight h cfg = cfg { height = h }
+
+-- | Set thumb size (diameter)
+withThumbSize :: Pixel -> SwitchConfig -> SwitchConfig
+withThumbSize s cfg = cfg { thumbSize = s }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: color
+--                                                                     // render
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Set track color when unchecked (Color.RGB atom)
-trackColorOff :: forall msg. Color.RGB -> SwitchProp msg
-trackColorOff c props = props { trackColorOff = Just c }
-
--- | Set track color when checked (Color.RGB atom)
-trackColorOn :: forall msg. Color.RGB -> SwitchProp msg
-trackColorOn c props = props { trackColorOn = Just c }
-
--- | Set thumb color (Color.RGB atom)
-thumbColor :: forall msg. Color.RGB -> SwitchProp msg
-thumbColor c props = props { thumbColor = Just c }
-
--- | Set label text color (Color.RGB atom)
-labelColor :: forall msg. Color.RGB -> SwitchProp msg
-labelColor c props = props { labelColor = Just c }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: dimension
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set track width (Device.Pixel atom)
-width :: forall msg. Device.Pixel -> SwitchProp msg
-width w props = props { width = Just w }
-
--- | Set track height (Device.Pixel atom)
-height :: forall msg. Device.Pixel -> SwitchProp msg
-height h props = props { height = Just h }
-
--- | Set thumb size/diameter (Device.Pixel atom)
-thumbSize :: forall msg. Device.Pixel -> SwitchProp msg
-thumbSize s props = props { thumbSize = Just s }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: typography
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set label font size (FontSize atom)
-labelFontSize :: forall msg. FontSize.FontSize -> SwitchProp msg
-labelFontSize s props = props { labelFontSize = Just s }
-
--- | Set label font weight (FontWeight atom)
-labelFontWeight :: forall msg. FontWeight.FontWeight -> SwitchProp msg
-labelFontWeight w props = props { labelFontWeight = Just w }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: motion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set transition duration (Temporal.Milliseconds atom)
-transitionDuration :: forall msg. Temporal.Milliseconds -> SwitchProp msg
-transitionDuration d props = props { transitionDuration = Just d }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: behavior
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set toggle handler
-onToggle :: forall msg. msg -> SwitchProp msg
-onToggle handler props = props { onToggle = Just handler }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                // prop builders: escape hatch
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Add extra attributes (escape hatch)
-extraAttributes :: forall msg. Array (E.Attribute msg) -> SwitchProp msg
-extraAttributes attrs props = props { extraAttributes = props.extraAttributes <> attrs }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                             // main component
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Render a switch toggle
+-- | Render a switch as pure Element.Core data.
 -- |
--- | Pure Element — renders to DOM, Halogen, Static HTML, or any target.
-switch :: forall msg. Array (SwitchProp msg) -> E.Element msg
-switch propMods =
+-- | Returns a Group containing:
+-- | - Track (rounded rectangle / pill shape)
+-- | - Thumb (circle positioned based on checked state)
+-- |
+-- | ## Opacity
+-- |
+-- | When disabled, opacity is reduced to 50%.
+-- | Otherwise full opacity (100%).
+renderSwitch :: SwitchConfig -> Element
+renderSwitch cfg =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
+    -- Track color based on state
+    trackColor = if cfg.checked
+      then cfg.trackColorOn
+      else cfg.trackColorOff
+    
+    -- Overall opacity (reduced when disabled)
+    switchOpacity :: Opacity
+    switchOpacity = if cfg.disabled
+      then opacity 50
+      else opacity 100
+    
+    -- Track element
+    trackElement :: Element
+    trackElement = renderTrack cfg trackColor switchOpacity
+    
+    -- Thumb element
+    thumbElement :: Element
+    thumbElement = renderThumb cfg switchOpacity
   in
-    E.button_
-      (buildSwitchAttrs props)
-      [ buildThumb props ]
-
--- | Build switch track attributes
-buildSwitchAttrs :: forall msg. SwitchProps msg -> Array (E.Attribute msg)
-buildSwitchAttrs props =
-  let
-    -- Default colors
-    defaultOffColor = Color.rgb 203 213 225  -- Gray
-    defaultOnColor = Color.rgb 59 130 246   -- Blue
-    
-    trackCol = if props.checked
-      then maybe defaultOnColor (\c -> c) props.trackColorOn
-      else maybe defaultOffColor (\c -> c) props.trackColorOff
-    
-    -- Dimensions (default: 44x24)
-    widthValue = maybe "44px" show props.width
-    heightValue = maybe "24px" show props.height
-    
-    -- Transition
-    transitionValue = maybe "150ms" show props.transitionDuration
-    
-    -- Core styles
-    coreStyles =
-      [ E.type_ "button"
-      , E.role "switch"
-      , E.attr "aria-checked" (if props.checked then "true" else "false")
-      , E.disabled props.disabled
-      , E.style "position" "relative"
-      , E.style "display" "inline-flex"
-      , E.style "align-items" "center"
-      , E.style "flex-shrink" "0"
-      , E.style "cursor" (if props.disabled then "not-allowed" else "pointer")
-      , E.style "width" widthValue
-      , E.style "height" heightValue
-      , E.style "border-radius" "9999px"
-      , E.style "border" "2px solid transparent"
-      , E.style "background-color" (Color.toLegacyCss trackCol)
-      , E.style "transition" ("background-color " <> transitionValue <> " ease-out")
-      , E.style "outline" "none"
-      ]
-    
-    -- Disabled opacity
-    disabledStyle = if props.disabled
-      then [ E.style "opacity" "0.5" ]
-      else []
-    
-    -- Click handler
-    clickHandler = case props.onToggle of
-      Just handler -> if not props.disabled then [ E.onClick handler ] else []
-      Nothing -> []
-  in
-    coreStyles <> disabledStyle <> clickHandler <> props.extraAttributes
-
--- | Build thumb element
-buildThumb :: forall msg. SwitchProps msg -> E.Element msg
-buildThumb props =
-  let
-    -- Default thumb color
-    defaultThumbColor = Color.rgb 255 255 255  -- White
-    thumbCol = maybe defaultThumbColor (\c -> c) props.thumbColor
-    
-    -- Thumb size (default: 20px)
-    thumbSizeValue = maybe "20px" show props.thumbSize
-    
-    -- Calculate translation (track width - thumb size - padding)
-    -- Default: 44 - 20 - 4 = 20px
-    translateValue = if props.checked then "20px" else "0px"
-    
-    -- Transition
-    transitionValue = maybe "150ms" show props.transitionDuration
-  in
-    E.span_
-      [ E.style "pointer-events" "none"
-      , E.style "display" "block"
-      , E.style "width" thumbSizeValue
-      , E.style "height" thumbSizeValue
-      , E.style "border-radius" "50%"
-      , E.style "background-color" (Color.toLegacyCss thumbCol)
-      , E.style "box-shadow" "0 1px 3px rgba(0, 0, 0, 0.2)"
-      , E.style "transform" ("translateX(" <> translateValue <> ")")
-      , E.style "transition" ("transform " <> transitionValue <> " ease-out")
-      ]
-      []
+    group [ trackElement, thumbElement ]
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                             // labeled switch
+--                                                                      // track
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Render a switch with label
-switchWithLabel :: forall msg. String -> Array (SwitchProp msg) -> E.Element msg
-switchWithLabel labelText propMods =
+-- | Render the track (pill-shaped rectangle).
+renderTrack :: SwitchConfig -> RGB -> Opacity -> Element
+renderTrack cfg trackColor trackOpacity =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
-    
-    -- Label styles
-    fontSizeStyle = case props.labelFontSize of
-      Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
-    
-    fontWeightStyle = case props.labelFontWeight of
-      Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
-    
-    colorStyle = case props.labelColor of
-      Nothing -> []
-      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
-    
-    cursorStyle = if props.disabled
-      then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]
-      else [ E.style "cursor" "pointer" ]
+    -- Track shape (pill = full corner radius)
+    trackShape :: RectangleShape
+    trackShape = rectangleShape
+      cfg.center
+      cfg.width
+      cfg.height
+      (cornersAll full)
   in
-    E.label_
-      ( [ E.style "display" "flex"
-        , E.style "align-items" "center"
-        , E.style "gap" "12px"
-        ]
-        <> cursorStyle
-      )
-      [ switch propMods
-      , E.span_
-          ([ E.style "line-height" "1" ] <> fontSizeStyle <> fontWeightStyle <> colorStyle)
-          [ E.text labelText ]
-      ]
+    rectangle
+      { shape: trackShape
+      , fill: fillSolid trackColor
+      , stroke: Nothing
+      , opacity: trackOpacity
+      }
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                      // thumb
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Render the thumb (circle).
+-- |
+-- | Thumb position:
+-- | - OFF: left side of track
+-- | - ON: right side of track
+-- |
+-- | The thumb has a small padding from the track edges.
+renderThumb :: SwitchConfig -> Opacity -> Element
+renderThumb cfg thumbOpacity =
+  let
+    -- Extract dimensions
+    (Pixel trackW) = cfg.width
+    (Pixel trackH) = cfg.height
+    (Pixel thumbD) = cfg.thumbSize
+    
+    -- Center of track
+    (Pixel cx) = case cfg.center of
+      { x: Pixel px_, y: _ } -> Pixel px_
+    (Pixel cy) = case cfg.center of
+      { x: _, y: Pixel py } -> Pixel py
+    
+    -- Thumb radius
+    thumbRadius = Pixel (thumbD / 2.0)
+    
+    -- Padding from track edge
+    padding = (trackH - thumbD) / 2.0
+    
+    -- Calculate thumb center X based on state
+    -- OFF: left edge + padding + radius
+    -- ON: right edge - padding - radius
+    thumbCenterX = if cfg.checked
+      then cx + (trackW / 2.0) - padding - (thumbD / 2.0)
+      else cx - (trackW / 2.0) + padding + (thumbD / 2.0)
+    
+    -- Thumb center point
+    thumbCenter = pixelPoint2D (Pixel thumbCenterX) (Pixel cy)
+    
+    -- Thumb shape (circle)
+    thumbShape :: EllipseShape
+    thumbShape = circleShape thumbCenter thumbRadius
+  in
+    ellipse
+      { shape: thumbShape
+      , fill: fillSolid cfg.thumbColor
+      , stroke: Nothing
+      , opacity: thumbOpacity
+      }

@@ -48,8 +48,7 @@ module Hydrogen.Schema.Dimension.ObjectFit
   , canClip
   , canDistort
   
-  -- * CSS Output
-  , objectFitToCss
+  -- * Parsing
   , objectFitFromString
   
   -- * All Values
@@ -117,18 +116,10 @@ canDistort Fill = true
 canDistort _ = false
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
+--                                                                   // parsing
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert ObjectFit to CSS object-fit value.
-objectFitToCss :: ObjectFit -> String
-objectFitToCss Fill = "fill"
-objectFitToCss Contain = "contain"
-objectFitToCss Cover = "cover"
-objectFitToCss None = "none"
-objectFitToCss ScaleDown = "scale-down"
-
--- | Parse ObjectFit from CSS string.
+-- | Parse ObjectFit from string.
 objectFitFromString :: String -> Maybe ObjectFit
 objectFitFromString "fill" = Just Fill
 objectFitFromString "contain" = Just Contain

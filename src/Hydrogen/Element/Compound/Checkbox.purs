@@ -2,396 +2,348 @@
 --                                           // hydrogen // element // check-box
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- | Checkbox — Schema-native checkbox input component.
+-- | Checkbox — Pure Element.Core rendering for checkbox components.
 -- |
 -- | ## Design Philosophy
 -- |
--- | This component accepts **concrete Schema atoms**, not semantic tokens.
+-- | This module emits **pure Element data**, not HTML/CSS.
+-- | No strings. No CSS properties. Just bounded Schema atoms
+-- | composed into Element.Core shapes (Rectangle, Path, Group).
 -- |
--- | ## Schema Atoms Accepted
+-- | ## Architecture
 -- |
--- | | Property             | Pillar     | Type                      | CSS Output              |
--- | |----------------------|------------|---------------------------|-------------------------|
--- | | backgroundColor      | Color      | Color.RGB                 | background (checked)    |
--- | | borderColor          | Color      | Color.RGB                 | border-color            |
--- | | checkColor           | Color      | Color.RGB                 | check mark color        |
--- | | size                 | Dimension  | Device.Pixel              | width, height           |
--- | | borderRadius         | Geometry   | Geometry.Corners          | border-radius           |
--- | | borderWidth          | Dimension  | Device.Pixel              | border-width            |
--- | | transitionDuration   | Motion     | Temporal.Milliseconds     | transition-duration     |
--- |
--- | ## Usage
--- |
--- | ```purescript
--- | import Hydrogen.Element.Compound.Checkbox as Checkbox
--- | import Hydrogen.Schema.Color.RGB as Color
--- |
--- | -- Basic checkbox
--- | Checkbox.checkbox
--- |   [ Checkbox.isChecked true
--- |   , Checkbox.onToggle ToggleMsg
--- |   ]
--- |
--- | -- With brand atoms
--- | Checkbox.checkbox
--- |   [ Checkbox.isChecked state.accepted
--- |   , Checkbox.onToggle ToggleTerms
--- |   , Checkbox.backgroundColor brand.primaryColor
--- |   , Checkbox.borderColor brand.inputBorder
--- |   , Checkbox.checkColor brand.onPrimaryColor
--- |   ]
--- |
--- | -- With label
--- | Checkbox.checkboxWithLabel "Accept terms"
--- |   [ Checkbox.isChecked state.accepted
--- |   , Checkbox.onToggle ToggleTerms
--- |   ]
 -- | ```
+-- | CheckboxConfig (Schema atoms)
+-- |    ↓
+-- | This module (render functions)
+-- |    ↓
+-- | Element.Core (Rectangle, Path, Group)
+-- |    ↓
+-- | Flatten → DrawCommand → Binary → GPU
+-- | ```
+-- |
+-- | ## Compositor Model
+-- |
+-- | A checkbox renders as:
+-- | - Box: Rectangle with fill (varies by checked state) and stroke
+-- | - Checkmark: Path (only when checked)
+-- |
+-- | Composed in a Group with the box as background, checkmark on top.
 
 module Hydrogen.Element.Compound.Checkbox
-  ( -- * Main Components
-    checkbox
-  , checkboxWithLabel
+  ( -- * Main Render Function
+    renderCheckbox
   
-  -- * Props
-  , CheckboxProps
-  , CheckboxProp
-  , defaultProps
+  -- * Configuration
+  , CheckboxConfig
+  , defaultConfig
   
-  -- * State Props
-  , isChecked
-  , isDisabled
-  , checkboxId
-  
-  -- * Color Atoms
-  , backgroundColor
-  , borderColor
-  , checkColor
-  , labelColor
-  
-  -- * Geometry Atoms
-  , borderRadius
-  , borderWidth
-  
-  -- * Dimension Atoms
-  , size
-  
-  -- * Typography Atoms
-  , labelFontSize
-  , labelFontWeight
-  
-  -- * Motion Atoms
-  , transitionDuration
-  
-  -- * Behavior Props
-  , onToggle
+  -- * Config Builders
+  , withChecked
+  , withDisabled
+  , withBackgroundColor
+  , withBorderColor
+  , withCheckColor
+  , withSize
+  , withBorderRadius
+  , withBorderWidth
   ) where
 
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                                    // imports
+-- ═════════════════════════════════════════════════════════════════════════════
+
 import Prelude
-  ( show
-  , (<>)
-  , not
+  ( ($)
+  , (+)
+  , (-)
+  , (/)
+  , (*) 
   )
 
-import Data.Array (foldl)
-import Data.Maybe (Maybe(Nothing, Just), maybe)
+import Data.Maybe (Maybe(Just, Nothing))
 
-import Hydrogen.Render.Element as E
-import Hydrogen.Schema.Color.RGB as Color
-import Hydrogen.Schema.Geometry.Radius as Geometry
-import Hydrogen.Schema.Dimension.Device as Device
-import Hydrogen.Schema.Dimension.Temporal as Temporal
-import Hydrogen.Schema.Typography.FontSize as FontSize
-import Hydrogen.Schema.Typography.FontWeight as FontWeight
+-- Element.Core — pure data shapes
+import Hydrogen.Element.Core
+  ( Element
+  , rectangle
+  , path
+  , group
+  , empty
+  )
+
+-- Schema atoms: Geometry — Path
+import Hydrogen.Schema.Geometry.Shape
+  ( PathShape
+  , openPath
+  )
+import Hydrogen.Schema.Geometry.Shape.Types
+  ( PixelPoint2D
+  , pixelPoint2D
+  , PathCommand(MoveTo, LineTo)
+  )
+import Hydrogen.Schema.Geometry.Shape.Primitives
+  ( RectangleShape
+  , rectangleShape
+  )
+import Hydrogen.Schema.Geometry.Radius
+  ( Corners
+  , Radius
+  , cornersAll
+  , px
+  )
+
+-- Schema atoms: Dimension
+import Hydrogen.Schema.Dimension.Device.Types
+  ( Pixel(Pixel)
+  )
+import Hydrogen.Schema.Dimension.Stroke
+  ( StrokeWidth
+  , strokeWidth
+  )
+
+-- Schema atoms: Surface
+import Hydrogen.Schema.Surface.Fill
+  ( Fill
+  , fillSolid
+  , fillNone
+  )
+
+-- Schema atoms: Color
+import Hydrogen.Schema.Color.RGB
+  ( RGB
+  , rgb
+  )
+import Hydrogen.Schema.Color.Opacity
+  ( Opacity
+  , opacity
+  )
+
+-- Element.Core stroke
+import Hydrogen.Element.Core.Stroke
+  ( StrokeSpec
+  , stroke
+  )
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                      // props
+--                                                                // config type
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Checkbox properties
-type CheckboxProps msg =
+-- | Configuration for rendering a checkbox.
+-- |
+-- | All fields use bounded Schema atoms. No strings. No CSS.
+type CheckboxConfig =
   { -- State
     checked :: Boolean
   , disabled :: Boolean
-  , id :: Maybe String
   
-  -- Color atoms
-  , backgroundColor :: Maybe Color.RGB
-  , borderColor :: Maybe Color.RGB
-  , checkColor :: Maybe Color.RGB
-  , labelColor :: Maybe Color.RGB
+  -- Colors
+  , backgroundColor :: RGB      -- Fill when checked
+  , uncheckedColor :: RGB       -- Fill when unchecked
+  , borderColor :: RGB          -- Border color
+  , checkColor :: RGB           -- Checkmark color
   
-  -- Geometry atoms
-  , borderRadius :: Maybe Geometry.Corners
-  , borderWidth :: Maybe Device.Pixel
+  -- Geometry
+  , size :: Pixel               -- Width and height
+  , borderRadius :: Radius      -- Corner radius (applied to all corners)
+  , borderWidth :: StrokeWidth  -- Border thickness
   
-  -- Dimension atoms
-  , size :: Maybe Device.Pixel
-  
-  -- Typography atoms
-  , labelFontSize :: Maybe FontSize.FontSize
-  , labelFontWeight :: Maybe FontWeight.FontWeight
-  
-  -- Motion atoms
-  , transitionDuration :: Maybe Temporal.Milliseconds
-  
-  -- Behavior
-  , onToggle :: Maybe msg
+  -- Position (center-based)
+  , center :: PixelPoint2D
   }
 
--- | Property modifier
-type CheckboxProp msg = CheckboxProps msg -> CheckboxProps msg
-
--- | Default properties
-defaultProps :: forall msg. CheckboxProps msg
-defaultProps =
+-- | Default checkbox configuration.
+-- |
+-- | Uses common defaults:
+-- | - 18px size
+-- | - 4px border radius
+-- | - 2px border
+-- | - Blue checked background
+-- | - Gray border
+-- | - White checkmark
+defaultConfig :: CheckboxConfig
+defaultConfig =
   { checked: false
   , disabled: false
-  , id: Nothing
-  , backgroundColor: Nothing
-  , borderColor: Nothing
-  , checkColor: Nothing
-  , labelColor: Nothing
-  , borderRadius: Nothing
-  , borderWidth: Nothing
-  , size: Nothing
-  , labelFontSize: Nothing
-  , labelFontWeight: Nothing
-  , transitionDuration: Nothing
-  , onToggle: Nothing
+  , backgroundColor: rgb 59 130 246    -- Blue
+  , uncheckedColor: rgb 255 255 255    -- White
+  , borderColor: rgb 203 213 225       -- Gray
+  , checkColor: rgb 255 255 255        -- White
+  , size: Pixel 18.0
+  , borderRadius: px 4.0
+  , borderWidth: strokeWidth 2.0
+  , center: pixelPoint2D (Pixel 0.0) (Pixel 0.0)
   }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: state
+--                                                             // config builders
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- | Set checked state
-isChecked :: forall msg. Boolean -> CheckboxProp msg
-isChecked c props = props { checked = c }
+withChecked :: Boolean -> CheckboxConfig -> CheckboxConfig
+withChecked c cfg = cfg { checked = c }
 
 -- | Set disabled state
-isDisabled :: forall msg. Boolean -> CheckboxProp msg
-isDisabled d props = props { disabled = d }
+withDisabled :: Boolean -> CheckboxConfig -> CheckboxConfig
+withDisabled d cfg = cfg { disabled = d }
 
--- | Set checkbox id
-checkboxId :: forall msg. String -> CheckboxProp msg
-checkboxId i props = props { id = Just i }
+-- | Set background color (when checked)
+withBackgroundColor :: RGB -> CheckboxConfig -> CheckboxConfig
+withBackgroundColor color cfg = cfg { backgroundColor = color }
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                       // prop builders: color
--- ═════════════════════════════════════════════════════════════════════════════
+-- | Set border color
+withBorderColor :: RGB -> CheckboxConfig -> CheckboxConfig
+withBorderColor color cfg = cfg { borderColor = color }
 
--- | Set background color when checked (Color.RGB atom)
-backgroundColor :: forall msg. Color.RGB -> CheckboxProp msg
-backgroundColor c props = props { backgroundColor = Just c }
+-- | Set checkmark color
+withCheckColor :: RGB -> CheckboxConfig -> CheckboxConfig
+withCheckColor color cfg = cfg { checkColor = color }
 
--- | Set border color (Color.RGB atom)
-borderColor :: forall msg. Color.RGB -> CheckboxProp msg
-borderColor c props = props { borderColor = Just c }
+-- | Set checkbox size
+withSize :: Pixel -> CheckboxConfig -> CheckboxConfig
+withSize s cfg = cfg { size = s }
 
--- | Set check mark color (Color.RGB atom)
-checkColor :: forall msg. Color.RGB -> CheckboxProp msg
-checkColor c props = props { checkColor = Just c }
+-- | Set border radius
+withBorderRadius :: Radius -> CheckboxConfig -> CheckboxConfig
+withBorderRadius r cfg = cfg { borderRadius = r }
 
--- | Set label text color (Color.RGB atom)
-labelColor :: forall msg. Color.RGB -> CheckboxProp msg
-labelColor c props = props { labelColor = Just c }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: geometry
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set border radius (Geometry.Corners atom)
-borderRadius :: forall msg. Geometry.Corners -> CheckboxProp msg
-borderRadius r props = props { borderRadius = Just r }
-
--- | Set border width (Device.Pixel atom)
-borderWidth :: forall msg. Device.Pixel -> CheckboxProp msg
-borderWidth w props = props { borderWidth = Just w }
+-- | Set border width
+withBorderWidth :: StrokeWidth -> CheckboxConfig -> CheckboxConfig
+withBorderWidth w cfg = cfg { borderWidth = w }
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                   // prop builders: dimension
+--                                                                     // render
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Set checkbox size (Device.Pixel atom)
-size :: forall msg. Device.Pixel -> CheckboxProp msg
-size s props = props { size = Just s }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                  // prop builders: typography
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set label font size (FontSize atom)
-labelFontSize :: forall msg. FontSize.FontSize -> CheckboxProp msg
-labelFontSize s props = props { labelFontSize = Just s }
-
--- | Set label font weight (FontWeight atom)
-labelFontWeight :: forall msg. FontWeight.FontWeight -> CheckboxProp msg
-labelFontWeight w props = props { labelFontWeight = Just w }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                      // prop builders: motion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set transition duration (Temporal.Milliseconds atom)
-transitionDuration :: forall msg. Temporal.Milliseconds -> CheckboxProp msg
-transitionDuration d props = props { transitionDuration = Just d }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                    // prop builders: behavior
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Set toggle handler
-onToggle :: forall msg. msg -> CheckboxProp msg
-onToggle handler props = props { onToggle = Just handler }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                             // main component
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Render a checkbox
+-- | Render a checkbox as pure Element.Core data.
 -- |
--- | Pure Element — renders to DOM, Halogen, Static HTML, or any target.
--- | Uses a button+SVG pattern for better styling control.
-checkbox :: forall msg. Array (CheckboxProp msg) -> E.Element msg
-checkbox propMods =
+-- | Returns a Group containing:
+-- | - Background rectangle with fill and stroke
+-- | - Checkmark path (only when checked)
+-- |
+-- | ## Opacity
+-- |
+-- | When disabled, opacity is reduced to 50%.
+-- | Otherwise full opacity (100%).
+renderCheckbox :: CheckboxConfig -> Element
+renderCheckbox cfg =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
+    -- Determine fill based on checked state
+    boxFill = if cfg.checked
+      then fillSolid cfg.backgroundColor
+      else fillSolid cfg.uncheckedColor
+    
+    -- Border color changes when checked
+    strokeColor = if cfg.checked
+      then cfg.backgroundColor
+      else cfg.borderColor
+    
+    -- Build box shape (convert single Radius to Corners)
+    boxShape :: RectangleShape
+    boxShape = rectangleShape
+      cfg.center
+      cfg.size
+      cfg.size
+      (cornersAll cfg.borderRadius)
+    
+    -- Build stroke spec
+    boxStroke :: StrokeSpec
+    boxStroke = stroke cfg.borderWidth (fillSolid strokeColor)
+    
+    -- Overall opacity (reduced when disabled)
+    boxOpacity :: Opacity
+    boxOpacity = if cfg.disabled
+      then opacity 50
+      else opacity 100
+    
+    -- Background rectangle
+    boxElement :: Element
+    boxElement = rectangle
+      { shape: boxShape
+      , fill: boxFill
+      , stroke: Just boxStroke
+      , opacity: boxOpacity
+      }
+    
+    -- Checkmark element (only when checked)
+    checkElement :: Element
+    checkElement = if cfg.checked
+      then renderCheckmark cfg
+      else empty
   in
-    E.button_
-      (buildCheckboxAttrs props)
-      [ if props.checked then checkmark props else E.empty ]
-
--- | Build checkbox attributes
-buildCheckboxAttrs :: forall msg. CheckboxProps msg -> Array (E.Attribute msg)
-buildCheckboxAttrs props =
-  let
-    -- Default colors
-    defaultBgColor = Color.rgb 59 130 246   -- Blue
-    defaultBorderColor = Color.rgb 203 213 225  -- Gray
-    
-    -- Background: colored when checked, transparent when unchecked
-    bgColor = if props.checked
-      then maybe defaultBgColor (\c -> c) props.backgroundColor
-      else Color.rgb 255 255 255  -- White when unchecked
-    
-    brdColor = maybe defaultBorderColor (\c -> c) props.borderColor
-    
-    -- Size (default: 18px)
-    sizeValue = maybe "18px" show props.size
-    
-    -- Border width (default: 2px)
-    brdWidth = maybe "2px" show props.borderWidth
-    
-    -- Border radius (default: 4px)
-    radiusStyle = case props.borderRadius of
-      Nothing -> [ E.style "border-radius" "4px" ]
-      Just r -> [ E.style "border-radius" (Geometry.cornersToLegacyCss r) ]
-    
-    -- Transition
-    transitionValue = maybe "150ms" show props.transitionDuration
-    
-    -- Core styles
-    coreStyles =
-      [ E.type_ "button"
-      , E.role "checkbox"
-      , E.attr "aria-checked" (if props.checked then "true" else "false")
-      , E.disabled props.disabled
-      , E.style "position" "relative"
-      , E.style "display" "inline-flex"
-      , E.style "align-items" "center"
-      , E.style "justify-content" "center"
-      , E.style "flex-shrink" "0"
-      , E.style "width" sizeValue
-      , E.style "height" sizeValue
-      , E.style "border-style" "solid"
-      , E.style "border-width" brdWidth
-      , E.style "border-color" (if props.checked then Color.toLegacyCss bgColor else Color.toLegacyCss brdColor)
-      , E.style "background-color" (Color.toLegacyCss bgColor)
-      , E.style "cursor" (if props.disabled then "not-allowed" else "pointer")
-      , E.style "transition" ("all " <> transitionValue <> " ease-out")
-      , E.style "outline" "none"
-      ]
-    
-    -- ID attribute
-    idAttr = case props.id of
-      Just i -> [ E.id_ i ]
-      Nothing -> []
-    
-    -- Disabled opacity
-    disabledStyle = if props.disabled
-      then [ E.style "opacity" "0.5" ]
-      else []
-    
-    -- Click handler
-    clickHandler = case props.onToggle of
-      Just handler -> if not props.disabled then [ E.onClick handler ] else []
-      Nothing -> []
-  in
-    coreStyles <> radiusStyle <> idAttr <> disabledStyle <> clickHandler
-
--- | Checkmark SVG icon
-checkmark :: forall msg. CheckboxProps msg -> E.Element msg
-checkmark props =
-  let
-    -- Default check color (white)
-    defaultCheckColor = Color.rgb 255 255 255
-    chkColor = maybe defaultCheckColor (\c -> c) props.checkColor
-  in
-    E.svg_
-      [ E.attr "width" "12"
-      , E.attr "height" "12"
-      , E.attr "viewBox" "0 0 24 24"
-      , E.attr "fill" "none"
-      , E.attr "stroke" (Color.toLegacyCss chkColor)
-      , E.attr "stroke-width" "3"
-      , E.attr "stroke-linecap" "round"
-      , E.attr "stroke-linejoin" "round"
-      ]
-      [ E.svgElement "polyline"
-          [ E.attr "points" "20 6 9 17 4 12" ]
-          []
-      ]
+    group [ boxElement, checkElement ]
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                           // labeled checkbox
+--                                                                  // checkmark
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Render a checkbox with label
-checkboxWithLabel :: forall msg. String -> Array (CheckboxProp msg) -> E.Element msg
-checkboxWithLabel labelText propMods =
+-- | Render the checkmark path.
+-- |
+-- | The checkmark is a simple "✓" shape scaled to fit within the box.
+-- | Rendered as a Path with two line segments.
+renderCheckmark :: CheckboxConfig -> Element
+renderCheckmark cfg =
   let
-    props = foldl (\p f -> f p) defaultProps propMods
-    fieldId = maybe ("checkbox-" <> labelText) (\i -> i) props.id
-    propsWithId = propMods <> [ checkboxId fieldId ]
+    -- Extract size for calculations
+    (Pixel sizeN) = cfg.size
     
-    -- Label styles
-    fontSizeStyle = case props.labelFontSize of
-      Nothing -> [ E.style "font-size" "14px" ]
-      Just s -> [ E.style "font-size" (FontSize.toLegacyCss s) ]
+    -- Checkmark is inset from edges
+    inset = sizeN * 0.2
+    innerSize = sizeN - (inset * 2.0)
     
-    fontWeightStyle = case props.labelFontWeight of
-      Nothing -> [ E.style "font-weight" "500" ]
-      Just w -> [ E.style "font-weight" (FontWeight.toLegacyCss w) ]
+    -- Center offset
+    (Pixel cx) = case cfg.center of
+      p -> case p of
+        { x: Pixel px_, y: _ } -> Pixel px_
+    (Pixel cy) = case cfg.center of
+      p -> case p of
+        { x: _, y: Pixel py } -> Pixel py
     
-    colorStyle = case props.labelColor of
-      Nothing -> []
-      Just c -> [ E.style "color" (Color.toLegacyCss c) ]
+    -- Calculate checkmark points relative to center
+    -- The checkmark "✓" has 3 points:
+    -- - Start: left-middle
+    -- - Middle: bottom-center (the "V" bottom)
+    -- - End: top-right
+    startX = cx - (innerSize * 0.3)
+    startY = cy
     
-    cursorStyle = if props.disabled
-      then [ E.style "cursor" "not-allowed", E.style "opacity" "0.7" ]
-      else [ E.style "cursor" "pointer" ]
-  in
-    E.label_
-      ( [ E.attr "for" fieldId
-        , E.style "display" "flex"
-        , E.style "align-items" "center"
-        , E.style "gap" "8px"
-        ]
-        <> cursorStyle
-      )
-      [ checkbox propsWithId
-      , E.span_
-          ([ E.style "line-height" "1" ] <> fontSizeStyle <> fontWeightStyle <> colorStyle)
-          [ E.text labelText ]
+    midX = cx - (innerSize * 0.05)
+    midY = cy + (innerSize * 0.25)
+    
+    endX = cx + (innerSize * 0.35)
+    endY = cy - (innerSize * 0.25)
+    
+    -- Build points
+    p1 = pixelPoint2D (Pixel startX) (Pixel startY)
+    p2 = pixelPoint2D (Pixel midX) (Pixel midY)
+    p3 = pixelPoint2D (Pixel endX) (Pixel endY)
+    
+    -- Path commands
+    pathCommands = 
+      [ MoveTo p1
+      , LineTo p2
+      , LineTo p3
       ]
+    
+    -- Build open path (not closed)
+    checkPath :: PathShape
+    checkPath = openPath pathCommands
+    
+    -- Stroke for the checkmark
+    checkStroke :: StrokeSpec
+    checkStroke = stroke 
+      (strokeWidth 2.0) 
+      (fillSolid cfg.checkColor)
+    
+    -- Opacity (reduced when disabled)
+    checkOpacity :: Opacity
+    checkOpacity = if cfg.disabled
+      then opacity 50
+      else opacity 100
+  in
+    path
+      { shape: checkPath
+      , fill: fillNone
+      , stroke: Just checkStroke
+      , opacity: checkOpacity
+      }

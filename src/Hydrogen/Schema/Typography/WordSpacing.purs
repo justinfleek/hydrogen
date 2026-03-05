@@ -35,7 +35,6 @@ module Hydrogen.Schema.Typography.WordSpacing
   -- * Accessors
   , unwrap
   , toEm
-  , toLegacyCSSValue
   
   -- * Operations
   , scale
@@ -117,13 +116,6 @@ unwrap (WordSpacing n) = n
 -- | Convert to em value
 toEm :: WordSpacing -> Number
 toEm (WordSpacing n) = Int.toNumber n / 1000.0
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS value string
-toLegacyCSSValue :: WordSpacing -> String
-toLegacyCSSValue ws
-  | unwrap ws == 0 = "normal"
-  | otherwise = show (toEm ws) <> "em"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

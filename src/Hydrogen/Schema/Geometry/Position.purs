@@ -58,7 +58,6 @@ module Hydrogen.Schema.Geometry.Position
   -- * Alignment
   , Alignment(AlignStart, AlignCenter, AlignEnd, AlignStretch, AlignBaseline)
   , isStretch
-  , alignmentToCss
   
   -- * Placement (Edge + Alignment)
   , Placement
@@ -291,14 +290,6 @@ instance showAlignment :: Show Alignment where
 isStretch :: Alignment -> Boolean
 isStretch AlignStretch = true
 isStretch _ = false
-
--- | Convert to CSS value
-alignmentToCss :: Alignment -> String
-alignmentToCss AlignStart = "flex-start"
-alignmentToCss AlignCenter = "center"
-alignmentToCss AlignEnd = "flex-end"
-alignmentToCss AlignStretch = "stretch"
-alignmentToCss AlignBaseline = "baseline"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // placement

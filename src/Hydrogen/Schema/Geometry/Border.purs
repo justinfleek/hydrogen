@@ -81,6 +81,7 @@ module Hydrogen.Schema.Geometry.Border
   , Border
   , border
   , borderSimple
+  , borderUniform
   , borderNone
   , borderEdges
   , borderCorners
@@ -293,6 +294,24 @@ borderSimple params =
       , color: params.color
       }
   , corners: params.corners
+  }
+
+-- | Uniform border: same on all sides, no corner rounding
+-- |
+-- | Convenience function when you want a simple border without
+-- | specifying corners (defaults to none/square).
+borderUniform ::
+  { width :: StrokeWidth
+  , style :: StrokeStyle
+  , color :: Color.RGBA
+  } -> Border
+borderUniform params =
+  { edges: edgesAll $ side
+      { width: params.width
+      , style: params.style
+      , color: params.color
+      }
+  , corners: cornersAll none
   }
 
 -- | No border at all

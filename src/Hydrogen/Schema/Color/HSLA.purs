@@ -44,9 +44,6 @@ module Hydrogen.Schema.Color.HSLA
   , opacify
   , transparentize
   
-  -- * CSS Output
-  , hslaToCss
-  
   -- * Conversion
   , toHSLA
   , fromHSLA
@@ -85,7 +82,10 @@ derive instance eqHSLA :: Eq HSLA
 derive instance ordHSLA :: Ord HSLA
 
 instance showHSLA :: Show HSLA where
-  show = hslaToCss
+  show (HSLA c) = "HSLA " <> show (Hue.unwrap c.hue)
+    <> " " <> show (Sat.unwrap c.saturation)
+    <> " " <> show (Light.unwrap c.lightness)
+    <> " " <> show (Op.unwrap c.alpha)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -301,26 +301,6 @@ opacify = fadeIn
 -- | Same as `fadeOut` - provided for semantic clarity in different contexts.
 transparentize :: Int -> HSLA -> HSLA
 transparentize = fadeOut
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS hsla() function string.
--- |
--- | CSS expects alpha as 0.0-1.0, so we use Opacity.toUnitInterval.
--- |
--- | ```purescript
--- | hslaToCss (hsla 210 80 50 100)  -- "hsla(210, 80%, 50%, 1.0)"
--- | hslaToCss (hsla 0 100 50 50)    -- "hsla(0, 100%, 50%, 0.5)"
--- | ```
-hslaToCss :: HSLA -> String
-hslaToCss (HSLA c) =
-  let a' = Op.toUnitInterval c.alpha
-  in "hsla(" <> show (Hue.unwrap c.hue)
-  <> ", " <> show (Sat.unwrap c.saturation) <> "%"
-  <> ", " <> show (Light.unwrap c.lightness) <> "%"
-  <> ", " <> show a' <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // conversion

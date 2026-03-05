@@ -74,7 +74,137 @@ module Hydrogen.Render.Element
 
 import Hydrogen.Render.Element.Types
   ( Element(Element, Empty, Keyed, Lazy, Text)
-  , Attribute(Attr, AttrNS, Handler, Prop, PropBool, Style)
+  , Attribute(Attr, AttrNS, Handler, Prop, PropBool, StyleAtom)
+  , StyleProperty
+      ( PropBackgroundColor
+      , PropColor
+      , PropFill
+      , PropFontSize
+      , PropFontWeight
+      , PropFontFamily
+      , PropLineHeight
+      , PropPadding
+      , PropPaddingTop
+      , PropPaddingRight
+      , PropPaddingBottom
+      , PropPaddingLeft
+      , PropMargin
+      , PropMarginTop
+      , PropMarginRight
+      , PropMarginBottom
+      , PropMarginLeft
+      , PropBorderRadius
+      , PropBorder
+      , PropBorderTop
+      , PropBorderRight
+      , PropBorderBottom
+      , PropBorderLeft
+      , PropTransform
+      , PropTransition
+      , PropOpacity
+      , PropBoxShadow
+      , PropWidth
+      , PropHeight
+      , PropMinWidth
+      , PropMinHeight
+      , PropMaxWidth
+      , PropMaxHeight
+      , PropDisplay
+      , PropFlexDirection
+      , PropAlignItems
+      , PropJustifyContent
+      , PropCursor
+      , PropVisibility
+      , PropOverflow
+      , PropTextAlign
+      )
+  , StyleValue
+      ( StyleColor
+      , StyleColorA
+      , StyleFill
+      , StyleFontSize
+      , StyleFontWeight
+      , StyleFontFamily
+      , StyleLineHeight
+      , StyleSpacing
+      , StyleRadius
+      , StyleBorder
+      , StyleTransform
+      , StyleTransition
+      , StyleOpacity
+      , StyleShadow
+      , StylePixel
+      , StyleDisplay
+      , StyleFlexDirection
+      , StyleFlexAlign
+      , StyleFlexJustify
+      , StyleCursor
+      , StyleVisibility
+      , StyleOverflow
+      , StyleTextAlign
+      )
+  , Display
+      ( DisplayNone
+      , DisplayBlock
+      , DisplayInline
+      , DisplayInlineBlock
+      , DisplayFlex
+      , DisplayInlineFlex
+      , DisplayGrid
+      , DisplayInlineGrid
+      , DisplayContents
+      )
+  , FlexDirection
+      ( FlexRow
+      , FlexRowReverse
+      , FlexColumn
+      , FlexColumnReverse
+      )
+  , FlexAlign
+      ( AlignStart
+      , AlignEnd
+      , AlignCenter
+      , AlignStretch
+      , AlignBaseline
+      )
+  , FlexJustify
+      ( JustifyStart
+      , JustifyEnd
+      , JustifyCenter
+      , JustifySpaceBetween
+      , JustifySpaceAround
+      , JustifySpaceEvenly
+      )
+  , Cursor
+      ( CursorAuto
+      , CursorDefault
+      , CursorPointer
+      , CursorWait
+      , CursorText
+      , CursorMove
+      , CursorNotAllowed
+      , CursorGrab
+      , CursorGrabbing
+      )
+  , Visibility
+      ( VisibilityVisible
+      , VisibilityHidden
+      , VisibilityCollapse
+      )
+  , Overflow
+      ( OverflowVisible
+      , OverflowHidden
+      , OverflowScroll
+      , OverflowAuto
+      )
+  , TextAlign
+      ( TextAlignLeft
+      , TextAlignRight
+      , TextAlignCenter
+      , TextAlignJustify
+      , TextAlignStart
+      , TextAlignEnd
+      )
   , EventHandler
       ( CustomEvent
       , OnBlur
@@ -197,8 +327,29 @@ import Hydrogen.Render.Element.Attributes
   , class_
   , classes
   , id_
-  , style
-  , styles
+  , backgroundColor
+  , color
+  , fontSize
+  , fontWeight
+  , padding
+  , margin
+  , border
+  , borderBottom
+  , width
+  , height
+  , maxWidth
+  , maxHeight
+  , transform
+  , transition
+  , opacity
+  , display
+  , flexDirection
+  , alignItems
+  , justifyContent
+  , cursor
+  , visibility
+  , overflow
+  , textAlign
   , href
   , src
   , alt

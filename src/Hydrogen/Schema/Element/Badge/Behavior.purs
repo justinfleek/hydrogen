@@ -18,7 +18,7 @@
 -- |
 -- | ## Pillar Atoms Used
 -- |
--- | - Haptic.Feedback — Impact, notification, selection feedback
+-- | - Haptic.Feedback — Impact and notification feedback for badge events
 -- | - Haptic.Event — AudioCue for notification sounds
 -- | - Gestural.Gesture — Tap, swipe, long press for dismiss
 -- | - Motion.KeyframeAnimation — Pulse, bounce, shake, heartBeat, etc.
@@ -104,9 +104,6 @@ import Hydrogen.Schema.Haptic.Feedback
       ( NotifySuccess
       , NotifyWarning
       , NotifyError
-      )
-  , SelectionFeedback
-      ( SelectionChanged
       )
   ) as Haptic
 

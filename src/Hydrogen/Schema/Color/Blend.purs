@@ -23,10 +23,6 @@ module Hydrogen.Schema.Color.Blend
   , mixRGB
   , mixRGBA
   , lerpRGB
-  
-  -- * CSS Output
-  , blendModeToCss
-  , compositeOpToCss
   ) where
 
 import Prelude
@@ -93,7 +89,29 @@ data BlendMode
 derive instance eqBlendMode :: Eq BlendMode
 
 instance showBlendMode :: Show BlendMode where
-  show = blendModeToCss
+  show Normal = "Normal"
+  show Dissolve = "Dissolve"
+  show Darken = "Darken"
+  show Multiply = "Multiply"
+  show ColorBurn = "ColorBurn"
+  show LinearBurn = "LinearBurn"
+  show DarkerColor = "DarkerColor"
+  show Lighten = "Lighten"
+  show Screen = "Screen"
+  show ColorDodge = "ColorDodge"
+  show LinearDodge = "LinearDodge"
+  show LighterColor = "LighterColor"
+  show Overlay = "Overlay"
+  show SoftLight = "SoftLight"
+  show HardLight = "HardLight"
+  show VividLight = "VividLight"
+  show LinearLight = "LinearLight"
+  show PinLight = "PinLight"
+  show HardMix = "HardMix"
+  show Difference = "Difference"
+  show Exclusion = "Exclusion"
+  show Subtract = "Subtract"
+  show Divide = "Divide"
 
 -- | Blend two RGBA colors using a blend mode
 blendRGBA :: BlendMode -> RGB.RGBA -> RGB.RGBA -> RGB.RGBA
@@ -187,6 +205,20 @@ data CompositeOp
 
 derive instance eqCompositeOp :: Eq CompositeOp
 
+instance showCompositeOp :: Show CompositeOp where
+  show Clear = "Clear"
+  show Copy = "Copy"
+  show Destination = "Destination"
+  show SourceOver = "SourceOver"
+  show DestinationOver = "DestinationOver"
+  show SourceIn = "SourceIn"
+  show DestinationIn = "DestinationIn"
+  show SourceOut = "SourceOut"
+  show DestinationOut = "DestinationOut"
+  show SourceAtop = "SourceAtop"
+  show DestinationAtop = "DestinationAtop"
+  show Xor = "Xor"
+
 -- | Apply Porter-Duff compositing
 composite :: CompositeOp -> RGB.RGBA -> RGB.RGBA -> RGB.RGBA
 composite op src dst =
@@ -266,53 +298,6 @@ mixRGBA t c1 c2 =
 -- | Linear interpolation between two RGB colors
 lerpRGB :: Number -> RGB.RGB -> RGB.RGB -> RGB.RGB
 lerpRGB = mixRGB
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert blend mode to CSS mix-blend-mode value
-blendModeToCss :: BlendMode -> String
-blendModeToCss = case _ of
-  Normal -> "normal"
-  Dissolve -> "normal"
-  Darken -> "darken"
-  Multiply -> "multiply"
-  ColorBurn -> "color-burn"
-  LinearBurn -> "color-burn"
-  DarkerColor -> "darken"
-  Lighten -> "lighten"
-  Screen -> "screen"
-  ColorDodge -> "color-dodge"
-  LinearDodge -> "color-dodge"
-  LighterColor -> "lighten"
-  Overlay -> "overlay"
-  SoftLight -> "soft-light"
-  HardLight -> "hard-light"
-  VividLight -> "hard-light"
-  LinearLight -> "hard-light"
-  PinLight -> "hard-light"
-  HardMix -> "hard-light"
-  Difference -> "difference"
-  Exclusion -> "exclusion"
-  Subtract -> "difference"
-  Divide -> "normal"
-
--- | Convert composite op to CSS value
-compositeOpToCss :: CompositeOp -> String
-compositeOpToCss = case _ of
-  Clear -> "clear"
-  Copy -> "copy"
-  Destination -> "destination"
-  SourceOver -> "source-over"
-  DestinationOver -> "destination-over"
-  SourceIn -> "source-in"
-  DestinationIn -> "destination-in"
-  SourceOut -> "source-out"
-  DestinationOut -> "destination-out"
-  SourceAtop -> "source-atop"
-  DestinationAtop -> "destination-atop"
-  Xor -> "xor"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

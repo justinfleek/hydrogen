@@ -55,9 +55,6 @@ module Hydrogen.Schema.Color.HSL
   , decreaseSaturation
   , grayscale
   
-  -- * Interop
-  , fromLegacy
-  , toLegacy
   ) where
 
 import Prelude
@@ -260,19 +257,3 @@ grayscale (HSL c) = HSL
   , saturation: Sat.saturation 0
   , lightness: c.lightness
   }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                    // interop
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert from legacy Value.purs HSL record.
--- |
--- | For migration from `Hydrogen.Schema.Color.Value.HSL` to this module.
-fromLegacy :: { h :: Int, s :: Int, l :: Int } -> HSL
-fromLegacy = fromRecord
-
--- | Convert to legacy Value.purs HSL record.
--- |
--- | For interop with code still using `Hydrogen.Schema.Color.Value`.
-toLegacy :: HSL -> { h :: Int, s :: Int, l :: Int }
-toLegacy = toRecord

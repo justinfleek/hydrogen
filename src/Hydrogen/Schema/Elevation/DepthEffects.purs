@@ -108,10 +108,6 @@ module Hydrogen.Schema.Elevation.DepthEffects
   , maxBackdropBlur
   , scaleBackdropBlur
   
-  -- * Conversion (Legacy CSS, not FFI)
-  , parallaxToLegacyCss
-  , floatingToLegacyCss
-  
   -- * Predicates
   , hasParallax
   , hasBackdropBlur
@@ -589,33 +585,6 @@ isFloating f =
 -- Import the Floating level constructor
 floatingLevelValue :: ElevationLevel
 floatingLevelValue = Floating
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // conversion
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert parallax to CSS transform style hints.
--- |
--- | Note: Full parallax requires JavaScript for scroll handling.
--- | This generates the CSS perspective setup.
--- | NOT an FFI boundary — pure string generation.
-parallaxToLegacyCss :: Parallax -> String
-parallaxToLegacyCss p =
-  "perspective: " <> show p.perspective <> "px; transform-style: preserve-3d;"
-
--- | Convert floating UI to CSS backdrop-filter string.
--- |
--- | NOT an FFI boundary — pure string generation.
-floatingToLegacyCss :: FloatingUI -> String
-floatingToLegacyCss f =
-  let
-    BackdropBlur b = f.blur
-    BackdropSaturation s = f.saturation
-    blurPart = if b > 0.0 then "blur(" <> show b <> "px)" else ""
-    satPart = if s == 1.0 then "" else " saturate(" <> show s <> ")"
-    combined = blurPart <> satPart
-  in
-    if combined == "" then "none" else combined
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers

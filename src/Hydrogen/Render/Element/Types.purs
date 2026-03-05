@@ -28,7 +28,32 @@ module Hydrogen.Render.Element.Types
       , Prop
       , PropBool
       , Handler
-      , Style
+      , StyleAtom
+      )
+  , StyleValue
+      ( StyleColor
+      , StyleColorA
+      , StyleFill
+      , StyleFontSize
+      , StyleFontWeight
+      , StyleFontFamily
+      , StyleLineHeight
+      , StyleSpacing
+      , StyleRadius
+      , StyleBorder
+      , StyleTransform
+      , StyleTransition
+      , StyleOpacity
+      , StyleShadow
+      , StylePixel
+      , StyleDisplay
+      , StyleFlexDirection
+      , StyleFlexAlign
+      , StyleFlexJustify
+      , StyleCursor
+      , StyleVisibility
+      , StyleOverflow
+      , StyleTextAlign
       )
   , EventHandler
       ( OnClick
@@ -67,6 +92,111 @@ module Hydrogen.Render.Element.Types
       , MathML
       , Custom
       )
+  , StyleProperty
+      ( PropBackgroundColor
+      , PropColor
+      , PropFill
+      , PropFontSize
+      , PropFontWeight
+      , PropFontFamily
+      , PropLineHeight
+      , PropPadding
+      , PropPaddingTop
+      , PropPaddingRight
+      , PropPaddingBottom
+      , PropPaddingLeft
+      , PropMargin
+      , PropMarginTop
+      , PropMarginRight
+      , PropMarginBottom
+      , PropMarginLeft
+      , PropBorderRadius
+      , PropBorder
+      , PropBorderTop
+      , PropBorderRight
+      , PropBorderBottom
+      , PropBorderLeft
+      , PropTransform
+      , PropTransition
+      , PropOpacity
+      , PropBoxShadow
+      , PropWidth
+      , PropHeight
+      , PropMinWidth
+      , PropMinHeight
+      , PropMaxWidth
+      , PropMaxHeight
+      , PropDisplay
+      , PropFlexDirection
+      , PropAlignItems
+      , PropJustifyContent
+      , PropCursor
+      , PropVisibility
+      , PropOverflow
+      , PropTextAlign
+      )
+  , Display
+      ( DisplayNone
+      , DisplayBlock
+      , DisplayInline
+      , DisplayInlineBlock
+      , DisplayFlex
+      , DisplayInlineFlex
+      , DisplayGrid
+      , DisplayInlineGrid
+      , DisplayContents
+      )
+  , FlexDirection
+      ( FlexRow
+      , FlexRowReverse
+      , FlexColumn
+      , FlexColumnReverse
+      )
+  , FlexAlign
+      ( AlignStart
+      , AlignEnd
+      , AlignCenter
+      , AlignStretch
+      , AlignBaseline
+      )
+  , FlexJustify
+      ( JustifyStart
+      , JustifyEnd
+      , JustifyCenter
+      , JustifySpaceBetween
+      , JustifySpaceAround
+      , JustifySpaceEvenly
+      )
+  , Cursor
+      ( CursorAuto
+      , CursorDefault
+      , CursorPointer
+      , CursorWait
+      , CursorText
+      , CursorMove
+      , CursorNotAllowed
+      , CursorGrab
+      , CursorGrabbing
+      )
+  , Visibility
+      ( VisibilityVisible
+      , VisibilityHidden
+      , VisibilityCollapse
+      )
+  , Overflow
+      ( OverflowVisible
+      , OverflowHidden
+      , OverflowScroll
+      , OverflowAuto
+      )
+  , TextAlign
+      ( TextAlignLeft
+      , TextAlignRight
+      , TextAlignCenter
+      , TextAlignJustify
+      , TextAlignStart
+      , TextAlignEnd
+      )
   
   -- * Internal Helpers
   , mapAttrMsg
@@ -84,9 +214,25 @@ import Prelude
   , (<<<)
   )
 
-
 import Data.Maybe (Maybe)
 import Data.Tuple (Tuple(Tuple))
+
+-- Schema atoms for typed styles
+import Hydrogen.Schema.Color.RGB (RGB, RGBA) as Color
+import Hydrogen.Schema.Typography.FontSize (FontSize) as Typography
+import Hydrogen.Schema.Typography.FontWeight (FontWeight) as Typography
+import Hydrogen.Schema.Typography.LineHeight (LineHeight) as Typography
+import Hydrogen.Schema.Typography.FontFamily (FontFamily) as Typography
+import Hydrogen.Schema.Geometry.Spacing (SpacingValue) as Geometry
+import Hydrogen.Schema.Geometry.Radius (Corners) as Geometry
+import Hydrogen.Schema.Geometry.Border (Border) as Geometry
+import Hydrogen.Schema.Motion.Transform (LayerTransform2D) as Motion
+import Hydrogen.Schema.Motion.Transition (TransitionConfig) as Motion
+import Hydrogen.Schema.Color.Opacity (Opacity) as ColorOpacity
+import Hydrogen.Schema.Motion.Transform (Opacity) as MotionOpacity
+import Hydrogen.Schema.Surface.Fill (Fill) as Surface
+import Hydrogen.Schema.Elevation.Shadow (LayeredShadow) as Elevation
+import Hydrogen.Schema.Dimension.Device (Pixel) as Dimension
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // namespace
@@ -157,6 +303,138 @@ instance functorElement :: Functor Element where
     Empty -> Empty
 
 -- ═════════════════════════════════════════════════════════════════════════════
+--                                                                 // style value
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | StyleValue — Typed style values using Schema atoms.
+-- |
+-- | NO STRINGS. Each variant wraps a bounded Schema atom.
+-- | The runtime interprets these to the target format (CSS, Canvas, WebGPU).
+data StyleValue
+  -- Color atoms
+  = StyleColor Color.RGB
+  | StyleColorA Color.RGBA
+  | StyleFill Surface.Fill
+  
+  -- Typography atoms
+  | StyleFontSize Typography.FontSize
+  | StyleFontWeight Typography.FontWeight
+  | StyleFontFamily Typography.FontFamily
+  | StyleLineHeight Typography.LineHeight
+  
+  -- Geometry atoms
+  | StyleSpacing Geometry.SpacingValue
+  | StyleRadius Geometry.Corners
+  | StyleBorder Geometry.Border
+  
+  -- Motion atoms
+  | StyleTransform Motion.LayerTransform2D
+  | StyleTransition Motion.TransitionConfig
+  | StyleOpacity MotionOpacity.Opacity
+  
+  -- Elevation atoms
+  | StyleShadow Elevation.LayeredShadow
+  
+  -- Dimension atoms
+  | StylePixel Dimension.Pixel
+  
+  -- Layout enums (bounded)
+  | StyleDisplay Display
+  | StyleFlexDirection FlexDirection
+  | StyleFlexAlign FlexAlign
+  | StyleFlexJustify FlexJustify
+  | StyleCursor Cursor
+  | StyleVisibility Visibility
+  | StyleOverflow Overflow
+  | StyleTextAlign TextAlign
+
+-- | Display mode — bounded enum
+data Display
+  = DisplayNone
+  | DisplayBlock
+  | DisplayInline
+  | DisplayInlineBlock
+  | DisplayFlex
+  | DisplayInlineFlex
+  | DisplayGrid
+  | DisplayInlineGrid
+  | DisplayContents
+
+derive instance eqDisplay :: Eq Display
+
+-- | Flex direction — bounded enum
+data FlexDirection
+  = FlexRow
+  | FlexRowReverse
+  | FlexColumn
+  | FlexColumnReverse
+
+derive instance eqFlexDirection :: Eq FlexDirection
+
+-- | Flex alignment — bounded enum
+data FlexAlign
+  = AlignStart
+  | AlignEnd
+  | AlignCenter
+  | AlignStretch
+  | AlignBaseline
+
+derive instance eqFlexAlign :: Eq FlexAlign
+
+-- | Flex justify — bounded enum
+data FlexJustify
+  = JustifyStart
+  | JustifyEnd
+  | JustifyCenter
+  | JustifySpaceBetween
+  | JustifySpaceAround
+  | JustifySpaceEvenly
+
+derive instance eqFlexJustify :: Eq FlexJustify
+
+-- | Cursor — bounded enum
+data Cursor
+  = CursorAuto
+  | CursorDefault
+  | CursorPointer
+  | CursorWait
+  | CursorText
+  | CursorMove
+  | CursorNotAllowed
+  | CursorGrab
+  | CursorGrabbing
+
+derive instance eqCursor :: Eq Cursor
+
+-- | Visibility — bounded enum
+data Visibility
+  = VisibilityVisible
+  | VisibilityHidden
+  | VisibilityCollapse
+
+derive instance eqVisibility :: Eq Visibility
+
+-- | Overflow — bounded enum
+data Overflow
+  = OverflowVisible
+  | OverflowHidden
+  | OverflowScroll
+  | OverflowAuto
+
+derive instance eqOverflow :: Eq Overflow
+
+-- | Text alignment — bounded enum
+data TextAlign
+  = TextAlignLeft
+  | TextAlignRight
+  | TextAlignCenter
+  | TextAlignJustify
+  | TextAlignStart
+  | TextAlignEnd
+
+derive instance eqTextAlign :: Eq TextAlign
+
+-- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // attribute
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -168,14 +446,60 @@ instance functorElement :: Functor Element where
 -- | - `Prop` — DOM property (name, value)
 -- | - `PropBool` — Boolean DOM property (renders as present/absent)
 -- | - `Handler` — Event handler that produces messages
--- | - `Style` — Inline style (property, value)
+-- | - `StyleAtom` — Typed style using Schema atoms (NO STRINGS)
 data Attribute msg
   = Attr String String
   | AttrNS String String String
   | Prop String String
   | PropBool String Boolean
   | Handler (EventHandler msg)
-  | Style String String
+  | StyleAtom StyleProperty StyleValue
+
+-- | Style property — what aspect of the element this style affects
+data StyleProperty
+  = PropBackgroundColor
+  | PropColor
+  | PropFill
+  | PropFontSize
+  | PropFontWeight
+  | PropFontFamily
+  | PropLineHeight
+  | PropPadding
+  | PropPaddingTop
+  | PropPaddingRight
+  | PropPaddingBottom
+  | PropPaddingLeft
+  | PropMargin
+  | PropMarginTop
+  | PropMarginRight
+  | PropMarginBottom
+  | PropMarginLeft
+  | PropBorderRadius
+  | PropBorder
+  | PropBorderTop
+  | PropBorderRight
+  | PropBorderBottom
+  | PropBorderLeft
+  | PropTransform
+  | PropTransition
+  | PropOpacity
+  | PropBoxShadow
+  | PropWidth
+  | PropHeight
+  | PropMinWidth
+  | PropMinHeight
+  | PropMaxWidth
+  | PropMaxHeight
+  | PropDisplay
+  | PropFlexDirection
+  | PropAlignItems
+  | PropJustifyContent
+  | PropCursor
+  | PropVisibility
+  | PropOverflow
+  | PropTextAlign
+
+derive instance eqStyleProperty :: Eq StyleProperty
 
 instance functorAttribute :: Functor Attribute where
   map f = case _ of
@@ -184,7 +508,7 @@ instance functorAttribute :: Functor Attribute where
     Prop n v -> Prop n v
     PropBool n v -> PropBool n v
     Handler h -> Handler (mapHandlerMsg f h)
-    Style p v -> Style p v
+    StyleAtom p v -> StyleAtom p v
 
 -- | Map over the message type of an attribute
 mapAttrMsg :: forall a b. (a -> b) -> Attribute a -> Attribute b

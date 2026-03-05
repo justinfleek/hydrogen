@@ -46,7 +46,6 @@ module Hydrogen.Schema.Typography.FontWidth
   -- * Accessors
   , unwrap
   , toPercentage
-  , toLegacyCSSValue
   
   -- * Operations
   , clamp
@@ -139,11 +138,6 @@ unwrap (FontWidth n) = n
 -- | Convert to a percentage Number (for CSS)
 toPercentage :: FontWidth -> Number
 toPercentage (FontWidth n) = Int.toNumber n
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS value string
-toLegacyCSSValue :: FontWidth -> String
-toLegacyCSSValue (FontWidth n) = show n <> "%"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

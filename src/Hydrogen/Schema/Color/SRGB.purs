@@ -57,8 +57,7 @@ module Hydrogen.Schema.Color.SRGB
   , multiply
   , screen
   
-  -- * SRGB Legacy CSS Output (for interop with legacy systems)
-  , srgbToLegacyCss
+  -- * SRGB Serialization
   , srgbToHex
   , srgbToRGB
   
@@ -69,9 +68,6 @@ module Hydrogen.Schema.Color.SRGB
   -- * SRGBA Accessors
   , alpha
   , srgbaToRecord
-  
-  -- * SRGBA Output
-  , srgbaToCss
   
   -- * Conversion
   , toSRGBA
@@ -86,7 +82,6 @@ import Prelude
   , (<>)
   )
 
-import Data.Int as Int
 import Hydrogen.Schema.Color.Channel as Ch
 import Hydrogen.Schema.Color.Opacity as Op
 import Hydrogen.Schema.Color.RGB as RGB
@@ -105,7 +100,9 @@ derive newtype instance eqSRGB :: Eq SRGB
 derive newtype instance ordSRGB :: Ord SRGB
 
 instance showSRGB :: Show SRGB where
-  show = srgbToLegacyCss
+  show (SRGB rgb) = "SRGB " <> show (Ch.unwrap (RGB.red rgb))
+    <> " " <> show (Ch.unwrap (RGB.green rgb))
+    <> " " <> show (Ch.unwrap (RGB.blue rgb))
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -184,25 +181,20 @@ screen :: SRGB -> SRGB -> SRGB
 screen (SRGB a) (SRGB b) = SRGB (RGB.screen a b)
 
 -- ═════════════════════════════════════════════════════════════════════════════
---                                                                     // output
+--                                                             // serialization
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Convert to CSS rgb() string.
--- | Convert to CSS string for legacy system interop.
+-- | Convert to 6-character hex string (without #).
 -- |
--- | **NOTE:** Hydrogen renders via WebGPU, NOT CSS. This function exists only
--- | for exporting to legacy systems that require CSS format.
+-- | Hex is a standard serialization format for RGB colors — just another
+-- | way to represent three bounded integers (0-255 each = 00-FF each).
 -- |
--- | ```purescript
--- | srgbToLegacyCss (srgb 255 128 0)  -- "rgb(255, 128, 0)"
--- | ```
-srgbToLegacyCss :: SRGB -> String
-srgbToLegacyCss (SRGB rgb) = RGB.rgbToLegacyCss rgb
-
--- | Convert to hex string.
+-- | This is NOT CSS output — it's data serialization. Color pickers use
+-- | this for hex input/output fields.
 -- |
 -- | ```purescript
--- | srgbToHex (srgb 255 128 0)  -- "#ff8000"
+-- | srgbToHex (srgb 255 128 0)  -- "ff8000"
+-- | srgbToHex (srgb 0 0 0)      -- "000000"
 -- | ```
 srgbToHex :: SRGB -> String
 srgbToHex (SRGB rgb) = RGB.rgbToHex rgb
@@ -221,7 +213,10 @@ newtype SRGBA = SRGBA { color :: SRGB, alpha :: Op.Opacity }
 derive instance eqSRGBA :: Eq SRGBA
 
 instance showSRGBA :: Show SRGBA where
-  show = srgbaToCss
+  show (SRGBA c) = "SRGBA " <> show (Ch.unwrap (RGB.red (srgbToRGB c.color)))
+    <> " " <> show (Ch.unwrap (RGB.green (srgbToRGB c.color)))
+    <> " " <> show (Ch.unwrap (RGB.blue (srgbToRGB c.color)))
+    <> " " <> show (Op.unwrap c.alpha)
 
 -- | Create an sRGBA color.
 -- |
@@ -245,20 +240,6 @@ srgbaToRecord :: SRGBA -> { r :: Ch.Channel, g :: Ch.Channel, b :: Ch.Channel, a
 srgbaToRecord (SRGBA c) =
   let rgb = srgbToRecord c.color
   in { r: rgb.r, g: rgb.g, b: rgb.b, a: c.alpha }
-
--- | Convert to CSS rgba() string.
--- |
--- | ```purescript
--- | srgbaToCss (srgba 255 128 0 0.5)  -- "rgba(255, 128, 0, 0.5)"
--- | ```
-srgbaToCss :: SRGBA -> String
-srgbaToCss (SRGBA c) =
-  let rgb = srgbToRecord c.color
-      r = show (Ch.unwrap rgb.r)
-      g = show (Ch.unwrap rgb.g)
-      b = show (Ch.unwrap rgb.b)
-      a = show (Op.unwrap c.alpha)
-  in "rgba(" <> r <> ", " <> g <> ", " <> b <> ", " <> a <> ")"
 
 -- | Add alpha to sRGB (creates SRGBA).
 toSRGBA :: SRGB -> Op.Opacity -> SRGBA

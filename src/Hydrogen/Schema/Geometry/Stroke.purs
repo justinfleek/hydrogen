@@ -58,7 +58,6 @@ module Hydrogen.Schema.Geometry.Stroke
       , StyleInset
       , StyleOutset
       )
-  , strokeStyleToCss
   , strokeStyleFromString
   , allStrokeStyles
   
@@ -68,7 +67,6 @@ module Hydrogen.Schema.Geometry.Stroke
       , CapRound
       , CapSquare
       )
-  , lineCapToCss
   , lineCapFromString
   , allLineCaps
   
@@ -78,7 +76,6 @@ module Hydrogen.Schema.Geometry.Stroke
       , JoinRound
       , JoinBevel
       )
-  , lineJoinToCss
   , lineJoinFromString
   , allLineJoins
   
@@ -89,7 +86,6 @@ module Hydrogen.Schema.Geometry.Stroke
   , miterLimitSharp
   , miterLimitRound
   , miterLimitValue
-  , miterLimitToCss
   , miterLimitBounds
   ) where
 
@@ -152,20 +148,6 @@ instance showStrokeStyle :: Show StrokeStyle where
   show StyleInset = "(StrokeStyle Inset)"
   show StyleOutset = "(StrokeStyle Outset)"
 
--- | Convert stroke style to CSS string
-strokeStyleToCss :: StrokeStyle -> String
-strokeStyleToCss = case _ of
-  StyleNone -> "none"
-  StyleHidden -> "hidden"
-  StyleDotted -> "dotted"
-  StyleDashed -> "dashed"
-  StyleSolid -> "solid"
-  StyleDouble -> "double"
-  StyleGroove -> "groove"
-  StyleRidge -> "ridge"
-  StyleInset -> "inset"
-  StyleOutset -> "outset"
-
 -- | Parse stroke style from string
 strokeStyleFromString :: String -> Maybe StrokeStyle
 strokeStyleFromString = case _ of
@@ -223,13 +205,6 @@ instance showLineCap :: Show LineCap where
   show CapRound = "(LineCap Round)"
   show CapSquare = "(LineCap Square)"
 
--- | Convert line cap to CSS/SVG string
-lineCapToCss :: LineCap -> String
-lineCapToCss = case _ of
-  CapButt -> "butt"
-  CapRound -> "round"
-  CapSquare -> "square"
-
 -- | Parse line cap from string
 lineCapFromString :: String -> Maybe LineCap
 lineCapFromString = case _ of
@@ -268,13 +243,6 @@ instance showLineJoin :: Show LineJoin where
   show JoinMiter = "(LineJoin Miter)"
   show JoinRound = "(LineJoin Round)"
   show JoinBevel = "(LineJoin Bevel)"
-
--- | Convert line join to CSS/SVG string
-lineJoinToCss :: LineJoin -> String
-lineJoinToCss = case _ of
-  JoinMiter -> "miter"
-  JoinRound -> "round"
-  JoinBevel -> "bevel"
 
 -- | Parse line join from string
 lineJoinFromString :: String -> Maybe LineJoin
@@ -346,7 +314,3 @@ miterLimitRound = MiterLimit 2.0
 -- | Extract the numeric value
 miterLimitValue :: MiterLimit -> Number
 miterLimitValue (MiterLimit n) = n
-
--- | Convert to CSS string (unitless number)
-miterLimitToCss :: MiterLimit -> String
-miterLimitToCss (MiterLimit n) = show n

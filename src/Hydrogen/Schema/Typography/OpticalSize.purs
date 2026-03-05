@@ -38,8 +38,8 @@ module Hydrogen.Schema.Typography.OpticalSize
   
   -- * Accessors
   , unwrap
-  , toLegacyCSSValue
   , toVariationValue
+  , toPoints
   
   -- * Operations
   , clamp
@@ -124,12 +124,6 @@ unwrap (OpticalSize n) = n
 -- | Convert to points
 toPoints :: OpticalSize -> Number
 toPoints (OpticalSize n) = Int.toNumber n / 10.0
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS value string
-toLegacyCSSValue :: OpticalSize -> String
-toLegacyCSSValue (OpticalSize 0) = "auto"
-toLegacyCSSValue os = show (toPoints os)
 
 -- | Convert to variation axis value (for font-variation-settings)
 toVariationValue :: OpticalSize -> String

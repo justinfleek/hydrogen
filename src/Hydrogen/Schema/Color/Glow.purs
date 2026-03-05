@@ -52,7 +52,6 @@ module Hydrogen.Schema.Color.Glow
   , glowSpread
   , glowToRecord
   , glowToRgb
-  , glowToCss
   , withColor
   , withIntensity
   , withSpread
@@ -167,42 +166,6 @@ glowToRecord g =
 -- | ```
 glowToRgb :: Glow -> RGB.RGB
 glowToRgb g = K.kelvinToRgb g.glowColor
-
--- | Convert to CSS drop-shadow filter
--- |
--- | Renders as `filter: drop-shadow(0 0 {spread}px rgba({r}, {g}, {b}, {alpha}))`
--- | where alpha is derived from luminance intensity.
--- |
--- | **Alpha calculation:**
--- | - 0-100 nits: alpha 0.0-0.3 (subtle)
--- | - 100-500 nits: alpha 0.3-0.7 (visible)
--- | - 500+ nits: alpha 0.7-1.0 (intense)
--- |
--- | ```purescript
--- | glowToCss myGlow  -- "drop-shadow(0 0 20px rgba(255, 200, 150, 0.6))"
--- | ```
-glowToCss :: Glow -> String
-glowToCss g =
-  let
-    rgb = glowToRgb g
-    r = Int.toNumber (Ch.unwrap (RGB.red rgb))
-    gv = Int.toNumber (Ch.unwrap (RGB.green rgb))
-    b = Int.toNumber (Ch.unwrap (RGB.blue rgb))
-    intensity = L.unwrap g.glowIntensity
-    spread = g.glowSpread
-    
-    -- Map luminance (nits) to CSS alpha
-    -- 0-100 nits: 0.0-0.3
-    -- 100-500 nits: 0.3-0.7
-    -- 500-2000 nits: 0.7-1.0
-    alpha = if intensity < 100.0
-              then (intensity / 100.0) * 0.3
-              else if intensity < 500.0
-                then 0.3 + ((intensity - 100.0) / 400.0) * 0.4
-                else 0.7 + (min ((intensity - 500.0) / 1500.0) 1.0) * 0.3
-  in
-    "drop-shadow(0 0 " <> show spread <> "px rgba(" 
-    <> show r <> ", " <> show gv <> ", " <> show b <> ", " <> show alpha <> "))"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // operations

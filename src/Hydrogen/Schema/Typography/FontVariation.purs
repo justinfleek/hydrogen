@@ -58,10 +58,6 @@ module Hydrogen.Schema.Typography.FontVariation
   , removeAxis
   , getAxis
   , merge
-  
-  -- * CSS Output
-  , toLegacyCSSValue
-  , toStyleAttribute
   ) where
 
 import Prelude
@@ -98,7 +94,9 @@ newtype FontVariation = FontVariation (Array { axis :: VariationAxis, value :: A
 derive instance eqFontVariation :: Eq FontVariation
 
 instance showFontVariation :: Show FontVariation where
-  show fv = "FontVariation " <> toLegacyCSSValue fv
+  show (FontVariation arr) = "FontVariation [" <> show (map showSetting arr) <> "]"
+    where
+    showSetting { axis: VariationAxis tag, value: AxisValue n } = tag <> "=" <> show n
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // axis constructors
@@ -209,28 +207,4 @@ merge (FontVariation a) (FontVariation b) =
     Just _ -> true
     Nothing -> false
 
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
 
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS font-variation-settings value
-toLegacyCSSValue :: FontVariation -> String
-toLegacyCSSValue (FontVariation []) = "normal"
-toLegacyCSSValue (FontVariation arr) =
-  joinWith ", " (map formatSetting arr)
-  where
-  formatSetting :: { axis :: VariationAxis, value :: AxisValue } -> String
-  formatSetting { axis: VariationAxis tag, value: AxisValue n } =
-    "\"" <> tag <> "\" " <> show n
-  
-  joinWith :: String -> Array String -> String
-  joinWith _ [] = ""
-  joinWith sep xs = case Array.uncons xs of
-    Nothing -> ""
-    Just { head: first, tail: rest } -> 
-      foldl (\acc x -> acc <> sep <> x) first rest
-
--- | Convert to CSS style attribute string
-toStyleAttribute :: FontVariation -> String
-toStyleAttribute fv = "font-variation-settings: " <> toLegacyCSSValue fv <> ";"

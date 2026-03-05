@@ -61,11 +61,6 @@ module Hydrogen.Schema.Dimension.Grid
   , setColumnGap
   , setRowGap
   
-  -- * CSS Output
-  , toCss
-  , trackToCss
-  , gapToCss
-  
   -- * Calculations
   , columnWidth
   , totalGapWidth
@@ -112,7 +107,11 @@ data GridTrack
 derive instance eqGridTrack :: Eq GridTrack
 
 instance showGridTrack :: Show GridTrack where
-  show = trackToCss
+  show (Fixed n) = "Fixed " <> show n
+  show (Fr n) = "Fr " <> show n
+  show (MinMax min' max') = "MinMax " <> show min' <> " " <> show max'
+  show Auto = "Auto"
+  show (FitContent n) = "FitContent " <> show n
 
 -- | Gap configuration (column gap, row gap).
 type GridGap = { column :: Number, row :: Number }
@@ -265,37 +264,6 @@ setColumnGap n (Grid g) = Grid (g { gap = g.gap { column = n } })
 -- | Set row gap.
 setRowGap :: Number -> Grid -> Grid
 setRowGap n (Grid g) = Grid (g { gap = g.gap { row = n } })
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert grid to CSS properties.
--- |
--- | Returns an object with grid-template-columns, grid-template-rows, and gap.
-toCss :: Grid -> { gridTemplateColumns :: String, gridTemplateRows :: String, gap :: String }
-toCss (Grid g) =
-  { gridTemplateColumns: intercalate " " (trackToCss <$> g.columns)
-  , gridTemplateRows: if length g.rows == 0 
-                      then "auto"
-                      else intercalate " " (trackToCss <$> g.rows)
-  , gap: gapToCss g.gap
-  }
-
--- | Convert a track to CSS value.
-trackToCss :: GridTrack -> String
-trackToCss (Fixed n) = show n <> "px"
-trackToCss (Fr n) = show n <> "fr"
-trackToCss (MinMax minV maxV) = "minmax(" <> show minV <> "px, " <> show maxV <> "fr)"
-trackToCss Auto = "auto"
-trackToCss (FitContent n) = "fit-content(" <> show n <> "px)"
-
--- | Convert gap to CSS value.
-gapToCss :: GridGap -> String
-gapToCss g =
-  if g.column == g.row
-    then show g.column <> "px"
-    else show g.row <> "px " <> show g.column <> "px"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // calculations

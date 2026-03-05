@@ -21,7 +21,6 @@ module Hydrogen.Schema.Typography.FontSize
   , unsafeFontSize
   , unwrap
   , scale
-  , toLegacyCss
   , bounds
   -- Common sizes
   , browserDefault
@@ -261,11 +260,6 @@ isHero (FontSize s) = s > 48.0
 -- | Extract the raw Number value
 unwrap :: FontSize -> Number
 unwrap (FontSize s) = s
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS font-size value
-toLegacyCss :: FontSize -> String
-toLegacyCss (FontSize s) = show s <> "px"
 
 -- | Bounds documentation for this type
 bounds :: Bounded.NumberBounds

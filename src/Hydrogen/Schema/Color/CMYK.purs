@@ -44,9 +44,6 @@ module Hydrogen.Schema.Color.CMYK
   , key
   , cmykToRecord
   
-  -- * CSS Output
-  , cmykToCss
-  
   -- * Conversion
   , rgbToCmyk
   , cmykToRgb
@@ -82,7 +79,10 @@ derive instance eqCMYK :: Eq CMYK
 derive instance ordCMYK :: Ord CMYK
 
 instance showCMYK :: Show CMYK where
-  show = cmykToCss
+  show (CMYK c) = "CMYK " <> show (C.unwrap c.cyan)
+    <> " " <> show (M.unwrap c.magenta)
+    <> " " <> show (Y.unwrap c.yellow)
+    <> " " <> show (K.unwrap c.key)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -145,24 +145,6 @@ cmykToRecord (CMYK c) =
   , y: Y.unwrap c.yellow
   , k: K.unwrap c.key
   }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS device-cmyk() function string.
--- |
--- | Uses CSS Color Level 4 device-cmyk() syntax:
--- | ```purescript
--- | cmykToCss (cmyk 0 100 100 0)  -- "device-cmyk(0%, 100%, 100%, 0%)"
--- | ```
-cmykToCss :: CMYK -> String
-cmykToCss (CMYK c) =
-  "device-cmyk(" 
-  <> show (C.unwrap c.cyan) <> "%"
-  <> ", " <> show (M.unwrap c.magenta) <> "%"
-  <> ", " <> show (Y.unwrap c.yellow) <> "%"
-  <> ", " <> show (K.unwrap c.key) <> "%)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // conversion

@@ -69,9 +69,37 @@ module Hydrogen.Render.Element.Attributes
   -- * Data Attributes
   , dataAttr
   
-  -- * Style Attributes
-  , style
-  , styles
+  -- * Typed Style Attributes (Schema atoms)
+  -- Color
+  , backgroundColor
+  , color
+  -- Typography
+  , fontSize
+  , fontWeight
+  -- Spacing
+  , padding
+  , margin
+  -- Border
+  , border
+  , borderBottom
+  -- Dimension
+  , width
+  , height
+  , maxWidth
+  , maxHeight
+  -- Transform
+  , transform
+  , transition
+  , opacity
+  -- Layout
+  , display
+  , flexDirection
+  , alignItems
+  , justifyContent
+  , cursor
+  , visibility
+  , overflow
+  , textAlign
   ) where
 
 import Prelude
@@ -86,8 +114,68 @@ import Data.String (joinWith)
 import Data.Tuple (Tuple(Tuple))
 
 import Hydrogen.Render.Element.Types
-  ( Attribute(Attr, AttrNS, Prop, PropBool, Style)
+  ( Attribute(Attr, AttrNS, Prop, PropBool, StyleAtom)
+  , StyleProperty
+      ( PropBackgroundColor
+      , PropColor
+      , PropFontSize
+      , PropFontWeight
+      , PropPadding
+      , PropMargin
+      , PropBorder
+      , PropBorderBottom
+      , PropTransform
+      , PropTransition
+      , PropOpacity
+      , PropWidth
+      , PropHeight
+      , PropMaxWidth
+      , PropMaxHeight
+      , PropDisplay
+      , PropFlexDirection
+      , PropAlignItems
+      , PropJustifyContent
+      , PropCursor
+      , PropVisibility
+      , PropOverflow
+      , PropTextAlign
+      )
+  , StyleValue
+      ( StyleColor
+      , StyleFontSize
+      , StyleFontWeight
+      , StyleSpacing
+      , StyleBorder
+      , StyleTransform
+      , StyleTransition
+      , StyleOpacity
+      , StylePixel
+      , StyleDisplay
+      , StyleFlexDirection
+      , StyleFlexAlign
+      , StyleFlexJustify
+      , StyleCursor
+      , StyleVisibility
+      , StyleOverflow
+      , StyleTextAlign
+      )
+  , Display
+  , FlexDirection
+  , FlexAlign
+  , FlexJustify
+  , Cursor
+  , Visibility
+  , Overflow
+  , TextAlign
   )
+import Hydrogen.Schema.Color.RGB (RGB) as Color
+import Hydrogen.Schema.Typography.FontSize (FontSize) as Typography
+import Hydrogen.Schema.Typography.FontWeight (FontWeight) as Typography
+import Hydrogen.Schema.Geometry.Spacing (SpacingValue) as Geometry
+import Hydrogen.Schema.Geometry.Border (Border) as Geometry
+import Hydrogen.Schema.Motion.Transform (Opacity, LayerTransform2D) as Motion
+import Hydrogen.Schema.Motion.Transition (TransitionConfig) as Motion
+import Hydrogen.Schema.Dimension.Device (Pixel) as Dimension
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                    // generic // constructors
@@ -275,22 +363,101 @@ dataAttr key = Attr ("data-" <> key)
 --                                                       // style // attributes
 -- ═════════════════════════════════════════════════════════════════════════════
 
--- | Set a single inline style
--- |
--- | ```purescript
--- | style "color" "red"
--- | style "margin-top" "10px"
--- | ```
-style :: forall msg. String -> String -> Attribute msg
-style = Style
+-- Color styles
+-- | Set background color using Schema RGB atom
+backgroundColor :: forall msg. Color.RGB -> Attribute msg
+backgroundColor c = StyleAtom PropBackgroundColor (StyleColor c)
 
--- | Set multiple inline styles
--- |
--- | ```purescript
--- | styles
--- |   [ Tuple "color" "red"
--- |   , Tuple "margin-top" "10px"
--- |   ]
--- | ```
-styles :: forall msg. Array (Tuple String String) -> Array (Attribute msg)
-styles = Array.map (\(Tuple p v) -> Style p v)
+-- | Set text color using Schema RGB atom
+color :: forall msg. Color.RGB -> Attribute msg
+color c = StyleAtom PropColor (StyleColor c)
+
+-- Typography styles
+-- | Set font size using Typography.FontSize atom
+fontSize :: forall msg. Typography.FontSize -> Attribute msg
+fontSize s = StyleAtom PropFontSize (StyleFontSize s)
+
+-- | Set font weight using Typography.FontWeight atom
+fontWeight :: forall msg. Typography.FontWeight -> Attribute msg
+fontWeight w = StyleAtom PropFontWeight (StyleFontWeight w)
+
+-- Spacing styles
+-- | Set padding using Geometry.SpacingValue atom
+padding :: forall msg. Geometry.SpacingValue -> Attribute msg
+padding s = StyleAtom PropPadding (StyleSpacing s)
+
+-- | Set margin using Geometry.SpacingValue atom
+margin :: forall msg. Geometry.SpacingValue -> Attribute msg
+margin s = StyleAtom PropMargin (StyleSpacing s)
+
+-- Border styles
+-- | Set border using Geometry.Border atom
+border :: forall msg. Geometry.Border -> Attribute msg
+border b = StyleAtom PropBorder (StyleBorder b)
+
+-- | Set bottom border using Geometry.Border atom
+borderBottom :: forall msg. Geometry.Border -> Attribute msg
+borderBottom b = StyleAtom PropBorderBottom (StyleBorder b)
+
+-- Dimension styles
+-- | Set width using Dimension.Pixel atom
+width :: forall msg. Dimension.Pixel -> Attribute msg
+width p = StyleAtom PropWidth (StylePixel p)
+
+-- | Set height using Dimension.Pixel atom
+height :: forall msg. Dimension.Pixel -> Attribute msg
+height p = StyleAtom PropHeight (StylePixel p)
+
+-- | Set max-width using Dimension.Pixel atom
+maxWidth :: forall msg. Dimension.Pixel -> Attribute msg
+maxWidth p = StyleAtom PropMaxWidth (StylePixel p)
+
+-- | Set max-height using Dimension.Pixel atom
+maxHeight :: forall msg. Dimension.Pixel -> Attribute msg
+maxHeight p = StyleAtom PropMaxHeight (StylePixel p)
+
+-- Transform styles
+-- | Set transform using Motion.LayerTransform2D atom
+transform :: forall msg. Motion.LayerTransform2D -> Attribute msg
+transform t = StyleAtom PropTransform (StyleTransform t)
+
+-- | Set transition using Motion.TransitionConfig atom
+transition :: forall msg. Motion.TransitionConfig -> Attribute msg
+transition t = StyleAtom PropTransition (StyleTransition t)
+
+-- | Set opacity using Motion.Opacity (0.0 to 1.0, clamped)
+opacity :: forall msg. Motion.Opacity -> Attribute msg
+opacity o = StyleAtom PropOpacity (StyleOpacity o)
+
+-- Layout styles
+-- | Set display mode using bounded enum
+display :: forall msg. Display -> Attribute msg
+display d = StyleAtom PropDisplay (StyleDisplay d)
+
+-- | Set flex direction using bounded enum
+flexDirection :: forall msg. FlexDirection -> Attribute msg
+flexDirection d = StyleAtom PropFlexDirection (StyleFlexDirection d)
+
+-- | Set align-items using bounded enum
+alignItems :: forall msg. FlexAlign -> Attribute msg
+alignItems a = StyleAtom PropAlignItems (StyleFlexAlign a)
+
+-- | Set justify-content using bounded enum
+justifyContent :: forall msg. FlexJustify -> Attribute msg
+justifyContent j = StyleAtom PropJustifyContent (StyleFlexJustify j)
+
+-- | Set cursor using bounded enum
+cursor :: forall msg. Cursor -> Attribute msg
+cursor c = StyleAtom PropCursor (StyleCursor c)
+
+-- | Set visibility using bounded enum
+visibility :: forall msg. Visibility -> Attribute msg
+visibility v = StyleAtom PropVisibility (StyleVisibility v)
+
+-- | Set overflow using bounded enum
+overflow :: forall msg. Overflow -> Attribute msg
+overflow o = StyleAtom PropOverflow (StyleOverflow o)
+
+-- | Set text-align using bounded enum
+textAlign :: forall msg. TextAlign -> Attribute msg
+textAlign t = StyleAtom PropTextAlign (StyleTextAlign t)

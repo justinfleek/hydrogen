@@ -39,7 +39,6 @@ module Hydrogen.Schema.Typography.Grade
   
   -- * Accessors
   , unwrap
-  , toLegacyCSSValue
   , toVariationValue
   
   -- * Operations
@@ -123,11 +122,6 @@ lightMode = Grade 0
 -- | Extract the raw integer value
 unwrap :: Grade -> Int
 unwrap (Grade n) = n
-
--- NOT an FFI boundary - pure string generation.
--- | Convert to CSS value (for font-variation-settings)
-toLegacyCSSValue :: Grade -> String
-toLegacyCSSValue (Grade n) = show n
 
 -- | Convert to variation axis value string
 toVariationValue :: Grade -> String

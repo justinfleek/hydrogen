@@ -61,9 +61,6 @@ module Hydrogen.Schema.Dimension.AspectRatio
   , fitHeight
   , fitContain
   , fitCover
-  
-  -- * CSS Output
-  , toCss
   ) where
 
 import Prelude
@@ -103,7 +100,9 @@ derive instance eqAspectRatio :: Eq AspectRatio
 derive instance ordAspectRatio :: Ord AspectRatio
 
 instance showAspectRatio :: Show AspectRatio where
-  show ar = "AspectRatio(" <> toCss ar <> ")"
+  show ar = 
+    let wh = toWH ar
+    in "AspectRatio(" <> show wh.width <> ":" <> show wh.height <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -320,19 +319,6 @@ fitCover (Size2D boundW boundH) ar =
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // css output
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS aspect-ratio value.
--- |
--- | Uses simplified integer ratios when possible.
--- |
--- | ```purescript
--- | toCss ratio16x9  -- "16 / 9"
--- | toCss square     -- "1 / 1"
--- | ```
-toCss :: AspectRatio -> String
-toCss ar =
-  let wh = toWH ar
-  in show wh.width <> " / " <> show wh.height
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // internal

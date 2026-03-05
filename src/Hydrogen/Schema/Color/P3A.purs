@@ -54,9 +54,6 @@ module Hydrogen.Schema.Color.P3A
   , fadeOut
   , setAlpha
   
-  -- * CSS Output
-  , p3aToCss
-  
   -- * Comparison
   , isEqual
   , isFullyOpaque
@@ -107,7 +104,12 @@ derive instance eqP3A :: Eq P3A
 derive instance ordP3A :: Ord P3A
 
 instance showP3A :: Show P3A where
-  show = p3aToCss
+  show (P3A p) =
+    let rec = WG.displayP3ToRecord p.color
+    in "P3A " <> show rec.r
+      <> " " <> show rec.g
+      <> " " <> show rec.b
+      <> " " <> show (Op.unwrap p.alpha)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -275,24 +277,6 @@ fadeOut amount (P3A p) =
 -- | Set alpha to a specific value.
 setAlpha :: Int -> P3A -> P3A
 setAlpha a (P3A p) = P3A { color: p.color, alpha: Op.opacity a }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS color() function with alpha.
--- |
--- | ```purescript
--- | p3aToCss (p3a 1.0 0.5 0.2 75)
--- | -- "color(display-p3 1 0.5 0.2 / 0.75)"
--- | ```
-p3aToCss :: P3A -> String
-p3aToCss (P3A p) =
-  let rec = WG.displayP3ToRecord p.color
-      a = Op.toUnitInterval p.alpha
-  in "color(display-p3 " <> show rec.r <> " " 
-     <> show rec.g <> " " <> show rec.b 
-     <> " / " <> show a <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // comparison

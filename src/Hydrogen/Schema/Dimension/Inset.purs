@@ -79,10 +79,6 @@ module Hydrogen.Schema.Dimension.Inset
   , isUniform
   , isSymmetric
   , isEqual
-  
-  -- * CSS Output
-  , toCss
-  , toCssXY
   ) where
 
 import Prelude
@@ -351,22 +347,6 @@ isEqual (Inset t1 r1 b1 l1) (Inset t2 r2 b2 l2) =
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // css output
 -- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS inset value.
--- |
--- | Uses shortest form possible:
--- | - 1 value if uniform
--- | - 2 values if vertical/horizontal symmetric
--- | - 4 values otherwise
-toCss :: Inset -> String
-toCss i@(Inset t r b l)
-  | isUniform i = show t <> "px"
-  | isSymmetric i = show t <> "px " <> show r <> "px"
-  | otherwise = show t <> "px " <> show r <> "px " <> show b <> "px " <> show l <> "px"
-
--- | Convert InsetXY to CSS.
-toCssXY :: InsetXY -> String
-toCssXY (InsetXY h v) = show v <> "px " <> show h <> "px"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // internal

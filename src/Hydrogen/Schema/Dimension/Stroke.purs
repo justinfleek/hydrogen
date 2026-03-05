@@ -60,7 +60,6 @@ module Hydrogen.Schema.Dimension.Stroke
   , strokeWidthMedium
   , strokeWidthThick
   , strokeWidthValue
-  , strokeWidthToCss
   , strokeWidthBounds
   , addStrokeWidth
   , subtractStrokeWidth
@@ -78,14 +77,12 @@ module Hydrogen.Schema.Dimension.Stroke
   , DashLength
   , dashLength
   , dashLengthValue
-  , dashLengthToCss
   , dashLengthBounds
   
   -- * Dash Gap (bounded)
   , DashGap
   , dashGap
   , dashGapValue
-  , dashGapToCss
   , dashGapBounds
   
   -- * Dash Offset (finite, unbounded)
@@ -93,7 +90,6 @@ module Hydrogen.Schema.Dimension.Stroke
   , dashOffset
   , dashOffsetZero
   , dashOffsetValue
-  , dashOffsetToCss
   , addDashOffset
   , negateDashOffset
   
@@ -102,7 +98,6 @@ module Hydrogen.Schema.Dimension.Stroke
   , outlineOffset
   , outlineOffsetZero
   , outlineOffsetValue
-  , outlineOffsetToCss
   , outlineOffsetBounds
   
   -- * Dash Pattern (molecule)
@@ -111,7 +106,6 @@ module Hydrogen.Schema.Dimension.Stroke
   , dashPatternSolid
   , dashPatternDotted
   , dashPatternDashed
-  , dashPatternToCss
   , dashPatternSegments
   ) where
 
@@ -193,10 +187,6 @@ strokeWidthThick = StrokeWidth 4.0
 strokeWidthValue :: StrokeWidth -> Number
 strokeWidthValue (StrokeWidth n) = n
 
--- | Convert to CSS string
-strokeWidthToCss :: StrokeWidth -> String
-strokeWidthToCss (StrokeWidth n) = show n <> "px"
-
 -- | Add two stroke widths (result is clamped to bounds)
 -- |
 -- | Useful for composing border effects or calculating total stroke size.
@@ -251,10 +241,6 @@ dashLength n
 dashLengthValue :: DashLength -> Number
 dashLengthValue (DashLength n) = n
 
--- | Convert to CSS string (unitless for dasharray)
-dashLengthToCss :: DashLength -> String
-dashLengthToCss (DashLength n) = show n
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // dash gap
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -290,10 +276,6 @@ dashGap n
 -- | Extract the numeric value
 dashGapValue :: DashGap -> Number
 dashGapValue (DashGap n) = n
-
--- | Convert to CSS string (unitless for dasharray)
-dashGapToCss :: DashGap -> String
-dashGapToCss (DashGap n) = show n
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                // dash offset
@@ -331,10 +313,6 @@ dashOffsetZero = DashOffset 0.0
 -- | Extract the numeric value
 dashOffsetValue :: DashOffset -> Number
 dashOffsetValue (DashOffset n) = n
-
--- | Convert to CSS string
-dashOffsetToCss :: DashOffset -> String
-dashOffsetToCss (DashOffset n) = show n <> "px"
 
 -- | Add two offsets (for animation)
 addDashOffset :: DashOffset -> DashOffset -> DashOffset
@@ -394,10 +372,6 @@ outlineOffsetZero = OutlineOffset 0.0
 outlineOffsetValue :: OutlineOffset -> Number
 outlineOffsetValue (OutlineOffset n) = n
 
--- | Convert to CSS string
-outlineOffsetToCss :: OutlineOffset -> String
-outlineOffsetToCss (OutlineOffset n) = show n <> "px"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // dash pattern
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -414,7 +388,7 @@ newtype DashPattern = DashPattern (Array Number)
 derive instance eqDashPattern :: Eq DashPattern
 
 instance showDashPattern :: Show DashPattern where
-  show = dashPatternToCss
+  show (DashPattern segments) = "DashPattern " <> show segments
 
 -- | Create a dash pattern from alternating dash/gap values
 -- |
@@ -438,15 +412,6 @@ dashPatternDotted = DashPattern [1.0, 2.0]
 -- | Standard dashed pattern (4px dash, 4px gap)
 dashPatternDashed :: DashPattern
 dashPatternDashed = DashPattern [4.0, 4.0]
-
--- | Convert to CSS stroke-dasharray string
--- |
--- | Returns "none" for empty pattern (solid stroke)
-dashPatternToCss :: DashPattern -> String
-dashPatternToCss (DashPattern segments) =
-  if length segments == 0
-    then "none"
-    else intercalate " " (map show segments)
 
 -- | Get the raw segments
 dashPatternSegments :: DashPattern -> Array Number

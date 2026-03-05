@@ -45,7 +45,6 @@ module Hydrogen.Schema.Geometry.Transform
   , isFlippedX
   , isFlippedY
   , scaleToPercent
-  , scaleToLegacyCss
   
   -- * Translate
   , Translate(Translate)
@@ -57,7 +56,6 @@ module Hydrogen.Schema.Geometry.Transform
   , getTranslateY
   , addTranslate
   , negateTranslate
-  , translateToLegacyCss
   
   -- * Rotate
   , Rotate(Rotate)
@@ -68,7 +66,6 @@ module Hydrogen.Schema.Geometry.Transform
   , rotate270
   , getRotation
   , addRotation
-  , rotateToLegacyCss
   
   -- * Skew
   , Skew(Skew)
@@ -78,7 +75,6 @@ module Hydrogen.Schema.Geometry.Transform
   , skewNone
   , getSkewX
   , getSkewY
-  , skewToLegacyCss
   
   -- * Transform Origin
   , Origin(Origin)
@@ -94,7 +90,6 @@ module Hydrogen.Schema.Geometry.Transform
   , originRight
   , getOriginX
   , getOriginY
-  , originToLegacyCss
   
   -- * Composed Transform
   , Transform2D(Transform2D)
@@ -106,7 +101,11 @@ module Hydrogen.Schema.Geometry.Transform
   , withRotate
   , withSkew
   , withOrigin
-  , transform2DToLegacyCss
+  
+  -- * Convenience Constructors
+  , rotateTransform
+  , scaleTransform
+  , translateTransform
   ) where
 
 import Prelude
@@ -240,13 +239,6 @@ scaleToPercent (Scale s) =
       then xPct
       else xPct <> " x " <> yPct
 
--- | Convert scale to legacy CSS transform string.
-scaleToLegacyCss :: Scale -> String
-scaleToLegacyCss (Scale s) =
-  if s.x == s.y
-    then "scale(" <> show s.x <> ")"
-    else "scale(" <> show s.x <> ", " <> show s.y <> ")"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                  // translate
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -295,11 +287,6 @@ addTranslate (Translate a) (Translate b) =
 negateTranslate :: Translate -> Translate
 negateTranslate (Translate t) = Translate { x: negate t.x, y: negate t.y }
 
--- | Convert to CSS
-translateToLegacyCss :: Translate -> String
-translateToLegacyCss (Translate t) =
-  "translate(" <> show t.x <> "px, " <> show t.y <> "px)"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                     // rotate
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -344,11 +331,6 @@ addRotation :: Rotate -> Rotate -> Rotate
 addRotation (Rotate a) (Rotate b) =
   Rotate { angle: addAngle a.angle b.angle }
 
--- | Convert to CSS
-rotateToLegacyCss :: Rotate -> String
-rotateToLegacyCss (Rotate r) =
-  "rotate(" <> show (unwrapDegrees r.angle) <> "deg)"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                       // skew
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -392,16 +374,6 @@ getSkewX (Skew s) = s.x
 -- | Get Y skew angle
 getSkewY :: Skew -> Number
 getSkewY (Skew s) = s.y
-
--- | Convert to CSS
-skewToLegacyCss :: Skew -> String
-skewToLegacyCss (Skew s) =
-  if s.y == 0.0 then
-    "skewX(" <> show s.x <> "deg)"
-  else if s.x == 0.0 then
-    "skewY(" <> show s.y <> "deg)"
-  else
-    "skew(" <> show s.x <> "deg, " <> show s.y <> "deg)"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // transform origin
@@ -466,10 +438,6 @@ getOriginX (Origin o) = o.x
 -- | Get Y origin percentage
 getOriginY :: Origin -> Number
 getOriginY (Origin o) = o.y
-
--- | Convert to CSS
-originToLegacyCss :: Origin -> String
-originToLegacyCss (Origin o) = show o.x <> "% " <> show o.y <> "%"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                         // composed transform
@@ -568,30 +536,48 @@ withSkew sk (Transform2D t) = Transform2D (t { skew = Just sk })
 withOrigin :: Origin -> Transform2D -> Transform2D
 withOrigin o (Transform2D t) = Transform2D (t { origin = o })
 
--- | Convert composed transform to CSS.
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                                    // convenience constructors
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Create a Transform2D with only rotation (from degrees).
 -- |
--- | Outputs transform and transform-origin as separate values.
--- | Order: translate → rotate → scale → skew
-transform2DToLegacyCss :: Transform2D -> String
-transform2DToLegacyCss (Transform2D t) =
-  let
-    parts = 
-      maybeToArray (maybe [] (\x -> [translateToLegacyCss x]) t.translate) <>
-      maybeToArray (maybe [] (\x -> [rotateToLegacyCss x]) t.rotate) <>
-      maybeToArray (maybe [] (\x -> [scaleToLegacyCss x]) t.scale) <>
-      maybeToArray (maybe [] (\x -> [skewToLegacyCss x]) t.skew)
-  in
-    joinParts parts
+-- | ```purescript
+-- | chevronRotation = rotateTransform 90.0  -- 90 degrees
+-- | ```
+rotateTransform :: Number -> Transform2D
+rotateTransform deg = Transform2D
+  { translate: Nothing
+  , rotate: Just (rotate (degrees deg))
+  , scale: Nothing
+  , skew: Nothing
+  , origin: originCenter
+  }
 
--- | Helper to convert Maybe to singleton or empty array
-maybeToArray :: forall a. Array a -> Array a
-maybeToArray = \arr -> arr
+-- | Create a Transform2D with only scale (uniform).
+-- |
+-- | ```purescript
+-- | buttonPress = scaleTransform 0.98
+-- | ```
+scaleTransform :: Number -> Transform2D
+scaleTransform s = Transform2D
+  { translate: Nothing
+  , rotate: Nothing
+  , scale: Just (scale s)
+  , skew: Nothing
+  , origin: originCenter
+  }
 
--- | Join transform parts with spaces
-joinParts :: Array String -> String
-joinParts arr = case uncons arr of
-  Nothing -> ""
-  Just { head, tail } -> 
-    case uncons tail of
-      Nothing -> head
-      Just _ -> foldl (\acc x -> acc <> " " <> x) head tail
+-- | Create a Transform2D with only translation.
+-- |
+-- | ```purescript
+-- | offset = translateTransform 10.0 20.0
+-- | ```
+translateTransform :: Number -> Number -> Transform2D
+translateTransform x y = Transform2D
+  { translate: Just (translate x y)
+  , rotate: Nothing
+  , scale: Nothing
+  , skew: Nothing
+  , origin: originCenter
+  }

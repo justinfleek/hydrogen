@@ -40,7 +40,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , getTranslate3DY
   , getTranslate3DZ
   , addTranslate3D
-  , translate3DToLegacyCss
   
   -- * Rotate3D
   , Rotate3D(Rotate3D)
@@ -53,7 +52,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , getRotateY
   , getRotateZ
   , addRotation3D
-  , rotate3DToLegacyCss
   
   -- * Scale3D
   , Scale3D(Scale3D)
@@ -66,7 +64,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , getScale3DX
   , getScale3DY
   , getScale3DZ
-  , scale3DToLegacyCss
   , scale3DBounds
   
   -- * Perspective
@@ -74,7 +71,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , perspective
   , perspectiveNone
   , getPerspective
-  , perspectiveToLegacyCss
   , perspectiveBounds
   
   -- * Perspective Origin
@@ -83,7 +79,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , perspectiveOriginCenter
   , getPerspectiveOriginX
   , getPerspectiveOriginY
-  , perspectiveOriginToLegacyCss
   
   -- * Composed Transform3D
   , Transform3D(Transform3D)
@@ -94,7 +89,6 @@ module Hydrogen.Schema.Geometry.Transform3D
   , withScale3D
   , withPerspective
   , withPerspectiveOrigin
-  , transform3DToLegacyCss
   
   -- * Camera Utilities
   , lookAt
@@ -182,11 +176,6 @@ addTranslate3D :: Translate3D -> Translate3D -> Translate3D
 addTranslate3D (Translate3D a) (Translate3D b) =
   Translate3D { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 
--- | Convert to CSS
-translate3DToLegacyCss :: Translate3D -> String
-translate3DToLegacyCss (Translate3D t) =
-  "translate3d(" <> show t.x <> "px, " <> show t.y <> "px, " <> show t.z <> "px)"
-
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                   // rotate3d
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -243,20 +232,6 @@ addRotation3D (Rotate3D a) (Rotate3D b) = Rotate3D
   , y: addAngle a.y b.y
   , z: addAngle a.z b.z
   }
-
--- | Convert to CSS
-rotate3DToLegacyCss :: Rotate3D -> String
-rotate3DToLegacyCss (Rotate3D r) =
-  let
-    xDeg = unwrapDegrees r.x
-    yDeg = unwrapDegrees r.y
-    zDeg = unwrapDegrees r.z
-    parts = []
-      <> (if xDeg == 0.0 then [] else ["rotateX(" <> show xDeg <> "deg)"])
-      <> (if yDeg == 0.0 then [] else ["rotateY(" <> show yDeg <> "deg)"])
-      <> (if zDeg == 0.0 then [] else ["rotateZ(" <> show zDeg <> "deg)"])
-  in
-    joinParts parts
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // scale3d
@@ -317,13 +292,6 @@ getScale3DY (Scale3D s) = s.y
 getScale3DZ :: Scale3D -> Number
 getScale3DZ (Scale3D s) = s.z
 
--- | Convert to CSS
-scale3DToLegacyCss :: Scale3D -> String
-scale3DToLegacyCss (Scale3D s) =
-  if s.x == s.y && s.y == s.z
-    then "scale3d(" <> show s.x <> ", " <> show s.x <> ", " <> show s.x <> ")"
-    else "scale3d(" <> show s.x <> ", " <> show s.y <> ", " <> show s.z <> ")"
-
 -- | Bounds for Scale3D components.
 -- |
 -- | Scale values are bounded -5.0 to 5.0 to prevent:
@@ -365,13 +333,6 @@ perspectiveNone = Perspective 0.0
 getPerspective :: Perspective -> Number
 getPerspective (Perspective p) = p
 
--- | Convert to CSS
-perspectiveToLegacyCss :: Perspective -> String
-perspectiveToLegacyCss (Perspective p) =
-  if p == 0.0
-    then "none"
-    else "perspective(" <> show p <> "px)"
-
 -- | Bounds for Perspective depth.
 -- |
 -- | Perspective values are bounded 1.0 to 10000.0 pixels:
@@ -412,11 +373,6 @@ getPerspectiveOriginX (PerspectiveOrigin o) = o.x
 -- | Get Y origin
 getPerspectiveOriginY :: PerspectiveOrigin -> Number
 getPerspectiveOriginY (PerspectiveOrigin o) = o.y
-
--- | Convert to CSS
-perspectiveOriginToLegacyCss :: PerspectiveOrigin -> String
-perspectiveOriginToLegacyCss (PerspectiveOrigin o) =
-  show o.x <> "% " <> show o.y <> "%"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                       // composed transform3d
@@ -487,19 +443,6 @@ withPerspective p (Transform3D tr) = Transform3D (tr { perspective = Just p })
 -- | Set perspective origin
 withPerspectiveOrigin :: PerspectiveOrigin -> Transform3D -> Transform3D
 withPerspectiveOrigin po (Transform3D tr) = Transform3D (tr { perspectiveOrigin = po })
-
--- | Convert to CSS transform property value.
--- | Order: perspective → translate → rotate → scale
-transform3DToLegacyCss :: Transform3D -> String
-transform3DToLegacyCss (Transform3D t) =
-  let
-    parts =
-      maybeToArray (map perspectiveToLegacyCss t.perspective) <>
-      maybeToArray (map translate3DToLegacyCss t.translate) <>
-      maybeToArray (map rotate3DToLegacyCss t.rotate) <>
-      maybeToArray (map scale3DToLegacyCss t.scale)
-  in
-    joinParts parts
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                           // camera utilities

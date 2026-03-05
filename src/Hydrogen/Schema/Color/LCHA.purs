@@ -51,9 +51,6 @@ module Hydrogen.Schema.Color.LCHA
   , fadeOut
   , setAlpha
   
-  -- * CSS Output
-  , lchaToCss
-  
   -- * Comparison
   , isEqual
   , isFullyOpaque
@@ -92,7 +89,12 @@ derive instance eqLCHA :: Eq LCHA
 derive instance ordLCHA :: Ord LCHA
 
 instance showLCHA :: Show LCHA where
-  show = lchaToCss
+  show (LCHA lcha') =
+    let rec = LCH.lchToRecord lcha'.color
+    in "LCHA " <> show rec.l
+      <> " " <> show rec.c
+      <> " " <> show rec.h
+      <> " " <> show (Op.unwrap lcha'.alpha)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // constructors
@@ -233,25 +235,6 @@ fadeOut amount (LCHA lcha') =
 -- | Set alpha to a specific value.
 setAlpha :: Int -> LCHA -> LCHA
 setAlpha a (LCHA lcha') = LCHA { color: lcha'.color, alpha: Op.opacity a }
-
--- ═════════════════════════════════════════════════════════════════════════════
---                                                                 // css output
--- ═════════════════════════════════════════════════════════════════════════════
-
--- | Convert to CSS lch() function with alpha.
--- |
--- | ```purescript
--- | lchaToCss (lcha 50.0 80.0 30.0 75)
--- | -- "lch(50 80 30 / 0.75)"
--- | ```
-lchaToCss :: LCHA -> String
-lchaToCss (LCHA lcha') =
-  let rec = LCH.lchToRecord lcha'.color
-      l = show rec.l
-      c = show rec.c
-      h = show rec.h
-      a = Op.toUnitInterval lcha'.alpha
-  in "lch(" <> l <> " " <> c <> " " <> h <> " / " <> show a <> ")"
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                 // comparison
