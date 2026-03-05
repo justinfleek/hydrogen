@@ -28,6 +28,7 @@ module Hydrogen.Schema.Attestation.UUID5.Namespaces
   , nsAccordionContent
   , nsOTPInput
   , nsOTPDigit
+  , nsInput
   -- * 3D/Scene Namespaces
   , nsMesh
   , nsScene
@@ -181,6 +182,14 @@ nsOTPDigit :: UUID5
 nsOTPDigit = UUID5
   [ 0x6f, 0x74, 0x70, 0x64, 0x69, 0x67, 0x69, 0x74
   , 0x5f, 0x68, 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65
+  ]
+
+-- | Namespace for Hydrogen Input UUIDs
+-- | \"input__hydrogen.\" as bytes
+nsInput :: UUID5
+nsInput = UUID5
+  [ 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5f, 0x5f, 0x68
+  , 0x79, 0x64, 0x72, 0x6f, 0x67, 0x65, 0x6e, 0x2e
   ]
 
 -- ═════════════════════════════════════════════════════════════════════════════

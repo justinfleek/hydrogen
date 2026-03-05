@@ -123,7 +123,7 @@ derive instance eqColorStop :: Eq ColorStop
 derive instance ordColorStop :: Ord ColorStop
 
 instance showColorStop :: Show ColorStop where
-  show (ColorStop cs) = rgbToLegacyCss cs.color <> " " <> show (ratioToPercent cs.position) <> "%"
+  show (ColorStop cs) = "ColorStop { color: " <> show cs.color <> ", position: " <> show cs.position <> " }"
 
 -- | Create a color stop at a specific position
 colorStop :: RGB -> Number -> ColorStop

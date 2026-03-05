@@ -75,6 +75,14 @@ module Hydrogen.Schema.Element.Input.State
   , setMaxLength
   , setMinLength
   
+  -- * Validation State
+  , ValidationState
+      ( ValidationNone
+      , ValidationValid
+      , ValidationWarning
+      , ValidationError
+      )
+  
   -- * Re-exports from Reactive
   , module Hydrogen.Schema.Reactive.Flags
   ) where

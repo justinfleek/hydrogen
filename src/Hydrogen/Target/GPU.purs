@@ -45,6 +45,7 @@ module Hydrogen.Target.GPU
   
   -- * Render Requests (Pure Data)
   , RenderRequest(..)
+  , ClearColor
   , ClearRequest
   , DrawRequest
   

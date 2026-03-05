@@ -82,7 +82,7 @@ import Prelude
   , not
   )
 
-import Prim (Boolean, String)
+import Prim (Boolean, Number, String)
 
 import Hydrogen.Schema.Reactive.Flags
   ( CheckedFlag(CheckedFlag)

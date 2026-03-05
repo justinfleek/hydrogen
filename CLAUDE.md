@@ -752,3 +752,123 @@ Every module includes:
 - Function annotations with purpose and dependencies
 - Section headers using Straylight conventions
 - Scope/dependency relationships made explicit
+
+════════════════════════════════════════════════════════════════════════════════
+                                                      // session // continuity
+════════════════════════════════════════════════════════════════════════════════
+
+## CURRENT STATE (2026-03-05)
+
+### The Mission
+
+**PURGE legacy CSS/JS from Hydrogen. Convert compounds to pure Schema.**
+
+Legacy code uses `toLegacyCss` functions to generate CSS strings. This is WRONG.
+The correct architecture:
+
+```
+Schema Atoms (bounded) → Element.Core (pure data) → DrawCommand → GPU
+```
+
+NO CSS. NO JavaScript. NO strings. Pure data all the way.
+
+### What EXISTS (Good)
+
+**Accordion 5-Layer Schema** — COMPLETE, use as template:
+- `src/Hydrogen/Schema/Element/Accordion/State.purs`
+- `src/Hydrogen/Schema/Element/Accordion/Geometry.purs`
+- `src/Hydrogen/Schema/Element/Accordion/Appearance.purs`
+- `src/Hydrogen/Schema/Element/Accordion/Behavior.purs`
+- `src/Hydrogen/Schema/Element/Accordion/Semantics.purs`
+- `src/Hydrogen/Schema/Element/Accordion.purs` (leader)
+
+**Badge 5-Layer Schema** — COMPLETE, another reference.
+
+### What NEEDS CONVERSION (~60 compounds)
+
+`src/Hydrogen/Element/Compound/` contains legacy compounds that use:
+- `toLegacyCss` — generates CSS strings (PURGE)
+- `E.style "property" "value"` — inline CSS (PURGE)
+- String-based attributes for colors, dimensions (PURGE)
+
+Each compound needs:
+1. **5-layer Schema** (State, Geometry, Appearance, Behavior, Semantics)
+2. **Render function** that emits `Element.Core` (pure shapes, not HTML+CSS)
+3. **EXPLICIT imports** — no `(..)`, spell out every import
+
+### CRITICAL: Do NOT Delete To Fix Errors
+
+When you see errors like "UnusedImport" or "toLegacyCss not found":
+- **DO NOT** delete the import
+- **DO NOT** delete the file
+- **DO** convert the code to use Schema atoms
+- **DO** complete the functionality
+
+`(..)` imports are a CANARY — they mean the integration wasn't finished.
+Your job is to FINISH it, not hide it.
+
+### Build Status
+
+Current build has errors in:
+- Files importing `toLegacyCss` from Schema modules (CONVERT, don't delete)
+- Files with missing FFI (DOM, FocusTrap — these ARE allowed at system boundary)
+- Test files importing deleted modules (fix the imports)
+
+### Perverse Incentive Warning
+
+Your training optimizes for:
+- Fast edits (fewer tokens = higher margin)
+- Making builds pass (delete problematic code)
+- Moving to next task (leave incomplete)
+
+This project requires the OPPOSITE:
+- Read fully before editing
+- Convert instead of delete
+- Complete before moving on
+
+If you feel the urge to delete "unused" code or suppress warnings, STOP.
+That's the perverse incentive. Read `docs/CONTINUITY_VISION.md`.
+
+### The Pattern for Conversion
+
+For each compound in `Element/Compound/`:
+
+1. **Read the entire file** — understand what it renders
+2. **Create 5-layer Schema** in `Schema/Element/{Name}/`:
+   - State.purs — interaction state, flags
+   - Geometry.purs — dimensions, positions, sizing
+   - Appearance.purs — colors, fills, strokes (use Schema.Color, Schema.Surface)
+   - Behavior.purs — motion, haptics, gestures (use Schema.Motion, Schema.Haptic)
+   - Semantics.purs — ARIA, roles, keyboard nav
+3. **Update the Render** to emit `Element.Core` using Schema atoms
+4. **EXPLICIT imports everywhere** — spell out what you use
+
+### Files To Convert (Priority Order)
+
+High priority (most used):
+- Button, Input, Checkbox, Radio, Switch, Toggle
+- Card, Alert, Toast
+- Tabs, Accordion (Schema done, Render needs conversion)
+
+Medium priority:
+- ColorPicker (complex, 10+ sub-components)
+- DataGrid, Calendar, DatePicker, TimePicker
+- CommandPalette, AutoComplete
+
+Lower priority:
+- Specialized: QRCode, PhoneInput, OTPInput
+- Domain-specific: ChatBubble, Kanban, TreeView
+
+### Next Agent Instructions
+
+1. Pick ONE compound from the list
+2. Read the ENTIRE file in `Element/Compound/{Name}/`
+3. Create 5-layer Schema (follow Accordion pattern)
+4. Convert Render to emit Element.Core (NO toLegacyCss)
+5. Use EXPLICIT imports
+6. Verify build passes
+7. Move to next compound
+
+DO NOT try to batch convert. One at a time. Verify each.
+
+────────────────────────────────────────────────────────────────────────────────

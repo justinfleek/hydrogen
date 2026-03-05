@@ -108,6 +108,7 @@ import Hydrogen.Schema.Attestation.UUID5.Namespaces
   , nsBlurKernel
   , nsGlowKernel
   , nsParticleKernel
+  , nsInput
   )
 
 
