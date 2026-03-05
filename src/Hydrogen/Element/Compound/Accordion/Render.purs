@@ -25,15 +25,14 @@ import Data.Array (foldl)
 import Data.Maybe (Maybe(Nothing, Just), maybe)
 
 import Hydrogen.Render.Element as E
-import Hydrogen.Render.Element
-  ( DisplayFlex
-  , AlignCenter
-  , JustifySpaceBetween
-  , CursorPointer
-  , CursorNotAllowed
-  , TextAlignLeft
-  , VisibilityHidden
-  , OverflowHidden
+import Hydrogen.Render.Element.Types
+  ( Display(DisplayFlex)
+  , FlexAlign(AlignCenter)
+  , FlexJustify(JustifySpaceBetween)
+  , Cursor(CursorPointer, CursorNotAllowed)
+  , TextAlign(TextAlignLeft)
+  , Visibility(VisibilityHidden)
+  , Overflow(OverflowHidden)
   )
 import Hydrogen.Schema.Color.RGB as Color
 import Hydrogen.Schema.Color.RGB (rgb)
@@ -41,7 +40,8 @@ import Hydrogen.Schema.Typography.FontSize as FontSize
 import Hydrogen.Schema.Typography.FontWeight as FontWeight
 import Hydrogen.Schema.Geometry.Spacing as Spacing
 import Hydrogen.Schema.Geometry.Border as Border
-import Hydrogen.Schema.Dimension.Device as Device
+import Hydrogen.Schema.Dimension.Device (px) as Device
+import Hydrogen.Schema.Dimension.Percentage (percent) as Percent
 import Hydrogen.Schema.Motion.Transform as Transform
 import Hydrogen.Schema.Motion.Transition as Transition
 import Hydrogen.Schema.Attestation.UUID5 as UUID5
@@ -97,7 +97,7 @@ item propMods children =
     
     defaultBorderColor = rgb 226 232 240
     borderColorVal = maybe defaultBorderColor (\c -> c) props.borderColor
-    borderWidthVal = maybe (Device.pixel 1) (\w -> w) props.borderWidth
+    borderWidthVal = maybe (Device.px 1.0) (\w -> w) props.borderWidth
     
     bottomBorder = Border.borderBottom
       { width: borderWidthVal
@@ -182,7 +182,7 @@ buildTriggerAttrs props =
       , E.display DisplayFlex
       , E.alignItems AlignCenter
       , E.justifyContent JustifySpaceBetween
-      , E.width (Device.percent 100)
+      , E.width (Percent.percent 100.0)
       , E.color textColorVal
       , E.textAlign TextAlignLeft
       ]
@@ -230,8 +230,8 @@ chevronIcon props =
       , E.attr "stroke-width" "2"
       , E.attr "stroke-linecap" "round"
       , E.attr "stroke-linejoin" "round"
-      , E.width (Device.pixel 16)
-      , E.height (Device.pixel 16)
+      , E.width (Device.px 16.0)
+      , E.height (Device.px 16.0)
       , E.transform transformVal
       ]
       [ E.polyline_
