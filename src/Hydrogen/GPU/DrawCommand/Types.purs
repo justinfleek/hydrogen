@@ -22,6 +22,7 @@ module Hydrogen.GPU.DrawCommand.Types
       , DrawImage
       , DrawVideo
       , Draw3D
+      , DrawScene3D
       , PushClip
       , PopClip
       , Noop
@@ -50,6 +51,7 @@ module Hydrogen.GPU.DrawCommand.Types
   , ImageParams
   , VideoParams
   , Model3DParams
+  , Scene3DParams
   , ClipRegion(ClipRect, ClipPath)
   
   -- * v2 Typography Parameter Types
@@ -86,6 +88,10 @@ import Hydrogen.Schema.Dimension.Device as Device
 import Hydrogen.Schema.Geometry.Radius as Radius
 import Hydrogen.GPU.Coordinates as Coord
 import Hydrogen.Animation.Types as AnimTypes
+import Hydrogen.GPU.Scene3D.Camera (Camera3D) as Scene3DTypes
+import Hydrogen.GPU.Scene3D.Background (Background3D) as Scene3DTypes
+import Hydrogen.GPU.Scene3D.Light (Light3D) as Scene3DTypes
+import Hydrogen.GPU.Scene3D.Mesh (MeshParams) as Scene3DTypes
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                      // pickid
@@ -242,6 +248,23 @@ type Model3DParams msg =
   , depth :: Coord.DepthValue
   , pickId :: Maybe PickId
   , onClick :: Maybe msg
+  }
+
+-- | Parameters for drawing a full 3D scene.
+-- |
+-- | This is used by applications that build Scene3D descriptions
+-- | (camera, lights, meshes) and render them to a viewport.
+type Scene3DParams msg =
+  { camera :: Scene3DTypes.Camera3D
+  , background :: Scene3DTypes.Background3D
+  , lights :: Array Scene3DTypes.Light3D
+  , meshes :: Array (Scene3DTypes.MeshParams msg)
+  , x :: Coord.ScreenX
+  , y :: Coord.ScreenY
+  , width :: Coord.PixelWidth
+  , height :: Coord.PixelHeight
+  , depth :: Coord.DepthValue
+  , pickId :: Maybe PickId
   }
 
 -- | Clip region for masking.
@@ -442,6 +465,7 @@ data DrawCommand msg
   | DrawImage (ImageParams msg)
   | DrawVideo (VideoParams msg)
   | Draw3D (Model3DParams msg)
+  | DrawScene3D (Scene3DParams msg)
   | PushClip ClipRegion
   | PopClip
   | Noop

@@ -41,6 +41,7 @@ module Hydrogen.Schema.Storage.Session
   , cookieOptions
   , defaultCookieOptions
   , secureCookieOptions
+  , sessionCookieOptions
   , cookiePath
   , cookieDomain
   , cookieSecure
@@ -209,6 +210,17 @@ secureCookieOptions =
   , secure: true
   , sameSite: SameSiteStrict
   , httpOnly: true
+  }
+
+-- | Session cookie options: expires when browser closes, SameSite=Lax.
+-- | Not marked Secure so it works in development.
+sessionCookieOptions :: CookieOptions
+sessionCookieOptions =
+  { path: "/"
+  , domain: Nothing
+  , secure: false
+  , sameSite: SameSiteLax
+  , httpOnly: false
   }
 
 -- | Get cookie path.

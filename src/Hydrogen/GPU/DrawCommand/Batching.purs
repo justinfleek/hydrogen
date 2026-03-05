@@ -47,6 +47,7 @@ import Hydrogen.GPU.DrawCommand.Types
       , DrawImage
       , DrawVideo
       , Draw3D
+      , DrawScene3D
       , PushClip
       , PopClip
       , Noop
@@ -78,6 +79,7 @@ getDepth = case _ of
   DrawImage p -> Coord.unwrapDepthValue p.depth
   DrawVideo p -> Coord.unwrapDepthValue p.depth
   Draw3D p -> Coord.unwrapDepthValue p.depth
+  DrawScene3D p -> Coord.unwrapDepthValue p.depth
   PushClip _ -> 0.0
   PopClip -> 0.0
   Noop -> 0.0
@@ -133,6 +135,7 @@ getMaterial = case _ of
   DrawImage _ -> MaterialTextured 0
   DrawVideo _ -> MaterialTextured 0
   Draw3D _ -> MaterialTextured 0
+  DrawScene3D _ -> MaterialTextured 0  -- 3D scene is textured
   PushClip _ -> MaterialClip
   PopClip -> MaterialClip
   Noop -> MaterialSolid

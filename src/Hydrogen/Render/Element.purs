@@ -128,6 +128,7 @@ import Hydrogen.Render.Element.HTML
   , button_
   , input_
   , img_
+  , canvas_
   , form_
   , label_
   , h1_

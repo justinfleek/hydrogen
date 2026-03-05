@@ -96,6 +96,7 @@ import Hydrogen.GPU.DrawCommand.Types
       , DrawImage
       , DrawVideo
       , Draw3D
+      , DrawScene3D
       , PushClip
       , PopClip
       , Noop
@@ -115,6 +116,7 @@ import Hydrogen.GPU.DrawCommand.Types
   , ImageParams
   , VideoParams
   , Model3DParams
+  , Scene3DParams
   , QuadParams
   , GlyphParams
   , PathParams

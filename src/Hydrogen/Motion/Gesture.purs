@@ -70,7 +70,17 @@
 module Hydrogen.Motion.Gesture
   ( -- * Re-exports from Schema.Gestural.Gesture
     module SchemaGesture
+    -- * Two-finger gesture utilities
+  , Point
+  , TwoFingerData
+  , computeTwoFingerData
   ) where
+
+import Prelude
+  ( (*), (-), (+), (/)
+  )
+
+import Data.Number (sqrt, atan2) as Num
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // imports
@@ -100,41 +110,45 @@ import Hydrogen.Schema.Gestural.Gesture
   , noTap
   , tapPosition
   , isTapRecognized
+  , isSingleTap
+  , isDoubleTap
+  , isTripleTap
   , LongPressState
   , longPressState
   , noLongPress
   , longPressPosition
-  , longPressDuration
-  , isLongPressRecognized
+  , updateLongPressDuration
+  , isLongPressTriggered
+  , isLongPressActive
   , SwipeDirection(SwipeLeft, SwipeRight, SwipeUp, SwipeDown)
   , SwipeState
   , swipeState
   , noSwipe
-  , swipeDirection
   , swipeVelocity
   , isSwipeRecognized
   , PanState
   , panState
   , noPan
-  , panDelta
+  , updatePanPosition
+  , panTranslation
   , panVelocity
-  , panPosition
-  , panStartPosition
-  , isPanActive
-  , PinchState
-  , pinchState
-  , noPinch
-  , pinchScale
-  , pinchVelocity
-  , pinchCenter
+  , isPanning
+  , panDistance
+  , PinchGesture
+  , pinchGesture
+  , noPinchGesture
+  , pinchGestureScale
+  , pinchGestureVelocity
+  , pinchGestureCenter
   , isPinchActive
-  , RotateState
-  , rotateState
-  , noRotation
-  , rotateAngle
-  , rotateVelocity
-  , rotateCenter
+  , RotateGesture
+  , rotateGesture
+  , noRotateGesture
+  , rotateGestureAngle
+  , rotateGestureVelocity
+  , rotateGestureCenter
   , isRotateActive
+  , normalizeAngle
   , GestureState
   , initialGestureState
   , resetGestures
@@ -147,3 +161,44 @@ import Hydrogen.Schema.Gestural.Gesture
   , updatePinchState
   , updateRotateState
   ) as SchemaGesture
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                               // two-finger gesture utilities
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | A 2D point.
+type Point = { x :: Number, y :: Number }
+
+-- | Data computed from two touch points.
+-- |
+-- | Used for pan/pinch/rotate gesture recognition.
+type TwoFingerData =
+  { center :: Point        -- ^ Center point between the two touches
+  , distance :: Number     -- ^ Distance between the two touches
+  , angle :: Number        -- ^ Angle of the line between touches (degrees)
+  }
+
+-- | Compute two-finger data from two touch points.
+-- |
+-- | ```purescript
+-- | let data = computeTwoFingerData point1 point2
+-- | -- data.center = midpoint
+-- | -- data.distance = distance between points
+-- | -- data.angle = angle in degrees (0-360)
+-- | ```
+computeTwoFingerData :: Point -> Point -> TwoFingerData
+computeTwoFingerData p1 p2 =
+  let
+    dx = p2.x - p1.x
+    dy = p2.y - p1.y
+    centerX = (p1.x + p2.x) / 2.0
+    centerY = (p1.y + p2.y) / 2.0
+    distance = Num.sqrt (dx * dx + dy * dy)
+    -- atan2 returns radians, convert to degrees
+    angleRad = Num.atan2 dy dx
+    angleDeg = angleRad * 180.0 / 3.14159265358979
+  in
+    { center: { x: centerX, y: centerY }
+    , distance: distance
+    , angle: angleDeg
+    }

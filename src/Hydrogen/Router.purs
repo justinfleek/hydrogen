@@ -102,14 +102,25 @@ module Hydrogen.Router
   , encodeRouteReplaceFrame
   , encodeRouteBackFrame
   , encodeRouteForwardFrame
+  
+  -- * Effect-based browser operations
+  , getPathname
+  , getHostname
+  , getOrigin
+  , pushState
+  , replaceState
+  , onPopState
+  , interceptLinks
   ) where
 
 import Prelude
   ( class Eq
+  , Unit
   , ($)
   , (==)
   )
 
+import Effect (Effect)
 import Data.Maybe (Maybe)
 import Data.String.CodeUnits as SCU
 
@@ -270,3 +281,40 @@ encodeRouteBackFrame = encodeRouteBack
 -- | Payload: none
 encodeRouteForwardFrame :: Frame
 encodeRouteForwardFrame = encodeRouteForward
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                                   // effect-based browser api
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Get the current pathname from the browser location.
+-- |
+-- | Effect-based operation for reading browser state directly.
+-- | For Elm-architecture apps, prefer using subscriptions for location changes.
+foreign import getPathname :: Effect String
+
+-- | Get the current hostname from the browser location.
+foreign import getHostname :: Effect String
+
+-- | Get the current origin from the browser location.
+foreign import getOrigin :: Effect String
+
+-- | Push a state onto the browser history.
+-- |
+-- | Effect-based operation. For Elm-architecture apps, use `pushUrl` Cmd instead.
+foreign import pushState :: String -> Effect Unit
+
+-- | Replace the current browser history entry.
+-- |
+-- | Effect-based operation. For Elm-architecture apps, use `replaceUrl` Cmd instead.
+foreign import replaceState :: String -> Effect Unit
+
+-- | Subscribe to popstate events (browser back/forward).
+-- |
+-- | Returns an unsubscribe function.
+foreign import onPopState :: (String -> Effect Unit) -> Effect (Effect Unit)
+
+-- | Intercept link clicks for SPA routing.
+-- |
+-- | Intercepts clicks on anchor elements with relative hrefs and calls
+-- | the provided handler with the path. Returns an unsubscribe function.
+foreign import interceptLinks :: (String -> Effect Unit) -> Effect (Effect Unit)

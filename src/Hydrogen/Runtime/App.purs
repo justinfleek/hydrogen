@@ -42,6 +42,9 @@ module Hydrogen.Runtime.App
       , OnTouchCancel
       , OnDeviceOrientation
       , OnDeviceMotion
+      , OnPointerDown
+      , OnPointerMove
+      , OnPointerUp
       , OnResize
       , OnVisibilityChange
       , OnInterval
@@ -54,6 +57,7 @@ module Hydrogen.Runtime.App
   , TouchEvent
   , DeviceOrientationEvent
   , DeviceMotionEvent
+  , PointerEvent
   , Dimensions
   , app
   
@@ -199,6 +203,14 @@ data Sub msg
   | OnDeviceMotion (DeviceMotionEvent -> msg)
     -- ^ Device motion/acceleration (includes gravity)
   
+  -- Pointer events (unified touch/mouse/stylus)
+  | OnPointerDown (PointerEvent -> msg)
+    -- ^ Pointer pressed (touch, mouse, or stylus)
+  | OnPointerMove (PointerEvent -> msg)
+    -- ^ Pointer moved (touch, mouse, or stylus)
+  | OnPointerUp (PointerEvent -> msg)
+    -- ^ Pointer released (touch, mouse, or stylus)
+  
   -- Window events
   | OnResize (Dimensions -> msg)
     -- ^ Window resize events
@@ -276,6 +288,27 @@ type DeviceMotionEvent =
 
 -- | Window/element dimensions
 type Dimensions = { width :: Number, height :: Number }
+
+-- | Pointer event (unified touch/mouse/stylus)
+-- |
+-- | The Pointer Events API unifies all pointing devices into a
+-- | single event model. This is preferred over separate mouse/touch handling.
+type PointerEvent =
+  { pointerId :: Int        -- ^ Unique pointer ID (can track multiple pointers)
+  , x :: Number             -- ^ X coordinate relative to target
+  , y :: Number             -- ^ Y coordinate relative to target
+  , clientX :: Number       -- ^ X relative to viewport
+  , clientY :: Number       -- ^ Y relative to viewport
+  , pressure :: Number      -- ^ Pressure (0.0 to 1.0)
+  , tiltX :: Number         -- ^ Stylus tilt X (-90 to 90)
+  , tiltY :: Number         -- ^ Stylus tilt Y (-90 to 90)
+  , twist :: Number         -- ^ Stylus twist (0 to 359)
+  , width :: Number         -- ^ Contact width
+  , height :: Number        -- ^ Contact height
+  , pointerType :: String   -- ^ "mouse", "touch", "pen"
+  , isPrimary :: Boolean    -- ^ True if primary pointer
+  , buttons :: Int          -- ^ Bitmask of pressed buttons
+  }
 
 -- | Construct an App with sensible defaults for optional fields
 app

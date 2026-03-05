@@ -74,6 +74,8 @@ import Prelude
   , (&&)
   , (<>)
   , (==)
+  , (>>>)
+  , (<<<)
   )
 
 import Data.Array (elem, filter)

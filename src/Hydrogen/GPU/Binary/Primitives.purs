@@ -114,6 +114,9 @@ serializeCommand = case _ of
   DC.DrawVideo params -> writeU8 0x31 <> pad 3 <> Media.serializeVideo params
   
   DC.Draw3D params -> writeU8 0x32 <> pad 3 <> Media.serialize3D params
+  
+  -- Scene3D (opcode 0x33)
+  DC.DrawScene3D _params -> writeU8 0x33 <> pad 3  -- TODO: full scene serialization
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                      // primitive serializers

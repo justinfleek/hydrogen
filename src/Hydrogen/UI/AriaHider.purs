@@ -87,7 +87,17 @@ module Hydrogen.UI.AriaHider
   -- | For direct wire encoding (advanced)
   , encodeAriaHideFrame
   , encodeAriaRestoreFrame
+  
+  -- * Effect-based operations (for Halogen components)
+  -- | Legacy Effect-based API for use in Halogen HalogenM contexts
+  , AriaHiderState
+  , hideOthers
+  , restoreOthers
   ) where
+
+import Prelude (Unit)
+import Effect (Effect)
+import Web.HTML.HTMLElement (HTMLElement)
 
 import Hydrogen.Runtime.Cmd 
   ( AriaStateToken(AriaStateToken)
@@ -125,3 +135,28 @@ encodeAriaHideFrame = encodeAriaHide
 -- | For normal application code, use `ariaRestore` from `Hydrogen.Runtime.Cmd`.
 encodeAriaRestoreFrame :: AriaStateToken -> Frame
 encodeAriaRestoreFrame (AriaStateToken token) = encodeAriaRestore token
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+--                                            // effect-based api (halogen compat)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- | Opaque state token for tracking hidden elements.
+-- |
+-- | This is the Effect-based counterpart to AriaStateToken, used by
+-- | Halogen components that need to manage ARIA state imperatively.
+foreign import data AriaHiderState :: Type
+
+-- | Hide all siblings of an element from screen readers.
+-- |
+-- | Sets aria-hidden="true" on sibling elements. Returns a state token
+-- | that can be used to restore the original state.
+-- |
+-- | This is the Effect-based API for use in Halogen components.
+-- | For Elm-architecture apps, use `ariaHide` from Hydrogen.Runtime.Cmd.
+foreign import hideOthers :: HTMLElement -> Effect AriaHiderState
+
+-- | Restore the original aria-hidden state.
+-- |
+-- | Uses the state token from `hideOthers` to restore all modified
+-- | elements to their original aria-hidden values.
+foreign import restoreOthers :: AriaHiderState -> Effect Unit

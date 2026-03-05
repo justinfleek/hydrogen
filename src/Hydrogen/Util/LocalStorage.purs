@@ -30,7 +30,15 @@
 module Hydrogen.Util.LocalStorage
   ( module SchemaLocal
   , module SchemaSession
+  -- * Direct Effect-based operations
+  , getItemRaw
+  , setItemRaw
+  , removeItemRaw
   ) where
+
+import Prelude (Unit)
+import Data.Maybe (Maybe)
+import Effect (Effect)
 
 import Hydrogen.Schema.Storage.Local
   ( StorageKey
@@ -86,3 +94,23 @@ import Hydrogen.Schema.Storage.Session
   , SessionError(SessionExpired, SessionNotFound, SessionCorrupted, SessionStorageUnavailable, CookieBlocked)
   , sessionErrorMessage
   ) as SchemaSession
+
+-- ═════════════════════════════════════════════════════════════════════════════
+--                                             // direct effect-based operations
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- | Get a raw string value from localStorage.
+-- |
+-- | Bypasses the ADT operation system for simple direct access.
+-- | Returns Nothing if key doesn't exist.
+foreign import getItemRaw :: String -> Effect (Maybe String)
+
+-- | Set a raw string value in localStorage.
+-- |
+-- | Bypasses the ADT operation system for simple direct writes.
+foreign import setItemRaw :: String -> String -> Effect Unit
+
+-- | Remove a key from localStorage.
+-- |
+-- | Bypasses the ADT operation system for simple direct removal.
+foreign import removeItemRaw :: String -> Effect Unit

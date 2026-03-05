@@ -77,6 +77,7 @@ module Hydrogen.Render.Element.HTML
   
   -- * Media Elements
   , img_
+  , canvas_
   
   -- * Void Elements
   , hr_
@@ -280,6 +281,10 @@ textarea_ = element "textarea"
 -- | Image element (void element - no children)
 img_ :: forall msg. Array (Attribute msg) -> Element msg
 img_ attrs = element "img" attrs []
+
+-- | Canvas element for 2D/WebGL/WebGPU rendering
+canvas_ :: forall msg. Array (Attribute msg) -> Element msg
+canvas_ attrs = element "canvas" attrs []
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                          // void // elements

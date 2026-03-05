@@ -39,6 +39,7 @@ import Hydrogen.GPU.DrawCommand.Types
       , DrawImage
       , DrawVideo
       , Draw3D
+      , DrawScene3D
       , PushClip
       , PopClip
       , Noop
@@ -92,6 +93,7 @@ withPickId pid cmd = case cmd of
   DrawImage p -> DrawImage (p { pickId = Just pid })
   DrawVideo p -> DrawVideo (p { pickId = Just pid })
   Draw3D p -> Draw3D (p { pickId = Just pid })
+  DrawScene3D p -> DrawScene3D (p { pickId = Just pid })
   -- v2 typography commands
   DrawGlyphPath p -> DrawGlyphPath (p { pickId = Just pid })
   DrawGlyphInstance p -> DrawGlyphInstance (p { pickId = Just pid })

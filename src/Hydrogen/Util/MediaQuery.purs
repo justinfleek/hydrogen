@@ -31,6 +31,7 @@
 
 module Hydrogen.Util.MediaQuery
   ( module SchemaMediaQuery
+  , module SchemaDevice
   ) where
 
 import Hydrogen.Schema.Dimension.MediaQuery
@@ -66,13 +67,13 @@ import Hydrogen.Schema.Dimension.MediaQuery
   , isHighResolution
   , isPrint
   , matches
-  , ScreenOrientation(PortraitOrientation, LandscapeOrientation)
-  , ColorScheme(Light, Dark)
-  , PointerType(NoPointer, Coarse, Fine)
-  , HoverCapability(NoHover, CanHover)
+  , ScreenOrientation(Portrait, Landscape)
+  , ColorScheme(Light, Dark, NoPreference)
+  , PointerType(PointerNone, PointerCoarse, PointerFine)
+  , HoverCapability(HoverNone, HoverOnDemand, Hover)
   , DisplayMode(Fullscreen, Standalone, MinimalUI, Browser)
   , MediaType(Screen, Print, All)
   , MediaEnvironment
-  , Pixel(Pixel)
-  , PixelsPerInch(PixelsPerInch)
   ) as SchemaMediaQuery
+
+import Hydrogen.Schema.Dimension.Device (Pixel(Pixel), PixelsPerInch(PixelsPerInch)) as SchemaDevice

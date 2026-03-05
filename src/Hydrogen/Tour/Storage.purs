@@ -54,7 +54,7 @@ import Data.Number as Number
 import Effect (Effect)
 import Effect.Now (now)
 import Hydrogen.Tour.Types (Milliseconds(Milliseconds), TourId(TourId))
-import Hydrogen.Util.LocalStorage as LS
+import Hydrogen.Util.LocalStorage (getItemRaw, setItemRaw, removeItemRaw) as LS
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                               // storage keys
@@ -158,7 +158,7 @@ snooze tourId (Milliseconds duration) = do
 
 -- | Clear an active snooze
 clearSnooze :: TourId -> Effect Unit
-clearSnooze tourId = LS.removeItem (snoozeKey tourId)
+clearSnooze tourId = LS.removeItemRaw (snoozeKey tourId)
 
 -- | Clear all state for a tour
 -- |
@@ -166,9 +166,9 @@ clearSnooze tourId = LS.removeItem (snoozeKey tourId)
 -- | Useful for testing or resetting tours.
 clearTourState :: TourId -> Effect Unit
 clearTourState tourId = do
-  LS.removeItem (completedKey tourId)
-  LS.removeItem (dismissedKey tourId)
-  LS.removeItem (snoozeKey tourId)
+  LS.removeItemRaw (completedKey tourId)
+  LS.removeItemRaw (dismissedKey tourId)
+  LS.removeItemRaw (snoozeKey tourId)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 --                                                                    // helpers
